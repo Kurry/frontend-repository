@@ -1,0 +1,168 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "9.1"
+name = "cold_start_under_two_seconds"
+description = "On a local cold load the workspace becomes interactive within 2 seconds, with both the seeded Christmas flowchart source and its rendered diagram visible."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.2"
+name = "console_clean_during_full_exercise"
+description = "No console errors or warnings appear during a full exercise of editing source, switching Code/Config, invalid syntax and recovery, sample switching, theme toggle, SVG/PNG/MMD/Session JSON export, Session JSON or mmd import, copy, and reload restoration; the console also stays free of hydration mismatch errors or warnings on first load and after in-app view changes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.3"
+name = "preview_rerender_feels_immediate"
+description = "After a valid source edit settles, the preview re-render response feels immediate (under about 100ms of UI lag) rather than blocking the editor."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.4"
+name = "shell_visible_while_settling"
+description = "While the app settles after first paint, the header, editor, and preview regions remain visible rather than a blank white screen with no controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.5"
+name = "sample_switches_without_lag"
+description = "Clicking through several sample diagrams (Flowchart, Sequence, Mindmap) in succession re-renders without perceived multi-second lag."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.6"
+name = "typing_stays_responsive_during_rerender"
+description = "Typing in the editor stays responsive during preview re-renders: rapid keystrokes are never dropped and the editor never visibly freezes while the diagram redraws."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.7"
+name = "preview_redraw_holds_stable_frame_rate"
+description = "Driven through real source edits or sample clicks, preview re-renders maintain a smooth frame rate without visible hitching during continuous typing."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.8"
+name = "rapid_input_never_hangs"
+description = "Rapid consecutive edits and sample switches keep the UI responsive with no hangs and leave editor and preview in agreement with the final source."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.9"
+name = "extended_editor_session_stable"
+description = "After an extended session of many edits, sample switches, theme toggles, and config changes, the tab remains responsive without runaway memory growth that freezes the UI."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.10"
+name = "no_flash_between_paint_and_interactive"
+description = "The content visible at first paint does not flash or get replaced by different content once the app becomes interactive: the header, seeded source, and layout hold steady between first render and full interactivity."
+type = "binary"
+weight = 1.0
+

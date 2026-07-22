@@ -55,7 +55,7 @@ export const SetupScreen = component$(() => {
               store.playerName = val;
               const trimmed = val.trim();
               if (trimmed.length < 2 || trimmed.length > 20) {
-                nameError.value = 'Player name must be 2 to 20 non-space characters';
+                nameError.value = 'playerName field must be 2 to 20 non-space characters';
               } else {
                 nameError.value = '';
               }
@@ -64,7 +64,7 @@ export const SetupScreen = component$(() => {
               const val = (e.target as HTMLInputElement).value;
               const trimmed = val.trim();
               if (trimmed.length < 2 || trimmed.length > 20) {
-                nameError.value = 'Player name must be 2 to 20 non-space characters';
+                nameError.value = 'playerName field must be 2 to 20 non-space characters';
               }
             }}
           />
@@ -114,7 +114,7 @@ export const SetupScreen = component$(() => {
             let valid = true;
             const playerName = store.playerName.trim();
             if (playerName.length < 2 || playerName.length > 20) {
-              nameError.value = 'Player name must be 2 to 20 non-space characters';
+              nameError.value = 'playerName field must be 2 to 20 non-space characters';
               valid = false;
             }
             if (!store.difficulty) {

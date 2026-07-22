@@ -1,0 +1,217 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "empty_canvas_placeholder_before_upload"
+description = "Before any image is loaded, the canvas region shows a placeholder reading Upload an image to get started and export actions do not produce a broken or empty file state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "empty_preset_name_inline_validation"
+description = "Attempting to save a preset with an empty name shows an inline validation message naming the name field before submit, keeps Save preset disabled or rejected, and adds no entry to the Saved presets list."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "unsupported_file_type_message"
+description = "Choosing or dropping an unsupported non-image file shows the visible message Unsupported file type. Choose a PNG or JPG image and preserves the last valid canvas state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "copy_image_shows_copied_confirmation"
+description = "After a successful Copy image action, the button briefly shows Copied! confirmation for about two seconds then reverts, without altering the on-screen composition."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "invalid_hex_keeps_last_valid_color"
+description = "Entering an invalid caption or watermark hex value shows Invalid color. Enter six hexadecimal digits after # and the canvas keeps rendering the last valid color."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "preset_delete_confirm_cancel_path"
+description = "Clicking Del on a Saved preset opens a confirm dialog; dismissing or canceling it leaves the preset in the list and the Saved presets count unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "duplicate_preset_name_rejected"
+description = "Saving a preset with a name that already exists shows Preset \"name\" already exists (with that name) and leaves the Saved presets list count unchanged rather than creating a duplicate."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "form_controls_use_semantic_labels"
+description = "Preset name, Caption, Watermark, and Collaboration inputs use semantic form controls with visible labels (or accessible name equivalents)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "delete_dialog_dismissible"
+description = "The preset delete confirm dialog can be dismissed via Escape or an explicit cancel/close path without deleting the preset."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "double_activate_save_creates_one_preset"
+description = "Double-activating the preset save control with a valid new name creates exactly one preset: the Saved presets count increases by one and one new entry appears."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "malformed_style_json_rejected"
+description = "Importing malformed (unparseable) style JSON shows Invalid style JSON and leaves the current canvas settings unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "empty_undo_redo_disabled"
+description = "Undo with an empty history and Redo with an empty redo stack are disabled controls; activating them does nothing and produces no console errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "empty_snapshot_name_rejected"
+description = "Saving a snapshot with an empty, whitespace-only, or over-length (over 40 characters) name adds no Snapshots entry and shows an inline message naming the name field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "paste_all_unchecked_noops"
+description = "Pasting settings with every group unchecked applies nothing and leaves the canvas unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "custom_background_hex_named_field_error"
+description = "Entering an invalid custom background hex (not exactly # followed by six hexadecimal digits) shows Invalid color. Enter six hexadecimal digits after # next to the custom background hex field and preserves the last valid canvas background."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "schema_invalid_style_json_rejected"
+description = "Importing parseable JSON that fails the RenderSettings field contract (missing required key, out-of-enum frame or canvasSize, out-of-bounds padding, invalid hex, or backgroundPreset/customBackground both non-null) leaves the canvas unchanged and shows validation naming the offending field or Invalid style JSON."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "overlong_preset_name_rejected"
+description = "Saving a preset with a name over 40 characters shows an inline message naming the name field and leaves the Saved presets count unchanged."
+type = "binary"
+weight = 1.0
+

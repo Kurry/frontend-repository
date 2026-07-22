@@ -1,0 +1,182 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "14.1"
+name = "multi_facet_reload_round_trip"
+description = "Multi-facet reload round-trip: edit displayName, enter a valid roomId, send one chat line while connecting/waiting, queue one file and start then pause its transfer, and toggle theme, then reload. Every facet (name, client ID, roomId, seeded plus sent transcript, file queue with the row Paused at its saved progress, transfer log, theme) is restored from local storage — never a mix of restored and reset facets — and the connection badge resumes at idle or disconnected."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.2"
+name = "session_pack_preview_tracks_mutations"
+description = "Derived Session Pack proof: note the Export Session preview, then change displayName and send a distinctive chat line; reopening Export shows those new values in peer.displayName and messages, proving the preview is derived from live store state rather than a static snapshot."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.3"
+name = "badge_and_composer_track_session_state"
+description = "Derived-view sensitivity: Join Room moves the badge from idle through connecting to waiting and enables the composer; Leave Room returns disconnected and disables the composer with its note — both surfaces track session state rather than staying identical."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.4"
+name = "chat_and_export_cross_echo"
+description = "Cross-view echo: send a distinctive chat line while waiting, then open Export Session without reload; the Session Pack messages array contains that same text."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.5"
+name = "transcript_and_queue_count_deltas"
+description = "Count-delta integrity: measure transcript lines immediately before and after one valid send (delta exactly +1); measure queue rows immediately before and after choosing one file (delta exactly +1)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.6"
+name = "different_room_ids_and_messages_differ"
+description = "Input-dependent output: join with roomId A and send message text A, note the Session Pack; leave and join with roomId B and send text B; Export shows roomId B and text B, not A."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.7"
+name = "interleaved_chat_and_queue_preserve_state"
+description = "Interleaved-flow integrity: while waiting, send a chat line, queue a file, toggle theme, then send a second chat line; both transcript lines and the queue row remain, and Export Session contains all of them with the matching theme."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.8"
+name = "import_rejected_then_valid_round_trip"
+description = "Edge-state round-trip: attempt Import Session with JSON that fails the field contract (state unchanged with a named error), then Import a valid previously downloaded Session Pack; panels and a fresh Export reconstruct the pack."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "transfer_pause_resume_checkpoint_probe"
+description = "Checkpoint probe: Start a transfer, Pause it, and record the exact bytes readout; Resume and let it finish; at no point after Resume is the readout lower than the recorded value, the row completes at exactly 100 percent, and Export Session shows that row Completed with bytesTransferred equal to sizeBytes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "batch_remove_count_delta"
+description = "Batch count delta: queue three files, select exactly two via checkboxes, and click Remove Selected; the queue row count drops by exactly two, the unselected row survives with its name intact, the transfer log gains one removed entry per deleted file, and the Session Pack fileQueue length matches the visible count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "reorder_echoes_to_export"
+description = "Order echo: drag a queue row to a new position, then open Export Session without reload; the fileQueue array serializes rows in the new on-screen order, and reloading preserves the same order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.12"
+name = "transcript_export_input_dependent"
+description = "Input-dependent transcript: send distinctive text A and open Export Transcript (contains A); send distinctive text B and reopen; the regenerated markdown contains both A and B in transcript order — never a stale document missing B"
+type = "binary"
+weight = 1.0
+

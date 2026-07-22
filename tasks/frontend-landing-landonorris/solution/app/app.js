@@ -62,11 +62,17 @@
     if (!/\./.test(at[1]) || at[1].length < 3) return { ok: false, error: 'email domain must contain a dot' };
     return { ok: true, value: email };
   }
+  function isIsoCalendarDate(value) {
+    if (!isPlainStr(value) || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+    const [year, month, day] = value.split('-').map(Number);
+    const parsed = new Date(Date.UTC(year, month - 1, day));
+    return parsed.getUTCFullYear() === year && parsed.getUTCMonth() === month - 1 && parsed.getUTCDate() === day;
+  }
   function validateRaceRecord(r) {
     if (!r || typeof r !== 'object') return 'race must be an object';
     if (!isPlainStr(r.id) || !r.id.trim()) return 'race id required';
     if (!isPlainStr(r.circuit) || !r.circuit.trim() || r.circuit.trim().length > 80) return 'race circuit invalid';
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(r.date)) return 'race date must be YYYY-MM-DD';
+    if (!isIsoCalendarDate(r.date)) return 'race date must be a valid YYYY-MM-DD calendar date';
     if (r.status !== 'Upcoming' && r.status !== 'Completed') return 'race status must be Upcoming or Completed';
     if (typeof r.selected !== 'boolean') return 'race selected must be boolean';
     if (!isPlainStr(r.uid) || !r.uid.trim()) return 'race uid required';
@@ -215,7 +221,7 @@
       r.circuit = value.trim(); afterMutation(); return { ok: true };
     }
     if (field === 'date') {
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return { ok: false, error: 'date must be YYYY-MM-DD' };
+      if (!isIsoCalendarDate(value)) return { ok: false, error: 'date must be a valid YYYY-MM-DD calendar date' };
       r.date = value; afterMutation(); return { ok: true };
     }
     return { ok: false, error: 'unknown field' };
@@ -547,14 +553,16 @@
     if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
     else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
   }
+  function focusAfterOpen(target) {
+    if (target && target.isConnected) target.focus({ preventScroll: true });
+  }
   function openMenu() {
     if (state.menuOpen) return;
     state.menuOpen = true; lastFocus = document.activeElement;
     menu.classList.add('is-open'); menu.setAttribute('aria-hidden', 'false');
     ham.setAttribute('aria-expanded', 'true');
     document.body.classList.add('is-menu-open');
-    const first = $('.nav-menu-close', menu);
-    if (first) first.focus();
+    focusAfterOpen($('.nav-menu-close', menu));
   }
   function closeMenu() {
     if (!state.menuOpen) return;
@@ -579,7 +587,7 @@
     drawer.classList.add('is-open'); drawer.setAttribute('aria-hidden', 'false');
     renderCounts();
     renderPreview();
-    const c = $('[data-presskit-close]'); if (c) c.focus();
+    focusAfterOpen($('[data-presskit-close]'));
   }
   function closePressKit() {
     if (!state.pressKitOpen) return;
@@ -639,7 +647,7 @@
     paletteScrim.hidden = false;
     palette.classList.add('is-open'); palette.setAttribute('aria-hidden', 'false');
     paletteInput.value = ''; paletteActive = 0; renderPalette();
-    paletteInput.focus();
+    focusAfterOpen(paletteInput);
   }
   function closePalette() {
     if (!state.paletteOpen) return;
@@ -785,12 +793,13 @@
         state.paletteOpen ? closePalette() : openPalette();
         return;
       }
-      if ((e.metaKey || e.ctrlKey) && !e.altKey && (e.key === 'z' || e.key === 'Z')) {
+      const editingText = e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target.isContentEditable;
+      if (!editingText && (e.metaKey || e.ctrlKey) && !e.altKey && (e.key === 'z' || e.key === 'Z')) {
         e.preventDefault();
         e.shiftKey ? redo() : undo();
         return;
       }
-      if ((e.metaKey || e.ctrlKey) && !e.altKey && (e.key === 'y' || e.key === 'Y')) {
+      if (!editingText && (e.metaKey || e.ctrlKey) && !e.altKey && (e.key === 'y' || e.key === 'Y')) {
         e.preventDefault(); redo(); return;
       }
       if (e.key === 'Escape') {
@@ -854,6 +863,11 @@
     const track = $('#horizontalTrack');
     if (!section || !track) return;
     // Extra scroll height gives the pinned strip its travel distance (multiples of the viewport).
+    if (prefersReduced()) {
+      section.style.height = 'auto';
+      track.style.transform = 'none';
+      return;
+    }
     section.style.height = '300vh';
     let ticking = false;
     function onScroll() {
@@ -861,7 +875,6 @@
       ticking = true;
       requestAnimationFrame(() => {
         ticking = false;
-        if (prefersReduced()) { track.style.transform = 'translateX(' + (-Math.max(0, track.scrollWidth - window.innerWidth)) + 'px)'; return; }
         const rect = section.getBoundingClientRect();
         const total = section.offsetHeight - window.innerHeight;
         const progress = Math.min(1, Math.max(0, -rect.top / (total || 1)));
@@ -877,10 +890,56 @@
   /* ---------------- WebMCP (delivery contract; same handlers as the visible UI) ---------------- */
   function registerWebMCP() {
     const tools = [];
+    const emptySchema = { type: 'object', additionalProperties: false };
+    const schemas = {
+      'browse.open': {
+        type: 'object', additionalProperties: false, required: ['destination'],
+        properties: { destination: { type: 'string', enum: DESTINATIONS, default: 'hero' } },
+      },
+      'browse.search': {
+        type: 'object', additionalProperties: false, required: ['query'],
+        properties: { query: { type: 'string', minLength: 1, maxLength: 200, default: 'race' } },
+      },
+      'entity.select': {
+        type: 'object', additionalProperties: false, required: ['id'],
+        properties: { id: { type: 'string', enum: SEED_RACES.map(race => race.id), default: 'r1' } },
+      },
+      'entity.toggle': {
+        type: 'object', additionalProperties: false, required: ['id'],
+        properties: {
+          id: { type: 'string', enum: SEED_RACES.map(race => race.id), default: 'r1' },
+          field: { type: 'string', enum: ['selected'], default: 'selected' },
+        },
+      },
+      'entity.update': {
+        type: 'object', additionalProperties: false, required: ['id', 'fields'],
+        properties: {
+          id: { type: 'string', enum: SEED_RACES.map(race => race.id), default: 'r1' },
+          fields: {
+            type: 'object', minProperties: 1, additionalProperties: false,
+            properties: {
+              selected: { type: 'string', enum: ['true', 'false'] },
+              status: { type: 'string', enum: ['Upcoming', 'Completed'] },
+              circuit: { type: 'string', minLength: 1, maxLength: 80 },
+              date: { type: 'string', pattern: '^\\d{4}-\\d{2}-\\d{2}$' },
+            },
+          },
+        },
+      },
+      'artifact.export': {
+        type: 'object', additionalProperties: false, required: ['format'],
+        properties: { format: { type: 'string', enum: ['json', 'markdown', 'ics'], default: 'json' } },
+      },
+      'artifact.import': {
+        type: 'object', additionalProperties: false, required: ['mode'],
+        properties: { mode: { type: 'string', enum: ['paste'], default: 'paste' } },
+      },
+    };
     const T = (name, description, handler) => tools.push({
       name,
       module: ({ browse: 'browse-query-v1', session: 'command-session-v1', entity: 'entity-collection-v1', artifact: 'artifact-transfer-v1' })[name.split('.')[0]],
       description,
+      inputSchema: schemas[name] || emptySchema,
       handler,
     });
 
@@ -919,7 +978,7 @@
       if (fields.selected !== undefined && fields.selected !== 'true' && fields.selected !== 'false') return { ok: false, error: 'selected must be true or false' };
       if (fields.status !== undefined && !['Upcoming', 'Completed'].includes(fields.status)) return { ok: false, error: 'status must be Upcoming or Completed' };
       if (fields.circuit !== undefined && (!isPlainStr(fields.circuit) || !fields.circuit.trim() || fields.circuit.trim().length > 80)) return { ok: false, error: 'circuit invalid' };
-      if (fields.date !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(fields.date)) return { ok: false, error: 'date must be YYYY-MM-DD' };
+      if (fields.date !== undefined && !isIsoCalendarDate(fields.date)) return { ok: false, error: 'date must be a valid YYYY-MM-DD calendar date' };
       for (const field of keys) {
         const result = updateRaceField(a.id, field, fields[field]);
         if (!result.ok) return result;
@@ -945,8 +1004,18 @@
     });
 
     const byName = Object.fromEntries(tools.map(t => [t.name, t]));
-    window.webmcp_session_info = () => ({ contract_version: 'zto-webmcp-v1', app: 'avery-vale-homepage', tools: tools.map(t => t.name) });
-    window.webmcp_list_tools = () => tools.map(t => ({ name: t.name, module: t.module, description: t.description }));
+    window.webmcp_session_info = () => ({
+      contract_version: 'zto-webmcp-v1',
+      app: 'avery-vale-homepage',
+      modules: ['browse-query-v1', 'command-session-v1', 'entity-collection-v1', 'artifact-transfer-v1'],
+      tools: tools.map(t => t.name),
+    });
+    window.webmcp_list_tools = () => tools.map(t => ({
+      name: t.name,
+      module: t.module,
+      description: t.description,
+      inputSchema: t.inputSchema,
+    }));
     const settleVisibleUi = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     window.webmcp_invoke_tool = async (name, args) => {
       const t = byName[name];

@@ -8,7 +8,8 @@
     "build": "vite build",
     "verify:build": "vite build",
     "preview": "vite preview --port 3000 --host --strictPort",
-    "start": "vite preview --port 3000 --host --strictPort"
+    "start": "vite preview --port 3000 --host --strictPort",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.10",
@@ -22,6 +23,7 @@
     "sveltekit-superforms": "^2.30.2",
     "tailwindcss": "^4.3.2",
     "vite": "^8.1.5",
-    "zod": "^4.4.3"
+    "zod": "^4.4.3",
+    "@playwright/test": "1.61.0"
   }
 }
