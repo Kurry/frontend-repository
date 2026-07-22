@@ -352,6 +352,12 @@ export const useReviewStore = create<StoreState>((set, get) => ({
           gate.status = gate.validTrials >= 3 && (gate.score ?? 0) >= 0.8 ? 'pass' : gate.validTrials < 3 ? 'inconclusive' : 'fail';
           gate.summary = `Quartz-Mini now measures ${gate.score.toFixed(2)} with ${gate.validTrials} of ${gate.totalTrials} valid trials after re-collection.`;
           gate.reasons = ['At least three trials are valid.', 'The aggregate difficulty score is at or above 0.80.'];
+          bundle.fixItems
+            .filter((item) => item.evidence.gateName === gateName && item.category === 'RERUN' && !item.resolved)
+            .forEach((item) => {
+              item.resolved = true;
+              bundle.timeline.unshift(event('fix-item', `Resolved ${item.category} item after successful re-run: ${item.title}`));
+            });
         }
       } else if (gateName === 'Oracle') {
         gate.score = 0.92;
