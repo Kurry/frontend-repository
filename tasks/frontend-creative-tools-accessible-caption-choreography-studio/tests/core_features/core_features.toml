@@ -1,0 +1,156 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "cf.1"
+name = "token_to_cue_choreography"
+description = "Users can drag transcript tokens into ordered cue blocks. Users can split or merge cues, and edit wording, retaining source-token provenance. Cue edges can be dragged to resize with 10-millisecond precision. Keyboard controls (nudge/resize) are supported alongside pointer edits. Cues are constrained to 500-7000ms duration."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.2"
+name = "overlap_and_lane_semantics"
+description = "Simultaneous speech uses exactly two visible speaker lanes. Sound-description cues occupy a distinct third lane. Ordinary cues cannot overlap in the same lane. Moving a cue previews collisions, reading speed, and shot-crossing before commit."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.3"
+name = "speaker_and_accessibility_styling"
+description = "Speaker identity, off-screen status, italics, and sound-description type are semantic properties. Missing speaker/sound labels or position collisions block approval."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.4"
+name = "wording_branches_and_provenance"
+description = "Cues can fork into wording variants (branches). Each branch retains token source ids, edits, timing, rationale, and reviewer decisions. A compare view highlights differences in text, timing, and style. Merging resolves conflicts explicitly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.5"
+name = "synchronized_preview_and_navigation"
+description = "The playhead synchronizes the video frame, waveform, current cue, transcript token, shot, reading-speed cursor, and mini-map. Clicking any linked entity seeks the logical clock. Supports loop cue, previous/next finding, 0.5x/1x/1.5x playback, and keyboard transport."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.6"
+name = "deterministic_validation_workflow"
+description = "Validation checks intervals, line-break/render, reading speed, shot boundaries, semantics, and export parity. Findings point to exact cues and rules, categorized as errors or warnings. The first render batch deterministically fails one cue font check and one export timestamp."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.7"
+name = "review_and_master_approval"
+description = "Reviewers accept/reject cue variants and acknowledge warnings. Master approval is blocked until all errors resolve and validation checksum is current. Approval freezes cue order, text, timing, style, and export checksums."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.8"
+name = "export_and_import"
+description = "Export produces Canonical JSON, WebVTT, SRT, and an SVG cue map matching project state. Importing canonical JSON or supported VTT reconstructs the state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

@@ -1,0 +1,25 @@
+{
+  "name": "accessible-caption-choreography-studio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 3000 --host 0.0.0.0",
+    "build": "vite build",
+    "start": "serve -s dist -l 3000",
+    "verify:build": "vite build"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "serve": "^14.2.0",
+    "tailwindcss": "^4.0.0",
+    "@tailwindcss/vite": "^4.0.0",
+    "lucide-react": "^0.300.0",
+    "react-hooks-global-state": "^2.1.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.0"
+  }
+}

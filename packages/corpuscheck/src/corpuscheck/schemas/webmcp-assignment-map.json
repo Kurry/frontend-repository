@@ -7892,5 +7892,79 @@
       "Multi-select marquee geometry and Shift-click chord timing stay Playwright when mechanism matters",
       "Timeline status filter chips and Saved Workflows / Artifact panel open toggles stay Playwright-driven; no browse-query module is assigned"
     ]
+  },
+  {
+    "task": "frontend-creative-tools-accessible-caption-choreography-studio",
+    "modules": [
+      "entity-collection-v1",
+      "structured-editor-v1",
+      "command-session-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "entity": "cue",
+      "entity_operations": [
+        "select",
+        "add",
+        "delete",
+        "update",
+        "split",
+        "merge",
+        "branch",
+        "resolve"
+      ],
+      "entity_fields": [
+        "interval",
+        "text",
+        "speaker",
+        "lane",
+        "styling",
+        "findings"
+      ],
+      "editor_object_types": [
+        "timeline",
+        "waveform",
+        "transcript",
+        "branch-graph"
+      ],
+      "editor_operations": [
+        "select",
+        "add",
+        "delete",
+        "update_property"
+      ],
+      "visible_postconditions": [
+        "stale-validation",
+        "approved-master",
+        "collision-warning",
+        "speed-warning"
+      ],
+      "commands": [
+        "validate",
+        "approve",
+        "retry",
+        "play",
+        "seek"
+      ],
+      "session_state": [
+        "clock",
+        "validation-freshness",
+        "approval-status"
+      ],
+      "artifact_formats": [
+        "caption-choreography-project-json",
+        "webvtt",
+        "srt",
+        "svg-cue-map"
+      ],
+      "transfer_directions": [
+        "import",
+        "export"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Drag geometry, continuous timeline zoom, responsive UI transformations, and keyboard selection boundaries remain Playwright responsibilities.",
+      "File downloads, clipboard access, and exact visual rendering of VTT outputs must be checked via Playwright."
+    ]
   }
 ]

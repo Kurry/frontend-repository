@@ -513,5 +513,9 @@
     "source": "feature-workflow-builder-workflow-builder PRD",
     "instruction": "tasks/frontend-workflow-workflow-builder/instruction.md",
     "description": "Node-graph workflow builder with durable executions and timelines."
+  },
+  "frontend-creative-tools-accessible-caption-choreography-studio": {
+    "source_url": "https://github.com/Kurry/frontend-repository/issues/123",
+    "description": "Accessible Caption Choreography Studio"
   }
 }
