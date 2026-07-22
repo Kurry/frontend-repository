@@ -151,7 +151,7 @@ kbd {
 .ops-metric span { display: block; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
 .ops-metric strong { display: block; font-family: var(--font-mono); font-size: 21px; font-weight: 600; margin: 3px 0 1px; }
 .ops-metric small { color: var(--text-3); font-size: 11px; }
-.ops-metric.metric-alert { border-color: var(--red); border-left-color: var(--red); background: rgba(255, 131, 137, 0.08); }
+.ops-metric.metric-alert { border: 2px solid var(--red); background: rgba(255, 131, 137, 0.08); }
 .ops-metric.metric-alert strong { color: var(--red); }
 .ops-metric.metric-alert span { color: var(--red); }
 
@@ -253,6 +253,7 @@ kbd {
 .catalog-table-container { max-height: 560px; overflow: auto; border-radius: 10px; }
 .catalog-table { min-width: 740px; }
 .catalog-table thead th {
+  position: sticky; top: 0; z-index: 10;
   background: var(--ink-2) !important; color: var(--text-3) !important;
   font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase;
   border-bottom: 1px solid var(--line-strong);

@@ -136,24 +136,6 @@ function useOpenerFocus(open, delay = 320) {
   }, [open, delay])
 }
 
-/* Visible label + hint/error wired to the field with aria-describedby. */
-function Field({ id, label, hint, error, children }) {
-  const describedBy = error ? `${id}-error` : hint ? `${id}-hint` : undefined
-  return (
-    <div className={`field ${error ? 'has-error' : ''}`}>
-      <label className="field-label" htmlFor={id}>{label}</label>
-      {children}
-      {error
-        ? <p className="field-error" id={`${id}-error`}>{error}</p>
-        : hint ? <p className="field-hint" id={`${id}-hint`}>{hint}</p> : null}
-    </div>
-  )
-}
-
-const a11yProps = (id, error, hint) => ({
-  'aria-invalid': error ? true : undefined,
-  'aria-describedby': error ? `${id}-error` : hint ? `${id}-hint` : undefined,
-})
 
 function StatusBadge({ tier }) {
   return (
@@ -192,20 +174,19 @@ function BudgetForm({ total }) {
     <section className="budget-block" aria-labelledby="budget-heading">
       <div className="section-eyebrow" id="budget-heading"><Wallet size={13} /> Session budget</div>
       <form className="budget-form" onSubmit={handleSubmit((data) => saveBudget(Number(data.session_budget_usd)))} noValidate>
-        <Field id="session-budget" label="Budget ceiling (USD)" hint="Greater than $0.00, max $100,000.00, up to 2 decimals" error={showError ? errors.session_budget_usd.message : undefined}>
-          <div className="budget-input-row">
-            <TextInput
-              id="session-budget"
-              labelText="Budget ceiling (USD)"
-              hideLabel
-              size="sm"
-              inputMode="decimal"
-              {...a11yProps('session-budget', showError, true)}
-              {...register('session_budget_usd')}
-            />
-            <Button type="submit" size="sm" kind="secondary" disabled={!isValid || !isDirty}>Apply</Button>
-          </div>
-        </Field>
+        <div className="budget-input-row">
+          <TextInput
+            id="session-budget"
+            labelText="Budget ceiling (USD)"
+            size="sm"
+            inputMode="decimal"
+            invalid={showError}
+            invalidText={errors.session_budget_usd?.message}
+            helperText="Greater than $0.00, max $100,000.00, up to 2 decimals"
+            {...register('session_budget_usd')}
+          />
+          <Button type="submit" size="sm" kind="secondary" disabled={!isValid || !isDirty}>Apply</Button>
+        </div>
       </form>
       <div className={`remaining-budget ${over ? 'over' : ''}`} role="status">
         <div className="remaining-copy">
@@ -273,8 +254,7 @@ function CostSidebar({ rollups, total, id = 'cost-sidebar' }) {
                 outerRadius={76}
                 paddingAngle={2}
                 stroke="transparent"
-                isAnimationActive
-                animationDuration={520}
+                isAnimationActive={false}
               >
                 {visibleData.map((entry) => (
                   <Cell key={entry.model} fill={chartColors[rollups.findIndex((item) => item.model === entry.model) % chartColors.length]} />
@@ -398,16 +378,15 @@ function AlertModal() {
         <Controller name="alerts_enabled" control={control} render={({ field }) => (
           <Toggle id="alert-toggle" labelText="Free-model alerts" labelA="Off" labelB="On" toggled={Boolean(field.value)} onToggle={(checked) => field.onChange(checked)} />
         )} />
-        <Field id="min-context-window" label="Minimum context window" hint="Whole tokens, 0 or greater" error={contextError}>
-          <TextInput
-            id="min-context-window"
-            labelText="Minimum context window"
-            hideLabel
-            inputMode="numeric"
-            {...a11yProps('min-context-window', Boolean(contextError), true)}
-            {...register('min_context_window', { setValueAs: (value) => (value === '' ? undefined : Number(value)) })}
-          />
-        </Field>
+        <TextInput
+          id="min-context-window"
+          labelText="Minimum context window"
+          inputMode="numeric"
+          invalid={Boolean(contextError)}
+          invalidText={contextError}
+          helperText="Whole tokens, 0 or greater"
+          {...register('min_context_window', { setValueAs: (value) => (value === '' ? undefined : Number(value)) })}
+        />
       </div>
     </Modal>
   )
@@ -463,22 +442,49 @@ function LogUsageModal() {
     >
       <p className="modal-intro">Record one inference event. Cost is computed from the selected model&apos;s current catalog rates and cannot be overridden.</p>
       <div className="form-stack">
-        <Field id="usage-model" label="Model" hint="Must exactly match a catalog model name" error={message('model')}>
-          <Select id="usage-model" labelText="Model" hideLabel {...a11yProps('usage-model', show('model'), true)} {...register('model')}>
-            <SelectItem value="" text="Select a model" />
-            {activeModels.map((item) => <SelectItem key={item.name} value={item.name} text={`${item.name} · ${item.provider}`} />)}
-          </Select>
-        </Field>
-        <Field id="request-label" label="Request label" hint="1–80 characters" error={message('request_label')}>
-          <TextInput id="request-label" labelText="Request label" hideLabel placeholder="e.g. Customer support summary" {...a11yProps('request-label', show('request_label'), true)} {...register('request_label')} />
-        </Field>
+        <Select
+          id="usage-model"
+          labelText="Model"
+          invalid={show('model')}
+          invalidText={message('model')}
+          helperText="Must exactly match a catalog model name"
+          {...register('model')}
+        >
+          <SelectItem value="" text="Select a model" />
+          {activeModels.map((item) => <SelectItem key={item.name} value={item.name} text={`${item.name} · ${item.provider}`} />)}
+        </Select>
+        <TextInput
+          id="request-label"
+          labelText="Request label"
+          placeholder="e.g. Customer support summary"
+          invalid={show('request_label')}
+          invalidText={message('request_label')}
+          helperText="1–80 characters"
+          {...register('request_label')}
+        />
         <div className="two-column-fields">
-          <Field id="prompt-tokens" label="Prompt tokens" hint="Integer ≥ 0" error={message('prompt_tokens')}>
-            <TextInput id="prompt-tokens" type="number" labelText="Prompt tokens" hideLabel min="0" step="1" {...a11yProps('prompt-tokens', show('prompt_tokens'), true)} {...register('prompt_tokens', { setValueAs: (value) => (value === '' ? undefined : Number(value)) })} />
-          </Field>
-          <Field id="completion-tokens" label="Completion tokens" hint="Integer ≥ 0" error={message('completion_tokens')}>
-            <TextInput id="completion-tokens" type="number" labelText="Completion tokens" hideLabel min="0" step="1" {...a11yProps('completion-tokens', show('completion_tokens'), true)} {...register('completion_tokens', { setValueAs: (value) => (value === '' ? undefined : Number(value)) })} />
-          </Field>
+          <TextInput
+            id="prompt-tokens"
+            type="number"
+            labelText="Prompt tokens"
+            min="0"
+            step="1"
+            invalid={show('prompt_tokens')}
+            invalidText={message('prompt_tokens')}
+            helperText="Integer ≥ 0"
+            {...register('prompt_tokens', { setValueAs: (value) => (value === '' ? undefined : Number(value)) })}
+          />
+          <TextInput
+            id="completion-tokens"
+            type="number"
+            labelText="Completion tokens"
+            min="0"
+            step="1"
+            invalid={show('completion_tokens')}
+            invalidText={message('completion_tokens')}
+            helperText="Integer ≥ 0"
+            {...register('completion_tokens', { setValueAs: (value) => (value === '' ? undefined : Number(value)) })}
+          />
         </div>
         <div className="cost-preview" aria-live="off">
           <span>Computed cost</span>
@@ -566,18 +572,17 @@ function ImportForm({ onImported }) {
   const importError = errors.import_json?.message
   return (
     <form className="import-form" onSubmit={handleSubmit(submit)} noValidate>
-      <Field id="import-json" label="Import Session JSON" hint="Paste a routing-session-report-v1 document to replace this session" error={importError}>
-        <TextArea
-          id="import-json"
-          labelText="Import Session JSON"
-          hideLabel
-          placeholder="Paste a routing-session-report-v1 document…"
-          rows={4}
-          {...a11yProps('import-json', Boolean(importError), true)}
-          {...importField}
-          ref={(element) => { importField.ref(element); textRef.current = element }}
-        />
-      </Field>
+      <TextArea
+        id="import-json"
+        labelText="Import Session JSON"
+        placeholder="Paste a routing-session-report-v1 document…"
+        rows={4}
+        invalid={Boolean(importError)}
+        invalidText={importError}
+        helperText="Paste a routing-session-report-v1 document to replace this session"
+        {...importField}
+        ref={(element) => { importField.ref(element); textRef.current = element }}
+      />
       <Button type="submit" size="sm" kind="tertiary" renderIcon={Upload}>Import and replace</Button>
     </form>
   )
@@ -931,7 +936,7 @@ function Catalog({ models, visibleModels, providers }) {
       <InsightStrip visibleModels={visibleModels} refreshIndex={refreshIndex} />
       <div className={`table-region ${refreshLoading ? 'is-loading' : ''}`}>
         {refreshLoading && <div className="table-loading"><InlineLoading description="Discovering marketplace changes…" /></div>}
-        {visibleModels.length ? (
+        {visibleModels.length > 0 ? (
           <TableContainer className="catalog-table-container" stickyHeader>
             <Table size="md" useZebraStyles={false} className="catalog-table" aria-label="Model catalog">
               <TableHead>
@@ -1160,6 +1165,11 @@ function App() {
                   <span>Free routes</span>
                   <strong>{models.filter((item) => item.pricing_tier === 'free' && item.lifecycle !== 'departing' && item.lifecycle !== 'collapsing').length}</strong>
                   <small>available now</small>
+                </div>
+                <div className="ops-metric">
+                  <span>Provider Health</span>
+                  <strong>99.9%</strong>
+                  <small>simulated uptime</small>
                 </div>
                 <div className="ops-metric">
                   <span>Session total</span>

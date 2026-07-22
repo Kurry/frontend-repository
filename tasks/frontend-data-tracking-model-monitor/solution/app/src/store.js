@@ -107,10 +107,10 @@ export function burnProjection(events, budget) {
   }
 }
 
-const snapshot = (state) => clone({
+const snapshot = (state) => ({
   models: state.models.map(({ name, pinned }) => ({ name, pinned })),
-  usageEvents: state.usageEvents,
-  alertConfig: state.alertConfig,
+  usageEvents: structuredClone(state.usageEvents),
+  alertConfig: structuredClone(state.alertConfig),
   sessionBudget: state.sessionBudget,
 })
 
@@ -121,8 +121,8 @@ const applySnapshot = (state, snap) => {
   const pinnedByName = new Map(snap.models.map((entry) => [entry.name, entry.pinned]))
   return {
     models: state.models.map((model) => (pinnedByName.has(model.name) ? { ...model, pinned: pinnedByName.get(model.name) } : model)),
-    usageEvents: clone(snap.usageEvents),
-    alertConfig: clone(snap.alertConfig),
+    usageEvents: structuredClone(snap.usageEvents),
+    alertConfig: structuredClone(snap.alertConfig),
     sessionBudget: snap.sessionBudget,
   }
 }

@@ -30,8 +30,9 @@ export const alertSchema = z.object({
 
 export const budgetSchema = z.object({
   session_budget_usd: z.string().min(1, namedMessage('Session budget', 'is required'))
-    .regex(/^\d+(?:\.\d{1,2})?$/, namedMessage('Session budget', 'must be a number with at most 2 decimal places'))
-    .refine((value) => Number(value) > 0, namedMessage('Session budget', 'must be greater than 0'))
+    .regex(/^-?\d+(?:\.\d{1,2})?$/, namedMessage('Session budget', 'must be a number with at most 2 decimal places'))
+    .refine((value) => !isNaN(Number(value)), namedMessage('Session budget', 'must be a number'))
+    .refine((value) => Number(value) > 0, namedMessage('Session budget', 'must be strictly greater than 0'))
     .refine((value) => Number(value) <= 100000, namedMessage('Session budget', 'must be at most $100,000')),
 })
 
