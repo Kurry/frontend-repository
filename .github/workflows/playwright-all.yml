@@ -18,7 +18,7 @@ jobs:
       count: ${{ steps.matrix.outputs.count }}
     steps:
       - id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Discover solution apps
         id: matrix
@@ -56,11 +56,11 @@ jobs:
         working-directory: tasks/${{ matrix.slug }}/solution/app
     steps:
       - id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node.js
         id: node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "22"
           cache: npm
@@ -74,7 +74,7 @@ jobs:
       - name: Cache Playwright Chromium
         if: ${{ steps.dependencies.outcome == 'success' }}
         continue-on-error: true
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles(format('tasks/{0}/solution/app/package-lock.json', matrix.slug)) }}
@@ -210,7 +210,7 @@ jobs:
 
       - name: Upload app result
         if: ${{ always() && steps.checkout.outcome == 'success' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-result-${{ matrix.slug }}
           path: ${{ runner.temp }}/playwright-results/
@@ -223,12 +223,12 @@ jobs:
     needs: [discover, playwright]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Download app results
         id: download
         continue-on-error: true
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           pattern: playwright-result-*
           path: ${{ runner.temp }}/all-playwright-results
@@ -303,7 +303,7 @@ jobs:
 
       - name: Upload aggregate report
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-all-results
           path: ${{ runner.temp }}/playwright-all-report/
