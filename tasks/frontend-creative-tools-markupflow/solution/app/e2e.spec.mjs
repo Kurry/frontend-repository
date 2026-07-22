@@ -274,17 +274,22 @@ test.describe('Markupflow Canonical E2E', () => {
   });
 
   test('1.32: edit_preview_mode_switch', async ({ page }) => {
-    await expect(page.getByRole('button', { name: 'Try sample image' })).toBeVisible();
-    await page.getByRole('button', { name: 'Try sample image' }).click();
-    await page.waitForTimeout(500);
-    await page.getByRole('button', { name: 'Draw rectangle' }).click();
-    const canvas = page.locator('canvas[role="application"]');
-    await canvas.hover({ position: { x: 100, y: 100 } });
-    await page.mouse.down();
-    await canvas.hover({ position: { x: 200, y: 200 } });
-    await page.mouse.up();
-    let layers = page.locator('[role="listitem"][aria-label^="Layer"]');
-    await expect(layers).toHaveCount(1);
+    const descriptor = await page.evaluate(() =>
+      window.webmcp_list_tools().find((tool) => tool.name === 'editor_switch_mode'));
+    expect(descriptor.inputSchema).toMatchObject({
+      required: ['mode'],
+      properties: { mode: { enum: ['preview', 'edit'] } },
+    });
+
+    const preview = await page.evaluate(() =>
+      window.webmcp_invoke_tool('editor_switch_mode', { mode: 'preview' }));
+    expect(preview).toMatchObject({ ok: true, mode: 'preview' });
+    await expect(page.locator('nav.tool-panel')).toHaveClass(/preview-hidden/);
+
+    const edit = await page.evaluate(() =>
+      window.webmcp_invoke_tool('editor_switch_mode', { mode: 'edit' }));
+    expect(edit).toMatchObject({ ok: true, mode: 'edit' });
+    await expect(page.locator('nav.tool-panel')).not.toHaveClass(/preview-hidden/);
   });
 
   test('1.33: save_form_validates_project_name', async ({ page }) => {
