@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --color-canvas-base: #f9f9f9;
+  --color-surface-panel: #ffffff;
+  --color-border-subtle: #e5e5e5;
+  --color-text-primary: #111111;
+  --color-text-secondary: #666666;
+  --color-accent-blue: #0066cc;
+  --color-status-draft: #888888;
+  --color-status-ready: #228b22;
+  --color-status-changed: #e59400;
+  --color-status-archived: #cc0000;
+}
