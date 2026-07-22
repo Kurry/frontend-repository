@@ -37,29 +37,19 @@ const duplicateId = computed(() => {
   return store.activeRubric.criteria.some((item) => item.id === normalized && (props.mode === 'add' || item.id !== props.criterion?.id))
 })
 const canSubmit = computed(() => meta.value.valid && meta.value.dirty && !duplicateId.value)
-let opener = null
-
 function onEscape(event) {
   if (event.key !== 'Escape' || !props.open) return
   // If a PrimeVue overlay (select dropdown) is open, let it handle Escape first.
   const overlayOpen = Array.from(document.querySelectorAll('.p-select-overlay, .p-autocomplete-overlay'))
     .some((overlay) => overlay.getClientRects().length > 0 && getComputedStyle(overlay).visibility !== 'hidden')
   if (overlayOpen) return
-  event.preventDefault()
-  event.stopImmediatePropagation()
   emit('close')
 }
 watch(() => props.open, async (open, wasOpen) => {
   if (open) {
-    opener = document.activeElement
     document.addEventListener('keydown', onEscape, true)
   } else {
     document.removeEventListener('keydown', onEscape, true)
-    if (wasOpen) {
-      await nextTick()
-      if (opener?.isConnected) opener.focus()
-      opener = null
-    }
     return
   }
   resetForm({ values: props.criterion ? { ...props.criterion } : blank() })

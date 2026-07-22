@@ -1,4 +1,4 @@
-import { onBeforeUnmount, watch } from 'vue'
+import { onBeforeUnmount, watch, nextTick } from 'vue'
 
 const FOCUSABLE = [
   'a[href]', 'button:not(:disabled)', 'textarea:not(:disabled)',
@@ -11,6 +11,8 @@ const FOCUSABLE = [
 // hide and closes on Escape (unless a component opts out for overlay-aware
 // Escape handling), so this composable only supplies the Tab trap.
 export function useFocusTrap(isOpen) {
+  let opener = null
+
   function onKeyDown(event) {
     if (event.key !== 'Tab') return
     const visible = Array.from(document.querySelectorAll('.p-dialog'))
@@ -37,9 +39,24 @@ export function useFocusTrap(isOpen) {
       first.focus()
     }
   }
-  watch(isOpen, (open) => {
-    if (open) document.addEventListener('keydown', onKeyDown, true)
-    else document.removeEventListener('keydown', onKeyDown, true)
+
+  watch(isOpen, async (open, wasOpen) => {
+    if (open) {
+      if (!opener) opener = document.activeElement
+      document.addEventListener('keydown', onKeyDown, true)
+    } else {
+      document.removeEventListener('keydown', onKeyDown, true)
+      if (wasOpen) {
+        await nextTick()
+        if (opener && opener.isConnected) {
+          opener.focus()
+        }
+        opener = null
+      }
+    }
   }, { immediate: true })
-  onBeforeUnmount(() => document.removeEventListener('keydown', onKeyDown, true))
+
+  onBeforeUnmount(() => {
+    document.removeEventListener('keydown', onKeyDown, true)
+  })
 }
