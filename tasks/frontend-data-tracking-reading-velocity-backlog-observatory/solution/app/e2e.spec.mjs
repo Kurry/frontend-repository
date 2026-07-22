@@ -134,4 +134,10 @@ test.describe('Reading Velocity Backlog Observatory', () => {
     await expect(page.locator('h1')).toContainText('<Reading Velocity Backlog Observatory>');
     expect(pageErrors.length).toBe(0);
   });
+
+  test('CFT-02: advance the workflow phase visibly', async ({ page }) => {
+    await expect(page.getByText('calibrate', { exact: true }).first()).toBeVisible();
+    await page.getByRole('button', { name: 'Advance phase' }).click();
+    await expect(page.getByText('Phase advanced to order.', { exact: true })).toBeVisible();
+  });
 });
