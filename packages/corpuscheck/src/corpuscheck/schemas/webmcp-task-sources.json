@@ -429,6 +429,11 @@
     "instruction": "tasks/frontend-workflow-agent-management/instruction.md",
     "description": "Agent registry with durable work runs, timelines, and status filters."
   },
+  "frontend-workflow-apparel-sample-review-pipeline": {
+    "source": "apparel sample review and tech-pack pipeline concept",
+    "instruction": "tasks/frontend-workflow-apparel-sample-review-pipeline/instruction.md",
+    "description": "Apparel review pipeline with garment callouts, graded measurements, material lots, immutable samples, issue revisions, comparisons, approvals, and recoverable tech-pack artifacts."
+  },
   "frontend-workflow-automation-studio": {
     "source": "feature-automation-browser-studio PRD",
     "instruction": "tasks/frontend-workflow-automation-studio/instruction.md",

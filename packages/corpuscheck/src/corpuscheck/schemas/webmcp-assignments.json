@@ -6214,6 +6214,27 @@
       ]
     },
     {
+      "task": "frontend-workflow-apparel-sample-review-pipeline",
+      "modules": ["entity-collection-v1", "structured-editor-v1", "command-session-v1", "artifact-transfer-v1"],
+      "bindings": {
+        "entity": "apparel-review-record",
+        "entity_operations": ["create", "select", "update", "toggle"],
+        "entity_fields": ["record-type", "label", "status", "severity", "owner", "measurement", "material-lot", "reason", "evidence"],
+        "editor_object_types": ["callout", "measurement-point", "construction-region", "material-binding", "sample-erratum", "issue-revision"],
+        "editor_operations": ["select", "add", "update_property", "set_content", "switch_mode", "preview"],
+        "editor_properties": ["x", "y", "type", "label", "method", "anchor", "note", "base-target", "tolerance", "size-rule", "material-id", "measured-value", "status"],
+        "editor_modes": ["diagram", "measurements", "materials", "samples", "issues", "compare", "approvals", "package"],
+        "session_operations": ["start", "restart", "advance", "trigger_demo"],
+        "demos": ["package-run", "retry-failed-package", "comparison-lens", "approval-check"],
+        "artifact_operations": ["export", "import", "copy"],
+        "export_formats": ["canonical-json", "annotated-svg", "measurements-csv", "materials-csv", "sample-history-csv", "tech-pack-markdown", "changelog-markdown"],
+        "import_modes": ["canonical-json"],
+        "value_bounds": ["callout normalized x and y each 0-100 and constrained to declared garment anchor zones", "measurements use integer tenths of millimeters with non-negative tolerances and acyclic dependencies", "material reservations conserve non-negative integer square centimeters or units per lot", "issue status follows the declared lifecycle without skipping required states", "sample snapshots are immutable and corrections append errata"],
+        "visible_postconditions": ["moving or editing a callout updates the shared diagram/table selection and recalculates dependent size targets while invalid bounds or cycles leave state unchanged with field errors", "changing a material binding adjusts derived targets and reservations and marks dependent samples and approvals stale", "recording a sample measurement classifies pass, high, low, or not-measured against the frozen revision while corrections append an erratum", "accepting and implementing an issue creates a revision branch and marks dependent conclusions stale", "selecting a compare or heatmap cell highlights its diagram, evidence, revision, and tech-pack row while zero remains distinct from missing", "the first package run preserves successful outputs while failing one colorway diagram and one checksum; retry-failed changes only those failed outputs", "canonical import reconstructs the visible diagram, specifications, materials, samples, issues, revisions, approvals, and package history" ]
+      },
+      "mechanics_exclusions": ["Callout and evidence-region dragging, diagram/heatmap selection, keyboard coordinate editing, mobile cards and drilldowns, and responsive navigation are driven with Playwright; equivalent bounded state uses editor/entity tools", "Visual stale markers, tolerance bands, leader lines, collision avoidance, focus indicators, hover states, and transitions remain Playwright-observed", "File downloads, native file selection, and clipboard contents remain Playwright responsibilities"]
+    },
+    {
       "task": "frontend-workflow-automation-studio",
       "modules": [
         "browse-query-v1",
