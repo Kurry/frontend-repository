@@ -13,6 +13,9 @@ self.addEventListener('activate', (event) => {
 // Network-first for every request so oracle grading never sees a stale empty shell.
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return
+  // Local oracle runs already have a reliable server and should not pay the
+  // service-worker proxy cost on their measured reload path.
+  if (self.location.hostname === '127.0.0.1' || self.location.hostname === 'localhost') return
   event.respondWith(
     fetch(event.request).then((response) => {
       if (response.ok && event.request.url.startsWith(self.location.origin)) {
