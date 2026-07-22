@@ -1,0 +1,5 @@
+[task]
+name = "mercor-intelligence/frontend-creative-tools-fictional-stud-brick-relief-course-composer"
+version = "1.0.0"
+description = "A fictional activity-card designer composing a small layered stud-brick relief and its step-by-step guide"
+authors = [{ name = "Kurry", email = "kurry@example.com" }]
