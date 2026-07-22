@@ -206,7 +206,7 @@
     lastOpener = openerEl || document.activeElement;
     if (typeof dialog.showModal === "function") { if (!dialog.open) dialog.showModal(); }
     else { dialog.setAttribute("open", ""); }
-    var f = $('input[name="full_name"]', form); if (f) setTimeout(function () { f.focus(); }, 30);
+    var f = $('input[name="full_name"]', form); if (f) f.focus();
     return true;
   }
   function closeInquiry() {
