@@ -123,7 +123,30 @@ test('1.1 controls_keyboard_operable', async ({ page }) => {
 });
 
 test('1.2 modals_trap_and_return_focus', async ({ page }) => {
-  await page.goto('http://localhost:3000'); await page.click('button:has-text("Log usage")'); await expect(page.locator('.cds--modal')).toBeVisible();
+  await page.goto('http://localhost:3000');
+  const opener = page.locator('.toolbar-button', { hasText: 'Log usage' });
+  await opener.focus();
+  await opener.click();
+  const modal = page.locator('.cds--modal');
+  await expect(modal).toBeVisible();
+  // Carbon focuses the declared selectorPrimaryFocus target on open.
+  await expect(page.locator('#usage-model')).toBeFocused();
+  // Tab through every focusable control in the modal and confirm focus never
+  // escapes it (real focus-trap behavior, not just "a modal is visible").
+  for (let i = 0; i < 12; i++) {
+    await page.keyboard.press('Tab');
+    // Carbon's focus-trap sentinel redirects focus on its own focus event;
+    // give it a tick to run before sampling, otherwise consecutive key
+    // presses can outrun the redirect.
+    await page.waitForTimeout(100);
+    const insideModal = await page.evaluate(() => document.activeElement?.closest('.cds--modal') != null);
+    expect(insideModal, `focus escaped the modal after ${i + 1} tabs`).toBe(true);
+  }
+  // Escape dismisses the modal.
+  await page.keyboard.press('Escape');
+  await expect(modal).not.toBeVisible();
+  // Focus returns to the control that opened it.
+  await expect(opener).toBeFocused();
 });
 
 test('1.3 live_region_announcements', async ({ page }) => {
@@ -143,15 +166,113 @@ test('1.6 state_not_color_only', async ({ page }) => {
 });
 
 test('14.3 derived_view_responds_to_input', async ({ page }) => {
-  await page.goto('http://localhost:3000'); await page.fill('input#session-budget', '50'); await page.click('button:has-text("Apply")'); await expect(page.locator('.remaining-value')).toBeVisible();
+  await page.goto('http://localhost:3000');
+  await page.fill('input#session-budget', '50');
+  await page.click('button:has-text("Apply")', { force: true });
+  const remaining = page.locator('.remaining-value');
+  const totalChip = page.locator('.total-chip strong');
+  const legend = page.locator('.chart-legend .legend-entry');
+
+  const remainingBefore = await remaining.textContent();
+  const totalBefore = parseFloat((await totalChip.textContent()).replace('$', ''));
+  const legendBefore = await legend.count();
+
+  // Llama 3.3 70B has no seeded usage — logging against it must introduce a
+  // brand-new rollup row and a brand-new pie-chart slice, not just grow an
+  // existing number.
+  await page.locator('.toolbar-button', { hasText: 'Log usage' }).click();
+  await page.locator('select#usage-model').selectOption('Llama 3.3 70B');
+  await page.fill('input#request-label', 'Derived view probe 1');
+  await page.fill('input#prompt-tokens', '30000');
+  await page.fill('input#completion-tokens', '10000');
+  await page.locator('button.cds--btn--primary').filter({ hasText: 'Log usage' }).click({ force: true });
+  await expect(page.getByText('Derived view probe 1').first()).toBeVisible();
+
+  const remainingAfter1 = await remaining.textContent();
+  const totalAfter1 = parseFloat((await totalChip.textContent()).replace('$', ''));
+  const legendAfter1 = await legend.count();
+  const llamaRow = page.locator('.rollup-row', { hasText: 'Llama 3.3 70B' });
+  await expect(llamaRow).toBeVisible();
+  await expect(llamaRow.locator('.rollup-subtotal')).not.toHaveText('$0.00');
+
+  expect(totalAfter1, 'session total moves after the first log').toBeGreaterThan(totalBefore);
+  expect(remainingAfter1, 'remaining-budget readout moves after the first log').not.toEqual(remainingBefore);
+  expect(legendAfter1, 'pie chart gains a slice for the newly-active model').toBe(legendBefore + 1);
+
+  // Second event on a different new model with different inputs — the views
+  // must move again, by different amounts, not redraw identically.
+  await page.locator('.toolbar-button', { hasText: 'Log usage' }).click();
+  await page.locator('select#usage-model').selectOption('Codestral');
+  await page.fill('input#request-label', 'Derived view probe 2');
+  await page.fill('input#prompt-tokens', '5000');
+  await page.fill('input#completion-tokens', '5000');
+  await page.locator('button.cds--btn--primary').filter({ hasText: 'Log usage' }).click({ force: true });
+  await expect(page.getByText('Derived view probe 2').first()).toBeVisible();
+
+  const remainingAfter2 = await remaining.textContent();
+  const totalAfter2 = parseFloat((await totalChip.textContent()).replace('$', ''));
+  const legendAfter2 = await legend.count();
+  const codestralRow = page.locator('.rollup-row', { hasText: 'Codestral' });
+  await expect(codestralRow).toBeVisible();
+
+  expect(totalAfter2, 'session total moves again after the second log').toBeGreaterThan(totalAfter1);
+  expect(remainingAfter2, 'remaining-budget readout moves again').not.toEqual(remainingAfter1);
+  expect(legendAfter2, 'pie chart gains a second slice').toBe(legendAfter1 + 1);
 });
 
 test('14.5 count_delta_is_exact', async ({ page }) => {
-  await page.goto('http://localhost:3000'); await expect(page.locator('.model-count')).toBeVisible();
+  await page.goto('http://localhost:3000');
+  const totalChip = page.locator('.total-chip span');
+  const modelRow = page.locator('.rollup-row', { hasText: 'Claude 3.7 Sonnet' });
+  const parseCount = (text) => Number(text.match(/\d+/)[0]);
+
+  const totalBefore = parseCount(await totalChip.textContent());
+  const modelBefore = parseCount(await modelRow.locator('.rollup-meta').textContent());
+
+  await page.locator('.toolbar-button', { hasText: 'Log usage' }).click();
+  await page.locator('select#usage-model').selectOption('Claude 3.7 Sonnet');
+  await page.fill('input#request-label', 'Count delta probe');
+  await page.fill('input#prompt-tokens', '1000');
+  await page.fill('input#completion-tokens', '500');
+  await page.locator('button.cds--btn--primary').filter({ hasText: 'Log usage' }).click({ force: true });
+  await expect(page.getByText('Count delta probe').first()).toBeVisible();
+
+  const totalAfter = parseCount(await totalChip.textContent());
+  const modelAfter = parseCount(await modelRow.locator('.rollup-meta').textContent());
+  expect(totalAfter - totalBefore, 'total request count increases by exactly one').toBe(1);
+  expect(modelAfter - modelBefore, "the submitted model's request count increases by exactly one").toBe(1);
 });
 
 test('14.6 different_inputs_change_outcomes', async ({ page }) => {
-  await page.goto('http://localhost:3000'); await page.fill('input#catalog-search', 'XYZ'); await expect(page.locator('text="No models found"')).toBeVisible();
+  await page.goto('http://localhost:3000');
+  const totalChip = page.locator('.total-chip strong');
+  const totalBefore = parseFloat((await totalChip.textContent()).replace('$', ''));
+
+  await page.locator('.toolbar-button', { hasText: 'Log usage' }).click();
+  await page.locator('select#usage-model').selectOption('GPT-4o Mini');
+  await page.fill('input#request-label', 'Batch pipeline A');
+  await page.fill('input#prompt-tokens', '20000');
+  await page.fill('input#completion-tokens', '20000');
+  const cost1 = parseFloat((await page.locator('.cost-preview strong').textContent()).replace('$', ''));
+  await page.locator('button.cds--btn--primary').filter({ hasText: 'Log usage' }).click({ force: true });
+  await expect(page.getByText('Batch pipeline A').first()).toBeVisible();
+
+  await page.locator('.toolbar-button', { hasText: 'Log usage' }).click();
+  await page.locator('select#usage-model').selectOption('Claude 3.5 Haiku');
+  await page.fill('input#request-label', 'Batch pipeline B');
+  await page.fill('input#prompt-tokens', '20000');
+  await page.fill('input#completion-tokens', '5000');
+  const cost2 = parseFloat((await page.locator('.cost-preview strong').textContent()).replace('$', ''));
+  await page.locator('button.cds--btn--primary').filter({ hasText: 'Log usage' }).click({ force: true });
+  await expect(page.getByText('Batch pipeline B').first()).toBeVisible();
+
+  // Feed shows both distinct labels.
+  await expect(page.getByText('Batch pipeline A').first()).toBeVisible();
+  await expect(page.getByText('Batch pipeline B').first()).toBeVisible();
+
+  expect(cost1, 'different inputs computed different costs').not.toBeCloseTo(cost2, 3);
+  const totalAfter = parseFloat((await totalChip.textContent()).replace('$', ''));
+  expect(Math.abs(totalAfter - (totalBefore + cost1 + cost2)), 'session total differs by exactly the two computed costs').toBeLessThan(0.02);
 });
 
 test('14.8 empty_to_repopulated_round_trip', async ({ page }) => {
