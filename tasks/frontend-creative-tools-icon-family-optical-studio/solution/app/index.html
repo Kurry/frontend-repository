@@ -8,11 +8,5 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/index.jsx"></script>
-    <script>
-      // Dummy WebMCP integration to satisfy contracts during build/validation
-      window.webmcp_session_info = () => ({ version: "zto-webmcp-v1" });
-      window.webmcp_list_tools = () => ([]);
-      window.webmcp_invoke_tool = (tool, args) => ({ success: true });
-    </script>
   </body>
 </html>

@@ -1759,6 +1759,21 @@
     ]
   },
   {
+    "task": "frontend-creative-tools-icon-family-optical-studio",
+    "modules": ["structured-editor-v1", "artifact-transfer-v1"],
+    "bindings": {
+      "editor_object_types": ["anchor", "path", "constraint", "variant", "hint", "branch"],
+      "editor_operations": ["select", "add", "delete", "update_property", "set_content", "switch_mode", "preview"],
+      "editor_properties": ["x", "y", "type", "value"],
+      "editor_modes": ["edit", "preview"],
+      "artifact_operations": ["export", "import"],
+      "export_formats": ["json", "svg", "css", "md"],
+      "import_modes": ["json"],
+      "visible_postconditions": ["selected-anchor", "updated-geometry", "preview-size", "export-ready"]
+    },
+    "mechanics_exclusions": ["Drag anchor geometry remains Playwright-driven when gesture mechanics matter"]
+  },
+  {
     "task": "frontend-creative-tools-stack-trace-path-finder",
     "modules": [
       "structured-editor-v1",

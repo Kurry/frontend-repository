@@ -364,6 +364,12 @@ TASK_SPECS: dict[str, dict] = {
 
 # Website-fidelity tasks converted from website-prds (pixel-perfect genre).
 TASK_SPECS.update({
+    "frontend-creative-tools-icon-family-optical-studio": {
+        "source": "Icon Family Optical Studio",
+        "description": "Vector icon-family editor with anchors, constraints, variants, pixel previews, and portable artifacts.",
+        "modules": ["structured-editor-v1", "artifact-transfer-v1"],
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
+    },
     "frontend-creative-tools-stack-trace-path-finder": {
         "source": "Stack-Trace Path Finder",
         "description": "Stack-trace hypothesis workspace for frames, causal paths, and saved investigations.",
