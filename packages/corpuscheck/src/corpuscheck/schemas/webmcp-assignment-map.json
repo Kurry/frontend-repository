@@ -109,7 +109,7 @@
     "mechanics_exclusions": [
       "Bounding-box drag-drawing, zoom plus/minus/fit scaling, and pan-tool dragging are gesture mechanics graded via Playwright; region CREATION as state goes through the editor add binding",
       "Command palette Ctrl+K open, fuzzy-match narrowing per keystroke, arrow-key highlight, and Escape focus-return are keyboard mechanics graded via Playwright",
-      "Undo/redo (Ctrl+Z / Ctrl+Shift+Z) and the history panel are graded through the real toolbar controls and shortcuts via Playwright \u2014 a WebMCP shortcut would bypass the stacks being graded",
+      "Undo/redo (Ctrl+Z / Ctrl+Shift+Z) and the history panel are graded through the real toolbar controls and shortcuts via Playwright — a WebMCP shortcut would bypass the stacks being graded",
       "Card slide-out/in transitions, rating-fill animation, queue entry animate-out, chip color transitions, retry-countdown ticking, and toasts stay Playwright-observed",
       "Clipboard contents of Copy export and the downloaded JSONL bytes are verified via Playwright, never returned in WebMCP results"
     ]
@@ -4556,7 +4556,7 @@
       ]
     },
     "mechanics_exclusions": [
-      "Card moves ARE state changes and go through entity update(column)/reorder, but drag gesture fidelity \u2014 raised shadow, ghost placeholder, exact drop-position insertion, settle animation \u2014 is graded via real Playwright drags only",
+      "Card moves ARE state changes and go through entity update(column)/reorder, but drag gesture fidelity — raised shadow, ghost placeholder, exact drop-position insertion, settle animation — is graded via real Playwright drags only",
       "Keyboard move-control operability is graded via real Playwright keyboard interaction; WebMCP entity update only proves state parity",
       "Assignee filter and search narrowing are graded via real Playwright interaction; no browse-query module is assigned",
       "Retry backoff countdown ticking and sub-item check animations are timed visuals, Playwright-observed live",
@@ -5740,7 +5740,7 @@
     "mechanics_exclusions": [
       "Command palette Cmd+K, per-keystroke fuzzy matching, and ArrowUp/ArrowDown result-card selection are keyboard mechanics graded via Playwright",
       "Why-this-ranks disclosure chevron rotation and contribution-bar grow-from-zero animations stay Playwright-observed",
-      "Result-card staggered animate-in and feedback re-rank slide movement stay Playwright-observed \u2014 a WebMCP feedback call may set state but the movement is graded through the real controls",
+      "Result-card staggered animate-in and feedback re-rank slide movement stay Playwright-observed — a WebMCP feedback call may set state but the movement is graded through the real controls",
       "Detail side-panel slide, breadcrumb trail navigation clicks, and smooth scrolling of the full 120-document result list stay Playwright-observed",
       "Undo/redo are graded through the real toolbar controls; clipboard contents of Copy report are verified via Playwright, never returned in WebMCP results"
     ]
@@ -6157,7 +6157,7 @@
       ]
     },
     "mechanics_exclusions": [
-      "Backoff countdown ticking and retrying pulse are timed visuals \u2014 Playwright-observed live, never asserted from tool output",
+      "Backoff countdown ticking and retrying pulse are timed visuals — Playwright-observed live, never asserted from tool output",
       "Step-status tick animation, badge color transitions, panel slide-in, and chevron rotation stay Playwright-observed",
       "Bulk Pause All / Resume All button mechanics graded via the real toolbar controls; state parity checkable via session pause/resume per selected agent",
       "Command palette keyboard navigation and undo/redo chord stay Playwright-driven",
@@ -6982,7 +6982,7 @@
       ]
     },
     "mechanics_exclusions": [
-      "Live GitHub and AI-endpoint calls (account checks, live PR fetching and paging, live chat-completions streaming) are network behaviors the judge grades by observation only \u2014 the judge has no credentials and no tool may simulate a successful connection or Live mode",
+      "Live GitHub and AI-endpoint calls (account checks, live PR fetching and paging, live chat-completions streaming) are network behaviors the judge grades by observation only — the judge has no credentials and no tool may simulate a successful connection or Live mode",
       "Candidates/Triage/Runs/Library navigation, PR source-file bound filters, require-linked-issue toggle, and library filter chips are simple visible controls the judge drives directly via Playwright",
       "Credential masked-field show/hide toggles and the Connections slide-over transition stay Playwright-driven",
       "Evaluate/Generate streaming cadence, the pulsing streaming affordance, and the rate-limit reset countdown ticking stay Playwright-observed",
@@ -7224,8 +7224,8 @@
         "complete-bundling"
       ],
       "value_bounds": [
-        "hero-state in {READY FOR THE BENCHMARK, NOT READY \u2014 BUT FIXABLE, AT RISK \u2014 MAY NEED A RESTART}",
-        "gate in {Admission, No-op, Oracle, Difficulty \u2014 Sable-4, Difficulty \u2014 Quartz-Mini, Analysis}",
+        "hero-state in {READY FOR THE BENCHMARK, NOT READY — BUT FIXABLE, AT RISK — MAY NEED A RESTART}",
+        "gate in {Admission, No-op, Oracle, Difficulty — Sable-4, Difficulty — Quartz-Mini, Analysis}",
         "gate status in {pass, fail, errored, inconclusive, missing}",
         "recommendation in {APPROVE, APPROVE WITH CAVEATS, MAJOR CHANGES NEEDED, REJECT-ESCALATE}; only the currently allowed set is selectable, and an out-of-set choice requires the override toggle plus a justification of at least 20 characters",
         "fix-item category in {RERUN, FIX, REDESIGN, TALK-TO-LEAD}",
@@ -7250,7 +7250,7 @@
         "review-summary-text"
       ],
       "visible_postconditions": [
-        "a completed re-run of ember-relay-router's Difficulty \u2014 Quartz-Mini gate leaves inconclusive (gathering additional valid trials) and recomputes the verdict hero banner, allowed recommendation set, constraint explanation, portfolio row gate chip and hero state, rollup counts, and calibration strip without a reload",
+        "a completed re-run of ember-relay-router's Difficulty — Quartz-Mini gate leaves inconclusive (gathering additional valid trials) and recomputes the verdict hero banner, allowed recommendation set, constraint explanation, portfolio row gate chip and hero state, rollup counts, and calibration strip without a reload",
         "resolving or unresolving a fix item immediately recomputes the allowed recommendation set and its plain-language explanation; a REDESIGN item's resolution updates the hero banner and portfolio row",
         "marking a step done unlocks the next step and updates the portfolio review-progress indicator; un-marking re-locks all later steps while preserving their notes",
         "complete bundling appends a timestamped bundling event to the timeline and flips the portfolio row to show the Bundled badge",
@@ -7706,10 +7706,10 @@
       ]
     },
     "mechanics_exclusions": [
-      "Scrubber continuous-drag updating is a gesture-fidelity criterion \u2014 Playwright-only; timeline clicks and arrow keys cover discrete step state",
+      "Scrubber continuous-drag updating is a gesture-fidelity criterion — Playwright-only; timeline clicks and arrow keys cover discrete step state",
       "Terminal progressive streaming, auto-follow, and jump-to-latest visuals are streaming mechanics observed live via Playwright",
       "Ingest checklist tick animation and per-item pacing stay Playwright-observed when a trial row is opened",
-      "File renderer visuals \u2014 syntax coloring, copy-to-clipboard confirmation, image scaling, markdown rendering \u2014 are Playwright/clipboard observations; no file contents in WebMCP results",
+      "File renderer visuals — syntax coloring, copy-to-clipboard confirmation, image scaling, markdown rendering — are Playwright/clipboard observations; no file contents in WebMCP results",
       "Cross-fade pane transitions and reasoning-disclosure chevron animation stay Playwright-observed",
       "Command-palette open gesture, typeahead narrowing, and keyboard highlight movement stay Playwright-observed when mechanism matters",
       "Clipboard contents and download of the review-package export stay Playwright responsibilities; no raw file paths, blobs, or base64 in WebMCP args or results",
@@ -7793,7 +7793,7 @@
     },
     "mechanics_exclusions": [
       "Terminal progressive streaming and its streaming-vs-complete affordance are observed live via Playwright",
-      "Linked-highlight easing, smooth scroll-to-step, rollup-bar segment animation, and flips-filter row enter/exit animations are motion criteria \u2014 Playwright-observed; the underlying selection state changes via the bound tools",
+      "Linked-highlight easing, smooth scroll-to-step, rollup-bar segment animation, and flips-filter row enter/exit animations are motion criteria — Playwright-observed; the underlying selection state changes via the bound tools",
       "Verdict cross-fade on label switch and pane slide transitions stay Playwright-observed",
       "Evidence-link and criterion-row hover washes and copy-control confirmation stay Playwright-only",
       "Clipboard contents and downloaded Review Package files remain Playwright responsibilities per artifact-transfer restrictions",
@@ -7891,6 +7891,66 @@
       "Raw file path / base64 blobs must not appear in WebMCP args; clipboard contents and downloaded artifact bytes remain Playwright responsibilities",
       "Multi-select marquee geometry and Shift-click chord timing stay Playwright when mechanism matters",
       "Timeline status filter chips and Saved Workflows / Artifact panel open toggles stay Playwright-driven; no browse-query module is assigned"
+    ]
+  },
+  {
+    "task": "frontend-creative-tools-weaving-draft-constraint-studio",
+    "modules": [
+      "structured-editor-v1",
+      "entity-collection-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "grid-cell",
+        "range"
+      ],
+      "editor_properties": [
+        "color",
+        "brush",
+        "repeat"
+      ],
+      "editor_modes": [
+        "paint",
+        "erase"
+      ],
+      "editor_operations": [
+        "select",
+        "update_property",
+        "switch_mode",
+        "preview",
+        "set_content"
+      ],
+      "entity": "variant",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete",
+        "toggle"
+      ],
+      "entity_fields": [
+        "name",
+        "cells"
+      ],
+      "artifact_operations": [
+        "export",
+        "import",
+        "copy"
+      ],
+      "export_formats": [
+        "session-json",
+        "png"
+      ],
+      "import_modes": [
+        "session-json"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Drag-paint / brush stroke geometry stays Playwright (gesture mechanics)",
+      "Mirror-partner cell painting during continuous drag stays Playwright-observed",
+      "Raw file paths/blobs forbidden in WebMCP args",
+      "PNG rasterization fidelity and clipboard copy stay Playwright-observed"
     ]
   }
 ]

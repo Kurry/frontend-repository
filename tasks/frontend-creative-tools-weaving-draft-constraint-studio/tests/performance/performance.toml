@@ -1,0 +1,162 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "9.1"
+name = "cold_start_under_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load — paint stage, toolbar, and canvas respond without a long blank wait."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.2"
+name = "console_clean_during_studio_flows"
+description = "No console errors or warnings appear during a full exercise of painting, saving, loading, filtering, Export, Import, and mode switching."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.3"
+name = "paint_strokes_respond_immediately"
+description = "Continuous drag-painting across many cells stays smooth with no visible lag between pointer movement and cells filling (UI response under ~100ms), including when mirrorMode is Horizontal or Vertical."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.4"
+name = "image_import_stays_responsive"
+description = "Uploading an image or capturing from the camera onto the grid completes without freezing the page; the UI remains interactive once pixelization finishes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.5"
+name = "cell_rebuild_without_freeze"
+description = "Rebuilding the grid via the cell-size slider (while unlocked) completes without freezing the page."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.6"
+name = "mode_switch_stays_interactive"
+description = "Switching between Paint and Gallery and saving/loading boards keeps the UI interactive during the state change."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.7"
+name = "rapid_drag_stays_smooth"
+description = "Rapid drag strokes across the grid keep painting smoothly with no hangs, dropped cells, or visible frame stutter."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.8"
+name = "rapid_tool_and_undo_no_freeze"
+description = "Rapid tool switching (Q/B/E), swatch picks (1–7), and Undo/Backspace do not hang or freeze the studio."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.9"
+name = "extended_paint_session_stable"
+description = "An extended painting session with many strokes and several gallery saves shows no runaway slowdown or browser resource collapse."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "9.10"
+name = "camera_cancel_recovers_promptly"
+description = "Opening then cancelling the camera overlay recovers promptly without hanging the toolbar or paint stage."
+type = "binary"
+weight = 1.0

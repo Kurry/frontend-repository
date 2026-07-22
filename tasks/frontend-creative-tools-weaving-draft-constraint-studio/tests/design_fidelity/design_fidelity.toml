@@ -1,0 +1,162 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "stage_spacing_matches_reference"
+description = "At 1440px, spacing and sizing of the light paper stage, floating black toolbar, and large centered canvas follow the reference composition in /reference-screenshots/ (overview.png / segment-NN.png) within a small tolerance — no arbitrary one-off collisions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "bracket_title_typography_matches"
+description = "The angle-bracket display title reading <SHAPESHIFT GRID TOOL> and condensed UI type match the reference's typographic treatment for headings and toolbar labels."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "desktop_layout_matches_reference"
+description = "Desktop layout matches reference screenshots to within a small tolerance: light paper stage with soft radial washes, floating black toolbar, and large centered canvas — a desktop-first creative tool composition, not a dashboard."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "gallery_card_motion_matches_spec"
+description = "Saving a board animates its new card into the gallery and deleting a board animates its card out rather than snapping, matching the motion the spec calls for."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "narrow_toolbar_reflow_matches_spec"
+description = "On narrow viewports the toolbar reflows or docks so all brush modes, swatches, and actions stay reachable, matching the responsiveness patterns rather than keeping broken free-float chrome."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "toolbar_control_styling_matches"
+description = "Toolbar buttons, cell-size slider, and form fields show styled radii/padding/depth consistent with the reference floating black toolbar — not unstyled browser defaults."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "title_vs_toolbar_hierarchy"
+description = "Typography hierarchy clearly distinguishes the <SHAPESHIFT GRID TOOL> display title / typewriter intro from toolbar and gallery body labels."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "component_states_match_spec"
+description = "Toolbar buttons, swatches, and form fields show distinct default, hover, focus, disabled, and error treatments as specified — including the muted/disabled cell-size slider when locked."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "seven_swatches_and_qr_cells"
+description = "Seven square palette swatches (white, black, red, yellow, green, blue, pink) are visible with the active swatch marked; QR cells render as a scannable festival QR mask and Color cells as flat fills, with grid hairlines when Grid On."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "toolbar_controls_present_in_order"
+description = "The floating toolbar carries the cell-size slider, mode buttons (QR Brush, Color Brush, Eraser, Grid On/Off), seven square swatches, and action buttons in a coherent creative-tool grouping matching the reference."
+type = "binary"
+weight = 1.0
