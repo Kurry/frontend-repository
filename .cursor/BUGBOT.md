@@ -316,6 +316,31 @@ of these rules is for the reviewer bot to spend the compute so humans don't have
 - If committed screenshots/recordings exist, open them: verify filenames match what the
   PR claims to demonstrate; flag mismatches.
 
+## New-task draft procedure (PRs adding a whole new tasks/<slug>/ directory)
+
+1. **WebMCP no-op stubs presented as working tools.** For each tool
+   `webmcp_list_tools` advertises, trace `webmcp_invoke_tool`'s handler: if it
+   returns `{ success: true }` (or any success envelope) WITHOUT reading or
+   mutating the app's real state store, the tool is a silent no-op — an agent
+   calling it believes the action happened and it did not (observed live,
+   PR #1458: 4 of 6 advertised tools always returned success while changing
+   nothing; PR #1474: the entire `webmcp_invoke_tool` was this pattern).
+   BLOCKING; list every no-op tool by name.
+2. **Missing negative criteria in specialized dimension tomls.** The repo's
+   Reward Kit polarity gate requires `negate = true` entries in scored
+   dimensions; a newly-specialized `core_features`/`visual_design`/`motion`/
+   `technical` toml containing ONLY positive criteria fails that gate
+   (observed live, PR #1474: all four specialized tomls were positive-only).
+   BLOCKING — flag the toml(s) missing any `negate = true` entry.
+3. **Dimension content mismatch.** Verify each specialized toml's criteria
+   actually belong to its own dimension — a duplicated/copy-pasted section
+   from another dimension (e.g. `accessibility.toml` containing `user_flows`
+   template content) means that dimension is ungraded in practice (observed
+   live, PR #1474). BLOCKING.
+4. Apply the existing Playwright-version-pin-drift check (scope-smuggling
+   catalog) here too — new-task package.json/lockfiles drift from
+   `tasks/_pins.py` just as often as suite-only PRs do.
+
 ## Review depth expectations
 
 Never limit the review to changed lines: for each checklist item in the PR body, read

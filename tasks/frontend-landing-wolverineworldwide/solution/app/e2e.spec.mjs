@@ -777,6 +777,19 @@ test.describe('Northstar Collective — Criteria Tests', () => {
     const requests = [];
     page.on('request', request => requests.push(request.url()));
     await page.goto('http://localhost:3000');
+
+    // Exercise the real lazy-loading path before asserting decoded dimensions.
+    // The portfolio and brand grids sit below the full-viewport hero, so their
+    // images are not required to be complete immediately after navigation.
+    await page.locator('#portfolio').scrollIntoViewIfNeeded();
+    await expect.poll(() => page.locator('#portfolio img.particle').evaluateAll(images =>
+      images.every(image => image.complete && image.naturalWidth > 0)
+    )).toBe(true);
+    await page.locator('#brand-grid').scrollIntoViewIfNeeded();
+    await expect.poll(() => page.locator('#brand-grid img').evaluateAll(images =>
+      images.every(image => image.complete && image.naturalWidth > 0)
+    )).toBe(true);
+
     expect(requests.every(url => url.startsWith('http://localhost:3000') || url.startsWith('data:'))).toBe(true);
 
     const particles = await page.locator('#portfolio img.particle').evaluateAll(images =>

@@ -1,5 +1,4 @@
 import { createForm } from "@tanstack/solid-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
 import { For, Show, createMemo, createEffect, on } from "solid-js";
 import { Motion } from "@motionone/solid";
 import { state, sendMessage } from "../store";
@@ -22,7 +21,6 @@ export default function ChatPanel() {
     defaultValues: {
       text: "",
     },
-    validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       if (chatDisabled()) return;
       sendMessage(value.text);
@@ -92,7 +90,12 @@ export default function ChatPanel() {
       >
         <form.Field
           name="text"
-          validators={{ onSubmit: ChatMessageSchema.shape.text }}
+          validators={{
+            onSubmit: ({ value }) => {
+              const result = ChatMessageSchema.shape.text.safeParse(value);
+              return result.success ? undefined : result.error.issues[0]?.message;
+            },
+          }}
         >
           {(field) => (
             <div class="relative flex gap-2 items-start">
@@ -128,7 +131,7 @@ export default function ChatPanel() {
               <button
                 type="submit"
                 class="touch-target rounded-lg bg-sky-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 disabled:cursor-not-allowed disabled:opacity-50 h-[52px]"
-                disabled={chatDisabled() || !form.state.values.text.trim()}
+                disabled={chatDisabled() || !field().state.value.trim()}
                 data-testid="chat-send-button"
               >
                 Send

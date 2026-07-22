@@ -1,0 +1,265 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "n1"
+title = "Matrix displays required portions per cell"
+description = "Displays a matrix where rows are course roles and columns are dietary groups, showing required portions in each cell."
+weight = 1.0
+
+[[criterion]]
+id = "n2"
+title = "Dish cards provide typed portions"
+description = "Dish cards representing contributions provide typed portions to one or more cells under declared overlap rules."
+weight = 1.0
+
+[[criterion]]
+id = "n3"
+title = "Selecting a cell highlights exact dishes, contributors, and labels"
+description = "When a cell in the coverage matrix is selected, the exact dishes, contributors, and labels contributing to that cell are highlighted."
+weight = 1.0
+
+[[criterion]]
+id = "n4"
+title = "Undercoverage, overconcentration, and unknown allergen data are distinct states"
+description = "The matrix displays distinct visual states for undercoverage, overconcentration, and unknown allergen data."
+weight = 1.0
+
+[[criterion]]
+id = "n5"
+title = "A proposal contains all required fields"
+description = "A proposal stores dish name, portions, recipe-card fixture id, dietary/allergen tags, arrival time, temperature state, equipment needs, cost reimbursement, owner, and fallback."
+weight = 1.0
+
+[[criterion]]
+id = "n6"
+title = "Commitments step through states"
+description = "Commitments can transition through states: draft, invited, clarification, revised, accepted, declined, expired, withdrawn, arrived-partial, arrived-complete, failed, substituted, or reconciled."
+weight = 1.0
+
+[[criterion]]
+id = "n7"
+title = "Accepting a commitment reserves coverage/resources but does not mark food as arrived"
+description = "When a commitment is accepted, it reserves coverage and resources but the state does not show the food as arrived."
+weight = 1.0
+
+[[criterion]]
+id = "n8"
+title = "Editing an accepted dish creates a revision and resets approvals"
+description = "Editing the quantity, timing, or resources of an accepted dish creates a revision and resets approvals."
+weight = 1.0
+
+[[criterion]]
+id = "n9"
+title = "Swaps and fallbacks apply atomically after all parties accept"
+description = "Two contributors may swap whole commitments, or one may hand off to a fallback, which applies atomically only after all affected parties accept the revision."
+weight = 1.0
+
+[[criterion]]
+id = "n10"
+title = "Rejected or expired swaps leave original commitments intact"
+description = "If a swap is rejected or expires, the original commitments remain intact and unchanged."
+weight = 1.0
+
+[[criterion]]
+id = "n11"
+title = "Dish bars include intervals"
+description = "Dish bars on the timeline include arrival, holding, reheat/chill, service-ready, and expiry intervals."
+weight = 1.0
+
+[[criterion]]
+id = "n12"
+title = "Appliance slots have rules"
+description = "Appliance slots enforce capacity, temperature, mode, and cleanup buffers."
+weight = 1.0
+
+[[criterion]]
+id = "n13"
+title = "Dragging or resizing bars previews conflicts and downstream readiness"
+description = "Dragging or resizing dish bars on the timeline previews conflicts and downstream readiness."
+weight = 1.0
+
+[[criterion]]
+id = "n14"
+title = "Provides keyboard scheduling"
+description = "Scheduling arrival and resource slots can be done using the keyboard."
+weight = 1.0
+
+[[criterion]]
+id = "n15"
+title = "Serving vessels occupy rectangular footprints on a centimeter grid"
+description = "Serving vessels are placed on a centimeter grid layout occupying rectangular footprints."
+weight = 1.0
+
+[[criterion]]
+id = "n16"
+title = "Users can move, rotate vessels, attach labels, and draw flow"
+description = "Users can move and rotate serving vessels, attach labels and utensils, and draw a one-way guest flow."
+weight = 1.0
+
+[[criterion]]
+id = "n17"
+title = "Layout bounds and rules are enforced"
+description = "The layout enforces bounds, non-overlap, hot/cold station separation, allergen separation, label clearance, and aisle width."
+weight = 1.0
+
+[[criterion]]
+id = "n18"
+title = "Placement is active only based on dish readiness and actual arrival"
+description = "A buffet placement becomes active only based on dish readiness and actual arrival."
+weight = 1.0
+
+[[criterion]]
+id = "n19"
+title = "Run advances through stages"
+description = "The event-day run advances through stages: check-in, receive/inspect, quantity reconcile, hold/reheat, label/place, replenish, close."
+weight = 1.0
+
+[[criterion]]
+id = "n20"
+title = "Supports fixture events"
+description = "Supports deterministic fixture events including contributor dropout, 20-minute late arrival, and one dish at 60% quantity."
+weight = 1.0
+
+[[criterion]]
+id = "n21"
+title = "Users can activate partial recovery actions"
+description = "Users can activate fallback, resize coverage, swap resource slot, split/relabel portions, move buffet placement, or mark an exception while preserving attempts and actual facts."
+weight = 1.0
+
+[[criterion]]
+id = "n22"
+title = "Optional reimbursements connect receipts to accepted/actual commitments"
+description = "Optional reimbursements in integer cents connect receipts to accepted or actual commitments."
+weight = 1.0
+
+[[criterion]]
+id = "n23"
+title = "Reconciles cost amounts"
+description = "Reconciles requested, approved, paid-simulated, reversed, and remaining cost amounts."
+weight = 1.0
+
+[[criterion]]
+id = "n24"
+title = "Responsibility view shows tasks, blocking dependencies, and completion evidence"
+description = "The responsibility view displays host, contributor, and fallback tasks along with blocking dependencies and completion evidence."
+weight = 1.0
+
+[[criterion]]
+id = "n25"
+title = "Event certification requires completion of all obligations"
+description = "Event certification requires coverage, labels, reconciled quantities, and closed obligations."
+weight = 1.0
+
+[[criterion]]
+id = "n26"
+title = "Responsive layout across desktop and mobile"
+description = "Responsive layout transforms from desktop views to mobile steppers, drawers, and sheets."
+weight = 1.0
+
+[[criterion]]
+id = "n27"
+title = "Export produces JSON, CSV, ICS, SVG, and Markdown"
+description = "Export produces canonical JSON, CSV dish/coverage/cost ledger, ICS arrival/resource/tasks, SVG buffet map, and Markdown run sheet/labels."
+weight = 1.0
+
+[[criterion]]
+id = "n28"
+title = "Import reconstructs state exactly from JSON"
+description = "Import reconstructs the exact state from canonical JSON."
+weight = 1.0

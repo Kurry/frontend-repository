@@ -2,6 +2,7 @@
   import { store, addToast } from '../lib/store.svelte';
 
   let copied: boolean = $state(false);
+  let copyFailed: boolean = $state(false);
   let liveMessage: string = $state('');
   let dialogRef: HTMLElement | null = $state(null);
   let lastFocused: HTMLElement | null = null;
@@ -55,6 +56,7 @@
       setTimeout(() => { copied = false; }, 1600);
     } else {
       copied = false;
+      copyFailed = false;
       copyFailed = true;
       liveMessage = `Failed to copy ${label} to clipboard`;
     }
