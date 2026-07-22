@@ -1,0 +1,142 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "domain_workbench_hierarchy"
+description = "The interface reads as a distinctive conference-operations workbench with navigator, three recovery lanes, summary ribbon, event timeline, and phone inspector; current state and next action are immediately clear."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "specified_palette_and_non_color_tokens"
+description = "Ink #17211B, paper #F4F0E8, moss #3C6E57, amber #D99B45, failure coral #C95E55, and resolved mint #D7E9DD are applied coherently, with text/icon status evidence alongside color."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "typography_and_identifier_system"
+description = "Compact uppercase eyebrows, high-contrast display title, legible 14–16 pixel workspace copy, and monospaced stable IDs and artifact text form a consistent hierarchy."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "lane_card_phone_anatomy"
+description = "Recovery lanes have counts, subtle grid texture, stable card anatomy, selected outline plus text, and clear empty states; the original phone card has dark bezel, timing badge, speaker details, duration bar, and local short link."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "complete_control_state_language"
+description = "Buttons, inputs, cards, filters, dialogs, timeline rows, and drop targets visibly distinguish default, hover, focus, active, disabled, error, and selected states within one spacing/radius system."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n1"
+name = "visual_clutter_or_ambiguous_affordances"
+description = "At desktop width, the workspace becomes visually cluttered or sparse, status is ambiguous, controls resemble passive text, or cards and copy overlap or clip."
+type = "binary"
+negate = true
+weight = 1.0

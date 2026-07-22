@@ -1,0 +1,16 @@
+{
+  "name": "greenroom-recovery-board-oracle",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "verify:build": "node --check app.js && node -e \"const fs=require('fs');['index.html','styles.css','app.js'].forEach((f)=>fs.accessSync(f))\"",
+    "start": "npx --yes serve -l 3000 -n",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
+  },
+  "dependencies": {
+    "serve": "14.2.6"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.0"
+  }
+}
