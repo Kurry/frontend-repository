@@ -1,0 +1,168 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "saturated_blue_stage_composition"
+description = "The page presents a saturated blue field framing a light/white paint stage with high-contrast ink and condensed UI type in a desktop-first creative-tool composition, not a dashboard card grid."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "angle_bracket_title_and_intro"
+description = "An angle-bracket display title reading <GRID PAINT STUDIO> and a typewriter-style angle-bracketed intro line appear above the stage."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "floating_black_toolbar_anatomy"
+description = "A floating black toolbar carries a labelled Cell slider, QR/Color/Flood Fill/Eraser mode buttons, Grid On/Off, Mirror control, seven square swatches, and Upload/Camera/Undo/Redo/Clear/Export/Share actions in a coherent tool strip."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "exact_palette_hex_swatches"
+description = "Seven swatches render black #000000, white #ffffff, red #ff0000, yellow #ffff00, green #00ff00, blue #0000ff, and pink #ff0098, with the active swatch visibly ringed."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "histogram_and_vision_chrome"
+description = "The live histogram shows seven color bars plus a blank bar with readable labels, and Vision mode chips make the active simulation discernible."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "gallery_cards_and_bulk_bar"
+description = "Gallery mode shows dense board cards/rows with names, tags, checkboxes, favorite and delete affordances; a bulk action bar appears when any card is selected; an empty state is visible when none remain."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "export_center_monospace_previews"
+description = "Export center shows monospaced Project JSON and CSS palette preview blocks, a PNG preview, and Copy/Download controls with clear section labels."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "versions_and_compare_labels"
+description = "Versions list entries show thumbnails; Compare split labels each side so before/after are readable without relying on color alone."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "component_state_treatments"
+description = "Toolbar buttons, swatches, and form fields show distinct default, hover, focus, disabled, and error treatments."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "large_centered_canvas"
+description = "A large centered canvas stage sits under the toolbar as the dominant paint surface."
+type = "binary"
+weight = 1.0
+
