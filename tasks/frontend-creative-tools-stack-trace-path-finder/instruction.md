@@ -135,15 +135,24 @@ Module specs:
 </module_spec>
 
 Bindings:
-- Editor operations: select; update_property; preview; set_content
+- Editor object types: frame; candidate; node
+- Editor operations: select; update_property; set_content; preview
+- Editor properties: weight; pinned-node; collapsed
+- Editor modes: normal; edit
 - Entity: hypothesis
 - Entity operations: create; select; delete
+- Entity fields: name; frame-count; path-status
 - Artifact operations: export; import; copy
-- Export formats: stack-path-hypothesis/v1
-- Import modes: stack-path-hypothesis/v1
+- Export formats: stack-path-hypothesis-json
+- Import modes: stack-path-hypothesis-json
+- Workflow completion: selected-frame
+- Workflow completion: mapped-node
+- Workflow completion: path-validity
+- Workflow completion: saved-hypothesis
 
 Mechanics exclusions:
-- Timeline dragging, keyboard shortcuts, and downloaded bytes stay Playwright-observed
+- Frame reordering and candidate drag mapping stay Playwright-driven when gesture mechanics matter
+- Raw file paths, blobs, clipboard contents, and downloaded artifact bytes stay Playwright-observed
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

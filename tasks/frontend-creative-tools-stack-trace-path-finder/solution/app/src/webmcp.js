@@ -1,6 +1,12 @@
 import { useStore } from './store';
 
 const modules = ['structured-editor-v1', 'entity-collection-v1', 'artifact-transfer-v1'];
+const sessionInfo = {
+  tools: [
+    'editor_select', 'editor_update_property', 'editor_preview', 'editor_set_content',
+    'entity_create', 'entity_select', 'entity_delete', 'artifact_export', 'artifact_import', 'artifact_copy',
+  ].map((name) => ({ name, description: `Stack trace ${name.replaceAll('_', ' ')}`, parameters: { type: 'object', properties: {}, required: [] } })),
+};
 
 window.webmcp_session_info = () => {
   return { contract_version: "zto-webmcp-v1", modules: ["structured-editor-v1", "entity-collection-v1", "artifact-transfer-v1"] };
