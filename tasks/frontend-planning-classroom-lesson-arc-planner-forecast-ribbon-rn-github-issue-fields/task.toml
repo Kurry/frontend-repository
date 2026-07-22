@@ -1,0 +1,12 @@
+[task]
+slug = "frontend-planning-classroom-lesson-arc-planner-forecast-ribbon-rn-github-issue-fields"
+name = "mercor-intelligence/frontend-planning-classroom-lesson-arc-planner-forecast-ribbon-rn-github-issue-fields"
+genre = "good-app"
+type = "app"
+
+[task.sandbox]
+type = "docker"
+image = "localhost/evaluation-harness"
+
+[task.requirements]
+internet = false
