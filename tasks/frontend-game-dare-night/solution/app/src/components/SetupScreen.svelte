@@ -142,8 +142,8 @@
         <button
           class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full text-white font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
           style="background-color: var(--color-accent);"
-          onclick={() => onAddPlayer(newPlayerInput)}
-          disabled={addDisabled}
+          onclick={() => { if (!addDisabled) onAddPlayer(newPlayerInput); }}
+          aria-disabled={addDisabled}
         >
           <Plus size={18} weight="bold" aria-hidden="true" /> Add
         </button>
