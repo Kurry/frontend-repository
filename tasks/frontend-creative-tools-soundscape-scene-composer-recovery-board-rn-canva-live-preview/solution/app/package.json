@@ -1,0 +1,29 @@
+{
+  "name": "soundscape-scene-composer-recovery-board",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "vite preview --host 0.0.0.0 --port 3000",
+    "dev": "vite --host 0.0.0.0 --port 3000",
+    "build": "vite build",
+    "verify:build": "vite build",
+    "start+verify:build": "npm run verify:build && npm start"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "4.3.2",
+    "clsx": "2.1.1",
+    "lucide-react": "0.453.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "tailwind-merge": "2.5.4",
+    "tailwindcss": "4.3.2",
+    "uuid": "^14.0.1",
+    "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@vitejs/plugin-react": "4.2.1",
+    "vite": "5.2.11"
+  }
+}
