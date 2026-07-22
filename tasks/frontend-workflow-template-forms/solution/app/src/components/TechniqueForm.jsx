@@ -1,5 +1,5 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react'
-import { useEffect, useMemo, useRef, useState, memo } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, memo } from 'react'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -197,7 +197,7 @@ export default function TechniqueForm({ technique, active }) {
     }
   }, [])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setSubmitAttempted(false)
     reset({
       ...clone(draft.fields),
