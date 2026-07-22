@@ -1,0 +1,257 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "AC-01"
+name = "signature_mutation"
+description = "place a selected record in a spatial composer and rebalance capacity. The spatial composer mutation changes the primary record, linked view, and status together."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.1"
+name = "primary_data_creates"
+description = "Core: primary data creates."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "primary_data_edits"
+description = "Core: primary data edits."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "primary_data_deletes"
+description = "Core: primary data deletes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "primary_state_retained_on_view_switch"
+description = "Core: view switches retain selection and state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "primary_view_renders"
+description = "Core: main views render."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "primary_list_scrolls"
+description = "Core: lists are scrollable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "primary_filter_sort_updates"
+description = "Core: filter/sort work."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "primary_empty_state_visible"
+description = "Core: empty state shows when no items."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "primary_navigation_functions"
+description = "Core: navigation works without crashing."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "primary_details_expand_collapse"
+description = "Core: details expand and collapse."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "fails_to_create_record"
+description = "Creation fails or does not appear in list."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n2"
+name = "fails_to_edit_record"
+description = "Edit fails or does not persist locally."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n3"
+name = "fails_to_delete_record"
+description = "Deletion fails to remove item."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n4"
+name = "loses_state_on_view_switch"
+description = "Switching views loses primary state."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n5"
+name = "primary_view_broken"
+description = "Primary view throws error or is broken."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n6"
+name = "primary_list_unscrollable"
+description = "List cannot be scrolled."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n7"
+name = "filter_sort_broken"
+description = "Filter or sort is broken or throws error."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n8"
+name = "missing_empty_state"
+description = "No clear empty state for 0 items."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n9"
+name = "navigation_dead_end"
+description = "Navigation leads to a dead end requiring reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n10"
+name = "details_stuck_open_or_closed"
+description = "Details pane gets stuck open or closed."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "core_features.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant defect."
+type = "binary"
+negate = true
+weight = 1.0
