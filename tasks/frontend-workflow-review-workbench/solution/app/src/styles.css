@@ -40,10 +40,10 @@ html { scroll-behavior: smooth; }
 html, body, #root { min-height: 100%; margin: 0; }
 body { min-width: 320px; overflow-x: hidden; background: var(--canvas); }
 button, input, textarea, select { font: inherit; }
-button { transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, transform .1s ease, opacity .18s ease; }
+button { transition: background-color .09s ease, border-color .09s ease, box-shadow .09s ease, transform .09s ease, opacity .09s ease; }
 button:active:not(:disabled) { transform: translateY(1px) scale(.995); }
 button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline: 3px solid rgba(27, 139, 126, .34); outline-offset: 2px; }
-.mantine-Button-root { transition: background-color .18s ease, box-shadow .18s ease, transform .1s ease, opacity .18s ease; }
+.mantine-Button-root { transition: background-color .09s ease, box-shadow .09s ease, transform .09s ease, opacity .09s ease; }
 .mantine-Button-root:hover:not(:disabled) { box-shadow: 0 5px 14px rgba(14, 69, 61, .12); }
 .mantine-Input-input:focus, .mantine-Textarea-input:focus { box-shadow: 0 0 0 3px rgba(27, 139, 126, .15); }
 .app-frame { min-height: 100vh; display: flex; flex-direction: column; }
@@ -84,7 +84,7 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline: 3px s
 .portfolio-table-wrap table { min-width: 1100px; }
 .portfolio-table-wrap thead { background: #eaf0ee; }
 .portfolio-table-wrap th { color: #455451; font-size: 11px; letter-spacing: .07em; text-transform: uppercase; }
-.bundle-row { cursor: pointer; transition: background .18s ease, box-shadow .18s ease; }
+.bundle-row { cursor: pointer; transition: background .09s ease, box-shadow .09s ease; }
 .bundle-row:hover, .bundle-row:focus-within { background: #edf8f5 !important; box-shadow: inset 4px 0 0 var(--teal); }
 .bundle-row td:first-child { min-width: 205px; max-width: 230px; }
 .gate-chip-row { display: grid; grid-template-columns: repeat(3, max-content); gap: 5px; min-width: 370px; }
@@ -421,7 +421,7 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monos
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
 }
 
-.status-chip { transition: background 0.25s ease, color 0.25s ease, transform 0.18s ease; }
+.status-chip { transition: background 0.09s ease, color 0.09s ease, transform 0.09s ease; }
 
 @media (max-width: 768px) {
   button, .mantine-Button-root, .mantine-Select-input, .mantine-TextInput-input, .mantine-Textarea-input, .gate-chip-button, .breadcrumb-link, .step-button, .calibration-cell {
@@ -449,8 +449,8 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monos
   100% { transform: scale(1); box-shadow: var(--shadow-sm); }
 }
 
-.bundle-row { animation: list-enter 0.25s ease both; }
-.bundle-card { animation: list-enter 0.25s ease both; }
+.bundle-row { animation: list-enter 0.09s ease both; }
+.bundle-card { animation: list-enter 0.09s ease both; }
 @keyframes list-enter {
   from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
@@ -458,6 +458,6 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monos
 
 .step-button.active::before {
   content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--teal);
-  border-radius: 4px; animation: slide-in 0.2s ease forwards;
+  border-radius: 4px; animation: slide-in 0.09s ease forwards;
 }
 @keyframes slide-in { from { transform: scaleY(0); } to { transform: scaleY(1); } }

@@ -316,6 +316,7 @@ export const useReviewStore = create<StoreState>((set, get) => ({
         return;
       }
       session.status = 'complete';
+      bundle.timeline.unshift(event('re-run', `${gateName} re-run completed`));
       const gate = bundle.gates.find((item) => item.name === gateName)!;
       const oldStatus = gate.status;
       const emberQuartz = bundle.slug === 'ember-relay-router' && gateName === 'Difficulty — Quartz-Mini';
@@ -360,8 +361,8 @@ export const useReviewStore = create<StoreState>((set, get) => ({
       bundle.timeline.unshift(event('gate-status', `${gateName} changed from ${oldStatus} to ${gate.status}`));
       const cleared = normalizeAfterConstraintChange(bundle);
       announcement = cleared
-        ? `${gateName} changed from ${oldStatus} to ${gate.status}. Recommendation ${cleared} became disallowed and was cleared.`
-        : `${gateName} changed from ${oldStatus} to ${gate.status}.`;
+        ? `${gateName} re-run completed. ${gateName} changed from ${oldStatus} to ${gate.status}. Recommendation ${cleared} became disallowed and was cleared.`
+        : `${gateName} re-run completed. ${gateName} changed from ${oldStatus} to ${gate.status}.`;
     }), ui: { ...state.ui, announcement: announcement || state.ui.announcement } }));
     if (shouldContinue) scheduleAdvance(slug, gateName, delay);
   },
