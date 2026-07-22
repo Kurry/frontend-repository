@@ -251,6 +251,16 @@ export default function TechniqueForm({ technique, active }) {
     setAnnouncement('Prompt not generated. Resolve the named fields and try again.')
   }
 
+  async function announceInvalidField(event) {
+    if (!event.target.matches('input, textarea, select')) return
+    const fieldName = event.target.name
+    if (!fieldName) return
+    const valid = await trigger(fieldName)
+    if (valid) return
+    const label = event.target.labels?.[0]?.textContent?.replace('*', '').trim() || 'Form'
+    setAnnouncement(`${label} has a validation error. Resolve the named field before generating.`)
+  }
+
   useEffect(() => {
     if (!active) return undefined
     window.__templateFormApplyFields = (incoming) => {
@@ -333,6 +343,7 @@ export default function TechniqueForm({ technique, active }) {
     <form
       className={`technique-form ${active ? 'is-active' : 'is-inactive'}`}
       onSubmit={handleSubmit(onValid, onInvalid)}
+      onBlurCapture={announceInvalidField}
       noValidate
     >
       <div className="sr-only" aria-live="polite">{announcement}</div>
@@ -377,7 +388,7 @@ export default function TechniqueForm({ technique, active }) {
           <Section eyebrow="02 · Demonstrations" title="Build an example set">
             <div className="dynamic-stack" ref={parent}>
               {examples.fields.map((field, index) => (
-                <DynamicRow key={field.id} index={index} title="Example" onRemove={() => { examples.remove(index); trigger('examples') }}>
+                <DynamicRow key={field.id} index={index} title="Example" onRemove={() => { examples.remove(index); setSubmitAttempted(true); trigger('examples') }}>
                   <div className="field-grid">
                     <TextField idPrefix={technique} name={`examples.${index}.input`} label="Example input" required register={register} errors={errors} placeholder="Input or question" showError={showFieldError(`examples.${index}.input`)} />
                     <TextField idPrefix={technique} name={`examples.${index}.output`} label="Expected output" required register={register} errors={errors} placeholder="Ideal response" showError={showFieldError(`examples.${index}.output`)} />
@@ -433,7 +444,7 @@ export default function TechniqueForm({ technique, active }) {
           <Section eyebrow="02 · Success" title="Make success measurable">
             <div className="dynamic-stack" ref={parent}>
               {successCriteria.fields.map((field, index) => (
-                <DynamicRow key={field.id} index={index} title="Success criterion" onRemove={() => successCriteria.remove(index)}>
+                <DynamicRow key={field.id} index={index} title="Success criterion" onRemove={() => { successCriteria.remove(index); setSubmitAttempted(true); trigger('successCriteria') }}>
                   <TextField idPrefix={technique} name={`successCriteria.${index}.text`} label={`Criterion ${index + 1}`} required register={register} errors={errors} placeholder="What must be true for this to succeed?" showError={showFieldError(`successCriteria.${index}.text`)} />
                 </DynamicRow>
               ))}
@@ -474,7 +485,7 @@ export default function TechniqueForm({ technique, active }) {
           <Section eyebrow="02 · Boundaries" title="Set explicit constraints">
             <div className="dynamic-stack" ref={parent}>
               {constraints.fields.map((field, index) => (
-                <DynamicRow key={field.id} index={index} title="Constraint" onRemove={() => constraints.remove(index)}>
+                <DynamicRow key={field.id} index={index} title="Constraint" onRemove={() => { constraints.remove(index); setSubmitAttempted(true); trigger('constraints') }}>
                   <div className="constraint-grid">
                     <Select required aria-required labelText={<Label required>Constraint type</Label>} {...register(`constraints.${index}.type`)} id={`${technique}-constraints-${index}-type`}>
                       <SelectItem value="length" text="Length" />
@@ -526,7 +537,7 @@ export default function TechniqueForm({ technique, active }) {
               kind="primary"
               size="md"
               renderIcon={(props) => <ArrowRight {...props} aria-hidden="true" />}
-              disabled={generating}
+              disabled={!isValid || generating}
             >
               {generating ? <InlineLoading description="Generating..." /> : 'Generate prompt'}
             </Button>

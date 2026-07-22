@@ -5,9 +5,11 @@ test('the document starts with its H1 and invalid generation announces named fie
   const headings = await page.locator('h1, h2, h3').evaluateAll((nodes) => nodes.map((node) => ({ tag: node.tagName, text: node.textContent.trim() })))
   expect(headings[0].tag).toBe('H1')
 
-  await page.locator('form.technique-form.is-active').getByRole('button', { name: 'Generate prompt' }).click()
+  const task = page.locator('#zero-shot-taskDescription')
+  await task.focus()
+  await task.blur()
   await expect(page.locator('#zero-shot-taskDescription-error-msg')).toBeVisible()
-  await expect(page.locator('form.technique-form.is-active > [aria-live="polite"]')).toContainText('Prompt not generated')
+  await expect(page.locator('form.technique-form.is-active > [aria-live="polite"]')).toContainText('Task description has a validation error')
 })
 
 test('editing a prior generated draft marks the technique in progress and survives switches', async ({ page }) => {
@@ -49,6 +51,6 @@ test('few-shot can reach zero examples and explains the minimum', async ({ page 
   const removeExamples = page.locator('form.technique-form.is-active').getByRole('button', { name: /Remove example/i })
   await removeExamples.evaluateAll((buttons) => buttons.forEach((button) => button.click()))
   await expect(removeExamples).toHaveCount(0)
-  await page.locator('form.technique-form.is-active').getByRole('button', { name: 'Generate prompt' }).click()
+  await expect(page.locator('form.technique-form.is-active').getByRole('button', { name: 'Generate prompt' })).toBeDisabled()
   await expect(page.getByText('At least one example is required.')).toBeVisible()
 })

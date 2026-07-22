@@ -40,10 +40,30 @@ export default function SaveModal({ launcherButtonRef }) {
   useEffect(() => {
     if (!open) return undefined
     function onKeyDown(event) {
-      if (event.key !== 'Escape') return
-      event.preventDefault()
-      event.stopPropagation()
-      close()
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        event.stopPropagation()
+        close()
+        return
+      }
+      if (event.key !== 'Tab') return
+      const dialog = document.querySelector('[role="dialog"]')
+      if (!dialog) return
+      const focusable = [...dialog.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [href], [tabindex]:not([tabindex="-1"])')]
+        .filter((element) => element.getAttribute('aria-hidden') !== 'true' && element.getClientRects().length > 0)
+      if (!focusable.length) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (!dialog.contains(document.activeElement)) {
+        event.preventDefault()
+        ;(event.shiftKey ? last : first).focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      } else if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      }
     }
     document.addEventListener('keydown', onKeyDown, true)
     return () => document.removeEventListener('keydown', onKeyDown, true)
