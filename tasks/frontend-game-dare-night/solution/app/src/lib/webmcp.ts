@@ -41,6 +41,10 @@ export interface WebmcpActions {
   formSubmit: (args: Record<string, unknown>) => ToolResult;
   formCancel: (args: Record<string, unknown>) => ToolResult;
   formReset: (args: Record<string, unknown>) => ToolResult;
+  // artifact-transfer-v1 — visible export/import/copy workflows
+  artifactExport: () => ToolResult;
+  artifactImport: () => ToolResult;
+  artifactCopy: () => ToolResult;
 }
 
 export function registerWebmcp(actions: WebmcpActions): void {
@@ -88,6 +92,14 @@ export function registerWebmcp(actions: WebmcpActions): void {
       description: 'Cancel an open confirmation dialog (new game or delete-card).', run: (a) => actions.formCancel(a) },
     { name: 'form_reset', module: 'form-workflow-v1', operation: 'reset',
       description: 'Reset the session back to the setup screen (New Game), preserving the saved record.', run: (a) => actions.formReset(a) },
+
+    // ---- artifact-transfer-v1 ----
+    { name: 'artifact_export', module: 'artifact-transfer-v1', operation: 'export',
+      description: 'Open the visible canonical session JSON export preview.', run: () => actions.artifactExport() },
+    { name: 'artifact_import', module: 'artifact-transfer-v1', operation: 'import',
+      description: 'Open the visible Dare Night session import workflow.', run: () => actions.artifactImport() },
+    { name: 'artifact_copy', module: 'artifact-transfer-v1', operation: 'copy',
+      description: 'Copy the canonical session JSON through the visible export workflow.', run: () => actions.artifactCopy() },
   ];
 
   const byName = new Map(tools.map((t) => [t.name, t]));
@@ -97,7 +109,7 @@ export function registerWebmcp(actions: WebmcpActions): void {
   w.webmcp_session_info = () => ({
     contract_version: CONTRACT_VERSION,
     app: 'dare-night',
-    modules: ['command-session-v1', 'entity-collection-v1', 'form-workflow-v1'],
+    modules: ['command-session-v1', 'entity-collection-v1', 'form-workflow-v1', 'artifact-transfer-v1'],
     tool_count: tools.length,
   });
 
