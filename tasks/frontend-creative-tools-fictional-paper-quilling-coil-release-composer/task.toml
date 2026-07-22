@@ -1,0 +1,5 @@
+[task]
+name = "mercor-intelligence/frontend-creative-tools-fictional-paper-quilling-coil-release-composer"
+version = "1.0.0"
+description = "Build a symbolic paper-coil composition workbench."
+authors = [{ name = "Claude", email = "claude@example.com" }]
