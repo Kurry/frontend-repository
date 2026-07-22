@@ -157,6 +157,24 @@ class TestWebmcpContract(unittest.TestCase):
         self.assertEqual(missing_contract, [],
                          f"instructions missing <webmcp_action_contract>: {missing_contract}")
 
+    def test_every_task_dir_has_source_metadata(self) -> None:
+        """Generated shared surfaces require source metadata for every task."""
+        sources = json.loads((SCHEMAS / "webmcp-task-sources.json").read_text())
+        task_dirs = sorted(
+            p.name for p in (ROOT / "tasks").iterdir()
+            if p.is_dir() and p.name.startswith("frontend-")
+            and (p / "instruction.md").exists()
+        )
+        missing = [
+            task for task in task_dirs
+            if not sources.get(task, {}).get("description")
+        ]
+        self.assertEqual(
+            missing,
+            [],
+            f"task dirs without source metadata descriptions: {missing}",
+        )
+
     def test_delivery_requires_package_json_scripts(self) -> None:
         preamble = webmcp_h3.render_instruction_preamble()
         self.assertIn("<integrity>", preamble)

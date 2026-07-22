@@ -60,6 +60,7 @@
     $$(".add-to-shortlist-btn").forEach(function (b) {
       var on = store.shortlist.indexOf(b.getAttribute("data-tier")) >= 0;
       b.setAttribute("aria-pressed", on ? "true" : "false");
+      b.setAttribute("aria-label", (on ? "Remove " : "Add ") + b.getAttribute("data-tier") + " Studio " + (on ? "from" : "to") + " shortlist");
       b.textContent = on ? "Remove from shortlist" : "Add to shortlist";
     });
     refreshPacketPreview();

@@ -139,7 +139,7 @@ test.describe('Grid Paint Studio E2E', () => {
     expect(errors).toEqual([]);
   });
 
-  test('full e2e user flow', async ({ page, browserName }) => {
+  test('paint_gallery_export_mode_switch', async ({ page, browserName }) => {
     // 1. Initial Load & structural validation
     await expect(page.getByRole('heading', { name: '<GRID PAINT STUDIO>', exact: true })).toBeVisible();
     await expect(page.getByText('YOU ARE THE ALGORITHM')).toBeVisible();

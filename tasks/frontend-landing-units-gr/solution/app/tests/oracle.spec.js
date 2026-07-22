@@ -127,15 +127,19 @@ test("shortlist drawer stays on-screen and exposes undo and redo", async ({ page
 test("two inquiry sessions each export a valid packet for current values", async ({ page }) => {
   await page.goto("/");
   await dismissConsent(page);
+
+  // Shortlist Flex studio (740€/month)
+  await page.getByRole("button", { name: "Add Flex Studio to shortlist" }).click();
+
   await page.locator("section.hero [data-action='open-inquiry']").click();
   const dialog = page.locator("#booking-inquiry-overlay");
   const moveIn = `${new Date().getFullYear() + 1}-01`;
 
-  async function submitAndExport(name, email) {
+  async function submitAndExport(name, email, tier) {
     await dialog.locator("[name='full_name']").fill(name);
     await dialog.locator("[name='email']").fill(email);
     await dialog.locator("[name='phone']").fill("+30 210 123 4567");
-    await dialog.locator("[name='studio_tier']").selectOption("Boost");
+    await dialog.locator("[name='studio_tier']").selectOption(tier);
     await dialog.locator("[name='move_in_month']").fill(moveIn);
     await dialog.locator("[name='privacy_consent']").check();
     await dialog.getByRole("button", { name: "Submit inquiry" }).click();
@@ -146,11 +150,14 @@ test("two inquiry sessions each export a valid packet for current values", async
     const packet = JSON.parse(await readFile(await download.path(), "utf8"));
     expect(packet.inquiry.full_name).toBe(name);
     expect(packet.inquiry.email).toBe(email);
+    expect(packet.inquiry.studio_tier).toBe(tier);
+    expect(packet.inquiry.privacy_consent).toBe(true);
     expect(packet.inquiry.submitted).toBe(true);
-    expect(packet.monthly_estimate_eur).toBe(0);
+    expect(packet.shortlist).toEqual([{ tier: "Flex", monthly_rent_eur: 740 }]);
+    expect(packet.monthly_estimate_eur).toBe(740);
   }
 
-  await submitAndExport("First Resident", "first@example.com");
+  await submitAndExport("First Resident", "first@example.com", "Flex");
   await dialog.getByRole("button", { name: "Reset" }).click();
-  await submitAndExport("Second Resident", "second@example.com");
+  await submitAndExport("Second Resident", "second@example.com", "Flex");
 });

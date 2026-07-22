@@ -483,7 +483,9 @@ export default function App() {
     const exists = state.boards.some((board) => board.name === name);
     if (!exists) return false;
     const complete = () => batch(() => {
-      setState("boards", (boards) => boards.filter((board) => board.name !== name));
+      const remaining = state.boards.filter((board) => board.name !== name);
+      setState("boards", remaining);
+      if (remaining.length === 0 && state.tagFilter) setState("tagFilter", "");
       if (state.selectedBoard === name) setState("selectedBoard", null);
       setDeletingBoard("");
     });

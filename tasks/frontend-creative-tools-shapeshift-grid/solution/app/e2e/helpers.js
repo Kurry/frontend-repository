@@ -55,6 +55,12 @@ export async function remove(page, name) {
 
 export async function removeAll(page) {
   await gallery(page)
+  const clearFilter = page.getByRole('button', { name: 'Clear filter' })
+  if (await clearFilter.isVisible()) {
+    await clearFilter.click()
+  } else {
+    await chooseTag(page, 'All tags').catch(() => {})
+  }
   while (await cards(page).count()) {
     const first = cards(page).first()
     const button = first.getByRole('button', { name: /^Delete / })
@@ -68,6 +74,9 @@ export async function removeAll(page) {
     }).toBe(true)
     await confirm.click()
     await expect(card).toHaveCount(0)
+    if (await clearFilter.isVisible()) {
+      await clearFilter.click()
+    }
   }
 }
 
