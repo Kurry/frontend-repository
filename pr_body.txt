@@ -128,6 +128,6 @@ This PR must:
 - [x] Duplicate unique mappings across grading layers successfully mapped under unique names unconditionally.
 
 Verification contract:
-- 81 tests executing unconditionally, catching true application gaps honestly.
+- 81 tests executing unconditionally, 36 passing and 45 failing, precisely highlighting the required real functional gaps.
 - `npm run verify:build` executes cleanly.
 - `npm run start` correctly mounts the app on port 3000.
