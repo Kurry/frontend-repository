@@ -122,11 +122,26 @@ test('1.1 controls_are_keyboard_accessible', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const fab = page.getByRole('button', { name: 'Open export drawer' });
-  await fab.focus();
+  // Reach the FAB via real Tab traversal (not a programmatic .focus() call):
+  // this is what an actual keyboard user does, and it is the input modality
+  // the browser's :focus-visible heuristic keys off of.
+  let reachedByTab = false;
+  for (let i = 0; i < 150; i += 1) {
+    await page.keyboard.press('Tab');
+    // eslint-disable-next-line no-await-in-loop
+    if (await fab.evaluate((el) => document.activeElement === el)) {
+      reachedByTab = true;
+      break;
+    }
+  }
+  expect(reachedByTab, 'the FAB is reachable via sequential keyboard Tab navigation').toBe(true);
   await expect(fab, 'the FAB is reachable via keyboard focus').toBeFocused();
   const hasVisibleFocus = await fab.evaluate((el) => {
     const cs = getComputedStyle(el);
-    return cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) > 0;
+    // Require the browser's own focus-visible heuristic to have applied
+    // (real keyboard focus) AND a rendered outline — a stray box-shadow
+    // that is present regardless of focus state does not count.
+    return el.matches(':focus-visible') && cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) > 0;
   });
   expect(hasVisibleFocus, 'focused control shows a visible focus indicator').toBe(true);
   await page.keyboard.press('Enter');
@@ -218,7 +233,7 @@ test('1.6 headings_follow_logical_order', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   const readLevels = () => page.evaluate(() =>
     Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6'))
-      .filter((el) => el.offsetParent !== null || el.closest('[aria-hidden="true"]') === null)
+      .filter((el) => el.offsetParent !== null && el.closest('[aria-hidden="true"]') === null)
       .map((el) => Number(el.tagName[1])));
   const assertNoSkips = (levels, where) => {
     expect(levels.length, `${where} has at least one heading`).toBeGreaterThan(0);
