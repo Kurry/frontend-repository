@@ -16,6 +16,7 @@ import {
   isErrorResult,
 } from './oracle_ci_semantics.mjs';
 import { runE2eSuite } from './oracle_ci_e2e.mjs';
+import { isReadOnly, runReadProbe, toolSchema, valueForSchema } from './oracle_ci_probe.mjs';
 
 const { chromium } = resolvePlaywright();
 const APP_URL = 'http://127.0.0.1:3000';
@@ -141,43 +142,6 @@ function descriptorModule(tool) {
   const name = String(tool.name || '');
   return Object.entries(MODULE_PREFIX).find(([, prefix]) =>
     name.startsWith(`${prefix}.`) || name.startsWith(`${prefix}_`))?.[0];
-}
-
-function toolSchema(tool) {
-  return tool.inputSchema || tool.input_schema || tool.parameters || { type: 'object' };
-}
-
-function valueForSchema(schema, key = '', depth = 0) {
-  if (!schema || typeof schema !== 'object' || depth > 5) return undefined;
-  if ('const' in schema) return schema.const;
-  if (Array.isArray(schema.enum) && schema.enum.length) return schema.enum[0];
-  if ('default' in schema) return schema.default;
-  const type = Array.isArray(schema.type) ? schema.type.find((item) => item !== 'null') : schema.type;
-  if (type === 'object' || schema.properties) {
-    const result = {};
-    for (const required of schema.required || []) {
-      const value = valueForSchema(schema.properties?.[required] || {}, required, depth + 1);
-      if (value === undefined) return undefined;
-      result[required] = value;
-    }
-    return result;
-  }
-  if (type === 'array') {
-    const item = valueForSchema(schema.items || {}, key, depth + 1);
-    return item === undefined ? [] : [item];
-  }
-  if (type === 'boolean') return true;
-  if (type === 'integer' || type === 'number') return schema.minimum ?? schema.min ?? 1;
-  if (type === 'string' || !type) {
-    if (/query|search|name|title|note|text|content|reason/i.test(key)) return 'oracle-ci';
-    return undefined;
-  }
-  return undefined;
-}
-
-function isReadOnly(tool) {
-  if (tool.annotations?.readOnlyHint === true) return true;
-  return /(?:^|[._])(search|validate|select)$/.test(String(tool.name || ''));
 }
 
 async function invokeTool(page, name, args) {
@@ -315,27 +279,14 @@ async function browserAndWebMcp(config) {
       );
     }
 
-    const readCandidates = tools
-      .filter(isReadOnly)
-      .map((tool) => ({ tool, args: valueForSchema(toolSchema(tool)) }))
-      .filter(({ args }) => args !== undefined);
-    let readProbe = null;
-    const readFailures = [];
-    for (const candidate of readCandidates) {
-      try {
-        const result = await invokeTool(page, candidate.tool.name, candidate.args);
-        if (!isErrorResult(result)) {
-          readProbe = candidate.tool.name;
-          break;
-        }
-        readFailures.push(`${candidate.tool.name}: error result`);
-      } catch (error) {
-        readFailures.push(`${candidate.tool.name}: ${error.message}`);
-      }
+    const read = await runReadProbe(tools, (name, args) => invokeTool(page, name, args));
+    if (!read.readProbe) {
+      throw new StageError('webmcp', `no read-only app tool round-tripped (${read.failures.join('; ') || 'none declared'})`);
     }
-    if (!readProbe) {
-      throw new StageError('webmcp', `no read-only app tool round-tripped (${readFailures.join('; ') || 'none declared'})`);
+    if (read.warning) {
+      console.log(`ORACLE_CI_STAGE ${config.slug} [webmcp]: WARNING ${read.warning}`);
     }
+    const readProbe = read.readProbe;
 
     const mutationCandidates = tools
       .filter((tool) => !isReadOnly(tool))

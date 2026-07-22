@@ -103,6 +103,77 @@ def test_runtime_rejects_both_standard_false_success_shapes() -> None:
     assert json.loads(result.stdout) == [True, True, False]
 
 
+# --- read probe (assets/oracle_ci_probe.mjs) ---------------------------------
+
+_PROBE_HELPER = Path(__file__).parents[1] / "src/corpuscheck/assets/oracle_ci_probe.mjs"
+
+
+def run_read_probe(tools: object, invoke_body: str) -> dict:
+    """Drive runReadProbe with an in-process fake `invoke` and capture calls.
+
+    `invoke_body` is the JS body of `async (name, args) => { ... }`; it may push
+    onto the `calls` array and must return the fake tool result.
+    """
+    script = f"""
+      import {{ runReadProbe }} from {json.dumps(_PROBE_HELPER.as_uri())};
+      const tools = {json.dumps(tools)};
+      const calls = [];
+      const invoke = async (name, args) => {{ calls.push([name, args]); {invoke_body} }};
+      const result = await runReadProbe(tools, invoke);
+      console.log(JSON.stringify({{ result, calls }}));
+    """
+    completed = subprocess.run(
+        ["node", "--input-type=module", "--eval", script],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return json.loads(completed.stdout.strip().splitlines()[-1])
+
+
+_SLUG_TOOL = {
+    "name": "entity_select",
+    "inputSchema": {
+        "type": "object",
+        "properties": {"slug": {"type": "string"}},
+        "required": ["slug"],
+        "additionalProperties": False,
+    },
+}
+
+
+def test_read_probe_lenient_synthesis_passes_on_success_result() -> None:
+    payload = run_read_probe([_SLUG_TOOL], "return { ok: true, project: { slug: args.slug } };")
+
+    assert payload["result"]["readProbe"] == "entity_select"
+    assert "warning" not in payload["result"]
+    # Lenient synthesis supplies the generic probe string for the unkeyworded
+    # required `slug` that the old keyword gate left undefined.
+    assert payload["calls"] == [["entity_select", {"slug": "oracle-ci"}]]
+
+
+def test_read_probe_degraded_passes_on_well_formed_error_envelope() -> None:
+    payload = run_read_probe(
+        [_SLUG_TOOL],
+        "return { ok: false, error: 'unknown slug: ' + args.slug };",
+    )
+
+    assert payload["result"]["readProbe"] == "entity_select"
+    assert (
+        payload["result"]["warning"]
+        == "read probe round-tripped via error envelope from entity_select;"
+        " no synthesizable success path"
+    )
+
+
+def test_read_probe_fails_on_malformed_response() -> None:
+    # `null` (not an object) and `{ error: 'boom' }` (an error-flagged object with
+    # no ok/success key) are both malformed envelopes: the round-trip is not proven.
+    for body in ("return null;", "return { error: 'boom' };"):
+        payload = run_read_probe([_SLUG_TOOL], body)
+        assert payload["result"]["readProbe"] is None
+
+
 def test_changed_oracle_slugs_filters_and_deduplicates_solution_paths(
     tmp_path: Path,
 ) -> None:
