@@ -121,6 +121,16 @@ export default function StepColours() {
               class="h-[46px] w-[180px] cursor-pointer appearance-none rounded-md border-2 border-scope-bg2 bg-scope-bg2 pl-3 pr-9 text-sm font-medium text-scope-fg1 transition-[border-color,box-shadow] duration-150 hover:border-scope-bg3 hover:shadow-sm focus:border-scope-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-scope-accent focus-visible:ring-offset-1"
               value={state.baseTheme}
               onChange={(e) => selectTheme(e.currentTarget.value as ThemeName)}
+              onKeyDown={(e) => {
+                if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+                e.preventDefault();
+                const current = THEME_ORDER.indexOf(state.baseTheme);
+                const next = Math.max(
+                  0,
+                  Math.min(THEME_ORDER.length - 1, current + (e.key === "ArrowDown" ? 1 : -1)),
+                );
+                if (next !== current) selectTheme(THEME_ORDER[next]);
+              }}
             >
               <For each={THEME_ORDER}>{(t) => <option value={t}>{t}</option>}</For>
             </select>
