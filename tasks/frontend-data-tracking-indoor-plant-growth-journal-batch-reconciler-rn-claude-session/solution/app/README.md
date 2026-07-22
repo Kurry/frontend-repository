@@ -1,32 +1,17 @@
-# React + TypeScript + Vite
+# Indoor Plant Growth Journal Batch Reconciler Rn Claude Session — Oracle
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Reference solution (oracle) for the `frontend-data-tracking-indoor-plant-growth-journal-batch-reconciler-rn-claude-session` task. Serves the app
+described in `../../instruction.md`; used by `solve.sh`, the reference
+screenshot capture harness, and oracle validation runs. Must serve with
+zero console/page errors.
 
-Currently, two official plugins are available:
+## Run
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+    npm install
+    npm run verify:build
+    npm start          # serves on port 3000
 
-## React Compiler
+## WebMCP
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Registers the task's contract modules: entity-collection-v1, artifact-transfer-v1. Tools are exposed via
+window.webmcp_session_info / webmcp_list_tools / webmcp_invoke_tool.

@@ -5,7 +5,6 @@ prompt_template = "../system_prompt.md"
 cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
-weight = 0.25
 
 [[judge.mcp_servers]]
 name = "webmcp"
@@ -246,5 +245,12 @@ weight = 1.0
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "innovation.ac_11_linked_utility"
+name = "ac_11_linked_utility"
+description = "Mutate a record and use the linked representation to make the next decision. Linked views provide domain utility beyond CRUD."
 type = "binary"
 weight = 1.0

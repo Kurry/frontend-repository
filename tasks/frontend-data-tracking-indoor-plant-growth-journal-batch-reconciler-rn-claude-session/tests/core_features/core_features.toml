@@ -89,27 +89,12 @@ allowed_tools = [
 ]
 
 [scoring]
-aggregation = "weighted_mean"
+aggregation = "sum"
 
-[dimension]
-id = "core_features"
-name = "Core features"
-description = "Criteria measuring the presence and functionality of the core application features."
 
 [[criterion]]
-id = "core_features.signature_interaction"
-title = "Signature Interaction: Batch Reconciler"
+id = "core_features.ac_01_signature_interaction"
+name = "ac_01_signature_interaction"
 description = "The batch reconciler mutation changes the primary record, linked view, and status together."
-weight = 1
-
-[[criterion]]
-id = "core_features.undo"
-title = "Undo functionality"
-description = "Undo restores ordering, selection, and derived values after a mutation."
-weight = 1
-
-[[criterion]]
-id = "core_features.crud"
-title = "CRUD Operations"
-description = "User can create, edit, delete, and filter one plant observation record at a time by its domain status."
-weight = 1
+type = "binary"
+weight = 1.0

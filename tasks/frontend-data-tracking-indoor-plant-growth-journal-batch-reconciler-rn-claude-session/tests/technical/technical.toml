@@ -89,15 +89,12 @@ allowed_tools = [
 ]
 
 [scoring]
-aggregation = "weighted_mean"
+aggregation = "sum"
 
-[dimension]
-id = "technical"
-name = "Technical"
-description = "Criteria measuring the implementation specifics like state, schema contract, and artifacts."
 
 [[criterion]]
-id = "technical.schema_contract"
-title = "Schema Contract"
+id = "technical.ac_04_schema_contract"
+name = "ac_04_schema_contract"
 description = "The tool result and artifact contain the declared API-shaped fields."
-weight = 1
+type = "binary"
+weight = 1.0

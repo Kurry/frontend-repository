@@ -248,3 +248,10 @@ description = "The app exhibits a significant, browser-observable defect in resp
 type = "binary"
 negate = true
 weight = 1.0
+
+[[criterion]]
+id = "responsiveness.ac_07_mobile_mode"
+name = "ac_07_mobile_mode"
+description = "Use the signature interaction at a narrow viewport. The desktop surface becomes a usable stack/drawer/stepper without horizontal overflow."
+type = "binary"
+weight = 1.0

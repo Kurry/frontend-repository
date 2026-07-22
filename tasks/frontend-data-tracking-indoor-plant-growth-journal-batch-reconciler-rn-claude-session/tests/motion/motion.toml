@@ -89,15 +89,12 @@ allowed_tools = [
 ]
 
 [scoring]
-aggregation = "weighted_mean"
+aggregation = "sum"
 
-[dimension]
-id = "motion"
-name = "Motion"
-description = "Criteria measuring causal parity and reduced motion."
 
 [[criterion]]
-id = "motion.causal_motion"
-title = "Causal Motion"
+id = "motion.ac_03_causal_motion"
+name = "ac_03_causal_motion"
 description = "Motion connects the acted-on item to its new state and has a reduced-motion equivalent."
-weight = 1
+type = "binary"
+weight = 1.0

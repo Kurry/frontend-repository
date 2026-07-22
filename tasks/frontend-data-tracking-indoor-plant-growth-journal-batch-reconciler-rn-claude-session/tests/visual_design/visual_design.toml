@@ -89,15 +89,12 @@ allowed_tools = [
 ]
 
 [scoring]
-aggregation = "weighted_mean"
+aggregation = "sum"
 
-[dimension]
-id = "visual_design"
-name = "Visual design"
-description = "Criteria measuring the visual hierarchy, layout map, and distinctive workbench look."
 
 [[criterion]]
-id = "visual_design.visual_hierarchy"
-title = "Visual Hierarchy"
+id = "visual_design.ac_02_visual_hierarchy"
+name = "ac_02_visual_hierarchy"
 description = "The visual hierarchy makes current state and next action clear."
-weight = 1
+type = "binary"
+weight = 1.0

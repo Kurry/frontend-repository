@@ -248,3 +248,10 @@ description = "The app exhibits a significant, browser-observable defect in fide
 type = "binary"
 negate = true
 weight = 1.0
+
+[[criterion]]
+id = "design_fidelity.ac_12_source_fidelity"
+name = "ac_12_source_fidelity"
+description = "Compare the implementation with the cited source interaction vocabulary. The visual and interaction thesis is coherent without copying unrelated screens."
+type = "binary"
+weight = 1.0
