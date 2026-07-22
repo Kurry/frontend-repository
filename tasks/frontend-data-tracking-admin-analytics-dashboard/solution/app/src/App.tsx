@@ -271,11 +271,10 @@ function AllUsers() {
   const { filterRole, filterStatus, sort, selection, density } = useSelector((s: RootState) => s.ui);
   const filtered = useFiltered();
   const kpiUsers = useRoleStatusFiltered();
-  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
-  useEffect(() => {
+  const rowSelection = useMemo(() => {
     const next: Record<string, boolean> = {};
     selection.forEach((id) => { if (filtered.some((u) => u.id === id)) next[id] = true; });
-    setRowSelection(next);
+    return next;
   }, [selection, filtered]);
 
   const columns = useMemo<ColumnDef<User>[]>(() => [
@@ -284,7 +283,7 @@ function AllUsers() {
         checked={table.getIsAllPageRowsSelected()} onChange={table.getToggleAllPageRowsSelectedHandler()} /> ),
       cell: ({ row }) => (
         <input type="checkbox" aria-label={`Select ${row.original.firstName} ${row.original.lastName}`} className="check-box"
-          checked={row.getIsSelected()} onChange={() => dispatch(toggleSelection(row.original.id))} /> ),
+          checked={selection.includes(row.original.id)} onChange={() => dispatch(toggleSelection(row.original.id))} /> ),
     },
     { header: 'User', accessorFn: (r) => `${r.firstName} ${r.lastName}`, cell: (info) => {
       const u = info.row.original;
@@ -306,9 +305,10 @@ function AllUsers() {
           <TrashIcon className="icon-sm" /></button>
       </div>
     ) },
-  ], [dispatch, filtered]);
+  ], [dispatch, filtered, selection]);
 
   const table = useReactTable({ data: filtered, columns, state: { rowSelection }, enableRowSelection: true,
+    getRowId: (row) => row.id,
     onRowSelectionChange: (up) => {
       const next = typeof up === 'function' ? up(rowSelection) : up;
       dispatch(setSelection(Object.keys(next).filter((k) => next[k])));
@@ -721,7 +721,9 @@ function ExportDrawer() {
     }
   }, [exportOpen]);
   useEffect(() => {
-    if (exportOpen) setMsg({ kind: 'success', text: `${exportTab === 'json' ? 'Session JSON' : 'Users CSV'} preview ready for ${users.length} users` });
+    if (exportOpen) setMsg((current) => current?.text.startsWith('Imported ')
+      ? current
+      : { kind: 'success', text: `${exportTab === 'json' ? 'Session JSON' : 'Users CSV'} preview ready for ${users.length} users` });
   }, [exportOpen, exportTab, users.length]);
   useEffect(() => {
     if (!exportOpen) return;

@@ -28,6 +28,8 @@ export interface User {
 }
 
 export type SortKey = 'last-active' | 'newest' | 'highest-spend' | 'name-az';
+const SORT_KEYS: SortKey[] = ['last-active', 'newest', 'highest-spend', 'name-az'];
+const ACTIVE_VIEWS = ['operations-overview', 'all-users', 'add-user', 'roles', 'permissions', 'user-logs', 'user-stats', 'user-payments', 'user-products'];
 
 const av = (i: number) => ((i - 1) % 6) + 1;
 const daysAgo = (d: number) => new Date(Date.now() - d * 86400000).toISOString();
@@ -192,12 +194,21 @@ function validUserRow(r: any, idx: number, requirePassword: boolean): string | n
 export function importSessionJson(text: string): ImportErr {
   let doc: any;
   try { doc = JSON.parse(text); } catch { return { ok: false, message: 'payload is not valid JSON' }; }
-  if (!doc || typeof doc !== 'object') return { ok: false, message: 'payload must be a JSON object' };
+  if (!doc || typeof doc !== 'object' || Array.isArray(doc)) return { ok: false, message: 'payload must be a JSON object' };
   if (doc.schemaVersion !== SCHEMA_VERSION) return { ok: false, message: `schemaVersion must be exactly ${SCHEMA_VERSION}` };
+  if (typeof doc.exportedAt !== 'string' || !/^\d{4}-\d{2}-\d{2}T/.test(doc.exportedAt) || !Number.isFinite(Date.parse(doc.exportedAt)))
+    return { ok: false, message: 'exportedAt is required and must be an ISO-8601 timestamp' };
   if (!Array.isArray(doc.users)) return { ok: false, message: 'users must be an array' };
   const k = doc.kpis;
-  if (k && ['total', 'active', 'paying', 'suspended'].some((x) => k[x] != null && (Number(k[x]) < 0 || !Number.isFinite(Number(k[x])))))
-    return { ok: false, message: 'kpis contain a negative or non-numeric figure' };
+  if (!k || typeof k !== 'object' || ['total', 'active', 'paying', 'suspended'].some((x) => !Number.isInteger(k[x]) || k[x] < 0))
+    return { ok: false, message: 'kpis must require non-negative integer total, active, paying, and suspended values' };
+  if (!doc.filters || typeof doc.filters !== 'object' || !Object.hasOwn(doc.filters, 'role') || !Object.hasOwn(doc.filters, 'status'))
+    return { ok: false, message: 'filters must require role and status' };
+  if (doc.filters.role !== null && !ROLES.includes(doc.filters.role)) return { ok: false, message: `filters.role must be null or one of ${ROLES.join(', ')}` };
+  if (doc.filters.status !== null && !STATUSES.includes(doc.filters.status)) return { ok: false, message: `filters.status must be null or one of ${STATUSES.join(', ')}` };
+  if (!SORT_KEYS.includes(doc.sort)) return { ok: false, message: `sort must be one of ${SORT_KEYS.join(', ')}` };
+  if (doc.theme !== 'light' && doc.theme !== 'dark') return { ok: false, message: 'theme must be light or dark' };
+  if (typeof doc.activeView !== 'string' || !ACTIVE_VIEWS.includes(doc.activeView)) return { ok: false, message: `activeView must be one of ${ACTIVE_VIEWS.join(', ')}` };
   const out: User[] = [];
   for (let i = 0; i < doc.users.length; i++) {
     const err = validUserRow(doc.users[i], i + 1, false);
@@ -211,10 +222,12 @@ export function importSessionJson(text: string): ImportErr {
       lastActive: String(r.lastActive), avatar: av(i + 1),
     });
   }
+  const expectedKpis = computeKpis(filterUsersForKpis(out, doc.filters.role || '', doc.filters.status || ''));
+  if (['total', 'active', 'paying', 'suspended'].some((key) => k[key] !== expectedKpis[key as keyof Kpis]))
+    return { ok: false, message: 'kpis must match the imported users and active filters' };
   return { ok: true, users: out, applied: {
     role: doc.filters?.role ?? '', status: doc.filters?.status ?? '',
-    sort: (['last-active', 'newest', 'highest-spend', 'name-az'].includes(doc.sort) ? doc.sort : 'newest') as SortKey,
-    theme: doc.theme === 'light' ? 'light' : 'dark', activeView: doc.activeView || 'operations-overview',
+    sort: doc.sort, theme: doc.theme, activeView: doc.activeView,
   } };
 }
 
@@ -222,9 +235,8 @@ export function importUsersCsv(text: string): ImportErr {
   const lines = text.replace(/\r/g, '').split('\n').filter((l) => l.trim() !== '');
   if (lines.length === 0) return { ok: false, message: 'CSV is empty' };
   const header = splitCsvLine(lines[0]).map((h) => h.trim());
-  const need = ['firstName', 'lastName', 'email', 'role', 'status'];
-  const missing = need.find((n) => !header.includes(n));
-  if (missing) return { ok: false, message: `CSV header missing required column: ${missing}` };
+  if (header.length !== CSV_COLS.length || header.some((column, index) => column !== CSV_COLS[index]))
+    return { ok: false, message: `CSV header must be exactly ${CSV_HEADER}` };
   const out: User[] = [];
   for (let i = 1; i < lines.length; i++) {
     const vals = splitCsvLine(lines[i]).map(parseCsvField);

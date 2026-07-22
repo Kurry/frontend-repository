@@ -331,3 +331,77 @@ test('1.10 status_role_not_color_only', async ({ page }) => {
   }
   expect(matched, 'every status badge carries its status as visible text, not color alone').toBe(count);
 });
+
+test('regression bulk selection stays synchronized with status updates', async ({ page }) => {
+  await page.goto(BASE);
+  await page.getByRole('button', { name: 'All Users' }).click();
+
+  for (const name of ['Katherine Johnson', 'Grace Hopper', 'Margaret Hamilton']) {
+    const checkbox = page.getByRole('checkbox', { name: `Select ${name}` });
+    await checkbox.check();
+    await expect(checkbox).toBeChecked();
+  }
+
+  await expect(page.getByText('3 selected')).toBeVisible();
+  await page.getByRole('combobox', { name: 'Change status for selected' }).selectOption('Suspended');
+
+  for (const name of ['Katherine Johnson', 'Grace Hopper', 'Margaret Hamilton']) {
+    await expect(page.locator('tbody tr').filter({ hasText: name })).toContainText('Suspended');
+  }
+});
+
+test('regression import requires every Session JSON contract field atomically', async ({ page }) => {
+  await page.goto(BASE);
+  await expect(page.getByRole('button', { name: 'Open export drawer' })).toBeVisible();
+  await invokeTool(page, 'artifact_export', { export_formats: ['json'] });
+
+  const drawer = page.getByRole('dialog', { name: 'Export and import session' });
+  await expect(drawer).toBeVisible();
+  const original = JSON.parse(await drawer.locator('pre').innerText());
+  await drawer.getByRole('button', { name: 'Close export drawer' }).click();
+  await expect(drawer).toBeHidden();
+
+  const invalidDocuments = [
+    ['exportedAt', { ...original, exportedAt: undefined }],
+    ['filters.role', { ...original, filters: { ...original.filters, role: 'Owner' } }],
+    ['sort', { ...original, sort: 'oldest' }],
+    ['theme', { ...original, theme: 'system' }],
+    ['activeView', { ...original, activeView: 'unknown-view' }],
+    ['kpis', { ...original, kpis: { ...original.kpis, total: original.kpis.total + 1 } }],
+  ];
+  for (const [field, document] of invalidDocuments) {
+    const result = await invokeTool(page, 'artifact_import', {
+      import_modes: ['session-json'], content: JSON.stringify(document),
+    });
+    expect(result.error).toContain(field);
+  }
+
+  await invokeTool(page, 'artifact_export', { export_formats: ['json'] });
+  await expect(drawer).toBeVisible();
+  const after = JSON.parse(await drawer.locator('pre').innerText());
+  expect(after.users).toEqual(original.users);
+  expect(after.kpis).toEqual(original.kpis);
+});
+
+test('regression Users CSV import requires the exact interoperable header', async ({ page }) => {
+  await page.goto(BASE);
+  await expect(page.getByRole('button', { name: 'Open export drawer' })).toBeVisible();
+  await invokeTool(page, 'artifact_export', { export_formats: ['json'] });
+
+  const drawer = page.getByRole('dialog', { name: 'Export and import session' });
+  await expect(drawer).toBeVisible();
+  const original = JSON.parse(await drawer.locator('pre').innerText());
+  await drawer.getByRole('button', { name: 'Close export drawer' }).click();
+  await expect(drawer).toBeHidden();
+
+  const malformed = 'firstName,lastName,email,role,status,lastActive\nBad,Header,bad@example.com,Member,Active,2026-07-22T00:00:00.000Z';
+  const result = await invokeTool(page, 'artifact_import', {
+    import_modes: ['users-csv'], content: malformed,
+  });
+  expect(result.error).toContain('CSV header');
+
+  await invokeTool(page, 'artifact_export', { export_formats: ['json'] });
+  await expect(drawer).toBeVisible();
+  const after = JSON.parse(await drawer.locator('pre').innerText());
+  expect(after.users).toEqual(original.users);
+});
