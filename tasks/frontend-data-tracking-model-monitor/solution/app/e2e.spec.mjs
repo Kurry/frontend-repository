@@ -397,7 +397,11 @@ test('11.4 optional_budget_burn_projection', async ({ page }) => {
 
 test('11.5 optional_provider_health_affordance', async ({ page }) => {
   await page.goto('http://localhost:3000');
-  await expect(page.getByText('Fastest simulated provider link')).toBeVisible();
+  const latencyCues = page.locator('.latency-cue[title="Simulated provider latency"]');
+  await expect(latencyCues.first()).toBeVisible();
+  expect(await latencyCues.count()).toBeGreaterThan(0);
+  await expect(latencyCues.first()).toHaveText(/^\d+ ms$/);
+  await expect(latencyCues.first()).toHaveClass(/\b(?:fast|steady|slow)\b/);
 });
 
 // NOT-AUTOMATABLE: innovation.catchall is a subjective judge-only criterion
