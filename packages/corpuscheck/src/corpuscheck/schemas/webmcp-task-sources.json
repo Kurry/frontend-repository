@@ -1,4 +1,9 @@
 {
+  "frontend-data-tracking-reading-velocity-backlog-observatory": {
+    "source": "Reading Velocity Backlog Observatory",
+    "instruction": "tasks/frontend-data-tracking-reading-velocity-backlog-observatory/instruction.md",
+    "description": "Reading-capacity calibration and backlog observatory for ordering, allocation, focus, and rollover."
+  },
   "frontend-creative-tools-annotation-studio": {
     "source": "feature-labeling-annotation-studio PRD",
     "instruction": "tasks/frontend-creative-tools-annotation-studio/instruction.md",
@@ -99,6 +104,11 @@
     "instruction": "tasks/frontend-creative-tools-prompt-workbench/instruction.md",
     "description": "Prompt workbench editor with streaming runs, variants, and library."
   },
+  "frontend-creative-tools-quilt-seam-topology-studio": {
+    "source": "feature-quilt-seam-topology-studio PRD",
+    "instruction": "tasks/frontend-creative-tools-quilt-seam-topology-studio/instruction.md",
+    "description": "Quilt topology studio for pieces, seams, fabric nesting, assembly, and interoperable project artifacts."
+  },
   "frontend-creative-tools-rubric-studio": {
     "source": "mercor-constellation rubric surfaces (debranded)",
     "instruction": "tasks/frontend-creative-tools-rubric-studio/instruction.md",
@@ -109,10 +119,25 @@
     "instruction": "tasks/frontend-creative-tools-schema-builder/instruction.md",
     "description": "Output schema builder with tree editor, playground, and versions."
   },
+  "frontend-creative-tools-stack-trace-path-finder": {
+    "source": "Stack-Trace Path Finder",
+    "instruction": "tasks/frontend-creative-tools-stack-trace-path-finder/instruction.md",
+    "description": "Stack-trace hypothesis workspace for frames, causal paths, and saved investigations."
+  },
   "frontend-creative-tools-shapeshift-grid": {
     "source": "Shapeshift",
     "instruction": "Shapeshift/instruction.md",
     "description": "SHAPESHIFT QR color grid painter good-app eval."
+  },
+  "frontend-creative-tools-stack-trace-path-finder": {
+    "source": "Stack-trace path finder task PRD",
+    "instruction": "tasks/frontend-creative-tools-stack-trace-path-finder/instruction.md",
+    "description": "Interactive stack-trace cartographer with frame mapping, path hypotheses, and portable session artifacts."
+  },
+  "frontend-creative-tools-icon-family-optical-studio": {
+    "source": "Icon Family Optical Studio",
+    "instruction": "tasks/frontend-creative-tools-icon-family-optical-studio/instruction.md",
+    "description": "Vector icon-family editor with anchors, constraints, variants, pixel previews, and portable artifacts."
   },
   "frontend-creative-tools-story-docs": {
     "source": "StoryDocs",
@@ -203,6 +228,11 @@
     "source": "MediaTimeline",
     "instruction": "MediaTimeline/instruction.md",
     "description": "Media history timeline explorer good-app eval."
+  },
+  "frontend-data-tracking-music-practice-loop-studio": {
+    "source": "feature-music-practice-loop-studio PRD",
+    "instruction": "tasks/frontend-data-tracking-music-practice-loop-studio/instruction.md",
+    "description": "Music practice loop studio with score ranges, tempo plans, session recovery, take alignment, scheduling, and interoperable artifacts."
   },
   "frontend-data-tracking-model-monitor": {
     "source": "feature-monitor-openrouter-monitor PRD (debranded)",
@@ -313,6 +343,11 @@
     "source": "variants/TravelItineraryPlanner",
     "instruction": "variants/TravelItineraryPlanner/instruction.md",
     "description": "French Riviera trip itinerary planner variant."
+  },
+  "frontend-planning-potluck-contribution-orchestrator": {
+    "source": "Potluck Contribution Orchestrator",
+    "instruction": "tasks/frontend-planning-potluck-contribution-orchestrator/instruction.md",
+    "description": "Potluck planning workspace for commitments, coverage, buffet layout, and event-day run coordination."
   },
   "frontend-planning-trip-itinerary": {
     "source": "TripItinerary",
