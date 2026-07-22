@@ -7920,6 +7920,60 @@
         "Multi-select marquee geometry and Shift-click chord timing stay Playwright when mechanism matters",
         "Timeline status filter chips and Saved Workflows / Artifact panel open toggles stay Playwright-driven; no browse-query module is assigned"
       ]
+    },
+    {
+      "task": "frontend-planning-museum-visit-route-composer",
+      "modules": [
+        "structured-editor-v1",
+        "entity-collection-v1",
+        "artifact-transfer-v1",
+        "command-session-v1"
+      ],
+      "bindings": {
+        "editor_object_types": [
+          "stop",
+          "branch",
+          "exhibit"
+        ],
+        "editor_properties": [
+          "dwell_time",
+          "subgroup"
+        ],
+        "editor_modes": [
+          "route",
+          "rehearsal"
+        ],
+        "editor_operations": [
+          "select",
+          "update_property",
+          "switch_mode"
+        ],
+        "entity": "reservation",
+        "entity_operations": [
+          "select",
+          "update",
+          "create",
+          "delete"
+        ],
+        "entity_fields": [
+          "state",
+          "exhibit_id",
+          "time_window"
+        ],
+        "artifact_operations": [
+          "import",
+          "export"
+        ],
+        "export_formats": [
+          "session-json",
+          "svg",
+          "ics",
+          "csv"
+        ],
+        "import_modes": [
+          "session-json"
+        ]
+      }
     }
   ]
 }

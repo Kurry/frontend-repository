@@ -2107,7 +2107,10 @@
       "form_fields": [
         "amount",
         "date",
-        "category"
+        "category",
+        "counterparty",
+        "recurrence-day",
+        "threshold-percent"
       ],
       "form_operations": [
         "validate",
@@ -2119,7 +2122,9 @@
         "dashboard",
         "expenses",
         "settings",
-        "export"
+        "export",
+        "recurring",
+        "import"
       ],
       "filters": [
         "reporting-period",
@@ -2135,7 +2140,18 @@
         "json"
       ],
       "import_modes": [
-        "budget-json"
+        "budget-json",
+        "transactions-csv"
+      ],
+      "value_bounds": {
+        "threshold-percent": "integer 0 to 100",
+        "recurrence-day": "integer 1 to 28",
+        "value": "number greater than 0, at most 1000000, at most 2 decimals"
+      },
+      "visible_postconditions": [
+        "export-preview-reflects-every-session-mutation",
+        "import-json-replaces-visible-state",
+        "csv-import-commits-only-valid-rows-after-commit"
       ]
     },
     "mechanics_exclusions": [
@@ -5151,10 +5167,12 @@
       ],
       "artifact_operations": [
         "export",
-        "copy"
+        "copy",
+        "import"
       ],
       "export_formats": [
-        "markdown"
+        "markdown",
+        "json"
       ]
     },
     "mechanics_exclusions": [
@@ -7892,5 +7910,59 @@
       "Multi-select marquee geometry and Shift-click chord timing stay Playwright when mechanism matters",
       "Timeline status filter chips and Saved Workflows / Artifact panel open toggles stay Playwright-driven; no browse-query module is assigned"
     ]
+  },
+  {
+    "task": "frontend-planning-museum-visit-route-composer",
+    "modules": [
+      "structured-editor-v1",
+      "entity-collection-v1",
+      "artifact-transfer-v1",
+      "command-session-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "stop",
+        "branch",
+        "exhibit"
+      ],
+      "editor_properties": [
+        "dwell_time",
+        "subgroup"
+      ],
+      "editor_modes": [
+        "route",
+        "rehearsal"
+      ],
+      "editor_operations": [
+        "select",
+        "update_property",
+        "switch_mode"
+      ],
+      "entity": "reservation",
+      "entity_operations": [
+        "select",
+        "update",
+        "create",
+        "delete"
+      ],
+      "entity_fields": [
+        "state",
+        "exhibit_id",
+        "time_window"
+      ],
+      "artifact_operations": [
+        "import",
+        "export"
+      ],
+      "export_formats": [
+        "session-json",
+        "svg",
+        "ics",
+        "csv"
+      ],
+      "import_modes": [
+        "session-json"
+      ]
+    }
   }
 ]
