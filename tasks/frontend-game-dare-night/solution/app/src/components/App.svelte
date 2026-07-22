@@ -957,6 +957,18 @@
         return { ok: true, message: 'No open dialog to cancel' };
       },
       formReset: () => { newGame(); return { ok: true, message: 'Returned to setup screen' }; },
+      artifactExport: () => {
+        showExportPreview = true;
+        return { ok: true, message: 'Opened session export preview' };
+      },
+      artifactImport: () => {
+        showImportDialog = true;
+        return { ok: true, message: 'Opened session import workflow' };
+      },
+      artifactCopy: () => {
+        showExportPreview = true;
+        return { ok: true, message: 'Opened export preview for copy' };
+      },
     };
     registerWebmcp(actions);
     webmcpReady = true;

@@ -1,0 +1,21 @@
+{
+  "archive_records": 6197,
+  "awwwards_displayed_count_at_collection": 6410,
+  "display_pagination_difference": 213,
+  "fingerprinted_records": 6197,
+  "generated_at": "2026-07-22T13:57:45+00:00",
+  "live_html_records": 4562,
+  "live_redirect_host_changed_records": 595,
+  "mirror_html_records": 4434,
+  "mirror_live_scope_complete": true,
+  "mirror_live_scope_records": 4562,
+  "mirror_out_of_scope_pilot_records": 35,
+  "mirror_status_records": 4597,
+  "newest_award_date": "2026-07-22",
+  "oldest_award_date": "2009-06-01",
+  "pagination_record_count": 6197,
+  "unique_awwwards_technology_tags": 126,
+  "unique_detected_technologies": 681,
+  "unique_detected_technology_categories": 79,
+  "unique_technology_pairs": 13783
+}

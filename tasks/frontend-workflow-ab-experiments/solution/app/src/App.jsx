@@ -31,7 +31,12 @@ const truncate = value => value.length > 60 ? `${value.slice(0, 60)}…` : value
 function useRestoreLauncherOnUnmount(launcherButtonRef) {
   useEffect(() => () => {
     const launcher = launcherButtonRef.current
-    window.setTimeout(() => launcher?.isConnected && launcher.focus(), 0)
+    const restoreFocus = () => launcher?.isConnected && launcher.focus()
+    // Carbon's modal cleanup can run after React unmounts the dialog. Restore
+    // immediately, then once more after that cleanup has settled so Escape
+    // reliably returns keyboard users to the control that opened the modal.
+    window.setTimeout(restoreFocus, 0)
+    window.setTimeout(restoreFocus, 80)
   }, [launcherButtonRef])
 }
 
@@ -44,6 +49,17 @@ function App() {
   useEffect(() => {
     const timer = setInterval(() => useStudio.getState().tickRuns(), 200)
     return () => clearInterval(timer)
+  }, [])
+  useEffect(() => {
+    const focusSearch = event => {
+      if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== 'k') return
+      const search = document.querySelector('input[aria-label="Search experiments"]')
+      if (!search) return
+      event.preventDefault()
+      search.focus()
+    }
+    window.addEventListener('keydown', focusSearch)
+    return () => window.removeEventListener('keydown', focusSearch)
   }, [])
   const modalOpen = !!(store.designer || store.criterionOpen || store.decisionFor || store.reportFor || store.confirm)
   useEffect(() => {
@@ -375,7 +391,22 @@ function DecisionModal({ launcherButtonRef }) {
       setIsSubmitting(false)
     }
   }
-  return <Modal open preventCloseOnClickOutside launcherButtonRef={launcherButtonRef} selectorPrimaryFocus="#decision-choice" danger modalHeading="Record Experiment Decision" modalLabel="DecisionUpsert · permanent lock" primaryButtonText="Confirm Decision" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || isSubmitting} onRequestClose={() => state.setField('decisionFor', null)} onRequestSubmit={handleSubmit(submit)}>
+  const close = () => {
+    const launcher = launcherButtonRef.current
+    state.setField('decisionFor', null)
+    const restoreFocus = () => launcher?.isConnected && launcher.focus()
+    window.setTimeout(restoreFocus, 0)
+    window.setTimeout(restoreFocus, 80)
+  }
+  useEffect(() => {
+    const closeOnEscape = event => {
+      if (event.key !== 'Escape' || event.defaultPrevented) return
+      close()
+    }
+    document.addEventListener('keydown', closeOnEscape, true)
+    return () => document.removeEventListener('keydown', closeOnEscape, true)
+  }, [])
+  return <Modal open preventCloseOnClickOutside launcherButtonRef={launcherButtonRef} selectorPrimaryFocus="#decision-choice" danger modalHeading="Record Experiment Decision" modalLabel="DecisionUpsert · permanent lock" primaryButtonText="Confirm Decision" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || isSubmitting} onRequestClose={close} onRequestSubmit={handleSubmit(submit)}>
     <div className="decision-warning"><Locked size={18} /><span>This action locks editing and outlier flags. Decisions are excluded from undo.</span></div><div aria-live="polite" aria-atomic="true">{errors.root && <div className="form-error global">{errors.root.message}</div>}</div><Select id="decision-choice" labelText="Decision choice" invalid={!!errors.choice} invalidText={errors.choice?.message} {...register('choice')}><SelectItem value="declare-winner" text="Declare winner" /><SelectItem value="inconclusive" text="Inconclusive" /><SelectItem value="stop-early" text="Stop early" /></Select>{choice === 'declare-winner' && <Select id="winner-variant" labelText="Winner variant" invalid={!!errors.winnerVariant} invalidText={errors.winnerVariant?.message} {...register('winnerVariant')}><SelectItem value="" text="Choose a variant" />{experiment.variants.map((variant, index) => <SelectItem key={LETTERS[index]} value={LETTERS[index]} text={`Variant ${LETTERS[index]} — ${variant.title}`} />)}</Select>}<TextArea id="decision-rationale" labelText="Decision rationale" rows={5} invalid={!!errors.rationale} invalidText={errors.rationale?.message} {...register('rationale')} />
   </Modal>
 }
