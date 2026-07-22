@@ -1,0 +1,4 @@
+[task]
+name = "mercor-intelligence/frontend-creative-tools-fictional-museum-label-patch-fit-composer"
+description = "Fictional Museum Label Patch-Fit Composer"
+authors = [{ name = "Jules", email = "jules@example.com" }]
