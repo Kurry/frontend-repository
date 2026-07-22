@@ -108,6 +108,8 @@ export function generatedDirConfigSource(appDir) {
     'export default {',
     `  testDir: ${JSON.stringify(path.join(appDir, TASK_SUITE_DIR))},`,
     `  testMatch: ${JSON.stringify('**/*.spec.{mjs,cjs,js,ts,tsx,jsx}')},`,
+    '  fullyParallel: true,',
+    '  workers: 4,',
     '  timeout: 30_000,',
     '  retries: 0,',
     `  use: { baseURL: ${JSON.stringify('http://127.0.0.1:3000')} },`,

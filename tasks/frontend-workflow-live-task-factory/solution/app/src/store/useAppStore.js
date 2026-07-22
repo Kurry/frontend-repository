@@ -278,7 +278,11 @@ export const useAppStore = create(persist((set, get) => ({
   announcement: '',
   focusReturnEl: null,
 
-  setView: (activeView) => set({ activeView, mobileNavOpen: false }),
+  setView: (activeView) => set({
+    activeView,
+    mobileNavOpen: false,
+    ...(activeView === 'library' ? { selectedPackage: null } : {}),
+  }),
   selectRepo: (selectedRepo) => set({ selectedRepo, selectedPr: null, activeView: 'candidates' }),
   selectPr: (repo, prNumber) => set({ selectedRepo: repo, selectedPr: Number(prNumber), activeView: 'candidates' }),
   selectPackage: (bundle) => set({ selectedPackage: bundle, activeView: 'library' }),

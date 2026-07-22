@@ -446,6 +446,26 @@ def test_playwright_workflow_uses_the_shared_pinned_discovery_runner() -> None:
     assert "solution/app/e2e/**" not in workflow
 
 
+def test_task_directory_config_parallelizes_the_pinned_suite(tmp_path: Path) -> None:
+    helper = (
+        Path(__file__).parents[1]
+        / "src/corpuscheck/assets/oracle_ci_e2e.mjs"
+    )
+    script = f"""
+      import {{ generatedDirConfigSource }} from {json.dumps(helper.as_uri())};
+      console.log(generatedDirConfigSource({json.dumps(str(tmp_path))}));
+    """
+    result = subprocess.run(
+        ["node", "--input-type=module", "--eval", script],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert "fullyParallel: true" in result.stdout
+    assert "workers: 4" in result.stdout
+
+
 @requires_playwright_test
 def test_e2e_stage_passes_with_stub_passing_suite(tmp_path: Path) -> None:
     app = make_e2e_app(tmp_path, spec=_PASSING_SPEC)
