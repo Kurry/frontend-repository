@@ -6,7 +6,8 @@
   "scripts": {
     "start": "vite --host 0.0.0.0 --port 3000",
     "test:e2e": "playwright test",
-    "verify:build": "vite build"
+    "verify:build": "vite build",
+    "test:e2e:canonical": "playwright test -c e2e.playwright.config.mjs"
   },
   "dependencies": {
     "@fontsource/outfit": "5.2.5"
