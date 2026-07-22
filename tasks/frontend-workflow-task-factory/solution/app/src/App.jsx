@@ -70,7 +70,12 @@ function StageStrip({ stages }) {
     <div className="stage-strip" aria-label="Factory stages">
       {stages.map((stage) => (
         <div
-          className={cn('stage-cell', `stage-${stage.status}`, stage.status === 'running' && 'stage-pulse')}
+          className={cn(
+            'stage-cell',
+            `stage-${stage.status}`,
+            stage.status === 'running' && 'stage-pulse',
+            stage.status === 'complete' && stage.startedAt && 'stage-running-complete',
+          )}
           key={stage.name}
           title={`${stage.name}: ${stage.status}, attempt ${stage.attemptCount}${stage.completedAt ? ` · completed ${formatTime(stage.completedAt)} UTC` : stage.startedAt ? ` · started ${formatTime(stage.startedAt)} UTC` : ''}`}
           aria-label={`${stage.name} stage, ${stage.status}, attempt ${stage.attemptCount}${stage.completedAt ? `, completed ${formatTime(stage.completedAt)} UTC` : ''}`}
@@ -80,7 +85,11 @@ function StageStrip({ stages }) {
             <span className="stage-name">{stage.name}</span>
             <span className="stage-status">{stage.status}</span>
           </span>
-          {(stage.attemptCount > 1 || ['running', 'failed'].includes(stage.status)) && <span className="stage-attempt">a{stage.attemptCount}</span>}
+          {(stage.attemptCount > 1 || ['running', 'failed'].includes(stage.status)) && (
+            <span className="stage-attempt">
+              {stage.name === 'Generate' && stage.status === 'failed' ? 'a1→a2' : `a${stage.attemptCount}`}
+            </span>
+          )}
         </div>
       ))}
     </div>
@@ -92,6 +101,7 @@ function AppSidebar() {
   const navigate = useFactoryStore((s) => s.navigate)
   const setCreateDialogOpen = useFactoryStore((s) => s.setCreateDialogOpen)
   const mobileNavOpen = useFactoryStore((s) => s.mobileNavOpen)
+  const setMobileNavOpen = useFactoryStore((s) => s.setMobileNavOpen)
   const runningCount = useFactoryStore((s) => s.runningIds.length)
   const theme = useFactoryStore((s) => s.theme)
   const setTheme = useFactoryStore((s) => s.setTheme)
@@ -147,7 +157,7 @@ function AppSidebar() {
       </nav>
       <Button
         className="create-sidebar"
-        onClick={() => setCreateDialogOpen(true)}
+        onClick={() => { setCreateDialogOpen(true); setMobileNavOpen(false); }}
         onPointerEnter={(e) => { e.currentTarget.classList.add('is-hovered'); e.currentTarget.style.backgroundColor = '#d4f58a'; e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 8px 18px rgba(187,236,99,.28)' }}
         onPointerLeave={(e) => { e.currentTarget.classList.remove('is-hovered'); e.currentTarget.style.backgroundColor = ''; e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '' }}
       >
@@ -192,7 +202,7 @@ function MobileHeader() {
         <div className="mobile-brand"><span className="brand-mark"><IconBinaryTree size={16} aria-hidden /></span>Forgebeam</div>
         <div className="mobile-actions">
           <button type="button" className="icon-button" aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'} onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}><IconSparkles size={18} aria-hidden /></button>
-          <button type="button" className="icon-button" aria-label="Create task" onClick={() => setCreateDialogOpen(true)}><IconPlus size={18} aria-hidden /></button>
+          <button type="button" className="icon-button" aria-label="Create task" onClick={() => { setCreateDialogOpen(true); setMobileNavOpen(false); }}><IconPlus size={18} aria-hidden /></button>
         </div>
       </header>
     </>
@@ -204,6 +214,7 @@ function RepositoriesView() {
   const pullRequests = useFactoryStore((s) => s.pullRequests)
   const openRepository = useFactoryStore((s) => s.openRepository)
   const setCreateDialogOpen = useFactoryStore((s) => s.setCreateDialogOpen)
+  const setMobileNavOpen = useFactoryStore((s) => s.setMobileNavOpen)
   const snapshot = useMemo(() => ({ pullRequests }), [pullRequests])
   const totals = repositories.reduce((acc, repo) => {
     const rollup = repositoryRollup(snapshot, repo.id)
@@ -233,7 +244,7 @@ function RepositoriesView() {
           <h1 className="page-title">Repository intake</h1>
           <p className="page-subtitle">Merged changes flow from qualification through task validation. Select a repository to inspect its live register.</p>
         </div>
-        <div className="header-actions"><Button onClick={() => setCreateDialogOpen(true)} onPointerEnter={(e) => { e.currentTarget.classList.add('is-hovered'); e.currentTarget.style.backgroundColor = '#1d503e'; e.currentTarget.style.boxShadow = '0 5px 15px rgba(21,36,29,.14)'; e.currentTarget.style.transform = 'translateY(-1px)' }} onPointerLeave={(e) => { e.currentTarget.classList.remove('is-hovered'); e.currentTarget.style.backgroundColor = ''; e.currentTarget.style.boxShadow = ''; e.currentTarget.style.transform = '' }}><IconPlus size={16} aria-hidden />Create task</Button></div>
+        <div className="header-actions"><Button onClick={() => { setCreateDialogOpen(true); setMobileNavOpen(false); }} onPointerEnter={(e) => { e.currentTarget.classList.add('is-hovered'); e.currentTarget.style.backgroundColor = '#1d503e'; e.currentTarget.style.boxShadow = '0 5px 15px rgba(21,36,29,.14)'; e.currentTarget.style.transform = 'translateY(-1px)' }} onPointerLeave={(e) => { e.currentTarget.classList.remove('is-hovered'); e.currentTarget.style.backgroundColor = ''; e.currentTarget.style.boxShadow = ''; e.currentTarget.style.transform = '' }}><IconPlus size={16} aria-hidden />Create task</Button></div>
       </div>
       <Card className="overview-strip" aria-label="Factory summary">
         <div className="overview-stat"><span>Repositories</span><strong>{repositories.length}</strong></div>
@@ -275,6 +286,7 @@ function PipelineView() {
   const openTask = useFactoryStore((s) => s.openTask)
   const navigate = useFactoryStore((s) => s.navigate)
   const setCreateDialogOpen = useFactoryStore((s) => s.setCreateDialogOpen)
+  const setMobileNavOpen = useFactoryStore((s) => s.setMobileNavOpen)
   const clearRepositoryRegister = useFactoryStore((s) => s.clearRepositoryRegister)
   const restoreRepositoryRegister = useFactoryStore((s) => s.restoreRepositoryRegister)
   const rollup = repositoryRollup({ pullRequests: { [repoId]: allPrs } }, repoId)
@@ -304,7 +316,7 @@ function PipelineView() {
           ) : (
             <Button variant="secondary" onClick={() => restoreRepositoryRegister(repoId)}>Restore seed register</Button>
           )}
-          <Button onClick={() => setCreateDialogOpen(true)}><IconPlus size={16} aria-hidden />Create task</Button>
+          <Button onClick={() => { setCreateDialogOpen(true); setMobileNavOpen(false); }}><IconPlus size={16} aria-hidden />Create task</Button>
         </div>
       </div>
       <div className="table-toolbar">
@@ -704,6 +716,9 @@ function CreateTaskDialog() {
             returnFocusRef.current.focus()
           }}
           onEscapeKeyDown={() => setOpen(false)}
+          onInteractOutside={(event) => {
+            if (event.target instanceof Element && event.target.closest('.sidebar')) event.preventDefault()
+          }}
           onKeyDown={(event) => {
             if (event.key !== 'Tab') return
             const focusable = [...event.currentTarget.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')]

@@ -238,7 +238,7 @@ button:disabled { cursor: not-allowed; }
 .chart-hover-banner { margin: -8px 0 14px; padding: 8px 12px; border-radius: 8px; background: #e7f2ed; color: #1d4a38; font-size: 12px; font-weight: 650; border: 1px solid #c5e0d3; }
 
 .dialog-overlay { position: fixed; z-index: 100; inset: 0 0 0 248px; background: rgba(16,28,22,.46); backdrop-filter: blur(2px); pointer-events: none; }
-.dialog-overlay[data-state='open'] { animation: overlayIn .26s ease; pointer-events: auto; }
+.dialog-overlay[data-state='open'] { animation: overlayIn .26s ease; pointer-events: none; }
 .dialog-overlay[data-state='closed'] { animation: overlayOut .26s ease forwards; pointer-events: none; }
 .dialog-content { position: fixed; z-index: 101; left: 50%; top: 50%; transform: translate(-50%,-50%); width: min(510px, calc(100vw - 28px)); max-height: calc(100vh - 32px); overflow-y: auto; border: 1px solid #dce2dd; border-radius: 16px; background: white; box-shadow: 0 28px 80px rgba(17,30,23,.25); }
 .dialog-content[data-state='open'] { animation: dialogIn .26s ease; }

@@ -15,15 +15,19 @@ test('3.1 dashboard_shell_composition', async ({ page }) => {
 test('3.2 stage_status_color_system', async ({ page }) => {
   await openRepository(page)
   const statusColors = new Map<string, string>()
+  const visualSignature = (stage: import('@playwright/test').Locator) => stage.evaluate((element) => {
+    const style = getComputedStyle(element)
+    return [style.color, style.backgroundColor, style.backgroundImage, style.borderColor].join('|')
+  })
   for (const status of ['pending', 'running', 'complete', 'skipped']) {
     const stage = page.locator(`.stage-${status}`).first()
     await expect(stage).toContainText(status)
-    statusColors.set(status, await stage.evaluate((element) => getComputedStyle(element).backgroundColor))
+    statusColors.set(status, await visualSignature(stage))
   }
   await submitRun(page, { pullRequestNumber: '1001' })
   const failed = page.locator('.stage-failed').first()
   await expect(failed).toBeVisible({ timeout: 6_000 })
-  statusColors.set('failed', await failed.evaluate((element) => getComputedStyle(element).backgroundColor))
+  statusColors.set('failed', await visualSignature(failed))
   expect(new Set(statusColors.values()).size).toBe(5)
 })
 
