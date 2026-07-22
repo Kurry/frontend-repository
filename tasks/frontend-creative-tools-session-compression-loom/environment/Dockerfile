@@ -41,4 +41,3 @@ HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=5 \
 
 WORKDIR /app
 EXPOSE 3000
-COPY reference-screenshots/ /reference-screenshots/
