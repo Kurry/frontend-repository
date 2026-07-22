@@ -16,7 +16,7 @@ const snapshot = (state) => clone({
   newNodeId: state.newNodeId,
 });
 
-const restoreSnapshot = (saved) => ({ ...clone(saved), selectedRange: null, annotationComposerOpen: false, mergeConfirmOpen: false, threadOpenId: null, threadCollapsed: false });
+const restoreSnapshot = (saved) => ({ ...clone(saved), selectedRange: null, annotationDraft: null, annotationComposerOpen: false, mergeConfirmOpen: false, threadOpenId: null, threadCollapsed: false });
 
 // Deterministic, collision-free toast ids that avoid the insecure JS random API
 // (flagged by SAST). Ids are opaque (React keys + dismiss/markLeaving matching).
@@ -102,8 +102,8 @@ export const useStudioStore = create((set, get) => ({
       threadOpenId: null, mergeConfirmOpen: false,
     };
   }),
-  setBaseVersion: (versionId) => set({ baseVersionId: versionId, selectedRange: null }),
-  setCompareVersion: (versionId) => set({ compareVersionId: versionId, selectedRange: null }),
+  setBaseVersion: (versionId) => set({ baseVersionId: versionId, selectedRange: null, annotationDraft: null }),
+  setCompareVersion: (versionId) => set({ compareVersionId: versionId, selectedRange: null, annotationDraft: null }),
   // Resolve a version that may belong to any prompt: switches prompts when
   // needed so picker selection always lands on a real, visible version.
   selectVersionAnywhere: (versionId, property) => {
