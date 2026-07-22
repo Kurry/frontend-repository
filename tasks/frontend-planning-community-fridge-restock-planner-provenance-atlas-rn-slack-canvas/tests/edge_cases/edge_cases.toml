@@ -1,0 +1,257 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "empty_state_is_present"
+description = "Empty state UI is present and renders when a collection is empty."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "forms_validate_inline"
+description = "Inline validation appears on all forms before submit."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "errors_are_actionable"
+description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "actions_show_confirmation"
+description = "Success or confirmation feedback appears after actions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "async_work_shows_loading_state"
+description = "Loading spinners or indicators are shown for async or simulated-async work."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "destructive_actions_support_undo_or_cancel"
+description = "Undo or cancel options are available where destructive actions exist."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "non_obvious_controls_have_help"
+description = "Help or tooltips are present for non-obvious controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "controls_use_semantic_tags"
+description = "Buttons, inputs, and labels use semantic tags."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "modal_supports_close_paths"
+description = "Modal close controls and background clicks both close the overlay."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "long_flows_show_progress"
+description = "Long task flows provide progress or feedback steps."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n1"
+name = "empty_collection_has_no_feedback"
+description = "An empty collection shows nothing and provides no UI feedback."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n2"
+name = "errors_only_reach_console"
+description = "Errors are surfaced only in the browser console."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n3"
+name = "actions_lack_visible_feedback"
+description = "Actions lack visible feedback and silently succeed or fail."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n4"
+name = "destructive_actions_lack_warning"
+description = "Destructive actions have no warnings."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n5"
+name = "interactive_elements_use_nonsemantic_tags"
+description = "Non-semantic div or span tags wrap interactive elements."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n6"
+name = "modal_not_keyboard_dismissible"
+description = "Modal overlays cannot be dismissed via keyboard."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n7"
+name = "validation_feedback_missing_or_delayed"
+description = "Validation feedback is missing or delayed with no UI indication."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n8"
+name = "button_text_ambiguous_or_missing"
+description = "Button text is ambiguous or missing."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n9"
+name = "non_obvious_flows_lack_guidance"
+description = "Non-obvious flows have no in-app guidance at all."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n10"
+name = "affordances_hidden_or_inaccessible"
+description = "Interactive affordances are visually hidden or inaccessible."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "edge_cases.catchall"
+name = "edge_cases_catchall"
+description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "AC-06"
+name = "boundaries_recovery"
+description = "Try exact bounds, an invalid cross-field value, an empty state, and malformed import. Each invalid action gives field-level recovery and preserves prior valid state."
+type = "behavioral"
+weight = 1
