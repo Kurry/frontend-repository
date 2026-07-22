@@ -1054,9 +1054,11 @@ test('14.4 canvas_edit_echoes_outline_and_export', async ({ page }) => {
   await page.goto('http://localhost:3000');
 
   await page.getByRole('button', { name: 'New Note' }).click();
-  const box = await page.locator('.ProseMirror:visible').boundingBox();
-  await page.mouse.dblclick(box.x + box.width/2, box.y + box.height/2);
+  const editor = page.locator('.ProseMirror:visible');
+  await editor.click();
+  await page.keyboard.press('ControlOrMeta+A');
   await page.keyboard.type('Echo Edit');
+  await expect(editor).toContainText('Echo Edit');
 
   await page.getByRole('button', { name: 'Export workspace' }).click();
   const jsonStr = await page.locator('textarea, pre, code').last().inputValue();
