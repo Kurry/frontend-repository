@@ -1,0 +1,22 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+
+[[criterion]]
+id = "AC-08"
+name = "alternate_input"
+description = "Alternate input produces identical state with visible focus and live feedback."
+type = "binary"
+weight = 1.0
