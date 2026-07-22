@@ -1,0 +1,4 @@
+[[criterion]]
+id = "motion.causal_motion"
+description = "Motion connects the acted-on item to its new state and has a reduced-motion equivalent."
+weight = 1
