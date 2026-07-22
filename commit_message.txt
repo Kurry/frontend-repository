@@ -1,9 +1,0 @@
-Draft new Harbor eval task: Escape Room Puzzle Studio
-
-- Created new eval task `frontend-creative-tools-escape-room-puzzle-studio` under `tasks/` based on the approved proposal.
-- Added `instruction.md` with complete PRD, Core Features, Visual Design, Motion, and Requirements mapped as observable behaviors.
-- Scaffolded solution oracle in React & Tailwind CSS. App serves on port 3000 via `npm start`.
-- Configured WebMCP contract bindings for layout, graph edit, simulate, and export mechanisms, with `window.webmcp_session_info` bindings injected in `main.tsx`.
-- Ran `uv run corpuscheck scaffold` to baseline the 13 dimension TOMLs, then populated `core_features`, `visual_design`, `motion`, and `technical` with criteria tracking the PRD requirements using a safe weight of 1.0 per dimension schema rules.
-- Registered task bindings into `webmcp-assignment-map.json` and task description to `webmcp-task-sources.json`.
-- Handled `uv run corpuscheck propagate` and `validate`, successfully resolving layout (removed node_modules, added reference dummy.webm) and contract validation errors. Validation checks are now passing for this task.
