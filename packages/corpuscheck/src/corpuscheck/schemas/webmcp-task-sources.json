@@ -129,6 +129,11 @@
     "instruction": "variants/TerminalPortfolio/instruction.md",
     "description": "CLI terminal product designer portfolio variant."
   },
+  "frontend-creative-tools-stack-trace-path-finder": {
+    "source": "Stack-Trace Path Finder",
+    "instruction": "tasks/frontend-creative-tools-stack-trace-path-finder/instruction.md",
+    "description": "Stack-Trace Path Finder hard browser app/tool eval."
+  },
   "frontend-creative-tools-vert": {
     "source": "Vert",
     "instruction": "Vert/instruction.md",
