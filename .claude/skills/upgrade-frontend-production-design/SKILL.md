@@ -12,6 +12,7 @@ Read these references as needed:
 - [references/awwwards-pattern-language.md](references/awwwards-pattern-language.md) when choosing an evidence-backed visual or interaction direction.
 - [references/production-craft.md](references/production-craft.md) when writing requirements for layout, typography, color, components, content, motion, media, or responsive behavior.
 - [references/task-upgrade-patterns.md](references/task-upgrade-patterns.md) when converting a weak instruction or criterion into an observable production-grade one.
+- [references/css-and-production-assets.md](references/css-and-production-assets.md) when specifying CSS craft, 3D/vector/runtime assets, loading pipelines, or asset-backed rubric evidence.
 
 When working in this repository, also follow the project `AGENTS.md`. Use the `task-authoring` and `rubrics` skills for their full mutation, coverage, and validation protocols; this skill supplies the visual-production specialization.
 
@@ -114,6 +115,8 @@ Describe what moves, collapses, becomes a sheet or tab, changes order, changes i
 Treat focus indication as art direction, not a browser-default afterthought. Require semantic controls, logical focus order, visible keyboard state, understandable labels, and equivalent outcomes across input modes.
 
 For video, canvas, WebGL, 3D, audio, Rive, Lottie, or WASM, require honest staged loading, timeout and retry, cleanup, reduced-motion handling, and a semantic or lightweight fallback that preserves the task's job.
+
+Specify advanced assets as a production system. Name the visible role of geometry, textures, environment lighting, vector state machines, shaders, workers, or WASM decoders; require evidence that the loaded asset changes the real experience. Do not add a GLB, Rive file, shader, or compressed texture merely to satisfy a format checklist.
 
 ## Translate Requirements into Rubrics
 

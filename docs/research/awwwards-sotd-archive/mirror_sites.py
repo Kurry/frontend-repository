@@ -2,8 +2,9 @@
 """Mirror each Awwwards live-site candidate with HTTrack.
 
 Mirrors are intentionally kept outside Git.  The runner records one status row
-per archive entry and excludes images, video, audio, and fonts while retaining
-code, text, manifests, shaders, WASM, Rive, and lightweight 3D assets.
+per archive entry and excludes raster images, video, audio, and fonts while
+retaining SVG, code, text, manifests, shaders, WASM, Rive, and lightweight 3D
+assets.
 """
 
 from __future__ import annotations
@@ -22,8 +23,9 @@ from urllib.parse import urlparse
 
 
 EXCLUDED_EXTENSIONS = [
-    # Photos and image delivery formats (SVG is excluded per user request too).
-    "jpg", "jpeg", "png", "gif", "webp", "avif", "svg", "ico", "bmp", "tif", "tiff", "heic", "heif",
+    # Raster photos and image delivery formats. SVG remains in scope as a
+    # code-like vector/interface asset rather than being scrubbed as a photo.
+    "jpg", "jpeg", "png", "gif", "webp", "avif", "ico", "bmp", "tif", "tiff", "heic", "heif",
     # Video and audio.
     "mp4", "webm", "mov", "m4v", "avi", "mkv", "ogv", "mp3", "wav", "ogg", "m4a", "aac", "flac",
     # Fonts.
@@ -32,6 +34,7 @@ EXCLUDED_EXTENSIONS = [
 
 EXCLUDED_MIME_FILTERS = [
     "-mime:image/*",
+    "+mime:image/svg+xml",
     "-mime:video/*",
     "-mime:audio/*",
     "-mime:font/*",

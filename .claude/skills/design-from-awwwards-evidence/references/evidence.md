@@ -12,6 +12,7 @@ Primary repository sources:
 - `docs/research/awwwards-sotd-archive/TASK-SYNTHESIS.md` — examples of converting evidence into coherent product tasks
 - `docs/research/awwwards-sotd-archive/derived/` — complete generated CSV appendices
 - `docs/research/awwwards-sotd-archive/technology-study/` — reproducible study implementation and tests
+- `docs/research/awwwards-sotd-archive/FRONTEND-DEPTH.md` — actual CSS feature and production-asset-system analysis
 
 The study keeps Awwwards editorial metadata, bounded live-response detection, and HTTrack mirror evidence separate. Keep those layers separate in downstream claims too.
 
@@ -82,6 +83,12 @@ Common live-response fingerprints included HSTS (50.8%), HTTP/3 (39.5%), Cloudfl
 Awwwards editorial technology tags were led by HTML5 (22.1%), GSAP (20.3%), CSS (20.1%), WebGL (16.3%), jQuery (13.3%), Three.js (9.3%), WordPress (8.5%), SVG (5.2%), React (4.2%), and Vue.js (3.8%). An editorial tag is not equivalent to a live detector match.
 
 Choose technology from the product contract and existing repository, not from frequency. If motion needs only opacity and transforms, CSS may be enough. If the job needs direct spatial manipulation, Three.js or another rendering layer may be justified. The visible outcome and fallback matter more than the dependency name.
+
+## CSS and production assets
+
+The retained-mirror pass found 66 CSS feature families across 2,210 sites with CSS. Common craft primitives include transforms (90.8%), transitions (89.0%), flexbox (88.9%), custom properties (69.5%), grid (62.4%), clipping (39.9%), dynamic viewport units (35.4%), backdrop filters (31.4%), masks (27.5%), `:has()` (21.7%), and reduced-motion queries (16.2%). Use `FRONTEND-DEPTH.md` and the complete CSS CSVs when a task needs evidence beyond broad animation/style tags.
+
+Advanced assets appear as systems: 275 sites referenced at least one advanced format, including GLB, WASM, KTX2, shader files, Rive, HDR, and Spline scenes. Pair asset asks with their production obligations—loaders/decoders, staged loading, material or interaction role, cleanup, reduced motion, alternate input, and a useful fallback. Never require an extension by itself.
 
 ## Interpretation limits
 

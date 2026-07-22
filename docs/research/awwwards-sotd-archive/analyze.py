@@ -53,7 +53,7 @@ VISUAL_TAGS = {
 }
 
 EXCLUDED_MIRROR_EXTENSIONS = {
-    "jpg", "jpeg", "png", "gif", "webp", "avif", "svg", "ico", "bmp", "tif", "tiff", "heic", "heif",
+    "jpg", "jpeg", "png", "gif", "webp", "avif", "ico", "bmp", "tif", "tiff", "heic", "heif",
     "mp4", "webm", "mov", "m4v", "avi", "mkv", "ogv", "mp3", "wav", "ogg", "m4a", "aac", "flac",
     "woff", "woff2", "ttf", "otf", "eot",
 }
@@ -151,8 +151,10 @@ def asset_category(extension: str) -> str:
         return "runtime"
     if extension in {"woff", "woff2", "ttf", "otf", "eot"}:
         return "font"
-    if extension in {"jpg", "jpeg", "png", "gif", "webp", "avif", "svg"}:
+    if extension in {"jpg", "jpeg", "png", "gif", "webp", "avif"}:
         return "image"
+    if extension == "svg":
+        return "vector_asset"
     if extension in {"mp4", "webm", "mov", "m4v"}:
         return "video"
     if extension in {"mp3", "wav", "ogg", "m4a", "aac", "flac"}:
