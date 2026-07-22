@@ -1,0 +1,15 @@
+[judge]
+  [judge.quality_standards]
+    evaluation_basis = "Did the model build a complete, usable, and functioning application that fulfills the instructions?"
+    score_levels = [
+      "0.0 = Blank, non-functional, or explicitly breaks constraints.",
+      "0.5 = Partial implementation; functional but shallow, incomplete, or missing key aspects.",
+      "1.0 = Complete, deep, and fully meets all requirements."
+    ]
+
+[[criterion]]
+id = "AC-12"
+title = "The visual and interaction thesis is coherent without copying unrelated screens."
+description = "Compare the implementation with the cited source interaction vocabulary (Figma variable modes/expressions). The adaptation should feel cohesive and true to the domain."
+eval_type = "browser"
+weight = 1.0

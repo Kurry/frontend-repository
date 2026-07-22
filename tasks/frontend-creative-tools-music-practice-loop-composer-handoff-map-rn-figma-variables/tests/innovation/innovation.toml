@@ -1,0 +1,22 @@
+[judge]
+  [judge.quality_standards]
+    evaluation_basis = "Did the model build a complete, usable, and functioning application that fulfills the instructions?"
+    score_levels = [
+      "0.0 = Blank, non-functional, or explicitly breaks constraints.",
+      "0.5 = Partial implementation; functional but shallow, incomplete, or missing key aspects.",
+      "1.0 = Complete, deep, and fully meets all requirements."
+    ]
+
+[[criterion]]
+id = "AC-11"
+title = "Linked views provide domain utility beyond CRUD."
+description = "Mutate a record and use the linked representation to make the next decision."
+eval_type = "browser"
+weight = 0.5
+
+[[criterion]]
+id = "innovation.catchall"
+title = "Innovation catch-all"
+description = "Any other innovative aspects implemented that provide additional utility not covered by other criteria. Evidence includes visual polish or unexpected capabilities."
+eval_type = "browser"
+weight = 0.5

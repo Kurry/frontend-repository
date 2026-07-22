@@ -1,0 +1,15 @@
+[judge]
+  [judge.quality_standards]
+    evaluation_basis = "Did the model build a complete, usable, and functioning application that fulfills the instructions?"
+    score_levels = [
+      "0.0 = Blank, non-functional, or explicitly breaks constraints.",
+      "0.5 = Partial implementation; functional but shallow, incomplete, or missing key aspects.",
+      "1.0 = Complete, deep, and fully meets all requirements."
+    ]
+
+[[criterion]]
+id = "AC-04"
+title = "The tool result and artifact contain the declared API-shaped fields."
+description = "Query the current state and export after a mutation. The artifact must strictly follow the practice-loop-v1-handoff-map.json schema with schemaVersion, exportedAt, records[], derived{}, and history[]."
+eval_type = "browser"
+weight = 1.0

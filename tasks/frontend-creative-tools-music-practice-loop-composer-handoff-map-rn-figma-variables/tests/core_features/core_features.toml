@@ -1,0 +1,29 @@
+[judge]
+  [judge.quality_standards]
+    evaluation_basis = "Did the model build a complete, usable, and functioning application that fulfills the instructions?"
+    score_levels = [
+      "0.0 = Blank, non-functional, or explicitly breaks constraints.",
+      "0.5 = Partial implementation; functional but shallow, incomplete, or missing key aspects.",
+      "1.0 = Complete, deep, and fully meets all requirements."
+    ]
+
+[[criterion]]
+id = "AC-01"
+title = "The handoff map mutation changes the primary record, linked view, and status together."
+description = "Verify that connecting a selected record to a handoff owner updates the primary record's readiness, the linked handoff map view, and the domain status simultaneously."
+eval_type = "browser"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.crud"
+title = "Create, edit, archive, and filter practice segments"
+description = "The application allows creating, editing, archiving, and filtering practice segments with explicit domain statuses."
+eval_type = "browser"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.undo"
+title = "Undo the last mutation"
+description = "Users can undo the last mutation (e.g., via Ctrl/Cmd+Z) and the linked representation correctly reverts."
+eval_type = "browser"
+weight = 1.0

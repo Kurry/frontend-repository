@@ -1,0 +1,15 @@
+[judge]
+  [judge.quality_standards]
+    evaluation_basis = "Did the model build a complete, usable, and functioning application that fulfills the instructions?"
+    score_levels = [
+      "0.0 = Blank, non-functional, or explicitly breaks constraints.",
+      "0.5 = Partial implementation; functional but shallow, incomplete, or missing key aspects.",
+      "1.0 = Complete, deep, and fully meets all requirements."
+    ]
+
+[[criterion]]
+id = "AC-08"
+title = "Alternate input produces identical state with visible focus and live feedback."
+description = "Repeat the signature interaction with keyboard and touch-equivalent controls. The outcome is identical to pointer interactions, with clear focus management."
+eval_type = "browser"
+weight = 1.0
