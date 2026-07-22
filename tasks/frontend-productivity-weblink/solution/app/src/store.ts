@@ -236,6 +236,7 @@ export function startTransfer(id: string): boolean {
   if (index === -1) return false;
   const file = state.files.queue[index];
   if (file.status !== "not-started" && file.status !== "paused") return false;
+  const transferEvent: TransferLogEvent = file.status === "paused" ? "resumed" : "started";
 
   // Defensively stop any stale timer still registered for this id (e.g. one
   // left running by a Session Pack import that swapped the queue out from
@@ -248,7 +249,7 @@ export function startTransfer(id: string): boolean {
   }
 
   setState("files", "queue", index, "status", "transferring");
-  logEvent(file.name, file.status === "not-started" ? "started" : "resumed");
+  logEvent(file.name, transferEvent);
 
   if (file.size === 0) {
      setState("files", "queue", index, "status", "completed");
