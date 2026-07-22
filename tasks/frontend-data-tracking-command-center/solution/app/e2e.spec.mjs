@@ -360,15 +360,34 @@ test.describe('Command Center E2E', () => {
 
   // ---- Motion (tests/motion/motion.toml) ----
 
-  test('4.8 reduced_motion_fallback', async ({ page }, testInfo) => {
+  test('4.8 reduced_motion_fallback', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.addInitScript(() => {
+      window.__firstKpiSamples = [];
+      let previous;
+      const capture = () => {
+        const value = document.querySelector('.kpi-value')?.textContent?.trim();
+        if (value === undefined || value === previous) return;
+        previous = value;
+        window.__firstKpiSamples.push({ value, at: performance.now() });
+      };
+      new MutationObserver(capture).observe(document, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      });
+    });
     await page.goto(BASE);
     const kpiValue = page.locator('.kpi-value').first();
-    const before = await kpiValue.innerText();
-    const settleAt = await page.evaluate(() => performance.now() + 900);
-    await page.waitForFunction((deadline) => performance.now() >= deadline, settleAt);
-    const after = kpiValue;
-    await expect(after, 'KPI count-up shows its final value instantly and does not keep animating under reduced motion').toHaveText(before);
+    await expect(kpiValue, 'reduced motion renders the seeded Total prompts value').toHaveText('2,486');
+    const samples = await page.evaluate(() => window.__firstKpiSamples);
+    const intermediateValues = samples
+      .map(({ value }) => value)
+      .filter((value) => value !== '0' && value !== '2,486');
+    expect(intermediateValues, 'reduced motion never renders count-up intermediates').toEqual([]);
+    const firstSampleAt = samples[0]?.at;
+    const finalSampleAt = samples.find(({ value }) => value === '2,486')?.at;
+    expect(finalSampleAt - firstSampleAt, 'KPI reaches its final value within one instant-update budget').toBeLessThanOrEqual(100);
     await page.getByRole('button', { name: 'Connect agent', exact: true }).first().click();
     const dialog = page.getByRole('dialog', { name: 'Connect agent' });
     await expect(dialog).toBeVisible();
