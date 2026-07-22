@@ -118,6 +118,114 @@ test.describe('workspace contract (canonical)', () => {
 
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
 
+test.describe('frontend-mosbyfiles oracle recovery regressions', () => {
+test('1.4 category_cover_exact_fills', async ({ page }) => {
+  await page.goto(BASE);
+
+  const expected = {
+    organic: 'rgb(30, 75, 215)',
+    expressive: 'rgb(12, 120, 102)',
+    monumental: 'rgb(88, 30, 112)',
+    place: 'rgb(215, 30, 30)',
+  };
+  for (const [category, color] of Object.entries(expected)) {
+    const cover = page.locator(`.stack-group[data-cat="${category}"] .stack-cover`);
+    await expect(cover).toBeVisible();
+    await expect.poll(() => cover.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe(color);
+  }
+});
+
+test('1.6 folder_cover_3d_reveals_sheet', async ({ page }) => {
+  await page.goto(BASE);
+  await page.locator('[data-tag="ada-mercer"]').click();
+
+  const cover = page.locator('.case-folder-cover');
+  await expect(cover).toBeVisible();
+  await expect.poll(() => cover.evaluate((element) => getComputedStyle(element).transform)).toMatch(/^matrix3d\(/);
+  await expect(page.locator('.case-folder-sheet__meta')).toContainText(/^Born \d{4}/);
+  await expect(page.locator('.case-folder-sheet__bio')).not.toBeEmpty();
+});
+
+test('1.12 scrapbook_drag_stays_released', async ({ page }) => {
+  await page.goto(BASE);
+  await page.locator('[data-tag="ada-mercer"]').click();
+
+  const note = page.locator('.scrapbook-item[data-item-id="note-0"]');
+  await expect(note).toBeVisible();
+  const before = await note.boundingBox();
+  expect(before).not.toBeNull();
+
+  const start = { x: before.x + before.width / 2, y: before.y + before.height / 2 };
+  await page.mouse.move(start.x, start.y);
+  await page.mouse.down();
+  await page.mouse.move(start.x + 90, start.y + 70, { steps: 8 });
+  await page.mouse.up();
+
+  const released = await note.boundingBox();
+  expect(released).not.toBeNull();
+  expect(Math.abs(released.x - before.x)).toBeGreaterThan(40);
+  expect(Math.abs(released.y - before.y)).toBeGreaterThan(30);
+  const releasedPosition = await note.evaluate((element) => ({ left: element.style.left, top: element.style.top }));
+  expect(releasedPosition.left).toMatch(/%$/);
+  expect(releasedPosition.top).toMatch(/%$/);
+
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  const settled = await note.boundingBox();
+  expect(settled).not.toBeNull();
+  expect(Math.abs(settled.x - released.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(settled.y - released.y)).toBeLessThanOrEqual(1);
+});
+
+test('1.13 offline_assets_and_empty_storage', async ({ page }) => {
+  const externalRequests = [];
+  page.on('request', (request) => {
+    const url = new URL(request.url());
+    if (url.protocol !== 'data:' && url.origin !== new URL(BASE).origin) externalRequests.push(request.url());
+  });
+
+  await page.goto(BASE);
+  await page.locator('[data-tag="ada-mercer"]').click();
+  await expect(page.locator('#caseTitle')).toHaveAttribute('aria-label', 'Ada Mercer');
+  await page.locator('.the-sub-header__back').click();
+  await page.locator('[data-nav="about"]').click();
+  await expect(page.locator('.page-about__title')).toBeVisible();
+  await page.locator('.page-about__close').click();
+  await page.locator('[data-tag="mara-voss"]').click();
+  await page.locator('.content-video .content-play').click();
+  await expect(page.locator('#popup')).toHaveAttribute('aria-hidden', 'false');
+  await page.locator('.popup__close').click();
+  await expect(page.locator('#popup')).toHaveAttribute('aria-hidden', 'true');
+
+  expect(externalRequests).toEqual([]);
+  await expect.poll(() => page.locator('html').evaluate(() => ({
+    local: localStorage.length,
+    session: sessionStorage.length,
+  }))).toEqual({ local: 0, session: 0 });
+});
+
+test('4.19 reduced_motion_collapses_timelines', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto(BASE);
+
+  const heroChar = page.locator('#heroTitle .char').first();
+  await expect(heroChar).toBeVisible();
+  await expect.poll(() => heroChar.evaluate((element) => ({
+    opacity: getComputedStyle(element).opacity,
+    translateY: new DOMMatrix(getComputedStyle(element).transform).m42,
+  }))).toEqual({ opacity: '1', translateY: 0 });
+
+  await page.locator('[data-tag="ada-mercer"]').click();
+  const cover = page.locator('.case-folder-cover');
+  await expect.poll(() => cover.evaluate((element) => ({
+    duration: getComputedStyle(element).transitionDuration,
+    transform: getComputedStyle(element).transform,
+  }))).toEqual(expect.objectContaining({ duration: '0.001s' }));
+  await expect.poll(() => cover.evaluate((element) => getComputedStyle(element).transform)).toMatch(/^matrix3d\(/);
+  await expect(page.locator('#caseTitle')).toHaveAttribute('aria-label', 'Ada Mercer');
+  await expect(page.locator('#caseTitle .char').first()).toBeVisible();
+});
+});
+
 test.describe('frontend-mosbyfiles criteria', () => {
   test('1.15 home_document_title_and_hero', async ({ page }) => {
     await page.goto(BASE);
