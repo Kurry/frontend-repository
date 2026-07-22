@@ -1,0 +1,9 @@
+[judge]
+model = "anthropic/claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-05"
+type = "browser-observable"
+title = "complete_user_flow"
+description = "Create, edit, mutate, undo, and complete one record; the end-to-end job is recoverable without reload."
+weight = 1.0

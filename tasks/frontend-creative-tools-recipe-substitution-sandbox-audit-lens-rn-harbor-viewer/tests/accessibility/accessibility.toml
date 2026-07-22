@@ -1,0 +1,9 @@
+[judge]
+model = "anthropic/claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-08"
+type = "browser-observable"
+title = "alternate_input"
+description = "Alternate input produces identical state with visible focus and live feedback using keyboard and touch-equivalent controls."
+weight = 1.0

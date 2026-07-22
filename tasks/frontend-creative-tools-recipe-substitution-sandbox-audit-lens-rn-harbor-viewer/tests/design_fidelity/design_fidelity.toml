@@ -1,0 +1,9 @@
+[judge]
+model = "anthropic/claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-12"
+type = "browser-observable"
+title = "source_fidelity"
+description = "The visual and interaction thesis is coherent without copying unrelated screens from the cited source interaction vocabulary."
+weight = 1.0

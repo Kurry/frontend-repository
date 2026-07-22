@@ -1,0 +1,9 @@
+[judge]
+model = "anthropic/claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-03"
+type = "browser-observable"
+title = "causal_motion"
+description = "Motion connects the acted-on item to its new state and has a reduced-motion equivalent when attaching evidence."
+weight = 1.0

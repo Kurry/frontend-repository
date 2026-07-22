@@ -1,0 +1,9 @@
+[judge]
+model = "anthropic/claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-02"
+type = "browser-observable"
+title = "visual_hierarchy"
+description = "The visual hierarchy makes current state and next action clear across the primary work surface, linked summary, and detail panel."
+weight = 1.0

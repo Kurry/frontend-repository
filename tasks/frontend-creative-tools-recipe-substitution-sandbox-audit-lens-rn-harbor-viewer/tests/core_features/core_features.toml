@@ -1,0 +1,9 @@
+[judge]
+model = "anthropic/claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-01"
+type = "browser-observable"
+title = "signature_mutation"
+description = "The audit lens mutation changes the primary record, linked view, and status together."
+weight = 1.0

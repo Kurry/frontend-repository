@@ -1,0 +1,9 @@
+[judge]
+model = "anthropic/claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-06"
+type = "browser-observable"
+title = "boundaries_recovery"
+description = "Invalid actions give field-level recovery and preserve prior valid state when trying exact bounds, empty state, and malformed import."
+weight = 1.0
