@@ -79,6 +79,29 @@ function taskSlugs() {
     .sort();
 }
 
+// `start` scripts that hand off to `vite preview` / `astro preview` / `http-server
+// <build-dir>` all assume a build output directory (dist/, build/, etc.) already
+// exists on disk — they never build it themselves. Build output is no longer
+// committed to git, so this script has to build it on demand before serving.
+// Scripts that already chain a build step (e.g. "npm run build && npm run
+// preview") are left alone — running a second build would be redundant, not
+// harmful, but skipping keeps this a no-op for those tasks.
+function needsPrebuiltOutput(start) {
+  if (!start || start.includes('&&')) return false;
+  if (/\bvite preview\b/.test(start) || /\bastro preview\b/.test(start)) return true;
+  if (/\bhttp-server\b/.test(start) && /(dist|build|out|\.next|\.nuxt|\.svelte-kit|storybook-static)/.test(start)) {
+    return true;
+  }
+  return false;
+}
+
+function buildIfNeeded(appDir, pkg, start) {
+  if (!needsPrebuiltOutput(start)) return;
+  const buildScript = pkg.scripts?.build ? 'build' : (pkg.scripts?.['verify:build'] ? 'verify:build' : null);
+  if (!buildScript) return;
+  execSync(`npm run ${buildScript}`, { cwd: appDir, stdio: 'ignore' });
+}
+
 function startServer(appDir) {
   const pkgPath = path.join(appDir, 'package.json');
   let cmd, args;
@@ -91,6 +114,8 @@ function startServer(appDir) {
       if (!fs.existsSync(path.join(appDir, 'node_modules'))) {
         execSync('npm install --no-audit --no-fund', { cwd: appDir, stdio: 'ignore' });
       }
+      // build first if `start` serves a pre-built output dir it doesn't build itself
+      buildIfNeeded(appDir, pkg, start);
       // rewrite any hardcoded port via PORT env; vite-style scripts use --port 3000,
       // http-server uses -p 3000, serve uses -l 3000
       const patched = start
