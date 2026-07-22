@@ -9,18 +9,20 @@ import { Btn, Chk, ModalShell, SelectField, TextAreaField, TextField, cx } from 
 export function DatasetDialog() {
   const setUi = useStore((s) => s.setUi)
   const createDataset = useStore((s) => s.createDataset)
-  const { control, register, handleSubmit, watch, reset, formState: { errors, isSubmitting } } = useForm({
+  const { control, register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(datasetCreateSchema), mode: 'onChange', reValidateMode: 'onChange',
     defaultValues: { name: '', description: '', schema: [{ name: '', type: 'text', allowedValues: [] }] },
   })
   const { fields, append, remove } = useFieldArray({ control, name: 'schema' })
-  const schemaValues = watch('schema')
+  const formValues = watch()
+  const schemaValues = formValues.schema
+  const formValid = datasetCreateSchema.safeParse(formValues).success
   const submitLock = useRef(false)
   const submit = (data) => { if (submitLock.current) return; submitLock.current = true; createDataset({ ...data, name: data.name.trim(), description: (data.description || '').trim() }) }
   const attempt = handleSubmit(submit, () => {})
   return (
     <ModalShell title="New dataset" subtitle="Define the record contract used by every row mutation." onClose={() => setUi({ modal: null })} wide
-      footer={<><Btn kind="secondary" onClick={() => setUi({ modal: null })}>Cancel</Btn><Btn type="submit" form="dataset-form" disabled={isSubmitting}>Create dataset</Btn></>}>
+      footer={<><Btn kind="secondary" onClick={() => setUi({ modal: null })}>Cancel</Btn><Btn type="submit" form="dataset-form" disabled={isSubmitting || !formValid}>Create dataset</Btn></>}>
       <form id="dataset-form" onSubmit={attempt} noValidate>
         <div className="space-y-5 p-5">
           <TextField id="dataset-name" label="Dataset name" required placeholder="e.g. Release candidate prompts" error={errors.name?.message} {...register('name')} />
@@ -65,9 +67,10 @@ export function RowDialog({ dataset, mode, rowId }) {
   const defaults = current
     ? { values: { ...current.values }, expectedOutput: current.expectedOutput, verified: current.verified, split: current.split || '' }
     : { values: Object.fromEntries(dataset.schema.map((f) => [f.name, ''])), expectedOutput: '', verified: false, split: '' }
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(dynamicRowSchema(dataset.schema)), mode: 'onChange', defaultValues: defaults,
   })
+  const formValid = dynamicRowSchema(dataset.schema).safeParse(watch()).success
   const lock = useRef(false)
   const submit = (data) => {
     if (lock.current) return; lock.current = true
@@ -78,7 +81,7 @@ export function RowDialog({ dataset, mode, rowId }) {
   return (
     <ModalShell title={mode === 'edit' ? 'Edit row' : 'Add row'} subtitle={`Values are validated against ${dataset.name}’s record contract.`}
       onClose={() => setUi({ modal: null })}
-      footer={<><Btn kind="secondary" onClick={() => setUi({ modal: null })}>Cancel</Btn><Btn type="submit" form="row-form" disabled={isSubmitting}>{mode === 'edit' ? 'Save changes' : 'Add row'}</Btn></>}>
+      footer={<><Btn kind="secondary" onClick={() => setUi({ modal: null })}>Cancel</Btn><Btn type="submit" form="row-form" disabled={isSubmitting || !formValid}>{mode === 'edit' ? 'Save changes' : 'Add row'}</Btn></>}>
       <form id="row-form" onSubmit={handleSubmit(submit, () => {})} noValidate>
         <div className="grid gap-5 p-5 sm:grid-cols-2">
           {dataset.schema.map((field) => (
