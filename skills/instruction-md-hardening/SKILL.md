@@ -1,6 +1,6 @@
 ---
 name: instruction-md-hardening
-description: Deepen Harbor task instruction.md files into a complete, evaluator-ready artifact with full state-machine behavior, deterministic edge-case coverage, and end-to-end execution workflows. Use for any request to strengthen, rewrite, expand, or harden instruction.md (including validator, reviewer, and streaming/contract requirements).
+description: Deepen Harbor task instruction.md files into complete, evaluator-ready artifacts with task-appropriate state behavior, deterministic edge-case coverage, and end-to-end user journeys. Use for requests to strengthen, rewrite, expand, or harden instruction.md, including validator, reviewer, streaming, or contract requirements when those capabilities exist in the task.
 ---
 
 # Instruction.md Hardening
@@ -29,7 +29,8 @@ Use this skill to revise a Harbor task `instruction.md` into a depth-complete sp
 - **Do not weaken or bypass rubrics**; only add additive criteria-compatible behavior.
 - **Write for the judge and browser**, not implementation details.
 - **Use concrete states and deterministic outcomes** (never ambiguous “may” behavior).
-- **Depth-first completion**: finish one feature’s state/edges/variants/controls before moving to the next.
+- **Depth-first completion**: finish one feature’s observable behavior, applicable states/edges, variants, and controls before moving to the next.
+- **Apply requirements conditionally**: deepen only behaviors supported by the current product scope, instruction, rubrics, or assigned contracts. Never invent orchestration, streaming, approval, persistence, import/export, or network flows solely because this skill lists them.
 
 ## Step 1 — Baseline contract pass
 
@@ -38,7 +39,7 @@ For each existing section, classify current quality:
 1. Identify primary user flow(s).
 2. List mutable data entities and their states.
 3. Map each user action to expected observable response.
-4. Detect missing constraints:
+4. Detect missing constraints that apply to the task's existing behavior, such as:
    - blocked transitions,
    - timeouts,
    - retry branches,
@@ -49,7 +50,9 @@ For each existing section, classify current quality:
 
 ## Step 2 — Add end-to-end journey layer
 
-Create or expand sections that explicitly cover all connected journeys:
+First classify each journey below as required, implied, or not applicable using the current instruction, rubrics, task genre, and assigned contracts. Create or expand sections only for required or implied journeys; record no requirement for a not-applicable journey. A local in-memory SPA, for example, must not gain dispatch, approval, retry, resume, or stream-review behavior unless its existing product contract calls for those concepts.
+
+Candidate journeys include:
 
 - Authoring/edit journey (draft -> validate -> ready).
 - Dispatch/run journey (queued -> running -> terminal state).
@@ -59,7 +62,7 @@ Create or expand sections that explicitly cover all connected journeys:
 - Review journey (reconstruction from export/stream/review artifacts).
 - Round-trip journey (export/import → same visible state, import failure safe-fail).
 
-For each journey, include:
+For each applicable journey, include:
 
 - Preconditions.
 - Transition table (state + trigger + side effects).
@@ -82,11 +85,11 @@ Required schema fields to include (or equivalent):
 - `streamText`
 - `finalOutput`
 
-If the task has no streaming, replace with task-specific equivalent state fields and keep them explicit.
+If the task has no streaming but does own mutable runtime state, replace these with task-specific equivalent fields and keep them explicit. Skip this step for tasks without a relevant runtime model.
 
 ## Step 4 — Lock edge cases and failures
 
-Add explicit failure branches as first-class requirements:
+Add explicit failure branches as first-class requirements only where the corresponding capability exists. Select from or adapt examples such as:
 
 - Validation failure blocks dispatch.
 - Duplicate/out-of-order events are ignored or rejected deterministically.
@@ -95,7 +98,7 @@ Add explicit failure branches as first-class requirements:
 - Invalid credentials/network artifacts are blocked in local/offline modes.
 - Missing artifact fields produce explicit diagnostics and explainable fallback.
 
-For each failure class, specify:
+For each applicable failure class, specify:
 
 - Exact condition.
 - Surface signal (UI/text/tool).
@@ -136,15 +139,15 @@ Do not add criteria IDs here; only define behavior. Keep IDs to rubric editors.
 
 ## Deepening checklist (use before finalizing)
 
-1. Have you added preconditions for every major action?
-2. Have you defined what happens on failure for every major action?
-3. Have you added recovery for every failure path?
+1. Have you added preconditions for every major action that has meaningful prerequisites?
+2. Have you defined applicable failure behavior for every major action?
+3. Have you added recovery for every recoverable failure path?
 4. Is every action idempotent and non-duplicating where relevant?
-5. Do approvals explicitly gate progress?
-6. Are export/import boundaries explicit and failure-safe?
-7. Is there a no-network/explicit-network policy?
+5. Where approvals exist, do they explicitly gate progress?
+6. Where import/export exists, are its boundaries explicit and failure-safe?
+7. Where network behavior exists or is prohibited, is that policy explicit?
 8. Are keyboard/focus/responsive requirements explicitly called out?
-9. Can every required path be reproduced from exported artifact data?
+9. Where an exported artifact is required, can it reproduce every promised artifact-backed path?
 10. Are all transitions observable without internal-implementation assumptions?
 
 ## Editing rules
@@ -156,10 +159,10 @@ Do not add criteria IDs here; only define behavior. Keep IDs to rubric editors.
 
 ## Completion decision
 
-Only mark hardening complete when every section has:
+Only mark hardening complete when every applicable feature has:
 
-- deterministic states,
-- explicit transition logic,
-- blocking and non-blocking failure definitions,
+- deterministic observable states or outcomes,
+- explicit transition logic where the feature changes state,
+- relevant blocking and non-blocking failure definitions,
 - visible evidence per behavior,
-- and a clear recovery path.
+- and a clear recovery path when recovery is possible.
