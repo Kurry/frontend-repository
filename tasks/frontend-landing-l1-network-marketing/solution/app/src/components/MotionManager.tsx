@@ -54,10 +54,10 @@ export default function MotionManager() {
       requestAnimationFrame(() => {
         document.documentElement.classList.add('is-mounted');
         entranceTimeline
-          .to('#chrome', { yPercent: 0, duration: 0.8, ease: 'power4.inOut' }, 0)
-          .to('.bento-mission', { clipPath: 'inset(0% 0 0 0)', y: 0, duration: 0.9, ease: 'power4.inOut' }, 0.1)
-          .to('.bento-clock', { clipPath: 'inset(0% 0 0 0)', y: 0, duration: 0.9, ease: 'power4.inOut' }, 0.2)
-          .to('.hero-plane', { clipPath: 'inset(0% 0 0 0)', scale: 1, duration: 1.1, ease: 'power4.inOut' }, 0.45);
+          .to('#chrome', { yPercent: 0, duration: 1.75, ease: 'power4.inOut' }, 0.85)
+          .to('.bento-mission', { clipPath: 'inset(0% 0 0 0)', y: 0, duration: 1.8, ease: 'power4.inOut' }, 0.9)
+          .to('.bento-clock', { clipPath: 'inset(0% 0 0 0)', y: 0, duration: 1.8, ease: 'power4.inOut' }, 1.05)
+          .to('.hero-plane', { clipPath: 'inset(0% 0 0 0)', scale: 1, duration: 1.85, ease: 'power4.inOut' }, 1.35);
       });
     });
 
@@ -91,7 +91,8 @@ export default function MotionManager() {
         const wrapper = document.createElement('div');
         wrapper.style.overflow = 'hidden';
         const text = document.createElement('span');
-        text.textContent = line;
+        // Preserve word boundaries for text-only and assistive representations.
+        text.textContent = `${line} `;
         text.style.display = 'block';
         text.style.transform = 'translateY(-100%)';
         text.classList.add('blurb-line');

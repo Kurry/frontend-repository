@@ -16,7 +16,7 @@ export default function WhyRidge() {
           {pillars.map((pillar, i) => (
             <article
               key={pillar.id}
-              className={`why-card notch-br p-8 md:p-12 border border-current/10 ${pillar.isInk ? 'bg-ink text-white ink' : 'surface-copy bg-white/70 backdrop-blur-md'} why-card--${i+1}`}
+              className={`why-card notch-br p-8 md:p-12 border border-current/10 ${pillar.isInk ? 'bg-ink text-white ink' : 'why-card--neutral backdrop-blur-md'} why-card--${i+1}`}
               style={{ '--i': i } as React.CSSProperties}
             >
               <div className="why-shell md:grid md:grid-cols-[1.35fr_1fr] gap-8 items-stretch">

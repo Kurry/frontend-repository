@@ -3,6 +3,32 @@ import { useStore } from '@nanostores/react';
 import { $events, $eventsFilter, $eventsSort, $eventsManagerOpen, formatEventDate } from '../store';
 import { ArrowRight } from 'phosphor-react';
 
+// MotionManager owns the descendants of these nodes while the kinetic intro is
+// running. Keeping the intro in a memoized leaf prevents event/filter updates
+// from reconciling away that animation-owned markup.
+const KineticEventIntro = React.memo(function KineticEventIntro() {
+  return (
+    <div className="events-copy">
+      <h2 className="events-headline text-5xl md:text-7xl font-bold display-font tracking-tight mb-8 min-h-[4rem]" id="eventsHeadline" aria-label="RIDGE GLOBAL EVENTS">
+        {/* Decoded by JS */}
+      </h2>
+      <div className="events-blurb text-xl opacity-70 max-w-lg mb-8" id="eventsBlurb" aria-hidden="true">
+        <p>Join our worldwide network of developers, founders, and enterprise partners building the future of institutional infrastructure.</p>
+      </div>
+      <p className="sr-only" id="eventsBlurbA11y">
+        Join our worldwide network of developers, founders, and enterprise partners building the future of institutional infrastructure.
+      </p>
+      <button
+        type="button"
+        className="btn btn-outline notch-br text-current border-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+        onClick={() => $eventsManagerOpen.set(true)}
+      >
+        View all events
+      </button>
+    </div>
+  );
+});
+
 export default function GlobalEvents() {
   const events = useStore($events);
   const filter = useStore($eventsFilter);
@@ -32,24 +58,7 @@ export default function GlobalEvents() {
     <section className="events surface-copy chapter py-24 bg-surface relative z-20" id="events" aria-label="Global Events">
       <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
 
-        <div className="events-copy">
-          <h2 className="events-headline text-5xl md:text-7xl font-bold display-font tracking-tight mb-8 min-h-[4rem]" id="eventsHeadline" aria-label="RIDGE GLOBAL EVENTS">
-            {/* Decoded by JS */}
-          </h2>
-          <div className="events-blurb text-xl opacity-70 max-w-lg mb-8" id="eventsBlurb" aria-hidden="true">
-            <p>Join our worldwide network of developers, founders, and enterprise partners building the future of institutional infrastructure.</p>
-          </div>
-          <p className="sr-only" id="eventsBlurbA11y">
-            Join our worldwide network of developers, founders, and enterprise partners building the future of institutional infrastructure.
-          </p>
-          <button
-            type="button"
-            className="btn btn-outline notch-br text-current border-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-            onClick={() => $eventsManagerOpen.set(true)}
-          >
-            View all events
-          </button>
-        </div>
+        <KineticEventIntro />
 
         <div className="flex flex-col gap-4">
           {featuredEvents.length === 0 ? (

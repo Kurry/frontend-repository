@@ -62,11 +62,29 @@ h1, h2, h3, h4, h5, h6, .display-font, .chapter-title {
 }
 
 /* ---- Why Ridge progressive sticky pile (desktop only) ---- */
+.sticky-title,
 .why-card { position: static; }
+
+:root[data-theme="light"] .why-card--neutral {
+  background-color: rgb(247 247 245 / 0.94);
+  color: #101114;
+}
+
+:root[data-theme="dark"] .why-card--neutral {
+  background-color: rgb(32 33 36 / 0.96);
+  color: #f8fafc;
+}
+
 @media (min-width: 768px) {
+  .sticky-title {
+    position: sticky;
+    top: 96px;
+    z-index: 10;
+  }
+
   .why-card {
     position: sticky;
-    top: calc(96px + var(--i, 0) * 32px);
+    top: calc(176px + var(--i, 0) * 32px);
     z-index: calc(var(--i, 0) + 1);
   }
 }
@@ -77,7 +95,7 @@ h1, h2, h3, h4, h5, h6, .display-font, .chapter-title {
     transform: translateY(50%);
     opacity: 0;
     transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
-    transition-delay: calc(var(--i, 0) * 0.16s);
+    transition-delay: calc(2s + var(--i, 0) * 0.4s);
   }
   #trio.trio-in .trio-card {
     transform: translateY(0);
@@ -149,7 +167,7 @@ tbody tr.row-exit {
     transition-delay: 0ms !important;
     scroll-behavior: auto !important;
   }
-  .why-card { position: static !important; top: auto !important; }
+  .sticky-title, .why-card { position: static !important; top: auto !important; }
   .trio-card { transform: none !important; opacity: 1 !important; }
   .load-target { transform: none !important; clip-path: none !important; opacity: 1 !important; }
 }
