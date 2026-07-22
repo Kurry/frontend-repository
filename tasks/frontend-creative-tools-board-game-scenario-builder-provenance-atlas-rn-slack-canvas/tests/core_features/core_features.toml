@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-01"
+name = "signature_mutation"
+description = "trace a selected record to source evidence and quarantine a bad lineage."
+type = "binary"
+weight = 1.0

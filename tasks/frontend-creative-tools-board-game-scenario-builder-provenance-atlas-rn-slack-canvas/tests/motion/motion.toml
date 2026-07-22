@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-03"
+name = "causal_motion"
+description = "trace a selected record to source evidence and quarantine a bad lineage. Motion connects the acted-on item to its new state and has a reduced-motion equivalent."
+type = "binary"
+weight = 1.0
