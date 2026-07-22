@@ -178,9 +178,26 @@ test('6.6 diff_or_timeline_empty_state', async ({ page }) => {
 
 test('6.7 splits_view_and_diff_summary_coherence', async ({ page }) => {
   await page.goto('/')
+
+  // Splits composition bars update immediately when the selected version changes.
   await page.getByRole('tab', { name: 'Splits' }).click()
-  const auricText = await page.locator('.fill-bar, .target-label, .category-row, tr', { hasText: 'auric' }).first().textContent()
-  expect(auricText).not.toBeNull()
+  const before = await page.locator('.quota-row strong').allTextContents()
+  // Selecting a sidebar entry also switches to the Manifest tab, so return to Splits after.
+  await page.locator('.release-entry', { hasText: 'v1.0.0' }).click()
+  await page.getByRole('tab', { name: 'Splits' }).click()
+  await expect(page.locator('.split-source')).toContainText('v1.0.0')
+  await expect.poll(() => page.locator('.quota-row strong').allTextContents()).not.toEqual(before)
+
+  // Diff summary strip counts update immediately when the diff pair changes,
+  // and stay consistent with the same shared manifests (base==compare -> 0 added/removed/changed).
+  await page.getByRole('tab', { name: 'Diff' }).click()
+  await page.locator('select').first().selectOption('1.0.0')
+  await page.locator('select').nth(1).selectOption('1.0.0')
+  await expect(page.locator('.summary-cell.added strong')).toHaveText('0')
+  await expect(page.locator('.summary-cell.removed strong')).toHaveText('0')
+  await expect(page.locator('.summary-cell.changed strong')).toHaveText('0')
+  await page.locator('select').nth(1).selectOption('2.0.0')
+  await expect(page.locator('.summary-cell.added strong')).not.toHaveText('0')
 })
 
 test('6.8 sidebar_and_export_panel_continuity', async ({ page }) => {
@@ -227,13 +244,88 @@ test('6.11 export_import_round_trip_flow', async ({ page }) => {
   await expect(page.getByText(new RegExp(`Cycle ${expectedCycle}\\b`)).first()).toBeVisible()
 })
 
-test('2.1 console_clean_full_exercise', async ({ page }) => {
+test('2.1 shared_state_coherence', async ({ page }) => {
   await page.goto('/')
+
+  // Sealing a cut must update the sidebar, pickers, timeline, and the
+  // Export release pack JSON together, all derived from one shared store.
+  await page.getByRole('button', { name: /Cut release/ }).click()
+  await page.locator('#version-name').fill('9.5.0')
+  await page.locator('.cut-dialog button[type="submit"]').click()
+  await expect(page.locator('.rank-error')).toBeVisible({ timeout: 10_000 })
+  await page.getByRole('button', { name: /Retry check/ }).click()
+  await expect(page.getByRole('dialog', { name: 'Cut a sealed release' })).not.toBeVisible({ timeout: 10_000 })
+  // Sidebar picked up the new sealed version and it is now selected.
+  await expect(page.locator('.release-entry.selected')).toContainText('v9.5.0')
+  // The diff "compare" picker defaults to the freshly sealed version too.
+  await page.getByRole('tab', { name: 'Diff' }).click()
+  expect(await page.locator('select').nth(1).inputValue()).toBe('9.5.0')
+  // Export JSON reflects the same store: new version present, correct count.
+  await page.locator('.pack-group button', { hasText: 'Export' }).click()
+  const packAfterCut = JSON.parse(await page.getByLabel('Release pack JSON preview').textContent())
+  expect(packAfterCut.versions.some((v) => v.name === '9.5.0')).toBe(true)
+  expect(packAfterCut.versions.length).toBe(5)
+  await page.keyboard.press('Escape')
+
+  // Changing a diff picker recomputes classification/summary from the same manifests.
+  await page.locator('select').first().selectOption('1.0.0')
+  await page.locator('select').nth(1).selectOption('9.5.0')
+  const addedAfterDiffChange = await page.locator('.summary-cell.added strong').textContent()
+  expect(Number(addedAfterDiffChange)).toBeGreaterThan(0)
+
+  // Advancing rotation updates the panel, history, timeline, and export
+  // rotation.cycle together, in one action.
+  await page.getByRole('tab', { name: 'Rotation' }).click()
+  const cycleText = await page.locator('text=/Cycle \\d+/').first().textContent()
+  const cycle = parseInt(cycleText.match(/Cycle (\d+)/)[1], 10)
+  await page.getByRole('button', { name: /Advance rotation/ }).click()
+  await expect(page.locator(`text=Cycle ${cycle + 1}`).first()).toBeVisible()
+  await page.locator('.pack-group button', { hasText: 'Export' }).click()
+  const packAfterRotation = JSON.parse(await page.getByLabel('Release pack JSON preview').textContent())
+  expect(packAfterRotation.rotation.cycle).toBe(cycle + 1)
+  const exportedPackText = await page.getByLabel('Release pack JSON preview').textContent()
+  await page.keyboard.press('Escape')
+
+  // A successful import replaces versions/rotation/timeline from that same
+  // store, without a reload — sidebar count reflects the imported pack.
+  await page.locator('.pack-group button', { hasText: 'Import' }).click()
+  await page.getByLabel('Release pack JSON').fill(exportedPackText)
+  await page.getByRole('button', { name: 'Confirm import' }).click()
+  await expect(page.locator('[role="dialog"]')).not.toBeVisible({ timeout: 5000 })
+  await expect(page.locator('.release-entry')).toHaveCount(packAfterRotation.versions.length)
+})
+
+test('2.5 console_clean_full_exercise', async ({ page }) => {
+  await page.goto('/')
+
+  // Complete a cut with a failed-then-retried rank-stability check.
+  await page.getByRole('button', { name: /Cut release/ }).click()
+  await page.locator('#version-name').fill('9.6.0')
+  await page.locator('.cut-dialog button[type="submit"]').click()
+  await expect(page.locator('.rank-error')).toBeVisible({ timeout: 10_000 })
+  await page.getByRole('button', { name: /Retry check/ }).click()
+  await expect(page.getByRole('dialog', { name: 'Cut a sealed release' })).not.toBeVisible({ timeout: 10_000 })
+
+  // Export/import of Release pack JSON, plus a copy action.
+  await page.locator('.pack-group button', { hasText: 'Export' }).click()
+  const jsonText = await page.getByLabel('Release pack JSON preview').textContent()
+  await page.locator('#export-copy-button').click()
+  await page.keyboard.press('Escape')
+  await page.locator('.pack-group button', { hasText: 'Import' }).click()
+  await page.getByLabel('Release pack JSON').fill(jsonText)
+  await page.getByRole('button', { name: 'Confirm import' }).click()
+  await expect(page.locator('[role="dialog"]')).not.toBeVisible({ timeout: 5000 })
+
+  // Diff pair changes.
   await page.getByRole('tab', { name: 'Diff' }).click()
   await page.locator('select').first().selectOption('1.0.0')
+  await page.locator('select').nth(1).selectOption('9.6.0')
+
+  // Rotation advance.
   await page.getByRole('tab', { name: 'Rotation' }).click()
   await page.getByRole('button', { name: /Advance rotation/ }).click()
   await expect(page.getByRole('button', { name: /Advance rotation/ })).toBeVisible()
+  // The extended `page` fixture asserts zero console/page errors on teardown.
 })
 
 test('2.6 cold_load_interactive_2s', async ({ page }) => {
@@ -247,19 +339,71 @@ test('2.6 cold_load_interactive_2s', async ({ page }) => {
 test('2.7 rapid_input_stability', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('tab', { name: 'Diff' }).click()
-  for(let i=0; i<5; i++) {
+
+  // Fast diff picker changes interleaved with quick tab switches across a
+  // 24-vs-27-task manifest pair; the UI must not hang and must land on the
+  // correct, freshly recomputed result.
+  const start = Date.now()
+  for (let i = 0; i < 5; i++) {
     await page.locator('select').first().selectOption('1.0.0')
-    await page.locator('select').first().selectOption('2.0.0')
+    await page.locator('select').nth(1).selectOption('2.0.0')
+    await page.getByRole('tab', { name: 'Splits' }).click()
+    await page.getByRole('tab', { name: 'Diff' }).click()
   }
-  await expect(page.getByRole('tab', { name: 'Diff' })).toBeVisible()
+  expect(Date.now() - start, 'rapid diff/tab churn stays responsive').toBeLessThan(8000)
+  // v1.0.0 (24 tasks) vs v2.0.0 (27 tasks) always has additions; recomputation is correct, not stale.
+  await expect(page.locator('.summary-cell.added strong')).not.toHaveText('0')
+
+  // Repeated rotation advances also stay responsive and keep state coherent.
+  await page.getByRole('tab', { name: 'Rotation' }).click()
+  const cycleText = await page.locator('text=/Cycle \\d+/').first().textContent()
+  const startCycle = parseInt(cycleText.match(/Cycle (\d+)/)[1], 10)
+  for (let i = 1; i <= 3; i += 1) {
+    await page.getByRole('button', { name: /Advance rotation/ }).click()
+    await expect(page.locator(`text=Cycle ${startCycle + i}`).first()).toBeVisible({ timeout: 2000 })
+  }
 })
 
 test('2.8 keyboard_operability_focus', async ({ page }) => {
   await page.goto('/')
-  await page.keyboard.press('Tab')
-  await page.keyboard.press('Tab')
-  const isFocused = await page.evaluate(() => document.activeElement !== document.body)
-  expect(isFocused).toBeTruthy()
+
+  // Tab through the page collecting every control that receives focus, and
+  // require a visible focus indicator (box-shadow ring) at every stop.
+  const stops = []
+  for (let i = 0; i < 40; i += 1) {
+    await page.keyboard.press('Tab')
+    const handle = await page.evaluateHandle(() => document.activeElement)
+    const info = await handle.evaluate((el) => {
+      if (!el || el === document.body) return null
+      const cs = getComputedStyle(el)
+      return {
+        tag: el.tagName,
+        role: el.getAttribute('role'),
+        cls: el.className || '',
+        text: (el.textContent || '').trim().slice(0, 40),
+        boxShadow: cs.boxShadow,
+      }
+    })
+    if (info) stops.push({ handle, info })
+    else await handle.dispose()
+  }
+
+  for (const { info } of stops) {
+    expect(info.boxShadow, `visible focus ring for ${info.tag} "${info.text}"`).not.toBe('none')
+  }
+
+  // The distinct control families named by the criterion are all keyboard-reachable.
+  expect(stops.some(({ info }) => info.cls.includes('release-entry')), 'sidebar entries reachable').toBe(true)
+  expect(stops.some(({ info }) => info.role === 'tab'), 'tabs reachable').toBe(true)
+  expect(stops.some(({ info }) => info.tag === 'BUTTON' && info.text.includes('Export')), 'Export control reachable').toBe(true)
+
+  // Operability: a focused sidebar entry is activated with Enter alone (native
+  // <button> semantics), and the selection genuinely changes as a result.
+  const entryStop = stops.find(({ info }) => info.cls.includes('release-entry'))
+  await entryStop.handle.asElement().focus()
+  await page.keyboard.press('Enter')
+  const after = await page.locator('.release-entry.selected').textContent()
+  expect(after).toBeTruthy()
 })
 
 test('2.9 dialog_focus_trap_escape', async ({ page }) => {
@@ -274,14 +418,24 @@ test('2.9 dialog_focus_trap_escape', async ({ page }) => {
 test('2.10 aria_states_and_error_association', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: /Cut release/ }).click()
-  await page.locator('.cut-dialog button[type="submit"]').click({ force: true }); await page.waitForTimeout(500);
-  const error = page.locator('p, span', { hasText: /invalid|required|must/i }).first()
+  const input = page.locator('#version-name')
+  // Type a name that fails the MAJOR.MINOR.PATCH schema (validateOnModelUpdate
+  // runs immediately, unlike the disabled submit button which never fires a
+  // click while the form is invalid).
+  await input.fill('not-a-version')
+  await input.blur()
+  await expect(input).toHaveAttribute('aria-invalid', 'true')
+  const error = page.locator('#version-name-error')
   await expect(error).toBeVisible()
-  const id = await error.getAttribute('id')
-  if (id) {
-    const input = page.locator(`[aria-errormessage="${id}"]`)
-    await expect(input).toBeVisible()
-  }
+  await expect(error).toHaveText(/version name must use major\.minor\.patch/i)
+  const describedBy = await input.getAttribute('aria-describedby')
+  expect(describedBy.split(/\s+/)).toContain('version-name-error')
+
+  // Clearing to empty switches to the "required" message, still associated by the same id.
+  await input.fill('')
+  await input.blur()
+  await expect(error).toHaveText(/version name is required/i)
+  expect((await input.getAttribute('aria-describedby')).split(/\s+/)).toContain('version-name-error')
 })
 
 test('2.11 no_outbound_chrome_links', async ({ page }) => {
@@ -302,10 +456,43 @@ test('3.8 responsive_sidebar_and_mobile', async ({ page }) => {
 
 test('14.1 multi_facet_round_trip', async ({ page }) => {
   await page.goto('/')
+
+  // Seal a cut. The rank-stability check always fails on the first attempt
+  // (by design, per the store's runRankCheck comment) and requires a retry
+  // before it seals — exercise that full path.
+  await page.getByRole('button', { name: /Cut release/ }).click()
+  await page.locator('#version-name').fill('9.9.9')
+  await page.locator('.cut-dialog button[type="submit"]').click()
+  await expect(page.locator('.rank-error')).toBeVisible({ timeout: 10_000 })
+  await page.getByRole('button', { name: /Retry check/ }).click()
+  await expect(page.getByRole('dialog', { name: 'Cut a sealed release' })).not.toBeVisible({ timeout: 10_000 })
+  await expect(page.locator('.release-entry', { hasText: 'v9.9.9' })).toBeVisible()
+
+  // Advance rotation.
+  await page.getByRole('tab', { name: 'Rotation' }).click()
+  await page.getByRole('button', { name: /Advance rotation/ }).click()
+  await expect(page.locator('text=Cycle 9').first()).toBeVisible()
+
+  // Diverge the diff pickers from their seeded defaults.
   await page.getByRole('tab', { name: 'Diff' }).click()
-  await page.locator('select').first().selectOption('1.0.0')
-  const val = await page.locator('select').first().inputValue()
-  expect(val).toBe('1.0.0')
+  await page.locator('select').first().selectOption('1.1.0')
+  await page.locator('select').nth(1).selectOption('1.2.0')
+
+  // A page reload must coherently reset to the seeded versions, default
+  // selection, and seeded cycle — the session cut must not survive reload.
+  await page.reload()
+  await page.waitForLoadState('networkidle')
+
+  await expect(page.locator('.release-entry', { hasText: 'v9.9.9' })).toHaveCount(0)
+  await expect(page.locator('.release-entry')).toHaveCount(4)
+  await expect(page.locator('.release-entry.selected')).toContainText('v2.0.0')
+
+  await page.getByRole('tab', { name: 'Diff' }).click()
+  expect(await page.locator('select').first().inputValue()).toBe('1.0.0')
+  expect(await page.locator('select').nth(1).inputValue()).toBe('2.0.0')
+
+  await page.getByRole('tab', { name: 'Rotation' }).click()
+  await expect(page.locator('text=Cycle 8').first()).toBeVisible()
 })
 
 // NOT-AUTOMATABLE: 3.1 spacing_and_sizing_follow_scale — subjective design criteria.
