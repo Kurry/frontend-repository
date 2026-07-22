@@ -1,0 +1,13 @@
+[[criterion]]
+id = "AC-01"
+title = "signature_mutation"
+description = "The scenario weaver mutation changes the primary record, linked view, and status together."
+type = "behavioral"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.catchall"
+title = "catch-all"
+description = "All core features."
+type = "behavioral"
+weight = 1.0

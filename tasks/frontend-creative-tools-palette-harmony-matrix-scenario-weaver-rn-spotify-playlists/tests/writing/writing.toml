@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-10"
+title = "domain_copy"
+description = "Copy names the domain consequence and recovery action precisely."
+type = "behavioral"
+weight = 1.0

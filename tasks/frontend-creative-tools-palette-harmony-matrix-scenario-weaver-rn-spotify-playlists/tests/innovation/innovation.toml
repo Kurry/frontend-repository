@@ -1,0 +1,13 @@
+[[criterion]]
+id = "AC-11"
+title = "linked_utility"
+description = "Linked views provide domain utility beyond CRUD."
+type = "behavioral"
+weight = 1.0
+
+[[criterion]]
+id = "innovation.catchall"
+title = "catch-all"
+description = "Any other observable innovation or polish features not covered by specific criteria, graded based on subjective evidence."
+type = "behavioral"
+weight = 1.0

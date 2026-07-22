@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-05"
+title = "complete_user_flow"
+description = "Create, edit, mutate, undo, and complete one record."
+type = "behavioral"
+weight = 1.0

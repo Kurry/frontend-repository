@@ -1,0 +1,13 @@
+[[criterion]]
+id = "AC-04"
+title = "schema_contract"
+description = "The tool result and artifact contain the declared API-shaped fields."
+type = "behavioral"
+weight = 1.0
+
+[[criterion]]
+id = "technical.catchall"
+title = "catch-all"
+description = "All technical features."
+type = "behavioral"
+weight = 1.0
