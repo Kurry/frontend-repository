@@ -93,7 +93,7 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "AC-01"
-title = "move a failed record into a recovery path and repair its downstream consequences."
+name = "signature_mutation"
 description = "The recovery board mutation changes the primary record, linked view, and status together."
 type = "binary"
 weight = 1.0

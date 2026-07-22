@@ -191,7 +191,7 @@ weight = 1.0
 
 [[criterion]]
 id = "AC-10"
-title = "Inspect labels, statuses, errors, and empty-state text."
+name = "domain_copy"
 description = "Copy names the domain consequence and recovery action precisely."
 type = "binary"
 weight = 1.0

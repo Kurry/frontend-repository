@@ -251,7 +251,7 @@ weight = 1.0
 
 [[criterion]]
 id = "AC-07"
-title = "Use the signature interaction at a narrow viewport."
+name = "mobile_mode"
 description = "The desktop surface becomes a usable stack/drawer/stepper without horizontal overflow."
 type = "binary"
 weight = 1.0

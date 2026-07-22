@@ -189,7 +189,7 @@ weight = 1.0
 
 [[criterion]]
 id = "AC-13"
-title = "Export, clear, import, and inspect the edited variant record and derived state."
+name = "artifact_round_trip"
 description = "Authored order/selection/geometry and domain state survive; invalid import is a no-op."
 type = "binary"
 weight = 1.0

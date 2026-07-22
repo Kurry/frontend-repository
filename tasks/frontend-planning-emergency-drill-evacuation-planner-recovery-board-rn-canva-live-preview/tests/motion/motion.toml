@@ -93,7 +93,7 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "AC-03"
-title = "move a failed record into a recovery path and repair its downstream consequences."
+name = "causal_motion"
 description = "Motion connects the acted-on item to its new state and has a reduced-motion equivalent."
 type = "binary"
 weight = 1.0

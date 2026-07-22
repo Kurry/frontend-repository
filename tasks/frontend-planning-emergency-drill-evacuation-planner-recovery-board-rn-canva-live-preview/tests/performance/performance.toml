@@ -237,7 +237,7 @@ weight = 1.0
 
 [[criterion]]
 id = "AC-09"
-title = "Exercise a seeded collection with at least 100 records."
+name = "large_collection"
 description = "The signature interaction remains responsive and unrelated rows stay stable."
 type = "binary"
 weight = 1.0
