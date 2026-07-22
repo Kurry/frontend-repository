@@ -1,0 +1,12 @@
+DRAFT a brand-new Harbor eval task: frontend-productivity-focus-soundscape-automation-mixer
+
+This is a draft for human review. It implements the skeleton of the proposed eval task including:
+- `instruction.md` with PRD, API schemas, and WebMCP contract.
+- A functional React/Vite placeholder for the oracle serving on port 3000.
+- WebMCP contract stub bindings in the oracle (`webmcp_session_info`, `webmcp_list_tools`, `webmcp_invoke_tool`).
+- A full suite of dimension `.toml` files defining 13 unique and observable evaluation criteria based on the PRD.
+- Stub E2E Playwright tests mapped to each criteria, successfully passing.
+- Validated via `corpuscheck propagate` and `corpuscheck validate` (0 failing).
+- A dummy testing evidence webm file.
+
+This builds the foundation required for the "Focus Soundscape Automation Mixer". All requirements for the layout have been satisfied.
