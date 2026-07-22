@@ -1,0 +1,196 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.5"
+name = "shared_state_coherence_across_views"
+description = "A change made in one view — creating, editing, favoriting, or applying a preset, or stepping a dial — is immediately reflected in every other surface showing that datum (list, compare panel, dials, meter, preview) without a reload, and no surface shows stale data another surface already updated"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "console_clean_during_full_exercise"
+description = "No console errors or unhandled promise rejections appear during a full exercise of the dials, both modes, presets, snapshots, undo/redo, before/after, export/import, and the help panel"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "interactive_within_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "rapid_stepper_presses_stay_responsive"
+description = "Under rapid repeated stepper presses, every press lands, dial values never skip outside the specified stop lists, and the preview keeps updating without hangs or freezes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "keyboard_operable_with_focus_ring"
+description = "Every stepper, mode switch, preset control, and form field is reachable and operable with the keyboard alone, with a visible focus ring on the focused control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "edge_steppers_exposed_as_disabled"
+description = "Steppers disabled at a stop-list edge are exposed as disabled to assistive technology (a disabled or aria-disabled attribute in the accessibility tree), not merely dimmed visually"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "help_overlay_dialog_semantics"
+description = "The help overlay behaves as a dialog: it traps keyboard focus while open, closes on Escape, and returns focus to the help trigger on close"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "validation_announced_aria_live"
+description = "Preset form validation messages are announced through an aria-live region in addition to being shown inline next to the field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "meter_exposes_text_readout"
+description = "The exposure meter region exposes a text readout of the current exposure state (under, balanced, or over) that updates as the stops change"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.15"
+name = "export_panel_coherent_with_store"
+description = "After mutating dials and presets, the Export panel JSON and every other surface showing those values agree without a reload — a single coherent store, not a disconnected export snapshot"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.16"
+name = "reload_resets_including_snapshots_and_stacks"
+description = "A page reload returns the app to its seeded baseline: default dials, seeded presets, seeded snapshots, and empty undo/redo stacks — consistent with the in-memory genre rule"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.17"
+name = "undo_redo_coherent_across_surfaces"
+description = "Undo and redo restore or reapply dials, presets, snapshots, meter/EV/histogram, and Export panel text together from the same shared state with no surface left stale"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.18"
+name = "api_shaped_schemas_drive_forms_and_export"
+description = "Preset create/edit, snapshot name, and import paste forms enforce the documented API-shaped field contracts with inline named-field errors before submit; the lab-package Export panel JSON uses the same field names, enums, and bounds (schemaVersion exposure-control-lab.package.v1, aperture/shutter/iso stop lists, lookTag closed enum, name max 40 uniqueness) that those forms accept"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.19"
+name = "import_validates_same_schemas"
+description = "Import rejects lab-package JSON that violates the ExposurePreset or DialSnapshot field contracts (wrong lookTag, out-of-list stops, or missing required fields) with a visible named error and leaves the shared store unchanged"
+type = "binary"
+weight = 1.0
+

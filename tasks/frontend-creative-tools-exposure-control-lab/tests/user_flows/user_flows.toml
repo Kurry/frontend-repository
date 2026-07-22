@@ -1,0 +1,252 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "6.1"
+name = "iso_step_updates_three_surfaces"
+description = "Stepping ISO up one stop updates three surfaces at once without a reload: the ISO dial label shows the next stop in the list, the tiled noise overlay on the preview becomes visibly more opaque, the exposure meter dot moves up the vertical track, and both the EV number and the histogram shape change."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.2"
+name = "create_preset_count_filter_and_mode_roundtrip"
+description = "After creating a valid preset in Presets/Compare mode with a lookTag from the closed enum, the visible preset count increases by exactly one, the new row appears with its name and stop readout, applying its lookTag filter still shows the new row, the Export panel JSON presets array includes that name and lookTag, and switching to Meter/Lab and back shows the same new preset without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.3"
+name = "apply_preset_writes_shared_dials"
+description = "Applying a preset writes its stops into the shared dial state: the three dial labels change to the preset's aperture, shutter, and ISO; the preview brightness, blur, motion frame, and noise re-render to match; and the meter dot moves to the position those stops imply — without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.4"
+name = "edit_preset_updates_everywhere"
+description = "Editing a preset's name and stops updates that same record everywhere it appears — the list row, any compare panel showing it, the Export panel JSON, and the dials after re-applying it — without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.5"
+name = "favorite_filter_then_delete_count_delta"
+description = "Marking a preset as favorite shows its favorite badge immediately, and switching the filter to favorites recomputes the visible list to include it; deleting that preset removes it from the list, any selection or compare slot, and the favorites filter results, and the visible preset count decreases by exactly one."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.6"
+name = "reload_returns_seeded_state"
+description = "Reloading the page returns the app to its seeded state: default stops f/16, 1/60, ISO 100 on the dials, only the seeded presets and seeded snapshots in their collections, and empty undo/redo stacks."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.7"
+name = "favorites_and_tag_filters_recompute_list"
+description = "With mixed presets present: mark one favorite and switch to favorites-only — only favorites remain visible; switch to a lookTag filter — only matching lookTags remain; clearing filters restores the full collection; the Export panel favorite boolean matches the badge for the toggled preset."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.8"
+name = "help_panel_open_close_keeps_workflow"
+description = "Open the in-page help panel, read an explainer, then close it: Meter/Lab or Presets/Compare workflow continues with the same dial and preset state — no navigation away and no reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.9"
+name = "invalid_create_keeps_count_with_inline_error"
+description = "Submitting the preset form with an empty name adds no row: the visible preset count stays the same and an inline validation message naming the name field appears."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.10"
+name = "mode_switch_preserves_dials_and_presets"
+description = "After changing dials in Meter/Lab and/or creating a preset in Presets/Compare, switching modes swaps the region without a full page reload and retains the current dial values and the same preset collection."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "before_hold_then_release_restores"
+description = "With dials off defaults: holding Before shows default preview/meter/EV/histogram; releasing restores the off-default dials and derived surfaces exactly — without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "snapshot_save_restore_round_trip"
+description = "Saving a named snapshot increases the snapshot count by one; stepping dials away and restoring that snapshot returns dial labels, preview, meter, EV, and histogram to the saved stops."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "copy_stops_updates_list_and_export"
+description = "Select a preset whose stops differ from the dials, activate Copy stops, and confirm that preset's stop readout matches the current dials in the list and in the Export panel JSON."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "batch_delete_then_undo_restores"
+description = "Select three presets, choose Delete selected, confirm the count drops by exactly three and the Export panel loses those three names; press Undo and confirm the three presets and Export panel text return."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "export_import_round_trip_restores_session"
+description = "Mutate dials, create one valid preset with a lookTag from the closed enum, and save one valid snapshot; copy or download the lab package; reload to seed; import that package and confirm dials, the new preset (name, stops, lookTag), the new snapshot, EV, histogram, and Export panel text all match the pre-export session."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "create_preset_export_shows_looktag_fields"
+description = "After creating a valid preset, the Export panel JSON presets array entry for that preset visibly includes name and lookTag field names with the submitted values, matching the form payload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.17"
+name = "snapshot_appears_in_export_snapshots_array"
+description = "After saving a valid named snapshot, the Export panel JSON snapshots array gains an object with name, aperture, shutter, and iso matching the saved stops."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.18"
+name = "develop_slider_then_grain_flow"
+description = "Dragging Exposure to +60 brightens the preview, shifts histogram mass toward the right, and updates the readout to 60 on the same gesture; then raising Grain to 80 adds visible grain to the preview — both without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.19"
+name = "copy_paste_light_only_selective"
+description = "After setting distinctive Light values and distinctive Effects values, Copy settings with only the Light group checked, then changing sliders in both groups, then Paste settings: every Light slider returns to the copied values while every Effects slider keeps its changed value"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.20"
+name = "look_apply_then_manual_clear_flow"
+description = "Activating Punch changes at least three develop sliders, the preview, and the histogram together and shows Punch as selected; dragging any one slider manually then clears the active-look indication while the other sliders keep Punch's values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.21"
+name = "reset_then_undo_flow"
+description = "After dial and slider edits, Reset to original returns dials to f/16, 1/60, ISO 100 and every develop slider to default in one press; pressing Undo restores the exact pre-reset dials and slider values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.22"
+name = "edited_image_differencing_flow"
+description = "From the seeded state, Download edited PNG; then apply the Mono look (or drag Exposure to -60), confirm the preview changed, and Download edited PNG again — the two downloaded files are visibly different images and the second matches the current on-screen preview's tonal look"
+type = "binary"
+weight = 1.0
+
