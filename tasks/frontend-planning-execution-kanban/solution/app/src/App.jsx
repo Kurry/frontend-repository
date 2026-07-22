@@ -441,9 +441,9 @@ function CreateCardModal({ column, shown }) {
     [state.prompts, state.assignees],
   )
   const seed = state.createFormSeed
-  const { register, handleSubmit, setError, clearErrors, reset, trigger, watch, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, setError, clearErrors, reset, trigger, watch, formState: { errors, isSubmitting, isValid } } = useForm({
     resolver: zodResolver(schema),
-    mode: 'onSubmit',
+    mode: 'onChange',
     reValidateMode: 'onChange',
     defaultValues: {
       title: seed?.title ?? '',
@@ -456,7 +456,6 @@ function CreateCardModal({ column, shown }) {
   })
   const close = () => state.setCreateColumn(null)
   const submitted = useRef(false)
-  const title = watch('title') || ''
 
   useEffect(() => {
     if (!seed) return
@@ -522,7 +521,7 @@ function CreateCardModal({ column, shown }) {
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={close}>Cancel</Button>
-        <Button type="submit" form="create-card-form" disabled={isSubmitting || !title.trim()}>Add Card</Button>
+        <Button type="submit" form="create-card-form" disabled={isSubmitting || !isValid}>Add Card</Button>
       </ModalFooter>
     </ComposedModal>
   )
