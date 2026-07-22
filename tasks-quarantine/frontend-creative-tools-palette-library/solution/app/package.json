@@ -6,7 +6,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "verify:build": "vite build && node -e \"require('fs').accessSync('dist/index.html')\"",
-    "start": "npx --yes serve -s dist -l 3000 -n"
+    "start": "npx --yes serve -s dist -l 3000 -n",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
   },
   "dependencies": {
     "@ark-ui/vue": "^4.9.2",
@@ -25,6 +26,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
-    "vite": "^6.4.3"
+    "vite": "^6.4.3",
+    "@playwright/test": "1.61.0"
   }
 }
