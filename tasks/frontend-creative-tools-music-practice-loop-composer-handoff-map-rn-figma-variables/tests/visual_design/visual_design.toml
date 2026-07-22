@@ -1,0 +1,22 @@
+[judge]
+  [judge.quality_standards]
+    evaluation_basis = "Did the model build a complete, usable, and functioning application that fulfills the instructions?"
+    score_levels = [
+      "0.0 = Blank, non-functional, or explicitly breaks constraints.",
+      "0.5 = Partial implementation; functional but shallow, incomplete, or missing key aspects.",
+      "1.0 = Complete, deep, and fully meets all requirements."
+    ]
+
+[[criterion]]
+id = "AC-02"
+title = "The visual hierarchy makes current state and next action clear."
+description = "Inspect the primary work surface, linked summary, and detail panel. The design must provide a distinctive workbench with clear state tokens and intentional density."
+eval_type = "browser"
+weight = 1.0
+
+[[criterion]]
+id = "visual_design.statuses"
+title = "Statuses are visually distinct"
+description = "Domain statuses like draft, ready, changed, archived, conflict, resolved have distinct visual tokens (colors, icons, or badges)."
+eval_type = "browser"
+weight = 1.0

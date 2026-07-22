@@ -1,0 +1,9 @@
+[task]
+name = "mercor-intelligence/frontend-creative-tools-music-practice-loop-composer-handoff-map-rn-figma-variables"
+title = "Music Practice Loop Composer Handoff Map"
+description = "Manage practice segments through a domain-native browser surface where one meaningful mutation updates linked views and an interoperable artifact."
+version = "1.0.0"
+
+[task.resources]
+memory_gb = 4
+cpus = 2

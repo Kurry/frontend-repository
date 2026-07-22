@@ -1,0 +1,15 @@
+[judge]
+  [judge.quality_standards]
+    evaluation_basis = "Did the model build a complete, usable, and functioning application that fulfills the instructions?"
+    score_levels = [
+      "0.0 = Blank, non-functional, or explicitly breaks constraints.",
+      "0.5 = Partial implementation; functional but shallow, incomplete, or missing key aspects.",
+      "1.0 = Complete, deep, and fully meets all requirements."
+    ]
+
+[[criterion]]
+id = "AC-06"
+title = "Each invalid action gives field-level recovery and preserves prior valid state."
+description = "Try exact bounds, an invalid cross-field value, an empty state, and malformed import. Validation messages guide the user, and the prior valid state is restored."
+eval_type = "browser"
+weight = 1.0

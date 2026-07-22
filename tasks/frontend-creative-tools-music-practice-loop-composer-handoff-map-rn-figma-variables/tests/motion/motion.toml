@@ -1,0 +1,15 @@
+[judge]
+  [judge.quality_standards]
+    evaluation_basis = "Did the model build a complete, usable, and functioning application that fulfills the instructions?"
+    score_levels = [
+      "0.0 = Blank, non-functional, or explicitly breaks constraints.",
+      "0.5 = Partial implementation; functional but shallow, incomplete, or missing key aspects.",
+      "1.0 = Complete, deep, and fully meets all requirements."
+    ]
+
+[[criterion]]
+id = "AC-03"
+title = "Motion connects the acted-on item to its new state and has a reduced-motion equivalent."
+description = "When connecting a selected record to a handoff owner, the item morphs or moves to its new state. A reduced-motion media query suppresses the transform while preserving feedback."
+eval_type = "browser"
+weight = 1.0

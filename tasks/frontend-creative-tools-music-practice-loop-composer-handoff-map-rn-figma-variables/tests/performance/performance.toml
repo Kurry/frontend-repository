@@ -1,0 +1,15 @@
+[judge]
+  [judge.quality_standards]
+    evaluation_basis = "Did the model build a complete, usable, and functioning application that fulfills the instructions?"
+    score_levels = [
+      "0.0 = Blank, non-functional, or explicitly breaks constraints.",
+      "0.5 = Partial implementation; functional but shallow, incomplete, or missing key aspects.",
+      "1.0 = Complete, deep, and fully meets all requirements."
+    ]
+
+[[criterion]]
+id = "AC-09"
+title = "The signature interaction remains responsive and unrelated rows stay stable."
+description = "Exercise a seeded collection with at least 100 records. Performance is maintained and non-affected elements do not needlessly re-render."
+eval_type = "browser"
+weight = 1.0
