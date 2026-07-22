@@ -1,0 +1,168 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "spacing_and_sizing_follow_festival_scale"
+description = "Spacing and control sizing on the Stage-select map and combat HUD follow a consistent dense festival scale comparable to the reference screenshots, with text winning on conflicts"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "typography_matches_festival_hierarchy"
+description = "Typography hierarchy for the Stage title, Stage node labels, and HUD readouts matches the reference structure (title dominant, HUD secondary) even if exact fonts differ when text conflicts"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "layout_matches_reference_stage_map"
+description = "Desktop Stage-select layout places title, Stage node row, Pesos/Masks readouts, and chrome controls in the same overall composition as the reference overview/segments"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "specified_state_changes_animate"
+description = "Specified state changes from the instruction (combo popup, Fury ready, overlay enter) animate rather than only hard-cutting when the reference shows motion"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "responsive_behavior_matches_reference_intent"
+description = "Narrow layouts keep the combat HUD and Stage chrome usable in the same spirit as the desktop reference rather than dropping required controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "control_styling_matches_festival_spec"
+description = "Combat and Stage-map controls use the warm fiesta accent styling rather than unstyled native buttons that contradict the reference aesthetic"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "typography_has_clear_hierarchy"
+description = "Stage title, node names, and HUD numbers show clear typographic hierarchy rather than a single undifferentiated size"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "component_states_match_spec"
+description = "Locked/unlocked Stage nodes and Mask card states match the instruction visual states in a way consistent with the reference treatments"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "surface_treatments_match_spec"
+description = "Overlay and HUD surfaces use dark festival panels consistent with the reference rather than light flat cards that break the aesthetic"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "microinteractions_match_spec"
+description = "Hover/press and meter-ready microinteractions are present in the spirit of the reference interactive chrome"
+type = "binary"
+weight = 1.0
+

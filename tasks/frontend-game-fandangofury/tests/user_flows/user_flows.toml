@@ -1,0 +1,182 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "6.1"
+name = "stage1_victory_unlocks_next"
+description = "Start → play → Victory flow: starting Stage 1, clearing every wave, defeating the Boss, and pressing Continue returns to the Stage-select map with Pesos increased by exactly the Victory amount, owned-Masks updated, and the next Stage unlocked and selectable without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.2"
+name = "fighter_settings_invalid_inline"
+description = "Invalid Fighter Settings submission (empty name, name outside 2–20 characters, or effectsIntensity outside 0–100) keeps Save disabled and shows an inline validation message naming the offending field with no partial save"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.3"
+name = "cantina_edit_updates_map_and_hud"
+description = "Buying a Cantina upgrade updates the Pesos balance on both the Cantina and Stage-select map, raises the upgrade level and next cost, and the next run HUD reflects the purchased effect without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.4"
+name = "reset_clears_campaign_surfaces"
+description = "Confirming Reset Progress clears Stage unlocks, Masks, Pesos, upgrades, and any checkpoint from the Stage-select map, Masks screen, and Cantina together, and Resume Run is gone"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.5"
+name = "pause_resume_retains_run_state"
+description = "Pause mid-run then Resume: the view switches to the Pause overlay and back to combat with Health, Fury, wave/boss phase, and enemies retained — no lost selection of the active run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.6"
+name = "no_checkpoint_hides_resume"
+description = "When checkpoint is null (fresh load or after Abandon/Reset), Resume Run is hidden or disabled and the Stage map still shows Stage 1 unlocked without a broken empty combat scene"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.7"
+name = "mask_equip_changes_fury_everywhere"
+description = "Equipping a Mask updates the Masks screen equipped treatment and changes the Fiesta Fury full-screen effect color in the next combat run without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.8"
+name = "history_panel_preserves_workflow"
+description = "Opening and closing the History panel (and using Undo/Redo inside it) preserves Stage-map workflow continuity — returning to the map leaves Pesos and unlocks coherent"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.9"
+name = "overlays_support_expected_flows"
+description = "Cantina, Masks, Fighter Settings, Export Campaign, Import Campaign, Pause, History, and reset-confirmation overlays support their flows (buy, equip, save, export/import, resume, undo, confirm/cancel) and close without trapping the user"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.10"
+name = "abandon_or_error_recovers_without_reload"
+description = "Cancelling Abandon Run or Reset confirmation, or failing an Import validation, recovers to a usable Stage map or Pause overlay without requiring a full page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "export_import_artifact_end_state"
+description = "Artifact end-state flow: mutate display name and a Cantina upgrade, open Export Campaign and confirm Campaign JSON contains those values and schemaVersion fandangofury.campaign.v1, Copy confirms, Download then Import reconstructs the same visible campaign surfaces"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "save_checkpoint_resume_after_refresh_flow"
+description = "Pause → Save Checkpoint → refresh → Resume Run restores the same Stage, wave or boss phase, Health, and Fury, then combat continues"
+type = "binary"
+weight = 1.0
+
