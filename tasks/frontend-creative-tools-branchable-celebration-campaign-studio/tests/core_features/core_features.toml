@@ -1,0 +1,134 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "cf_canvas"
+title = "Canvas supports drag, resize, rotate, align, distribute, reorder, lock, hide, and edit"
+description = "Canvas supports drag, resize, rotate, align, distribute, reorder, lock, hide, and edit"
+weight = 1.0
+
+[[criterion]]
+id = "cf_branching"
+title = "Branch graph supports creating nodes, compare mode, and merge mode"
+description = "Branch graph supports creating nodes, compare mode, and merge mode"
+weight = 1.0
+
+[[criterion]]
+id = "cf_workflow"
+title = "Resumable workflow timeline supports pause, resume, retry, reject, and rewind"
+description = "Resumable workflow timeline supports pause, resume, retry, reject, and rewind"
+weight = 1.0
+
+[[criterion]]
+id = "cf_evidence"
+title = "Evidence panel shows suggestion rationale, cited fixture source snippets, and output previews"
+description = "Evidence panel shows suggestion rationale, cited fixture source snippets, and output previews"
+weight = 1.0
+
+[[criterion]]
+id = "cf_recipients"
+title = "Recipient matrix supports binding variants, salutations, inserts, channels, send windows, and consents"
+description = "Recipient matrix supports binding variants, salutations, inserts, channels, send windows, and consents"
+weight = 1.0
+
+[[criterion]]
+id = "cf_rehearsal"
+title = "Delivery rehearsal queue simulates limits, missing consents, and partial batch failures"
+description = "Delivery rehearsal queue simulates limits, missing consents, and partial batch failures"
+weight = 1.0
+
+[[criterion]]
+id = "cf_rsvp"
+title = "RSVP ledger reconciles pending, viewed, accepted, declined, needs-follow-up states"
+description = "RSVP ledger reconciles pending, viewed, accepted, declined, needs-follow-up states"
+weight = 1.0

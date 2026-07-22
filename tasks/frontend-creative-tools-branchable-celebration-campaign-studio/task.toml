@@ -1,0 +1,43 @@
+schema_version = "1.3"
+
+[task]
+name = "mercor-intelligence/frontend-creative-tools-branchable-celebration-campaign-studio"
+description = "A host composes a layered invitation, branches its message and artwork into alternatives, binds recipient groups to variants, reviews generated suggestions with evidence, approves or rejects workflow checkpoints, rehearses delivery failures, tracks RSVP replies, and exports a self-contained campaign bundle plus print-ready cards. Generation is never a one-shot chat response: every step is visible, interruptible, resumable, and tied to the canonical design and recipient state."
+
+[agent]
+timeout_sec = 3600.0
+
+[verifier]
+timeout_sec = 14400.0
+
+[environment]
+workdir = "/app"
+build_timeout_sec = 1200.0
+memory_mb = 8192
+cpus = 4
+
+[[artifacts]]
+source = "/app"
+destination = "app"
+exclude = [
+    "node_modules",
+    ".git",
+    ".DS_Store",
+    "dist",
+    "build",
+    "out",
+    ".next",
+    ".nuxt",
+    ".svelte-kit",
+    "storybook-static",
+    ".cache",
+    ".vite",
+    ".turbo",
+    ".parcel-cache",
+    ".pnpm-store",
+    ".yarn",
+    ".npm",
+    "coverage",
+    "playwright-report",
+    "test-results",
+]

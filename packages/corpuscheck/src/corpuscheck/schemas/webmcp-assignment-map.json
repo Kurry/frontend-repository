@@ -1,5 +1,59 @@
 [
   {
+    "task": "frontend-creative-tools-branchable-celebration-campaign-studio",
+    "modules": [
+      "structured-editor-v1",
+      "entity-collection-v1",
+      "command-session-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "canvas-layer",
+        "branch-node"
+      ],
+      "editor_properties": [
+        "position",
+        "rotation",
+        "dimensions",
+        "content",
+        "lineage"
+      ],
+      "entity": "recipient",
+      "entity_operations": [
+        "select",
+        "update",
+        "bind"
+      ],
+      "entity_fields": [
+        "household",
+        "salutation",
+        "channel",
+        "consent",
+        "rsvp_state"
+      ],
+      "session_operations": [
+        "pause",
+        "resume",
+        "retry",
+        "rewind",
+        "rehearse"
+      ],
+      "session_state_fields": [
+        "workflow_step",
+        "run_graph",
+        "queue"
+      ],
+      "artifact_types": [
+        "campaign_bundle"
+      ],
+      "transfer_operations": [
+        "export",
+        "import"
+      ]
+    }
+  },
+  {
     "task": "frontend-creative-tools-annotation-studio",
     "modules": [
       "entity-collection-v1",

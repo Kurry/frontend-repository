@@ -513,5 +513,10 @@
     "source": "feature-workflow-builder-workflow-builder PRD",
     "instruction": "tasks/frontend-workflow-workflow-builder/instruction.md",
     "description": "Node-graph workflow builder with durable executions and timelines."
+  },
+  "frontend-creative-tools-branchable-celebration-campaign-studio": {
+    "source": "BranchableCelebrationCampaignStudio PRD",
+    "instruction": "tasks/frontend-creative-tools-branchable-celebration-campaign-studio/instruction.md",
+    "description": "A host composes a layered invitation, branches its message and artwork into alternatives, binds recipient groups to variants, reviews generated suggestions with evidence, approves or rejects workflow checkpoints, rehearses delivery failures, tracks RSVP replies, and exports a self-contained campaign bundle plus print-ready cards. Generation is never a one-shot chat response: every step is visible, interruptible, resumable, and tied to the canonical design and recipient state."
   }
 }

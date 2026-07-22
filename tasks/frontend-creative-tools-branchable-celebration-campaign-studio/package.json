@@ -1,0 +1,20 @@
+{
+  "name": "frontend-creative-tools-branchable-celebration-campaign-studio",
+  "version": "1.0.0",
+  "description": "A host composes a layered invitation, branches its message and artwork into alternatives, binds recipient groups to variants, reviews generated suggestions with evidence, approves or rejects workflow checkpoints, rehearses delivery failures, tracks RSVP replies, and exports a self-contained campaign bundle plus print-ready cards. Generation is never a one-shot chat response: every step is visible, interruptible, resumable, and tied to the canonical design and recipient state.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "playwright": "^1.61.1"
+  }
+}
