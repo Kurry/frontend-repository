@@ -1,0 +1,257 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "AC-08"
+name = "alternate_input"
+description = "Repeating the signature interaction with keyboard and touch-equivalent controls produces identical state with visible focus and live feedback."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.1"
+name = "color_contrast_passes_wcag"
+description = "Text, interactive elements, and meaningful icons meet WCAG AA contrast ratios against their backgrounds."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "interactive_elements_keyboard_focusable"
+description = "All buttons, links, form fields, and custom controls can be reached via the Tab key in a logical order."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "focus_indicators_visible"
+description = "A clear, visible focus ring or highlight appears on every interactive element when it receives keyboard focus."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "interactive_elements_actionable_via_keyboard"
+description = "Custom controls (buttons, toggles, menus) can be activated using the Enter or Space keys, identical to mouse clicks."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "images_have_alt_text"
+description = "Meaningful images have descriptive `alt` attributes; decorative images use `alt=\"\"` or CSS backgrounds."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "form_inputs_have_labels"
+description = "Every form input has a clear, programmatic label (using `<label for=\"id\">` or `aria-label`/`aria-labelledby`)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "landmarks_and_headings_logical"
+description = "The page uses proper semantic HTML landmarks (`<main>`, `<nav>`, `<header>`) and a logical heading structure (h1-h6) without skipping levels."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "dynamic_changes_announced"
+description = "Significant dynamic content updates (like form errors, toast messages, or new search results) use `aria-live` or similar techniques to announce changes to screen readers."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "modals_trap_focus"
+description = "When a modal or dialog is open, keyboard focus is trapped inside it until it is closed, and it can be dismissed via the Escape key."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "zoom_text_scaling_supported"
+description = "The UI remains functional and readable (without severe overlap or hidden text) when the browser zoom is increased to 200%."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "poor_contrast_hides_content"
+description = "Low contrast makes critical text or interactive elements difficult or impossible to read."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n2"
+name = "keyboard_trap_exists"
+description = "A user can Tab into a component (like a modal or complex widget) but cannot Tab or Escape out of it without a mouse."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n3"
+name = "focus_outline_suppressed"
+description = "The CSS actively removes focus outlines (`outline: none` without a fallback) on interactive elements."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n4"
+name = "divs_used_as_buttons_without_semantics"
+description = "Interactive actions use `<div>` or `<span>` with click handlers, but lack `role=\"button\"` and keyboard event listeners."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n5"
+name = "missing_form_validation_feedback_for_screen_readers"
+description = "Form errors are indicated only visually (e.g., a red border) without accompanying programmatic text or `aria-invalid` attributes."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n6"
+name = "heading_structure_used_for_styling_only"
+description = "Heading tags (like `<h5>`) are used just to make text bold or small, rather than to represent the document's logical hierarchy."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n7"
+name = "hover_only_content_inaccessible"
+description = "Critical information or actions appear only on mouse hover, with no way to trigger them via keyboard focus or touch."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n8"
+name = "animations_lack_reduced_motion_support"
+description = "Continuous or distracting animations do not respect the user's `prefers-reduced-motion` OS setting."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n9"
+name = "color_used_as_sole_indicator"
+description = "Information is conveyed exclusively through color (e.g., 'the green items are done'), failing users with color vision deficiencies."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n10"
+name = "hidden_content_reads_aloud"
+description = "Content that is visually hidden (e.g., using `opacity: 0` or placed off-screen incorrectly) is still read by screen readers, causing confusion."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "accessibility.catchall"
+name = "accessibility_catchall"
+description = "The app exhibits a significant, browser-observable accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it clearly violates WCAG guidelines or creates a severe barrier for users with disabilities. If present, name the defect and cite the concrete evidence (element, state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0
