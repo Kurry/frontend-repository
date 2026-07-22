@@ -513,5 +513,10 @@
     "source": "feature-workflow-builder-workflow-builder PRD",
     "instruction": "tasks/frontend-workflow-workflow-builder/instruction.md",
     "description": "Node-graph workflow builder with durable executions and timelines."
+  },
+  "frontend-planning-seating-constraint-canvas": {
+    "source": "Seating Constraint Canvas",
+    "instruction": "Seating Constraint Canvas/instruction.md",
+    "description": "Seating Constraint Canvas good-app eval."
   }
 }

@@ -7892,5 +7892,63 @@
       "Multi-select marquee geometry and Shift-click chord timing stay Playwright when mechanism matters",
       "Timeline status filter chips and Saved Workflows / Artifact panel open toggles stay Playwright-driven; no browse-query module is assigned"
     ]
+  },
+  {
+    "task": "frontend-planning-seating-constraint-canvas",
+    "modules": [
+      "structured-editor-v1",
+      "entity-collection-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "table",
+        "aisle",
+        "guest"
+      ],
+      "editor_properties": [
+        "x",
+        "y",
+        "rotation",
+        "width",
+        "height"
+      ],
+      "editor_operations": [
+        "select",
+        "add",
+        "delete",
+        "update_property"
+      ],
+      "editor_modes": [
+        "draw-aisle"
+      ],
+      "entity": "assignment",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "guest-id",
+        "seat-id",
+        "relationship"
+      ],
+      "artifact_operations": [
+        "export",
+        "import"
+      ],
+      "export_formats": [
+        "seating-constraint-plan",
+        "svg"
+      ],
+      "import_modes": [
+        "seating-constraint-plan"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Drag and drop gesture geometry stays Playwright-driven",
+      "Canvas redraw rendering is visually observed"
+    ]
   }
 ]

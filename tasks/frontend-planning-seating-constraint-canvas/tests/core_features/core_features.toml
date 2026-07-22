@@ -1,0 +1,326 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "empty_state_is_present"
+description = "Empty state UI is present and renders when a collection is empty."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "forms_validate_inline"
+description = "Inline validation appears on all forms before submit."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "errors_are_actionable"
+description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "actions_show_confirmation"
+description = "Success or confirmation feedback appears after actions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "async_work_shows_loading_state"
+description = "Loading spinners or indicators are shown for async or simulated-async work."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "destructive_actions_support_undo_or_cancel"
+description = "Undo or cancel options are available where destructive actions exist."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "non_obvious_controls_have_help"
+description = "Help or tooltips are present for non-obvious controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "controls_use_semantic_tags"
+description = "Buttons, inputs, and labels use semantic tags."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "modal_supports_close_paths"
+description = "Modal close controls and background clicks both close the overlay."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "long_flows_show_progress"
+description = "Long task flows provide progress or feedback steps."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n1"
+name = "empty_collection_has_no_feedback"
+description = "An empty collection shows nothing and provides no UI feedback."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n2"
+name = "errors_only_reach_console"
+description = "Errors are surfaced only in the browser console."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n3"
+name = "actions_lack_visible_feedback"
+description = "Actions lack visible feedback and silently succeed or fail."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n4"
+name = "destructive_actions_lack_warning"
+description = "Destructive actions have no warnings."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n5"
+name = "interactive_elements_use_nonsemantic_tags"
+description = "Non-semantic div or span tags wrap interactive elements."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n6"
+name = "modal_not_keyboard_dismissible"
+description = "Modal overlays cannot be dismissed via keyboard."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n7"
+name = "validation_feedback_missing_or_delayed"
+description = "Validation feedback is missing or delayed with no UI indication."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n8"
+name = "button_text_ambiguous_or_missing"
+description = "Button text is ambiguous or missing."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n9"
+name = "non_obvious_flows_lack_guidance"
+description = "Non-obvious flows have no in-app guidance at all."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n10"
+name = "affordances_hidden_or_inaccessible"
+description = "Interactive affordances are visually hidden or inaccessible."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "edge_cases.catchall"
+name = "edge_cases_catchall"
+description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0
+[dimension]
+id = "core_features"
+name = "Core Features"
+description = "Assesses the application's ability to deliver the primary functionality defined in the PRD."
+
+[[criterion]]
+id = "cf_room_geometry"
+title = "A 24x18-meter room canvas is rendered with a stage, two doors, one accessible entrance, three columns, and a service zone, all snapped to a 0.25-meter grid."
+description = "The canvas must display the fixed obstacles and grid snapping."
+weight = 1.0
+
+[[criterion]]
+id = "cf_table_manipulation"
+title = "Tables can be dragged, rotated in 15-degree increments, and resized among allowed capacities (round 6/8, rectangle 6/10, accessible rectangle 6)."
+description = "Tables must rotate and resize correctly."
+weight = 1.0
+
+[[criterion]]
+id = "cf_table_collision"
+title = "Table collision, wall/column overlap, or leaving bounds blocks movement and resizing, functioning only as a preview."
+description = "Constraints must block invalid positions."
+weight = 1.0
+
+[[criterion]]
+id = "cf_lasso_selection"
+title = "Lasso selection supports group movement of tables while preserving their relative positions."
+description = "Lasso select and move must work."
+weight = 1.0
+
+[[criterion]]
+id = "cf_seat_generation"
+title = "Seats derive deterministically from table type, dimensions, rotation, and capacity."
+description = "Seats must map 1:1 with capacity."
+weight = 1.0
+
+[[criterion]]
+id = "cf_guest_assignment"
+title = "Guest cards can be dragged onto seats; a guest occupies at most one seat; declined guests cannot be seated, and tentative guests are seated with a warning."
+description = "Guest assignment logic must enforce limits."
+weight = 1.0
+
+[[criterion]]
+id = "cf_relationship_graph"
+title = "Guest cards connect with together, near (≤ 4m), or apart (≥ 6m) edges. Contradictory edges between the same pair are rejected."
+description = "Distance rules apply to near/apart."
+weight = 1.0
+
+[[criterion]]
+id = "cf_accessibility_lens"
+title = "A mobility lens displays accessible seats and requires an obstacle-free aisle polygon at least 1.2 meters wide connecting to the accessible entrance."
+description = "Lens must display accessibility visually."
+weight = 1.0
+
+[[criterion]]
+id = "cf_sightline_lens"
+title = "A sightline overlay raycasts seat centers to the stage and flags columns/tables blocking priority guests without altering geometry."
+description = "Raycasting shows blocked lines of sight."
+weight = 1.0
+
+[[criterion]]
+id = "cf_aisle_editor"
+title = "The planner can draw up to six aisle centerlines (1.2m or 1.5m width) that snap to the grid and cannot cross obstacles."
+description = "Aisles snap and avoid obstacles."
+weight = 1.0
+
+[[criterion]]
+id = "cf_metrics_rings"
+title = "Concentric rings (or metrics sidebar) show counts for confirmed/tentative/declined, assigned/unassigned, accessibility-ready, and relationship-satisfied guests."
+description = "Metrics display guest breakdown accurately."
+weight = 1.0
+
+[[criterion]]
+id = "cf_export_import"
+title = "Export produces a reproducible JSON matching the schema and a print-ready SVG. Import recalculates all state atomically and rejects invalid payloads."
+description = "Round-trip JSON import and export must work."
+weight = 1.0
