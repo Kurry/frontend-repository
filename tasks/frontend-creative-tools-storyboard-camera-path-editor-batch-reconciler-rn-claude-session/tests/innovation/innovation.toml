@@ -1,0 +1,26 @@
+[judge]
+dimensions = [
+  "core_features",
+  "visual_design",
+  "motion",
+  "technical",
+  "user_flows",
+  "edge_cases",
+  "responsiveness",
+  "accessibility",
+  "performance",
+  "writing",
+  "innovation",
+  "design_fidelity",
+  "behavioral",
+]
+
+[[criterion]]
+id = "innovation.catchall"
+title = "linked_utility"
+description = "Linked views provide domain utility beyond CRUD, covering areas not covered by other criteria. Reviewer should verify evidence."
+evaluation_steps = [
+  "Mutate a record and use the linked representation to make the next decision.",
+  "Observe that linked utility assists the user flow."
+]
+weight = 1.0

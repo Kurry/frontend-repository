@@ -1,0 +1,26 @@
+[judge]
+dimensions = [
+  "core_features",
+  "visual_design",
+  "motion",
+  "technical",
+  "user_flows",
+  "edge_cases",
+  "responsiveness",
+  "accessibility",
+  "performance",
+  "writing",
+  "innovation",
+  "design_fidelity",
+  "behavioral",
+]
+
+[[criterion]]
+id = "AC-05"
+title = "complete_user_flow"
+description = "The end-to-end job is recoverable without reload."
+evaluation_steps = [
+  "Create, edit, mutate, undo, and complete one record.",
+  "Observe that the state can be recovered via undo without page reload."
+]
+weight = 1.0

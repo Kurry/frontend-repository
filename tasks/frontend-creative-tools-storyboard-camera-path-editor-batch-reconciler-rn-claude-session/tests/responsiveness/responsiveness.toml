@@ -1,0 +1,26 @@
+[judge]
+dimensions = [
+  "core_features",
+  "visual_design",
+  "motion",
+  "technical",
+  "user_flows",
+  "edge_cases",
+  "responsiveness",
+  "accessibility",
+  "performance",
+  "writing",
+  "innovation",
+  "design_fidelity",
+  "behavioral",
+]
+
+[[criterion]]
+id = "AC-07"
+title = "mobile_mode"
+description = "The desktop surface becomes a usable stack/drawer/stepper without horizontal overflow."
+evaluation_steps = [
+  "Use the signature interaction at a narrow viewport.",
+  "Observe that the application is usable and has no horizontal overflow."
+]
+weight = 1.0

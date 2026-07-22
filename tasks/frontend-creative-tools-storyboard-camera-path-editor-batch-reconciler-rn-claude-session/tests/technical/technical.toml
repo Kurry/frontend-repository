@@ -1,0 +1,26 @@
+[judge]
+dimensions = [
+  "core_features",
+  "visual_design",
+  "motion",
+  "technical",
+  "user_flows",
+  "edge_cases",
+  "responsiveness",
+  "accessibility",
+  "performance",
+  "writing",
+  "innovation",
+  "design_fidelity",
+  "behavioral",
+]
+
+[[criterion]]
+id = "AC-04"
+title = "schema_contract"
+description = "The tool result and artifact contain the declared API-shaped fields."
+evaluation_steps = [
+  "Query the current state and export after the mutation.",
+  "Observe that the tool result and exported artifact contain the exact expected schema."
+]
+weight = 1.0

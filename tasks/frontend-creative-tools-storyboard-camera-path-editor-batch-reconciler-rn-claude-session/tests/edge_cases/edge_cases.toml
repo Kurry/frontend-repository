@@ -1,0 +1,26 @@
+[judge]
+dimensions = [
+  "core_features",
+  "visual_design",
+  "motion",
+  "technical",
+  "user_flows",
+  "edge_cases",
+  "responsiveness",
+  "accessibility",
+  "performance",
+  "writing",
+  "innovation",
+  "design_fidelity",
+  "behavioral",
+]
+
+[[criterion]]
+id = "AC-06"
+title = "boundaries_recovery"
+description = "Each invalid action gives field-level recovery and preserves prior valid state."
+evaluation_steps = [
+  "Try exact bounds, an invalid cross-field value, an empty state, and malformed import.",
+  "Observe that each invalid action provides recovery and does not change the prior valid state."
+]
+weight = 1.0

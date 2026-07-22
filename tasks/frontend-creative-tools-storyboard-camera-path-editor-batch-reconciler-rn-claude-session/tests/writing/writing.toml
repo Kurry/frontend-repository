@@ -1,0 +1,26 @@
+[judge]
+dimensions = [
+  "core_features",
+  "visual_design",
+  "motion",
+  "technical",
+  "user_flows",
+  "edge_cases",
+  "responsiveness",
+  "accessibility",
+  "performance",
+  "writing",
+  "innovation",
+  "design_fidelity",
+  "behavioral",
+]
+
+[[criterion]]
+id = "AC-10"
+title = "domain_copy"
+description = "Copy names the domain consequence and recovery action precisely."
+evaluation_steps = [
+  "Inspect labels, statuses, errors, and empty-state text.",
+  "Observe that the copy precisely matches the domain expectations."
+]
+weight = 1.0
