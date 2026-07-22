@@ -521,7 +521,7 @@ input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="
   .app { display: block; width: 100%; min-width: 0; height: 100dvh; }
   .nav, .rail { display: none; }
   .board { width: 100%; min-width: 0; height: 100%; }
-  .board-head { padding: 10px 12px; gap: 6px; }
+  .board-head { flex-wrap: wrap; padding: 10px 12px; gap: 6px; }
   .board-head-spacer { display: none; }
   .columns { padding: 10px 12px 16px; gap: 10px; }
   .col { flex-basis: min(224px, calc(100vw - 48px)); }
