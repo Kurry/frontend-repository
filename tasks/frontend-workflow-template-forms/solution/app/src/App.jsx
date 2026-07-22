@@ -261,17 +261,9 @@ function FormsView() {
           </motion.div>
         </div>
         <div className={`form-panel ${reduce ? '' : 'form-fade'}`}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={technique}
-              initial={reduce ? false : { opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={reduce ? undefined : { opacity: 0 }}
-              transition={{ duration: reduce ? 0 : 0.15 }}
-            >
-              <TechniqueForm technique={technique} active={true} />
-            </motion.div>
-          </AnimatePresence>
+          <div key={technique} className={reduce ? '' : 'technique-transition'}>
+            <TechniqueForm technique={technique} active={true} />
+          </div>
         </div>
         <PreviewPanel saveButtonRef={saveButtonRef} />
         <SaveModal launcherButtonRef={saveButtonRef} />

@@ -388,6 +388,7 @@ a:focus-visible,
 }
 
 .form-fade { animation: form-fade 150ms var(--ease-out); }
+.technique-transition { animation: form-fade 150ms var(--ease-out) both; }
 @keyframes form-fade { from { opacity: 0; transform: translateY(4px); } }
 
 .technique-form { display: flex; flex-direction: column; gap: 16px; }
