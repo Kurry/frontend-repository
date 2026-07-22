@@ -189,9 +189,9 @@ test.describe('daisyUI theme studio (task-specific)', () => {
     await page.waitForLoadState('networkidle');
     await holdAdd(page);
     await expect(page.locator('#my-count')).toHaveText('1');
-    await page.fill('#theme-name', 'harbor-dawn');
+    await page.fill('#theme-name', 'coastal-dawn');
     await page.locator('#theme-name').blur();
-    await expect(page.locator('#my-themes .tname').first()).toHaveText('harbor-dawn');
+    await expect(page.locator('#my-themes .tname').first()).toHaveText('coastal-dawn');
     await expect(page.locator('#my-themes .theme-row').first()).toHaveAttribute('aria-pressed', 'true');
     await expect(page.locator('#my-themes .active-mark').first()).toBeVisible();
   });
@@ -222,7 +222,7 @@ test.describe('daisyUI theme studio (task-specific)', () => {
   test('1.5 rename_updates_all_surfaces', async ({ page }) => {
     await page.goto(BASE);
     await holdAdd(page);
-    await page.fill('#theme-name', 'harbor-dawn');
+    await page.fill('#theme-name', 'coastal-dawn');
     await page.locator('#theme-name').blur();
     await page.fill('#theme-name', 'evening-tide');
     await page.locator('#theme-name').blur();
