@@ -16,12 +16,14 @@
     "@tailwindcss/vite": "4.3.2",
     "@tanstack/solid-form": "^1.33.2",
     "motion": "^12.42.2",
+    "playwright": "^1.61.1",
     "solid-js": "1.9.14",
     "tailwindcss": "4.3.2",
     "yjs": "13.6.31",
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "typescript": "6.0.3",
     "vite": "8.1.4",
     "vite-plugin-solid": "2.11.12"
