@@ -1,0 +1,9 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+
+[[criterion]]
+id = "AC-01"
+title = "signature_mutation"
+description = "scrub a selected record through its timeline and restore a prior checkpoint. The replay timeline mutation changes the primary record, linked view, and status together."
+weight = 1.0

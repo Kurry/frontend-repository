@@ -1,0 +1,9 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+
+[[criterion]]
+id = "AC-04"
+title = "schema_contract"
+description = "Query the current state and export after the mutation. The tool result and artifact contain the declared API-shaped fields."
+weight = 1.0

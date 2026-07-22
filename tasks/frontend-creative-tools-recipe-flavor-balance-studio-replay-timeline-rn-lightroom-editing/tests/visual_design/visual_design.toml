@@ -1,0 +1,9 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+
+[[criterion]]
+id = "AC-02"
+title = "visual_hierarchy"
+description = "Inspect the primary work surface, linked summary, and detail panel. The visual hierarchy makes current state and next action clear."
+weight = 1.0
