@@ -608,4 +608,36 @@ test.describe('Command Center E2E', () => {
     await expect(page.getByRole('button', { name: 'Copy', exact: true }), 'export controls use the specific verb Copy').toBeVisible();
     await expect(page.getByRole('button', { name: 'Download', exact: true }), 'export controls use the specific verb Download').toBeVisible();
   });
+
+  test('1.22 undo_redo_agent_mutations', async ({ page }) => {
+    await page.getByRole('button', { name: 'Export session' }).click();
+    const drawer = page.getByRole('dialog', { name: 'Export session' });
+    const imported = JSON.parse(await drawer.locator('pre.export-preview').innerText());
+    imported.activeView = 'cost-this-month-detail';
+
+    await drawer.getByLabel('Session JSON import field').fill(JSON.stringify(imported));
+    await drawer.getByRole('button', { name: 'Import session' }).click();
+    await expect(page.getByRole('heading', { name: 'Cost this month', exact: true }).first()).toBeVisible();
+    await drawer.getByRole('button', { name: 'Close Export session drawer' }).click();
+
+    await page.getByRole('button', { name: 'Undo' }).click();
+    await expect(page.getByRole('heading', { name: 'Good morning, operator.' })).toBeVisible();
+    await page.getByRole('button', { name: 'Redo' }).click();
+    await expect(page.getByRole('heading', { name: 'Cost this month', exact: true }).first()).toBeVisible();
+  });
+
+  test('4.3 validation_messages_name_field_and_rule', async ({ page }) => {
+    const seededNames = await page.locator('.agent-name').allInnerTexts();
+    await page.getByRole('button', { name: 'Export session' }).click();
+    const drawer = page.getByRole('dialog', { name: 'Export session' });
+    const invalid = JSON.parse(await drawer.locator('pre.export-preview').innerText());
+    invalid.agents[0]['last-active'] = 'not-a-timestamp';
+
+    await drawer.getByLabel('Session JSON import field').fill(JSON.stringify(invalid));
+    await drawer.getByRole('button', { name: 'Import session' }).click();
+    await expect(drawer.getByRole('alert').filter({ hasText: /agents\.0\.last-active.*ISO timestamp/i }).first()).toBeVisible();
+    await drawer.getByRole('button', { name: 'Close Export session drawer' }).click();
+    await expect(page.locator('.agent-name')).toHaveText(seededNames);
+    await expect(page.getByRole('button', { name: 'Undo' })).toBeDisabled();
+  });
 });

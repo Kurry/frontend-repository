@@ -9,11 +9,11 @@ export const agentInputSchema = z.object({
   name: z.string().trim().min(1, 'Agent name is required and cannot be whitespace only.').max(80, 'Agent name must be 80 characters or fewer.'),
   model: z.enum(MODELS, { error: 'Model is required and must be one of the four allowed models.' }),
   description: z.string().max(280, 'Description must be 280 characters or fewer.').default(''),
-})
+}).strict()
 
 export const renameSchema = z.object({
   name: z.string().trim().min(1, 'Agent name is required and cannot be whitespace only.').max(80, 'Agent name must be 80 characters or fewer.'),
-})
+}).strict()
 
 const timeField = (label) => z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, `${label} is required in 24-hour HH:MM format.`)
 
@@ -21,7 +21,7 @@ export const nightScheduleSchema = z.object({
   enable: z.boolean(),
   startTime: z.string(),
   endTime: z.string(),
-}).superRefine((value, ctx) => {
+}).strict().superRefine((value, ctx) => {
   if (!value.enable) return
   const start = timeField('Start time').safeParse(value.startTime)
   const end = timeField('End time').safeParse(value.endTime)
@@ -34,25 +34,25 @@ const exportedAgentSchema = z.object({
   model: z.enum(MODELS),
   description: z.string().max(280, 'Agent description must be 280 characters or fewer.'),
   state: z.enum(AGENT_STATES),
-  'last-active': z.string().min(1, 'Agent last-active is required.'),
-})
+  'last-active': z.string().datetime({ message: 'Agent last-active must be an ISO timestamp.' }),
+}).strict()
 
 const eventSchema = z.object({
   type: z.enum(['prompt', 'evaluation', 'agent']),
   description: z.string().min(1),
   status: z.enum(['info', 'success', 'error']),
-  timestamp: z.string().min(1),
+  timestamp: z.string().datetime({ message: 'Event timestamp must be an ISO timestamp.' }),
   relatedName: z.string().optional(),
   metricKey: z.enum(KPI_KEYS).optional(),
-})
+}).strict()
 
 const kpiSchema = z.object({
   key: z.enum(KPI_KEYS),
   label: z.string(),
   current: z.number(),
   trend: z.number(),
-  series: z.array(z.object({ label: z.string(), value: z.number() })).min(7),
-})
+  series: z.array(z.object({ label: z.string(), value: z.number() }).strict()).min(7),
+}).strict()
 
 export const sessionSchema = z.object({
   agents: z.array(exportedAgentSchema),
@@ -62,7 +62,7 @@ export const sessionSchema = z.object({
     enable: z.boolean(),
     startTime: z.string(),
     endTime: z.string(),
-  }).superRefine((value, ctx) => {
+  }).strict().superRefine((value, ctx) => {
     if (!value.enable) return
     if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(value.startTime)) ctx.addIssue({ code: 'custom', path: ['startTime'], message: 'Night schedule start time must use HH:MM.' })
     if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(value.endTime)) ctx.addIssue({ code: 'custom', path: ['endTime'], message: 'Night schedule end time must use HH:MM.' })
@@ -70,7 +70,7 @@ export const sessionSchema = z.object({
   theme: z.enum(['light', 'night']),
   activeView: z.enum(['dashboard', 'total-prompts-detail', 'active-agents-detail', 'evaluations-run-detail', 'cost-this-month-detail']),
   feedFilters: z.array(z.enum(['prompt', 'evaluation', 'agent', 'error'])),
-})
+}).strict()
 
 const now = Date.now()
 let sequence = 100
@@ -403,9 +403,8 @@ export const useCommandStore = create((set, get) => ({
     }))
     const idByName = Object.fromEntries(agents.map((agent) => [agent.name, agent.id]))
     const events = data.events.map((event) => ({ ...event, id: uid('event'), resourceId: event.relatedName ? idByName[event.relatedName] : undefined, isNew: false }))
-    get().setView(data.activeView)
     domainMutation(set, 'Imported session', () => ({
-      agents, events, kpis: data.kpis.map((kpi) => ({ ...kpi, format: kpi.key === 'cost-this-month' ? 'currency' : 'number' })), nightSchedule: data.nightSchedule, theme: data.theme, feedFilters: data.feedFilters, feedSearch: '', importError: '', announcement: 'Session JSON import completed.',
+      agents, events, kpis: data.kpis.map((kpi) => ({ ...kpi, format: kpi.key === 'cost-this-month' ? 'currency' : 'number' })), nightSchedule: data.nightSchedule, theme: data.theme, activeView: data.activeView, feedFilters: data.feedFilters, feedSearch: '', importError: '', announcement: 'Session JSON import completed.',
     }))
     return { ok: true }
   },
