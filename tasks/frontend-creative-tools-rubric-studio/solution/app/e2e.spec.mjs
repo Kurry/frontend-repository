@@ -197,6 +197,8 @@ test('1.6 criterion_form_inline_validation', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
 
+  const baselineCount = await page.locator('.criterion-panel').count();
+
   const addOpener = page.getByRole('button', { name: 'Add criterion', exact: true }).first();
   await addOpener.click();
 
@@ -204,24 +206,71 @@ test('1.6 criterion_form_inline_validation', async ({ page }) => {
   await expect(addDialog).toBeVisible();
 
   const submit = page.getByRole('button', { name: 'Add criterion', exact: true }).nth(1);
+  const idError = page.locator('#criterion-id-error');
+  const nameError = page.locator('#criterion-name-error');
+  const descError = page.locator('#criterion-description-error');
+  const weightError = page.locator('#criterion-weight-error');
 
-  // form validates on mount: submit stays disabled and per-field inline
-  // messages are already populated for the empty required fields
+  const fillNumber = async (selector, value) => {
+    const input = page.locator(selector);
+    await input.fill(String(value));
+    await input.dispatchEvent('input');
+    await input.dispatchEvent('change');
+    await input.blur();
+  };
+
+  // Empty required fields on mount: per-field messages naming id/name/description
+  // are present and the submit control is disabled.
+  await expect(submit).toBeDisabled();
   await expect(submit).toHaveAttribute('data-incomplete', 'true');
+  await expect(idError).not.toBeEmpty();
+  await expect(nameError).not.toBeEmpty();
+  await expect(descError).not.toBeEmpty();
+
+  // Give name + description valid values so each remaining case is isolated to
+  // the field under test.
+  await page.fill('#criterion-name', 'Inline Validation Probe');
+  await page.fill('#criterion-description', 'A valid description for the inline validation probe.');
+  await expect(nameError).toBeEmpty();
+  await expect(descError).toBeEmpty();
+
+  // Id violating the allowed pattern (uppercase + punctuation): the id message
+  // names the pattern rule and submit stays disabled.
+  await page.fill('#criterion-id', 'Bad ID!');
+  await expect(idError).toContainText(/lowercase letters/i);
+  await expect(submit).toBeDisabled();
+  await expect(submit).toHaveAttribute('data-incomplete', 'true');
+
+  // Duplicate id (valid pattern but collides with a seeded criterion): the id
+  // message names the collision and submit stays disabled.
+  await page.fill('#criterion-id', 'clarity-check');
+  await expect(idError).toContainText(/already in use/i);
   await expect(submit).toBeDisabled();
 
-  const initialCount = await page.locator('.criterion-panel').count();
+  // A unique valid id clears the id error.
+  await page.fill('#criterion-id', 'inline-validation-probe');
+  await expect(idError).toBeEmpty();
 
-  const idError = page.locator('#criterion-id-error');
-  await expect(idError).not.toBeEmpty();
-  const nameError = page.locator('#criterion-name-error');
-  await expect(nameError).not.toBeEmpty();
+  // Weight outside 0.5-5: the weight message names the bound and submit stays
+  // disabled.
+  await fillNumber('#criterion-weight', 9);
+  await expect(weightError).toContainText(/between 0\.5 and 5/i);
+  await expect(submit).toBeDisabled();
+  await fillNumber('#criterion-weight', 2);
+  await expect(weightError).toBeEmpty();
 
-  // disabled submit cannot be actioned; the criterion is not added
-  await expect(addDialog).toBeVisible();
+  // Likert range where min is not less than max: switch to likert, set min>=max,
+  // and both range fields surface inline messages while submit stays disabled.
+  await page.locator('label[for="criterion-type"]').locator('..').locator('.p-select').first().click();
+  await page.getByRole('option', { name: 'likert' }).click();
+  await fillNumber('#criterion-min', 5);
+  await fillNumber('#criterion-max', 5);
+  await expect(page.locator('#criterion-min-error')).toContainText(/lower than likert max/i);
+  await expect(page.locator('#criterion-max-error')).toContainText(/greater than likert min/i);
+  await expect(submit).toBeDisabled();
 
-  const currentCount = await page.locator('.criterion-panel').count();
-  expect(currentCount).toBe(initialCount);
+  // Across every invalid state above, no criterion was added to the rubric.
+  expect(await page.locator('.criterion-panel').count()).toBe(baselineCount);
 
   await page.keyboard.press('Escape');
   await expect(addDialog).toBeHidden();
@@ -260,25 +309,48 @@ test('1.5 add_criterion_count_delta', async ({ page }) => {
   expect(finalCount).toBe(initialCount + 1);
 });
 
-test('4.4 editor_preview does not mutate other fields', async ({ page }) => {
+test('6.5 criteria_tune_preview_switch_retains_rubric', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
 
   const skip = page.getByRole('button', { name: 'Skip tour' });
   if (await skip.isVisible()) await skip.click();
 
-  const initialCriteriaCount = await page.locator('.criterion-panel').count();
+  const title = page.locator('#rubric-title');
+  const rubricName = await title.innerText();
 
-  const result = await invokeTool(page, 'editor_preview');
-  expect(result.ok).toBe(true);
+  const switcher = page.locator('.view-switcher');
+  const criteriaBtn = switcher.getByRole('button', { name: 'Criteria' });
+  const tuneBtn = switcher.getByRole('button', { name: 'Tune' });
+  const previewBtn = switcher.getByRole('button', { name: 'Preview' });
 
-  await expect(page.locator('.preview-view')).toBeVisible();
-  await expect(page.locator('text=Sample submission')).toBeVisible();
-
-  await page.getByRole('button', { name: 'Criteria', exact: true }).click();
+  // Baseline: the Criteria canvas is active with the seeded criteria set.
   await expect(page.locator('.criteria-view')).toBeVisible();
-  const currentCriteriaCount = await page.locator('.criterion-panel').count();
-  expect(currentCriteriaCount).toBe(initialCriteriaCount);
+  const criteriaCount = await page.locator('.criterion-panel').count();
+  expect(criteriaCount).toBeGreaterThan(0);
+
+  // Switch to Tune: the canvas changes without a reload, and the same rubric
+  // (header title) and criteria set (one metric card per criterion) persist.
+  await tuneBtn.click();
+  await expect(page.locator('.tune-view')).toBeVisible();
+  await expect(page.locator('.criteria-view')).toHaveCount(0);
+  await expect(title).toHaveText(rubricName);
+  expect(await page.locator('.metric-card').count()).toBe(criteriaCount);
+
+  // Switch to Preview: canvas changes again, rubric identity + criteria set held
+  // (one verdict row per criterion; the Sample submission panel renders).
+  await previewBtn.click();
+  await expect(page.locator('.preview-view')).toBeVisible();
+  await expect(page.locator('.tune-view')).toHaveCount(0);
+  await expect(page.locator('.preview-view .section-kicker').first()).toContainText(/sample submission/i);
+  await expect(title).toHaveText(rubricName);
+  expect(await page.locator('.verdict-row').count()).toBe(criteriaCount);
+
+  // Back to Criteria: same rubric, identical criteria set — no reload occurred.
+  await criteriaBtn.click();
+  await expect(page.locator('.criteria-view')).toBeVisible();
+  await expect(title).toHaveText(rubricName);
+  expect(await page.locator('.criterion-panel').count()).toBe(criteriaCount);
 });
 
 test('4.10 end_state_export_is_portable_persistence', async ({ page }) => {
@@ -312,63 +384,120 @@ test('1.18 import_package_round_trip', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
 
-  const testPackage = {
-    schemaVersion: 'rubric-package-v1',
-    library: 'Rubric Studio',
-    rubrics: [
-      {
-        schemaVersion: 'rubric-document-v1',
-        name: 'Test Import Rubric',
-        version: '1.0.0',
-        arbiterModel: 'quartz-arbiter-2',
-        aggregationMode: 'weighted-mean',
-        criteria: [
-          {
-            id: 'test-import-id',
-            name: 'Test Import Name',
-            description: 'Test Import Description',
-            type: 'binary',
-            likertMin: null,
-            likertMax: null,
-            weight: 1,
-            importance: 'must-have'
-          }
-        ]
-      }
-    ],
-    generatedAt: new Date().toISOString()
+  const addOpener = page.getByRole('button', { name: 'Add criterion', exact: true }).first();
+  const addCriterion = async (id, name) => {
+    await addOpener.click();
+    await expect(page.locator('.criterion-form').first()).toBeVisible();
+    await page.fill('#criterion-id', id);
+    await page.fill('#criterion-name', name);
+    await page.fill('#criterion-description', `${name} description for the round-trip probe.`);
+    await page.getByRole('button', { name: 'Add criterion', exact: true }).nth(1).click();
+    await expect(page.getByRole('button', { name: new RegExp(id) }).first()).toBeVisible();
+  };
+  const readExportedPackage = async () => {
+    await page.getByRole('button', { name: 'Export', exact: true }).first().click();
+    const exportDialog = page.locator('.export-dialog');
+    await expect(exportDialog).toBeVisible();
+    await page.getByRole('tab', { name: 'Package JSON' }).click();
+    const text = await page.locator('.export-preview').innerText();
+    const parsed = JSON.parse(text);
+    // Close the export center (Escape closes once the preview holds focus).
+    await page.locator('.export-preview').click();
+    await page.keyboard.press('Escape');
+    await expect(exportDialog).toHaveCount(0);
+    return parsed;
   };
 
-  const importStr = JSON.stringify(testPackage);
+  // 1) Add a criterion in-session.
+  await addCriterion('round-trip-probe', 'Round Trip Probe');
 
-  const importOpener = page.getByRole('button', { name: 'Import', exact: true }).first();
-  await importOpener.click();
+  // 2) Export a package that now includes the session-added criterion; capture
+  //    the exact JSON that a user would re-import later.
+  const exported = await readExportedPackage();
+  const exportedRq = exported.rubrics.find((r) => r.name === 'Response Quality');
+  expect(exportedRq.criteria.some((c) => c.id === 'round-trip-probe')).toBe(true);
+  expect(exportedRq.criteria.some((c) => c.id === 'divergence-marker')).toBe(false);
+  const exportedStr = JSON.stringify(exported);
 
-  await page.fill('textarea[placeholder="Paste the exported package JSON here"]', importStr);
+  // 3) Diverge the studio away from that snapshot with a criterion the export
+  //    does not contain.
+  await addCriterion('divergence-marker', 'Divergence Marker');
+
+  // 4) Import the captured package JSON.
+  await page.getByRole('button', { name: 'Import', exact: true }).first().click();
+  await expect(page.locator('.import-dialog')).toBeVisible();
+  await page.fill('textarea[placeholder="Paste the exported package JSON here"]', exportedStr);
   await page.getByRole('button', { name: 'Import package', exact: true }).click();
 
-  const newRow = page.getByRole('button', { name: /test-import-id/ });
-  await expect(newRow.first()).toBeVisible();
+  // 5) Rail membership, versions, and criteria reconstruct to the imported
+  //    document without a reload: the divergence is undone, the probe remains.
+  await expect(page.locator('.rubric-entry')).toHaveCount(exported.rubrics.length);
+  const railRq = page.locator('.rubric-entry', { hasText: 'Response Quality' });
+  await expect(railRq).toContainText(`${exportedRq.criteria.length} criteria`);
+  await expect(railRq).toContainText(`v${exportedRq.version}`);
+  await expect(page.getByRole('button', { name: /round-trip-probe/ }).first()).toBeVisible();
+  await expect(page.getByRole('button', { name: /divergence-marker/ })).toHaveCount(0);
 
-  await page.getByRole('button', { name: 'Export', exact: true }).first().click();
-  await page.getByRole('tab', { name: 'Package JSON' }).click();
-
-  const previewContent = await page.locator('.export-preview').innerText();
-  const jsonContent = JSON.parse(previewContent);
-  expect(jsonContent.rubrics[0].name).toBe('Test Import Rubric');
+  // 6) A fresh export reflects the restored collection (probe present, diverged
+  //    marker absent).
+  const reexported = await readExportedPackage();
+  const restoredRq = reexported.rubrics.find((r) => r.name === 'Response Quality');
+  expect(restoredRq.criteria.some((c) => c.id === 'round-trip-probe')).toBe(true);
+  expect(restoredRq.criteria.some((c) => c.id === 'divergence-marker')).toBe(false);
 });
 
 test('4.6 keyboard_operability_focus', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
 
+  const skip = page.getByRole('button', { name: 'Skip tour' });
+  if (await skip.isVisible()) await skip.click();
+
+  // Start from a neutral focus and Tab through the studio. Keyboard alone must
+  // move focus across many distinct interactive controls, and focused controls
+  // must show a visible (>=2px) focus outline via :focus-visible.
+  await page.evaluate(() => {
+    if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
+  });
+  const stops = [];
+  let outlinedStops = 0;
+  for (let i = 0; i < 25; i += 1) {
+    await page.keyboard.press('Tab');
+    const info = await page.evaluate(() => {
+      const el = document.activeElement;
+      if (!el || el === document.body) return null;
+      const cs = getComputedStyle(el);
+      const outline = parseFloat(cs.outlineWidth) || 0;
+      const desc = `${el.tagName.toLowerCase()}:${(el.getAttribute('aria-label') || el.textContent || '').trim().slice(0, 32)}`;
+      return { desc, outline, focusVisible: el.matches(':focus-visible') };
+    });
+    if (!info) continue;
+    stops.push(info.desc);
+    if (info.focusVisible && info.outline >= 2) outlinedStops += 1;
+  }
+  expect(new Set(stops).size, 'Tab reaches several distinct interactive controls').toBeGreaterThanOrEqual(6);
+  expect(outlinedStops, 'focused controls show a visible focus outline').toBeGreaterThan(0);
+
+  // Shift+Tab walks focus backward to a different control.
+  const before = await page.evaluate(() => document.activeElement?.outerHTML?.slice(0, 80) ?? '');
+  await page.keyboard.press('Shift+Tab');
+  const after = await page.evaluate(() => document.activeElement?.outerHTML?.slice(0, 80) ?? '');
+  expect(after).not.toBe(before);
+
+  // Enter activates a focused control (keyboard operability): focusing the Add
+  // criterion button and pressing Enter opens the dialog...
   const addOpener = page.getByRole('button', { name: 'Add criterion', exact: true }).first();
   await addOpener.focus();
   await expect(addOpener).toBeFocused();
+  await page.keyboard.press('Enter');
+  const addDialog = page.locator('.criterion-form').first();
+  await expect(addDialog).toBeVisible();
 
-  const header = page.locator('.p-accordionheader').first();
-  await header.focus();
-  await expect(header).toBeFocused();
+  // ...and Escape closes it and returns focus to the opener — a keyboard-only
+  // round trip with no pointer interaction.
+  await page.keyboard.press('Escape');
+  await expect(addDialog).toBeHidden();
+  await expect(addOpener).toBeFocused();
 });
 
 test('1.10 reduced_motion_respected', async ({ page }) => {
