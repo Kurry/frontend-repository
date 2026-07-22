@@ -19,11 +19,11 @@
     "zustand": "^4.5.2"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.2.1",
-    "vite": "^5.2.0",
     "@playwright/test": "^1.61.0",
+    "@vitejs/plugin-react": "6.0.3",
     "baseline-browser-mapping": "2.10.43",
     "browserslist": "4.28.6",
-    "electron-to-chromium": "1.5.393"
+    "electron-to-chromium": "1.5.393",
+    "vite": "^8.1.5"
   }
 }
