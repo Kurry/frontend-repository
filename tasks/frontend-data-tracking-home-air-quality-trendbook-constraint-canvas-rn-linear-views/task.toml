@@ -1,0 +1,5 @@
+[task]
+id = "frontend-data-tracking-home-air-quality-trendbook-constraint-canvas-rn-linear-views"
+name = "mercor-intelligence/frontend-data-tracking-home-air-quality-trendbook-constraint-canvas-rn-linear-views"
+description = "Home Air Quality Trendbook — Constraint Canvas"
+tags = ["frontend", "good-app", "react"]
