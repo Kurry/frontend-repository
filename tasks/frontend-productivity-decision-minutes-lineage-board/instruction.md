@@ -5,7 +5,25 @@ Build a fully client-side (in-memory) decision tracker for structured meeting mi
 </summary>
 
 <core_features>
-Manage an agenda timeline where blocks can be dragged and resized. The logical clock controls start, pause, resume, extend, skip, and close events. Drag source evidence cards onto proposal claims as supporting or opposing context. Maintain revision histories for proposals rather than in-place text replacement. Create branching amendments that target exact proposal revision ranges. Accepted amendments form new proposal revisions, while rejected branches remain in the history. Append-only attendance tracking. Calculate quorum based on role and current clock. Enforce rules where decisions cannot close without a current quorum and eligible positions. Adopt, reject, table, or withdraw motions. Once decided, records freeze context including tally and dissent. Support superseding previous decisions with new edges in a DAG, never rewriting the past. Generate action items from adopted decisions with dependencies and deadlines. Track state and handoffs. Actions tied to superseded decisions must be marked for review. Manage a queue of participants requesting to speak. Route off-topic items to a parking lot mapped for future agendas. Export the ledger to JSON, Markdown, CSV, ICS, and SVG artifacts. Ensure importing these artifacts precisely restores the board state.
+- Manage an agenda timeline where blocks can be dragged and resized.
+- The logical clock controls start, pause, resume, extend, skip, and close events.
+- Drag source evidence cards onto proposal claims as supporting or opposing context.
+- Maintain revision histories for proposals rather than in-place text replacement.
+- Create branching amendments that target exact proposal revision ranges.
+- Accepted amendments form new proposal revisions, while rejected branches remain in the history.
+- Append-only attendance tracking.
+- Calculate quorum based on role and current clock.
+- Enforce rules where decisions cannot close without a current quorum and eligible positions.
+- Adopt, reject, table, or withdraw motions.
+- Once decided, records freeze context including tally and dissent.
+- Support superseding previous decisions with new edges in a DAG, never rewriting the past.
+- Generate action items from adopted decisions with dependencies and deadlines.
+- Track state and handoffs.
+- Actions tied to superseded decisions must be marked for review.
+- Manage a queue of participants requesting to speak.
+- Route off-topic items to a parking lot mapped for future agendas.
+- Export the ledger to JSON, Markdown, CSV, ICS, and SVG artifacts.
+- Ensure importing these artifacts precisely restores the board state.
 </core_features>
 
 <visual_design>
