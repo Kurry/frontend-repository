@@ -16,6 +16,37 @@ from corpuscheck.oracle_ci import (
 )
 
 
+_SCREENSHOT_CAPTURE_HELPER = (
+    Path(__file__).parents[1]
+    / "src/corpuscheck/assets/start_script_semantics.mjs"
+)
+
+
+@pytest.mark.parametrize(
+    ("start", "expected"),
+    [
+        ("vite preview", True),
+        ("npx http-server dist -p 3000", True),
+        ("npx serve -l 3000 -n dist", True),
+        ("npx serve build", True),
+        ("npx serve -l 3000 -n .", False),
+        ("npm run build && npx serve dist", False),
+    ],
+)
+def test_screenshot_capture_identifies_prebuilt_start_scripts(start: str, expected: bool) -> None:
+    script = f"""
+      import {{ needsPrebuiltOutput }} from {json.dumps(_SCREENSHOT_CAPTURE_HELPER.as_uri())};
+      console.log(JSON.stringify(needsPrebuiltOutput({json.dumps(start)})));
+    """
+    result = subprocess.run(
+        ["node", "--input-type=module", "--eval", script],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert json.loads(result.stdout) is expected
+
+
 def completed(
     command: list[str] | None = None,
     *,
