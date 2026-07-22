@@ -492,18 +492,7 @@ test('1.38 map_pane_static_snapshot_affordances', async ({ page }) => {
     }
 });
 
-test('1.39 ledger_grid_seeded_multi_currency', async ({ page }) => {
-    const errors = [];
-    page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
-
-    await page.goto('http://localhost:3000');
-    await page.evaluate(({ name, args }) => window.webmcp_invoke_tool?.(name, args), { name: 'browse_open', args: { destination: 'budget-ledger' } });
-    const content = await page.locator('body').innerText();
-    expect(content.length).toBeGreaterThan(0);
-    if (true) {
-        expect(errors.length, 'Console errors should be zero').toBe(0);
-    }
-});
+// NOT YET COVERED: 1.39 - ledger_grid_seeded_multi_currency (Cannot confidently map bespoke substantive test)
 
 test('1.40 fx_table_and_live_eur_conversion', async ({ page }) => {
     const errors = [];
@@ -593,18 +582,7 @@ test('1.48 template_injector_seeds_sample_trip', async ({ page }) => {
     }
 });
 
-test('1.49 receipt_scanner_draft_expense', async ({ page }) => {
-    const errors = [];
-    page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
-
-    await page.goto('http://localhost:3000');
-    await page.evaluate(({ name, args }) => window.webmcp_invoke_tool?.(name, args), { name: 'browse_open', args: { destination: 'budget-ledger' } });
-    const content = await page.locator('body').innerText();
-    expect(content.length).toBeGreaterThan(0);
-    if (true) {
-        expect(errors.length, 'Console errors should be zero').toBe(0);
-    }
-});
+// NOT YET COVERED: 1.49 - receipt_scanner_draft_expense (Cannot confidently map bespoke substantive test)
 
 test('1.50 spreadsheet_keyboard_matrix_inline_edit', async ({ page }) => {
     const errors = [];
@@ -643,18 +621,7 @@ test('1.52 pivot_category_by_day_summaries', async ({ page }) => {
     }
 });
 
-test('1.53 display_currency_toggle_non_mutating', async ({ page }) => {
-    const errors = [];
-    page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
-
-    await page.goto('http://localhost:3000');
-    await page.evaluate(({ name, args }) => window.webmcp_invoke_tool?.(name, args), { name: 'browse_open', args: { destination: 'budget-ledger' } });
-    const content = await page.locator('body').innerText();
-    expect(content.length).toBeGreaterThan(0);
-    if (true) {
-        expect(errors.length, 'Console errors should be zero').toBe(0);
-    }
-});
+// NOT YET COVERED: 1.53 - display_currency_toggle_non_mutating (Cannot confidently map bespoke substantive test)
 
 test('1.54 bulk_mutation_tray_applies_to_selection', async ({ page }) => {
     const errors = [];
@@ -757,31 +724,9 @@ test('1.62 factory_reset_confirm_and_cancel', async ({ page }) => {
 });
 // NOT-AUTOMATABLE: 1.63 - theme_toggle_restyles_all_panes (Visual subjective trait)
 
-test('1.64 settlement_report_live_copy', async ({ page }) => {
-    const errors = [];
-    page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
+// NOT YET COVERED: 1.64 - settlement_report_live_copy (Cannot confidently map bespoke substantive test)
 
-    await page.goto('http://localhost:3000');
-    await page.evaluate(({ name, args }) => window.webmcp_invoke_tool?.(name, args), { name: 'browse_open', args: { destination: 'budget-ledger' } });
-    const content = await page.locator('body').innerText();
-    expect(content.length).toBeGreaterThan(0);
-    if (true) {
-        expect(errors.length, 'Console errors should be zero').toBe(0);
-    }
-});
-
-test('1.65 budget_summary_live_copy', async ({ page }) => {
-    const errors = [];
-    page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
-
-    await page.goto('http://localhost:3000');
-    await page.evaluate(({ name, args }) => window.webmcp_invoke_tool?.(name, args), { name: 'browse_open', args: { destination: 'budget-ledger' } });
-    const content = await page.locator('body').innerText();
-    expect(content.length).toBeGreaterThan(0);
-    if (true) {
-        expect(errors.length, 'Console errors should be zero').toBe(0);
-    }
-});
+// NOT YET COVERED: 1.65 - budget_summary_live_copy (Cannot confidently map bespoke substantive test)
 
 test('1.66 stop_field_contract_enforced', async ({ page }) => {
     const errors = [];
@@ -795,18 +740,7 @@ test('1.66 stop_field_contract_enforced', async ({ page }) => {
     }
 });
 
-test('1.67 expense_field_contract_enforced', async ({ page }) => {
-    const errors = [];
-    page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
-
-    await page.goto('http://localhost:3000');
-    await page.evaluate(({ name, args }) => window.webmcp_invoke_tool?.(name, args), { name: 'browse_open', args: { destination: 'budget-ledger' } });
-    const content = await page.locator('body').innerText();
-    expect(content.length).toBeGreaterThan(0);
-    if (true) {
-        expect(errors.length, 'Console errors should be zero').toBe(0);
-    }
-});
+// NOT YET COVERED: 1.67 - expense_field_contract_enforced (Cannot confidently map bespoke substantive test)
 
 test('1.68 ics_payload_valid_structure', async ({ page }) => {
     const errors = [];
@@ -1110,17 +1044,7 @@ test('3.17 export_canvas_monospaced_previews', async ({ page }) => {
     }
 });
 
-test('4.1 empty_state_is_present', async ({ page }) => {
-    const errors = [];
-    page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
-
-    await page.goto('http://localhost:3000');
-    const emptyText = await page.locator('body').innerText();
-    expect(emptyText).toBeDefined();
-    if (true) {
-        expect(errors.length, 'Console errors should be zero').toBe(0);
-    }
-});
+// NOT YET COVERED: 4.1 - empty_state_is_present (Empty state requires deletion tracking logic missing specific elements)
 
 test('4.2 forms_validate_inline', async ({ page }) => {
     const errors = [];
@@ -1445,18 +1369,7 @@ test('6.13 undo_restores_bulk_delete', async ({ page }) => {
     }
 });
 
-test('6.14 spreadsheet_edit_echoes_to_cards', async ({ page }) => {
-    const errors = [];
-    page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
-
-    await page.goto('http://localhost:3000');
-    await page.evaluate(({ name, args }) => window.webmcp_invoke_tool?.(name, args), { name: 'browse_open', args: { destination: 'budget-ledger' } });
-    const content = await page.locator('body').innerText();
-    expect(content.length).toBeGreaterThan(0);
-    if (true) {
-        expect(errors.length, 'Console errors should be zero').toBe(0);
-    }
-});
+// NOT YET COVERED: 6.14 - spreadsheet_edit_echoes_to_cards (Cannot confidently map bespoke substantive test)
 
 test('6.15 export_import_round_trip_flow', async ({ page }) => {
     const errors = [];
@@ -1905,18 +1818,7 @@ test('14.7 interleaved_flows_preserve_state', async ({ page }) => {
 });
 // NOT-AUTOMATABLE: 14.8 - empty_to_repopulated_round_trip (Visual subjective trait)
 
-test('14.9 import_wizard_to_ledger_chain', async ({ page }) => {
-    const errors = [];
-    page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
-
-    await page.goto('http://localhost:3000');
-    await page.evaluate(({ name, args }) => window.webmcp_invoke_tool?.(name, args), { name: 'browse_open', args: { destination: 'budget-ledger' } });
-    const content = await page.locator('body').innerText();
-    expect(content.length).toBeGreaterThan(0);
-    if (true) {
-        expect(errors.length, 'Console errors should be zero').toBe(0);
-    }
-});
+// NOT YET COVERED: 14.9 - import_wizard_to_ledger_chain (Cannot confidently map bespoke substantive test)
 // NOT-AUTOMATABLE: 14.10 - weighted_split_to_settlement_report_chain (Visual subjective trait)
 
 test('14.11 formula_recomputes_on_cell_edit', async ({ page }) => {
@@ -1931,18 +1833,7 @@ test('14.11 formula_recomputes_on_cell_edit', async ({ page }) => {
     }
 });
 
-test('14.12 custom_field_card_spreadsheet_round_trip', async ({ page }) => {
-    const errors = [];
-    page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
-
-    await page.goto('http://localhost:3000');
-    await page.evaluate(({ name, args }) => window.webmcp_invoke_tool?.(name, args), { name: 'browse_open', args: { destination: 'budget-ledger' } });
-    const content = await page.locator('body').innerText();
-    expect(content.length).toBeGreaterThan(0);
-    if (true) {
-        expect(errors.length, 'Console errors should be zero').toBe(0);
-    }
-});
+// NOT YET COVERED: 14.12 - custom_field_card_spreadsheet_round_trip (Cannot confidently map bespoke substantive test)
 
 test('14.13 display_toggle_returns_exact_originals', async ({ page }) => {
     const errors = [];
@@ -2007,17 +1898,7 @@ test('15.3 errors_name_problem_and_fix', async ({ page }) => {
     }
 });
 
-test('15.4 empty_states_explain_next_step', async ({ page }) => {
-    const errors = [];
-    page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
-
-    await page.goto('http://localhost:3000');
-    const emptyText = await page.locator('body').innerText();
-    expect(emptyText).toBeDefined();
-    if (true) {
-        expect(errors.length, 'Console errors should be zero').toBe(0);
-    }
-});
+// NOT YET COVERED: 15.4 - empty_states_explain_next_step (Empty state requires deletion tracking logic missing specific elements)
 // NOT-AUTOMATABLE: 15.5 - body_copy_is_well_written (Visual subjective trait)
 // NOT-AUTOMATABLE: 15.6 - terminology_is_consistent (Visual subjective trait)
 
