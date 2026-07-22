@@ -15,6 +15,7 @@
     "yjs": "13.6.31"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@vitejs/plugin-vue": "6.0.7",
     "typescript": "6.0.3",
     "unocss": "66.7.5",
