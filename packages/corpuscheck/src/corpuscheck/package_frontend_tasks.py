@@ -364,6 +364,13 @@ TASK_SPECS: dict[str, dict] = {
 
 # Website-fidelity tasks converted from website-prds (pixel-perfect genre).
 TASK_SPECS.update({
+    "frontend-creative-tools-session-compression-loom": {
+        "source": "Session Compression Loom",
+        "description": "Session compression editor with capsule summaries, preview, and artifact export.",
+        "modules": ["structured-editor-v1", "artifact-transfer-v1"],
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
+        "mechanics_exclusions": ["Text selection, range highlighting, preview layout, and download bytes stay Playwright-observed"],
+    },
     "frontend-landing-avax-network": {
         "source": "AvaxNetwork",
         "description": "Avalanche network marketing homepage fidelity eval.",
