@@ -29,8 +29,9 @@ uv run harbor score <trial-or-job-dir> \
   --task tasks/<slug> --label my-label --action append
 
 # Cheap dev-tier judging (no file edits): export REWARDKIT_MODEL=gpt-5.6-luna
-# Production judging uses the toml default (gpt-5.6-sol). Verifier needs
-# OPENAI_API_KEY in the host env; the builder agent needs CLAUDE_CODE_OAUTH_TOKEN.
+# Production judging uses the toml default (gpt-5.6-sol). Local verifier auth
+# may use OPENAI_API_KEY or CODEX_AUTH_JSON; the builder agent needs
+# CLAUDE_CODE_OAUTH_TOKEN.
 
 # Capture reference screenshots from every task's solution/app oracle
 # (also a per-oracle smoke validation: serve + zero console/page errors)
@@ -38,6 +39,20 @@ uv run corpuscheck screenshots capture [slug ...]
 uv run corpuscheck screenshots install [slug ...]   # install into task envs
 
 ```
+
+### Judge-in-CI
+
+Maintainers can comment exactly `/judge` on an open PR to run
+`.github/workflows/judge-oracle.yml` for a PR whose diff is confined to exactly one
+`tasks/<slug>/solution/app/` tree.
+The workflow uses `gpt-5.6-luna` and the repository's `CODEX_AUTH_JSON`
+secret, updates a sticky PR score comment, and appends a successful score to
+`docs/judge-ledger.jsonl` on `main`. Reward artifacts remain ephemeral and must
+never be committed inside task directories. This workflow consumes the owner's
+ChatGPT-plan quota, never runs automatically on PR-controlled code, is globally
+serialized, and accepts one task only; do not add
+matrix fanout, broad push triggers, or OAuth corpus sweeps. A maintainer can
+also use the workflow's one-slug manual dispatch.
 
 Dimension tomls (`tests/<dim>/<dim>.toml`) are the single source of truth for criteria and are edited directly (see `docs/rubrics.md` for criterion conventions; the `rubrics` skill does the alignment work). Outcome / user-flow lists are authored as criteria in a dimension toml — the `behavioral` dimension covers them when a task ships it; until then they live in `core_features`. There is no separate outcomes file.
 

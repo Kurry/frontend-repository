@@ -39,8 +39,9 @@ uv run harbor score <trial-or-job-dir> \
   --task tasks/<slug> --label my-label --action append
 
 # Cheap dev-tier judging (no file edits): export REWARDKIT_MODEL=gpt-5.6-luna
-# Production judging uses the toml default (gpt-5.6-sol). Verifier needs
-# OPENAI_API_KEY in the host env; the builder agent needs CLAUDE_CODE_OAUTH_TOKEN.
+# Production judging uses the toml default (gpt-5.6-sol). Local verifier auth
+# may use OPENAI_API_KEY or CODEX_AUTH_JSON; the builder agent needs
+# CLAUDE_CODE_OAUTH_TOKEN.
 
 # Capture reference screenshots from every task's solution/app oracle
 # (also a per-oracle smoke validation: serve + zero console/page errors)
@@ -48,6 +49,25 @@ uv run corpuscheck screenshots capture [slug ...]
 uv run corpuscheck screenshots install [slug ...]   # install into task envs
 
 ```
+
+### Judge-in-CI
+
+Maintainers can comment exactly `/judge` on an open PR to run
+`.github/workflows/judge-oracle.yml` for a PR whose diff is confined to exactly one
+`tasks/<slug>/solution/app/` tree. The workflow
+runs the task's `solution/solve.sh` through Harbor's `oracle` agent and judges
+it with `gpt-5.6-luna` using the repository's `CODEX_AUTH_JSON` secret. It
+updates a sticky PR score comment and appends the successful `{slug, sha, model,
+total, per-dim}` record to `docs/judge-ledger.jsonl` on `main`; verifier
+`reward.json` and `reward-details.json` stay in ephemeral job storage and must
+never be committed under a task.
+
+The command is restricted to `OWNER`, `MEMBER`, or `COLLABORATOR` comments
+because it consumes the owner's ChatGPT-plan quota and exposes an OAuth secret
+to the verifier environment. It never runs automatically on PR-controlled code. Runs are globally serialized
+and accept one task only. Do not add matrix fanout, broad push triggers, or
+corpus sweeps to this OAuth workflow. For a manual run, dispatch **Judge oracle
+with Codex OAuth** with one task slug.
 
 Dimension tomls (`tests/<dim>/<dim>.toml`) are the single source of truth for criteria and are edited directly (see `docs/rubrics.md` for criterion conventions; the `rubrics` skill does the alignment work). Outcome / user-flow lists are authored as criteria in a dimension toml — the `behavioral` dimension covers them when a task ships it; until then they live in `core_features`. There is no separate outcomes file.
 
