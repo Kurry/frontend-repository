@@ -1,0 +1,13 @@
+Draft new task: Ceramic Kiln Load Composer forecast ribbon
+
+Delivers a complete Harbor eval task based on the proposed Ceramic Kiln Load Composer - Forecast Ribbon - GitHub Issue Fields PRD.
+
+Included deliverables:
+- instruction.md (observable behaviors)
+- solution/app (oracle application built with Solid.js, Tailwind v4, and solid-motionone without using localStorage)
+- WebMCP contract bindings and tools implemented via window.webmcp_* standard shapes
+- Baseline toml dimensions added
+- evidence.webm walkthrough capture
+- Generated Dockerfile and shell files
+
+All outputs verified via 'uv run corpuscheck' against the created task showing only the expected absent-from-registry errors.
