@@ -50,7 +50,15 @@ proves otherwise.
 4. **Scope smuggling.** Repo-root files (helper scripts, plan.md, package.json/lockfile
    churn), edits to OTHER tasks, hand-edits inside dist/prebuilt bundles without
    matching source changes, generated-file drift. Enumerate every path outside
-   `tasks/<slug>/solution/` and fail on any.
+   `tasks/<slug>/solution/` and fail on any. A root-level `package.json`/lockfile
+   edit is scope smuggling even when it's "just" adding `@playwright/test` — that
+   dependency belongs in the task's own `solution/app/package.json`.
+5. **Playwright version pin drift.** Any `@playwright/test`/`playwright`/
+   `playwright-core` pin — root or per-task — must match the version `tasks/_pins.py`
+   standardizes on (observed live: a root-level add resolved to 1.61.1 while
+   `tasks/_pins.py` pins 1.61.0, so `npm ci` could install a different browser stack
+   than judges use). Flag any diff introducing or bumping a Playwright dependency to
+   a version that doesn't match the pin file.
 5. **Identity/fidelity corruption.** Brand renames or content rewrites in
    website-fidelity tasks; seed-data changes that break rubric criteria quoting it;
    denied brands (Anthropic/OpenAI/Harbor/Mercor/...) introduced anywhere.
@@ -423,6 +431,38 @@ structure the Bug with this template:
    with the ratio and three named examples; require each templated block replaced by
    the criterion's specific observable or the test deleted and its id listed under
    "not yet covered".
+6. **Dead assertion branches**: an expectation inside a conditional whose trigger the
+   app's own constraints make unreachable (observed live: a test expecting a
+   validation error for a 200-char name when the input carries `maxlength="160"` —
+   the error branch can never run, so the test passes on any behavior). Cross-check
+   conditional triggers against the oracle's actual DOM constraints before crediting
+   the assertion.
+7. **Always-true negative assertions**: expectations that assert the absence of a
+   state the app never produces, so they pass without touching the app (observed
+   live: 67 of 102 "criterion tests" asserting only
+   `expect(body).not.toHaveAttribute('data-missing-test', '<criterion-id>')` — an
+   attribute nothing in the oracle ever sets, concentrated on the highest-value
+   criteria). A negative assertion counts as coverage only if the diff or oracle
+   shows a code path that CAN produce the asserted-absent state; otherwise BLOCKING.
+8. **API-shape-only assertions (locator/handle non-null checks)**: asserting that a
+   Playwright locator/handle object itself is non-null or truthy (e.g.
+   `expect(focused).not.toBeNull()` on a locator) is always true — a locator wrapper
+   is never null regardless of whether the underlying element exists or received
+   focus. Only element-state assertions prove anything (`toBeVisible()`,
+   `toHaveAttribute('aria-*', ...)`, `page.evaluate(() => document.activeElement ===
+   ...)`  for focus specifically). Flag any test whose only check is on the
+   locator/handle wrapper rather than the DOM state it points at.
+9. **Static-attribute-instead-of-effect assertions**: asserting a constant/static
+   attribute of a control (e.g. an `<input>`'s `max` attribute) after interacting
+   with it, instead of asserting the control's current *value* or the interaction's
+   *downstream effect* (observed live: a slider filled to 25, then the test asserted
+   the slider's static `max="25"` attribute — passes whether or not the fill ever
+   applied). The assertion must target what the interaction is supposed to change,
+   not a property that was true before the interaction ran.
+10. **Duplicate tests under different criterion ids**: the same interaction block
+    (same locators, same assertions) copy-pasted under two distinct criterion titles
+    (observed live: an accessibility Tab-walk test reused verbatim as a
+    design-fidelity test) — flag both; only one criterion is actually exercised.
 
 ## Motion procedure
 
