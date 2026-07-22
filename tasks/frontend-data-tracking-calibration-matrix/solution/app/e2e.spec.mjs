@@ -117,3 +117,36 @@ test.describe('workspace contract (canonical)', () => {
 });
 
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
+
+test('1.10 filters_narrow_both_views', async ({ page }) => {
+  await page.goto(BASE);
+  await page.getByRole('button', { name: 'Got it' }).click();
+
+  const harnessFilter = page.locator('[aria-label="Filter harnesses"]');
+  await harnessFilter.fill('qua');
+  await expect(page.locator('.heatmap-table thead th')).toHaveText(['Model', 'quarry']);
+  await expect(page.locator('.heatmap-table thead')).not.toHaveText(/driftbench|lanternctl|mosaic-eval/);
+
+  await page.getByRole('button', { name: 'Variance', exact: true }).click();
+  await expect(page.locator('.variance-table thead')).toHaveText(/quarry/);
+  await expect(page.locator('.variance-table thead')).not.toHaveText(/driftbench|lanternctl|mosaic-eval/);
+
+  await page.getByRole('button', { name: 'Clear filters' }).click();
+  await page.getByRole('button', { name: 'Heatmap', exact: true }).click();
+  await expect(page.locator('.heatmap-table thead')).toContainText('driftbench');
+  await expect(page.locator('.heatmap-table thead')).toContainText('mosaic-eval');
+});
+
+test('1.37 calibration_pack_nested_field_contract', async ({ page }) => {
+  await page.goto(BASE);
+  await page.getByRole('button', { name: 'Got it' }).click();
+
+  await page.locator('[aria-label="Filter harnesses"]').fill('qua');
+  await expect(page.locator('.heatmap-table thead th')).toHaveText(['Model', 'quarry']);
+  await page.getByRole('button', { name: 'Export calibration pack' }).click();
+
+  const preview = page.locator('.export-drawer.v-navigation-drawer--active pre');
+  const pack = JSON.parse(await preview.innerText());
+  expect(pack.filters).toEqual({ model: [], harness: ['quarry'], taskCategory: [] });
+  expect(pack.filters.harness).not.toContain('qua');
+});

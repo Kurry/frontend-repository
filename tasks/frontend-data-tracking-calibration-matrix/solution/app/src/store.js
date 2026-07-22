@@ -180,9 +180,9 @@ export const useCalibrationStore = defineStore('calibration', {
         timeline: state.timeline.filter((entry) => entry.kind !== 'classification').map(({ timestamp, model, harness, mean }) => ({ timestamp, model, harness, mean: round(mean, 2) })),
         baseline: state.baseline ? { cells: state.baseline.cells.map((cell) => ({ ...cell, mean: round(cell.mean, 2) })) } : null,
         filters: {
-          model: [...state.filters.model],
-          harness: [...state.filters.harness],
-          taskCategory: [...state.filters.taskCategory],
+          model: state.filters.model.length || state.filterSearch.model.trim() ? [...this.activeModels] : [],
+          harness: state.filters.harness.length || state.filterSearch.harness.trim() ? [...this.activeHarnesses] : [],
+          taskCategory: state.filters.taskCategory.length || state.filterSearch.taskCategory.trim() ? [...this.activeCategories] : [],
         },
         triage: Object.values(state.classifications).map((record) => ({ ...record })),
       }

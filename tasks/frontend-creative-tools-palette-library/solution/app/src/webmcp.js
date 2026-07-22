@@ -130,7 +130,7 @@ export function registerWebMCP() {
       const existing = findPalette(args.id);
       if (!existing) return error('Palette not found');
       store.toggleFavorite(args.id);
-      return ok({ id: args.id, favorite: !existing.favorite, visible: true });
+      return ok({ id: args.id, favorite: existing.favorite, visible: true });
     },
 
     // ---- artifact-transfer-v1 ----------------------------------------------

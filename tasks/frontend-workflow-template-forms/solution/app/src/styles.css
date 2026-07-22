@@ -388,6 +388,7 @@ a:focus-visible,
 }
 
 .form-fade { animation: form-fade 150ms var(--ease-out); }
+.technique-transition { animation: form-fade 150ms var(--ease-out) both; }
 @keyframes form-fade { from { opacity: 0; transform: translateY(4px); } }
 
 .technique-form { display: flex; flex-direction: column; gap: 16px; }
@@ -511,7 +512,7 @@ a:focus-visible,
   visibility: hidden;
   position: absolute;
   z-index: 20;
-  bottom: calc(100% + 8px);
+  bottom: 100%;
   left: 0;
   width: min(270px, 80vw);
   display: flex;
@@ -522,16 +523,15 @@ a:focus-visible,
   color: #fff;
   background: #202632;
   box-shadow: 0 8px 26px rgba(0,0,0,.2);
-  transition: opacity 90ms ease, transform 90ms ease;
-  transform: translateY(4px);
+  transition: opacity 90ms ease;
 }
 
 .asset-preview strong { font-size: 12px; }
 .asset-preview > span { color: #c4cad3; font-size: 11px; line-height: 1.4; }
 .asset-badge:hover .asset-preview,
 .asset-badge:focus .asset-preview,
-.asset-badge:focus-within .asset-preview { visibility: visible; opacity: 1; transform: none; }
-.asset-remove { display: inline-flex; align-items: center; gap: 5px; align-self: flex-start; margin-top: 3px; border: 0; padding: 5px 8px; color: #fff; background: #da1e28; cursor: pointer; }
+.asset-badge:focus-within .asset-preview { visibility: visible; opacity: 1; }
+.asset-remove { display: inline-flex; align-items: center; gap: 5px; border: 0; padding: 5px 8px; color: #fff; background: #da1e28; cursor: pointer; }
 
 .asset-picker { margin-top: 12px; border: 1px solid #cfd5de; background: #fff; box-shadow: 0 12px 30px rgba(32,38,50,.1); animation: form-fade 90ms var(--ease-out); }
 .asset-picker__top { display: flex; align-items: center; justify-content: space-between; padding: 12px 12px 12px 16px; border-bottom: 1px solid #e1e5ea; }
@@ -700,6 +700,7 @@ a:focus-visible,
 
 @media (max-width: 430px) {
   .brand > span:last-child { display: none; }
+  .view-nav .header-preference { display: none; }
   .view-nav .cds--btn { padding-inline: 9px; font-size: 12px; }
   .nav-count { margin-left: 4px; }
   .technique-hero { min-height: 130px; }

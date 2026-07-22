@@ -48,17 +48,17 @@ export default function AttachmentsField({ selected, onChange, idPrefix = 'attac
             return (
               <span className="asset-badge" key={name} tabIndex={0}>
                 <Tag type="cool-gray" renderIcon={(props) => <DocumentAttachment {...props} aria-hidden="true" />}>{name}</Tag>
+                <button
+                  type="button"
+                  className="asset-remove"
+                  onClick={() => onChange(selected.filter((item) => item !== name))}
+                  aria-label={`Remove ${name}`}
+                >
+                  <Close size={14} aria-hidden="true" /> Remove
+                </button>
                 <span className="asset-preview" role="tooltip">
                   <strong>{name}</strong>
                   <span>{asset?.type} · {asset?.detail}</span>
-                  <button
-                    type="button"
-                    className="asset-remove"
-                    onClick={() => onChange(selected.filter((item) => item !== name))}
-                    aria-label={`Remove ${name}`}
-                  >
-                    <Close size={14} aria-hidden="true" /> Remove
-                  </button>
                 </span>
               </span>
             )

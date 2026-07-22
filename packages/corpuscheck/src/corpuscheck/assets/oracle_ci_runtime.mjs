@@ -355,6 +355,7 @@ async function e2eStage(config) {
     slug: config.slug,
     appDir: config.appDir,
     runtimeDir: config.runtimeDir,
+    taskDir: config.taskDir,
   });
   if (result.status === 'skip') {
     console.log(

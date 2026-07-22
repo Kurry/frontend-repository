@@ -190,11 +190,10 @@ export const usePaletteStore = defineStore('palette', () => {
   /** Replace a palette's swatches with the wheel's computed set. One undoable step. */
   function applyHarmonySet(id, hexes) {
     const unique = [...new Set(hexes.map((h) => h.toUpperCase()))];
-    const minSwatches = harmonyMode.value === 'Complementary' ? 2 : 3;
-    if (unique.length < minSwatches || unique.length > 8) {
+    if (unique.length < 3 || unique.length > 8) {
       return {
         ok: false,
-        error: `Swatches must contain ${minSwatches} to 8 unique hex values — this ${harmonyMode.value} set computes ${unique.length}. Nothing was changed.`,
+        error: `Swatches must contain 3 to 8 unique hex values — this ${harmonyMode.value} set computes ${unique.length}. Nothing was changed.`,
       };
     }
     commit(() => {

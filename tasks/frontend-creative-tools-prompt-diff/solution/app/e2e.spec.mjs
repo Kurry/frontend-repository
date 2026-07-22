@@ -117,3 +117,126 @@ test.describe('workspace contract (canonical)', () => {
 });
 
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
+
+test('interleaved annotation draft retains its line anchor and text', async ({ page }) => {
+  await page.goto(BASE);
+  await page.waitForLoadState('networkidle');
+  await page.evaluate(() => {
+    const lines = [...document.querySelectorAll('.split-diff .diff-line[data-side="base"]')];
+    const first = lines[0]?.querySelector('.line-code');
+    const second = lines[1]?.querySelector('.line-code');
+    if (!first || !second) throw new Error('Expected two visible base lines');
+    const range = document.createRange();
+    range.setStart(first, 0);
+    range.setEnd(second, second.childNodes.length);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    first.closest('.diff-scroll').dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+  });
+  await page.getByRole('button', { name: 'Annotate range' }).click();
+  await page.getByLabel('bodyMarkdown').fill('INTERLEAVED ANNOTATION SENTINEL');
+  await page.keyboard.press('Escape');
+  await page.getByLabel('Studio modes').getByRole('button', { name: 'Graph', exact: true }).click();
+  await page.getByLabel('Studio modes').getByRole('button', { name: 'Diff', exact: true }).click();
+  await expect(page.getByText('Lines 1–2 selected')).toBeVisible();
+  await page.getByLabel('Studio modes').getByRole('button', { name: 'Compare branches', exact: true }).click();
+  await page.getByRole('button', { name: 'Merge branches' }).click();
+  await page.getByRole('button', { name: 'Use all left' }).click();
+  await page.getByRole('button', { name: 'Complete merge' }).click();
+  await page.getByRole('dialog', { name: 'Confirm merge' }).getByRole('button', { name: 'Create merge version' }).click();
+  await expect(page.getByText('Lines 1–2 selected')).toBeVisible();
+  await page.getByRole('button', { name: 'Annotate range' }).click();
+  await expect(page.getByLabel('bodyMarkdown')).toHaveValue('INTERLEAVED ANNOTATION SENTINEL');
+  await page.getByRole('button', { name: 'Post annotation' }).click();
+  await expect(page.getByLabel('Annotation thread on lines 1–2')).toContainText('INTERLEAVED ANNOTATION SENTINEL');
+});
+
+test('version changes and undo invalidate annotation drafts tied to stale lines', async ({ page }) => {
+  const selectFirstTwoBaseLines = () => page.evaluate(() => {
+    const lines = [...document.querySelectorAll('.split-diff .diff-line[data-side="base"]')];
+    const first = lines[0]?.querySelector('.line-code');
+    const second = lines[1]?.querySelector('.line-code');
+    if (!first || !second) throw new Error('Expected two visible base lines');
+    const range = document.createRange();
+    range.setStart(first, 0);
+    range.setEnd(second, second.childNodes.length);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    first.closest('.diff-scroll').dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+  });
+  await page.goto(BASE);
+  await page.waitForLoadState('networkidle');
+  await selectFirstTwoBaseLines();
+  await page.getByRole('button', { name: 'Annotate range' }).click();
+  await page.getByLabel('bodyMarkdown').fill('STALE PICKER DRAFT');
+  await page.keyboard.press('Escape');
+  const base = page.getByLabel('Base version');
+  const options = await base.locator('option').evaluateAll(nodes => nodes.map(node => node.value));
+  const currentBase = await base.inputValue();
+  await base.selectOption(options.find(value => value !== currentBase));
+  await selectFirstTwoBaseLines();
+  await page.getByRole('button', { name: 'Annotate range' }).click();
+  await expect(page.getByLabel('bodyMarkdown')).toHaveValue('');
+  await page.getByLabel('bodyMarkdown').fill('STALE UNDO DRAFT');
+  await page.keyboard.press('Escape');
+  await page.getByLabel('Studio modes').getByRole('button', { name: 'Compare branches', exact: true }).click();
+  await page.getByRole('button', { name: 'Merge branches' }).click();
+  await page.locator('.merge-region').first().getByRole('button', { name: /Choose left/ }).click();
+  await page.getByRole('button', { name: 'Cancel' }).click();
+  await page.getByRole('button', { name: /^Undo/ }).click();
+  await page.getByLabel('Studio modes').getByRole('button', { name: 'Diff', exact: true }).click();
+  await selectFirstTwoBaseLines();
+  await page.getByRole('button', { name: 'Annotate range' }).click();
+  await expect(page.getByLabel('bodyMarkdown')).toHaveValue('');
+});
+
+test('restore and import invalidate annotation drafts tied to replaced context', async ({ page }) => {
+  const selectFirstTwoBaseLines = () => page.evaluate(() => {
+    const lines = [...document.querySelectorAll('.split-diff .diff-line[data-side="base"]')];
+    const first = lines[0]?.querySelector('.line-code');
+    const second = lines[1]?.querySelector('.line-code');
+    if (!first || !second) throw new Error('Expected two visible base lines');
+    const range = document.createRange();
+    range.setStart(first, 0);
+    range.setEnd(second, second.childNodes.length);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    first.closest('.diff-scroll').dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+  });
+  const draftAndClose = async (text) => {
+    await selectFirstTwoBaseLines();
+    await page.getByRole('button', { name: 'Annotate range' }).click();
+    await page.getByLabel('bodyMarkdown').fill(text);
+    await page.keyboard.press('Escape');
+  };
+  await page.goto(BASE);
+  await page.waitForLoadState('networkidle');
+  await draftAndClose('STALE RESTORE DRAFT');
+  await page.getByRole('button', { name: 'Restore to compare' }).click();
+  const restoreHeading = await page.getByRole('heading', { name: /Restore source v/ }).textContent();
+  const sourceVersion = restoreHeading.match(/v\d+/)[0];
+  await page.getByLabel('Change note').fill(`Restore ${sourceVersion} after review`);
+  await page.getByRole('button', { name: 'Restore version' }).click();
+  await selectFirstTwoBaseLines();
+  await page.getByRole('button', { name: 'Annotate range' }).click();
+  await expect(page.getByLabel('bodyMarkdown')).toHaveValue('');
+  await page.keyboard.press('Escape');
+
+  await draftAndClose('STALE IMPORT DRAFT');
+  await page.getByRole('button', { name: 'Export' }).click();
+  await page.getByRole('tab', { name: 'Version package' }).click();
+  const preview = page.getByLabel('package preview');
+  await expect(preview).toBeVisible({ timeout: 3000 });
+  const packageJson = await preview.textContent();
+  await page.getByRole('button', { name: 'Import' }).click();
+  await page.getByLabel('Package JSON').fill(packageJson);
+  await page.getByRole('button', { name: 'Import package' }).click();
+  await expect(page.getByText(/Imported \d+ versions/).first()).toBeVisible();
+  await page.keyboard.press('Escape');
+  await selectFirstTwoBaseLines();
+  await page.getByRole('button', { name: 'Annotate range' }).click();
+  await expect(page.getByLabel('bodyMarkdown')).toHaveValue('');
+});

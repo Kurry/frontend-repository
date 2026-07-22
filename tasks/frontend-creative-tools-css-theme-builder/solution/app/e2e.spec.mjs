@@ -76,39 +76,48 @@ test.describe('workspace contract (canonical)', () => {
 
   test('reduced motion behaviorally suppresses animation', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    // Start observing at navigation commit, before short intro animations can
-    // finish and disappear from document.getAnimations(). Sampling only after
-    // networkidle/settle would falsely pass a forbidden sub-second animation.
-    await page.goto(BASE, { waitUntil: 'commit' });
+    // Install the collector before navigation so load/hydration animations are
+    // observed too. Keep it running through network idle and a settled 1.5s
+    // window so late-starting effects cannot escape the assertion.
+    await page.addInitScript(() => {
+      window.__reducedMotionOffenders = [];
+      const seen = new Set();
+      const sample = () => {
+        for (const animation of document.getAnimations({ subtree: true })) {
+          if (animation.playState !== 'running') continue;
+          let timing = {};
+          try { timing = animation.effect?.getComputedTiming?.() ?? {}; } catch { /* detached */ }
+          const duration = typeof timing.duration === 'number' ? timing.duration : 0;
+          if (duration <= 1) continue;
+          const offender = {
+            kind: animation.constructor?.name ?? 'Animation',
+            name: animation.animationName ?? animation.transitionProperty ?? animation.id ?? '(anonymous)',
+            duration,
+            iterations: timing.iterations ?? 1,
+          };
+          const key = JSON.stringify(offender);
+          if (!seen.has(key)) {
+            seen.add(key);
+            window.__reducedMotionOffenders.push(offender);
+          }
+        }
+        requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    });
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
     // Precondition sanity check: the emulation actually reaches the app.
     const reduced = await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
     expect(reduced, 'precondition: app sees prefers-reduced-motion: reduce').toBe(true);
-    // Observe every frame through the intro/settle window. Finished, idle, or
-    // paused effects and durations <=1ms are allowed; any meaningfully timed
-    // running effect at any sample is a reduced-motion failure.
-    const offenders = await page.evaluate(async () => {
-      const seen = new Map();
-      const deadline = performance.now() + 1500;
-      while (performance.now() < deadline) {
-        for (const a of document.getAnimations({ subtree: true })) {
-          if (a.playState !== 'running') continue;
-          let timing = {};
-          try { timing = a.effect?.getComputedTiming?.() ?? {}; } catch { /* detached */ }
-          const dur = typeof timing.duration === 'number' ? timing.duration : 0;
-          if (dur <= 1) continue; // fill-only / effectively instant
-          const offender = {
-            kind: a.constructor?.name ?? 'Animation',
-            name: a.animationName ?? a.transitionProperty ?? a.id ?? '(anonymous)',
-            duration: dur,
-            iterations: timing.iterations ?? 1,
-          };
-          seen.set(JSON.stringify(offender), offender);
-        }
-        await new Promise((resolve) => requestAnimationFrame(resolve));
-      }
-      return [...seen.values()];
-    });
-    await page.waitForLoadState('networkidle');
+    // Observe every frame for another 1.5s after load settles and assert on
+    // everything seen since the document started.
+    // Finished, idle, or paused effects and durations <=1ms are allowed; any
+    // meaningfully timed RUNNING effect at any sample is a reduced-motion
+    // failure. Apps with zero animations pass vacuously (the render/console
+    // test still gates them).
+    await page.waitForTimeout(1500);
+    const offenders = await page.evaluate(() => window.__reducedMotionOffenders ?? []);
     expect(offenders, 'no running animation/transition with meaningful duration under reduced motion').toEqual([]);
   });
 
@@ -123,3 +132,43 @@ test.describe('workspace contract (canonical)', () => {
 });
 
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
+
+test.describe('task-specific criteria', () => {
+  test('7.8 no_horizontal_scroll_at_375', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    const overflow = await page.evaluate(() =>
+      document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow, 'no horizontal page scroll at 375px (criterion 7.8)').toBeLessThanOrEqual(1);
+  });
+
+  test('panels_stack_below_768', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+
+    const layout = await page.evaluate(() => {
+      const box = (selector) => {
+        const element = document.querySelector(selector);
+        const rect = element.getBoundingClientRect();
+        return {
+          top: rect.top,
+          bottom: rect.bottom,
+          height: rect.height,
+          scrollHeight: element.scrollHeight,
+        };
+      };
+      return {
+        themes: box('#themes-panel'),
+        editor: box('#editor-panel'),
+        preview: box('.preview-panel'),
+      };
+    });
+
+    expect(layout.editor.top, 'editor panel starts at or below themes panel bottom').toBeGreaterThanOrEqual(layout.themes.bottom - 1);
+    expect(layout.preview.top, 'preview panel starts at or below editor panel bottom').toBeGreaterThanOrEqual(layout.editor.bottom - 1);
+    expect(layout.themes.height, 'themes panel is not internally clipped').toBeGreaterThanOrEqual(layout.themes.scrollHeight - 1);
+    expect(layout.editor.height, 'editor panel is not internally clipped').toBeGreaterThanOrEqual(layout.editor.scrollHeight - 1);
+  });
+});

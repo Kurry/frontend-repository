@@ -250,6 +250,26 @@ function closeImport() {
 
 function updateFilter(type, values) {
   store.setFilter(type, values || [])
+  if (values?.length) setFilterSearch(type, '')
+}
+
+const filterSearchRefs = { model: modelSearch, harness: harnessSearch, taskCategory: categorySearch }
+const filterSearchLabels = { model: 'Filter models', harness: 'Filter harnesses', taskCategory: 'Filter task categories' }
+
+function setFilterSearch(type, value) {
+  const next = typeof value === 'string' ? value : ''
+  filterSearchRefs[type].value = next
+  store.setFilterSearch(type, next)
+}
+
+function updateFilterSearch(type, value) {
+  const next = typeof value === 'string' ? value : ''
+  const input = document.querySelector(`[aria-label="${filterSearchLabels[type]}"]`)
+  // Vuetify emits an empty search update when an autocomplete loses focus.
+  // Keep the active dashboard filter across view switches and overlay opens;
+  // an intentional clear still arrives while the input owns focus.
+  if (!next && document.activeElement !== input && store.filterSearch[type]) return
+  setFilterSearch(type, next)
 }
 
 function finishThreshold() {
@@ -504,11 +524,6 @@ watch(() => store.ui.paletteOpen, async (open) => {
 
 watch(() => store.ui.copyRequest, () => copyActive())
 
-watch([modelSearch, harnessSearch, categorySearch], ([m, h, c]) => {
-  store.setFilterSearch('model', m)
-  store.setFilterSearch('harness', h)
-  store.setFilterSearch('taskCategory', c)
-})
 watch(() => store.filterSearch, (next) => {
   if (modelSearch.value !== next.model) modelSearch.value = next.model
   if (harnessSearch.value !== next.harness) harnessSearch.value = next.harness
@@ -577,22 +592,25 @@ onBeforeUnmount(() => {
           <span class="filter-count">{{ activeFilterCount ? `${activeFilterCount} narrowing inputs` : 'Showing all data' }}</span>
         </div>
         <div class="filter-grid">
-          <v-combobox
-            label="Models" :items="store.models" :model-value="store.filters.model" v-model:search="modelSearch"
+          <v-autocomplete
+            label="Models" :items="store.models" :model-value="store.filters.model" :search="modelSearch"
             multiple chips closable-chips hide-details no-filter :menu-icon="null"
             aria-label="Filter models" placeholder="Select or type to narrow"
+            @update:search="updateFilterSearch('model', $event)"
             @update:model-value="updateFilter('model', $event)"
           />
-          <v-combobox
-            label="Harnesses" :items="store.harnesses" :model-value="store.filters.harness" v-model:search="harnessSearch"
+          <v-autocomplete
+            label="Harnesses" :items="store.harnesses" :model-value="store.filters.harness" :search="harnessSearch"
             multiple chips closable-chips hide-details no-filter :menu-icon="null"
             aria-label="Filter harnesses" placeholder="Select or type to narrow"
+            @update:search="updateFilterSearch('harness', $event)"
             @update:model-value="updateFilter('harness', $event)"
           />
-          <v-combobox
-            label="Task categories" :items="store.categories" :model-value="store.filters.taskCategory" v-model:search="categorySearch"
+          <v-autocomplete
+            label="Task categories" :items="store.categories" :model-value="store.filters.taskCategory" :search="categorySearch"
             multiple chips closable-chips hide-details no-filter :menu-icon="null"
             aria-label="Filter task categories" placeholder="Select or type to narrow"
+            @update:search="updateFilterSearch('taskCategory', $event)"
             @update:model-value="updateFilter('taskCategory', $event)"
           />
           <v-btn prepend-icon="mdi-filter-off-outline" variant="text" :disabled="!activeFilterCount" @click="store.clearFilters">Clear filters</v-btn>

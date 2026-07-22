@@ -616,7 +616,7 @@ function PromptFormModal({ modal }) {
     handleSubmit,
     watch,
     trigger,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm({ resolver: zodResolver(existing ? promptEditSchema(existing.title) : promptRequestSchema), mode: 'all', defaultValues: initial });
   const values = watch();
 
@@ -648,7 +648,7 @@ function PromptFormModal({ modal }) {
       modalLabel={existing ? `Version ${existing.version}` : 'Prompt Library'}
       primaryButtonText={existing ? 'Save new version' : 'Create prompt'}
       secondaryButtonText="Cancel"
-      primaryButtonDisabled={submitLock.current}
+      primaryButtonDisabled={submitLock.current || !isValid}
       launcherButtonRef={modalTriggerRef}
       onRequestClose={closeModal}
       onSecondarySubmit={closeModal}

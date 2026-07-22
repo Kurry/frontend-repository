@@ -9,9 +9,7 @@ export async function openApp(page) {
 
 export async function fillEditor(page, text = 'Explain {{topic}} for {{audience}}') {
   const editor = page.getByRole('textbox', { name: 'Prompt editor' })
-  await editor.click()
-  await page.keyboard.press(process.platform === 'darwin' ? 'Meta+A' : 'Control+A')
-  await page.keyboard.type(text)
+  await editor.fill(text)
   if (text.includes('{{topic}}')) await expect(editor).toContainText('{{topic}}')
   return editor
 }
@@ -49,10 +47,12 @@ async function checkLibrary(page, name) {
 async function checkEmptyLibrary(page) {
   await page.getByRole('button', { name: 'Library', exact: true }).click()
   while (await page.locator('.library-row').count()) {
+    const rowCount = await page.locator('.library-row').count()
     await page.locator('.library-row').first().getByRole('button', { name: /Delete / }).click()
+    await expect(page.locator('.library-row')).toHaveCount(rowCount - 1)
   }
   await expect(page.locator('.library-row')).toHaveCount(0)
-  await expect(page.getByText(/No prompts|empty/i)).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Your Library Is Empty' })).toBeVisible()
 }
 
 async function checkReload(page) {
@@ -115,7 +115,8 @@ async function checkPreviewLatency(page) {
     const input = document.querySelector('#binding-topic')
     const preview = document.querySelector('.preview-body')
     const started = performance.now()
-    input.value = 'latency-sentinel'
+    const setValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set
+    setValue.call(input, 'latency-sentinel')
     input.dispatchEvent(new Event('input', { bubbles: true }))
     while (!preview.textContent.includes('latency-sentinel')) await new Promise(requestAnimationFrame)
     return performance.now() - started

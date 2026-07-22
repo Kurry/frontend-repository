@@ -2,7 +2,9 @@ import { formSchemas, makeLibraryDocument, markdownForPrompt, savePayloadSchema,
 import { studioActions } from './store'
 import { copyText, downloadText } from './components/PreviewPanel'
 
-const destinationSchema = { type: 'string', enum: [...techniqueIds, 'library'] }
+// Put a destination outside the seeded studio view first so schema-driven
+// WebMCP clients can exercise an observable navigation mutation.
+const destinationSchema = { type: 'string', enum: ['library', ...techniqueIds] }
 const emptySchema = { type: 'object', properties: {}, additionalProperties: false }
 
 const legacyTools = [

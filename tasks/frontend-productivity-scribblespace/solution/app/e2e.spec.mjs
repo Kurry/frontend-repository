@@ -245,25 +245,38 @@ test('1.6 stacking_order_controls', async ({ page }) => {
   await page.getByRole('button', { name: 'New Shape' }).click();
   await page.getByRole('menuitem', { name: /Circle/i }).click();
 
-  // DOM element order dictates z-index implicitly if no raw z-index is set.
-  // Circle is placed 2nd so it's top.
-  let wrappers = page.locator('.canvas-object-wrapper');
-  let firstElText = await wrappers.first().innerHTML();
+  // Placing the circle second auto-selects it (store.addObject sets
+  // selectedIds = [newId]), so it's the element carrying
+  // canvas-object-selected -- use that to identify it deterministically
+  // rather than relying on first/last DOM order, which the app is free to
+  // reassign as z-index changes.
+  const circle = page.locator('.canvas-object-wrapper.canvas-object-selected');
+  const rectangle = page.locator('.canvas-object-wrapper:not(.canvas-object-selected)');
+  await expect(circle).toHaveCount(1);
+  await expect(rectangle).toHaveCount(1);
 
-  await page.getByRole('button', { name: /Send to Back/i }).click();
+  const zIndexOf = async (locator) =>
+    parseInt(await locator.evaluate((n) => window.getComputedStyle(n).zIndex), 10) || 0;
 
-  // The first element should have changed if reordered (Circle is now at bottom)
-  let wrappersAfter = page.locator('.canvas-object-wrapper');
-  let firstElTextAfter = await wrappersAfter.first().innerHTML();
+  const rectZBefore = await zIndexOf(rectangle);
+  const circleZBefore = await zIndexOf(circle);
+  // Sanity precondition: the circle, placed second, starts on top.
+  expect(circleZBefore).toBeGreaterThan(rectZBefore);
 
-  // Or z-index changed
-  const z1 = parseInt(await wrappers.first().evaluate(n => window.getComputedStyle(n).zIndex), 10) || 0;
-  const z2 = parseInt(await wrappers.last().evaluate(n => window.getComputedStyle(n).zIndex), 10) || 0;
+  await page.getByRole('button', { name: 'Send to Back' }).click();
 
-  // Assert either DOM reorder occurred OR zIndex difference reflects exact z-order change
-  const reordered = firstElText !== firstElTextAfter;
-  const zIndexChanged = z1 < z2;
-  expect(reordered || zIndexChanged).toBe(true);
+  const rectZAfterSend = await zIndexOf(rectangle);
+  const circleZAfterSend = await zIndexOf(circle);
+  // The relative order must have actually flipped: the circle (still the
+  // selected object) now renders behind the rectangle.
+  expect(circleZAfterSend).toBeLessThan(rectZAfterSend);
+
+  await page.getByRole('button', { name: 'Bring to Front' }).click();
+
+  const rectZAfterBring = await zIndexOf(rectangle);
+  const circleZAfterBring = await zIndexOf(circle);
+  // Bring to Front restores the circle to the top again.
+  expect(circleZAfterBring).toBeGreaterThan(rectZAfterBring);
 });
 
 test('1.7 shift_multi_select_delete', async ({ page }) => {
@@ -417,6 +430,7 @@ test('1.45 flow_note_create_export_json', async ({ page }) => {
   await page.getByRole('button', { name: 'New Note' }).click();
   const box = await page.locator('.ProseMirror:visible').boundingBox();
   await page.mouse.dblclick(box.x + box.width/2, box.y + box.height/2);
+  await page.waitForTimeout(100);
   await page.keyboard.type('JSON Export String');
 
   await page.getByRole('button', { name: 'Export workspace' }).click();
@@ -450,9 +464,12 @@ test('1.48 flow_stream_counts_in_lockstep', async ({ page }) => {
   // Wait a moment for some events
   await page.waitForTimeout(1000);
 
-  // The footer count should match the number of objects on canvas
+  // The footer count should match the number of objects on canvas. The app
+  // pluralizes: exactly "1 object" for a single object, "N objects" (with
+  // an explicit trailing "s") for zero or any other count.
   const canvasCount = await page.locator('.canvas-object-wrapper').count();
-  await expect(page.getByText(`${canvasCount} object`)).toBeVisible();
+  const expectedFooterText = canvasCount === 1 ? '1 object' : `${canvasCount} objects`;
+  await expect(page.getByText(expectedFooterText)).toBeVisible();
 });
 
 // DROPPED (fails live oracle): '1.49 flow_export_import_round_trip'
@@ -519,6 +536,7 @@ test('1.56 note_create_payload_in_export', async ({ page }) => {
   await page.getByRole('button', { name: 'New Note' }).click();
   const box = await page.locator('.ProseMirror:visible').boundingBox();
   await page.mouse.dblclick(box.x + box.width/2, box.y + box.height/2);
+  await page.waitForTimeout(100);
   await page.keyboard.type('Note Payload Text');
 
   // Select color
@@ -680,15 +698,54 @@ test('2.12 smooth_with_thirty_objects', async ({ page }) => {
 test('2.13 keyboard_only_operability', async ({ page }) => {
   await page.goto('http://localhost:3000');
 
-  // Focus first element
-  await page.keyboard.press('Tab');
+  // Tab-only navigation to a named control, verifying it's actually the one
+  // reached (not just "some" focused element), plus a visible focus
+  // indicator distinct from hover.
+  const tabToControl = async (name, maxTabs = 40) => {
+    for (let i = 0; i < maxTabs; i++) {
+      await page.keyboard.press('Tab');
+      const matched = await page.evaluate((n) => {
+        const el = document.activeElement;
+        if (!el) return false;
+        const label = (el.getAttribute('aria-label') || el.textContent || '').trim();
+        return label === n;
+      }, name);
+      if (matched) return true;
+    }
+    return false;
+  };
 
-  // Tab through until we find a button focused
-  await page.keyboard.press('Tab');
-  await page.keyboard.press('Tab');
-  // We can't perfectly map out every element sequence due to DOM variability. Let's make an honest attempt.
-  // "let genuine application failures fail honestly"
-  await expect(page.locator(':focus')).toBeVisible();
+  // Toolbar control: reachable and operable with the keyboard alone.
+  expect(await tabToControl('New Note'), 'New Note toolbar button reachable via Tab').toBe(true);
+  const hasFocusIndicator = await page.evaluate(() => {
+    const el = document.activeElement;
+    const cs = window.getComputedStyle(el);
+    // The app's global :focus-visible rule draws a solid outline distinct
+    // from ambient button shadows, so assert that rule rather than accepting
+    // any non-none computed outline.
+    return cs.outlineStyle === 'solid' && parseFloat(cs.outlineWidth) > 0;
+  });
+  expect(hasFocusIndicator, 'focused control shows the :focus-visible outline').toBe(true);
+  await page.keyboard.press('Enter');
+  await expect(page.getByText('1 object')).toBeVisible();
+
+  // Board control: reachable and operable with the keyboard alone.
+  expect(await tabToControl('New Board'), 'New Board control reachable via Tab').toBe(true);
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('tab', { name: 'Board 2' })).toBeVisible();
+
+  // Panel control: reachable and operable with the keyboard alone.
+  expect(await tabToControl('Show outline'), 'Show outline panel control reachable via Tab').toBe(true);
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('heading', { name: /^Outline:/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Show canvas' })).toHaveAttribute('aria-pressed', 'true');
+
+  // Command-palette (dialog) control: reachable and dismissible with the
+  // keyboard alone.
+  await page.keyboard.press('ControlOrMeta+k');
+  await expect(page.getByPlaceholder(/Search commands/i).or(page.getByRole('dialog'))).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByPlaceholder(/Search commands/i).or(page.getByRole('dialog'))).not.toBeVisible();
 });
 
 test('2.14 dialog_focus_trap_return', async ({ page }) => {
@@ -721,6 +778,7 @@ test('2.18 export_texts_derived_from_shared_state', async ({ page }) => {
   await page.getByRole('button', { name: 'New Note' }).click();
   const box = await page.locator('.ProseMirror:visible').boundingBox();
   await page.mouse.dblclick(box.x + box.width/2, box.y + box.height/2);
+  await page.waitForTimeout(100);
   await page.keyboard.type('Unique Shared Text');
 
   await page.getByRole('button', { name: 'Export workspace' }).click();
@@ -753,6 +811,7 @@ test('2.20 created_records_match_export_schema', async ({ page }) => {
   await page.getByRole('button', { name: 'New Note' }).click();
   const box = await page.locator('.ProseMirror:visible').boundingBox();
   await page.mouse.dblclick(box.x + box.width/2, box.y + box.height/2);
+  await page.waitForTimeout(100);
   await page.keyboard.type('Schema Match Text');
 
   await page.getByRole('button', { name: 'Export workspace' }).click();
@@ -903,8 +962,27 @@ test('4.15 archive_empty_state', async ({ page }) => {
 // DROPPED (fails live oracle): '4.16 overlength_note_text_keeps_prior'
 test('6.1 create_note_updates_all_surfaces', async ({ page }) => {
   await page.goto('http://localhost:3000');
+  await expect(page.getByText('This board is empty')).toBeVisible();
+  await expect(page.getByText('0 objects')).toBeVisible();
+
   await page.getByRole('button', { name: 'New Note' }).click();
+
+  // Footer count surface: increments by one.
   await expect(page.getByText('1 object')).toBeVisible();
+  // Empty-state hint surface: clears.
+  await expect(page.getByText('This board is empty')).not.toBeVisible();
+
+  // Outline surface: gains a row naming the new note's default color, all
+  // without a reload.
+  await page.getByRole('button', { name: 'Show outline' }).click();
+  await expect(page.getByText('butter yellow')).toBeVisible();
+  await page.getByRole('button', { name: 'Show canvas' }).click();
+
+  // Export surface: Workspace JSON preview gains a note entry.
+  await page.getByRole('button', { name: 'Export workspace' }).click();
+  const jsonStr = await page.locator('textarea, pre, code').last().inputValue();
+  const data = JSON.parse(jsonStr);
+  expect(data.boards[0].objects.some((o) => o.type === 'note')).toBe(true);
 });
 
 test('6.2 invalid_board_rename_inline', async ({ page }) => {
@@ -920,6 +998,7 @@ test('6.3 edit_note_echoes_outline_export', async ({ page }) => {
   await page.getByRole('button', { name: 'New Note' }).click();
   const box = await page.locator('.ProseMirror:visible').boundingBox();
   await page.mouse.dblclick(box.x + box.width/2, box.y + box.height/2);
+  await page.waitForTimeout(100);
   await page.keyboard.type('Echo Test');
 
   // Usually outline update or export update works immediately.
@@ -952,6 +1031,7 @@ test('6.7 search_filters_highlights_matches', async ({ page }) => {
   await page.getByRole('button', { name: 'New Note' }).click();
   const box = await page.locator('.ProseMirror:visible').boundingBox();
   await page.mouse.dblclick(box.x + box.width/2, box.y + box.height/2);
+  await page.waitForTimeout(100);
   await page.keyboard.type('Test Query');
   await page.getByPlaceholder(/Search/i).fill('Test Query');
   await page.waitForTimeout(500);
@@ -1028,26 +1108,51 @@ test('14.2 board_switch_reversal_proves_live_state', async ({ page }) => {
 test('14.3 search_derived_view_sensitivity', async ({ page }) => {
   await page.goto('http://localhost:3000');
 
+  // Two notes, each containing a distinct word.
   await page.getByRole('button', { name: 'New Note' }).click();
   let box = await page.locator('.ProseMirror:visible').boundingBox();
-  await page.mouse.dblclick(box.x + box.width/2, box.y + box.height/2);
-  await page.keyboard.type('Derived View Text');
+  await page.mouse.dblclick(box.x + box.width / 2, box.y + box.height / 2);
+  await page.waitForTimeout(100);
+  await page.keyboard.type('alpha keyword');
+  await page.keyboard.press('Escape');
 
-  await page.getByPlaceholder(/Search/i).fill('Derived');
-  await page.waitForTimeout(500);
+  await page.getByRole('button', { name: 'New Note' }).click();
+  box = await page.locator('.canvas-object-wrapper').last().boundingBox();
+  await page.mouse.dblclick(box.x + box.width / 2, box.y + box.height / 2);
+  await page.waitForTimeout(100);
+  await page.keyboard.type('beta keyword');
+  await page.keyboard.press('Escape');
 
+  // Search for each word in turn: the match count and the actual highlighted
+  // note must both change meaningfully, not redraw identically. (Note:
+  // searching also re-pans the canvas to center the match, so screen
+  // position can't be used to distinguish which note glows -- read the
+  // highlighted note's own text instead.)
+  await page.getByPlaceholder(/Search/i).fill('alpha');
+  await page.waitForTimeout(400);
   await expect(page.locator('.app-search')).toContainText('1');
+  await expect(page.locator('.canvas-object-search-hit')).toHaveCount(1);
+  await expect(page.locator('.canvas-object-search-hit')).toContainText('alpha');
 
-  // Modify it
-  await page.locator('.ProseMirror:visible').dblclick();
-  await page.keyboard.press('Backspace'); // remove "Text"
-  await page.keyboard.type('Modified');
-  await page.waitForTimeout(500);
+  await page.getByPlaceholder(/Search/i).fill('beta');
+  await page.waitForTimeout(400);
+  await expect(page.locator('.app-search')).toContainText('1');
+  await expect(page.locator('.canvas-object-search-hit')).toHaveCount(1);
+  await expect(page.locator('.canvas-object-search-hit')).toContainText('beta');
+  const betaHit = await page.locator('.canvas-object-search-hit').boundingBox();
 
-  // Depending on implementation it might stay highlighted or drop highlight.
-  // The test specifically is derived-view sensitivity. If it updates count automatically, that's what we want.
-  const searchTxt = await page.locator('.app-search').innerText();
-  expect(searchTxt === '0' || searchTxt === '1' || searchTxt.includes('0') || searchTxt.includes('1')).toBe(true);
+  // Derived-view sensitivity: editing the currently-matched note's text away
+  // from the search term drops it from the live match set without reload.
+  await page.mouse.dblclick(betaHit.x + betaHit.width / 2, betaHit.y + betaHit.height / 2);
+  await page.waitForTimeout(100);
+  await page.keyboard.press('ControlOrMeta+a');
+  await page.keyboard.type('nothing relevant here');
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(400);
+
+  await expect(page.locator('.app-search')).toContainText('0');
+  await expect(page.locator('.canvas-object-search-hit')).toHaveCount(0);
+  await expect(page.getByText('No results for the query')).toBeVisible();
 });
 
 test('14.4 canvas_edit_echoes_outline_and_export', async ({ page }) => {
@@ -1081,6 +1186,7 @@ test('14.6 different_note_text_different_export', async ({ page }) => {
   await page.getByRole('button', { name: 'New Note' }).click();
   let box = await page.locator('.ProseMirror:visible').boundingBox();
   await page.mouse.dblclick(box.x + box.width/2, box.y + box.height/2);
+  await page.waitForTimeout(100);
   await page.keyboard.type('Note A');
 
   await page.getByRole('button', { name: 'Export workspace' }).click();
@@ -1090,6 +1196,7 @@ test('14.6 different_note_text_different_export', async ({ page }) => {
   await page.getByRole('button', { name: 'New Note' }).click();
   let box2 = await page.locator('.ProseMirror:visible').last().boundingBox();
   await page.mouse.dblclick(box2.x + box2.width/2, box2.y + box2.height/2);
+  await page.waitForTimeout(100);
   await page.keyboard.type('Note B');
 
   await page.getByRole('button', { name: 'Export workspace' }).click();
@@ -1130,14 +1237,66 @@ test('14.8 empty_then_repopulate_board', async ({ page }) => {
 test('14.9 export_import_round_trip_preserves_boards', async ({ page }) => {
   await page.goto('http://localhost:3000');
 
+  // Mutate: a note on Board 1, plus a second named board with its own note.
+  await page.getByRole('button', { name: 'New Note' }).click();
+  let box = await page.locator('.ProseMirror:visible').boundingBox();
+  await page.mouse.dblclick(box.x + box.width / 2, box.y + box.height / 2);
+  await page.waitForTimeout(100);
+  await page.keyboard.type('Board 1 keeper note');
+  await page.keyboard.press('Escape');
+
   await page.getByRole('button', { name: 'New Board' }).click();
   await page.getByRole('button', { name: 'Rename board' }).nth(1).click();
   await page.getByLabel('Board name').fill('Keep This Board');
   await page.keyboard.press('Enter');
+  await page.getByRole('button', { name: 'New Note' }).click();
+  await expect(page.getByText('1 object')).toBeVisible();
 
+  // Export: open the modal, confirm the JSON preview reflects both boards,
+  // then actually trigger a real file download (not just read the textarea).
   await page.getByRole('button', { name: 'Export workspace' }).click();
   const jsonStr = await page.locator('textarea, pre, code').last().inputValue();
   expect(jsonStr).toContain('Keep This Board');
+  expect(jsonStr).toContain('Board 1 keeper note');
+
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: 'Download Workspace JSON' }).click(),
+  ]);
+  expect(download.suggestedFilename()).toBe('workspace.json');
+  const downloadedPath = await download.path();
+  expect(downloadedPath, 'download actually wrote a file').toBeTruthy();
+  const fs = await import('node:fs/promises');
+  const downloadedContent = await fs.readFile(downloadedPath, 'utf-8');
+  const downloadedData = JSON.parse(downloadedContent);
+  expect(downloadedData.schemaVersion).toBe('scribblespace-workspace-v1');
+  expect(downloadedData.boards.some((b) => b.name === 'Keep This Board')).toBe(true);
+
+  // Close the modal, then mutate the live workspace further so the exported
+  // snapshot and the current workspace genuinely diverge.
+  await page.keyboard.press('Escape');
+  await page.getByRole('tab', { name: 'Board 1' }).click();
+  await page.getByRole('button', { name: 'New Note' }).click();
+  await page.getByRole('button', { name: 'New Note' }).click();
+  await expect(page.getByText('3 objects')).toBeVisible();
+
+  // Import: paste the exported snapshot back in and confirm it restores the
+  // pre-mutation state (2 boards, 1 note each) rather than keeping the
+  // post-download additions.
+  await page.getByRole('button', { name: 'Export workspace' }).click();
+  await page.getByRole('tab', { name: 'Import' }).click();
+  await page.getByLabel('Import Workspace JSON').fill(downloadedContent);
+  await page.getByRole('button', { name: 'Import workspace' }).click();
+
+  await expect(page.getByRole('button', { name: 'Import workspace' })).not.toBeVisible();
+  await expect(page.getByRole('tab', { name: 'Board 1' })).toBeVisible();
+  await expect(page.getByRole('tab', { name: 'Keep This Board' })).toBeVisible();
+  // Explicitly select Board 1 (the board mutated to 3 objects after export)
+  // and confirm the import restored it to its pre-mutation single note.
+  await page.getByRole('tab', { name: 'Board 1' }).click();
+  await expect(page.getByText('1 object')).toBeVisible();
+  await page.getByRole('tab', { name: 'Keep This Board' }).click();
+  await expect(page.getByText('1 object')).toBeVisible();
 });
 
 test('14.10 undo_round_trip_restores_surfaces', async ({ page }) => {
@@ -1201,15 +1360,49 @@ test('3.14 empty_states_explicit', async ({ page }) => {
   await expect(page.getByText(/empty|no deleted/i)).toBeVisible();
 });
 
-test('7.1 prefers_reduced_motion_respected', async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
+// NOTE: this test was previously mistitled "7.1 prefers_reduced_motion_respected".
+// In this task's responsiveness dimension, criterion id 7.1 is actually
+// "layout_adapts_desktop_to_mobile" (tests/responsiveness/responsiveness.toml)
+// -- there is no "prefers_reduced_motion_respected" criterion under that id
+// or any other id in this task's rubric. Reduced motion is a genuine
+// criterion under different ids (accessibility 1.10 "reduced_motion_is_respected"
+// and motion 4.12 "reduced_motion_instant_usable"); both are already covered
+// for real by the canonical "reduced motion behaviorally suppresses
+// animation" test above (it samples every running Web Animation across a
+// fresh load plus a 1.5s settle window and fails on any meaningfully-timed
+// running animation), so it is not duplicated here.
+test('7.1 layout_adapts_desktop_to_mobile', async ({ page }) => {
   await page.goto('http://localhost:3000');
 
-  // Check if transition or animation is stripped
+  const toolbar = page.locator('[role="toolbar"]');
+  const metricsOf = (locator) =>
+    locator.evaluate((el) => ({ flexWrap: getComputedStyle(el).flexWrap, height: el.getBoundingClientRect().height }));
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(page.getByRole('button', { name: 'New Note' })).toBeVisible();
+  const wide = await metricsOf(toolbar);
+  // At desktop width the toolbar is a single non-wrapping row (it scrolls
+  // horizontally, by design, rather than wrapping).
+  expect(wide.flexWrap).toBe('nowrap');
+
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.waitForTimeout(100);
+  const narrow = await metricsOf(toolbar);
+  // At mobile width the same toolbar genuinely reflows: a max-width:480px
+  // rule (src/index.css `.app-actions [role="toolbar"]`) switches it from a
+  // horizontal-scroll strip to a wrapping, multi-row layout -- it does not
+  // freeze the desktop-only single-row layout and clip controls off-screen.
+  expect(narrow.flexWrap).toBe('wrap');
+  expect(narrow.height).toBeGreaterThan(wide.height);
+
+  // Toolbar, board tabs, and canvas all remain usable at the narrow width.
   await page.getByRole('button', { name: 'New Note' }).click();
-  // We can just verify it didn't crash. Exact CSS parsing of motion strip requires checking all nodes,
-  // which might be hard, but the application shouldn't break.
   await expect(page.getByText('1 object')).toBeVisible();
+  await expect(page.getByRole('tab', { name: 'Board 1' })).toBeVisible();
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth
+  );
+  expect(overflow).toBeLessThanOrEqual(1);
 });
 
 test('9.2 console_clean_during_use', async ({ page }) => {
@@ -1353,14 +1546,44 @@ test('15.8 success_messages_are_specific', async ({ page }) => {
 test('WebMCP integration: lists tools and session info', async ({ page }) => {
   await page.goto('http://localhost:3000');
 
-  // Verify WebMCP exists on window
+  // Session info reports the contract and the declared module set.
   const session = await page.evaluate(() => window.webmcp_session_info());
   expect(session).toBeDefined();
+  expect(session.contract_version).toBe('zto-webmcp-v1');
+  expect(session.app).toBe('scribblespace');
+  expect(session.modules).toEqual(
+    expect.arrayContaining([
+      'structured-editor-v1',
+      'entity-collection-v1',
+      'command-session-v1',
+      'artifact-transfer-v1',
+    ])
+  );
 
-  // Use canonical helpers if they were globals, but the reviewer said "use canonical exports"
-  // Actually I'll use page.evaluate for session info, and listTools for tools.
-  // Wait, if I call listTools({ page }), it will throw ReferenceError during my test run.
-  // Is that okay? No, it will fail the entire file if it's a syntax error, but it's a runtime error so only this test fails.
+  // Use the canonical listTools helper (exported at the top of this file)
+  // to confirm real tools are registered, not just that the session-info
+  // function is defined.
+  const tools = await listTools(page);
+  const arr = Array.isArray(tools) ? tools : tools?.tools ?? [];
+  expect(arr.length).toBeGreaterThan(0);
+  const toolNames = arr.map((t) => t.name ?? t.id);
+  expect(toolNames).toEqual(
+    expect.arrayContaining([
+      'editor_add',
+      'editor_select',
+      'editor_delete',
+      'board_create',
+      'session_start',
+      'artifact_export',
+      'artifact_import',
+    ])
+  );
+
+  // Round-trip a real tool invocation through the exported invokeTool
+  // helper and confirm it mutates visible app state.
+  const result = await invokeTool(page, 'editor_add', { type: 'note', x: 200, y: 200 });
+  expect(result.ok).toBe(true);
+  await expect(page.getByText('1 object')).toBeVisible();
 });
 
 // DROPPED (fails live oracle): 'WebMCP integration: invokes tool and mutates visible canvas'

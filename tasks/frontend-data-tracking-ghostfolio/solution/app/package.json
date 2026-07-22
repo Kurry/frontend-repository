@@ -8,7 +8,8 @@
     "dev": "node server.js",
     "build": "node -e \"require('fs').accessSync('index.html');console.log('ok')\"",
     "verify:build": "node -e \"require('fs').accessSync('index.html');require('fs').accessSync('src/app.js');console.log('build ok');process.exit(0)\"",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:canonical": "playwright test -c e2e.playwright.config.mjs"
   },
   "dependencies": {
     "serve": "14.2.6"

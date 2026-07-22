@@ -140,7 +140,7 @@ export default function Shell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-gray-100 font-sans">
-      <header className="flex items-center justify-between px-4 py-2 border-b border-gray-700">
+      <header className="studio-header flex items-center justify-between px-4 py-2 border-b border-gray-700">
         <div className="flex items-center gap-4">
           <h1 className="text-xl font-bold">Material-UI Theme Creator</h1>
           <div className="flex items-center text-sm text-gray-400">
@@ -186,7 +186,7 @@ export default function Shell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <nav className="relative flex px-4 border-b border-gray-700 bg-gray-900" role="tablist" aria-label="Main">
+      <nav className="studio-nav relative flex px-4 border-b border-gray-700 bg-gray-900" role="tablist" aria-label="Main">
         <div className="flex items-center mr-6">
           <svg viewBox="0 0 24 24" width="28" height="28" role="img" aria-label="Material logo mark">
             <path

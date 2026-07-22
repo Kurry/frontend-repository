@@ -8,6 +8,7 @@ on:
 permissions:
   contents: read
   issues: write
+  pull-requests: write
 
 concurrency:
   group: playwright-${{ github.event.pull_request.number }}
@@ -19,7 +20,7 @@ jobs:
     outputs:
       slugs: ${{ steps.diff.outputs.slugs }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - id: diff
@@ -46,9 +47,26 @@ jobs:
       run:
         working-directory: tasks/${{ matrix.slug }}/solution/app
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - name: Detect task-specific E2E changes
+        id: task-tests
+        working-directory: ${{ github.workspace }}
+        env:
+          BASE_REF: origin/${{ github.base_ref }}
+          TASK_SLUG: ${{ matrix.slug }}
+        run: |
+          if git diff --quiet "$BASE_REF"...HEAD -- \
+            "tasks/$TASK_SLUG/solution/app/e2e.spec.mjs" \
+            "tasks/$TASK_SLUG/solution/app/e2e"; then
+            echo "required=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "required=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"
 
@@ -58,7 +76,7 @@ jobs:
           if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
       - name: Cache Playwright browsers
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles(format('tasks/{0}/solution/app/package-lock.json', matrix.slug)) }}
@@ -82,6 +100,7 @@ jobs:
       - name: Run Playwright suites
         id: suites
         env:
+          REQUIRE_TASK_TESTS: ${{ steps.task-tests.outputs.required }}
           RESULT_PATH: ${{ runner.temp }}/playwright-status-${{ matrix.slug }}.json
           TASK_SLUG: ${{ matrix.slug }}
         run: |
@@ -99,6 +118,8 @@ jobs:
             slug: process.env.TASK_SLUG,
             appDir: process.cwd(),
             runtimeDir: process.env.RUNNER_TEMP,
+            taskDir: path.join(process.env.GITHUB_WORKSPACE, 'tasks', process.env.TASK_SLUG),
+            requireTaskTests: process.env.REQUIRE_TASK_TESTS === 'true',
           });
           fs.writeFileSync(
             process.env.RESULT_PATH,
@@ -154,7 +175,7 @@ jobs:
 
       - name: Upload task status
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-status-${{ matrix.slug }}
           path: ${{ runner.temp }}/playwright-status-${{ matrix.slug }}.json
@@ -163,7 +184,7 @@ jobs:
 
       - name: Upload report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report-${{ matrix.slug }}
           path: |
@@ -179,11 +200,12 @@ jobs:
       actions: read
       contents: read
       issues: write
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Download task statuses
         continue-on-error: true
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: playwright-status-*
           path: ${{ runner.temp }}/playwright-statuses
@@ -238,6 +260,11 @@ jobs:
                       detail = "No canonical or task-owned Playwright suite discovered"
                   else:
                       detail = result.get("message", "No failure detail reported")
+                      if "taskSpecificTests" in result:
+                          detail += (
+                              f"; task-specific={result['taskSpecificTests']}"
+                              f" rubric-matched={result.get('rubricMatchedTests', 0)}"
+                          )
               totals[status] = totals.get(status, 0) + 1
               rows.append(
                   f"| `{table_text(slug)}` | {labels.get(status, labels['missing'])} | {table_text(detail)} |"
