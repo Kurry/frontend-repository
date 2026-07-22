@@ -250,13 +250,6 @@ negate = true
 weight = 1.0
 
 [[criterion]]
-id = "AC-02"
-name = "visual_hierarchy"
-description = "Inspect the primary work surface, linked summary, and detail panel. The visual hierarchy makes current state and next action clear."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "AC-12"
 name = "source_fidelity"
 description = "Compare the implementation with the cited source interaction vocabulary. The visual and interaction thesis is coherent without copying unrelated screens."

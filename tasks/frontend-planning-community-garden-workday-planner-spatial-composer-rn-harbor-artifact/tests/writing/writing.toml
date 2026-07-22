@@ -188,3 +188,10 @@ description = "The app exhibits a significant, browser-observable defect in rend
 type = "binary"
 negate = true
 weight = 1.0
+
+[[criterion]]
+id = "AC-10"
+name = "domain_copy"
+description = "Inspect labels, statuses, errors, and empty-state text. Copy names the domain consequence and recovery action precisely."
+type = "binary"
+weight = 1.0

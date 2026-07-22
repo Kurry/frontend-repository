@@ -250,15 +250,8 @@ negate = true
 weight = 1.0
 
 [[criterion]]
-id = "AC-01"
-name = "signature_mutation"
-description = "The spatial composer mutation changes the primary record, linked view, and status together."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "AC-04"
-name = "schema_contract"
-description = "Query the current state and export after the mutation. The tool result and artifact contain the declared API-shaped fields."
+id = "AC-05"
+name = "complete_user_flow"
+description = "Create, edit, mutate, undo, and complete one record. The end-to-end job is recoverable without reload."
 type = "binary"
 weight = 1.0

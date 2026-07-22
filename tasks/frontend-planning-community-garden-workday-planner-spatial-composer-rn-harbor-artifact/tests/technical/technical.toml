@@ -87,8 +87,17 @@ allowed_tools = [
   "browser_click",
   "browser_hover",
 ]
+
 [scoring]
 aggregation = "weighted_mean"
+
+[[criterion]]
+id = "technical.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable defect in technical or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "AC-04"
