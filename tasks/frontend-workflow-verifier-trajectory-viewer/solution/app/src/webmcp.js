@@ -10,8 +10,8 @@ import {
 import { adjudicationFormSchema, bulkSchema, classifications } from "./schemas";
 
 const destinations = [
-  "task-list",
   "task-detail",
+  "task-list",
   "review-workspace",
   "agent-trajectory-pane",
   "scorer-trajectory-pane",
@@ -55,7 +55,7 @@ function navigate(destination, args = {}) {
     };
   }
   if (destination === "task-detail") {
-    const taskId = args.taskId || useReviewStore.getState().activeTaskId;
+    const taskId = args.taskId || useReviewStore.getState().activeTaskId || tasks[0].id;
     if (!getTask(taskId))
       return {
         ok: false,
