@@ -1,6 +1,6 @@
 {
 	"version": "1",
-	"manifestHash": "o08s8a",
+	"manifestHash": "9otoe4",
 	"options": {
 		"target": "client",
 		"buildMode": "production",
@@ -8,9 +8,9 @@
 			"type": "smart"
 		}
 	},
-	"core": "../assets/core.min-DGtNB905.js",
+	"core": "../assets/core.min-DVALGa4Q.js",
 	"preloader": "../assets/preloader-Bns9QiKi.js",
-	"bundleGraphAsset": "assets/bundle-graph-DIgIQNyD.json",
+	"bundleGraphAsset": "assets/bundle-graph-B2sBt4wl.json",
 	"injections": [
 		{
 			"tag": "style",
@@ -22,117 +22,121 @@
 		}
 	],
 	"mapping": {
-		"s_1V00Oeumm3A": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_2_1V00Oeumm3A-BOAgT0bG.js",
-		"s_6GkoBWguNM4": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_6GkoBWguNM4-D_FOq8T2.js",
-		"s_7KOrS001cXg": "../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_button_onClick_7KOrS001cXg-DBv0RpfX.js",
-		"s_Dei6RWBbu1A": "../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_1_Dei6RWBbu1A-BuzF0xYk.js",
-		"s_EKeb6KqxSI4": "../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_EKeb6KqxSI4-B5IdCvTa.js",
-		"s_EnBW0wvCL0s": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_1_EnBW0wvCL0s-COkEuotT.js",
-		"s_F9FALmrlteE": "../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_F9FALmrlteE-C5xiT8Lk.js",
-		"s_FMSYg76N0Zs": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_1_FMSYg76N0Zs--RWAM19A.js",
-		"s_IPqaPOjKhxc": "../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_div_div_button_onClick_IPqaPOjKhxc-boFlvHgN.js",
-		"s_JyjuChi10ZU": "../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_JyjuChi10ZU-DAznD8YS.js",
-		"s_L3ob80fuEAU": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_L3ob80fuEAU-jXbPVHqD.js",
-		"s_NTmF8n9I0Gs": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_button_onClick_NTmF8n9I0Gs-CFTRxl9o.js",
-		"s_NsvVAXre3TA": "../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_2_NsvVAXre3TA-B1sOwpeY.js",
-		"s_PAuFJflBP1s": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_3_PAuFJflBP1s-6aluu93t.js",
-		"s_Pj8Co1EUM0g": "../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_1_Pj8Co1EUM0g-CijXoH82.js",
-		"s_PuUk0bQf6G8": "../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_4_PuUk0bQf6G8-D05MCvvb.js",
-		"s_SQNZtBMmRaE": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_SQNZtBMmRaE-CTf0dffC.js",
-		"s_Sekd3xm9Hlk": "../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_2_Sekd3xm9Hlk-CvaGrUPR.js",
-		"s_U4ieqgPSVw8": "../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_U4ieqgPSVw8-BnoJGKmS.js",
-		"s_V00XREVXB7M": "../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_V00XREVXB7M-Czge6nzr.js",
-		"s_ZGMjM8QCA0M": "../assets/ExportArtifactView.tsx_ExportArtifactView_component_div_div_button_onClick_ZGMjM8QCA0M-BuJPJsGx.js",
-		"s_c6GPsnYA3Tw": "../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_1_c6GPsnYA3Tw-BAMbKr5O.js",
-		"s_cXBKM6w6Wu4": "../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_div_div_button_onClick_cXBKM6w6Wu4-DhdDKEtL.js",
-		"s_ds9tGvfajnM": "../assets/HistoryPanel.tsx_HistoryPanel_component_div_button_onClick_ds9tGvfajnM--r5LFgRb.js",
-		"s_l6qVcIhvLdw": "../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_1_l6qVcIhvLdw-CS-RgLWm.js",
-		"s_nIiEenZlTf8": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_3_nIiEenZlTf8-CuezC2ut.js",
-		"s_nc38IlLFEBE": "../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_3_nc38IlLFEBE-MPn9EQQr.js",
-		"s_oBdtupCTDg0": "../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_2_oBdtupCTDg0-DXRqRM5G.js",
-		"s_pDhtHaOoBT8": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_2_pDhtHaOoBT8-QAlG0I51.js",
-		"s_psYPS1pW8mw": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_1_psYPS1pW8mw-y0fHOf6r.js",
-		"s_qNFtIiIKwVc": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_button_onClick_qNFtIiIKwVc-EJ34CGHd.js",
-		"s_vAuKY3MyLMQ": "../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_1_vAuKY3MyLMQ-C2EwBNtP.js",
-		"s_vD4RAMsccTk": "../assets/TileCell.tsx_TileCell_component_button_onClick_vD4RAMsccTk-PHtN1GlI.js",
-		"s_xc8nAqmejr8": "../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_xc8nAqmejr8-BVhsT_Tp.js",
-		"s_xhLlu2KzRFo": "../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_1_xhLlu2KzRFo-C8RejQdT.js",
-		"s_yaN0jRapfjU": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_div_button_onClick_yaN0jRapfjU-K6PWGQYw.js",
-		"s_yiMA0J3pO4U": "../assets/TileCell.tsx_TileCell_component_button_onContextMenu_yiMA0J3pO4U-wTsWQzIE.js",
-		"s_S0h0027RObQ": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_textarea_onInput_S0h0027RObQ-B2fB_i7j.js",
-		"s_hZfT9p0uXk4": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onInput_hZfT9p0uXk4-B0d8H0Ga.js",
-		"s_S2CSE0Gzo4k": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onBlur_S2CSE0Gzo4k-DkKwgz1L.js",
-		"s_8cEnb6VAgJ0": "../assets/HistoryPanel.tsx_HistoryPanel_component_useVisibleTask_1_8cEnb6VAgJ0-C6BJy0gh.js",
-		"s_AGMhcRtyECs": "../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_useVisibleTask_AGMhcRtyECs-C43tTuxN.js",
-		"s_B6SgwAuFFL4": "../assets/Confetti.tsx_Confetti_component_useVisibleTask_B6SgwAuFFL4-BAaqjxCG.js",
-		"s_C69My0oHP0Q": "../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_useVisibleTask_C69My0oHP0Q-BB0RGhvT.js",
-		"s_MvNYQXMjSCo": "../assets/SetupScreen.tsx_SetupScreen_component_useVisibleTask_MvNYQXMjSCo-BnheNqbP.js",
-		"s_NbCPVgdXbTo": "../assets/App.tsx_App_component_useVisibleTask_4_NbCPVgdXbTo-DElO4DCM.js",
-		"s_SEVuqJn0rLA": "../assets/App.tsx_App_component_useVisibleTask_SEVuqJn0rLA-CRNUeNpq.js",
-		"s_aBQHsmYNI04": "../assets/App.tsx_App_component_useVisibleTask_2_aBQHsmYNI04-BYblDy1p.js",
-		"s_brSDhVKHAYs": "../assets/HistoryPanel.tsx_HistoryPanel_component_useVisibleTask_brSDhVKHAYs-T4bxmL42.js",
-		"s_g6jJ5iiT0cs": "../assets/App.tsx_App_component_useVisibleTask_3_g6jJ5iiT0cs-7TeMWrBn.js",
-		"s_h00hjwWyXnI": "../assets/App.tsx_App_component_useVisibleTask_1_h00hjwWyXnI-4qenxkAF.js",
-		"s_0ZDMGydeKSw": "../assets/MatchLogScreen.tsx_MatchLogScreen_component_0ZDMGydeKSw-SaL-m7LF.js",
-		"s_4vu2fcO2qTg": "../assets/GameBoard.tsx_GameBoard_component_4vu2fcO2qTg-oDqHIhE-.js",
-		"s_BDsq7Z6XZxs": "../assets/App.tsx_App_component_BDsq7Z6XZxs-CBPfu0_7.js",
-		"s_IcXLrc5UqwU": "../assets/Scoreboard.tsx_Scoreboard_component_IcXLrc5UqwU-DsEiUc-B.js",
-		"s_JW2EPiCEiOI": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_JW2EPiCEiOI-SC-q166q.js",
-		"s_PO80pwp8je0": "../assets/HistoryPanel.tsx_HistoryPanel_component_PO80pwp8je0-By-D1_8X.js",
-		"s_VaDtMGCFjxA": "../assets/GameScreen.tsx_GameScreen_component_VaDtMGCFjxA-Rr_5xxDA.js",
-		"s_XoKsqidUSEQ": "../assets/StatsScreen.tsx_StatRow_component_XoKsqidUSEQ-Bz4JzalJ.js",
-		"s_YWDa0BbEeyI": "../assets/SetupScreen.tsx_SetupScreen_component_YWDa0BbEeyI-CFOngrkB.js",
-		"s_ZQvKK1V1KOg": "../assets/StatsScreen.tsx_StatsScreen_component_ZQvKK1V1KOg-C8BtIxNA.js",
-		"s_ZyFNs40m23c": "../assets/Confetti.tsx_Confetti_component_ZyFNs40m23c-CDaIA3yn.js",
-		"s_f2FHIWngX2E": "../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_f2FHIWngX2E-CxqXYnIS.js",
-		"s_hXuZU8fZq00": "../assets/ExportArtifactView.tsx_ExportArtifactView_component_hXuZU8fZq00-DZv1Yd7c.js",
-		"s_k7s0bu4aUyo": "../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_k7s0bu4aUyo-CSnBkVoc.js",
-		"s_nwa1BvVxOjY": "../assets/Scoreboard.tsx_PlayerPanel_component_nwa1BvVxOjY-YOLh5Vw3.js",
-		"s_o6mOxEjWsMg": "../assets/TileCell.tsx_TileCell_component_o6mOxEjWsMg-BEAObQaC.js",
-		"s_u3s63rt8sUk": "../assets/Toast.tsx_Toast_component_u3s63rt8sUk-piSTtnxJ.js",
-		"s_uDtgd0ueDpk": "../assets/MatchCompleteScreen.tsx_ScoreBadge_component_uDtgd0ueDpk-BZTX3eiq.js"
+		"s_1V00Oeumm3A": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_2_1V00Oeumm3A-Wnk6royE.js",
+		"s_6GkoBWguNM4": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_6GkoBWguNM4-BUmIymI_.js",
+		"s_7KOrS001cXg": "../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_button_onClick_7KOrS001cXg-CnHUuUNj.js",
+		"s_Dei6RWBbu1A": "../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_1_Dei6RWBbu1A-pIYWXuwH.js",
+		"s_EKeb6KqxSI4": "../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_EKeb6KqxSI4-Bmj5Tiy0.js",
+		"s_EnBW0wvCL0s": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_1_EnBW0wvCL0s-BqnJ_NQD.js",
+		"s_F9FALmrlteE": "../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_F9FALmrlteE-CUCgLLqJ.js",
+		"s_FMSYg76N0Zs": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_1_FMSYg76N0Zs-zvSxlpAF.js",
+		"s_IPqaPOjKhxc": "../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_div_div_button_onClick_IPqaPOjKhxc-CSJ0ipNE.js",
+		"s_JyjuChi10ZU": "../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_JyjuChi10ZU-DRVua0Qn.js",
+		"s_L3ob80fuEAU": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_L3ob80fuEAU-B-LPImW_.js",
+		"s_NTmF8n9I0Gs": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_button_onClick_NTmF8n9I0Gs-DWj-X3rd.js",
+		"s_NsvVAXre3TA": "../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_2_NsvVAXre3TA-B5RKvQlu.js",
+		"s_PAuFJflBP1s": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_3_PAuFJflBP1s-DcxJx42D.js",
+		"s_Pj8Co1EUM0g": "../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_1_Pj8Co1EUM0g-DBEEW9Hs.js",
+		"s_PuUk0bQf6G8": "../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_4_PuUk0bQf6G8-D2PMahZY.js",
+		"s_SQNZtBMmRaE": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_SQNZtBMmRaE-CXCB5SNu.js",
+		"s_Sekd3xm9Hlk": "../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_2_Sekd3xm9Hlk-I9Tj2tGS.js",
+		"s_U4ieqgPSVw8": "../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_U4ieqgPSVw8-BzFYBOZI.js",
+		"s_V00XREVXB7M": "../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_V00XREVXB7M-DF1z_qRf.js",
+		"s_ZGMjM8QCA0M": "../assets/ExportArtifactView.tsx_ExportArtifactView_component_div_div_button_onClick_ZGMjM8QCA0M-vAlGtgU6.js",
+		"s_c6GPsnYA3Tw": "../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_1_c6GPsnYA3Tw-CTHUTslY.js",
+		"s_cXBKM6w6Wu4": "../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_div_div_button_onClick_cXBKM6w6Wu4-DU2kvHmT.js",
+		"s_ds9tGvfajnM": "../assets/HistoryPanel.tsx_HistoryPanel_component_div_button_onClick_ds9tGvfajnM-CQ7IBeAF.js",
+		"s_l6qVcIhvLdw": "../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_1_l6qVcIhvLdw-vV4h1jSd.js",
+		"s_nIiEenZlTf8": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_3_nIiEenZlTf8-Ce3nIidH.js",
+		"s_nc38IlLFEBE": "../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_3_nc38IlLFEBE-CcKYMVxn.js",
+		"s_oBdtupCTDg0": "../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_2_oBdtupCTDg0-DNkZnZrH.js",
+		"s_pDhtHaOoBT8": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_2_pDhtHaOoBT8-D23ueVmn.js",
+		"s_psYPS1pW8mw": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_1_psYPS1pW8mw-CrjJaOOE.js",
+		"s_qNFtIiIKwVc": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_button_onClick_qNFtIiIKwVc-lukdr40X.js",
+		"s_vAuKY3MyLMQ": "../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_1_vAuKY3MyLMQ-BxMW-Fbm.js",
+		"s_vD4RAMsccTk": "../assets/TileCell.tsx_TileCell_component_button_onClick_vD4RAMsccTk-D5Cl-z02.js",
+		"s_xc8nAqmejr8": "../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_xc8nAqmejr8-vN4-UhGn.js",
+		"s_xhLlu2KzRFo": "../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_1_xhLlu2KzRFo-yxQskGX-.js",
+		"s_yaN0jRapfjU": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_div_button_onClick_yaN0jRapfjU-qo0vfoHV.js",
+		"s_yiMA0J3pO4U": "../assets/TileCell.tsx_TileCell_component_button_onContextMenu_yiMA0J3pO4U-CbJv0ueI.js",
+		"s_S0h0027RObQ": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_textarea_onInput_S0h0027RObQ-DE_X3P0f.js",
+		"s_hZfT9p0uXk4": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onInput_hZfT9p0uXk4-ipISjJ94.js",
+		"s_S2CSE0Gzo4k": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onBlur_S2CSE0Gzo4k-By0kqcxp.js",
+		"s_8cEnb6VAgJ0": "../assets/HistoryPanel.tsx_HistoryPanel_component_useVisibleTask_1_8cEnb6VAgJ0-CSi3ISct.js",
+		"s_AGMhcRtyECs": "../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_useVisibleTask_AGMhcRtyECs-C4-OuLMK.js",
+		"s_B6SgwAuFFL4": "../assets/Confetti.tsx_Confetti_component_useVisibleTask_B6SgwAuFFL4-D5lAJZs6.js",
+		"s_C69My0oHP0Q": "../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_useVisibleTask_C69My0oHP0Q-BK3DGhp2.js",
+		"s_MvNYQXMjSCo": "../assets/SetupScreen.tsx_SetupScreen_component_useVisibleTask_MvNYQXMjSCo-rPoagKU3.js",
+		"s_NbCPVgdXbTo": "../assets/App.tsx_App_component_useVisibleTask_4_NbCPVgdXbTo-ClBOMAOq.js",
+		"s_SEVuqJn0rLA": "../assets/App.tsx_App_component_useVisibleTask_SEVuqJn0rLA-CSUWgJ8L.js",
+		"s_aBQHsmYNI04": "../assets/App.tsx_App_component_useVisibleTask_2_aBQHsmYNI04-DTwCZY5U.js",
+		"s_brSDhVKHAYs": "../assets/HistoryPanel.tsx_HistoryPanel_component_useVisibleTask_brSDhVKHAYs-DXXaPgCA.js",
+		"s_g6jJ5iiT0cs": "../assets/App.tsx_App_component_useVisibleTask_3_g6jJ5iiT0cs-DQ8v85eR.js",
+		"s_h00hjwWyXnI": "../assets/App.tsx_App_component_useVisibleTask_1_h00hjwWyXnI-KNJvm2Hw.js",
+		"s_0ZDMGydeKSw": "../assets/MatchLogScreen.tsx_MatchLogScreen_component_0ZDMGydeKSw-Bw7oG2YY.js",
+		"s_4vu2fcO2qTg": "../assets/GameBoard.tsx_GameBoard_component_4vu2fcO2qTg-jX5_DnkE.js",
+		"s_BDsq7Z6XZxs": "../assets/App.tsx_App_component_BDsq7Z6XZxs-vxzoZc7F.js",
+		"s_IcXLrc5UqwU": "../assets/Scoreboard.tsx_Scoreboard_component_IcXLrc5UqwU-BzQ5Zz3v.js",
+		"s_JW2EPiCEiOI": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_JW2EPiCEiOI-D27g8Cu5.js",
+		"s_PO80pwp8je0": "../assets/HistoryPanel.tsx_HistoryPanel_component_PO80pwp8je0-mruXnZ4L.js",
+		"s_VaDtMGCFjxA": "../assets/GameScreen.tsx_GameScreen_component_VaDtMGCFjxA-CQvcfR-X.js",
+		"s_XoKsqidUSEQ": "../assets/StatsScreen.tsx_StatRow_component_XoKsqidUSEQ-DGr4hehI.js",
+		"s_YWDa0BbEeyI": "../assets/SetupScreen.tsx_SetupScreen_component_YWDa0BbEeyI-BTkovWzM.js",
+		"s_ZQvKK1V1KOg": "../assets/StatsScreen.tsx_StatsScreen_component_ZQvKK1V1KOg-CmHTcbxU.js",
+		"s_ZyFNs40m23c": "../assets/Confetti.tsx_Confetti_component_ZyFNs40m23c-l9T9tcIz.js",
+		"s_f2FHIWngX2E": "../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_f2FHIWngX2E-BZ738rTx.js",
+		"s_hXuZU8fZq00": "../assets/ExportArtifactView.tsx_ExportArtifactView_component_hXuZU8fZq00-DRi-8h24.js",
+		"s_k7s0bu4aUyo": "../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_k7s0bu4aUyo-CN45y-TT.js",
+		"s_nwa1BvVxOjY": "../assets/Scoreboard.tsx_PlayerPanel_component_nwa1BvVxOjY-CkdmuE4H.js",
+		"s_o6mOxEjWsMg": "../assets/TileCell.tsx_TileCell_component_o6mOxEjWsMg-CU_KqMPL.js",
+		"s_u3s63rt8sUk": "../assets/Toast.tsx_Toast_component_u3s63rt8sUk-Bc6Vk53E.js",
+		"s_uDtgd0ueDpk": "../assets/MatchCompleteScreen.tsx_ScoreBadge_component_uDtgd0ueDpk-Dad8ISjN.js",
+		"s_FPkFDL0ir5k": "../assets/HistoryPanel.tsx_HistoryPanel_component_canUndo_useComputed_FPkFDL0ir5k-BAITRzOx.js",
+		"s_TL8NebUAuPk": "../assets/HistoryPanel.tsx_HistoryPanel_component_current_useComputed_TL8NebUAuPk-D_S9WBjl.js",
+		"s_i2xY4uFpUOU": "../assets/HistoryPanel.tsx_HistoryPanel_component_selected_useComputed_i2xY4uFpUOU-Dt1sHqV9.js",
+		"s_sWgQQHAVx58": "../assets/HistoryPanel.tsx_HistoryPanel_component_canRedo_useComputed_sWgQQHAVx58-CMfZWxY-.js"
 	},
 	"bundles": {
-		"../assets/App-XxpMh6Q-.js": {
+		"../assets/App-AFiihWSP.js": {
 			"size": 948,
-			"total": 62907,
+			"total": 63199,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/App.tsx_App_component_BDsq7Z6XZxs-CBPfu0_7.js"
+				"../assets/App.tsx_App_component_BDsq7Z6XZxs-vxzoZc7F.js"
 			],
 			"origins": [
 				"src/components/App.tsx"
 			],
 			"interactivity": 0
 		},
-		"../assets/App.tsx_App_component_BDsq7Z6XZxs-CBPfu0_7.js": {
+		"../assets/App.tsx_App_component_BDsq7Z6XZxs-vxzoZc7F.js": {
 			"size": 2171,
-			"total": 372936,
+			"total": 374980,
 			"imports": [
-				"../assets/App-XxpMh6Q-.js",
-				"../assets/context-BPISbJT0.js",
-				"../assets/core.min-DGtNB905.js",
+				"../assets/App-AFiihWSP.js",
+				"../assets/context-D9nmXemK.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js",
-				"../assets/MatchCompleteScreen-D_We9DZH.js",
-				"../assets/MatchLogScreen-B-WosNKU.js",
+				"../assets/MatchCompleteScreen-D-ljP-lS.js",
+				"../assets/MatchLogScreen-BrEwWzaQ.js",
 				"../assets/preload-helper-CVfkMyKi.js",
-				"../assets/SetupScreen-BBSdhFIl.js",
-				"../assets/StatsScreen-BiIErQi5.js"
+				"../assets/SetupScreen-BtAWmbiy.js",
+				"../assets/StatsScreen-Cn4J2323.js"
 			],
 			"dynamicImports": [
-				"../assets/App.tsx_App_component_useVisibleTask_1_h00hjwWyXnI-4qenxkAF.js",
-				"../assets/App.tsx_App_component_useVisibleTask_2_aBQHsmYNI04-BYblDy1p.js",
-				"../assets/App.tsx_App_component_useVisibleTask_3_g6jJ5iiT0cs-7TeMWrBn.js",
-				"../assets/App.tsx_App_component_useVisibleTask_4_NbCPVgdXbTo-DElO4DCM.js",
-				"../assets/App.tsx_App_component_useVisibleTask_SEVuqJn0rLA-CRNUeNpq.js",
-				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_JW2EPiCEiOI-SC-q166q.js",
-				"../assets/GameScreen.tsx_GameScreen_component_VaDtMGCFjxA-Rr_5xxDA.js",
-				"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_f2FHIWngX2E-CxqXYnIS.js",
-				"../assets/Toast.tsx_Toast_component_u3s63rt8sUk-piSTtnxJ.js"
+				"../assets/App.tsx_App_component_useVisibleTask_1_h00hjwWyXnI-KNJvm2Hw.js",
+				"../assets/App.tsx_App_component_useVisibleTask_2_aBQHsmYNI04-DTwCZY5U.js",
+				"../assets/App.tsx_App_component_useVisibleTask_3_g6jJ5iiT0cs-DQ8v85eR.js",
+				"../assets/App.tsx_App_component_useVisibleTask_4_NbCPVgdXbTo-ClBOMAOq.js",
+				"../assets/App.tsx_App_component_useVisibleTask_SEVuqJn0rLA-CSUWgJ8L.js",
+				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_JW2EPiCEiOI-D27g8Cu5.js",
+				"../assets/GameScreen.tsx_GameScreen_component_VaDtMGCFjxA-CQvcfR-X.js",
+				"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_f2FHIWngX2E-BZ738rTx.js",
+				"../assets/Toast.tsx_Toast_component_u3s63rt8sUk-Bc6Vk53E.js"
 			],
 			"origins": [
 				"src/components/App.tsx_App_component_BDsq7Z6XZxs.js",
@@ -146,11 +150,11 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/App.tsx_App_component_useVisibleTask_1_h00hjwWyXnI-4qenxkAF.js": {
+		"../assets/App.tsx_App_component_useVisibleTask_1_h00hjwWyXnI-KNJvm2Hw.js": {
 			"size": 7193,
-			"total": 67898,
+			"total": 68190,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -162,11 +166,11 @@
 			],
 			"interactivity": 3
 		},
-		"../assets/App.tsx_App_component_useVisibleTask_2_aBQHsmYNI04-BYblDy1p.js": {
+		"../assets/App.tsx_App_component_useVisibleTask_2_aBQHsmYNI04-DTwCZY5U.js": {
 			"size": 800,
-			"total": 49708,
+			"total": 50000,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/storage-CHjNb0ES.js"
 			],
 			"origins": [
@@ -177,11 +181,11 @@
 			],
 			"interactivity": 3
 		},
-		"../assets/App.tsx_App_component_useVisibleTask_3_g6jJ5iiT0cs-7TeMWrBn.js": {
+		"../assets/App.tsx_App_component_useVisibleTask_3_g6jJ5iiT0cs-DQ8v85eR.js": {
 			"size": 411,
-			"total": 61116,
+			"total": 61408,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -192,11 +196,11 @@
 			],
 			"interactivity": 3
 		},
-		"../assets/App.tsx_App_component_useVisibleTask_4_NbCPVgdXbTo-DElO4DCM.js": {
+		"../assets/App.tsx_App_component_useVisibleTask_4_NbCPVgdXbTo-ClBOMAOq.js": {
 			"size": 321,
-			"total": 61026,
+			"total": 61318,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -207,11 +211,11 @@
 			],
 			"interactivity": 3
 		},
-		"../assets/App.tsx_App_component_useVisibleTask_SEVuqJn0rLA-CRNUeNpq.js": {
+		"../assets/App.tsx_App_component_useVisibleTask_SEVuqJn0rLA-CSUWgJ8L.js": {
 			"size": 242,
-			"total": 49150,
+			"total": 49442,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/storage-CHjNb0ES.js"
 			],
 			"origins": [
@@ -230,26 +234,26 @@
 			],
 			"interactivity": 0
 		},
-		"../assets/Confetti-BLeo2UXm.js": {
+		"../assets/Confetti-C0aLHTr7.js": {
 			"size": 516,
-			"total": 49619,
+			"total": 49911,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/Confetti.tsx_Confetti_component_ZyFNs40m23c-CDaIA3yn.js"
+				"../assets/Confetti.tsx_Confetti_component_ZyFNs40m23c-l9T9tcIz.js"
 			],
 			"origins": [
 				"src/components/Confetti.tsx"
 			],
 			"interactivity": 0
 		},
-		"../assets/Confetti.tsx_Confetti_component_useVisibleTask_B6SgwAuFFL4-BAaqjxCG.js": {
+		"../assets/Confetti.tsx_Confetti_component_useVisibleTask_B6SgwAuFFL4-D5lAJZs6.js": {
 			"size": 244,
-			"total": 48093,
+			"total": 48385,
 			"imports": [
-				"../assets/core.min-DGtNB905.js"
+				"../assets/core.min-DVALGa4Q.js"
 			],
 			"origins": [
 				"src/components/Confetti.tsx_Confetti_component_useVisibleTask_B6SgwAuFFL4.js"
@@ -259,16 +263,16 @@
 			],
 			"interactivity": 3
 		},
-		"../assets/Confetti.tsx_Confetti_component_ZyFNs40m23c-CDaIA3yn.js": {
+		"../assets/Confetti.tsx_Confetti_component_ZyFNs40m23c-l9T9tcIz.js": {
 			"size": 806,
-			"total": 99528,
+			"total": 100112,
 			"imports": [
-				"../assets/Confetti-BLeo2UXm.js",
-				"../assets/core.min-DGtNB905.js",
+				"../assets/Confetti-C0aLHTr7.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/Confetti.tsx_Confetti_component_useVisibleTask_B6SgwAuFFL4-BAaqjxCG.js"
+				"../assets/Confetti.tsx_Confetti_component_useVisibleTask_B6SgwAuFFL4-D5lAJZs6.js"
 			],
 			"origins": [
 				"src/components/Confetti.tsx_Confetti_component_ZyFNs40m23c.js"
@@ -278,45 +282,45 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/context-BPISbJT0.js": {
+		"../assets/context-D9nmXemK.js": {
 			"size": 83,
-			"total": 47932,
+			"total": 48224,
 			"imports": [
-				"../assets/core.min-DGtNB905.js"
+				"../assets/core.min-DVALGa4Q.js"
 			],
 			"origins": [
 				"src/context.ts"
 			],
 			"interactivity": 0
 		},
-		"../assets/core.min-DGtNB905.js": {
-			"size": 47849,
-			"total": 47849,
+		"../assets/core.min-DVALGa4Q.js": {
+			"size": 48141,
+			"total": 48141,
 			"origins": [
 				"node_modules/@builder.io/qwik/dist/core.min.mjs"
 			],
 			"interactivity": 0
 		},
-		"../assets/ExportArtifactView-Cy6LyExq.js": {
+		"../assets/ExportArtifactView-C6Pc6emC.js": {
 			"size": 247,
-			"total": 49350,
+			"total": 49642,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/ExportArtifactView.tsx_ExportArtifactView_component_hXuZU8fZq00-DZv1Yd7c.js"
+				"../assets/ExportArtifactView.tsx_ExportArtifactView_component_hXuZU8fZq00-DRi-8h24.js"
 			],
 			"origins": [
 				"src/components/ExportArtifactView.tsx"
 			],
 			"interactivity": 0
 		},
-		"../assets/ExportArtifactView.tsx_ExportArtifactView_component_div_div_button_onClick_ZGMjM8QCA0M-BuJPJsGx.js": {
+		"../assets/ExportArtifactView.tsx_ExportArtifactView_component_div_div_button_onClick_ZGMjM8QCA0M-vAlGtgU6.js": {
 			"size": 201,
-			"total": 60906,
+			"total": 61198,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -327,16 +331,16 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/ExportArtifactView.tsx_ExportArtifactView_component_hXuZU8fZq00-DZv1Yd7c.js": {
+		"../assets/ExportArtifactView.tsx_ExportArtifactView_component_hXuZU8fZq00-DRi-8h24.js": {
 			"size": 2784,
-			"total": 99819,
+			"total": 100403,
 			"imports": [
-				"../assets/context-BPISbJT0.js",
-				"../assets/core.min-DGtNB905.js",
+				"../assets/context-D9nmXemK.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/ExportArtifactView.tsx_ExportArtifactView_component_div_div_button_onClick_ZGMjM8QCA0M-BuJPJsGx.js"
+				"../assets/ExportArtifactView.tsx_ExportArtifactView_component_div_div_button_onClick_ZGMjM8QCA0M-vAlGtgU6.js"
 			],
 			"origins": [
 				"src/components/ExportArtifactView.tsx_ExportArtifactView_component_hXuZU8fZq00.js"
@@ -346,11 +350,11 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_button_onClick_qNFtIiIKwVc-EJ34CGHd.js": {
+		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_button_onClick_qNFtIiIKwVc-lukdr40X.js": {
 			"size": 186,
-			"total": 60891,
+			"total": 61183,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -361,11 +365,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_button_onClick_NTmF8n9I0Gs-CFTRxl9o.js": {
+		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_button_onClick_NTmF8n9I0Gs-DWj-X3rd.js": {
 			"size": 186,
-			"total": 60891,
+			"total": 61183,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -376,11 +380,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_1_FMSYg76N0Zs--RWAM19A.js": {
+		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_1_FMSYg76N0Zs-zvSxlpAF.js": {
 			"size": 209,
-			"total": 60914,
+			"total": 61206,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -391,11 +395,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_2_1V00Oeumm3A-BOAgT0bG.js": {
+		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_2_1V00Oeumm3A-Wnk6royE.js": {
 			"size": 186,
-			"total": 60891,
+			"total": 61183,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -406,11 +410,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_3_nIiEenZlTf8-CuezC2ut.js": {
+		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_3_nIiEenZlTf8-Ce3nIidH.js": {
 			"size": 223,
-			"total": 60928,
+			"total": 61220,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -421,11 +425,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_SQNZtBMmRaE-CTf0dffC.js": {
+		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_SQNZtBMmRaE-CXCB5SNu.js": {
 			"size": 190,
-			"total": 60895,
+			"total": 61187,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -436,11 +440,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_textarea_onInput_S0h0027RObQ-B2fB_i7j.js": {
+		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_textarea_onInput_S0h0027RObQ-DE_X3P0f.js": {
 			"size": 157,
-			"total": 48006,
+			"total": 48298,
 			"imports": [
-				"../assets/core.min-DGtNB905.js"
+				"../assets/core.min-DVALGa4Q.js"
 			],
 			"origins": [
 				"src/components/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_textarea_onInput_S0h0027RObQ.js"
@@ -450,24 +454,24 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_JW2EPiCEiOI-SC-q166q.js": {
+		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_JW2EPiCEiOI-D27g8Cu5.js": {
 			"size": 4363,
-			"total": 163604,
+			"total": 164480,
 			"imports": [
-				"../assets/context-BPISbJT0.js",
-				"../assets/core.min-DGtNB905.js",
-				"../assets/ExportArtifactView-Cy6LyExq.js",
+				"../assets/context-D9nmXemK.js",
+				"../assets/core.min-DVALGa4Q.js",
+				"../assets/ExportArtifactView-C6Pc6emC.js",
 				"../assets/gameLogic-BOGBTXck.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_button_onClick_qNFtIiIKwVc-EJ34CGHd.js",
-				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_button_onClick_NTmF8n9I0Gs-CFTRxl9o.js",
-				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_1_FMSYg76N0Zs--RWAM19A.js",
-				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_2_1V00Oeumm3A-BOAgT0bG.js",
-				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_3_nIiEenZlTf8-CuezC2ut.js",
-				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_SQNZtBMmRaE-CTf0dffC.js",
-				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_textarea_onInput_S0h0027RObQ-B2fB_i7j.js"
+				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_button_onClick_qNFtIiIKwVc-lukdr40X.js",
+				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_button_onClick_NTmF8n9I0Gs-DWj-X3rd.js",
+				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_1_FMSYg76N0Zs-zvSxlpAF.js",
+				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_2_1V00Oeumm3A-Wnk6royE.js",
+				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_3_nIiEenZlTf8-Ce3nIidH.js",
+				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_SQNZtBMmRaE-CXCB5SNu.js",
+				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_textarea_onInput_S0h0027RObQ-DE_X3P0f.js"
 			],
 			"origins": [
 				"src/components/ExportCenterScreen.tsx_ExportCenterScreen_component_JW2EPiCEiOI.js"
@@ -477,14 +481,14 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/GameBoard.tsx_GameBoard_component_4vu2fcO2qTg-oDqHIhE-.js": {
+		"../assets/GameBoard.tsx_GameBoard_component_4vu2fcO2qTg-jX5_DnkE.js": {
 			"size": 700,
-			"total": 147159,
+			"total": 148035,
 			"imports": [
-				"../assets/context-BPISbJT0.js",
-				"../assets/core.min-DGtNB905.js",
+				"../assets/context-D9nmXemK.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/preload-helper-CVfkMyKi.js",
-				"../assets/TileCell-CMG09Sac.js"
+				"../assets/TileCell-Cj6K_jMk.js"
 			],
 			"origins": [
 				"src/components/GameBoard.tsx_GameBoard_component_4vu2fcO2qTg.js"
@@ -502,11 +506,11 @@
 			],
 			"interactivity": 0
 		},
-		"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_1_Dei6RWBbu1A-BuzF0xYk.js": {
+		"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_1_Dei6RWBbu1A-pIYWXuwH.js": {
 			"size": 309,
-			"total": 61014,
+			"total": 61306,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -517,11 +521,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_2_oBdtupCTDg0-DXRqRM5G.js": {
+		"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_2_oBdtupCTDg0-DNkZnZrH.js": {
 			"size": 181,
-			"total": 60886,
+			"total": 61178,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -532,11 +536,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_3_nc38IlLFEBE-MPn9EQQr.js": {
+		"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_3_nc38IlLFEBE-CcKYMVxn.js": {
 			"size": 266,
-			"total": 48115,
+			"total": 48407,
 			"imports": [
-				"../assets/core.min-DGtNB905.js"
+				"../assets/core.min-DVALGa4Q.js"
 			],
 			"origins": [
 				"src/components/GameScreen.tsx_GameScreen_component_div_div_button_onClick_3_nc38IlLFEBE.js"
@@ -546,11 +550,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_4_PuUk0bQf6G8-D05MCvvb.js": {
+		"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_4_PuUk0bQf6G8-D2PMahZY.js": {
 			"size": 192,
-			"total": 48041,
+			"total": 48333,
 			"imports": [
-				"../assets/core.min-DGtNB905.js"
+				"../assets/core.min-DVALGa4Q.js"
 			],
 			"origins": [
 				"src/components/GameScreen.tsx_GameScreen_component_div_div_button_onClick_4_PuUk0bQf6G8.js"
@@ -560,11 +564,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_V00XREVXB7M-Czge6nzr.js": {
+		"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_V00XREVXB7M-DF1z_qRf.js": {
 			"size": 249,
-			"total": 48098,
+			"total": 48390,
 			"imports": [
-				"../assets/core.min-DGtNB905.js"
+				"../assets/core.min-DVALGa4Q.js"
 			],
 			"origins": [
 				"src/components/GameScreen.tsx_GameScreen_component_div_div_button_onClick_V00XREVXB7M.js"
@@ -574,11 +578,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_1_xhLlu2KzRFo-C8RejQdT.js": {
+		"../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_1_xhLlu2KzRFo-yxQskGX-.js": {
 			"size": 198,
-			"total": 60903,
+			"total": 61195,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -589,11 +593,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_2_Sekd3xm9Hlk-CvaGrUPR.js": {
+		"../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_2_Sekd3xm9Hlk-I9Tj2tGS.js": {
 			"size": 161,
-			"total": 48010,
+			"total": 48302,
 			"imports": [
-				"../assets/core.min-DGtNB905.js"
+				"../assets/core.min-DVALGa4Q.js"
 			],
 			"origins": [
 				"src/components/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_2_Sekd3xm9Hlk.js"
@@ -603,11 +607,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_U4ieqgPSVw8-BnoJGKmS.js": {
+		"../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_U4ieqgPSVw8-BzFYBOZI.js": {
 			"size": 194,
-			"total": 60899,
+			"total": 61191,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -618,27 +622,27 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/GameScreen.tsx_GameScreen_component_VaDtMGCFjxA-Rr_5xxDA.js": {
+		"../assets/GameScreen.tsx_GameScreen_component_VaDtMGCFjxA-CQvcfR-X.js": {
 			"size": 6585,
-			"total": 215395,
+			"total": 216563,
 			"imports": [
-				"../assets/context-BPISbJT0.js",
-				"../assets/core.min-DGtNB905.js",
+				"../assets/context-D9nmXemK.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js",
-				"../assets/HistoryPanel-XlnDgQrx.js",
+				"../assets/HistoryPanel-BqJtEZEk.js",
 				"../assets/preload-helper-CVfkMyKi.js",
-				"../assets/Scoreboard-C2s-1TiY.js"
+				"../assets/Scoreboard-Hmi_j_EF.js"
 			],
 			"dynamicImports": [
-				"../assets/GameBoard.tsx_GameBoard_component_4vu2fcO2qTg-oDqHIhE-.js",
-				"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_1_Dei6RWBbu1A-BuzF0xYk.js",
-				"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_2_oBdtupCTDg0-DXRqRM5G.js",
-				"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_3_nc38IlLFEBE-MPn9EQQr.js",
-				"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_4_PuUk0bQf6G8-D05MCvvb.js",
-				"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_V00XREVXB7M-Czge6nzr.js",
-				"../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_1_xhLlu2KzRFo-C8RejQdT.js",
-				"../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_2_Sekd3xm9Hlk-CvaGrUPR.js",
-				"../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_U4ieqgPSVw8-BnoJGKmS.js"
+				"../assets/GameBoard.tsx_GameBoard_component_4vu2fcO2qTg-jX5_DnkE.js",
+				"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_1_Dei6RWBbu1A-pIYWXuwH.js",
+				"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_2_oBdtupCTDg0-DNkZnZrH.js",
+				"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_3_nc38IlLFEBE-CcKYMVxn.js",
+				"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_4_PuUk0bQf6G8-D2PMahZY.js",
+				"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_V00XREVXB7M-DF1z_qRf.js",
+				"../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_1_xhLlu2KzRFo-yxQskGX-.js",
+				"../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_2_Sekd3xm9Hlk-I9Tj2tGS.js",
+				"../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_U4ieqgPSVw8-BzFYBOZI.js"
 			],
 			"origins": [
 				"src/components/GameBoard.tsx",
@@ -649,26 +653,68 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/HistoryPanel-XlnDgQrx.js": {
+		"../assets/HistoryPanel-BqJtEZEk.js": {
 			"size": 369,
-			"total": 49472,
+			"total": 49764,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/HistoryPanel.tsx_HistoryPanel_component_PO80pwp8je0-By-D1_8X.js"
+				"../assets/HistoryPanel.tsx_HistoryPanel_component_PO80pwp8je0-mruXnZ4L.js"
 			],
 			"origins": [
 				"src/components/HistoryPanel.tsx"
 			],
 			"interactivity": 0
 		},
-		"../assets/HistoryPanel.tsx_HistoryPanel_component_div_button_onClick_ds9tGvfajnM--r5LFgRb.js": {
-			"size": 220,
-			"total": 60925,
+		"../assets/HistoryPanel.tsx_HistoryPanel_component_canRedo_useComputed_sWgQQHAVx58-CMfZWxY-.js": {
+			"size": 168,
+			"total": 48309,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js"
+			],
+			"origins": [
+				"src/components/HistoryPanel.tsx_HistoryPanel_component_canRedo_useComputed_sWgQQHAVx58.js"
+			],
+			"symbols": [
+				"s_sWgQQHAVx58"
+			],
+			"interactivity": 3
+		},
+		"../assets/HistoryPanel.tsx_HistoryPanel_component_canUndo_useComputed_FPkFDL0ir5k-BAITRzOx.js": {
+			"size": 171,
+			"total": 48312,
+			"imports": [
+				"../assets/core.min-DVALGa4Q.js"
+			],
+			"origins": [
+				"src/components/HistoryPanel.tsx_HistoryPanel_component_canUndo_useComputed_FPkFDL0ir5k.js"
+			],
+			"symbols": [
+				"s_FPkFDL0ir5k"
+			],
+			"interactivity": 3
+		},
+		"../assets/HistoryPanel.tsx_HistoryPanel_component_current_useComputed_TL8NebUAuPk-D_S9WBjl.js": {
+			"size": 187,
+			"total": 48328,
+			"imports": [
+				"../assets/core.min-DVALGa4Q.js"
+			],
+			"origins": [
+				"src/components/HistoryPanel.tsx_HistoryPanel_component_current_useComputed_TL8NebUAuPk.js"
+			],
+			"symbols": [
+				"s_TL8NebUAuPk"
+			],
+			"interactivity": 3
+		},
+		"../assets/HistoryPanel.tsx_HistoryPanel_component_div_button_onClick_ds9tGvfajnM-CQ7IBeAF.js": {
+			"size": 220,
+			"total": 61217,
+			"imports": [
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -679,11 +725,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_button_onClick_7KOrS001cXg-DBv0RpfX.js": {
+		"../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_button_onClick_7KOrS001cXg-CnHUuUNj.js": {
 			"size": 157,
-			"total": 48006,
+			"total": 48298,
 			"imports": [
-				"../assets/core.min-DGtNB905.js"
+				"../assets/core.min-DVALGa4Q.js"
 			],
 			"origins": [
 				"src/components/HistoryPanel.tsx_HistoryPanel_component_div_div_button_onClick_7KOrS001cXg.js"
@@ -693,11 +739,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_1_vAuKY3MyLMQ-C2EwBNtP.js": {
+		"../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_1_vAuKY3MyLMQ-BxMW-Fbm.js": {
 			"size": 186,
-			"total": 60891,
+			"total": 61183,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -708,11 +754,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_F9FALmrlteE-C5xiT8Lk.js": {
+		"../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_F9FALmrlteE-CUCgLLqJ.js": {
 			"size": 186,
-			"total": 60891,
+			"total": 61183,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -723,22 +769,26 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/HistoryPanel.tsx_HistoryPanel_component_PO80pwp8je0-By-D1_8X.js": {
-			"size": 4278,
-			"total": 150785,
+		"../assets/HistoryPanel.tsx_HistoryPanel_component_PO80pwp8je0-mruXnZ4L.js": {
+			"size": 4890,
+			"total": 152273,
 			"imports": [
-				"../assets/context-BPISbJT0.js",
-				"../assets/core.min-DGtNB905.js",
-				"../assets/HistoryPanel-XlnDgQrx.js",
+				"../assets/context-D9nmXemK.js",
+				"../assets/core.min-DVALGa4Q.js",
+				"../assets/HistoryPanel-BqJtEZEk.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/HistoryPanel.tsx_HistoryPanel_component_div_button_onClick_ds9tGvfajnM--r5LFgRb.js",
-				"../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_button_onClick_7KOrS001cXg-DBv0RpfX.js",
-				"../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_1_vAuKY3MyLMQ-C2EwBNtP.js",
-				"../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_F9FALmrlteE-C5xiT8Lk.js",
-				"../assets/HistoryPanel.tsx_HistoryPanel_component_useVisibleTask_1_8cEnb6VAgJ0-C6BJy0gh.js",
-				"../assets/HistoryPanel.tsx_HistoryPanel_component_useVisibleTask_brSDhVKHAYs-T4bxmL42.js"
+				"../assets/HistoryPanel.tsx_HistoryPanel_component_canRedo_useComputed_sWgQQHAVx58-CMfZWxY-.js",
+				"../assets/HistoryPanel.tsx_HistoryPanel_component_canUndo_useComputed_FPkFDL0ir5k-BAITRzOx.js",
+				"../assets/HistoryPanel.tsx_HistoryPanel_component_current_useComputed_TL8NebUAuPk-D_S9WBjl.js",
+				"../assets/HistoryPanel.tsx_HistoryPanel_component_div_button_onClick_ds9tGvfajnM-CQ7IBeAF.js",
+				"../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_button_onClick_7KOrS001cXg-CnHUuUNj.js",
+				"../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_1_vAuKY3MyLMQ-BxMW-Fbm.js",
+				"../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_F9FALmrlteE-CUCgLLqJ.js",
+				"../assets/HistoryPanel.tsx_HistoryPanel_component_selected_useComputed_i2xY4uFpUOU-Dt1sHqV9.js",
+				"../assets/HistoryPanel.tsx_HistoryPanel_component_useVisibleTask_1_8cEnb6VAgJ0-CSi3ISct.js",
+				"../assets/HistoryPanel.tsx_HistoryPanel_component_useVisibleTask_brSDhVKHAYs-DXXaPgCA.js"
 			],
 			"origins": [
 				"src/components/HistoryPanel.tsx_HistoryPanel_component_PO80pwp8je0.js"
@@ -748,11 +798,25 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/HistoryPanel.tsx_HistoryPanel_component_useVisibleTask_1_8cEnb6VAgJ0-C6BJy0gh.js": {
-			"size": 359,
-			"total": 48208,
+		"../assets/HistoryPanel.tsx_HistoryPanel_component_selected_useComputed_i2xY4uFpUOU-Dt1sHqV9.js": {
+			"size": 188,
+			"total": 48329,
 			"imports": [
-				"../assets/core.min-DGtNB905.js"
+				"../assets/core.min-DVALGa4Q.js"
+			],
+			"origins": [
+				"src/components/HistoryPanel.tsx_HistoryPanel_component_selected_useComputed_i2xY4uFpUOU.js"
+			],
+			"symbols": [
+				"s_i2xY4uFpUOU"
+			],
+			"interactivity": 3
+		},
+		"../assets/HistoryPanel.tsx_HistoryPanel_component_useVisibleTask_1_8cEnb6VAgJ0-CSi3ISct.js": {
+			"size": 359,
+			"total": 48500,
+			"imports": [
+				"../assets/core.min-DVALGa4Q.js"
 			],
 			"origins": [
 				"src/components/HistoryPanel.tsx_HistoryPanel_component_useVisibleTask_1_8cEnb6VAgJ0.js"
@@ -762,11 +826,11 @@
 			],
 			"interactivity": 3
 		},
-		"../assets/HistoryPanel.tsx_HistoryPanel_component_useVisibleTask_brSDhVKHAYs-T4bxmL42.js": {
+		"../assets/HistoryPanel.tsx_HistoryPanel_component_useVisibleTask_brSDhVKHAYs-DXXaPgCA.js": {
 			"size": 389,
-			"total": 48238,
+			"total": 48530,
 			"imports": [
-				"../assets/core.min-DGtNB905.js"
+				"../assets/core.min-DVALGa4Q.js"
 			],
 			"origins": [
 				"src/components/HistoryPanel.tsx_HistoryPanel_component_useVisibleTask_brSDhVKHAYs.js"
@@ -776,12 +840,12 @@
 			],
 			"interactivity": 3
 		},
-		"../assets/index-InnUVP28.js": {
+		"../assets/index-DErrKGQv.js": {
 			"size": 3566,
-			"total": 128432,
+			"total": 129016,
 			"imports": [
-				"../assets/App-XxpMh6Q-.js",
-				"../assets/core.min-DGtNB905.js",
+				"../assets/App-AFiihWSP.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
@@ -793,27 +857,27 @@
 			],
 			"interactivity": 0
 		},
-		"../assets/MatchCompleteScreen-D_We9DZH.js": {
+		"../assets/MatchCompleteScreen-D-ljP-lS.js": {
 			"size": 375,
-			"total": 49478,
+			"total": 49770,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_k7s0bu4aUyo-CSnBkVoc.js",
-				"../assets/MatchCompleteScreen.tsx_ScoreBadge_component_uDtgd0ueDpk-BZTX3eiq.js"
+				"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_k7s0bu4aUyo-CN45y-TT.js",
+				"../assets/MatchCompleteScreen.tsx_ScoreBadge_component_uDtgd0ueDpk-Dad8ISjN.js"
 			],
 			"origins": [
 				"src/components/MatchCompleteScreen.tsx"
 			],
 			"interactivity": 0
 		},
-		"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_1_l6qVcIhvLdw-CS-RgLWm.js": {
+		"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_1_l6qVcIhvLdw-vV4h1jSd.js": {
 			"size": 176,
-			"total": 48025,
+			"total": 48317,
 			"imports": [
-				"../assets/core.min-DGtNB905.js"
+				"../assets/core.min-DVALGa4Q.js"
 			],
 			"origins": [
 				"src/components/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_1_l6qVcIhvLdw.js"
@@ -823,11 +887,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_2_NsvVAXre3TA-B1sOwpeY.js": {
+		"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_2_NsvVAXre3TA-B5RKvQlu.js": {
 			"size": 204,
-			"total": 60909,
+			"total": 61201,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -838,11 +902,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_xc8nAqmejr8-BVhsT_Tp.js": {
+		"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_xc8nAqmejr8-vN4-UhGn.js": {
 			"size": 179,
-			"total": 60884,
+			"total": 61176,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -853,22 +917,22 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_k7s0bu4aUyo-CSnBkVoc.js": {
+		"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_k7s0bu4aUyo-CN45y-TT.js": {
 			"size": 3982,
-			"total": 249464,
+			"total": 250924,
 			"imports": [
-				"../assets/Confetti-BLeo2UXm.js",
-				"../assets/context-BPISbJT0.js",
-				"../assets/core.min-DGtNB905.js",
-				"../assets/ExportArtifactView-Cy6LyExq.js",
-				"../assets/MatchCompleteScreen-D_We9DZH.js",
+				"../assets/Confetti-C0aLHTr7.js",
+				"../assets/context-D9nmXemK.js",
+				"../assets/core.min-DVALGa4Q.js",
+				"../assets/ExportArtifactView-C6Pc6emC.js",
+				"../assets/MatchCompleteScreen-D-ljP-lS.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_1_l6qVcIhvLdw-CS-RgLWm.js",
-				"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_2_NsvVAXre3TA-B1sOwpeY.js",
-				"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_xc8nAqmejr8-BVhsT_Tp.js",
-				"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_useVisibleTask_AGMhcRtyECs-C43tTuxN.js"
+				"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_1_l6qVcIhvLdw-vV4h1jSd.js",
+				"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_2_NsvVAXre3TA-B5RKvQlu.js",
+				"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_xc8nAqmejr8-vN4-UhGn.js",
+				"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_useVisibleTask_AGMhcRtyECs-C4-OuLMK.js"
 			],
 			"origins": [
 				"src/components/MatchCompleteScreen.tsx_MatchCompleteScreen_component_k7s0bu4aUyo.js"
@@ -878,11 +942,11 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_useVisibleTask_AGMhcRtyECs-C43tTuxN.js": {
+		"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_useVisibleTask_AGMhcRtyECs-C4-OuLMK.js": {
 			"size": 711,
-			"total": 48560,
+			"total": 48852,
 			"imports": [
-				"../assets/core.min-DGtNB905.js"
+				"../assets/core.min-DVALGa4Q.js"
 			],
 			"origins": [
 				"src/components/MatchCompleteScreen.tsx_MatchCompleteScreen_component_useVisibleTask_AGMhcRtyECs.js"
@@ -892,11 +956,11 @@
 			],
 			"interactivity": 3
 		},
-		"../assets/MatchCompleteScreen.tsx_ScoreBadge_component_uDtgd0ueDpk-BZTX3eiq.js": {
+		"../assets/MatchCompleteScreen.tsx_ScoreBadge_component_uDtgd0ueDpk-Dad8ISjN.js": {
 			"size": 523,
-			"total": 48372,
+			"total": 48664,
 			"imports": [
-				"../assets/core.min-DGtNB905.js"
+				"../assets/core.min-DVALGa4Q.js"
 			],
 			"origins": [
 				"src/components/MatchCompleteScreen.tsx_ScoreBadge_component_uDtgd0ueDpk.js"
@@ -906,35 +970,35 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/MatchLogScreen-B-WosNKU.js": {
+		"../assets/MatchLogScreen-BrEwWzaQ.js": {
 			"size": 348,
-			"total": 49451,
+			"total": 49743,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/MatchLogScreen.tsx_MatchLogScreen_component_0ZDMGydeKSw-SaL-m7LF.js"
+				"../assets/MatchLogScreen.tsx_MatchLogScreen_component_0ZDMGydeKSw-Bw7oG2YY.js"
 			],
 			"origins": [
 				"src/components/MatchLogScreen.tsx"
 			],
 			"interactivity": 0
 		},
-		"../assets/MatchLogScreen.tsx_MatchLogScreen_component_0ZDMGydeKSw-SaL-m7LF.js": {
+		"../assets/MatchLogScreen.tsx_MatchLogScreen_component_0ZDMGydeKSw-Bw7oG2YY.js": {
 			"size": 3233,
-			"total": 199069,
+			"total": 200237,
 			"imports": [
-				"../assets/context-BPISbJT0.js",
-				"../assets/core.min-DGtNB905.js",
-				"../assets/ExportArtifactView-Cy6LyExq.js",
-				"../assets/MatchLogScreen-B-WosNKU.js",
+				"../assets/context-D9nmXemK.js",
+				"../assets/core.min-DVALGa4Q.js",
+				"../assets/ExportArtifactView-C6Pc6emC.js",
+				"../assets/MatchLogScreen-BrEwWzaQ.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_1_Pj8Co1EUM0g-CijXoH82.js",
-				"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_EKeb6KqxSI4-B5IdCvTa.js",
-				"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_div_div_button_onClick_cXBKM6w6Wu4-DhdDKEtL.js"
+				"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_1_Pj8Co1EUM0g-DBEEW9Hs.js",
+				"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_EKeb6KqxSI4-Bmj5Tiy0.js",
+				"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_div_div_button_onClick_cXBKM6w6Wu4-DU2kvHmT.js"
 			],
 			"origins": [
 				"src/components/MatchLogScreen.tsx_MatchLogScreen_component_0ZDMGydeKSw.js"
@@ -944,11 +1008,11 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_1_Pj8Co1EUM0g-CijXoH82.js": {
+		"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_1_Pj8Co1EUM0g-DBEEW9Hs.js": {
 			"size": 186,
-			"total": 60891,
+			"total": 61183,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -959,11 +1023,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_EKeb6KqxSI4-B5IdCvTa.js": {
+		"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_EKeb6KqxSI4-Bmj5Tiy0.js": {
 			"size": 186,
-			"total": 60891,
+			"total": 61183,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -974,11 +1038,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_div_div_button_onClick_cXBKM6w6Wu4-DhdDKEtL.js": {
+		"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_div_div_button_onClick_cXBKM6w6Wu4-DU2kvHmT.js": {
 			"size": 196,
-			"total": 60901,
+			"total": 61193,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -1010,11 +1074,11 @@
 			],
 			"interactivity": 0
 		},
-		"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_div_div_button_onClick_IPqaPOjKhxc-boFlvHgN.js": {
+		"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_div_div_button_onClick_IPqaPOjKhxc-CSJ0ipNE.js": {
 			"size": 179,
-			"total": 60884,
+			"total": 61176,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -1025,17 +1089,17 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_f2FHIWngX2E-CxqXYnIS.js": {
+		"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_f2FHIWngX2E-BZ738rTx.js": {
 			"size": 2646,
-			"total": 99681,
+			"total": 100265,
 			"imports": [
-				"../assets/context-BPISbJT0.js",
-				"../assets/core.min-DGtNB905.js",
+				"../assets/context-D9nmXemK.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_div_div_button_onClick_IPqaPOjKhxc-boFlvHgN.js",
-				"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_useVisibleTask_C69My0oHP0Q-BB0RGhvT.js"
+				"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_div_div_button_onClick_IPqaPOjKhxc-CSJ0ipNE.js",
+				"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_useVisibleTask_C69My0oHP0Q-BK3DGhp2.js"
 			],
 			"origins": [
 				"src/components/RoundResultOverlay.tsx_RoundResultOverlay_component_f2FHIWngX2E.js"
@@ -1045,12 +1109,12 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_useVisibleTask_C69My0oHP0Q-BB0RGhvT.js": {
+		"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_useVisibleTask_C69My0oHP0Q-BK3DGhp2.js": {
 			"size": 807,
-			"total": 62352,
+			"total": 62644,
 			"imports": [
 				"../assets/audio-B74xn9bK.js",
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -1061,27 +1125,27 @@
 			],
 			"interactivity": 3
 		},
-		"../assets/Scoreboard-C2s-1TiY.js": {
+		"../assets/Scoreboard-Hmi_j_EF.js": {
 			"size": 344,
-			"total": 49447,
+			"total": 49739,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/Scoreboard.tsx_PlayerPanel_component_nwa1BvVxOjY-YOLh5Vw3.js",
-				"../assets/Scoreboard.tsx_Scoreboard_component_IcXLrc5UqwU-DsEiUc-B.js"
+				"../assets/Scoreboard.tsx_PlayerPanel_component_nwa1BvVxOjY-CkdmuE4H.js",
+				"../assets/Scoreboard.tsx_Scoreboard_component_IcXLrc5UqwU-BzQ5Zz3v.js"
 			],
 			"origins": [
 				"src/components/Scoreboard.tsx"
 			],
 			"interactivity": 0
 		},
-		"../assets/Scoreboard.tsx_PlayerPanel_component_nwa1BvVxOjY-YOLh5Vw3.js": {
+		"../assets/Scoreboard.tsx_PlayerPanel_component_nwa1BvVxOjY-CkdmuE4H.js": {
 			"size": 1503,
-			"total": 62208,
+			"total": 62500,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -1092,14 +1156,14 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/Scoreboard.tsx_Scoreboard_component_IcXLrc5UqwU-DsEiUc-B.js": {
+		"../assets/Scoreboard.tsx_Scoreboard_component_IcXLrc5UqwU-BzQ5Zz3v.js": {
 			"size": 1542,
-			"total": 148024,
+			"total": 148900,
 			"imports": [
-				"../assets/context-BPISbJT0.js",
-				"../assets/core.min-DGtNB905.js",
+				"../assets/context-D9nmXemK.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/preload-helper-CVfkMyKi.js",
-				"../assets/Scoreboard-C2s-1TiY.js"
+				"../assets/Scoreboard-Hmi_j_EF.js"
 			],
 			"origins": [
 				"src/components/Scoreboard.tsx_Scoreboard_component_IcXLrc5UqwU.js"
@@ -1109,26 +1173,26 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/SetupScreen-BBSdhFIl.js": {
+		"../assets/SetupScreen-BtAWmbiy.js": {
 			"size": 433,
-			"total": 49536,
+			"total": 49828,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/SetupScreen.tsx_SetupScreen_component_YWDa0BbEeyI-CFOngrkB.js"
+				"../assets/SetupScreen.tsx_SetupScreen_component_YWDa0BbEeyI-BTkovWzM.js"
 			],
 			"origins": [
 				"src/components/SetupScreen.tsx"
 			],
 			"interactivity": 0
 		},
-		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_1_EnBW0wvCL0s-COkEuotT.js": {
+		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_1_EnBW0wvCL0s-BqnJ_NQD.js": {
 			"size": 194,
-			"total": 60899,
+			"total": 61191,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -1139,11 +1203,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_2_pDhtHaOoBT8-QAlG0I51.js": {
+		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_2_pDhtHaOoBT8-D23ueVmn.js": {
 			"size": 904,
-			"total": 61609,
+			"total": 61901,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -1154,11 +1218,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_3_PAuFJflBP1s-6aluu93t.js": {
+		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_3_PAuFJflBP1s-DcxJx42D.js": {
 			"size": 161,
-			"total": 48010,
+			"total": 48302,
 			"imports": [
-				"../assets/core.min-DGtNB905.js"
+				"../assets/core.min-DVALGa4Q.js"
 			],
 			"origins": [
 				"src/components/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_3_PAuFJflBP1s.js"
@@ -1168,11 +1232,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_6GkoBWguNM4-D_FOq8T2.js": {
-			"size": 392,
-			"total": 61097,
+		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_6GkoBWguNM4-BUmIymI_.js": {
+			"size": 397,
+			"total": 61394,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -1183,11 +1247,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_1_psYPS1pW8mw-y0fHOf6r.js": {
+		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_1_psYPS1pW8mw-CrjJaOOE.js": {
 			"size": 202,
-			"total": 60907,
+			"total": 61199,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -1198,11 +1262,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_L3ob80fuEAU-jXbPVHqD.js": {
+		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_L3ob80fuEAU-B-LPImW_.js": {
 			"size": 198,
-			"total": 60903,
+			"total": 61195,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -1213,11 +1277,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_div_button_onClick_yaN0jRapfjU-K6PWGQYw.js": {
+		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_div_button_onClick_yaN0jRapfjU-qo0vfoHV.js": {
 			"size": 181,
-			"total": 48030,
+			"total": 48322,
 			"imports": [
-				"../assets/core.min-DGtNB905.js"
+				"../assets/core.min-DVALGa4Q.js"
 			],
 			"origins": [
 				"src/components/SetupScreen.tsx_SetupScreen_component_div_div_div_div_button_onClick_yaN0jRapfjU.js"
@@ -1227,11 +1291,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onBlur_S2CSE0Gzo4k-DkKwgz1L.js": {
-			"size": 241,
-			"total": 48090,
+		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onBlur_S2CSE0Gzo4k-By0kqcxp.js": {
+			"size": 246,
+			"total": 48387,
 			"imports": [
-				"../assets/core.min-DGtNB905.js"
+				"../assets/core.min-DVALGa4Q.js"
 			],
 			"origins": [
 				"src/components/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onBlur_S2CSE0Gzo4k.js"
@@ -1241,11 +1305,11 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onInput_hZfT9p0uXk4-B0d8H0Ga.js": {
-			"size": 274,
-			"total": 48123,
+		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onInput_hZfT9p0uXk4-ipISjJ94.js": {
+			"size": 279,
+			"total": 48420,
 			"imports": [
-				"../assets/core.min-DGtNB905.js"
+				"../assets/core.min-DVALGa4Q.js"
 			],
 			"origins": [
 				"src/components/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onInput_hZfT9p0uXk4.js"
@@ -1255,11 +1319,11 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/SetupScreen.tsx_SetupScreen_component_useVisibleTask_MvNYQXMjSCo-BnheNqbP.js": {
+		"../assets/SetupScreen.tsx_SetupScreen_component_useVisibleTask_MvNYQXMjSCo-rPoagKU3.js": {
 			"size": 199,
-			"total": 48048,
+			"total": 48340,
 			"imports": [
-				"../assets/core.min-DGtNB905.js"
+				"../assets/core.min-DVALGa4Q.js"
 			],
 			"origins": [
 				"src/components/SetupScreen.tsx_SetupScreen_component_useVisibleTask_MvNYQXMjSCo.js"
@@ -1269,26 +1333,26 @@
 			],
 			"interactivity": 3
 		},
-		"../assets/SetupScreen.tsx_SetupScreen_component_YWDa0BbEeyI-CFOngrkB.js": {
+		"../assets/SetupScreen.tsx_SetupScreen_component_YWDa0BbEeyI-BTkovWzM.js": {
 			"size": 6543,
-			"total": 153114,
+			"total": 153990,
 			"imports": [
-				"../assets/context-BPISbJT0.js",
-				"../assets/core.min-DGtNB905.js",
+				"../assets/context-D9nmXemK.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/preload-helper-CVfkMyKi.js",
-				"../assets/SetupScreen-BBSdhFIl.js"
+				"../assets/SetupScreen-BtAWmbiy.js"
 			],
 			"dynamicImports": [
-				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_1_EnBW0wvCL0s-COkEuotT.js",
-				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_2_pDhtHaOoBT8-QAlG0I51.js",
-				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_3_PAuFJflBP1s-6aluu93t.js",
-				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_6GkoBWguNM4-D_FOq8T2.js",
-				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_1_psYPS1pW8mw-y0fHOf6r.js",
-				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_L3ob80fuEAU-jXbPVHqD.js",
-				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_div_button_onClick_yaN0jRapfjU-K6PWGQYw.js",
-				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onBlur_S2CSE0Gzo4k-DkKwgz1L.js",
-				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onInput_hZfT9p0uXk4-B0d8H0Ga.js",
-				"../assets/SetupScreen.tsx_SetupScreen_component_useVisibleTask_MvNYQXMjSCo-BnheNqbP.js"
+				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_1_EnBW0wvCL0s-BqnJ_NQD.js",
+				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_2_pDhtHaOoBT8-D23ueVmn.js",
+				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_3_PAuFJflBP1s-DcxJx42D.js",
+				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_6GkoBWguNM4-BUmIymI_.js",
+				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_1_psYPS1pW8mw-CrjJaOOE.js",
+				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_L3ob80fuEAU-B-LPImW_.js",
+				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_div_button_onClick_yaN0jRapfjU-qo0vfoHV.js",
+				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onBlur_S2CSE0Gzo4k-By0kqcxp.js",
+				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onInput_hZfT9p0uXk4-ipISjJ94.js",
+				"../assets/SetupScreen.tsx_SetupScreen_component_useVisibleTask_MvNYQXMjSCo-rPoagKU3.js"
 			],
 			"origins": [
 				"src/components/SetupScreen.tsx_SetupScreen_component_YWDa0BbEeyI.js"
@@ -1298,27 +1362,27 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/StatsScreen-BiIErQi5.js": {
+		"../assets/StatsScreen-Cn4J2323.js": {
 			"size": 399,
-			"total": 49502,
+			"total": 49794,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/StatsScreen.tsx_StatRow_component_XoKsqidUSEQ-Bz4JzalJ.js",
-				"../assets/StatsScreen.tsx_StatsScreen_component_ZQvKK1V1KOg-C8BtIxNA.js"
+				"../assets/StatsScreen.tsx_StatRow_component_XoKsqidUSEQ-DGr4hehI.js",
+				"../assets/StatsScreen.tsx_StatsScreen_component_ZQvKK1V1KOg-CmHTcbxU.js"
 			],
 			"origins": [
 				"src/components/StatsScreen.tsx"
 			],
 			"interactivity": 0
 		},
-		"../assets/StatsScreen.tsx_StatRow_component_XoKsqidUSEQ-Bz4JzalJ.js": {
+		"../assets/StatsScreen.tsx_StatRow_component_XoKsqidUSEQ-DGr4hehI.js": {
 			"size": 593,
-			"total": 48442,
+			"total": 48734,
 			"imports": [
-				"../assets/core.min-DGtNB905.js"
+				"../assets/core.min-DVALGa4Q.js"
 			],
 			"origins": [
 				"src/components/StatsScreen.tsx_StatRow_component_XoKsqidUSEQ.js"
@@ -1328,11 +1392,11 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_1_c6GPsnYA3Tw-BAMbKr5O.js": {
+		"../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_1_c6GPsnYA3Tw-CTHUTslY.js": {
 			"size": 186,
-			"total": 60891,
+			"total": 61183,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -1343,11 +1407,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_JyjuChi10ZU-DAznD8YS.js": {
+		"../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_JyjuChi10ZU-DRVua0Qn.js": {
 			"size": 186,
-			"total": 60891,
+			"total": 61183,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -1358,18 +1422,18 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/StatsScreen.tsx_StatsScreen_component_ZQvKK1V1KOg-C8BtIxNA.js": {
+		"../assets/StatsScreen.tsx_StatsScreen_component_ZQvKK1V1KOg-CmHTcbxU.js": {
 			"size": 3046,
-			"total": 149583,
+			"total": 150459,
 			"imports": [
-				"../assets/context-BPISbJT0.js",
-				"../assets/core.min-DGtNB905.js",
+				"../assets/context-D9nmXemK.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/preload-helper-CVfkMyKi.js",
-				"../assets/StatsScreen-BiIErQi5.js"
+				"../assets/StatsScreen-Cn4J2323.js"
 			],
 			"dynamicImports": [
-				"../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_1_c6GPsnYA3Tw-BAMbKr5O.js",
-				"../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_JyjuChi10ZU-DAznD8YS.js"
+				"../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_1_c6GPsnYA3Tw-CTHUTslY.js",
+				"../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_JyjuChi10ZU-DRVua0Qn.js"
 			],
 			"origins": [
 				"src/components/StatsScreen.tsx_StatsScreen_component_ZQvKK1V1KOg.js"
@@ -1387,27 +1451,27 @@
 			],
 			"interactivity": 0
 		},
-		"../assets/TileCell-CMG09Sac.js": {
+		"../assets/TileCell-Cj6K_jMk.js": {
 			"size": 321,
-			"total": 49424,
+			"total": 49716,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/TileCell.tsx_TileCell_component_o6mOxEjWsMg-BEAObQaC.js"
+				"../assets/TileCell.tsx_TileCell_component_o6mOxEjWsMg-CU_KqMPL.js"
 			],
 			"origins": [
 				"src/components/TileCell.tsx"
 			],
 			"interactivity": 0
 		},
-		"../assets/TileCell.tsx_TileCell_component_button_onClick_vD4RAMsccTk-PHtN1GlI.js": {
+		"../assets/TileCell.tsx_TileCell_component_button_onClick_vD4RAMsccTk-D5Cl-z02.js": {
 			"size": 926,
-			"total": 62471,
+			"total": 62763,
 			"imports": [
 				"../assets/audio-B74xn9bK.js",
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -1418,11 +1482,11 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/TileCell.tsx_TileCell_component_button_onContextMenu_yiMA0J3pO4U-wTsWQzIE.js": {
+		"../assets/TileCell.tsx_TileCell_component_button_onContextMenu_yiMA0J3pO4U-CbJv0ueI.js": {
 			"size": 495,
-			"total": 61200,
+			"total": 61492,
 			"imports": [
-				"../assets/core.min-DGtNB905.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
@@ -1433,18 +1497,18 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/TileCell.tsx_TileCell_component_o6mOxEjWsMg-BEAObQaC.js": {
+		"../assets/TileCell.tsx_TileCell_component_o6mOxEjWsMg-CU_KqMPL.js": {
 			"size": 3030,
-			"total": 149489,
+			"total": 150365,
 			"imports": [
-				"../assets/context-BPISbJT0.js",
-				"../assets/core.min-DGtNB905.js",
+				"../assets/context-D9nmXemK.js",
+				"../assets/core.min-DVALGa4Q.js",
 				"../assets/preload-helper-CVfkMyKi.js",
-				"../assets/TileCell-CMG09Sac.js"
+				"../assets/TileCell-Cj6K_jMk.js"
 			],
 			"dynamicImports": [
-				"../assets/TileCell.tsx_TileCell_component_button_onClick_vD4RAMsccTk-PHtN1GlI.js",
-				"../assets/TileCell.tsx_TileCell_component_button_onContextMenu_yiMA0J3pO4U-wTsWQzIE.js"
+				"../assets/TileCell.tsx_TileCell_component_button_onClick_vD4RAMsccTk-D5Cl-z02.js",
+				"../assets/TileCell.tsx_TileCell_component_button_onContextMenu_yiMA0J3pO4U-CbJv0ueI.js"
 			],
 			"origins": [
 				"src/components/TileCell.tsx_TileCell_component_o6mOxEjWsMg.js"
@@ -1454,12 +1518,12 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/Toast.tsx_Toast_component_u3s63rt8sUk-piSTtnxJ.js": {
+		"../assets/Toast.tsx_Toast_component_u3s63rt8sUk-Bc6Vk53E.js": {
 			"size": 988,
-			"total": 96769,
+			"total": 97353,
 			"imports": [
-				"../assets/context-BPISbJT0.js",
-				"../assets/core.min-DGtNB905.js"
+				"../assets/context-D9nmXemK.js",
+				"../assets/core.min-DVALGa4Q.js"
 			],
 			"origins": [
 				"src/components/Toast.tsx_Toast_component_u3s63rt8sUk.js"
@@ -1478,9 +1542,9 @@
 		"index.html": {
 			"size": 683
 		},
-		"assets/bundle-graph-DIgIQNyD.json": {
+		"assets/bundle-graph-B2sBt4wl.json": {
 			"name": "bundle-graph.json",
-			"size": 545
+			"size": 569
 		}
 	},
 	"symbols": {
@@ -1508,8 +1572,8 @@
 			"parent": "s_YWDa0BbEeyI",
 			"origin": "components/SetupScreen.tsx",
 			"loc": [
-				5227,
-				5788
+				5237,
+				5803
 			]
 		},
 		"s_7KOrS001cXg": {
@@ -1522,8 +1586,8 @@
 			"parent": "s_PO80pwp8je0",
 			"origin": "components/HistoryPanel.tsx",
 			"loc": [
-				3515,
-				3559
+				3901,
+				3945
 			]
 		},
 		"s_Dei6RWBbu1A": {
@@ -1564,8 +1628,8 @@
 			"parent": "s_YWDa0BbEeyI",
 			"origin": "components/SetupScreen.tsx",
 			"loc": [
-				6005,
-				6037
+				6020,
+				6052
 			]
 		},
 		"s_F9FALmrlteE": {
@@ -1578,8 +1642,8 @@
 			"parent": "s_PO80pwp8je0",
 			"origin": "components/HistoryPanel.tsx",
 			"loc": [
-				2227,
-				2251
+				2601,
+				2625
 			]
 		},
 		"s_FMSYg76N0Zs": {
@@ -1634,8 +1698,8 @@
 			"parent": "s_YWDa0BbEeyI",
 			"origin": "components/SetupScreen.tsx",
 			"loc": [
-				6352,
-				6388
+				6367,
+				6403
 			]
 		},
 		"s_NTmF8n9I0Gs": {
@@ -1676,8 +1740,8 @@
 			"parent": "s_YWDa0BbEeyI",
 			"origin": "components/SetupScreen.tsx",
 			"loc": [
-				10875,
-				10926
+				10890,
+				10941
 			]
 		},
 		"s_Pj8Co1EUM0g": {
@@ -1816,8 +1880,8 @@
 			"parent": "s_PO80pwp8je0",
 			"origin": "components/HistoryPanel.tsx",
 			"loc": [
-				6109,
-				6241
+				6555,
+				6687
 			]
 		},
 		"s_l6qVcIhvLdw": {
@@ -1886,8 +1950,8 @@
 			"parent": "s_YWDa0BbEeyI",
 			"origin": "components/SetupScreen.tsx",
 			"loc": [
-				7876,
-				10166
+				7891,
+				10181
 			]
 		},
 		"s_psYPS1pW8mw": {
@@ -1900,8 +1964,8 @@
 			"parent": "s_YWDa0BbEeyI",
 			"origin": "components/SetupScreen.tsx",
 			"loc": [
-				6615,
-				6655
+				6630,
+				6670
 			]
 		},
 		"s_qNFtIiIKwVc": {
@@ -1928,8 +1992,8 @@
 			"parent": "s_PO80pwp8je0",
 			"origin": "components/HistoryPanel.tsx",
 			"loc": [
-				2502,
-				2526
+				2888,
+				2912
 			]
 		},
 		"s_vD4RAMsccTk": {
@@ -1984,8 +2048,8 @@
 			"parent": "s_YWDa0BbEeyI",
 			"origin": "components/SetupScreen.tsx",
 			"loc": [
-				4080,
-				4248
+				4090,
+				4258
 			]
 		},
 		"s_yiMA0J3pO4U": {
@@ -2027,7 +2091,7 @@
 			"origin": "components/SetupScreen.tsx",
 			"loc": [
 				2348,
-				2740
+				2745
 			]
 		},
 		"s_S2CSE0Gzo4k": {
@@ -2040,8 +2104,8 @@
 			"parent": "s_YWDa0BbEeyI",
 			"origin": "components/SetupScreen.tsx",
 			"loc": [
-				2763,
-				3056
+				2768,
+				3066
 			]
 		},
 		"s_8cEnb6VAgJ0": {
@@ -2054,8 +2118,8 @@
 			"parent": "s_PO80pwp8je0",
 			"origin": "components/HistoryPanel.tsx",
 			"loc": [
-				1242,
-				1579
+				1604,
+				1941
 			]
 		},
 		"s_AGMhcRtyECs": {
@@ -2166,8 +2230,8 @@
 			"parent": "s_PO80pwp8je0",
 			"origin": "components/HistoryPanel.tsx",
 			"loc": [
-				861,
-				1220
+				1223,
+				1582
 			]
 		},
 		"s_g6jJ5iiT0cs": {
@@ -2278,8 +2342,8 @@
 			"parent": null,
 			"origin": "components/HistoryPanel.tsx",
 			"loc": [
-				285,
-				6314
+				299,
+				6760
 			]
 		},
 		"s_VaDtMGCFjxA": {
@@ -2321,7 +2385,7 @@
 			"origin": "components/SetupScreen.tsx",
 			"loc": [
 				681,
-				11344
+				11359
 			]
 		},
 		"s_ZQvKK1V1KOg": {
@@ -2448,6 +2512,62 @@
 			"loc": [
 				5939,
 				6324
+			]
+		},
+		"s_FPkFDL0ir5k": {
+			"displayName": "HistoryPanel.tsx_HistoryPanel_component_canUndo_useComputed",
+			"hash": "FPkFDL0ir5k",
+			"ctxKind": "function",
+			"ctxName": "useComputed$",
+			"captures": true,
+			"canonicalFilename": "HistoryPanel.tsx_HistoryPanel_component_canUndo_useComputed_FPkFDL0ir5k",
+			"parent": "s_PO80pwp8je0",
+			"origin": "components/HistoryPanel.tsx",
+			"loc": [
+				829,
+				885
+			]
+		},
+		"s_TL8NebUAuPk": {
+			"displayName": "HistoryPanel.tsx_HistoryPanel_component_current_useComputed",
+			"hash": "TL8NebUAuPk",
+			"ctxKind": "function",
+			"ctxName": "useComputed$",
+			"captures": true,
+			"canonicalFilename": "HistoryPanel.tsx_HistoryPanel_component_current_useComputed_TL8NebUAuPk",
+			"parent": "s_PO80pwp8je0",
+			"origin": "components/HistoryPanel.tsx",
+			"loc": [
+				609,
+				680
+			]
+		},
+		"s_i2xY4uFpUOU": {
+			"displayName": "HistoryPanel.tsx_HistoryPanel_component_selected_useComputed",
+			"hash": "i2xY4uFpUOU",
+			"ctxKind": "function",
+			"ctxName": "useComputed$",
+			"captures": true,
+			"canonicalFilename": "HistoryPanel.tsx_HistoryPanel_component_selected_useComputed_i2xY4uFpUOU",
+			"parent": "s_PO80pwp8je0",
+			"origin": "components/HistoryPanel.tsx",
+			"loc": [
+				719,
+				791
+			]
+		},
+		"s_sWgQQHAVx58": {
+			"displayName": "HistoryPanel.tsx_HistoryPanel_component_canRedo_useComputed",
+			"hash": "sWgQQHAVx58",
+			"ctxKind": "function",
+			"ctxName": "useComputed$",
+			"captures": true,
+			"canonicalFilename": "HistoryPanel.tsx_HistoryPanel_component_canRedo_useComputed_sWgQQHAVx58",
+			"parent": "s_PO80pwp8je0",
+			"origin": "components/HistoryPanel.tsx",
+			"loc": [
+				919,
+				966
 			]
 		}
 	},
