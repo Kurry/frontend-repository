@@ -1841,11 +1841,14 @@ function BulkBar({ trial, ui }) {
                 value={field.value}
                 items={classifications}
                 onChange={field.onChange}
+                ariaLabel="classification"
+                isInvalid={!!errors.classification}
+                errorMessageId="bulk-classification-error"
               />
             )}
           />
           {errors.classification && (
-            <p className="error" role="alert">
+            <p id="bulk-classification-error" className="error" role="alert">
               classification: {errors.classification.message}
             </p>
           )}
@@ -1855,18 +1858,20 @@ function BulkBar({ trial, ui }) {
             name="rationale"
             control={control}
             render={({ field }) => (
-              <TextField>
+              <TextField isInvalid={!!errors.rationale}>
                 <Label className="label">Shared rationale</Label>
                 <Input
                   {...field}
                   className="field"
+                  aria-invalid={!!errors.rationale}
+                  aria-describedby={errors.rationale ? "bulk-rationale-error" : undefined}
                   placeholder="Explain the selected criteria (20–2000 characters)."
                 />
               </TextField>
             )}
           />
           {errors.rationale && (
-            <p className="error" role="alert">
+            <p id="bulk-rationale-error" className="error" role="alert">
               rationale: {errors.rationale.message}
             </p>
           )}
@@ -2208,8 +2213,8 @@ function ExportDrawer({ trial, ui }) {
         ? "Review package JSON copied to clipboard"
         : "Review memo Markdown copied to clipboard";
     setCopied(true);
-    setCopyNotice(notice);
-    setAnnouncement(notice);
+    setCopyNotice(`${notice} ${Date.now()}`);
+    setAnnouncement(`${notice} ${Date.now()}`);
     setTimeout(() => {
       setCopied(false);
       setCopyNotice("");
@@ -2303,7 +2308,7 @@ function ExportDrawer({ trial, ui }) {
                 role="status"
                 aria-live="polite"
               >
-                {copyNotice}
+                {copyNotice.replace(/\s\d+$/, "")}
               </p>
             )}
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -2380,7 +2385,7 @@ function ImportSurface({ task, trial }) {
     replace(result.data.adjudications);
     setImportErrors([]);
     setAnnouncement(
-      `Imported ${result.data.adjudications.length} adjudications successfully from Review Package JSON`,
+      `Imported ${result.data.adjudications.length} adjudications successfully from Review Package JSON ${Date.now()}`,
     );
     close("import");
   });
@@ -2889,7 +2894,7 @@ export default function App() {
             announcement ? "opacity-100" : "pointer-events-none opacity-0",
           )}
         >
-          {announcement}
+          {announcement ? announcement.replace(/\s\d+$/, "") : ""}
         </span>
       </div>
     </>
