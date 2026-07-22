@@ -1,0 +1,5 @@
+[task]
+name = "mercor-intelligence/frontend-planning-fictional-risograph-pass-drying-rack-sequencer"
+description = "Planning with creative-tool and data-tracking evidence for Fictional Risograph Pass & Drying-Rack Sequencer"
+authors = [{ name = "Kurry", email = "kurry@example.com" }]
+version = "1.0.0"
