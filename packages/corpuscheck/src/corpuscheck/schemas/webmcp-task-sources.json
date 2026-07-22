@@ -1,4 +1,9 @@
 {
+  "frontend-data-tracking-reading-velocity-backlog-observatory": {
+    "source": "Reading Velocity Backlog Observatory",
+    "instruction": "tasks/frontend-data-tracking-reading-velocity-backlog-observatory/instruction.md",
+    "description": "Reading-capacity calibration and backlog observatory for ordering, allocation, focus, and rollover."
+  },
   "frontend-creative-tools-annotation-studio": {
     "source": "feature-labeling-annotation-studio PRD",
     "instruction": "tasks/frontend-creative-tools-annotation-studio/instruction.md",

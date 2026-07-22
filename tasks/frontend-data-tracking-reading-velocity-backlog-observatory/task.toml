@@ -2,7 +2,7 @@ schema_version = "1.3"
 
 [task]
 name = "mercor-intelligence/frontend-data-tracking-reading-velocity-backlog-observatory"
-description = "Reading Velocity Backlog Observatory data tracking eval."
+description = "Reading-capacity calibration and backlog observatory for ordering, allocation, focus, and rollover."
 
 [agent]
 timeout_sec = 3600.0

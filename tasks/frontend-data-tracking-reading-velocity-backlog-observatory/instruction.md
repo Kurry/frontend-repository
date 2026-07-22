@@ -164,10 +164,6 @@ Stack: Solid.js with Solid stores, Tailwind CSS 4.3.2 (pinned), and Kobalte as t
 - Work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
 </integrity>
 
-<integrity>
-- Work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
-</integrity>
-
 <delivery>
 - Produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; `/app/package.json` MUST define npm scripts named exactly `start` (serves the app on port 3000) and `verify:build` (exits 0 when the app entry/build is present and succeeds); run via `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
 - Before you finish, run `npm run verify:build` and confirm it exits 0, then run `npm start` and confirm the app serves on port 3000. This is your responsibility: the verifier runs the same `verify:build` gate first, and an app that fails it is not served or judged and scores 0 outright — no partial credit for a build that does not come up.
@@ -179,27 +175,29 @@ Stack: Solid.js with Solid stores, Tailwind CSS 4.3.2 (pinned), and Kobalte as t
 Contract version: zto-webmcp-v1
 
 Modules:
-- structured-editor-v1
+- browse-query-v1
 - entity-collection-v1
+- form-workflow-v1
 - artifact-transfer-v1
 
 Module specs:
-<module_spec id="structured-editor-v1">
+<module_spec id="browse-query-v1">
 {
-  "id": "structured-editor-v1",
+  "id": "browse-query-v1",
   "contract_version": "zto-webmcp-v1",
-  "title": "Structured editor",
-  "purpose": "Document, diagram, canvas, configuration, and property editors.",
-  "permitted_operations": ["select", "add", "delete", "update_property", "set_content", "switch_mode", "preview"],
+  "title": "Browse / query",
+  "purpose": "Content sites, catalogs, feeds, dashboards, and navigation.",
+  "permitted_operations": ["open", "search", "apply_filter", "clear_filter", "sort", "set_locale", "set_theme"],
   "binding_keys": {
-    "required_any_of": [["editor_operations"], ["editor_object_types"]],
-    "optional": ["editor_properties", "editor_modes", "value_bounds", "visible_postconditions"]
+    "required_any_of": [["destinations"]],
+    "optional": ["browsable_entity", "filters", "sorts", "locales", "themes", "visible_postconditions"]
   },
   "restrictions": [
-    "No arbitrary coordinate, DOM, or storage mutation via WebMCP.",
-    "Drag, resize, drawing, snapping, and keyboard movement remain Playwright-driven when mechanism matters."
+    "No arbitrary URL, selector, or undeclared route.",
+    "Destinations and filters come from bounded PRD declarations.",
+    "Visible navigation state must update via the same handlers as UI controls."
   ],
-  "tool_name_prefix": "editor"
+  "tool_name_prefix": "browse"
 }
 </module_spec>
 
@@ -226,6 +224,27 @@ Module specs:
 }
 </module_spec>
 
+<module_spec id="form-workflow-v1">
+{
+  "id": "form-workflow-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Form workflow",
+  "purpose": "Forms, setup flows, authentication shells, and multi-step workflows.",
+  "permitted_operations": ["validate", "submit", "cancel", "reset", "advance", "return"],
+  "binding_keys": {
+    "required_any_of": [["form_fields"], ["form_operations"]],
+    "optional": ["workflow_steps", "value_bounds", "visible_postconditions"]
+  },
+  "restrictions": [
+    "Declared fields only.",
+    "Normal validation and visible errors remain active.",
+    "Cannot manufacture authentication or bypass guarded routes.",
+    "Backend-free apps must surface honest unavailable state through product handlers."
+  ],
+  "tool_name_prefix": "form"
+}
+</module_spec>
+
 <module_spec id="artifact-transfer-v1">
 {
   "id": "artifact-transfer-v1",
@@ -246,19 +265,22 @@ Module specs:
 </module_spec>
 
 Bindings:
-- Editor object types: book
-- Editor properties: priority; track
-- Editor modes: shelf; focus
-- Editor operations: select; update_property; switch_mode
-- Entity: plan
+- Filters: all; ready; blocked; done
+- Entity: backlog-item
 - Entity operations: select; update; toggle
-- Entity fields: velocity
-- Artifact operations: export; import; copy
-- Export formats: csv; ics; json
-- Import modes: json
+- Entity fields: title; points; status; lane
+- Form operations: submit
+- Form fields: title; points
+- Artifact operations: export; import
+- Export formats: reading-velocity-json
+- Import modes: reading-velocity-json
+- Workflow completion: selected-item
+- Workflow completion: filtered-queue
+- Workflow completion: phase-advanced
+- Workflow completion: artifact-ready
 
 Mechanics exclusions:
-- None
+- Backlog drag ordering remains Playwright-driven when gesture mechanics matter
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.
