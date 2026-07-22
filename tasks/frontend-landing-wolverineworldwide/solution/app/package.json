@@ -6,9 +6,13 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "verify:build": "node --check web/northstar.js && node --check web/webmcp.js && node --check server.mjs && node -e \"const fs=require('fs');const files=['web/index.html','web/northstar.css','web/assets/hero-poster.jpg','web/assets/hero-montage.webm','web/assets/northstar-annual-report-2025.pdf','web/assets/og-northstar.jpg'];const missing=files.filter(f=>!fs.existsSync(f)||!fs.statSync(f).size);if(missing.length){console.error('missing build assets:',missing);process.exit(1)}console.log('build ok')\""
+    "verify:build": "node --check web/northstar.js && node --check web/webmcp.js && node --check server.mjs && node -e \"const fs=require('fs');const files=['web/index.html','web/northstar.css','web/assets/hero-poster.jpg','web/assets/hero-montage.webm','web/assets/northstar-annual-report-2025.pdf','web/assets/og-northstar.jpg'];const missing=files.filter(f=>!fs.existsSync(f)||!fs.statSync(f).size);if(missing.length){console.error('missing build assets:',missing);process.exit(1)}console.log('build ok')\"",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.0"
   }
 }

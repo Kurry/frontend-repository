@@ -1,0 +1,179 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+[[criterion]]
+id = "3.1"
+name = "spacing_and_sizing_follow_scale"
+description = """Sidebar, identity card, and Identities grid spacing follow a consistent rhythm matching the reference shell"""
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "3.2"
+name = "typography_matches_spec"
+description = """Monospace keys and sans UI type match the reference treatment for cryptographic versus chrome text"""
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "3.3"
+name = "layout_matches_reference"
+description = """Left sidebar plus main content layout matches the reference overview structure at desktop width"""
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "3.4"
+name = "specified_state_changes_animate"
+description = """Specified state changes (theme, reveal, card entrance, toasts) animate in line with the reference behavior"""
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "3.5"
+name = "responsive_behavior_matches_reference"
+description = """Sidebar collapse and Identities grid reflow match the reference responsive behavior"""
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "3.6"
+name = "control_styling_matches_spec"
+description = """Permission switches, pills, and buttons match the reference control styling rather than unstyled browser defaults"""
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "3.7"
+name = "typography_has_clear_hierarchy"
+description = """Vault brand, view titles, and card nicknames show clear hierarchy as in the reference"""
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "3.8"
+name = "component_states_match_spec"
+description = """Active nav, active identity card, and Granted/Revoked pills match the reference state treatments"""
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "3.9"
+name = "surface_treatments_match_spec"
+description = """Light and dark surfaces match the reference shell treatments for backgrounds and borders"""
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "3.10"
+name = "microinteractions_match_spec"
+description = """Hover wash and toast microinteractions match the reference intent"""
+type = "binary"
+weight = 1.0
+
+

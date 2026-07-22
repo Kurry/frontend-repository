@@ -1,0 +1,337 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "initial_load_shell"
+description = "On load, the app opens at / with the title LetterDrop, view tabs Game, History and Achievements, a HUD showing Best Score, and a canvas board reading \"Press Start game to begin!\" with no login or backend."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "tiles_spawn_and_fall_six_columns"
+description = "When Start game is pressed, letter tiles spawn at the top of the canvas board and fall downward through six columns at a steady rate, and more tiles keep spawning on a repeating interval so the board fills over time."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "tile_tap_builds_tray"
+description = "After tapping two or more falling tiles, each tapped letter appears in the current-word tray beneath the board, and tapping an already selected tile removes it from the tray."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "valid_word_clears_and_scores"
+description = "When Submit Word is pressed on tiles that spell a bundled-dictionary word, those tiles clear from the board, the score increases by an amount scaled to word length, and a transient confirmation such as +30 for \"CAT\"! appears."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "invalid_word_feedback_and_streak_reset"
+description = "When Submit Word is pressed on letters that are not a dictionary word, the word tray shakes and an inline Not a word style message appears instead of a silent rejection, and the streak resets to zero."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "board_cleared_bonus_multiplier"
+description = "After clearing every tile on the board through valid submissions, a Board Cleared! confirmation appears and the next scored word receives the bonus multiplier."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "danger_line_game_over"
+description = "When an uncleared tile falls across the visible danger line, the run ends and a Game Over screen shows the final score with a Play again control."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "streak_meter_thresholds"
+description = "After several consecutive valid submissions, a visible streak meter grows and reaching thresholds of 3, 5 and 8 shows a temporary score-multiplier badge next to the score."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "bomb_and_slow_power_tiles"
+description = "When a submitted word includes a Bomb tile its whole column clears and a \"Bomb! Column cleared\" toast appears; when it includes a Slow tile the fall speed drops for a few seconds and a named Slow toast appears."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "undo_last_tile_removes_recent"
+description = "When Undo Last Tile is pressed, the most recently tapped tile is removed from the current-word tray without submitting the word."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "pause_resume_freezes_state"
+description = "When Pause is pressed the tiles and timer freeze and the board dims with a Paused overlay; when Resume is pressed play continues from the exact same state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "history_list_and_empty_state"
+description = "After finishing a run, the History tab lists that game-result most-recent-first with score, tilesCleared, durationSec, playerName, tierReached, and endedAt visible, and before any run finishes History shows a friendly empty-state message."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "achievements_locked_unlocked_states"
+description = "On the Achievements tab, locked achievements appear muted or grayscale and named achievements such as Clean Sweep, Marathon and Combo Master turn to full color once their milestone is met, with a transient unlock confirmation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "reload_restores_persisted_state"
+description = "After a completed run, a full page refresh restores the exact Best Score, Match History rows, and unlocked achievements from localStorage, and never-created runs are not fabricated."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "branching_history_undo_redo"
+description = "During an active run, using Apply Scenario Change adds a transition to the History state region; pressing Undo then applying a different change creates a selectable branch, and restoring a branch restores the exact prior visible board state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "tier_acceleration_readout"
+description = "Fall speed and spawn rate increase as the score crosses thresholds and the current tier (Tier 1, Tier 2, Tier 3) is shown in a status readout."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "best_score_display_updates"
+description = "Best Score is displayed at all times and updates only when a run's final score beats the previous best."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "settings_form_inline_validation"
+description = "The Settings control opens a form whose fields match the settings request body: playerName (required, 2 to 20 characters) and startingTier (enum 1, 2, or 3 shown as Tier 1/2/3); typing a one-character playerName shows an inline message under the field naming playerName and the 2-to-20 length rule before any submit, Save stays disabled while invalid, and correcting the name clears the message and enables Save."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "settings_save_applies_name_and_tier"
+description = "Saving valid settings closes the form; each Match History game-result recorded afterwards shows the saved playerName, and a run started afterwards begins at the chosen startingTier shown in the tier readout."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "history_entry_fields_after_game_over"
+description = "After a danger-line Game Over, the History tab shows a new top game-result whose score matches the Game Over final score and that also lists tilesCleared, durationSec, playerName, tierReached, and endedAt."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "clean_sweep_unlocks_on_board_clear"
+description = "Fully clearing the board shows Board Cleared! and unlocks Clean Sweep on the Achievements tab (full color) with an unlock confirmation at the moment of the clear."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "streak_threshold_three_and_reset"
+description = "Three consecutive valid submissions show the streak meter at 3 with a multiplier badge; an invalid submission clears the badge and returns the meter to zero."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "settings_name_on_new_history_only"
+description = "After saving a new playerName, a newly finished run's History game-result shows that playerName while earlier History entries keep their original playerName values."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "pause_does_not_change_score"
+description = "Pausing and resuming mid-run leaves the HUD score unchanged by the pause itself while timer and tiles freeze for the pause duration."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "empty_tray_submit_rejected"
+description = "Pressing Submit Word with an empty tray leaves the run, score, and streak unchanged, and either shows a visible rejection or the control is disabled."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "undo_empty_tray_noop"
+description = "Activating Undo Last Tile when the tray is empty changes nothing on screen and produces no visible error."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.43"
+name = "common_short_words_accepted"
+description = "The bundled word list accepts everyday short words: submitting a tray spelling a common three-letter word such as CAT, DOG, or SUN is scored as valid rather than rejected."
+type = "binary"
+weight = 0.5
+
+
+[[criterion]]
+id = "1.44"
+name = "export_run_json_contains_session_play"
+description = "After Game Over on a run that scored at least one valid word, Export Run produces downloadable or copyable JSON whose top-level game-result includes format letterdrop-game-v1, schemaVersion 1, that run's actual score, tilesCleared, durationSec, playerName, tierReached, endedAt, result game_over, and a words array listing each submitted word with its points — compiled from the session, not a blank stub."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "export_history_archive_lists_runs"
+description = "With at least one finished run in Match History, Export History downloads or copies a run-history JSON with format letterdrop-history-v1, schemaVersion 1, and a runs array that includes that run's score, tilesCleared, durationSec, playerName, tierReached, endedAt, and words."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "save_progress_checkpoint"
+description = "During an active or paused run after at least one valid word, Save Progress shows a Saved confirmation and writes a letterdrop-checkpoint-v1 payload (format, schemaVersion 1, score, streak, tier, trayLetters, tiles, durationSec, playerName, startingTier); after a full page reload, Resume Saved Run restores the same score, tray, streak, tier, and tile layout."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "import_run_json_appends_history"
+description = "Importing a previously exported run-json appends a Match History game-result whose score, tilesCleared, durationSec, playerName, tierReached, endedAt, and words match the imported record."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "play_again_clean_restart"
+description = "From Game Over, Play again starts a fresh falling-tile run with score and streak reset for the new run while prior History entries and Best Score remain listed."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "game_result_field_contract_visible"
+description = "After a finished run, the History row and Export Run preview both expose the required game-result field names format, schemaVersion, score, tilesCleared, durationSec, playerName, tierReached, endedAt, result, and words (with word and points on each words entry)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "settings_payload_field_contract"
+description = "Saving settings with a valid playerName (2 to 20 chars) and startingTier (1, 2, or 3) produces a settings record that carries exactly those two fields; invalid playerName length keeps Save disabled with an inline message naming playerName and the 2-to-20 rule."
+type = "binary"
+weight = 1.0
+

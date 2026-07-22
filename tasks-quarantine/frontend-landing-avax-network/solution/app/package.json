@@ -12,7 +12,8 @@
     "astro": "astro",
     "scrub-offline": "node scripts/scrub-offline-dist.mjs",
     "verify:build": "astro build && node scripts/scrub-offline-dist.mjs",
-    "start": "astro build && node scripts/scrub-offline-dist.mjs && npx serve dist -l 3000"
+    "start": "astro build && node scripts/scrub-offline-dist.mjs && npx serve dist -l 3000",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
   },
   "dependencies": {
     "@astrojs/node": "^11.0.2",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.1.1",
-    "serve": "^14.2.4"
+    "serve": "^14.2.4",
+    "@playwright/test": "1.61.0"
   }
 }

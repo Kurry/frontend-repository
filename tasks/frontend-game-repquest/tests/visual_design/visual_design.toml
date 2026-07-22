@@ -1,0 +1,158 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "zone_palettes_distinct"
+description = "Each unlocked zone (Foothills, Canyon, Summit) paints the quest map canvas with its own distinct sky/ground palette so the current region is identifiable at a glance"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "3.2"
+name = "boss_marker_distinction"
+description = "Boss Challenge waypoints render visibly larger and in a different color than normal waypoints, with a clearly different defeated treatment once cleared"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "3.3"
+name = "goal_progress_color_thresholds"
+description = "The daily-goal progress fill uses a clear color threshold (below half, at/above half, at/above goal) so progress reads without checking the numbers"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "3.4"
+name = "gear_locked_unlocked_treatment"
+description = "Locked outfits in the Gear Shop show a muted/grayscale treatment that turns to full color once unlocked; the equipped outfit is clearly marked as selected among unlocked options"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "3.5"
+name = "empty_states_render"
+description = "Before any set is logged, the History tab shows a friendly placeholder message, and the weekly summary chart shows all-zero bars rather than a blank area"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "3.6"
+name = "active_tab_visually_distinct"
+description = "Tab navigation (Quest / History / Gear / Settings) is visually distinct for the active tab versus inactive tabs"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "3.7"
+name = "meta_screens_cohesive_styling"
+description = "Meta screens (tab bar, Settings forms, Gear Shop cards, History list, dialogs, notification banners, Export/Import controls, Personal Records, and streak heat-map) share cohesive component styling distinct from the hand-rendered canvas play surfaces"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "3.8"
+name = "victory_defeat_visually_distinct"
+description = "Victory and Defeat result panels are visually distinct from each other (success-toned vs warning/defeat-toned) so the decided outcome reads at a glance"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "3.9"
+name = "heatmap_cell_treatments_distinct"
+description = "Heat-map cells for empty, below-goal, and at-or-above-goal days are visually distinct by fill intensity or color"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "3.10"
+name = "single_consistent_icon_set"
+description = "Icons appear from a single consistent icon set across tabs, buttons, and status indicators with no mismatched icon styles"
+type = "binary"
+weight = 1.0

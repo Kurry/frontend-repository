@@ -36,7 +36,7 @@ export default function EventsManager() {
     window.setTimeout(() => {
       $eventsManagerOpen.set(false);
       setClosing(false);
-      lastFocused.current?.focus?.();
+      lastFocused.current?.focus({ preventScroll: true });
       lastFocused.current = null;
     }, 160);
   };
@@ -137,11 +137,11 @@ export default function EventsManager() {
       <div
         ref={dialogRef}
         onKeyDown={trapFocus}
-        className={`bg-surface w-full max-w-6xl max-h-[90vh] rounded-xl shadow-2xl flex flex-col border border-white/10 overflow-hidden ${closing ? 'overlay-out' : 'overlay-in'}`}
+        className={`surface-copy bg-surface w-full max-w-6xl max-h-[90vh] rounded-xl shadow-2xl flex flex-col border border-current/10 overflow-hidden ${closing ? 'overlay-out' : 'overlay-in'}`}
       >
 
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-white/10 bg-void/50">
+        <div className="flex justify-between items-center p-6 border-b border-current/10 bg-surface">
           <h2 className="text-2xl font-bold display-font">Events Manager</h2>
           <button ref={firstFocusRef} className="btn btn-square btn-ghost text-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={requestClose} aria-label="Close Events Manager">
             <X size={24} />
@@ -185,7 +185,7 @@ export default function EventsManager() {
         {/* Filters */}
         <div className="p-4 flex flex-wrap gap-4 items-center border-b border-white/10 bg-surface/30 text-sm">
           <select
-            className="select select-sm select-bordered notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            className="select select-bordered h-11 min-h-11 notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             value={filter.status}
             onChange={e => $eventsFilter.set({ ...filter, status: e.target.value as any })}
             aria-label="Filter by status"
@@ -197,7 +197,7 @@ export default function EventsManager() {
           </select>
 
           <select
-            className="select select-sm select-bordered notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            className="select select-bordered h-11 min-h-11 notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             value={filter.category}
             onChange={e => $eventsFilter.set({ ...filter, category: e.target.value as any })}
             aria-label="Filter by category"
@@ -211,7 +211,7 @@ export default function EventsManager() {
           </select>
 
           {(filter.status || filter.category) && (
-            <button className="btn btn-ghost btn-sm text-gray-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => $eventsFilter.set({ status: '', category: '' })}>Clear filters</button>
+            <button className="btn btn-ghost btn-sm opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => $eventsFilter.set({ status: '', category: '' })}>Clear filters</button>
           )}
         </div>
 
@@ -224,19 +224,19 @@ export default function EventsManager() {
         )}
 
         {/* Table */}
-        <div className="flex-1 overflow-auto p-4 bg-void">
+        <div className="void-copy flex-1 overflow-auto p-4 bg-void">
           {events.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center p-8">
-              <p className="text-xl text-gray-400 mb-4">No events found in the catalog. Create your first event to start building the schedule.</p>
+              <p className="text-xl opacity-70 mb-4">No events found in the catalog. Create your first event to start building the schedule.</p>
               <button className="btn btn-primary notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => { setEditingEvent(null); setIsFormOpen(true); }}>Create event</button>
             </div>
           ) : filteredEvents.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center p-8">
-              <p className="text-xl text-gray-400 mb-4">No events match the current filters.</p>
+              <p className="text-xl opacity-70 mb-4">No events match the current filters.</p>
               <button className="btn btn-outline notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => $eventsFilter.set({ status: '', category: '' })}>Clear filters</button>
             </div>
           ) : (
-            <table className="table w-full">
+            <table className="table w-full text-white">
               <thead>
                 <tr>
                   <th>

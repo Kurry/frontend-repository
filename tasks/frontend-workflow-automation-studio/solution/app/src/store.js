@@ -116,7 +116,8 @@ async function executeRun(set, get, token, startIndex = 0, forceCurrentPass = fa
 
       const invalid = !paramSchemas[step.type].safeParse(step.params).success
       const forcedFailure = String(step.params.selector || '').includes('missing') || String(step.params.expected_text || '').toLowerCase().includes('force fail')
-      const failed = invalid || forcedFailure
+      const retryBypassesCurrentFailure = forceCurrentPass && index === startIndex
+      const failed = !retryBypassesCurrentFailure && (invalid || forcedFailure)
       if (!failed) {
         passed = true
         const value = step.type === 'extract' ? `${step.params.variable}_${Math.random().toString(36).slice(2, 8)}` : undefined

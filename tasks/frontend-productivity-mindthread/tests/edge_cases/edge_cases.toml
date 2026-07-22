@@ -1,0 +1,170 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "empty_states_on_blank_workspace"
+description = "Empty state UI is present: inbox shows 'Capture your first spark', threads show 'No threads yet', and Today shows 'No sparks captured yet today' when empty."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.2"
+name = "forms_validate_field_contracts_inline"
+description = "Inline validation appears on capture, thread title, tag, reflection, and Import before any record is written, naming the offending field."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.3"
+name = "errors_name_field_and_rule"
+description = "Error messages name the field and rule (e.g. Enter a thought to add a spark; tag format/length; schemaVersion) rather than only saying Invalid."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.4"
+name = "actions_show_confirmation_toasts"
+description = "Success or confirmation feedback appears after assign, status, pin, merge, archive, copy export, and successful Import."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.5"
+name = "merge_two_step_progress_feedback"
+description = "The Merge Into… two-step confirm (Continue then Confirm Merge) provides clear step progress rather than a silent multi-click."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.6"
+name = "destructive_merge_delete_cancel_or_undo"
+description = "Destructive Merge confirm and bulk Delete support cancel; domain Undo can reverse captures/deletes/bulk actions."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.7"
+name = "command_palette_labels_actions"
+description = "Command palette rows use specific action labels (Home, Today, Archived, Export, Import, focus capture) so non-obvious shortcuts are discoverable."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.8"
+name = "controls_use_semantic_tags"
+description = "Buttons, inputs, checkboxes, and labels for capture, bulk tray, Export, and Import use semantic interactive tags."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.9"
+name = "modals_support_close_paths"
+description = "Merge, Export, Import, and command palette close via explicit close and Escape."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.10"
+name = "import_validation_names_offending_field"
+description = "Import of a document failing the Workspace JSON field contract (wrong schemaVersion, missing keys, illegal status/tag/bounds, or unresolved threadId/sparkId) shows visible validation naming the offending field and changes nothing."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.11"
+name = "tag_contract_rejects_spaces_punctuation"
+description = "A tag with spaces, punctuation, or length over 32 characters is rejected naming the tag field and creates no tag."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.12"
+name = "spark_text_over_2000_rejected"
+description = "Spark text longer than 2000 characters is rejected naming the text field and adds no spark."
+type = "binary"
+weight = 1.0

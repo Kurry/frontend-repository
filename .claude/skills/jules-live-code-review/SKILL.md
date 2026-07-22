@@ -1,6 +1,6 @@
 ---
 name: jules-live-code-review
-description: Review and steer live Google Jules coding sessions while they are still working. Use when asked to audit ongoing Jules sessions, code-review live Jules work, supervise an active Jules fleet, catch scope or test-quality defects before PR creation, or send focused feedback through the Jules CLI. Designed for frontend-repository workflows and reusable with any repository connected to Jules.
+description: Review and steer live Google Jules coding sessions while they are still working, including fleets split across primary and backup Jules API accounts. Use when asked to audit ongoing Jules sessions, code-review live Jules work, supervise an active Jules fleet, maintain a concurrency floor, catch scope or test-quality defects before PR creation, or send focused feedback through the Jules CLI. Designed for frontend-repository workflows and reusable with any repository connected to Jules.
 ---
 
 # Jules Live Code Review
@@ -12,34 +12,51 @@ Review the evidence Jules is producing in real time, then send small, specific c
 1. Read the sibling `../jules/SKILL.md` completely. Follow its CLI and agent-to-agent communication rules.
 2. Read the target repository's `AGENTS.md` or equivalent instructions.
 3. Confirm the connected source from session data. For this repository, Jules normally works from `sources/github/Kurry/frontend-repository`, even when the upstream PR target is Mercor.
-4. Use the bundled CLI, never hand-written API calls:
+4. Use the account wrapper, never hand-written API calls. It selects the
+   repository's bundled CLI and maps `backup` to `JULES_BACKUP_API_KEY` without
+   printing either credential. If the backup key is only declared in
+   `~/.zshrc`, the wrapper loads it in an isolated zsh process:
 
 ```bash
-JULES_CLI=.claude/skills/jules/scripts/jules
-"$JULES_CLI" list --all --state IN_PROGRESS
-"$JULES_CLI" list --all --state AWAITING_PLAN_APPROVAL
-"$JULES_CLI" list --all --state AWAITING_USER_FEEDBACK
-"$JULES_CLI" get <session-id>
-"$JULES_CLI" activities <session-id> --all
+JULES_ACCOUNT=.claude/skills/jules-live-code-review/scripts/jules-account
+"$JULES_ACCOUNT" primary list --all --state IN_PROGRESS
+"$JULES_ACCOUNT" backup list --all --state IN_PROGRESS
+"$JULES_ACCOUNT" primary get <session-id>
+"$JULES_ACCOUNT" backup activities <session-id> --all
 ```
 
-Put global flags before the command: `"$JULES_CLI" --json activities ...`.
+Put global flags before the command:
+`"$JULES_ACCOUNT" backup --json activities ...`. Never echo, log, write, or
+pass either key as a literal command-line argument.
 
 ## Live review loop
 
-### 1. Inventory without steering
+### 1. Inventory both accounts without steering
 
-- List `IN_PROGRESS`, `AWAITING_PLAN_APPROVAL`, and
-  `AWAITING_USER_FEEDBACK` separately because the CLI accepts one state filter
-  per invocation. Always pass `--all`; state filtering happens after pagination,
-  so omitting it silently excludes matching sessions beyond the first page.
+- For every configured account, list `IN_PROGRESS`,
+  `AWAITING_PLAN_APPROVAL`, and `AWAITING_USER_FEEDBACK` separately because the
+  CLI accepts one state filter per invocation. Always pass `--all`; state
+  filtering happens after pagination, so omitting it silently excludes matching
+  sessions beyond the first page.
+- Keep the account label with every session ID. Session IDs alone are not
+  sufficient routing information because every later `get`, `activities`, and
+  `message` call must use the credential that owns the session.
+- Build the combined fleet count from completed full pagination on both
+  accounts. Do not add stale snapshots, delivered-message counts, or inferred
+  state transitions. If either account's list is still running, report a
+  provisional floor and name the missing account.
+- De-duplicate by `(source, starting branch, task/path ownership)` for work
+  coordination, while still counting distinct API sessions for a user-requested
+  concurrency target. Flag duplicate task ownership rather than silently
+  assigning both sessions overlapping edits.
 - Record session ID, title, source, starting branch, state, update time, and PR output if present.
 - Treat sessions with no activities as queued or not yet reviewable. Do not send speculative feedback.
 - Note sessions that own overlapping app, spec, package, lockfile, fixture, registry, or generated-output paths.
 
 ### 2. Read one complete session at a time
 
-Before every message, read that session's current `get` result and complete `activities --all` stream. Inspect:
+Before every message, use the session's owning account to read its current
+`get` result and complete `activities --all` stream. Inspect:
 
 - the original prompt and explicit file scope;
 - the latest plan and every later user correction;
@@ -108,17 +125,18 @@ Good feedback:
 - stays inside the session's authorized scope;
 - answers a pending question directly and autonomously.
 
-Use:
+Use the same account that supplied the session:
 
 ```bash
-"$JULES_CLI" message <session-id> "<session-specific review feedback>"
+"$JULES_ACCOUNT" <primary-or-backup> message <session-id> "<session-specific review feedback>"
 ```
 
 Do not praise generally, restate the entire prompt, auto-approve plans, or send feedback to a session with no reviewable activity.
 
 ### 5. Confirm receipt and continue reviewing
 
-1. Re-read `activities --all` and verify the message appears as `userMessaged`.
+1. Re-read `activities --all` through the same account and verify the message
+   appears as `userMessaged`.
 2. Re-run `get` to record the current state. For a previously paused session,
    confirm it resumed; for an already `IN_PROGRESS` session, the
    `userMessaged` activity is sufficient proof of delivery and a revised plan
@@ -132,7 +150,11 @@ Do not praise generally, restate the entire prompt, auto-approve plans, or send 
 
 Give the user a compact review ledger:
 
-| Session | Evidence reviewed | Finding | Feedback sent | Current state |
+| Account / session | Evidence reviewed | Finding | Feedback sent | Current state |
 |---|---|---|---|---|
 
-Separate confirmed code defects from plan risks and unreviewable queued sessions. Report exact session IDs or links for important blockers. Never claim a correction landed until later activity, a diff, or test output proves it.
+Separate confirmed code defects from plan risks and unreviewable queued
+sessions. Report primary, backup, and combined full-pagination counts when a
+fleet target matters. Report exact session IDs or links for important blockers.
+Never claim a correction landed until later activity, a diff, or test output
+proves it.

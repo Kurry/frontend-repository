@@ -1,0 +1,210 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "empty_projects_state_after_delete_all"
+description = "After deleting every project, Projects Board and /work output both show an empty state with a message and a way to create a project."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "empty_name_inline_validation"
+description = "On project create, an empty project name or uppercase slug shows visible validation feedback naming the field and the contract rule, and the projects collection count does not increase."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "validation_names_field_and_fix"
+description = "Project create/edit validation copy names the invalid field and the accepted contract rule (bounds, enum, or format) rather than only saying Invalid."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "unknown_command_prints_hint"
+description = "Typing an unknown command prints a visible command-not-found line with a hint rather than failing silently or throwing."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "double_submit_adds_exactly_one"
+description = "Double-activating the create submit adds exactly one project: the collection count increases by one and exactly one new board card appears."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "reopen_restores_history_and_theme"
+description = "Closing the terminal with the red traffic light then pressing Reopen restores the terminal with its output history and theme intact."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "up_arrow_before_history_is_noop"
+description = "Pressing the up arrow before any command has been typed leaves the prompt unchanged with no errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "shell_controls_use_semantic_tags"
+description = "Command prompt, create/edit form fields, consent Accept/Decline, traffic lights, and mode toggle use semantic button/input/label elements rather than unlabeled decorative wrappers."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "exit_overlay_reopen_path"
+description = "The exit overlay shown after the red-dot close provides a working Reopen control that returns to the terminal without a full page reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "create_submit_disabled_until_valid"
+description = "On the project create form, the submit control stays disabled or inert until all API-shaped required fields are valid, and per-field inline messages name each invalid field before submit."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "featured_fourth_limit_message"
+description = "Featuring a fourth project while three are already featured shows a featured-limit message and does not set the fourth flag."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "malformed_import_rejected"
+description = "Importing malformed Portfolio JSON shows a visible validation message naming the problem, changes no projects, and leaves /work and the board unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "empty_profile_name_rejected"
+description = "Saving a profile with an empty name creates no profile and shows validation naming the name field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "undo_redo_disabled_when_empty"
+description = "Undo with an empty history and Redo with an empty redo stack are disabled; activating them does nothing and produces no console errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "config_diff_no_differences_state"
+description = "Config Diff with no session mutations shows a no-differences state rather than a blank or broken panel."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "year_out_of_bounds_rejected"
+description = "Submitting project create with year 1999 or 2101 does not increase the projects count and shows validation naming the year field."
+type = "binary"
+weight = 1.0
+

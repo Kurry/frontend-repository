@@ -1,0 +1,14 @@
+import { test, expect } from './fixtures';
+import { css, openApp, openDetail, openExport, row } from './helpers';
+// NOT-AUTOMATABLE:
+// - 3.1 spacing_follows_console_rhythm — "no arbitrary one-off gaps" is a source/design-system judgment without numeric acceptance values.
+// - 3.6 carbon_kit_styling_consistent — aesthetic consistency of radii, padding, and shadows across kit surfaces is subjective without baselines.
+test.beforeEach(async({page})=>openApp(page));
+test('3.2 typography_matches_hierarchy',async({page})=>{const h1=parseFloat(await css(page.getByRole('heading',{name:'Agent registry'}),'font-size'));const h2=parseFloat(await css(page.getByRole('heading',{name:'Fleet agents'}),'font-size'));const body=parseFloat(await css(page.locator('.agent-row').first(),'font-size'));expect(h1).toBeGreaterThan(h2);expect(h2).toBeGreaterThan(body);});
+test('3.3 layout_matches_console_composition',async({page})=>{await expect(page.locator('.fleet-toolbar')).toBeVisible();await expect(page.locator('.agent-table')).toBeVisible();await openDetail(page);expect((await page.locator('.detail-panel').boundingBox())!.width).toBeCloseTo(320,-1);});
+test('3.4 specified_state_changes_animate',async({page})=>{expect(parseFloat(await css(page.locator('.agent-row').first(),'transition-duration'))).toBeGreaterThan(0);await openDetail(page);expect(await css(page.locator('.detail-panel'),'animation-name')).toBe('panel-in');});
+test('3.5 responsive_patterns_match_spec',async({page})=>{await page.setViewportSize({width:768,height:800});await openDetail(page);expect((await page.locator('.detail-panel').boundingBox())!.width).toBeGreaterThan(320);await page.setViewportSize({width:375,height:800});expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);});
+test('3.7 status_mapping_matches_spec',async({page})=>{for(const status of ['running','idle','paused','error','offline'])await expect(page.locator(`.status-${status}`).first()).toBeVisible();await expect(row(page,'Boreal Sable').locator('.error-status-cell')).toBeVisible();});
+test('3.8 export_surface_matches_spec',async({page})=>{const modal=await openExport(page);expect(await css(page.locator('.json-preview'),'font-family')).toMatch(/mono/i);await expect(modal.getByRole('button',{name:'Copy'})).toBeVisible();await expect(modal.getByRole('button',{name:'Download'})).toBeVisible();});
+test('3.9 rollup_tiles_match_spec',async({page})=>{await expect(page.locator('.rollup-strip > div')).toHaveCount(6);const borders=await page.locator('.rollup-strip > div').evaluateAll((els)=>els.map((e)=>getComputedStyle(e).borderRightWidth));expect(borders.every((x)=>x==='1px'||x==='0px')).toBe(true);});
+test('3.10 icon_set_consistent',async({page})=>{expect(await page.locator('svg').count()).toBeGreaterThan(10);expect(await page.locator('img[src$=".svg"]').count()).toBe(0);});

@@ -52,6 +52,11 @@ function sessionStart() {
   if (phase !== 'setup' && phase !== 'match-complete') {
     return { ok: false, error: `cannot start: a match is already in phase "${phase}"` };
   }
+  const playerName = a.store.playerName.trim();
+  if (playerName.length < 2 || playerName.length > 20) {
+    return { ok: false, error: 'playerName field must be 2 to 20 non-space characters' };
+  }
+  a.store.playerName = playerName;
   a.startMatch();
   return { ok: true, operation: 'start', phase: a.store.phase, roundNumber: a.store.roundNumber };
 }
@@ -77,6 +82,9 @@ function sessionResume() {
 function sessionRestart() {
   const a = api();
   if (!a) return { ok: false, error: 'app not ready' };
+  if (a.store.phase !== 'match-complete') {
+    return { ok: false, error: 'rematch is only available after a completed match' };
+  }
   a.restartMatch();
   return { ok: true, operation: 'restart', phase: a.store.phase, roundNumber: a.store.roundNumber };
 }
@@ -107,6 +115,25 @@ function browseOpen(args: Record<string, unknown>) {
   }
   a.navigate(destination as NavDest);
   return { ok: true, operation: 'open', destination, phase: a.store.phase };
+}
+
+function browseSearch(args: Record<string, unknown>) {
+  const a = api();
+  if (!a) return { ok: false, error: 'app not ready' };
+  const query = String(args.query ?? '').trim().toLowerCase();
+  if (!query || query.length > 200) {
+    return { ok: false, error: 'query must be 1 to 200 characters' };
+  }
+  const destinations = DESTINATIONS.filter((destination) => destination.includes(query));
+  return {
+    ok: true,
+    operation: 'search',
+    query,
+    phase: a.store.phase,
+    difficulty: a.store.difficulty,
+    destinations,
+    matchCount: a.store.matchLog.length,
+  };
 }
 
 function browseApplyFilter(args: Record<string, unknown>) {
@@ -208,65 +235,133 @@ function artifactImport(args: Record<string, unknown>) {
 
 type Handler = (args: Record<string, unknown>) => unknown;
 
-const TOOLS: { name: string; description: string; handler: Handler }[] = [
+type ModuleId = (typeof MODULES)[number];
+type ToolDescriptor = {
+  name: string;
+  module: ModuleId;
+  operation: string;
+  description: string;
+  inputSchema: Record<string, unknown>;
+  annotations?: { readOnlyHint?: boolean };
+  handler: Handler;
+};
+
+const EMPTY_INPUT = { type: 'object', additionalProperties: false };
+
+const TOOLS: ToolDescriptor[] = [
   {
-    name: 'session-start',
+    name: 'session.start',
+    module: 'command-session-v1',
+    operation: 'start',
     description: 'Start a new best-of-3 match from the setup screen (same as the "Start match" button).',
+    inputSchema: EMPTY_INPUT,
     handler: sessionStart,
   },
   {
-    name: 'session-pause',
+    name: 'session.pause',
+    module: 'command-session-v1',
+    operation: 'pause',
     description: 'Pause the active round, freezing the board and the Rival (same as the Pause button).',
+    inputSchema: EMPTY_INPUT,
     handler: sessionPause,
   },
   {
-    name: 'session-resume',
+    name: 'session.resume',
+    module: 'command-session-v1',
+    operation: 'resume',
     description: 'Resume a paused round (same as the Resume button).',
+    inputSchema: EMPTY_INPUT,
     handler: sessionResume,
   },
   {
-    name: 'session-restart',
+    name: 'session.restart',
+    module: 'command-session-v1',
+    operation: 'restart',
     description: 'Restart the match at the current difficulty, resetting scores and strikes (same as "Rematch").',
+    inputSchema: EMPTY_INPUT,
     handler: sessionRestart,
   },
   {
-    name: 'session-stop',
+    name: 'session.stop',
+    module: 'command-session-v1',
+    operation: 'stop',
     description: 'Stop the match and return to the setup screen (same as the "New match" reset).',
+    inputSchema: EMPTY_INPUT,
     handler: sessionStop,
   },
   {
-    name: 'browse-open',
-    description: 'Navigate to a destination. args.destination is one of: game-board, stats, match-log, export-center. Works mid-round; use browse-back to return to the round.',
+    name: 'browse.open',
+    module: 'browse-query-v1',
+    operation: 'open',
+    description: 'Navigate to a destination. args.destination is one of: game-board, stats, match-log, export-center. Works mid-round; use the visible Go back control to return to the round.',
+    inputSchema: {
+      type: 'object', additionalProperties: false, default: { destination: 'stats' }, required: ['destination'],
+      properties: { destination: { type: 'string', enum: DESTINATIONS } },
+    },
     handler: browseOpen,
   },
   {
-    name: 'browse-back',
-    description: 'Press the "← Go back" control. Returns to an in-progress round when opened from one, else to setup.',
-    handler: () => { const a = api(); if (!a) return { ok: false, error: 'app not ready' }; a.back(); return { ok: true, operation: 'back', phase: a.store.phase }; },
+    name: 'browse.search',
+    module: 'browse-query-v1',
+    operation: 'search',
+    description: 'Search declared MineClash destinations and return the current visible session summary.',
+    inputSchema: {
+      type: 'object', additionalProperties: false, required: ['query'],
+      properties: { query: { type: 'string', minLength: 1, maxLength: 200 } },
+    },
+    annotations: { readOnlyHint: true },
+    handler: browseSearch,
   },
   {
-    name: 'browse-apply_filter',
+    name: 'browse.apply_filter',
+    module: 'browse-query-v1',
+    operation: 'apply_filter',
     description: 'Set the match difficulty filter on setup. args.difficulty is one of: easy, medium, hard.',
+    inputSchema: {
+      type: 'object', additionalProperties: false, required: ['difficulty'],
+      properties: { difficulty: { type: 'string', enum: DIFFICULTIES, default: 'medium' } },
+    },
     handler: browseApplyFilter,
   },
   {
-    name: 'browse-clear_filter',
+    name: 'browse.clear_filter',
+    module: 'browse-query-v1',
+    operation: 'clear_filter',
     description: 'Clear the difficulty filter back to the default (easy) on setup.',
+    inputSchema: EMPTY_INPUT,
     handler: browseClearFilter,
   },
   {
-    name: 'artifact-export',
+    name: 'artifact.export',
+    module: 'artifact-transfer-v1',
+    operation: 'export',
     description: 'Show an export artifact in the DOM as a readable/copyable preview (same as the Export Match / Export Archive controls). args.format is match-json or match-archive-json; match-json may pass args.entryId (index into the Match log, or an endedAt string). No raw JSON is returned.',
+    inputSchema: {
+      type: 'object', additionalProperties: false,
+      properties: { format: { type: 'string', enum: EXPORT_FORMATS }, entryId: { type: ['number', 'string'] } },
+    },
     handler: artifactExport,
   },
   {
-    name: 'artifact-copy',
+    name: 'artifact.copy',
+    module: 'artifact-transfer-v1',
+    operation: 'copy',
     description: 'Copy an export artifact to the clipboard (same as the on-screen Copy button). args.format is match-json or match-archive-json. The copied text is NOT returned.',
+    inputSchema: {
+      type: 'object', additionalProperties: false,
+      properties: { format: { type: 'string', enum: EXPORT_FORMATS }, entryId: { type: ['number', 'string'] } },
+    },
     handler: artifactCopy,
   },
   {
-    name: 'artifact-import',
+    name: 'artifact.import',
+    module: 'artifact-transfer-v1',
+    operation: 'import',
     description: 'Import the JSON currently in the import textarea (same handler as the Import button; type the text first the way a human pastes). args.mode is match-json or match-archive-json. Returns ok/imported/message only — never the parsed contents.',
+    inputSchema: {
+      type: 'object', additionalProperties: false,
+      properties: { mode: { type: 'string', enum: ['match-json', 'match-archive-json'] } },
+    },
     handler: artifactImport,
   },
 ];
@@ -279,7 +374,7 @@ export function initWebMcp(app: MineClashApi) {
     modules: MODULES,
     tools: TOOLS.map((t) => t.name),
   });
-  w.webmcp_list_tools = () => TOOLS.map((t) => ({ name: t.name, description: t.description }));
+  w.webmcp_list_tools = () => TOOLS.map(({ handler: _handler, ...descriptor }) => descriptor);
   w.webmcp_invoke_tool = (name: string, args: Record<string, unknown> = {}) => {
     const tool = TOOLS.find((t) => t.name === name);
     if (!tool) return { ok: false, error: `unknown tool: ${name}` };

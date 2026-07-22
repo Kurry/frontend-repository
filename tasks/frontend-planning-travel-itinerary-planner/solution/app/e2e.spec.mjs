@@ -59,7 +59,53 @@ test.describe('workspace contract (canonical)', () => {
     for (const t of arr) expect(typeof (t.name ?? t.id), 'every tool has a name').toBe('string');
   });
 
-  // DROPPED (fails live oracle): 'reduced motion behaviorally suppresses animation'
+  test('reduced motion behaviorally suppresses animation', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    // Install the collector before navigation so load/hydration animations are
+    // observed too. Keep it running through network idle and a settled 1.5s
+    // window so late-starting effects cannot escape the assertion.
+    await page.addInitScript(() => {
+      window.__reducedMotionOffenders = [];
+      const seen = new Set();
+      const sample = () => {
+        for (const animation of document.getAnimations({ subtree: true })) {
+          if (animation.playState !== 'running') continue;
+          let timing = {};
+          try { timing = animation.effect?.getComputedTiming?.() ?? {}; } catch { /* detached */ }
+          const duration = typeof timing.duration === 'number' ? timing.duration : 0;
+          if (duration <= 1) continue;
+          const offender = {
+            kind: animation.constructor?.name ?? 'Animation',
+            name: animation.animationName ?? animation.transitionProperty ?? animation.id ?? '(anonymous)',
+            duration,
+            iterations: timing.iterations ?? 1,
+          };
+          const key = JSON.stringify(offender);
+          if (!seen.has(key)) {
+            seen.add(key);
+            window.__reducedMotionOffenders.push(offender);
+          }
+        }
+        requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    });
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    // Precondition sanity check: the emulation actually reaches the app.
+    const reduced = await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
+    expect(reduced, 'precondition: app sees prefers-reduced-motion: reduce').toBe(true);
+    // Observe every frame for another 1.5s after load settles and assert on
+    // everything seen since the document started.
+    // Finished, idle, or paused effects and durations <=1ms are allowed; any
+    // meaningfully timed RUNNING effect at any sample is a reduced-motion
+    // failure. Apps with zero animations pass vacuously (the render/console
+    // test still gates them).
+    await page.waitForTimeout(1500);
+    const offenders = await page.evaluate(() => window.__reducedMotionOffenders ?? []);
+    expect(offenders, 'no running animation/transition with meaningful duration under reduced motion').toEqual([]);
+  });
+
   test('no horizontal overflow at 375px', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto(BASE);

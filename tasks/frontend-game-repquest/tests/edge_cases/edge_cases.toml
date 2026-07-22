@@ -1,0 +1,188 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "history_empty_state_before_logs"
+description = "Before any set is logged, the History tab shows a placeholder message explaining what will appear there instead of an empty list"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.2"
+name = "log_reps_invalid_inline_errors"
+description = "Empty, zero, negative, non-integer, or out-of-range reps show a visible inline error naming the reps field and do not change today's total, lifetime reps, or character position"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.3"
+name = "note_over_120_rejected"
+description = "A note longer than 120 characters shows an inline error naming the note field and does not create a History entry"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.4"
+name = "zone_unlock_and_boss_defeat_feedback"
+description = "Zone unlock and boss defeat each show a transient confirmation banner in addition to the map palette or marker change"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.5"
+name = "challenge_idle_log_rejected"
+description = "Logging reps while a challenge run is not active shows visible feedback and does not advance the run"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.6"
+name = "reset_cancel_leaves_state"
+description = "Canceling the Reset Quest confirmation dialog leaves lifetime reps, History, gear, and checkpoint untouched"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.7"
+name = "undo_redo_disabled_when_empty"
+description = "Undo and Redo controls are disabled, not merely ignored, when there is nothing to undo or redo"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.8"
+name = "weekly_chart_zero_day_ticks"
+description = "Days with zero reps in the weekly summary chart still render a visible zero-height tick, never a blank chart area"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.9"
+name = "reset_dialog_escape_and_confirm"
+description = "The Reset Quest confirmation dialog closes on Escape or Cancel without wiping state, and Confirm performs the wipe"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.10"
+name = "challenge_lifecycle_progress_feedback"
+description = "Challenge run status (idle, active, paused, Victory, Defeat) is always visible so the player knows which lifecycle step is current"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.11"
+name = "malformed_import_rejected"
+description = "Importing a malformed Quest Log JSON leaves lifetime reps, History, gear, and settings unchanged and shows a visible invalid-file rejection"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.12"
+name = "empty_export_still_valid_json"
+description = "Export Quest Log with zero logged sets still downloads a valid JSON document whose sets array is empty and lifetimeReps is 0, without a crash"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.13"
+name = "save_resume_controls_gated"
+description = "Resume Saved Run is disabled when no checkpoint exists; Save Progress is disabled when the challenge run is idle or already ended"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.14"
+name = "difficulty_locked_during_active_run"
+description = "Changing difficulty while a run is active is disabled or rejected with visible feedback and does not alter the in-progress target mid-run"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.15"
+name = "rapid_25_logs_integrity"
+description = "Logging 25 rep sets back to back leaves lifetime reps, today's total, and History exactly matching the sum entered with no frozen or blank screen"
+type = "binary"
+weight = 1.0
