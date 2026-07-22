@@ -1,0 +1,197 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "cr-core_features-01"
+description = "Loads the Symbolic Window scene with 18 cutouts across 7 depth slots on an 800x500 board."
+weight = 1.0
+
+[[criterion]]
+id = "cr-core_features-02"
+description = "Shows perspective stage, depth rail, old and new ghost silhouettes, world-position anchors, viewer-stop ruler, and center-view lock marker."
+weight = 1.0
+
+[[criterion]]
+id = "cr-core_features-03"
+description = "Permits selecting cutouts and dragging their depth token between slots without changing the world silhouette."
+weight = 1.0
+
+[[criterion]]
+id = "cr-core_features-04"
+description = "Updates projected bounds, old and new parallax traces, and directed overlap when a cutout is dragged to a new slot."
+weight = 1.0
+
+[[criterion]]
+id = "cr-core_features-05"
+description = "Updates visibility bands, slot occupancy, spacer count, and assembly-step reassignment during depth drag."
+weight = 1.0
+
+[[criterion]]
+id = "cr-core_features-06"
+description = "Shows a revision-guarded confirmation naming old and new slots, exact overlap, visibility vectors, and minimum visibility after drop."
+weight = 1.0
+
+[[criterion]]
+id = "cr-core_features-07"
+description = "Restores exact depth and view states when cancel is clicked."
+weight = 1.0
+
+[[criterion]]
+id = "cr-core_features-08"
+description = "Applies depthSlot mutation (e.g. 2 to 4) exactly upon confirmation."
+weight = 1.0
+
+[[criterion]]
+id = "cr-core_features-09"
+description = "Synchronizes perspective stage, three-stop contact sheet, parallax trace, depth stack, occlusion raster, edge graph, and visibility bands."
+weight = 1.0
+
+[[criterion]]
+id = "cr-core_features-010"
+description = "Highlights matching fixed-point cells across all views when brushing an overlap rectangle."
+weight = 1.0
+
+[[criterion]]
+id = "cr-core_features-011"
+description = "Projects using eighth-unit fixed point logic where xFixed8 equals x times 8 minus u times depthSlot."
+weight = 1.0
+
+[[criterion]]
+id = "cr-core_features-012"
+description = "Evaluates occlusion by deterministic intersection of projected half-open rectangles."
+weight = 1.0
+
+[[criterion]]
+id = "cr-core_features-013"
+description = "Displays depth sheets with ordered cutout membership, derived spacer markers, and visibility prerequisites."
+weight = 1.0
+
+[[criterion]]
+id = "cr-core_features-014"
+description = "Reassigns cutout-07 to the slot-4 sheet and creates expected spacer markers after canonical move."
+weight = 1.0
+
+[[criterion]]
+id = "cr-core_features-015"
+description = "Enforces a strict acyclic order for assembly steps."
+weight = 1.0
+
+[[criterion]]
+id = "cr-core_features-016"
+description = "Provides a comparison wipe showing signed deltas between Shallow Draft and Balanced Reveal branches."
+weight = 1.0
+
+[[criterion]]
+id = "cr-core_features-017"
+description = "Records a layout decision with preferred layout, rationale, confidence, and source annotations."
+weight = 1.0
+
+[[criterion]]
+id = "cr-core_features-018"
+description = "Enforces approval requirements: canonical depth move, preferred decision, note on edge, minimum visibility exactly or above 2000, and zero conflicts."
+weight = 1.0
+
+[[criterion]]
+id = "cr-core_features-019"
+description = "Exports a depth packet ZIP containing manifest.json, shadowbox-project.json, CSV files, SVGs, and viewer-card.html."
+weight = 1.0
+
+[[criterion]]
+id = "cr-core_features-020"
+description = "Allows atomic ZIP or JSON-only import, validating before mutation and reporting diagnostics."
+weight = 1.0
+
+[[criterion]]
+id = "cr-core_features-021"
+description = "Provides a reset feature that previews counts, restores fixture definitions, and returns focus to opener."
+weight = 1.0
