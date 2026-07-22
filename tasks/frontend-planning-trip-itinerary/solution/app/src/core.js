@@ -14,6 +14,7 @@ export function h(tag, attrs = {}, ...kids) {
     else if (k === "style" && typeof v === "object") Object.assign(el.style, v);
     else if (k.startsWith("on") && typeof v === "function") el.addEventListener(k.slice(2).toLowerCase(), v);
     else if (k === "dataset") Object.assign(el.dataset, v);
+    else if (k === "value" && tag === "textarea") el.value = v;
     else if (v === true) el.setAttribute(k, "");
     else el.setAttribute(k, v);
   }
