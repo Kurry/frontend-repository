@@ -226,7 +226,12 @@ export const useCostStore = create((set, get) => ({
   })),
   setRate: (model, rate) => set((state) => {
     const { min, max } = rateBounds(model);
-    return { rateOverrides: { ...state.rateOverrides, [model]: Math.min(max, Math.max(min, Number(rate))) } };
+    const nextRate = Math.min(max, Math.max(min, Number(rate)));
+    if (Math.abs(nextRate - ORIGINAL_RATES[model]) < Number.EPSILON) {
+      const { [model]: _removed, ...rateOverrides } = state.rateOverrides;
+      return { rateOverrides };
+    }
+    return { rateOverrides: { ...state.rateOverrides, [model]: nextRate } };
   }),
   revertRates: () => set({ rateOverrides: {}, announce: 'What-if rates reverted to the originals' }),
   setFormula: (formula) => set({ formula }),

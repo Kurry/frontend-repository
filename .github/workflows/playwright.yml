@@ -48,6 +48,23 @@ jobs:
         working-directory: tasks/${{ matrix.slug }}/solution/app
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect task-specific E2E changes
+        id: task-tests
+        working-directory: ${{ github.workspace }}
+        env:
+          BASE_REF: origin/${{ github.base_ref }}
+          TASK_SLUG: ${{ matrix.slug }}
+        run: |
+          if git diff --quiet "$BASE_REF"...HEAD -- \
+            "tasks/$TASK_SLUG/solution/app/e2e.spec.mjs" \
+            "tasks/$TASK_SLUG/solution/app/e2e"; then
+            echo "required=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "required=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - uses: actions/setup-node@v4
         with:
@@ -83,6 +100,7 @@ jobs:
       - name: Run Playwright suites
         id: suites
         env:
+          REQUIRE_TASK_TESTS: ${{ steps.task-tests.outputs.required }}
           RESULT_PATH: ${{ runner.temp }}/playwright-status-${{ matrix.slug }}.json
           TASK_SLUG: ${{ matrix.slug }}
         run: |
@@ -100,6 +118,8 @@ jobs:
             slug: process.env.TASK_SLUG,
             appDir: process.cwd(),
             runtimeDir: process.env.RUNNER_TEMP,
+            taskDir: path.join(process.env.GITHUB_WORKSPACE, 'tasks', process.env.TASK_SLUG),
+            requireTaskTests: process.env.REQUIRE_TASK_TESTS === 'true',
           });
           fs.writeFileSync(
             process.env.RESULT_PATH,
@@ -240,6 +260,11 @@ jobs:
                       detail = "No canonical or task-owned Playwright suite discovered"
                   else:
                       detail = result.get("message", "No failure detail reported")
+                      if "taskSpecificTests" in result:
+                          detail += (
+                              f"; task-specific={result['taskSpecificTests']}"
+                              f" rubric-matched={result.get('rubricMatchedTests', 0)}"
+                          )
               totals[status] = totals.get(status, 0) + 1
               rows.append(
                   f"| `{table_text(slug)}` | {labels.get(status, labels['missing'])} | {table_text(detail)} |"

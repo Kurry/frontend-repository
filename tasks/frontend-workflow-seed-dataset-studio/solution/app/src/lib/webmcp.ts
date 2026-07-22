@@ -1,25 +1,25 @@
 import { studio } from './studio.svelte';
 import { RejectSeedSchema } from './schemas';
 
-// Maps each registered webmcp_* tool name to the positional argument order its
+// Maps each registered tool name to the positional argument order its
 // handler expects, so webmcp_invoke_tool can dispatch a named-arguments object
 // (the shape the bundled stdio MCP bridge sends) onto the right handler.
 const TOOL_ARG_KEYS: Record<string, string[]> = {
-  webmcp_editor_select: ['id', 'type'],
-  webmcp_editor_add: ['id', 'type', 'content'],
-  webmcp_editor_delete: ['id', 'type', 'objectId'],
-  webmcp_editor_update_property: ['id', 'type', 'objectId', 'property', 'value'],
-  webmcp_editor_set_content: ['id', 'type', 'objectId', 'content'],
-  webmcp_form_validate: ['id', 'data'],
-  webmcp_form_submit: ['id', 'data'],
-  webmcp_form_cancel: ['id'],
-  webmcp_form_advance: ['id', 'to'],
-  webmcp_form_return: ['id', 'to'],
-  webmcp_session_start: ['id'],
-  webmcp_session_pause: ['id'],
-  webmcp_session_resume: ['id'],
-  webmcp_artifact_export: ['id', 'format'],
-  webmcp_artifact_copy: ['id', 'artifact'],
+  editor_select: ['id', 'type'],
+  editor_add: ['id', 'type', 'content'],
+  editor_delete: ['id', 'type', 'objectId'],
+  editor_update_property: ['id', 'type', 'objectId', 'property', 'value'],
+  editor_set_content: ['id', 'type', 'objectId', 'content'],
+  form_validate: ['id', 'data'],
+  form_submit: ['id', 'data'],
+  form_cancel: ['id'],
+  form_advance: ['id', 'to'],
+  form_return: ['id', 'to'],
+  session_start: ['id'],
+  session_pause: ['id'],
+  session_resume: ['id'],
+  artifact_export: ['id', 'format'],
+  artifact_copy: ['id', 'artifact'],
 };
 
 export function initWebMCP() {
@@ -30,7 +30,26 @@ export function initWebMCP() {
     modules: ["structured-editor-v1", "form-workflow-v1", "command-session-v1", "artifact-transfer-v1"]
   });
 
-  (window as any).webmcp_list_tools = () => Object.keys(TOOL_ARG_KEYS);
+  (window as any).webmcp_list_tools = () => Object.entries(TOOL_ARG_KEYS).map(([name, argKeys]) => ({
+    name,
+    description: `Seed Dataset Studio ${name.replaceAll('_', ' ')} action.`,
+    inputSchema: {
+      type: 'object',
+      properties: Object.fromEntries(argKeys.map((key) => [key,
+        name === 'editor_add' && key === 'id'
+          ? { type: 'string', enum: ['quartz-orm-issue-142'] }
+          : name === 'editor_add' && key === 'type'
+            ? { type: 'string', enum: ['positive-criterion'] }
+            : name === 'form_advance' && key === 'id'
+          ? { type: 'string', enum: ['accept-for-authoring'] }
+          : name === 'form_advance' && key === 'to'
+            ? { type: 'string', enum: ['authoring'] }
+            : {},
+      ])),
+      required: name === 'editor_add' ? ['id', 'type'] : argKeys,
+      additionalProperties: false,
+    },
+  }));
 
   // structured-editor-v1
   (window as any).webmcp_editor_select = (id: string, type: string) => {
@@ -230,8 +249,9 @@ export function initWebMCP() {
   // point (window.webmcp_invoke_tool(name, arguments)); it fans the named
   // arguments object out to the matching handler's positional parameters.
   (window as any).webmcp_invoke_tool = (name: string, args: Record<string, any> = {}) => {
-    const argKeys = TOOL_ARG_KEYS[name];
-    const handler = (window as any)[name];
+    const normalizedName = name.replace(/^webmcp_/, '');
+    const argKeys = TOOL_ARG_KEYS[normalizedName];
+    const handler = (window as any)[`webmcp_${normalizedName}`];
     if (!argKeys || typeof handler !== 'function') throw new Error(`Unknown WebMCP tool: ${name}`);
     return handler(...argKeys.map((key) => args?.[key]));
   };
