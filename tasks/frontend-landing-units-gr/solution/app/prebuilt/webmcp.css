@@ -8,7 +8,8 @@
 .cmd-item.active:focus-visible,.shortlist-opener:focus-visible{outline-color:#fff}
 
 /* ---------- full-screen menu overlay (hamburger) ---------- */
-.nav-overlay{position:fixed;inset:0;z-index:600;background:#f4e9e1;display:flex;
+header{z-index:850}
+.nav-overlay{position:fixed;inset:0;z-index:850;background:#f4e9e1;display:flex;
   align-items:center;justify-content:center;opacity:0;visibility:hidden;pointer-events:none;
   transition:opacity .5s cubic-bezier(.19,1,.22,1),visibility 0s linear .5s}
 .nav-overlay.is-open{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .5s cubic-bezier(.19,1,.22,1)}
