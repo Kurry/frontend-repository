@@ -1,0 +1,5 @@
+[task]
+id = "frontend-workflow-rental-turnaround-control-board"
+title = "Rental Turnaround Control Board"
+description = "Spatial inspection and handoff workflow app"
+type = "frontend"
