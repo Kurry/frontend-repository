@@ -401,7 +401,7 @@ async function e2eStage(config) {
   });
   if (result.status === 'skip') {
     console.log(
-      `ORACLE_CI_STAGE ${config.slug} [e2e]: SKIP (no e2e.spec.mjs; canonical coverage arrives progressively)`,
+      `ORACLE_CI_STAGE ${config.slug} [e2e]: SKIP (no e2e.spec.mjs and no e2e/*.spec.*; coverage arrives progressively)`,
     );
     return;
   }

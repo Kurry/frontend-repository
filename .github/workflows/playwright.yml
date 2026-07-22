@@ -1,0 +1,116 @@
+name: Playwright Tests
+
+on:
+  pull_request:
+    paths:
+      - "tasks/**/solution/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: playwright-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      slugs: ${{ steps.diff.outputs.slugs }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: diff
+        env:
+          BASE_REF: origin/${{ github.base_ref }}
+        run: |
+          slugs=$(git diff --name-only "$BASE_REF"...HEAD \
+            | grep -oE '^tasks/[^/]+/solution/' | cut -d/ -f2 | sort -u \
+            | jq -R . | jq -cs .)
+          echo "slugs=$slugs" >> "$GITHUB_OUTPUT"
+          echo "changed tasks: $slugs"
+
+  playwright:
+    needs: detect
+    if: needs.detect.outputs.slugs != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        slug: ${{ fromJson(needs.detect.outputs.slugs) }}
+    defaults:
+      run:
+        working-directory: tasks/${{ matrix.slug }}/solution/app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles(format('tasks/{0}/solution/app/package-lock.json', matrix.slug)) }}
+          restore-keys: playwright-${{ runner.os }}-
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build
+        run: |
+          if npm run | grep -q "verify:build"; then npm run verify:build; fi
+
+      - name: Start app
+        run: |
+          (npm run start &> /tmp/serve.log &)
+          npx --yes wait-on@8 http://localhost:3000 --timeout 90000 || { cat /tmp/serve.log; exit 1; }
+
+      - name: Run Playwright suites
+        env:
+          TASK_SLUG: ${{ matrix.slug }}
+        run: |
+          node --input-type=module <<'NODE'
+          import path from 'node:path';
+          import { pathToFileURL } from 'node:url';
+
+          const helperPath = path.join(
+            process.env.GITHUB_WORKSPACE,
+            'packages/corpuscheck/src/corpuscheck/assets/oracle_ci_e2e.mjs',
+          );
+          const { runE2eSuite } = await import(pathToFileURL(helperPath));
+          const result = await runE2eSuite({
+            slug: process.env.TASK_SLUG,
+            appDir: process.cwd(),
+            runtimeDir: process.env.RUNNER_TEMP,
+          });
+
+          if (result.status === 'skip') {
+            console.log(`::notice::${process.env.TASK_SLUG} has no Playwright suites yet — coverage arrives progressively`);
+          } else if (result.status === 'fail') {
+            console.error(`::error::${result.message}`);
+            process.exitCode = 1;
+          } else {
+            console.log(result.detail);
+            if (result.warning) console.log(`::warning::${result.warning}`);
+          }
+          NODE
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.slug }}
+          path: |
+            tasks/${{ matrix.slug }}/solution/app/playwright-report/
+            tasks/${{ matrix.slug }}/solution/app/test-results/
+          retention-days: 14
+          if-no-files-found: ignore

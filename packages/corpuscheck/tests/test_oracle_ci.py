@@ -348,6 +348,33 @@ def test_e2e_stage_fails_clearly_when_playwright_test_is_missing(
     assert "@playwright/test is not resolvable" in result["message"]
 
 
+def test_e2e_stage_names_task_directory_when_playwright_test_is_missing(
+    tmp_path: Path,
+) -> None:
+    app = tmp_path / "app"
+    app.mkdir()
+    (app / "package.json").write_text('{"name": "fixture", "private": true}')
+    (app / "e2e").mkdir()
+    (app / "e2e/core_features.spec.ts").write_text(_PASSING_SPEC)
+
+    result = run_e2e_suite(tmp_path, app)
+
+    assert result["status"] == "fail"
+    assert "e2e/*.spec.*" in result["message"]
+    assert "e2e.spec.mjs exists" not in result["message"]
+
+
+def test_playwright_workflow_uses_the_shared_pinned_discovery_runner() -> None:
+    workflow = (
+        Path(__file__).parents[3] / ".github/workflows/playwright.yml"
+    ).read_text()
+
+    assert "runE2eSuite" in workflow
+    assert "oracle_ci_e2e.mjs" in workflow
+    assert "npx playwright test e2e/" not in workflow
+    assert "solution/app/e2e/**" not in workflow
+
+
 @requires_playwright_test
 def test_e2e_stage_passes_with_stub_passing_suite(tmp_path: Path) -> None:
     app = make_e2e_app(tmp_path, spec=_PASSING_SPEC)
@@ -357,7 +384,7 @@ def test_e2e_stage_passes_with_stub_passing_suite(tmp_path: Path) -> None:
     assert result["status"] == "pass"
     assert (result["passed"], result["failed"], result["skipped"]) == (2, 0, 0)
     assert "warning" not in result
-    assert result["detail"] == "passed=2 failed=0 skipped=0 flaky=0"
+    assert result["detail"] == "passed=2 failed=0 skipped=0 flaky=0 (suites: canonical)"
 
 
 @requires_playwright_test
@@ -396,6 +423,72 @@ def test_e2e_stage_discovery_ignores_app_local_playwright_config(
 
     assert result["status"] == "pass"
     assert (result["passed"], result["failed"]) == (2, 0)
+
+
+_DIR_SPEC_TS = """
+import { test, expect } from '@playwright/test';
+test('task-dir spec runs', () => { expect(2 * 2).toBe(4); });
+"""
+_DIR_SPEC_FAILING_TS = """
+import { test, expect } from '@playwright/test';
+test('task-dir spec fails', () => { expect(2 * 2).toBe(5); });
+"""
+
+
+@requires_playwright_test
+def test_e2e_stage_runs_task_owned_e2e_directory_suite(tmp_path: Path) -> None:
+    """The PR #895 layout: solution/app/e2e/*.spec.ts with NO e2e.spec.mjs."""
+    app = make_e2e_app(tmp_path, spec=None)
+    (app / "e2e").mkdir()
+    (app / "e2e/core_features.spec.ts").write_text(_DIR_SPEC_TS)
+
+    result = run_e2e_suite(tmp_path, app)
+
+    assert result["status"] == "pass"
+    assert (result["passed"], result["failed"]) == (1, 0)
+    assert "(suites: task-dir)" in result["detail"]
+
+
+@requires_playwright_test
+def test_e2e_stage_runs_both_canonical_and_task_dir_suites(tmp_path: Path) -> None:
+    app = make_e2e_app(tmp_path, spec=_PASSING_SPEC)
+    (app / "e2e").mkdir()
+    (app / "e2e/behavioral.spec.ts").write_text(_DIR_SPEC_TS)
+
+    result = run_e2e_suite(tmp_path, app)
+
+    assert result["status"] == "pass"
+    assert (result["passed"], result["failed"]) == (3, 0)
+    assert "(suites: canonical, task-dir)" in result["detail"]
+
+
+@requires_playwright_test
+def test_e2e_stage_fails_when_task_dir_suite_fails(tmp_path: Path) -> None:
+    app = make_e2e_app(tmp_path, spec=_PASSING_SPEC)
+    (app / "e2e").mkdir()
+    (app / "e2e/edge_cases.spec.ts").write_text(_DIR_SPEC_FAILING_TS)
+
+    result = run_e2e_suite(tmp_path, app)
+
+    assert result["status"] == "fail"
+    assert "[task-dir]" in result["message"]
+    assert "task-dir spec fails" in result["message"]
+
+
+@requires_playwright_test
+def test_e2e_stage_task_dir_suite_ignores_decoy_config(tmp_path: Path) -> None:
+    app = make_e2e_app(
+        tmp_path,
+        spec=None,
+        extra={"playwright.config.js": _DECOY_CONFIG, "decoy.spec.mjs": _DECOY_SPEC},
+    )
+    (app / "e2e").mkdir()
+    (app / "e2e/accessibility.spec.ts").write_text(_DIR_SPEC_TS)
+
+    result = run_e2e_suite(tmp_path, app)
+
+    assert result["status"] == "pass"
+    assert (result["passed"], result["failed"]) == (1, 0)
 
 
 def test_generated_e2e_config_targets_the_served_app() -> None:
