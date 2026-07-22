@@ -259,14 +259,111 @@ def pbr_roles(name: str) -> list[str]:
     return [role for role, tokens in aliases.items() if any(token in normalized for token in tokens)]
 
 
-def is_lottie_json(path: Path, text: str) -> bool:
+def lottie_metadata(path: Path, text: str) -> dict | None:
     if path.suffix.lower() != ".json" or '"layers"' not in text or '"v"' not in text:
-        return False
+        return None
     try:
         data = json.loads(text)
     except json.JSONDecodeError:
-        return False
-    return isinstance(data, dict) and isinstance(data.get("layers"), list) and "v" in data
+        return None
+    if not isinstance(data, dict) or not isinstance(data.get("layers"), list) or "v" not in data:
+        return None
+    return {
+        "version": data["v"],
+        "width": data.get("w"),
+        "height": data.get("h"),
+        "frame_rate": data.get("fr"),
+        "in_point": data.get("ip"),
+        "out_point": data.get("op"),
+        "layer_count": len(data["layers"]),
+    }
+
+
+def is_lottie_json(path: Path, text: str) -> bool:
+    return lottie_metadata(path, text) is not None
+
+
+def render_report_section(
+    manifest: dict,
+    css_counts: collections.Counter[str],
+    referenced_format_sites: collections.Counter[str],
+) -> str:
+    css_denominator = int(manifest["sites_with_css"])
+    feature_labels = [
+        ("transforms", "Transforms"),
+        ("transitions", "transitions"),
+        ("flexbox", "flexbox"),
+        ("custom_properties", "custom properties"),
+        ("grid", "grid"),
+        ("transform_3d", "3D transforms"),
+        ("clip_path", "clipping"),
+        ("dynamic_viewport_units", "dynamic viewport units"),
+        ("backdrop_filter", "backdrop filters"),
+        ("masks", "masks"),
+        ("has_selector", "`:has()`"),
+        ("prefers_reduced_motion", "reduced-motion queries"),
+    ]
+    features = ", ".join(
+        f"{label} ({percent(css_counts[name], css_denominator):.1f}%)"
+        for name, label in feature_labels
+        if css_counts[name]
+    )
+    shader_sites = sum(referenced_format_sites[name] for name in ("glsl", "frag", "vert"))
+    references = [
+        ("GLB", referenced_format_sites["glb"]),
+        ("WASM", referenced_format_sites["wasm"]),
+        ("KTX2", referenced_format_sites["ktx2"]),
+        ("shader files", shader_sites),
+        ("Rive", referenced_format_sites["riv"]),
+        ("HDR", referenced_format_sites["hdr"]),
+        ("Spline scenes", referenced_format_sites["splinecode"]),
+    ]
+    reference_text = ", ".join(f"{label} ({count} sites)" for label, count in references if count)
+    return f"""## CSS and production-asset depth
+
+A second pass over the {int(manifest['mirrored_html_sites']):,} direct-cohort retained mirrors measures the actual
+CSS language and advanced asset systems. Among {css_denominator:,} sites with retained CSS,
+the analyzer found {int(manifest['css_features']):,} feature families and {int(manifest['css_feature_pairs']):,} site-level feature pairs.
+{features} show the production vocabulary hidden by a single `css_animation` flag.
+
+The same pass found {int(manifest['sites_with_referenced_advanced_assets']):,} sites referencing an advanced production asset and {int(manifest['sites_with_retained_advanced_assets']):,}
+with an advanced production asset retained. References include {reference_text}. Runtime signals connect those files to
+OffscreenCanvas, workers, glTF loaders, Draco, Basis/KTX2, Meshopt, Rive,
+WebAssembly, WebGPU, and WebXR pipelines.
+
+See [FRONTEND-DEPTH.md](FRONTEND-DEPTH.md) for the full method, CSS tables,
+retained-versus-referenced asset evidence, parsed GLB/KTX2/HDR metadata, the
+Lando Norris production-system analysis, and limitations."""
+
+
+def upsert_report_section(report: str, section: str) -> str:
+    heading = "## CSS and production-asset depth"
+    next_heading = "## Repeated feature bundles"
+    if heading in report:
+        start = report.index(heading)
+        end = report.index(next_heading, start)
+        return report[:start] + section.rstrip() + "\n\n" + report[end:]
+    if next_heading not in report:
+        raise ValueError(f"REPORT.md is missing insertion anchor: {next_heading}")
+    start = report.index(next_heading)
+    return report[:start] + section.rstrip() + "\n\n" + report[start:]
+
+
+def synchronize_study_outputs(output_dir: Path, manifest: dict, report_section: str) -> None:
+    summary = {key: value for key, value in manifest.items() if key != "generated_at"}
+    study_manifest_path = output_dir / "study-manifest.json"
+    if study_manifest_path.exists():
+        study_manifest = json.loads(study_manifest_path.read_text(encoding="utf-8"))
+        study_manifest["frontend_depth"] = summary
+        study_manifest_path.write_text(
+            json.dumps(study_manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
+    report_path = output_dir / "REPORT.md"
+    if report_path.exists():
+        report_path.write_text(
+            upsert_report_section(report_path.read_text(encoding="utf-8"), report_section),
+            encoding="utf-8",
+        )
 
 
 def write_frequency(path: Path, rows: list[list[object]], header: list[str]) -> None:
@@ -359,9 +456,21 @@ def main() -> int:
                 blocks = re.findall(r"<style\b[^>]*>(.*?)</style\s*>", text, re.I | re.S)
                 css_chunks.extend(blocks)
                 inline_blocks += len(blocks)
-            if is_lottie_json(path, text):
+            metadata = lottie_metadata(path, text)
+            if metadata is not None:
                 lottie_files += 1
                 lottie_bytes += path.stat().st_size
+                asset_inventory.append({
+                    "archive_rank": rank,
+                    "slug": status.get("slug", ""),
+                    "mirror_path": status.get("mirror_path", ""),
+                    "path": path.relative_to(root).as_posix(),
+                    "extension": "lottie_json",
+                    "category": "vector_animation",
+                    "bytes": path.stat().st_size,
+                    "metadata": metadata,
+                    "pbr_roles": pbr_roles(path.name),
+                })
 
         css_text = "\n".join(css_chunks)
         features = sorted(detect_css_features(css_text))
@@ -530,6 +639,8 @@ def main() -> int:
     (args.output_dir / "frontend-depth-manifest.json").write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
+    report_section = render_report_section(manifest, css_counts, referenced_format_sites)
+    synchronize_study_outputs(args.output_dir, manifest, report_section)
     print(json.dumps(manifest, indent=2, sort_keys=True))
     return 0
 

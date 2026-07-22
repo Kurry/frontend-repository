@@ -108,6 +108,24 @@ def changed_redirect_host(requested_url: str, final_url: str) -> bool:
     return bool(requested and final and requested != final)
 
 
+def existing_frontend_depth(output_dir: Path) -> tuple[dict | None, str]:
+    manifest_path = output_dir / "frontend-depth-manifest.json"
+    depth_manifest = None
+    if manifest_path.exists():
+        depth_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    report_path = output_dir / "REPORT.md"
+    if not report_path.exists():
+        return depth_manifest, ""
+    report = report_path.read_text(encoding="utf-8")
+    heading = "## CSS and production-asset depth"
+    next_heading = "## Repeated feature bundles"
+    if heading not in report or next_heading not in report:
+        return depth_manifest, ""
+    start = report.index(heading)
+    end = report.index(next_heading, start)
+    return depth_manifest, report[start:end].strip()
+
+
 def tag_groups(tags: list[str]) -> tuple[list[str], list[str], list[str], list[str]]:
     technologies, interactions, visuals, industries = [], [], [], []
     for tag in tags:
@@ -453,6 +471,7 @@ def main() -> int:
         changed_redirect_host(str(row.get("requested_url", "")), str(row.get("final_url", "")))
         for row in live
     )
+    depth_manifest, depth_report_section = existing_frontend_depth(args.output_dir)
     manifest = {
         "generated_at": dt.datetime.now(dt.UTC).replace(microsecond=0).isoformat(),
         "archive_records": len(archive),
@@ -476,6 +495,10 @@ def main() -> int:
         "pagination_record_count": len(archive),
         "display_pagination_difference": 6410 - len(archive),
     }
+    if depth_manifest is not None:
+        manifest["frontend_depth"] = {
+            key: value for key, value in depth_manifest.items() if key != "generated_at"
+        }
     (args.output_dir / "study-manifest.json").write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
@@ -580,7 +603,7 @@ denominator and should not be read as a longitudinal panel of unchanged sites.
 
 {markdown_table(signal_counts.most_common(), denominator, 20)}
 
-## Repeated feature bundles
+{depth_report_section + chr(10) + chr(10) if depth_report_section else ''}## Repeated feature bundles
 
 {markdown_table(feature_bundles.most_common(), denominator, 20)}
 
@@ -617,7 +640,7 @@ loading, reduced-motion, keyboard, touch, and fallback paths.
   `site-status.csv` and the denominator rather than disappearing from the study.
 - **Tag/detection conflation:** `GSAP` on an Awwwards card is editorial evidence;
   a Wappalyzer match is live-response evidence. The CSVs never merge the two.
-- **Asset dumping:** the mirror excludes heavy media and fonts, honors robots,
+- **Asset dumping:** the mirror excludes raster media and fonts, retains code-like SVG and runtime assets, honors robots,
   and enforces per-file, per-site, rate, socket, retry, depth, and time ceilings.
 - **Decorative complexity without an end state:** generated tasks should culminate
   in a saved configuration, shareable state, playable result, or downloadable
@@ -630,7 +653,7 @@ loading, reduced-motion, keyboard, touch, and fallback paths.
 - Awwwards tags are editorial metadata and are reported separately from live detection.
 - Consent walls, bot defenses, regional gating, expired TLS, and client-only rendering
   reduce observability. They are status outcomes, not silently excluded failures.
-- The mirror intentionally excludes images, video, audio, and fonts and caps depth,
+- The mirror intentionally excludes raster images, video, audio, and fonts while retaining SVG and caps depth,
   time, file size, total bytes, request rate, and sockets per site.
 - Client-side routes and lazy-loaded dependencies that require a real browser gesture
   can be absent from the bounded mirror and initial HTML fingerprint.

@@ -1,9 +1,11 @@
 import importlib.util
 import html
 import json
+import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 
 ROOT = Path(__file__).parent
@@ -169,6 +171,113 @@ class StudyToolTests(unittest.TestCase):
             self.assertFalse(analyze_frontend_depth.is_retained_advanced_asset(placeholder))
             placeholder.write_bytes(b"scene")
             self.assertTrue(analyze_frontend_depth.is_retained_advanced_asset(placeholder))
+
+    def test_lottie_metadata_is_inventory_ready(self):
+        payload = json.dumps({
+            "v": "5.9.0", "w": 1880, "h": 980, "fr": 15,
+            "ip": 0, "op": 100, "layers": [{}, {}],
+        })
+
+        metadata = analyze_frontend_depth.lottie_metadata(Path("hero.json"), payload)
+
+        self.assertEqual(metadata, {
+            "version": "5.9.0", "width": 1880, "height": 980,
+            "frame_rate": 15, "in_point": 0, "out_point": 100,
+            "layer_count": 2,
+        })
+
+    def test_depth_pass_synchronizes_parent_manifest_and_report(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            (output / "study-manifest.json").write_text(
+                json.dumps({"archive_records": 10, "generated_at": "study-time"}) + "\n",
+                encoding="utf-8",
+            )
+            (output / "REPORT.md").write_text(
+                "# Report\n\n## Browser and asset signals\n\nTable\n\n"
+                "## Repeated feature bundles\n\nBundles\n",
+                encoding="utf-8",
+            )
+            manifest = {"generated_at": "depth-time", "mirrored_html_sites": 8}
+            section = "## CSS and production-asset depth\n\nDepth evidence."
+
+            analyze_frontend_depth.synchronize_study_outputs(output, manifest, section)
+            analyze_frontend_depth.synchronize_study_outputs(output, manifest, section)
+
+            merged = json.loads((output / "study-manifest.json").read_text(encoding="utf-8"))
+            report = (output / "REPORT.md").read_text(encoding="utf-8")
+        self.assertEqual(merged["frontend_depth"], {"mirrored_html_sites": 8})
+        self.assertEqual(report.count("## CSS and production-asset depth"), 1)
+        self.assertLess(
+            report.index("## CSS and production-asset depth"),
+            report.index("## Repeated feature bundles"),
+        )
+
+    def test_primary_analysis_preserves_depth_outputs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            (output / "frontend-depth-manifest.json").write_text(
+                json.dumps({"generated_at": "depth-time", "css_features": 66}) + "\n",
+                encoding="utf-8",
+            )
+            (output / "REPORT.md").write_text(
+                "# Report\n\n## CSS and production-asset depth\n\nDepth evidence.\n\n"
+                "## Repeated feature bundles\n\nBundles\n",
+                encoding="utf-8",
+            )
+
+            manifest, section = analyze.existing_frontend_depth(output)
+
+        self.assertEqual(manifest["css_features"], 66)
+        self.assertEqual(section, "## CSS and production-asset depth\n\nDepth evidence.")
+
+    def test_depth_analysis_inventories_lottie_and_updates_parent_outputs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            mirror_root = root / "mirrors"
+            site_root = mirror_root / "0001-sample"
+            site_root.mkdir(parents=True)
+            (site_root / "index.html").write_text(
+                '<link rel="stylesheet" href="style.css">', encoding="utf-8"
+            )
+            (site_root / "style.css").write_text(".card { display: grid; }", encoding="utf-8")
+            (site_root / "hero.json").write_text(
+                json.dumps({"v": "5.9.0", "layers": [{}]}), encoding="utf-8"
+            )
+            status = root / "status.jsonl"
+            status.write_text(json.dumps({
+                "archive_rank": 1, "slug": "sample", "source_url": "https://example.com",
+                "mirror_path": "0001-sample", "visitable_html": True,
+            }) + "\n", encoding="utf-8")
+            fingerprints = root / "fingerprints.jsonl"
+            fingerprints.write_text(json.dumps({
+                "archive_rank": 1, "reachable_html": True,
+            }) + "\n", encoding="utf-8")
+            output = root / "output"
+            output.mkdir()
+            (output / "study-manifest.json").write_text("{}\n", encoding="utf-8")
+            (output / "REPORT.md").write_text(
+                "# Report\n\n## Repeated feature bundles\n\nBundles\n", encoding="utf-8"
+            )
+            argv = [
+                "analyze_frontend_depth.py", "--mirror-root", str(mirror_root),
+                "--mirror-status", str(status), "--fingerprints", str(fingerprints),
+                "--output-dir", str(output),
+            ]
+
+            with mock.patch.object(sys, "argv", argv):
+                self.assertEqual(analyze_frontend_depth.main(), 0)
+
+            inventory = [
+                json.loads(line)
+                for line in (output / "advanced-asset-inventory.jsonl").read_text().splitlines()
+            ]
+            study_manifest = json.loads((output / "study-manifest.json").read_text())
+            report = (output / "REPORT.md").read_text()
+        self.assertEqual(len(inventory), 1)
+        self.assertEqual(inventory[0]["extension"], "lottie_json")
+        self.assertEqual(study_manifest["frontend_depth"]["retained_advanced_asset_files"], 1)
+        self.assertIn("## CSS and production-asset depth", report)
 
 
 if __name__ == "__main__":

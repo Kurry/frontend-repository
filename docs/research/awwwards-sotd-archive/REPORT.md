@@ -270,16 +270,10 @@ denominator and should not be read as a longitudinal panel of unchanged sites.
 A second pass over the 4,434 direct-cohort retained mirrors measures the actual
 CSS language and advanced asset systems. Among 2,210 sites with retained CSS,
 the analyzer found 66 feature families and 2,131 site-level feature pairs.
-Transforms (90.8%), transitions (89.0%), flexbox (88.9%), custom properties
-(69.5%), grid (62.4%), 3D transforms (57.4%), clipping (39.9%), dynamic viewport
-units (35.4%), backdrop filters (31.4%), masks (27.5%), `:has()` (21.7%), and
-reduced-motion queries (16.2%) show the production vocabulary hidden by a
-single `css_animation` flag.
+Transforms (90.8%), transitions (89.0%), flexbox (88.9%), custom properties (69.5%), grid (62.4%), 3D transforms (57.4%), clipping (39.9%), dynamic viewport units (35.4%), backdrop filters (31.4%), masks (27.5%), `:has()` (21.7%), reduced-motion queries (16.2%) show the production vocabulary hidden by a single `css_animation` flag.
 
 The same pass found 275 sites referencing an advanced production asset and 14
-with an advanced binary retained. References include GLB (111 sites), WASM
-(107), KTX2 (51), shader files (58 across GLSL/fragment/vertex forms), Rive
-(25), HDR (24), and Spline scenes (19). Runtime signals connect those files to
+with an advanced production asset retained. References include GLB (111 sites), WASM (107 sites), KTX2 (51 sites), shader files (58 sites), Rive (25 sites), HDR (24 sites), Spline scenes (19 sites). Runtime signals connect those files to
 OffscreenCanvas, workers, glTF loaders, Draco, Basis/KTX2, Meshopt, Rive,
 WebAssembly, WebGPU, and WebXR pipelines.
 
