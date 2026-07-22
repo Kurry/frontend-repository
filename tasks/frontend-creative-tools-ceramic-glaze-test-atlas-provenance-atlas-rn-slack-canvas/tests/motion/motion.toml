@@ -1,0 +1,7 @@
+
+[[criterion]]
+id = "3.50"
+name = "causal_motion"
+description = "Motion connects the acted-on item to its new state and has a reduced-motion equivalent."
+type = "binary"
+weight = 1.0

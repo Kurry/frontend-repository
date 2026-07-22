@@ -1,0 +1,14 @@
+
+[[criterion]]
+id = "4.50"
+name = "schema_contract"
+description = "Query the current state and export after the mutation. The tool result and artifact contain the declared API-shaped fields."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.51"
+name = "artifact_round_trip"
+description = "Export, clear, import, and inspect the edited variant record and derived state. Authored order/selection/geometry and domain state survive; invalid import is a no-op."
+type = "binary"
+weight = 1.0

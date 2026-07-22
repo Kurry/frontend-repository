@@ -1,0 +1,16 @@
+{
+  "name": "ceramic-glaze-test-atlas",
+  "version": "1.0.0",
+  "description": "Ceramic Glaze Test Atlas",
+  "main": "index.js",
+  "scripts": {
+    "start": "vite --port 3000 --host",
+    "build": "vite build",
+    "verify:build": "vite build"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.0.1",
+    "tailwindcss": "4.3.2",
+    "vite": "^6.0.7"
+  }
+}
