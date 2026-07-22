@@ -7,7 +7,8 @@
     "start": "npx serve dist -p 3000",
     "dev": "vite --port 3000 --host 0.0.0.0",
     "build": "vite build",
-    "verify:build": "vite build"
+    "verify:build": "vite build",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "4.3.2",

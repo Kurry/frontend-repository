@@ -1,6 +1,6 @@
 # Multilevel Accessible Route Lab
 
-Multilevel Accessible Route Lab hard browser app eval.
+Accessible campus route planner with layered stops, route constraints, and interoperable route artifacts.
 
 A frontend-only Harbor eval task. A builder agent recreates the
 app in `instruction.md`, delivering a self-contained SPA in `/app`

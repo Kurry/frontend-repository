@@ -4,11 +4,13 @@ import { DESTINATIONS, CAMPUS_NODES } from './fixture';
 window.webmcp_session_info = () => ({
   version: "zto-webmcp-v1",
   task: "frontend-planning-multilevel-accessible-route-lab",
+  modules: ["entity-collection-v1", "artifact-transfer-v1"],
 });
 
 const tools = [
   {
     name: "entity_create",
+    module: "entity-collection-v1",
     description: "Create a route-stop entity",
     parameters: {
       type: "object",
@@ -27,6 +29,7 @@ const tools = [
   },
   {
     name: "entity_update",
+    module: "entity-collection-v1",
     description: "Update a route-stop entity",
     parameters: {
       type: "object",
@@ -45,6 +48,7 @@ const tools = [
   },
   {
     name: "entity_delete",
+    module: "entity-collection-v1",
     description: "Delete a route-stop entity",
     parameters: {
       type: "object",
@@ -58,6 +62,7 @@ const tools = [
   },
   {
     name: "entity_reorder",
+    module: "entity-collection-v1",
     description: "Reorder a route-stop entity",
     parameters: {
       type: "object",
@@ -71,6 +76,7 @@ const tools = [
   },
   {
     name: "entity_select",
+    module: "entity-collection-v1",
     description: "Select a route-stop entity",
     parameters: {
       type: "object",
@@ -83,6 +89,7 @@ const tools = [
   },
   {
     name: "artifact_export",
+    module: "artifact-transfer-v1",
     description: "Export the route-plan-json artifact",
     parameters: {
       type: "object",
@@ -94,6 +101,7 @@ const tools = [
   },
   {
     name: "artifact_import",
+    module: "artifact-transfer-v1",
     description: "Import a route-plan-json artifact",
     parameters: {
       type: "object",
