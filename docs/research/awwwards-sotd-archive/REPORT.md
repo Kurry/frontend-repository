@@ -265,6 +265,28 @@ denominator and should not be read as a longitudinal panel of unchanged sites.
 | rive | 44 | 1.0% |
 | webassembly | 20 | 0.4% |
 
+## CSS and production-asset depth
+
+A second pass over the 4,434 direct-cohort retained mirrors measures the actual
+CSS language and advanced asset systems. Among 2,210 sites with retained CSS,
+the analyzer found 66 feature families and 2,131 site-level feature pairs.
+Transforms (90.8%), transitions (89.0%), flexbox (88.9%), custom properties
+(69.5%), grid (62.4%), 3D transforms (57.4%), clipping (39.9%), dynamic viewport
+units (35.4%), backdrop filters (31.4%), masks (27.5%), `:has()` (21.7%), and
+reduced-motion queries (16.2%) show the production vocabulary hidden by a
+single `css_animation` flag.
+
+The same pass found 275 sites referencing an advanced production asset and 14
+with an advanced binary retained. References include GLB (111 sites), WASM
+(107), KTX2 (51), shader files (58 across GLSL/fragment/vertex forms), Rive
+(25), HDR (24), and Spline scenes (19). Runtime signals connect those files to
+OffscreenCanvas, workers, glTF loaders, Draco, Basis/KTX2, Meshopt, Rive,
+WebAssembly, WebGPU, and WebXR pipelines.
+
+See [FRONTEND-DEPTH.md](FRONTEND-DEPTH.md) for the full method, CSS tables,
+retained-versus-referenced asset evidence, parsed GLB/KTX2/HDR metadata, the
+Lando Norris production-system analysis, and limitations.
+
 ## Repeated feature bundles
 
 | Item | Sites | Share of live sites |
@@ -335,7 +357,7 @@ loading, reduced-motion, keyboard, touch, and fallback paths.
   `site-status.csv` and the denominator rather than disappearing from the study.
 - **Tag/detection conflation:** `GSAP` on an Awwwards card is editorial evidence;
   a Wappalyzer match is live-response evidence. The CSVs never merge the two.
-- **Asset dumping:** the mirror excludes heavy media and fonts, honors robots,
+- **Asset dumping:** the mirror excludes raster media and fonts, retains code-like SVG and runtime assets, honors robots,
   and enforces per-file, per-site, rate, socket, retry, depth, and time ceilings.
 - **Decorative complexity without an end state:** generated tasks should culminate
   in a saved configuration, shareable state, playable result, or downloadable
@@ -348,7 +370,7 @@ loading, reduced-motion, keyboard, touch, and fallback paths.
 - Awwwards tags are editorial metadata and are reported separately from live detection.
 - Consent walls, bot defenses, regional gating, expired TLS, and client-only rendering
   reduce observability. They are status outcomes, not silently excluded failures.
-- The mirror intentionally excludes images, video, audio, and fonts and caps depth,
+- The mirror intentionally excludes raster images, video, audio, and fonts while retaining SVG and caps depth,
   time, file size, total bytes, request rate, and sockets per site.
 - Client-side routes and lazy-loaded dependencies that require a real browser gesture
   can be absent from the bounded mirror and initial HTML fingerprint.

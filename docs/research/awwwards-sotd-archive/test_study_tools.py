@@ -20,6 +20,7 @@ def load_module(name: str):
 analyze = load_module("analyze")
 collect_archive = load_module("collect_archive")
 mirror_sites = load_module("mirror_sites")
+analyze_frontend_depth = load_module("analyze_frontend_depth")
 
 
 class StudyToolTests(unittest.TestCase):
@@ -46,11 +47,12 @@ class StudyToolTests(unittest.TestCase):
         self.assertEqual(record["studio"], "Example Studio")
         self.assertEqual(record["awwwards_tags"], ["GSAP", "Animation"])
 
-    def test_mirror_excludes_images_video_audio_and_fonts(self):
-        expected = {"jpg", "png", "svg", "webp", "mp4", "webm", "mp3", "wav", "woff", "woff2", "ttf", "otf"}
+    def test_mirror_excludes_raster_media_video_audio_and_fonts_but_keeps_svg(self):
+        expected = {"jpg", "png", "webp", "mp4", "webm", "mp3", "wav", "woff", "woff2", "ttf", "otf"}
         self.assertTrue(expected.issubset(set(mirror_sites.EXCLUDED_EXTENSIONS)))
-        self.assertFalse({"html", "css", "js", "json", "wasm", "glb", "gltf", "ktx2", "hdr", "riv"} & set(mirror_sites.EXCLUDED_EXTENSIONS))
+        self.assertFalse({"html", "css", "js", "json", "svg", "wasm", "glb", "gltf", "ktx2", "hdr", "riv"} & set(mirror_sites.EXCLUDED_EXTENSIONS))
         self.assertIn("-mime:image/*", mirror_sites.EXCLUDED_MIME_FILTERS)
+        self.assertIn("+mime:image/svg+xml", mirror_sites.EXCLUDED_MIME_FILTERS)
         self.assertIn("-mime:font/*", mirror_sites.EXCLUDED_MIME_FILTERS)
 
     def test_signature_sanitizer_catches_proxy_media_without_harming_code(self):
@@ -112,8 +114,10 @@ class StudyToolTests(unittest.TestCase):
             path = Path(directory) / "records.jsonl"
             path.write_text(json.dumps({"title": "safe\u2028title"}) + "\n", encoding="utf-8")
             [record] = analyze.load_jsonl(path)
+            depth_records = analyze_frontend_depth.load_jsonl(path)
 
         self.assertEqual(record["title"], "safe\u2028title")
+        self.assertEqual(depth_records[0]["title"], "safe\u2028title")
 
     def test_redirect_host_change_is_observed_without_claiming_repurpose(self):
         self.assertFalse(analyze.changed_redirect_host("https://www.example.com/a", "https://example.com/b"))
@@ -133,6 +137,38 @@ class StudyToolTests(unittest.TestCase):
         self.assertFalse(by_extension["glb"]["excluded_from_mirror"])
         self.assertTrue(by_extension["woff2"]["excluded_from_mirror"])
         self.assertEqual(len(by_extension["glb"]["sha256"]), 64)
+
+    def test_css_depth_detection_covers_production_feature_families(self):
+        css = """
+        @container card (min-width: 40rem) { .card:has(img) { display: grid; } }
+        @media (prefers-reduced-motion: reduce) { * { animation: none; } }
+        .hero { color: oklch(70% .2 20); text-wrap: balance; backdrop-filter: blur(1rem); }
+        .track { scroll-snap-type: x mandatory; animation-timeline: view(); }
+        """
+
+        features = analyze_frontend_depth.detect_css_features(css)
+
+        self.assertTrue({
+            "container_queries", "has_selector", "grid", "prefers_reduced_motion",
+            "oklch_oklab", "text_wrap_balance_pretty", "backdrop_filter",
+            "scroll_snap", "scroll_driven_animation",
+        }.issubset(features))
+
+    def test_advanced_asset_classification_separates_runtime_systems(self):
+        self.assertEqual(analyze_frontend_depth.asset_category("scene.glb"), "3d_model")
+        self.assertEqual(analyze_frontend_depth.asset_category("albedo.ktx2"), "gpu_texture")
+        self.assertEqual(analyze_frontend_depth.asset_category("studio.hdr"), "environment_map")
+        self.assertEqual(analyze_frontend_depth.asset_category("button.riv"), "vector_animation")
+        self.assertEqual(analyze_frontend_depth.asset_category("decoder.wasm"), "webassembly")
+
+    def test_zero_byte_advanced_asset_is_not_retained_evidence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            placeholder = Path(directory) / "scene.splinecode"
+            placeholder.touch()
+
+            self.assertFalse(analyze_frontend_depth.is_retained_advanced_asset(placeholder))
+            placeholder.write_bytes(b"scene")
+            self.assertTrue(analyze_frontend_depth.is_retained_advanced_asset(placeholder))
 
 
 if __name__ == "__main__":

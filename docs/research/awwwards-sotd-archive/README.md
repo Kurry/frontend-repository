@@ -20,8 +20,9 @@ browser-observable task briefs instead of one unbuildable mega-stack.
   each URL that still returns visitable HTML.
 - Respect `robots.txt` and page-level robot directives.
 - Keep mirrors outside Git. Commit only derived evidence and aggregate data.
-- Exclude photos/images, video, audio, and fonts. Retain HTML, CSS, JavaScript,
-  JSON, manifests, WASM, shaders, Rive, and lightweight 3D/configuration assets.
+- Exclude raster photos/images, video, audio, and fonts. Retain SVG, HTML, CSS,
+  JavaScript, JSON, manifests, WASM, shaders, Rive, and lightweight
+  3D/configuration assets.
 - Reject media/fonts by URL extension and response MIME type, then delete any
   proxy-disguised media/font signature and HTTrack response cache before recording
   the per-site result.
@@ -61,6 +62,13 @@ python3 docs/research/awwwards-sotd-archive/analyze.py \
   --mirror-status "$study_dir/mirror-status.jsonl" \
   --asset-root /path/to/landonorris-design-assets \
   --output-dir "$study_dir/analysis"
+
+python3 docs/research/awwwards-sotd-archive/analyze_frontend_depth.py \
+  --mirror-root "$mirror_dir" \
+  --mirror-status "$study_dir/mirror-status.jsonl" \
+  --fingerprints "$study_dir/fingerprints.jsonl" \
+  --asset-root /path/to/landonorris-design-assets \
+  --output-dir "$study_dir/analysis"
 ```
 
 The mirror runner is resumable: completed archive ranks in `mirror-status.jsonl`
@@ -89,6 +97,10 @@ python3 docs/research/awwwards-sotd-archive/validate_study.py \
 - `site-fingerprints.jsonl`: compact direct-response evidence without copied page bodies.
 - Frequency CSVs: technologies, categories, tags, interactions, signals, bundles,
   asset references, co-occurrences, yearly trends, visit outcomes, and mirror outcomes.
+- CSS/asset-depth appendices: site-level CSS features and co-occurrences,
+  retained-versus-referenced advanced asset formats, runtime-loader signals,
+  parsed retained binary metadata, and the expanded Lando production system.
+- `FRONTEND-DEPTH.md`: interpretation of those deeper CSS and production-asset results.
 - `landonorris-asset-reference.json`: metadata and hashes only; no reference assets.
 - `study-manifest.json`: row counts, date bounds, mirror coverage, and the discrepancy
   between the displayed Awwwards count and actual pagination.
@@ -103,4 +115,5 @@ and advanced runtime assets remain in scope even when conventional media is
 excluded. It contains GLB models, KTX2 GPU textures, HDR environment maps, Rive
 state-machine files, a Basis Universal WASM transcoder, and WOFF2 fonts. Fonts
 are inventoried in the methodology but excluded from HTTrack downloads, as are
-photos, video, and audio. No proprietary reference asset is copied into Git.
+photos, video, and audio. SVG is retained as a vector/code asset. No proprietary
+reference asset is copied into Git.
