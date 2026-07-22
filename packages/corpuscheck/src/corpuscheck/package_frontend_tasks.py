@@ -3702,6 +3702,15 @@ TASK_SPECS.update({
         "modules": ["structured-editor-v1", "command-session-v1", "artifact-transfer-v1"],
         "bindings": "see corpuscheck schemas/webmcp-assignments.json",
     },
+    "frontend-creative-tools-session-compression-loom": {
+        "source": "Session Compression Loom",
+        "description": "Session compression editor with capsule summaries, preview, and artifact export.",
+        "modules": ["structured-editor-v1", "artifact-transfer-v1"],
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
+        "mechanics_exclusions": [
+            "Text selection, range highlighting, preview layout, and download bytes stay Playwright-observed",
+        ],
+    },
     "frontend-data-tracking-cost-analytics": {
         "source": "feature-analytics-cost-analytics PRD",
         "description": "Cost analytics with budgets, anomalies, what-if repricing, reports.",
