@@ -7,15 +7,8 @@ window.webmcp_session_info = () => {
         "modules": ["entity-collection-v1", "structured-editor-v1", "artifact-transfer-v1"]
     };
 };
-    tools.forEach((tool) => {
-        tool.module = tool.name.startsWith('entity_')
-            ? 'entity-collection-v1'
-            : tool.name.startsWith('artifact_')
-                ? 'artifact-transfer-v1'
-                : 'structured-editor-v1';
-    });
-    window.webmcp_list_tools = () => {
-    return [
+window.webmcp_list_tools = () => {
+    const tools = [
         {
             "name": "editor_select",
             "description": "Select an editor object",
@@ -185,6 +178,14 @@ window.webmcp_session_info = () => {
             }
         }
     ];
+    tools.forEach((tool) => {
+        tool.module = tool.name.startsWith('entity_')
+            ? 'entity-collection-v1'
+            : tool.name.startsWith('artifact_')
+                ? 'artifact-transfer-v1'
+                : 'structured-editor-v1';
+    });
+    return tools;
 };
 window.webmcp_invoke_tool = (toolName, parameters) => {
     let status = document.getElementById('webmcp-status');
