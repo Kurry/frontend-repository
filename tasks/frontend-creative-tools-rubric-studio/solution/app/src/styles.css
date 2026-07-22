@@ -303,8 +303,8 @@ kbd { font-family: var(--font-mono); }
 @keyframes field-in { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
 .before-after > div { overflow: hidden; animation: pane-wipe .45s ease both; }
 @keyframes pane-wipe { from { opacity: 0; clip-path: inset(0 100% 0 0); } to { opacity: 1; clip-path: inset(0 0 0 0); } }
-.removed-copy h3, .removed-copy code, .removed-copy p { animation: strike-draw .55s ease .15s both; }
-@keyframes strike-draw { from { text-decoration-color: transparent; } to { text-decoration-color: #c0404c; } }
+.removed-copy h3, .removed-copy code, .removed-copy p { /* no animation */ }
+
 
 /* The criterion form dialog is non-modal and docks bottom-right so the
    canvas (view switcher, Tune cases) stays clickable while it is open. */
