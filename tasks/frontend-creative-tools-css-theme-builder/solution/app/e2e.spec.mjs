@@ -74,7 +74,7 @@ test.describe('workspace contract (canonical)', () => {
     expect(new Set(names).size, 'tool names are unique').toBe(names.length);
   });
 
-  test('reduced motion behaviorally suppresses animation', async ({ page }) => {
+  test('playwright_reduced_motion', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     // Install the collector before navigation so load/hydration animations are
     // observed too. Keep it running through network idle and a settled 1.5s
@@ -121,7 +121,7 @@ test.describe('workspace contract (canonical)', () => {
     expect(offenders, 'no running animation/transition with meaningful duration under reduced motion').toEqual([]);
   });
 
-  test('no horizontal overflow at 375px', async ({ page }) => {
+  test('no_horizontal_scroll_at_375', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto(BASE);
     await page.waitForLoadState('networkidle');
@@ -134,7 +134,7 @@ test.describe('workspace contract (canonical)', () => {
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
 
 test.describe('task-specific criteria', () => {
-  test('7.5-7.6 mobile panels stack in document flow without overlap', async ({ page }) => {
+  test('panels_stack_below_768', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto(BASE);
     await page.waitForLoadState('networkidle');
