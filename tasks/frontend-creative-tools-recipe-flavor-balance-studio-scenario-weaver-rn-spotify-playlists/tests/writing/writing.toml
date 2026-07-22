@@ -1,0 +1,9 @@
+[judge]
+model = "claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-10"
+type = "visual"
+weight = 1.0
+title = "domain_copy"
+description = "Inspect labels, statuses, errors, and empty-state text. Copy names the domain consequence and recovery action precisely."

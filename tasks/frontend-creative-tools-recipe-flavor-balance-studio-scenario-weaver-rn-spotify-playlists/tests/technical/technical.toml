@@ -1,0 +1,9 @@
+[judge]
+model = "claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-04"
+type = "technical"
+weight = 1.0
+title = "schema_contract"
+description = "Query the current state and export after the mutation. The tool result and artifact contain the declared API-shaped fields."

@@ -1,0 +1,16 @@
+[judge]
+model = "claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-11"
+type = "behavioral"
+weight = 1.0
+title = "linked_utility"
+description = "Mutate a record and use the linked representation to make the next decision. Linked views provide domain utility beyond CRUD."
+
+[[criterion]]
+id = "innovation.catchall"
+type = "behavioral"
+weight = 0.5
+title = "innovation catch-all"
+description = "Any useful innovation not covered by other criteria, supported by evidence."
