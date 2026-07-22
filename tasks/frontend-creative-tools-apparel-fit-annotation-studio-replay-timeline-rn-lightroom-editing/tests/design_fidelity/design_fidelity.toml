@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-12"
+name = "source_fidelity"
+description = "The visual and interaction thesis is coherent without copying unrelated screens."
+type = "binary"
+weight = 0.5
