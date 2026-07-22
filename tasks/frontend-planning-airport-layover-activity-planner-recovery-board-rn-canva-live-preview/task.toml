@@ -1,0 +1,27 @@
+[task]
+name = "mercor-intelligence/frontend-planning-airport-layover-activity-planner-recovery-board-rn-canva-live-preview"
+task_slug = "frontend-planning-airport-layover-activity-planner-recovery-board-rn-canva-live-preview"
+evaluation_type = "reward_webmcp"
+dataset = "frontend_tasks"
+difficulty = 1.0
+priority = 1.0
+task_type = "oracle_match"
+
+[task.webmcp]
+contract_version = "zto-webmcp-v1"
+registry_id = "mercor-intelligence/frontend-planning-airport-layover-activity-planner-recovery-board-rn-canva-live-preview"
+port = 3000
+
+[task.eval]
+mode = "full"
+use_isolated_cdp = true
+
+[task.limits]
+memory_gb = 4
+timeout_minutes = 15
+
+[task.environment]
+image = "harbor-frontend-node20"
+
+[task.labels]
+genre = "good-app"
