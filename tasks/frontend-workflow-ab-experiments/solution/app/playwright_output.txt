@@ -1,0 +1,2507 @@
+
+Running 102 tests using 1 worker
+
+  ✓    1 e2e.spec.mjs:5:3 › AB Experiments Oracle Tests › 1.1 controls_are_keyboard_accessible (1.5s)
+  ✓    2 e2e.spec.mjs:9:3 › AB Experiments Oracle Tests › 1.2 modals_manage_focus (2.7s)
+  ✘    3 e2e.spec.mjs:13:3 › AB Experiments Oracle Tests › 1.3 icons_have_accessible_names (2.8s)
+  ✘    4 e2e.spec.mjs:17:3 › AB Experiments Oracle Tests › 1.4 feedback_uses_live_regions (3.2s)
+  ✘    5 e2e.spec.mjs:21:3 › AB Experiments Oracle Tests › 1.5 forms_have_explicit_labels (3.2s)
+  ✓    6 e2e.spec.mjs:25:3 › AB Experiments Oracle Tests › 1.6 headings_follow_logical_order (1.8s)
+  ✓    7 e2e.spec.mjs:29:3 › AB Experiments Oracle Tests › 1.7 landmark_navigation_is_present (1.1s)
+  ✘    8 e2e.spec.mjs:33:3 › AB Experiments Oracle Tests › 1.8 text_and_controls_have_contrast (1.1s)
+  ✓    9 e2e.spec.mjs:38:3 › AB Experiments Oracle Tests › 1.9 semantic_html_roles_are_used (1.2s)
+  ✘   10 e2e.spec.mjs:42:3 › AB Experiments Oracle Tests › 1.10 reduced_motion_is_respected (1.3s)
+  ✘   11 e2e.spec.mjs:46:3 › AB Experiments Oracle Tests › 14.1 multi_facet_reload_resets_seeded (1.1s)
+  ✘   12 e2e.spec.mjs:51:3 › AB Experiments Oracle Tests › 14.2 sample_table_sort_reversal (1.2s)
+  ✘   13 e2e.spec.mjs:56:3 › AB Experiments Oracle Tests › 14.3 flag_recomputes_derived_surfaces (1.2s)
+  ✘   14 e2e.spec.mjs:61:3 › AB Experiments Oracle Tests › 14.4 decision_echoes_across_views (1.2s)
+  ✘   15 e2e.spec.mjs:66:3 › AB Experiments Oracle Tests › 14.5 experiment_count_delta_exact (1.1s)
+  ✘   16 e2e.spec.mjs:71:3 › AB Experiments Oracle Tests › 14.6 full_pipeline_to_export_json (1.1s)
+  ✘   17 e2e.spec.mjs:76:3 › AB Experiments Oracle Tests › 14.7 interleaved_designer_and_run (1.1s)
+  ✘   18 e2e.spec.mjs:81:3 › AB Experiments Oracle Tests › 14.8 flag_all_then_restore_round_trip (1.2s)
+  ✘   19 e2e.spec.mjs:86:3 › AB Experiments Oracle Tests › 14.9 import_export_round_trip_probe (1.2s)
+  ✘   20 e2e.spec.mjs:91:3 › AB Experiments Oracle Tests › 1.1 seeded_library_table (1.2s)
+  ✘   21 e2e.spec.mjs:96:3 › AB Experiments Oracle Tests › 1.2 status_filter_and_search (1.2s)
+  ✘   22 e2e.spec.mjs:101:3 › AB Experiments Oracle Tests › 1.3 bulk_archive_delete (1.1s)
+  ✘   23 e2e.spec.mjs:106:3 › AB Experiments Oracle Tests › 1.4 archive_toggle_unarchive (1.2s)
+  ✘   24 e2e.spec.mjs:111:3 › AB Experiments Oracle Tests › 1.5 designer_experiment_upsert_modal (1.2s)
+  ✘   25 e2e.spec.mjs:116:3 › AB Experiments Oracle Tests › 1.6 variant_add_remove_bounds (1.1s)
+  ✘   26 e2e.spec.mjs:121:3 › AB Experiments Oracle Tests › 1.7 allocation_sum_live_validation (1.1s)
+  ✘   27 e2e.spec.mjs:126:3 › AB Experiments Oracle Tests › 1.8 valid_submit_adds_pending (1.2s)
+  ✘   28 e2e.spec.mjs:131:3 › AB Experiments Oracle Tests › 1.9 invalid_submit_named_errors (1.1s)
+  ✘   29 e2e.spec.mjs:136:3 › AB Experiments Oracle Tests › 1.10 edit_prefilled_updates_row (1.2s)
+  ✘   30 e2e.spec.mjs:141:3 › AB Experiments Oracle Tests › 1.11 criteria_view_and_form (1.2s)
+  ✘   31 e2e.spec.mjs:146:3 › AB Experiments Oracle Tests › 1.12 new_criterion_feeds_metric_select (1.2s)
+  ✘   32 e2e.spec.mjs:151:3 › AB Experiments Oracle Tests › 1.13 preview_playground_columns (1.3s)
+  ✘   33 e2e.spec.mjs:156:3 › AB Experiments Oracle Tests › 1.14 preview_rerun_replaces_all (1.9s)
+  ✘   34 e2e.spec.mjs:161:3 › AB Experiments Oracle Tests › 1.15 run_per_variant_progress (1.3s)
+  ✘   35 e2e.spec.mjs:166:3 › AB Experiments Oracle Tests › 1.16 pause_resume_preserves_samples (1.3s)
+  ✘   36 e2e.spec.mjs:171:3 › AB Experiments Oracle Tests › 1.17 event_timeline_live_filterable (1.1s)
+  ✘   37 e2e.spec.mjs:176:3 › AB Experiments Oracle Tests › 1.18 results_grouped_bar_chart (1.2s)
+  ✘   38 e2e.spec.mjs:181:3 › AB Experiments Oracle Tests › 1.19 distributions_differ_by_config (1.2s)
+  ✘   39 e2e.spec.mjs:186:3 › AB Experiments Oracle Tests › 1.20 difference_chart_ci_band (1.2s)
+  ✘   40 e2e.spec.mjs:191:3 › AB Experiments Oracle Tests › 1.21 summary_strip_stats (1.1s)
+  ✘   41 e2e.spec.mjs:196:3 › AB Experiments Oracle Tests › 1.22 underpowered_gate_then_verdict (1.1s)
+  ✘   42 e2e.spec.mjs:201:3 › AB Experiments Oracle Tests › 1.23 sample_table_delta_sort (1.2s)
+  ✘   43 e2e.spec.mjs:206:3 › AB Experiments Oracle Tests › 1.24 monitoring_convergence_chart (1.2s)
+  ✘   44 e2e.spec.mjs:211:3 › AB Experiments Oracle Tests › 1.25 comparison_matrix_coherent (1.3s)
+  ✘   45 e2e.spec.mjs:216:3 › AB Experiments Oracle Tests › 1.26 radial_criterion_wheels (1.1s)
+  ✘   46 e2e.spec.mjs:221:3 › AB Experiments Oracle Tests › 1.27 inspector_flag_recompute (1.3s)
+  ✘   47 e2e.spec.mjs:226:3 › AB Experiments Oracle Tests › 1.28 decision_locks_experiment (1.2s)
+  ✘   48 e2e.spec.mjs:231:3 › AB Experiments Oracle Tests › 1.29 promote_winner_head_version (1.2s)
+  ✘   49 e2e.spec.mjs:236:3 › AB Experiments Oracle Tests › 1.30 undo_redo_state_edits (1.2s)
+  ✘   50 e2e.spec.mjs:241:3 › AB Experiments Oracle Tests › 1.31 export_report_api_shaped_live (1.3s)
+  ✘   51 e2e.spec.mjs:246:3 › AB Experiments Oracle Tests › 1.32 double_activation_single_effect (1.1s)
+  ✘   52 e2e.spec.mjs:251:3 › AB Experiments Oracle Tests › 1.33 empty_and_edge_states (1.1s)
+  ✘   53 e2e.spec.mjs:256:3 › AB Experiments Oracle Tests › 1.34 variant_removal_keeps_allocations (1.1s)
+  ✘   54 e2e.spec.mjs:261:3 › AB Experiments Oracle Tests › 1.35 experiment_upsert_field_contract (1.2s)
+  ✘   55 e2e.spec.mjs:266:3 › AB Experiments Oracle Tests › 1.36 criterion_and_decision_field_contracts (1.1s)
+  ✘   56 e2e.spec.mjs:271:3 › AB Experiments Oracle Tests › 1.37 import_report_round_trip (1.2s)
+  ✘   57 e2e.spec.mjs:286:3 › AB Experiments Oracle Tests › 4.1 empty_states_designed (1.1s)
+  ✘   58 e2e.spec.mjs:291:3 › AB Experiments Oracle Tests › 4.2 field_contracts_validate_inline (1.1s)
+  ✘   59 e2e.spec.mjs:296:3 › AB Experiments Oracle Tests › 4.3 errors_name_field_and_fix (1.2s)
+  ✘   60 e2e.spec.mjs:301:3 › AB Experiments Oracle Tests › 4.4 actions_show_confirmation (1.2s)
+  ✘   61 e2e.spec.mjs:306:3 › AB Experiments Oracle Tests › 4.5 run_shows_progress_affordances (1.3s)
+  ✘   62 e2e.spec.mjs:311:3 › AB Experiments Oracle Tests › 4.6 destructive_actions_guarded (1.3s)
+  ✘   63 e2e.spec.mjs:316:3 › AB Experiments Oracle Tests › 4.7 nonobvious_controls_have_help (1.3s)
+  ✘   64 e2e.spec.mjs:321:3 › AB Experiments Oracle Tests › 4.8 controls_use_semantic_tags (1.3s)
+  ✘   65 e2e.spec.mjs:326:3 › AB Experiments Oracle Tests › 4.9 modal_close_paths (1.2s)
+  ✘   66 e2e.spec.mjs:331:3 › AB Experiments Oracle Tests › 4.10 long_run_shows_progress (1.3s)
+  ✘   67 e2e.spec.mjs:336:3 › AB Experiments Oracle Tests › 4.11 export_always_schema_valid (1.2s)
+  ✘   68 e2e.spec.mjs:341:3 › AB Experiments Oracle Tests › 4.12 import_rejects_invalid_contract (1.1s)
+  ✘   69 e2e.spec.mjs:375:3 › AB Experiments Oracle Tests › 7.1 layout_adapts_desktop_to_mobile (1.2s)
+  ✘   70 e2e.spec.mjs:380:3 › AB Experiments Oracle Tests › 7.2 mobile_tap_targets_are_large_enough (1.1s)
+  ✘   71 e2e.spec.mjs:385:3 › AB Experiments Oracle Tests › 7.3 typography_resizes_across_breakpoints (1.2s)
+  ✘   72 e2e.spec.mjs:390:3 › AB Experiments Oracle Tests › 7.4 content_avoids_clipping_and_overflow (1.0s)
+  ✘   73 e2e.spec.mjs:395:3 › AB Experiments Oracle Tests › 7.5 panel_fullwidth_with_back (1.2s)
+  ✘   74 e2e.spec.mjs:400:3 › AB Experiments Oracle Tests › 7.6 stacking_reflows_logically (1.2s)
+  ✘   75 e2e.spec.mjs:405:3 › AB Experiments Oracle Tests › 7.7 mobile_touch_gestures_work (1.2s)
+  ✘   76 e2e.spec.mjs:410:3 › AB Experiments Oracle Tests › 7.8 small_screens_avoid_horizontal_scroll (1.3s)
+  ✘   77 e2e.spec.mjs:415:3 › AB Experiments Oracle Tests › 7.9 charts_resize_responsively (1.2s)
+  ✘   78 e2e.spec.mjs:420:3 › AB Experiments Oracle Tests › 7.10 fixed_controls_remain_accessible (1.1s)
+  ✘   79 e2e.spec.mjs:425:3 › AB Experiments Oracle Tests › 2.1 shared_state_coherence (1.2s)
+  ✘   80 e2e.spec.mjs:430:3 › AB Experiments Oracle Tests › 2.2 no_storage_reload_seeded (3.2s)
+  ✓   81 e2e.spec.mjs:434:3 › AB Experiments Oracle Tests › 2.5 console_clean (2.2s)
+  ✓   82 e2e.spec.mjs:438:3 › AB Experiments Oracle Tests › 2.6 cold_load_interactive_2s (1.1s)
+  ✘   83 e2e.spec.mjs:442:3 › AB Experiments Oracle Tests › 2.7 responsive_during_run (1.1s)
+  ✘   84 e2e.spec.mjs:447:3 › AB Experiments Oracle Tests › 2.8 statistics_react_to_data (1.1s)
+  ✘   85 e2e.spec.mjs:452:3 › AB Experiments Oracle Tests › 2.9 keyboard_operability_focus (1.1s)
+  ✘   86 e2e.spec.mjs:457:3 › AB Experiments Oracle Tests › 2.10 modal_focus_trap_escape (1.2s)
+  ✘   87 e2e.spec.mjs:462:3 › AB Experiments Oracle Tests › 2.11 aria_live_announcements (1.2s)
+  ✘   88 e2e.spec.mjs:467:3 › AB Experiments Oracle Tests › 2.12 labels_slider_values_errors (1.1s)
+  ✓   89 e2e.spec.mjs:472:3 › AB Experiments Oracle Tests › 2.13 fictional_model_names_only (1.7s)
+  ✘   90 e2e.spec.mjs:476:3 › AB Experiments Oracle Tests › 2.14 export_import_end_state_contract (3.1s)
+  ✘   91 e2e.spec.mjs:480:3 › AB Experiments Oracle Tests › 6.1 create_experiment_upsert_everywhere (3.1s)
+  ✘   92 e2e.spec.mjs:493:3 › AB Experiments Oracle Tests › 6.2 invalid_upsert_inline_validation (3.1s)
+  ✘   93 e2e.spec.mjs:497:3 › AB Experiments Oracle Tests › 6.3 edit_updates_row_and_panel (3.1s)
+  ✘   94 e2e.spec.mjs:501:3 › AB Experiments Oracle Tests › 6.4 delete_removes_from_all_surfaces (3.1s)
+  ✘   95 e2e.spec.mjs:505:3 › AB Experiments Oracle Tests › 6.5 tab_switch_retains_state (1.1s)
+  ✘   96 e2e.spec.mjs:510:3 › AB Experiments Oracle Tests › 6.6 empty_library_state_visible (1.1s)
+  ✘   97 e2e.spec.mjs:515:3 › AB Experiments Oracle Tests › 6.7 filters_and_search_consistent (1.1s)
+  ✘   98 e2e.spec.mjs:520:3 › AB Experiments Oracle Tests › 6.8 panel_close_reopen_continuity (1.1s)
+  ✘   99 e2e.spec.mjs:525:3 › AB Experiments Oracle Tests › 6.9 dialogs_and_export_import_flows (1.1s)
+  ✘  100 e2e.spec.mjs:530:3 › AB Experiments Oracle Tests › 6.10 recovery_without_reload (1.1s)
+  ✘  101 e2e.spec.mjs:535:3 › AB Experiments Oracle Tests › 6.11 export_after_mutations_flow (1.1s)
+  ✘  102 e2e.spec.mjs:540:3 › AB Experiments Oracle Tests › 6.12 import_round_trip_flow (1.1s)
+
+
+  1) e2e.spec.mjs:13:3 › AB Experiments Oracle Tests › 1.3 icons_have_accessible_names ─────────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 8
+
+      12 |
+      13 |   test('1.3 icons_have_accessible_names', async ({ page }) => {
+    > 14 |     await page.goto('http://localhost:3000'); await page.waitForSelector('button'); const btns = await page.locator('button').all(); let fails=0; for (const b of btns) { const t=await b.textContent(), a=await b.getAttribute('aria-label'), h=await b.getAttribute('aria-hidden'), ti=await b.getAttribute('title'); if(h!=='true' && !ti && (!t||t.trim()==='') && !a) fails++; } expect(fails).toBe(0);
+         |                                                                                                                                                                                                                                                                                                                                                                                                     ^
+      15 |   });
+      16 |
+      17 |   test('1.4 feedback_uses_live_regions', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:14:389
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--963e9-icons-have-accessible-names/error-context.md
+
+  2) e2e.spec.mjs:17:3 › AB Experiments Oracle Tests › 1.4 feedback_uses_live_regions ──────────────
+
+    Test timeout of 3000ms exceeded.
+
+    Error: locator.fill: Test timeout of 3000ms exceeded.
+    Call log:
+      - waiting for locator('label').filter({ hasText: 'Experiment name' }).locator('~ div input, ~ input, + div input, + input').first()
+
+
+      16 |
+      17 |   test('1.4 feedback_uses_live_regions', async ({ page }) => {
+    > 18 |     await page.goto('http://localhost:3000'); await page.click('button:has-text("New Experiment")'); await page.locator('label', { hasText: 'Experiment name' }).locator('~ div input, ~ input, + div input, + input').first().fill('a'); await page.locator('label', { hasText: 'Experiment name' }).locator('~ div input, ~ input, + div input, + input').first().fill(''); await page.click('body'); const lc = page.locator('[aria-live], [role="alert"], .toast'); expect(await lc.count()).toBeGreaterThanOrEqual(1);
+         |                                                                                                                                                                                                                                ^
+      19 |   });
+      20 |
+      21 |   test('1.5 forms_have_explicit_labels', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:18:224
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--b6839--feedback-uses-live-regions/error-context.md
+
+  3) e2e.spec.mjs:21:3 › AB Experiments Oracle Tests › 1.5 forms_have_explicit_labels ──────────────
+
+    Test timeout of 3000ms exceeded.
+
+    Error: locator.getAttribute: Test timeout of 3000ms exceeded.
+    Call log:
+      - waiting for locator('label').filter({ hasText: 'Experiment name' }).locator('~ div input, ~ input, + div input, + input').first()
+
+
+      20 |
+      21 |   test('1.5 forms_have_explicit_labels', async ({ page }) => {
+    > 22 |     await page.goto('http://localhost:3000'); await page.click('button:has-text("New Experiment")'); const input = page.locator('label', { hasText: 'Experiment name' }).locator('~ div input, ~ input, + div input, + input').first(); const id = await input.getAttribute('id'); expect(await page.locator(`label[for="${id}"]`).count()).toBeGreaterThan(0);
+         |                                                                                                                                                                                                                                                                ^
+      23 |   });
+      24 |
+      25 |   test('1.6 headings_follow_logical_order', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:22:256
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--1c6dc--forms-have-explicit-labels/error-context.md
+
+  4) e2e.spec.mjs:33:3 › AB Experiments Oracle Tests › 1.8 text_and_controls_have_contrast ─────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-8-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-8-exact-element')
+
+
+      33 |   test('1.8 text_and_controls_have_contrast', async ({ page }) => {
+      34 |     await page.goto('http://localhost:3000');
+    > 35 |     await expect(page.locator('#criterion-1-8-exact-element')).toBeVisible({ timeout: 50 });
+         |                                                                ^
+      36 |   });
+      37 |
+      38 |   test('1.9 semantic_html_roles_are_used', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:35:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--fc4cc--and-controls-have-contrast/error-context.md
+
+  5) e2e.spec.mjs:42:3 › AB Experiments Oracle Tests › 1.10 reduced_motion_is_respected ────────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: "0s"
+    Received: "1e-06s"
+
+      41 |
+      42 |   test('1.10 reduced_motion_is_respected', async ({ page }) => {
+    > 43 |     await page.emulateMedia({ reducedMotion: 'reduce' }); await page.goto('http://localhost:3000'); await page.waitForSelector('button'); const dur = await page.evaluate(() => window.getComputedStyle(document.body).transitionDuration); expect(dur).toBe('0s');
+         |                                                                                                                                                                                                                                                         ^
+      44 |   });
+      45 |
+      46 |   test('14.1 multi_facet_reload_resets_seeded', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:43:249
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--ad3df-reduced-motion-is-respected/error-context.md
+
+  6) e2e.spec.mjs:46:3 › AB Experiments Oracle Tests › 14.1 multi_facet_reload_resets_seeded ───────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-14-1-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-14-1-exact-element')
+
+
+      46 |   test('14.1 multi_facet_reload_resets_seeded', async ({ page }) => {
+      47 |     await page.goto('http://localhost:3000');
+    > 48 |     await expect(page.locator('#criterion-14-1-exact-element')).toBeVisible({ timeout: 50 });
+         |                                                                 ^
+      49 |   });
+      50 |
+      51 |   test('14.2 sample_table_sort_reversal', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:48:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--30a40--facet-reload-resets-seeded/error-context.md
+
+  7) e2e.spec.mjs:51:3 › AB Experiments Oracle Tests › 14.2 sample_table_sort_reversal ─────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-14-2-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-14-2-exact-element')
+
+
+      51 |   test('14.2 sample_table_sort_reversal', async ({ page }) => {
+      52 |     await page.goto('http://localhost:3000');
+    > 53 |     await expect(page.locator('#criterion-14-2-exact-element')).toBeVisible({ timeout: 50 });
+         |                                                                 ^
+      54 |   });
+      55 |
+      56 |   test('14.3 flag_recomputes_derived_surfaces', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:53:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--184a7--sample-table-sort-reversal/error-context.md
+
+  8) e2e.spec.mjs:56:3 › AB Experiments Oracle Tests › 14.3 flag_recomputes_derived_surfaces ───────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-14-3-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-14-3-exact-element')
+
+
+      56 |   test('14.3 flag_recomputes_derived_surfaces', async ({ page }) => {
+      57 |     await page.goto('http://localhost:3000');
+    > 58 |     await expect(page.locator('#criterion-14-3-exact-element')).toBeVisible({ timeout: 50 });
+         |                                                                 ^
+      59 |   });
+      60 |
+      61 |   test('14.4 decision_echoes_across_views', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:58:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--0c561-recomputes-derived-surfaces/error-context.md
+
+  9) e2e.spec.mjs:61:3 › AB Experiments Oracle Tests › 14.4 decision_echoes_across_views ───────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-14-4-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-14-4-exact-element')
+
+
+      61 |   test('14.4 decision_echoes_across_views', async ({ page }) => {
+      62 |     await page.goto('http://localhost:3000');
+    > 63 |     await expect(page.locator('#criterion-14-4-exact-element')).toBeVisible({ timeout: 50 });
+         |                                                                 ^
+      64 |   });
+      65 |
+      66 |   test('14.5 experiment_count_delta_exact', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:63:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--b6c9e-ecision-echoes-across-views/error-context.md
+
+  10) e2e.spec.mjs:66:3 › AB Experiments Oracle Tests › 14.5 experiment_count_delta_exact ──────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-14-5-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-14-5-exact-element')
+
+
+      66 |   test('14.5 experiment_count_delta_exact', async ({ page }) => {
+      67 |     await page.goto('http://localhost:3000');
+    > 68 |     await expect(page.locator('#criterion-14-5-exact-element')).toBeVisible({ timeout: 50 });
+         |                                                                 ^
+      69 |   });
+      70 |
+      71 |   test('14.6 full_pipeline_to_export_json', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:68:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--42193-xperiment-count-delta-exact/error-context.md
+
+  11) e2e.spec.mjs:71:3 › AB Experiments Oracle Tests › 14.6 full_pipeline_to_export_json ──────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-14-6-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-14-6-exact-element')
+
+
+      71 |   test('14.6 full_pipeline_to_export_json', async ({ page }) => {
+      72 |     await page.goto('http://localhost:3000');
+    > 73 |     await expect(page.locator('#criterion-14-6-exact-element')).toBeVisible({ timeout: 50 });
+         |                                                                 ^
+      74 |   });
+      75 |
+      76 |   test('14.7 interleaved_designer_and_run', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:73:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--2510f-ull-pipeline-to-export-json/error-context.md
+
+  12) e2e.spec.mjs:76:3 › AB Experiments Oracle Tests › 14.7 interleaved_designer_and_run ──────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-14-7-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-14-7-exact-element')
+
+
+      76 |   test('14.7 interleaved_designer_and_run', async ({ page }) => {
+      77 |     await page.goto('http://localhost:3000');
+    > 78 |     await expect(page.locator('#criterion-14-7-exact-element')).toBeVisible({ timeout: 50 });
+         |                                                                 ^
+      79 |   });
+      80 |
+      81 |   test('14.8 flag_all_then_restore_round_trip', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:78:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--f8717-nterleaved-designer-and-run/error-context.md
+
+  13) e2e.spec.mjs:81:3 › AB Experiments Oracle Tests › 14.8 flag_all_then_restore_round_trip ──────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-14-8-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-14-8-exact-element')
+
+
+      81 |   test('14.8 flag_all_then_restore_round_trip', async ({ page }) => {
+      82 |     await page.goto('http://localhost:3000');
+    > 83 |     await expect(page.locator('#criterion-14-8-exact-element')).toBeVisible({ timeout: 50 });
+         |                                                                 ^
+      84 |   });
+      85 |
+      86 |   test('14.9 import_export_round_trip_probe', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:83:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--487da-all-then-restore-round-trip/error-context.md
+
+  14) e2e.spec.mjs:86:3 › AB Experiments Oracle Tests › 14.9 import_export_round_trip_probe ────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-14-9-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-14-9-exact-element')
+
+
+      86 |   test('14.9 import_export_round_trip_probe', async ({ page }) => {
+      87 |     await page.goto('http://localhost:3000');
+    > 88 |     await expect(page.locator('#criterion-14-9-exact-element')).toBeVisible({ timeout: 50 });
+         |                                                                 ^
+      89 |   });
+      90 |
+      91 |   test('1.1 seeded_library_table', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:88:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--bfffb-ort-export-round-trip-probe/error-context.md
+
+  15) e2e.spec.mjs:91:3 › AB Experiments Oracle Tests › 1.1 seeded_library_table ───────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-1-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-1-exact-element')
+
+
+      91 |   test('1.1 seeded_library_table', async ({ page }) => {
+      92 |     await page.goto('http://localhost:3000');
+    > 93 |     await expect(page.locator('#criterion-1-1-exact-element')).toBeVisible({ timeout: 50 });
+         |                                                                ^
+      94 |   });
+      95 |
+      96 |   test('1.2 status_filter_and_search', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:93:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-1-1-seeded-library-table/error-context.md
+
+  16) e2e.spec.mjs:96:3 › AB Experiments Oracle Tests › 1.2 status_filter_and_search ───────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-2-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-2-exact-element')
+
+
+       96 |   test('1.2 status_filter_and_search', async ({ page }) => {
+       97 |     await page.goto('http://localhost:3000');
+    >  98 |     await expect(page.locator('#criterion-1-2-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+       99 |   });
+      100 |
+      101 |   test('1.3 bulk_archive_delete', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:98:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-1-2-status-filter-and-search/error-context.md
+
+  17) e2e.spec.mjs:101:3 › AB Experiments Oracle Tests › 1.3 bulk_archive_delete ───────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-3-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-3-exact-element')
+
+
+      101 |   test('1.3 bulk_archive_delete', async ({ page }) => {
+      102 |     await page.goto('http://localhost:3000');
+    > 103 |     await expect(page.locator('#criterion-1-3-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      104 |   });
+      105 |
+      106 |   test('1.4 archive_toggle_unarchive', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:103:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-1-3-bulk-archive-delete/error-context.md
+
+  18) e2e.spec.mjs:106:3 › AB Experiments Oracle Tests › 1.4 archive_toggle_unarchive ──────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-4-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-4-exact-element')
+
+
+      106 |   test('1.4 archive_toggle_unarchive', async ({ page }) => {
+      107 |     await page.goto('http://localhost:3000');
+    > 108 |     await expect(page.locator('#criterion-1-4-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      109 |   });
+      110 |
+      111 |   test('1.5 designer_experiment_upsert_modal', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:108:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-1-4-archive-toggle-unarchive/error-context.md
+
+  19) e2e.spec.mjs:111:3 › AB Experiments Oracle Tests › 1.5 designer_experiment_upsert_modal ──────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-5-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-5-exact-element')
+
+
+      111 |   test('1.5 designer_experiment_upsert_modal', async ({ page }) => {
+      112 |     await page.goto('http://localhost:3000');
+    > 113 |     await expect(page.locator('#criterion-1-5-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      114 |   });
+      115 |
+      116 |   test('1.6 variant_add_remove_bounds', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:113:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--ed518-ner-experiment-upsert-modal/error-context.md
+
+  20) e2e.spec.mjs:116:3 › AB Experiments Oracle Tests › 1.6 variant_add_remove_bounds ─────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-6-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-6-exact-element')
+
+
+      116 |   test('1.6 variant_add_remove_bounds', async ({ page }) => {
+      117 |     await page.goto('http://localhost:3000');
+    > 118 |     await expect(page.locator('#criterion-1-6-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      119 |   });
+      120 |
+      121 |   test('1.7 allocation_sum_live_validation', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:118:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--d110c-6-variant-add-remove-bounds/error-context.md
+
+  21) e2e.spec.mjs:121:3 › AB Experiments Oracle Tests › 1.7 allocation_sum_live_validation ────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-7-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-7-exact-element')
+
+
+      121 |   test('1.7 allocation_sum_live_validation', async ({ page }) => {
+      122 |     await page.goto('http://localhost:3000');
+    > 123 |     await expect(page.locator('#criterion-1-7-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      124 |   });
+      125 |
+      126 |   test('1.8 valid_submit_adds_pending', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:123:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--2b2c0-ocation-sum-live-validation/error-context.md
+
+  22) e2e.spec.mjs:126:3 › AB Experiments Oracle Tests › 1.8 valid_submit_adds_pending ─────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-8-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-8-exact-element')
+
+
+      126 |   test('1.8 valid_submit_adds_pending', async ({ page }) => {
+      127 |     await page.goto('http://localhost:3000');
+    > 128 |     await expect(page.locator('#criterion-1-8-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      129 |   });
+      130 |
+      131 |   test('1.9 invalid_submit_named_errors', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:128:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--914e6-8-valid-submit-adds-pending/error-context.md
+
+  23) e2e.spec.mjs:131:3 › AB Experiments Oracle Tests › 1.9 invalid_submit_named_errors ───────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-9-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-9-exact-element')
+
+
+      131 |   test('1.9 invalid_submit_named_errors', async ({ page }) => {
+      132 |     await page.goto('http://localhost:3000');
+    > 133 |     await expect(page.locator('#criterion-1-9-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      134 |   });
+      135 |
+      136 |   test('1.10 edit_prefilled_updates_row', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:133:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--3713e-invalid-submit-named-errors/error-context.md
+
+  24) e2e.spec.mjs:136:3 › AB Experiments Oracle Tests › 1.10 edit_prefilled_updates_row ───────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-10-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-10-exact-element')
+
+
+      136 |   test('1.10 edit_prefilled_updates_row', async ({ page }) => {
+      137 |     await page.goto('http://localhost:3000');
+    > 138 |     await expect(page.locator('#criterion-1-10-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      139 |   });
+      140 |
+      141 |   test('1.11 criteria_view_and_form', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:138:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--fe399--edit-prefilled-updates-row/error-context.md
+
+  25) e2e.spec.mjs:141:3 › AB Experiments Oracle Tests › 1.11 criteria_view_and_form ───────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-11-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-11-exact-element')
+
+
+      141 |   test('1.11 criteria_view_and_form', async ({ page }) => {
+      142 |     await page.goto('http://localhost:3000');
+    > 143 |     await expect(page.locator('#criterion-1-11-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      144 |   });
+      145 |
+      146 |   test('1.12 new_criterion_feeds_metric_select', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:143:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-1-11-criteria-view-and-form/error-context.md
+
+  26) e2e.spec.mjs:146:3 › AB Experiments Oracle Tests › 1.12 new_criterion_feeds_metric_select ────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-12-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-12-exact-element')
+
+
+      146 |   test('1.12 new_criterion_feeds_metric_select', async ({ page }) => {
+      147 |     await page.goto('http://localhost:3000');
+    > 148 |     await expect(page.locator('#criterion-1-12-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      149 |   });
+      150 |
+      151 |   test('1.13 preview_playground_columns', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:148:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--89ff3-iterion-feeds-metric-select/error-context.md
+
+  27) e2e.spec.mjs:151:3 › AB Experiments Oracle Tests › 1.13 preview_playground_columns ───────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-13-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-13-exact-element')
+
+
+      151 |   test('1.13 preview_playground_columns', async ({ page }) => {
+      152 |     await page.goto('http://localhost:3000');
+    > 153 |     await expect(page.locator('#criterion-1-13-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      154 |   });
+      155 |
+      156 |   test('1.14 preview_rerun_replaces_all', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:153:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--8a8a9--preview-playground-columns/error-context.md
+
+  28) e2e.spec.mjs:156:3 › AB Experiments Oracle Tests › 1.14 preview_rerun_replaces_all ───────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-14-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-14-exact-element')
+
+
+      156 |   test('1.14 preview_rerun_replaces_all', async ({ page }) => {
+      157 |     await page.goto('http://localhost:3000');
+    > 158 |     await expect(page.locator('#criterion-1-14-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      159 |   });
+      160 |
+      161 |   test('1.15 run_per_variant_progress', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:158:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--38b15--preview-rerun-replaces-all/error-context.md
+
+  29) e2e.spec.mjs:161:3 › AB Experiments Oracle Tests › 1.15 run_per_variant_progress ─────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-15-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-15-exact-element')
+
+
+      161 |   test('1.15 run_per_variant_progress', async ({ page }) => {
+      162 |     await page.goto('http://localhost:3000');
+    > 163 |     await expect(page.locator('#criterion-1-15-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      164 |   });
+      165 |
+      166 |   test('1.16 pause_resume_preserves_samples', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:163:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--580f6-15-run-per-variant-progress/error-context.md
+
+  30) e2e.spec.mjs:166:3 › AB Experiments Oracle Tests › 1.16 pause_resume_preserves_samples ───────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-16-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-16-exact-element')
+
+
+      166 |   test('1.16 pause_resume_preserves_samples', async ({ page }) => {
+      167 |     await page.goto('http://localhost:3000');
+    > 168 |     await expect(page.locator('#criterion-1-16-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      169 |   });
+      170 |
+      171 |   test('1.17 event_timeline_live_filterable', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:168:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--7ab1e-se-resume-preserves-samples/error-context.md
+
+  31) e2e.spec.mjs:171:3 › AB Experiments Oracle Tests › 1.17 event_timeline_live_filterable ───────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-17-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-17-exact-element')
+
+
+      171 |   test('1.17 event_timeline_live_filterable', async ({ page }) => {
+      172 |     await page.goto('http://localhost:3000');
+    > 173 |     await expect(page.locator('#criterion-1-17-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      174 |   });
+      175 |
+      176 |   test('1.18 results_grouped_bar_chart', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:173:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--250e2-nt-timeline-live-filterable/error-context.md
+
+  32) e2e.spec.mjs:176:3 › AB Experiments Oracle Tests › 1.18 results_grouped_bar_chart ────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-18-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-18-exact-element')
+
+
+      176 |   test('1.18 results_grouped_bar_chart', async ({ page }) => {
+      177 |     await page.goto('http://localhost:3000');
+    > 178 |     await expect(page.locator('#criterion-1-18-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      179 |   });
+      180 |
+      181 |   test('1.19 distributions_differ_by_config', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:178:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--7aac2-8-results-grouped-bar-chart/error-context.md
+
+  33) e2e.spec.mjs:181:3 › AB Experiments Oracle Tests › 1.19 distributions_differ_by_config ───────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-19-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-19-exact-element')
+
+
+      181 |   test('1.19 distributions_differ_by_config', async ({ page }) => {
+      182 |     await page.goto('http://localhost:3000');
+    > 183 |     await expect(page.locator('#criterion-1-19-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      184 |   });
+      185 |
+      186 |   test('1.20 difference_chart_ci_band', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:183:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--b7393-tributions-differ-by-config/error-context.md
+
+  34) e2e.spec.mjs:186:3 › AB Experiments Oracle Tests › 1.20 difference_chart_ci_band ─────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-20-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-20-exact-element')
+
+
+      186 |   test('1.20 difference_chart_ci_band', async ({ page }) => {
+      187 |     await page.goto('http://localhost:3000');
+    > 188 |     await expect(page.locator('#criterion-1-20-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      189 |   });
+      190 |
+      191 |   test('1.21 summary_strip_stats', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:188:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--b9271-20-difference-chart-ci-band/error-context.md
+
+  35) e2e.spec.mjs:191:3 › AB Experiments Oracle Tests › 1.21 summary_strip_stats ──────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-21-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-21-exact-element')
+
+
+      191 |   test('1.21 summary_strip_stats', async ({ page }) => {
+      192 |     await page.goto('http://localhost:3000');
+    > 193 |     await expect(page.locator('#criterion-1-21-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      194 |   });
+      195 |
+      196 |   test('1.22 underpowered_gate_then_verdict', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:193:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-1-21-summary-strip-stats/error-context.md
+
+  36) e2e.spec.mjs:196:3 › AB Experiments Oracle Tests › 1.22 underpowered_gate_then_verdict ───────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-22-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-22-exact-element')
+
+
+      196 |   test('1.22 underpowered_gate_then_verdict', async ({ page }) => {
+      197 |     await page.goto('http://localhost:3000');
+    > 198 |     await expect(page.locator('#criterion-1-22-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      199 |   });
+      200 |
+      201 |   test('1.23 sample_table_delta_sort', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:198:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--ea6d0-erpowered-gate-then-verdict/error-context.md
+
+  37) e2e.spec.mjs:201:3 › AB Experiments Oracle Tests › 1.23 sample_table_delta_sort ──────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-23-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-23-exact-element')
+
+
+      201 |   test('1.23 sample_table_delta_sort', async ({ page }) => {
+      202 |     await page.goto('http://localhost:3000');
+    > 203 |     await expect(page.locator('#criterion-1-23-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      204 |   });
+      205 |
+      206 |   test('1.24 monitoring_convergence_chart', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:203:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-1-23-sample-table-delta-sort/error-context.md
+
+  38) e2e.spec.mjs:206:3 › AB Experiments Oracle Tests › 1.24 monitoring_convergence_chart ─────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-24-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-24-exact-element')
+
+
+      206 |   test('1.24 monitoring_convergence_chart', async ({ page }) => {
+      207 |     await page.goto('http://localhost:3000');
+    > 208 |     await expect(page.locator('#criterion-1-24-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      209 |   });
+      210 |
+      211 |   test('1.25 comparison_matrix_coherent', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:208:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--33f69-onitoring-convergence-chart/error-context.md
+
+  39) e2e.spec.mjs:211:3 › AB Experiments Oracle Tests › 1.25 comparison_matrix_coherent ───────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-25-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-25-exact-element')
+
+
+      211 |   test('1.25 comparison_matrix_coherent', async ({ page }) => {
+      212 |     await page.goto('http://localhost:3000');
+    > 213 |     await expect(page.locator('#criterion-1-25-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      214 |   });
+      215 |
+      216 |   test('1.26 radial_criterion_wheels', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:213:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--cbc59--comparison-matrix-coherent/error-context.md
+
+  40) e2e.spec.mjs:216:3 › AB Experiments Oracle Tests › 1.26 radial_criterion_wheels ──────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-26-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-26-exact-element')
+
+
+      216 |   test('1.26 radial_criterion_wheels', async ({ page }) => {
+      217 |     await page.goto('http://localhost:3000');
+    > 218 |     await expect(page.locator('#criterion-1-26-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      219 |   });
+      220 |
+      221 |   test('1.27 inspector_flag_recompute', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:218:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-1-26-radial-criterion-wheels/error-context.md
+
+  41) e2e.spec.mjs:221:3 › AB Experiments Oracle Tests › 1.27 inspector_flag_recompute ─────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-27-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-27-exact-element')
+
+
+      221 |   test('1.27 inspector_flag_recompute', async ({ page }) => {
+      222 |     await page.goto('http://localhost:3000');
+    > 223 |     await expect(page.locator('#criterion-1-27-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      224 |   });
+      225 |
+      226 |   test('1.28 decision_locks_experiment', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:223:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--71d3b-27-inspector-flag-recompute/error-context.md
+
+  42) e2e.spec.mjs:226:3 › AB Experiments Oracle Tests › 1.28 decision_locks_experiment ────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-28-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-28-exact-element')
+
+
+      226 |   test('1.28 decision_locks_experiment', async ({ page }) => {
+      227 |     await page.goto('http://localhost:3000');
+    > 228 |     await expect(page.locator('#criterion-1-28-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      229 |   });
+      230 |
+      231 |   test('1.29 promote_winner_head_version', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:228:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--4bfd4-8-decision-locks-experiment/error-context.md
+
+  43) e2e.spec.mjs:231:3 › AB Experiments Oracle Tests › 1.29 promote_winner_head_version ──────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-29-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-29-exact-element')
+
+
+      231 |   test('1.29 promote_winner_head_version', async ({ page }) => {
+      232 |     await page.goto('http://localhost:3000');
+    > 233 |     await expect(page.locator('#criterion-1-29-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      234 |   });
+      235 |
+      236 |   test('1.30 undo_redo_state_edits', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:233:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--dc2d3-promote-winner-head-version/error-context.md
+
+  44) e2e.spec.mjs:236:3 › AB Experiments Oracle Tests › 1.30 undo_redo_state_edits ────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-30-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-30-exact-element')
+
+
+      236 |   test('1.30 undo_redo_state_edits', async ({ page }) => {
+      237 |     await page.goto('http://localhost:3000');
+    > 238 |     await expect(page.locator('#criterion-1-30-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      239 |   });
+      240 |
+      241 |   test('1.31 export_report_api_shaped_live', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:238:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-1-30-undo-redo-state-edits/error-context.md
+
+  45) e2e.spec.mjs:241:3 › AB Experiments Oracle Tests › 1.31 export_report_api_shaped_live ────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-31-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-31-exact-element')
+
+
+      241 |   test('1.31 export_report_api_shaped_live', async ({ page }) => {
+      242 |     await page.goto('http://localhost:3000');
+    > 243 |     await expect(page.locator('#criterion-1-31-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      244 |   });
+      245 |
+      246 |   test('1.32 double_activation_single_effect', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:243:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--46f65-port-report-api-shaped-live/error-context.md
+
+  46) e2e.spec.mjs:246:3 › AB Experiments Oracle Tests › 1.32 double_activation_single_effect ──────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-32-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-32-exact-element')
+
+
+      246 |   test('1.32 double_activation_single_effect', async ({ page }) => {
+      247 |     await page.goto('http://localhost:3000');
+    > 248 |     await expect(page.locator('#criterion-1-32-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      249 |   });
+      250 |
+      251 |   test('1.33 empty_and_edge_states', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:248:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--8a64d-le-activation-single-effect/error-context.md
+
+  47) e2e.spec.mjs:251:3 › AB Experiments Oracle Tests › 1.33 empty_and_edge_states ────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-33-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-33-exact-element')
+
+
+      251 |   test('1.33 empty_and_edge_states', async ({ page }) => {
+      252 |     await page.goto('http://localhost:3000');
+    > 253 |     await expect(page.locator('#criterion-1-33-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      254 |   });
+      255 |
+      256 |   test('1.34 variant_removal_keeps_allocations', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:253:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-1-33-empty-and-edge-states/error-context.md
+
+  48) e2e.spec.mjs:256:3 › AB Experiments Oracle Tests › 1.34 variant_removal_keeps_allocations ────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-34-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-34-exact-element')
+
+
+      256 |   test('1.34 variant_removal_keeps_allocations', async ({ page }) => {
+      257 |     await page.goto('http://localhost:3000');
+    > 258 |     await expect(page.locator('#criterion-1-34-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      259 |   });
+      260 |
+      261 |   test('1.35 experiment_upsert_field_contract', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:258:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--464d0-t-removal-keeps-allocations/error-context.md
+
+  49) e2e.spec.mjs:261:3 › AB Experiments Oracle Tests › 1.35 experiment_upsert_field_contract ─────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-35-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-35-exact-element')
+
+
+      261 |   test('1.35 experiment_upsert_field_contract', async ({ page }) => {
+      262 |     await page.goto('http://localhost:3000');
+    > 263 |     await expect(page.locator('#criterion-1-35-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      264 |   });
+      265 |
+      266 |   test('1.36 criterion_and_decision_field_contracts', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:263:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--5d733-iment-upsert-field-contract/error-context.md
+
+  50) e2e.spec.mjs:266:3 › AB Experiments Oracle Tests › 1.36 criterion_and_decision_field_contracts
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-36-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-36-exact-element')
+
+
+      266 |   test('1.36 criterion_and_decision_field_contracts', async ({ page }) => {
+      267 |     await page.goto('http://localhost:3000');
+    > 268 |     await expect(page.locator('#criterion-1-36-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      269 |   });
+      270 |
+      271 |   test('1.37 import_report_round_trip', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:268:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--43445-nd-decision-field-contracts/error-context.md
+
+  51) e2e.spec.mjs:271:3 › AB Experiments Oracle Tests › 1.37 import_report_round_trip ─────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-1-37-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-1-37-exact-element')
+
+
+      271 |   test('1.37 import_report_round_trip', async ({ page }) => {
+      272 |     await page.goto('http://localhost:3000');
+    > 273 |     await expect(page.locator('#criterion-1-37-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      274 |   });
+      275 |
+      276 |   // NOT-AUTOMATABLE: 3.1 - spacing_follows_studio_rhythm - Subjective/visual criteria.
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:273:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--98fe3-37-import-report-round-trip/error-context.md
+
+  52) e2e.spec.mjs:286:3 › AB Experiments Oracle Tests › 4.1 empty_states_designed ─────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-4-1-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-4-1-exact-element')
+
+
+      286 |   test('4.1 empty_states_designed', async ({ page }) => {
+      287 |     await page.goto('http://localhost:3000');
+    > 288 |     await expect(page.locator('#criterion-4-1-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      289 |   });
+      290 |
+      291 |   test('4.2 field_contracts_validate_inline', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:288:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-4-1-empty-states-designed/error-context.md
+
+  53) e2e.spec.mjs:291:3 › AB Experiments Oracle Tests › 4.2 field_contracts_validate_inline ───────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-4-2-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-4-2-exact-element')
+
+
+      291 |   test('4.2 field_contracts_validate_inline', async ({ page }) => {
+      292 |     await page.goto('http://localhost:3000');
+    > 293 |     await expect(page.locator('#criterion-4-2-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      294 |   });
+      295 |
+      296 |   test('4.3 errors_name_field_and_fix', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:293:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--a0675-d-contracts-validate-inline/error-context.md
+
+  54) e2e.spec.mjs:296:3 › AB Experiments Oracle Tests › 4.3 errors_name_field_and_fix ─────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-4-3-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-4-3-exact-element')
+
+
+      296 |   test('4.3 errors_name_field_and_fix', async ({ page }) => {
+      297 |     await page.goto('http://localhost:3000');
+    > 298 |     await expect(page.locator('#criterion-4-3-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      299 |   });
+      300 |
+      301 |   test('4.4 actions_show_confirmation', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:298:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--e6ecd-3-errors-name-field-and-fix/error-context.md
+
+  55) e2e.spec.mjs:301:3 › AB Experiments Oracle Tests › 4.4 actions_show_confirmation ─────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-4-4-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-4-4-exact-element')
+
+
+      301 |   test('4.4 actions_show_confirmation', async ({ page }) => {
+      302 |     await page.goto('http://localhost:3000');
+    > 303 |     await expect(page.locator('#criterion-4-4-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      304 |   });
+      305 |
+      306 |   test('4.5 run_shows_progress_affordances', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:303:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--bbdf9-4-actions-show-confirmation/error-context.md
+
+  56) e2e.spec.mjs:306:3 › AB Experiments Oracle Tests › 4.5 run_shows_progress_affordances ────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-4-5-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-4-5-exact-element')
+
+
+      306 |   test('4.5 run_shows_progress_affordances', async ({ page }) => {
+      307 |     await page.goto('http://localhost:3000');
+    > 308 |     await expect(page.locator('#criterion-4-5-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      309 |   });
+      310 |
+      311 |   test('4.6 destructive_actions_guarded', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:308:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--40f2a--shows-progress-affordances/error-context.md
+
+  57) e2e.spec.mjs:311:3 › AB Experiments Oracle Tests › 4.6 destructive_actions_guarded ───────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-4-6-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-4-6-exact-element')
+
+
+      311 |   test('4.6 destructive_actions_guarded', async ({ page }) => {
+      312 |     await page.goto('http://localhost:3000');
+    > 313 |     await expect(page.locator('#criterion-4-6-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      314 |   });
+      315 |
+      316 |   test('4.7 nonobvious_controls_have_help', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:313:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--5750d-destructive-actions-guarded/error-context.md
+
+  58) e2e.spec.mjs:316:3 › AB Experiments Oracle Tests › 4.7 nonobvious_controls_have_help ─────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-4-7-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-4-7-exact-element')
+
+
+      316 |   test('4.7 nonobvious_controls_have_help', async ({ page }) => {
+      317 |     await page.goto('http://localhost:3000');
+    > 318 |     await expect(page.locator('#criterion-4-7-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      319 |   });
+      320 |
+      321 |   test('4.8 controls_use_semantic_tags', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:318:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--f4c8a-nobvious-controls-have-help/error-context.md
+
+  59) e2e.spec.mjs:321:3 › AB Experiments Oracle Tests › 4.8 controls_use_semantic_tags ────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-4-8-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-4-8-exact-element')
+
+
+      321 |   test('4.8 controls_use_semantic_tags', async ({ page }) => {
+      322 |     await page.goto('http://localhost:3000');
+    > 323 |     await expect(page.locator('#criterion-4-8-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      324 |   });
+      325 |
+      326 |   test('4.9 modal_close_paths', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:323:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--5aaba--controls-use-semantic-tags/error-context.md
+
+  60) e2e.spec.mjs:326:3 › AB Experiments Oracle Tests › 4.9 modal_close_paths ─────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-4-9-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-4-9-exact-element')
+
+
+      326 |   test('4.9 modal_close_paths', async ({ page }) => {
+      327 |     await page.goto('http://localhost:3000');
+    > 328 |     await expect(page.locator('#criterion-4-9-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      329 |   });
+      330 |
+      331 |   test('4.10 long_run_shows_progress', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:328:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-4-9-modal-close-paths/error-context.md
+
+  61) e2e.spec.mjs:331:3 › AB Experiments Oracle Tests › 4.10 long_run_shows_progress ──────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-4-10-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-4-10-exact-element')
+
+
+      331 |   test('4.10 long_run_shows_progress', async ({ page }) => {
+      332 |     await page.goto('http://localhost:3000');
+    > 333 |     await expect(page.locator('#criterion-4-10-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      334 |   });
+      335 |
+      336 |   test('4.11 export_always_schema_valid', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:333:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-4-10-long-run-shows-progress/error-context.md
+
+  62) e2e.spec.mjs:336:3 › AB Experiments Oracle Tests › 4.11 export_always_schema_valid ───────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-4-11-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-4-11-exact-element')
+
+
+      336 |   test('4.11 export_always_schema_valid', async ({ page }) => {
+      337 |     await page.goto('http://localhost:3000');
+    > 338 |     await expect(page.locator('#criterion-4-11-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      339 |   });
+      340 |
+      341 |   test('4.12 import_rejects_invalid_contract', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:338:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--24dbd--export-always-schema-valid/error-context.md
+
+  63) e2e.spec.mjs:341:3 › AB Experiments Oracle Tests › 4.12 import_rejects_invalid_contract ──────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-4-12-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-4-12-exact-element')
+
+
+      341 |   test('4.12 import_rejects_invalid_contract', async ({ page }) => {
+      342 |     await page.goto('http://localhost:3000');
+    > 343 |     await expect(page.locator('#criterion-4-12-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      344 |   });
+      345 |
+      346 |   // NOT-AUTOMATABLE: 11.1 - linked_chart_highlighting - Subjective/visual criteria.
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:343:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--0596a-rt-rejects-invalid-contract/error-context.md
+
+  64) e2e.spec.mjs:375:3 › AB Experiments Oracle Tests › 7.1 layout_adapts_desktop_to_mobile ───────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-7-1-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-7-1-exact-element')
+
+
+      375 |   test('7.1 layout_adapts_desktop_to_mobile', async ({ page }) => {
+      376 |     await page.goto('http://localhost:3000');
+    > 377 |     await expect(page.locator('#criterion-7-1-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      378 |   });
+      379 |
+      380 |   test('7.2 mobile_tap_targets_are_large_enough', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:377:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--672f5-ut-adapts-desktop-to-mobile/error-context.md
+
+  65) e2e.spec.mjs:380:3 › AB Experiments Oracle Tests › 7.2 mobile_tap_targets_are_large_enough ───
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-7-2-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-7-2-exact-element')
+
+
+      380 |   test('7.2 mobile_tap_targets_are_large_enough', async ({ page }) => {
+      381 |     await page.goto('http://localhost:3000');
+    > 382 |     await expect(page.locator('#criterion-7-2-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      383 |   });
+      384 |
+      385 |   test('7.3 typography_resizes_across_breakpoints', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:382:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--67c9b-ap-targets-are-large-enough/error-context.md
+
+  66) e2e.spec.mjs:385:3 › AB Experiments Oracle Tests › 7.3 typography_resizes_across_breakpoints ─
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-7-3-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-7-3-exact-element')
+
+
+      385 |   test('7.3 typography_resizes_across_breakpoints', async ({ page }) => {
+      386 |     await page.goto('http://localhost:3000');
+    > 387 |     await expect(page.locator('#criterion-7-3-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      388 |   });
+      389 |
+      390 |   test('7.4 content_avoids_clipping_and_overflow', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:387:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--64f9b--resizes-across-breakpoints/error-context.md
+
+  67) e2e.spec.mjs:390:3 › AB Experiments Oracle Tests › 7.4 content_avoids_clipping_and_overflow ──
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-7-4-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-7-4-exact-element')
+
+
+      390 |   test('7.4 content_avoids_clipping_and_overflow', async ({ page }) => {
+      391 |     await page.goto('http://localhost:3000');
+    > 392 |     await expect(page.locator('#criterion-7-4-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      393 |   });
+      394 |
+      395 |   test('7.5 panel_fullwidth_with_back', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:392:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--391a8-voids-clipping-and-overflow/error-context.md
+
+  68) e2e.spec.mjs:395:3 › AB Experiments Oracle Tests › 7.5 panel_fullwidth_with_back ─────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-7-5-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-7-5-exact-element')
+
+
+      395 |   test('7.5 panel_fullwidth_with_back', async ({ page }) => {
+      396 |     await page.goto('http://localhost:3000');
+    > 397 |     await expect(page.locator('#criterion-7-5-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      398 |   });
+      399 |
+      400 |   test('7.6 stacking_reflows_logically', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:397:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--56ae9-5-panel-fullwidth-with-back/error-context.md
+
+  69) e2e.spec.mjs:400:3 › AB Experiments Oracle Tests › 7.6 stacking_reflows_logically ────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-7-6-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-7-6-exact-element')
+
+
+      400 |   test('7.6 stacking_reflows_logically', async ({ page }) => {
+      401 |     await page.goto('http://localhost:3000');
+    > 402 |     await expect(page.locator('#criterion-7-6-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      403 |   });
+      404 |
+      405 |   test('7.7 mobile_touch_gestures_work', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:402:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--71a36--stacking-reflows-logically/error-context.md
+
+  70) e2e.spec.mjs:405:3 › AB Experiments Oracle Tests › 7.7 mobile_touch_gestures_work ────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-7-7-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-7-7-exact-element')
+
+
+      405 |   test('7.7 mobile_touch_gestures_work', async ({ page }) => {
+      406 |     await page.goto('http://localhost:3000');
+    > 407 |     await expect(page.locator('#criterion-7-7-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      408 |   });
+      409 |
+      410 |   test('7.8 small_screens_avoid_horizontal_scroll', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:407:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--8c847--mobile-touch-gestures-work/error-context.md
+
+  71) e2e.spec.mjs:410:3 › AB Experiments Oracle Tests › 7.8 small_screens_avoid_horizontal_scroll ─
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('#criterion-7-8-exact-element')
+    Expected: visible
+    Received: undefined
+    Timeout:  50ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-7-8-exact-element')
+
+
+      410 |   test('7.8 small_screens_avoid_horizontal_scroll', async ({ page }) => {
+      411 |     await page.goto('http://localhost:3000');
+    > 412 |     await expect(page.locator('#criterion-7-8-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      413 |   });
+      414 |
+      415 |   test('7.9 charts_resize_responsively', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:412:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--ca760-ens-avoid-horizontal-scroll/error-context.md
+
+  72) e2e.spec.mjs:415:3 › AB Experiments Oracle Tests › 7.9 charts_resize_responsively ────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-7-9-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-7-9-exact-element')
+
+
+      415 |   test('7.9 charts_resize_responsively', async ({ page }) => {
+      416 |     await page.goto('http://localhost:3000');
+    > 417 |     await expect(page.locator('#criterion-7-9-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      418 |   });
+      419 |
+      420 |   test('7.10 fixed_controls_remain_accessible', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:417:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--13513--charts-resize-responsively/error-context.md
+
+  73) e2e.spec.mjs:420:3 › AB Experiments Oracle Tests › 7.10 fixed_controls_remain_accessible ─────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-7-10-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-7-10-exact-element')
+
+
+      420 |   test('7.10 fixed_controls_remain_accessible', async ({ page }) => {
+      421 |     await page.goto('http://localhost:3000');
+    > 422 |     await expect(page.locator('#criterion-7-10-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      423 |   });
+      424 |
+      425 |   test('2.1 shared_state_coherence', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:422:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--4149c--controls-remain-accessible/error-context.md
+
+  74) e2e.spec.mjs:425:3 › AB Experiments Oracle Tests › 2.1 shared_state_coherence ────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-2-1-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-2-1-exact-element')
+
+
+      425 |   test('2.1 shared_state_coherence', async ({ page }) => {
+      426 |     await page.goto('http://localhost:3000');
+    > 427 |     await expect(page.locator('#criterion-2-1-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      428 |   });
+      429 |
+      430 |   test('2.2 no_storage_reload_seeded', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:427:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-2-1-shared-state-coherence/error-context.md
+
+  75) e2e.spec.mjs:430:3 › AB Experiments Oracle Tests › 2.2 no_storage_reload_seeded ──────────────
+
+    Test timeout of 3000ms exceeded.
+
+    Error: locator.fill: Test timeout of 3000ms exceeded.
+    Call log:
+      - waiting for locator('label').filter({ hasText: 'Experiment name' }).locator('~ div input, ~ input, + div input, + input').first()
+
+
+      429 |
+      430 |   test('2.2 no_storage_reload_seeded', async ({ page }) => {
+    > 431 |     await page.goto('http://localhost:3000'); const initialCount = await page.locator('tbody tr').count(); await page.click('button:has-text("New Experiment")'); await page.locator('label', { hasText: 'Experiment name' }).locator('~ div input, ~ input, + div input, + input').first().fill('Test Reload Exp'); await page.locator('textarea[name="hypothesis"], label:has-text("Hypothesis") + div textarea, label:has-text("Hypothesis") ~ textarea').first().fill('Hypo reload'); await page.click('button:has-text("Create Experiment")'); await expect(page.locator('tbody tr')).toHaveCount(initialCount + 1); await page.reload(); await expect(page.locator('tbody tr')).toHaveCount(initialCount);
+          |                                                                                                                                                                                                                                                                                             ^
+      432 |   });
+      433 |
+      434 |   test('2.5 console_clean', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:431:285
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-2-2-no-storage-reload-seeded/error-context.md
+
+  76) e2e.spec.mjs:442:3 › AB Experiments Oracle Tests › 2.7 responsive_during_run ─────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-2-7-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-2-7-exact-element')
+
+
+      442 |   test('2.7 responsive_during_run', async ({ page }) => {
+      443 |     await page.goto('http://localhost:3000');
+    > 444 |     await expect(page.locator('#criterion-2-7-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      445 |   });
+      446 |
+      447 |   test('2.8 statistics_react_to_data', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:444:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-2-7-responsive-during-run/error-context.md
+
+  77) e2e.spec.mjs:447:3 › AB Experiments Oracle Tests › 2.8 statistics_react_to_data ──────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-2-8-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-2-8-exact-element')
+
+
+      447 |   test('2.8 statistics_react_to_data', async ({ page }) => {
+      448 |     await page.goto('http://localhost:3000');
+    > 449 |     await expect(page.locator('#criterion-2-8-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      450 |   });
+      451 |
+      452 |   test('2.9 keyboard_operability_focus', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:449:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-2-8-statistics-react-to-data/error-context.md
+
+  78) e2e.spec.mjs:452:3 › AB Experiments Oracle Tests › 2.9 keyboard_operability_focus ────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-2-9-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-2-9-exact-element')
+
+
+      452 |   test('2.9 keyboard_operability_focus', async ({ page }) => {
+      453 |     await page.goto('http://localhost:3000');
+    > 454 |     await expect(page.locator('#criterion-2-9-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      455 |   });
+      456 |
+      457 |   test('2.10 modal_focus_trap_escape', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:454:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--108d5--keyboard-operability-focus/error-context.md
+
+  79) e2e.spec.mjs:457:3 › AB Experiments Oracle Tests › 2.10 modal_focus_trap_escape ──────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-2-10-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-2-10-exact-element')
+
+
+      457 |   test('2.10 modal_focus_trap_escape', async ({ page }) => {
+      458 |     await page.goto('http://localhost:3000');
+    > 459 |     await expect(page.locator('#criterion-2-10-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      460 |   });
+      461 |
+      462 |   test('2.11 aria_live_announcements', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:459:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-2-10-modal-focus-trap-escape/error-context.md
+
+  80) e2e.spec.mjs:462:3 › AB Experiments Oracle Tests › 2.11 aria_live_announcements ──────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-2-11-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-2-11-exact-element')
+
+
+      462 |   test('2.11 aria_live_announcements', async ({ page }) => {
+      463 |     await page.goto('http://localhost:3000');
+    > 464 |     await expect(page.locator('#criterion-2-11-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      465 |   });
+      466 |
+      467 |   test('2.12 labels_slider_values_errors', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:464:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-2-11-aria-live-announcements/error-context.md
+
+  81) e2e.spec.mjs:467:3 › AB Experiments Oracle Tests › 2.12 labels_slider_values_errors ──────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-2-12-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-2-12-exact-element')
+
+
+      467 |   test('2.12 labels_slider_values_errors', async ({ page }) => {
+      468 |     await page.goto('http://localhost:3000');
+    > 469 |     await expect(page.locator('#criterion-2-12-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      470 |   });
+      471 |
+      472 |   test('2.13 fictional_model_names_only', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:469:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--c3319-labels-slider-values-errors/error-context.md
+
+  82) e2e.spec.mjs:476:3 › AB Experiments Oracle Tests › 2.14 export_import_end_state_contract ─────
+
+    Test timeout of 3000ms exceeded.
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('button:has-text("Export report"), button[aria-label="Export report"], button[title="Export report"]')
+    Expected: 1
+    Received: 0
+
+    Call log:
+      - Expect "toHaveCount" with timeout 5000ms
+      - waiting for locator('button:has-text("Export report"), button[aria-label="Export report"], button[title="Export report"]')
+        8 × locator resolved to 0 elements
+          - unexpected value "0"
+
+
+      475 |
+      476 |   test('2.14 export_import_end_state_contract', async ({ page }) => {
+    > 477 |     await page.goto('http://localhost:3000'); await page.locator('tbody tr:has-text("Completed")').first().click(); const expBtn = page.locator('button:has-text("Export report"), button[aria-label="Export report"], button[title="Export report"]'); await expect(expBtn).toHaveCount(1); const dlP = page.waitForEvent('download'); await expBtn.first().click(); const dl = await dlP; expect(dl.suggestedFilename()).toContain('.json');
+          |                                                                                                                                                                                                                                                                              ^
+      478 |   });
+      479 |
+      480 |   test('6.1 create_experiment_upsert_everywhere', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:477:270
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--4b953-t-import-end-state-contract/error-context.md
+
+  83) e2e.spec.mjs:480:3 › AB Experiments Oracle Tests › 6.1 create_experiment_upsert_everywhere ───
+
+    Test timeout of 3000ms exceeded.
+
+    Error: locator.fill: Test timeout of 3000ms exceeded.
+    Call log:
+      - waiting for locator('label').filter({ hasText: 'Experiment name' }).locator('~ div input, ~ input, + div input, + input').first()
+
+
+      479 |
+      480 |   test('6.1 create_experiment_upsert_everywhere', async ({ page }) => {
+    > 481 |     await page.goto('http://localhost:3000'); const initialCount = await page.locator('tbody tr').count(); await page.click('button:has-text("New Experiment")'); await page.locator('label', { hasText: 'Experiment name' }).locator('~ div input, ~ input, + div input, + input').first().fill('Upsert Test'); await page.locator('textarea[name="hypothesis"], label:has-text("Hypothesis") + div textarea').first().fill('Hypo'); await page.click('button:has-text("Create Experiment")'); await expect(page.locator('tbody tr')).toHaveCount(initialCount + 1); await expect(page.locator('tbody tr').first()).toContainText('Upsert Test');
+          |                                                                                                                                                                                                                                                                                             ^
+      482 |     // Folded WebMCP mutation exactly as requested
+      483 |     const mcpRes = await page.evaluate(async () => {
+      484 |        try {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:481:285
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--176c8-xperiment-upsert-everywhere/error-context.md
+
+  84) e2e.spec.mjs:493:3 › AB Experiments Oracle Tests › 6.2 invalid_upsert_inline_validation ──────
+
+    Test timeout of 3000ms exceeded.
+
+    Error: locator.fill: Test timeout of 3000ms exceeded.
+    Call log:
+      - waiting for locator('label').filter({ hasText: 'Experiment name' }).locator('~ div input, ~ input, + div input, + input').first()
+
+
+      492 |
+      493 |   test('6.2 invalid_upsert_inline_validation', async ({ page }) => {
+    > 494 |     await page.goto('http://localhost:3000'); await page.click('button:has-text("New Experiment")'); await page.locator('label', { hasText: 'Experiment name' }).locator('~ div input, ~ input, + div input, + input').first().fill('a'); await page.locator('label', { hasText: 'Experiment name' }).locator('~ div input, ~ input, + div input, + input').first().fill(''); await page.click('body'); await expect(page.locator('text=/required/i').first().first()).toBeVisible();
+          |                                                                                                                                                                                                                                ^
+      495 |   });
+      496 |
+      497 |   test('6.3 edit_updates_row_and_panel', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:494:224
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--1ad38-id-upsert-inline-validation/error-context.md
+
+  85) e2e.spec.mjs:497:3 › AB Experiments Oracle Tests › 6.3 edit_updates_row_and_panel ────────────
+
+    Test timeout of 3000ms exceeded.
+
+    Error: locator.fill: Test timeout of 3000ms exceeded.
+    Call log:
+      - waiting for locator('label').filter({ hasText: 'Experiment name' }).locator('~ div input, ~ input, + div input, + input').first()
+
+
+      496 |
+      497 |   test('6.3 edit_updates_row_and_panel', async ({ page }) => {
+    > 498 |     await page.goto('http://localhost:3000'); await page.locator('tbody tr:has-text("Pending")').first().locator('button:has-text("Edit"), button[aria-label="Edit"]').click(); await page.locator('label', { hasText: 'Experiment name' }).locator('~ div input, ~ input, + div input, + input').first().fill('Edited Name'); await page.click('button:has-text("Create Experiment"), button:has-text("Save Experiment"), button:has-text("Save")'); await expect(page.locator('tbody tr:has-text("Edited Name")')).toBeVisible();
+          |                                                                                                                                                                                                                                                                                                           ^
+      499 |   });
+      500 |
+      501 |   test('6.4 delete_removes_from_all_surfaces', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:498:299
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--0626d--edit-updates-row-and-panel/error-context.md
+
+  86) e2e.spec.mjs:501:3 › AB Experiments Oracle Tests › 6.4 delete_removes_from_all_surfaces ──────
+
+    Test timeout of 3000ms exceeded.
+
+    Error: locator.fill: Test timeout of 3000ms exceeded.
+    Call log:
+      - waiting for locator('label').filter({ hasText: 'Experiment name' }).locator('~ div input, ~ input, + div input, + input').first()
+
+
+      500 |
+      501 |   test('6.4 delete_removes_from_all_surfaces', async ({ page }) => {
+    > 502 |     await page.goto('http://localhost:3000'); const initialCount = await page.locator('tbody tr').count(); await page.click('button:has-text("New Experiment")'); await page.locator('label', { hasText: 'Experiment name' }).locator('~ div input, ~ input, + div input, + input').first().fill('Delete Me'); await page.locator('textarea[name="hypothesis"], label:has-text("Hypothesis") + div textarea').first().fill('Hypo'); await page.click('button:has-text("Create Experiment")'); await expect(page.locator('tbody tr')).toHaveCount(initialCount + 1); const newRow = page.locator('tbody tr').filter({ hasText: 'Delete Me' }); const delBtn = newRow.locator('button:has-text("Archive experiment"), button[aria-label="Archive experiment"]'); await expect(delBtn).toHaveCount(1); await delBtn.first().click(); const conf = page.locator('button:has-text("Confirm"), button:has-text("Archive")').filter({ hasNotText: 'experiment' }); if(await conf.count()>0) await conf.first().click(); await expect(page.locator('tbody tr')).toHaveCount(initialCount);
+          |                                                                                                                                                                                                                                                                                             ^
+      503 |   });
+      504 |
+      505 |   test('6.5 tab_switch_retains_state', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:502:285
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--96557-e-removes-from-all-surfaces/error-context.md
+
+  87) e2e.spec.mjs:505:3 › AB Experiments Oracle Tests › 6.5 tab_switch_retains_state ──────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-6-5-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-6-5-exact-element')
+
+
+      505 |   test('6.5 tab_switch_retains_state', async ({ page }) => {
+      506 |     await page.goto('http://localhost:3000');
+    > 507 |     await expect(page.locator('#criterion-6-5-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      508 |   });
+      509 |
+      510 |   test('6.6 empty_library_state_visible', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:507:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-6-5-tab-switch-retains-state/error-context.md
+
+  88) e2e.spec.mjs:510:3 › AB Experiments Oracle Tests › 6.6 empty_library_state_visible ───────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-6-6-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-6-6-exact-element')
+
+
+      510 |   test('6.6 empty_library_state_visible', async ({ page }) => {
+      511 |     await page.goto('http://localhost:3000');
+    > 512 |     await expect(page.locator('#criterion-6-6-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      513 |   });
+      514 |
+      515 |   test('6.7 filters_and_search_consistent', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:512:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--c1fd4-empty-library-state-visible/error-context.md
+
+  89) e2e.spec.mjs:515:3 › AB Experiments Oracle Tests › 6.7 filters_and_search_consistent ─────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-6-7-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-6-7-exact-element')
+
+
+      515 |   test('6.7 filters_and_search_consistent', async ({ page }) => {
+      516 |     await page.goto('http://localhost:3000');
+    > 517 |     await expect(page.locator('#criterion-6-7-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      518 |   });
+      519 |
+      520 |   test('6.8 panel_close_reopen_continuity', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:517:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--dc06f-lters-and-search-consistent/error-context.md
+
+  90) e2e.spec.mjs:520:3 › AB Experiments Oracle Tests › 6.8 panel_close_reopen_continuity ─────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-6-8-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-6-8-exact-element')
+
+
+      520 |   test('6.8 panel_close_reopen_continuity', async ({ page }) => {
+      521 |     await page.goto('http://localhost:3000');
+    > 522 |     await expect(page.locator('#criterion-6-8-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      523 |   });
+      524 |
+      525 |   test('6.9 dialogs_and_export_import_flows', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:522:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--7a758-nel-close-reopen-continuity/error-context.md
+
+  91) e2e.spec.mjs:525:3 › AB Experiments Oracle Tests › 6.9 dialogs_and_export_import_flows ───────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-6-9-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-6-9-exact-element')
+
+
+      525 |   test('6.9 dialogs_and_export_import_flows', async ({ page }) => {
+      526 |     await page.goto('http://localhost:3000');
+    > 527 |     await expect(page.locator('#criterion-6-9-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                ^
+      528 |   });
+      529 |
+      530 |   test('6.10 recovery_without_reload', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:527:64
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--da286-ogs-and-export-import-flows/error-context.md
+
+  92) e2e.spec.mjs:530:3 › AB Experiments Oracle Tests › 6.10 recovery_without_reload ──────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-6-10-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-6-10-exact-element')
+
+
+      530 |   test('6.10 recovery_without_reload', async ({ page }) => {
+      531 |     await page.goto('http://localhost:3000');
+    > 532 |     await expect(page.locator('#criterion-6-10-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      533 |   });
+      534 |
+      535 |   test('6.11 export_after_mutations_flow', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:532:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-6-10-recovery-without-reload/error-context.md
+
+  93) e2e.spec.mjs:535:3 › AB Experiments Oracle Tests › 6.11 export_after_mutations_flow ──────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-6-11-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-6-11-exact-element')
+
+
+      535 |   test('6.11 export_after_mutations_flow', async ({ page }) => {
+      536 |     await page.goto('http://localhost:3000');
+    > 537 |     await expect(page.locator('#criterion-6-11-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      538 |   });
+      539 |
+      540 |   test('6.12 import_round_trip_flow', async ({ page }) => {
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:537:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle--1d91a-export-after-mutations-flow/error-context.md
+
+  94) e2e.spec.mjs:540:3 › AB Experiments Oracle Tests › 6.12 import_round_trip_flow ───────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#criterion-6-12-exact-element')
+    Expected: visible
+    Timeout: 50ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 50ms
+      - waiting for locator('#criterion-6-12-exact-element')
+
+
+      540 |   test('6.12 import_round_trip_flow', async ({ page }) => {
+      541 |     await page.goto('http://localhost:3000');
+    > 542 |     await expect(page.locator('#criterion-6-12-exact-element')).toBeVisible({ timeout: 50 });
+          |                                                                 ^
+      543 |   });
+      544 |
+      545 |   // NOT-AUTOMATABLE: 3.1 - library_and_slide_panel_layout - Subjective/visual criteria.
+        at /app/tasks/frontend-workflow-ab-experiments/solution/app/e2e.spec.mjs:542:65
+
+    Error Context: test-results/e2e-AB-Experiments-Oracle-Tests-6-12-import-round-trip-flow/error-context.md
+
+  94 failed
+    e2e.spec.mjs:13:3 › AB Experiments Oracle Tests › 1.3 icons_have_accessible_names ──────────────
+    e2e.spec.mjs:17:3 › AB Experiments Oracle Tests › 1.4 feedback_uses_live_regions ───────────────
+    e2e.spec.mjs:21:3 › AB Experiments Oracle Tests › 1.5 forms_have_explicit_labels ───────────────
+    e2e.spec.mjs:33:3 › AB Experiments Oracle Tests › 1.8 text_and_controls_have_contrast ──────────
+    e2e.spec.mjs:42:3 › AB Experiments Oracle Tests › 1.10 reduced_motion_is_respected ─────────────
+    e2e.spec.mjs:46:3 › AB Experiments Oracle Tests › 14.1 multi_facet_reload_resets_seeded ────────
+    e2e.spec.mjs:51:3 › AB Experiments Oracle Tests › 14.2 sample_table_sort_reversal ──────────────
+    e2e.spec.mjs:56:3 › AB Experiments Oracle Tests › 14.3 flag_recomputes_derived_surfaces ────────
+    e2e.spec.mjs:61:3 › AB Experiments Oracle Tests › 14.4 decision_echoes_across_views ────────────
+    e2e.spec.mjs:66:3 › AB Experiments Oracle Tests › 14.5 experiment_count_delta_exact ────────────
+    e2e.spec.mjs:71:3 › AB Experiments Oracle Tests › 14.6 full_pipeline_to_export_json ────────────
+    e2e.spec.mjs:76:3 › AB Experiments Oracle Tests › 14.7 interleaved_designer_and_run ────────────
+    e2e.spec.mjs:81:3 › AB Experiments Oracle Tests › 14.8 flag_all_then_restore_round_trip ────────
+    e2e.spec.mjs:86:3 › AB Experiments Oracle Tests › 14.9 import_export_round_trip_probe ──────────
+    e2e.spec.mjs:91:3 › AB Experiments Oracle Tests › 1.1 seeded_library_table ─────────────────────
+    e2e.spec.mjs:96:3 › AB Experiments Oracle Tests › 1.2 status_filter_and_search ─────────────────
+    e2e.spec.mjs:101:3 › AB Experiments Oracle Tests › 1.3 bulk_archive_delete ─────────────────────
+    e2e.spec.mjs:106:3 › AB Experiments Oracle Tests › 1.4 archive_toggle_unarchive ────────────────
+    e2e.spec.mjs:111:3 › AB Experiments Oracle Tests › 1.5 designer_experiment_upsert_modal ────────
+    e2e.spec.mjs:116:3 › AB Experiments Oracle Tests › 1.6 variant_add_remove_bounds ───────────────
+    e2e.spec.mjs:121:3 › AB Experiments Oracle Tests › 1.7 allocation_sum_live_validation ──────────
+    e2e.spec.mjs:126:3 › AB Experiments Oracle Tests › 1.8 valid_submit_adds_pending ───────────────
+    e2e.spec.mjs:131:3 › AB Experiments Oracle Tests › 1.9 invalid_submit_named_errors ─────────────
+    e2e.spec.mjs:136:3 › AB Experiments Oracle Tests › 1.10 edit_prefilled_updates_row ─────────────
+    e2e.spec.mjs:141:3 › AB Experiments Oracle Tests › 1.11 criteria_view_and_form ─────────────────
+    e2e.spec.mjs:146:3 › AB Experiments Oracle Tests › 1.12 new_criterion_feeds_metric_select ──────
+    e2e.spec.mjs:151:3 › AB Experiments Oracle Tests › 1.13 preview_playground_columns ─────────────
+    e2e.spec.mjs:156:3 › AB Experiments Oracle Tests › 1.14 preview_rerun_replaces_all ─────────────
+    e2e.spec.mjs:161:3 › AB Experiments Oracle Tests › 1.15 run_per_variant_progress ───────────────
+    e2e.spec.mjs:166:3 › AB Experiments Oracle Tests › 1.16 pause_resume_preserves_samples ─────────
+    e2e.spec.mjs:171:3 › AB Experiments Oracle Tests › 1.17 event_timeline_live_filterable ─────────
+    e2e.spec.mjs:176:3 › AB Experiments Oracle Tests › 1.18 results_grouped_bar_chart ──────────────
+    e2e.spec.mjs:181:3 › AB Experiments Oracle Tests › 1.19 distributions_differ_by_config ─────────
+    e2e.spec.mjs:186:3 › AB Experiments Oracle Tests › 1.20 difference_chart_ci_band ───────────────
+    e2e.spec.mjs:191:3 › AB Experiments Oracle Tests › 1.21 summary_strip_stats ────────────────────
+    e2e.spec.mjs:196:3 › AB Experiments Oracle Tests › 1.22 underpowered_gate_then_verdict ─────────
+    e2e.spec.mjs:201:3 › AB Experiments Oracle Tests › 1.23 sample_table_delta_sort ────────────────
+    e2e.spec.mjs:206:3 › AB Experiments Oracle Tests › 1.24 monitoring_convergence_chart ───────────
+    e2e.spec.mjs:211:3 › AB Experiments Oracle Tests › 1.25 comparison_matrix_coherent ─────────────
+    e2e.spec.mjs:216:3 › AB Experiments Oracle Tests › 1.26 radial_criterion_wheels ────────────────
+    e2e.spec.mjs:221:3 › AB Experiments Oracle Tests › 1.27 inspector_flag_recompute ───────────────
+    e2e.spec.mjs:226:3 › AB Experiments Oracle Tests › 1.28 decision_locks_experiment ──────────────
+    e2e.spec.mjs:231:3 › AB Experiments Oracle Tests › 1.29 promote_winner_head_version ────────────
+    e2e.spec.mjs:236:3 › AB Experiments Oracle Tests › 1.30 undo_redo_state_edits ──────────────────
+    e2e.spec.mjs:241:3 › AB Experiments Oracle Tests › 1.31 export_report_api_shaped_live ──────────
+    e2e.spec.mjs:246:3 › AB Experiments Oracle Tests › 1.32 double_activation_single_effect ────────
+    e2e.spec.mjs:251:3 › AB Experiments Oracle Tests › 1.33 empty_and_edge_states ──────────────────
+    e2e.spec.mjs:256:3 › AB Experiments Oracle Tests › 1.34 variant_removal_keeps_allocations ──────
+    e2e.spec.mjs:261:3 › AB Experiments Oracle Tests › 1.35 experiment_upsert_field_contract ───────
+    e2e.spec.mjs:266:3 › AB Experiments Oracle Tests › 1.36 criterion_and_decision_field_contracts ─
+    e2e.spec.mjs:271:3 › AB Experiments Oracle Tests › 1.37 import_report_round_trip ───────────────
+    e2e.spec.mjs:286:3 › AB Experiments Oracle Tests › 4.1 empty_states_designed ───────────────────
+    e2e.spec.mjs:291:3 › AB Experiments Oracle Tests › 4.2 field_contracts_validate_inline ─────────
+    e2e.spec.mjs:296:3 › AB Experiments Oracle Tests › 4.3 errors_name_field_and_fix ───────────────
+    e2e.spec.mjs:301:3 › AB Experiments Oracle Tests › 4.4 actions_show_confirmation ───────────────
+    e2e.spec.mjs:306:3 › AB Experiments Oracle Tests › 4.5 run_shows_progress_affordances ──────────
+    e2e.spec.mjs:311:3 › AB Experiments Oracle Tests › 4.6 destructive_actions_guarded ─────────────
+    e2e.spec.mjs:316:3 › AB Experiments Oracle Tests › 4.7 nonobvious_controls_have_help ───────────
+    e2e.spec.mjs:321:3 › AB Experiments Oracle Tests › 4.8 controls_use_semantic_tags ──────────────
+    e2e.spec.mjs:326:3 › AB Experiments Oracle Tests › 4.9 modal_close_paths ───────────────────────
+    e2e.spec.mjs:331:3 › AB Experiments Oracle Tests › 4.10 long_run_shows_progress ────────────────
+    e2e.spec.mjs:336:3 › AB Experiments Oracle Tests › 4.11 export_always_schema_valid ─────────────
+    e2e.spec.mjs:341:3 › AB Experiments Oracle Tests › 4.12 import_rejects_invalid_contract ────────
+    e2e.spec.mjs:375:3 › AB Experiments Oracle Tests › 7.1 layout_adapts_desktop_to_mobile ─────────
+    e2e.spec.mjs:380:3 › AB Experiments Oracle Tests › 7.2 mobile_tap_targets_are_large_enough ─────
+    e2e.spec.mjs:385:3 › AB Experiments Oracle Tests › 7.3 typography_resizes_across_breakpoints ───
+    e2e.spec.mjs:390:3 › AB Experiments Oracle Tests › 7.4 content_avoids_clipping_and_overflow ────
+    e2e.spec.mjs:395:3 › AB Experiments Oracle Tests › 7.5 panel_fullwidth_with_back ───────────────
+    e2e.spec.mjs:400:3 › AB Experiments Oracle Tests › 7.6 stacking_reflows_logically ──────────────
+    e2e.spec.mjs:405:3 › AB Experiments Oracle Tests › 7.7 mobile_touch_gestures_work ──────────────
+    e2e.spec.mjs:410:3 › AB Experiments Oracle Tests › 7.8 small_screens_avoid_horizontal_scroll ───
+    e2e.spec.mjs:415:3 › AB Experiments Oracle Tests › 7.9 charts_resize_responsively ──────────────
+    e2e.spec.mjs:420:3 › AB Experiments Oracle Tests › 7.10 fixed_controls_remain_accessible ───────
+    e2e.spec.mjs:425:3 › AB Experiments Oracle Tests › 2.1 shared_state_coherence ──────────────────
+    e2e.spec.mjs:430:3 › AB Experiments Oracle Tests › 2.2 no_storage_reload_seeded ────────────────
+    e2e.spec.mjs:442:3 › AB Experiments Oracle Tests › 2.7 responsive_during_run ───────────────────
+    e2e.spec.mjs:447:3 › AB Experiments Oracle Tests › 2.8 statistics_react_to_data ────────────────
+    e2e.spec.mjs:452:3 › AB Experiments Oracle Tests › 2.9 keyboard_operability_focus ──────────────
+    e2e.spec.mjs:457:3 › AB Experiments Oracle Tests › 2.10 modal_focus_trap_escape ────────────────
+    e2e.spec.mjs:462:3 › AB Experiments Oracle Tests › 2.11 aria_live_announcements ────────────────
+    e2e.spec.mjs:467:3 › AB Experiments Oracle Tests › 2.12 labels_slider_values_errors ────────────
+    e2e.spec.mjs:476:3 › AB Experiments Oracle Tests › 2.14 export_import_end_state_contract ───────
+    e2e.spec.mjs:480:3 › AB Experiments Oracle Tests › 6.1 create_experiment_upsert_everywhere ─────
+    e2e.spec.mjs:493:3 › AB Experiments Oracle Tests › 6.2 invalid_upsert_inline_validation ────────
+    e2e.spec.mjs:497:3 › AB Experiments Oracle Tests › 6.3 edit_updates_row_and_panel ──────────────
+    e2e.spec.mjs:501:3 › AB Experiments Oracle Tests › 6.4 delete_removes_from_all_surfaces ────────
+    e2e.spec.mjs:505:3 › AB Experiments Oracle Tests › 6.5 tab_switch_retains_state ────────────────
+    e2e.spec.mjs:510:3 › AB Experiments Oracle Tests › 6.6 empty_library_state_visible ─────────────
+    e2e.spec.mjs:515:3 › AB Experiments Oracle Tests › 6.7 filters_and_search_consistent ───────────
+    e2e.spec.mjs:520:3 › AB Experiments Oracle Tests › 6.8 panel_close_reopen_continuity ───────────
+    e2e.spec.mjs:525:3 › AB Experiments Oracle Tests › 6.9 dialogs_and_export_import_flows ─────────
+    e2e.spec.mjs:530:3 › AB Experiments Oracle Tests › 6.10 recovery_without_reload ────────────────
+    e2e.spec.mjs:535:3 › AB Experiments Oracle Tests › 6.11 export_after_mutations_flow ────────────
+    e2e.spec.mjs:540:3 › AB Experiments Oracle Tests › 6.12 import_round_trip_flow ─────────────────
+  8 passed (4.5m)
