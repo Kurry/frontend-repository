@@ -74,7 +74,7 @@ function formatTimestamp(value) {
 const TYPE_LABELS = { aster: 'Aster', boreal: 'Boreal', cinder: 'Cinder' }
 const EDITOR_LABELS = { codedeck: 'Codedeck', nimbus: 'Nimbus', quill: 'Quill', vector: 'Vector', none: 'None' }
 const STATUS_LABELS = { idle: 'Idle', running: 'Running', paused: 'Paused', error: 'Error', offline: 'Offline' }
-const STATUS_TAG_TYPES = { idle: 'green', running: 'blue', paused: 'cyan', error: 'red', offline: 'gray' }
+const STATUS_TAG_TYPES = { idle: 'green', running: 'blue', paused: 'teal', error: 'red', offline: 'gray' }
 const TYPE_ITEMS = Object.entries(TYPE_LABELS).map(([id, label]) => ({ id, label }))
 const EDITOR_ITEMS = Object.entries(EDITOR_LABELS).map(([id, label]) => ({ id, label }))
 
