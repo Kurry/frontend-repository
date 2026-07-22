@@ -41,15 +41,15 @@
     "ada-mercer": { name: "Ada Mercer", born: "1867", died: "1959",
       title: "Ada Mercer—Field Notes Archive",
       bio: "The architect who made buildings breathe with the land, dissolving the line between structure and site through an organic philosophy.",
-      video: "lNhL1mrNmdg.mp4", plan: "ada_mercer_plan.avif" },
+      video: "ada-mercer-archive.mp4", plan: "ada_mercer_plan.avif" },
     "elias-north": { name: "Elias North", born: "1870", died: "1936",
       title: "Elias North—Field Notes Archive",
       bio: "The architect who stripped ornament from California decades before Europe made minimalism a movement.",
-      video: "0geywInE0Mg.mp4", pdf: "elias_north_pdf.avif" },
+      video: "elias-north-archive.mp4", pdf: "elias_north_pdf.avif" },
     "mara-voss": { name: "Mara Voss", born: "1929", died: "",
       title: "Mara Voss—Field Notes Archive",
       bio: "Deconstructivist provocateur or modernism's natural heir — radical forms bent the language of the building into sculpture.",
-      video: "772351121.mp4" },
+      video: "mara-voss-archive.mp4" },
     "julian-kade": { name: "Julian Kade", born: "1901", died: "1974",
       title: "Julian Kade—Field Notes Archive",
       bio: "From Tide Court to River Assembly Hall, Kade made raw concrete and natural light into a singular obsession.",
@@ -57,11 +57,11 @@
     "imani-vale": { name: "Imani Vale", born: "1917", died: "2019",
       title: "Imani Vale—Field Notes Archive",
       bio: "Seventy years of landmarks across four continents, every one anchored in geometric precision.",
-      video: "wPgmcHGKvwc.mp4" },
+      video: "imani-vale-archive.mp4" },
     "pavel-rowan": { name: "Pavel Rowan", born: "1918", died: "1997",
       title: "Pavel Rowan—Field Notes Archive",
       bio: "Can concrete be expressive and confrontational? Rowan's boundary-pushing civic work still divides opinion today.",
-      video: "yB2caWQwY9Y.mp4" },
+      video: "pavel-rowan-archive.mp4" },
     "lucian-shore": { name: "Lucian Shore", born: "1856", died: "1924",
       title: "Lucian Shore—Field Notes Archive",
       bio: "The father of the tall office frame and the man behind form following function — ideas that still underpin how the world builds tall.",
@@ -75,10 +75,10 @@
   var ROUTES = ["home", "about"].concat(ARCHITECT_SLUGS);
 
   var ABOUT_GALLERY = [
-    { file: "julian-kade-salk-institute-la-jolla-ca.avif", caption: "Julian Kade's Tide Court" },
-    { file: "julian-kade-the-national-assembly-building-in-dhaka-bangladesh.avif", caption: "Julian Kade's River Assembly Hall" },
-    { file: "pavel-rowan-art-and-architecture-building-yale-university-new-haven-connecticut.avif", caption: "Pavel Rowan's Northline Arts Building" },
-    { file: "imani-vale-national-gallery-of-art-east-building-washington-d-c.avif", caption: "Imani Vale's East Archive Pavilion" }
+    { file: "julian-kade-tide-court.avif", caption: "Julian Kade's Tide Court" },
+    { file: "julian-kade-river-assembly-hall.avif", caption: "Julian Kade's River Assembly Hall" },
+    { file: "pavel-rowan-northline-arts-building.avif", caption: "Pavel Rowan's Northline Arts Building" },
+    { file: "imani-vale-east-archive-pavilion.avif", caption: "Imani Vale's East Archive Pavilion" }
   ];
 
   var ABOUT_ESSAY = [
@@ -935,8 +935,8 @@
   function pauseVideo() { var v = $("#popupVideo"); if (v) { v.pause(); state.videoPlaying = false; } }
 
   var WAVE_PARTS = {
-    1: { mp3: "/media/blob/audio/7ef30141-f14e-5364-a33c-6ae2038cc9ec.mp3", json: "/media/blob/audio/julian_kade_part_1.json" },
-    2: { mp3: "/media/blob/audio/b82469ae-0943-5b95-834d-e1b9e5f858b1.mp3", json: "/media/blob/audio/julian_kade_part_2.json" }
+    1: { mp3: "/media/blob/audio/julian-kade-interview-part-1.mp3", json: "/media/blob/audio/julian_kade_part_1.json" },
+    2: { mp3: "/media/blob/audio/julian-kade-interview-part-2.mp3", json: "/media/blob/audio/julian_kade_part_2.json" }
   };
   function buildWavePlayer(container) {
     var wrap = document.createElement("div");
