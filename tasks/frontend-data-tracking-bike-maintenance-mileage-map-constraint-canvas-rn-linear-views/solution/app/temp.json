@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "bike-maintenance-v1",
+  "exportedAt": "2026-07-22T07:43:48.728Z",
+  "records": [
+    {
+      "id": "zsqn89v",
+      "state": "ready",
+      "details": {
+        "title": "New Service",
+        "mileage": 150,
+        "cost": 100,
+        "description": ""
+      },
+      "conflictReason": null
+    }
+  ],
+  "derived": {
+    "total": 1,
+    "byStatus": {
+      "ready": 1
+    },
+    "totalCost": 100
+  },
+  "history": [
+    {
+      "records": [
+        {
+          "id": "zsqn89v",
+          "state": "draft",
+          "details": {
+            "title": "New Service",
+            "mileage": 0,
+            "cost": 0,
+            "description": ""
+          }
+        }
+      ],
+      "timestamp": 1784706226485
+    },
+    {
+      "records": [
+        {
+          "id": "zsqn89v",
+          "state": "draft",
+          "details": {
+            "title": "New Service",
+            "mileage": 150,
+            "cost": 0,
+            "description": ""
+          }
+        }
+      ],
+      "timestamp": 1784706227024
+    },
+    {
+      "records": [
+        {
+          "id": "zsqn89v",
+          "state": "draft",
+          "details": {
+            "title": "New Service",
+            "mileage": 150,
+            "cost": 100,
+            "description": ""
+          }
+        }
+      ],
+      "timestamp": 1784706227041
+    },
+    {
+      "records": [
+        {
+          "id": "zsqn89v",
+          "state": "ready",
+          "details": {
+            "title": "New Service",
+            "mileage": 150,
+            "cost": 100,
+            "description": ""
+          },
+          "conflictReason": null
+        }
+      ],
+      "timestamp": 1784706227680
+    }
+  ]
+}
