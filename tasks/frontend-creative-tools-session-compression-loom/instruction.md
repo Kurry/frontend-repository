@@ -94,19 +94,15 @@ Module specs:
 </module_spec>
 
 Bindings:
-- Editor object types: capsule
-- Editor operations: select; update_property; preview; add
+- Editor Entity: capsule
+- Editor operations: select; update; create; preview
+- Editor Fields: title; variant
+- Artifact Formats: compressed-session-pack-v1
 - Artifact operations: export; import
-- Export formats: session-pack
+- Import modes: compressed-session-pack-v1
 
 Mechanics exclusions:
-- drag
-- resize
-- drawing
-- snapping
-- keyboard movement remain Playwright-driven when mechanism matters
-- raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results
-- file picker interaction, clipboard contents, and downloaded artifacts remain Playwright responsibilities
+- Text selection, range highlighting, preview layout, and download bytes stay Playwright-observed
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.
