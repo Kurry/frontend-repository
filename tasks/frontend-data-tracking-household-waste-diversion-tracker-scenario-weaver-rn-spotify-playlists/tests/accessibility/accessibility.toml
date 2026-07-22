@@ -1,0 +1,9 @@
+[dimension]
+id = "accessibility"
+name = "Accessibility"
+description = "Accessibility"
+
+[[criterion]]
+id = "accessibility.alternate_input"
+description = "Alternate input produces identical state with visible focus and live feedback."
+weight = 1

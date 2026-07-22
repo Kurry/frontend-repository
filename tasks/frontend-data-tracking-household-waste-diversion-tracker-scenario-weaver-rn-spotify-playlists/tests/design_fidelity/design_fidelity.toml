@@ -1,0 +1,9 @@
+[dimension]
+id = "design_fidelity"
+name = "Design Fidelity"
+description = "Design Fidelity"
+
+[[criterion]]
+id = "design_fidelity.source_fidelity"
+description = "The visual and interaction thesis is coherent without copying unrelated screens."
+weight = 1

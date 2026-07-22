@@ -1,0 +1,9 @@
+[dimension]
+id = "behavioral"
+name = "Behavioral"
+description = "Behavioral"
+
+[[criterion]]
+id = "behavioral.artifact_round_trip"
+description = "Authored order/selection/geometry and domain state survive; invalid import is a no-op."
+weight = 1

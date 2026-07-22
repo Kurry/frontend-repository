@@ -1,0 +1,9 @@
+[dimension]
+id = "edge_cases"
+name = "Edge Cases"
+description = "Edge Cases"
+
+[[criterion]]
+id = "edge_cases.boundaries_recovery"
+description = "Each invalid action gives field-level recovery and preserves prior valid state."
+weight = 1

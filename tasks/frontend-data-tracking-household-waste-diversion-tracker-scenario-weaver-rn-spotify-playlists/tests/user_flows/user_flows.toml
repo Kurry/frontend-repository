@@ -1,0 +1,9 @@
+[dimension]
+id = "user_flows"
+name = "User Flows"
+description = "User flows"
+
+[[criterion]]
+id = "user_flows.complete_user_flow"
+description = "The end-to-end job is recoverable without reload."
+weight = 1
