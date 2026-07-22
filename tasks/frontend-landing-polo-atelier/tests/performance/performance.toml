@@ -1,0 +1,220 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "9.1"
+name = "cold_start_interactive_under_2s"
+description = "First meaningful render of the preloader occurs within about 2 seconds of a local cold load, and the lobby becomes interactive promptly after the preloader completes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.2"
+name = "console_clean_on_full_exercise"
+description = "Exercising a full happy-path session (preloader dismiss, Begin the tour, hold-to-charge and run all three halls, swatch selection, run log, prize-draw fill and submit, confirmation, Download and Copy pass, rules overlay open/close, sound toggle) emits no console errors, no unhandled promise rejections, and no warnings during flows."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.3"
+name = "chrome_interactions_stay_responsive"
+description = "Begin the tour, the sound toggle, swatch selection, and progress-rail navigation respond without multi-second lag after first paint (chrome interactions feel under ~100ms to begin)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.4"
+name = "preloader_clears_without_hang"
+description = "The preloader progress indicator reaches completion and clears to reveal the lobby within a bounded time and never permanently blocks content while heavier media finish streaming."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.5"
+name = "machine_scene_orbit_stays_smooth"
+description = "Pointer-drag orbiting within the clamped bounds and idle ambient animation (bobbing, blinking lamps, drifting steam) in a machine hall remain smooth without long main-thread stalls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.6"
+name = "interactive_during_media_stream"
+description = "The UI stays interactive while heavier 3D models, textures, and audio assets finish streaming in — the lobby chrome, sound toggle, and Begin the tour remain operable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.7"
+name = "machine_run_holds_smooth_frame_rate"
+description = "A staged machine run (roughly four to seven seconds, choreographed sub-animations, spotlight reveal) plays with a smooth frame rate and no visible hitching or dropped frames from charge completion through the polo reveal."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.8"
+name = "rapid_button_activation_never_freezes"
+description = "Rapidly pressing and releasing the arcade button, and rapid double-activation during a run, never freezes the page and never starts an overlapping second run."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.9"
+name = "extended_session_stable"
+description = "After an extended session with multiple hall runs, replays from the confirmation chapter, sound-toggle cycles, and repeated exports, the experience remains responsive without runaway resource use that freezes interaction."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "9.10"
+name = "layout_stable_while_assets_load"
+description = "After first paint no visible layout jumps occur as fonts, illustrations, or the 3D scene finish loading; the canvas and card regions hold their space from the start."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a1"
+name = "chapter_transitions_frame_rate"
+description = "Choreographed full-viewport chapter transitions (lobby, halls, form, confirmation) hold a smooth frame rate with no visible stutter and content never pops between chapters."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a2"
+name = "charge_meter_tracks_hold_responsively"
+description = "The charge meter fills over about one second of hold and drains on early release with responsive, lag-free feedback tied to the press-and-hold gesture, with no delayed or jumpy metering."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a4"
+name = "canvas_resize_mid_run_no_stall"
+description = "Resizing the window mid-run keeps the 3D canvas correctly sized with no stretched or letterboxed rendering, does not abort the run, and introduces no visible frame-rate stall."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a5"
+name = "webgl_capability_fallback"
+description = "The machine halls detect WebGL capability before initializing and fall back to a complete static 2D illustrated composition of the same machine when GPU support is missing — the tour remains whole, completable end to end, and visually coherent without the scene."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a6"
+name = "heavy_assets_load_progressively"
+description = "Heavy assets load progressively: the lobby becomes interactive before all 3D models, textures, and audio finish loading; scene regions hold reserved space while streaming in; no interaction is blocked waiting on an asset."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.11"
+name = "export_compile_stays_responsive"
+description = "Compiling the atelier-pass JSON on Download and Copy, and re-exporting after replay appends new runs, stays responsive without freezing the page."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.12"
+name = "no_stall_during_charge_and_particles"
+description = "Idle scenes with mascot drift, floating polos, steam particles, and lamp blinks run continuously without janking the main thread; a machine run does not degrade to a visible slideshow."
+type = "binary"
+weight = 0.5
+negate = true
+
+[[criterion]]
+id = "9.13"
+name = "open_ended_performance_defect"
+description = "The experience exhibits a significant performance or stability defect (load, frame rate, hang, memory, or fallback) not covered by any other criterion in this dimension."
+type = "binary"
+weight = 1.0
+negate = true

@@ -1,0 +1,227 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "spacing_follows_consistent_scale"
+description = "At 1440 width, chapter padding, card gaps, and progress-rail spacing align to a consistent spacing scale and its multiples rather than arbitrary one-off offsets visible in computed styles."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "typography_matches_spec_hierarchy"
+description = "At 1440 typography matches the spec: the lobby headline The Polo Atelier Experience and the Congratulations headline render in the bundled rounded display face at a clearly larger size than UI text, hall names and blurbs form a consistent scale, and UI/body copy renders in the bundled sans — no undifferentiated single-size text."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "block_fidelity_preloader"
+description = "Block: preloader — a full-viewport intro carrying the original animated origami-heron Heron & Loom line-art logo, the words Welcome to the Heron & Loom Polo Atelier, and a visible loading progress indicator that reaches completion, styled in the paper-atelier language. Score this block against the specification: 5 = all specified elements present, correctly placed, correctly labelled, and on the paper-atelier palette; 4 = minor imperfections (one minor text or spacing slip); 3 = partial match (missing one element or noticeable spacing/label drift); 2 = poor match (multiple elements missing or off-spec); 1 = missing or completely off-spec."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.13"
+name = "block_fidelity_lobby"
+description = "Block: lobby — the paper-field introduction with the floating origami heron mascot, drifting knitted polo shirts, the display headline The Polo Atelier Experience, an original one-paragraph invitation, a Begin the tour call-to-action, and a persistent sound toggle. Score this block against the specification: 5 = all specified elements present, correctly placed, correctly labelled, and on the paper-atelier palette; 4 = minor imperfections (one minor text or spacing slip); 3 = partial match (missing one element or noticeable spacing/label drift); 2 = poor match (multiple elements missing or off-spec); 1 = missing or completely off-spec."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.14"
+name = "block_fidelity_machine_hall_and_button"
+description = "Block: machine hall — an interactive 3D (or 2D-fallback) stylized factory-machine scene on a floating platform with the oversized three-part arcade button (cap, collar, base) in the foreground carrying a circumferential charge meter and indicator lamps, plus idle ambient animation. Score this block against the specification: 5 = all specified elements present, correctly placed, correctly styled on the paper-atelier palette; 4 = minor imperfections (one minor styling or placement slip); 3 = partial match (missing one element or noticeable drift); 2 = poor match (multiple elements missing or off-spec); 1 = missing or completely off-spec."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "block_fidelity_progress_rail"
+description = "Block: progress rail — a persistent rail showing the three halls in fixed order Knitting, Dyeing, Embroidering with clearly distinct completed, active, and locked states and a visible locked affordance. Score this block against the specification: 5 = all three halls, order, and three states present and clearly differentiated on the paper-atelier palette; 4 = minor imperfections (one minor state or label slip); 3 = partial match (states hard to tell apart or one hall/label wrong); 2 = poor match (order wrong or states largely undifferentiated); 1 = missing or completely off-spec."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.16"
+name = "block_fidelity_dye_swatch_picker"
+description = "Block: dye swatch picker — the Dyeing hall's picker of exactly six named swatches Marsh Green, River Blue, Clay Red, Sand, Ink, Chalk, each with a fill matching its name and a visible selected state. Score this block against the specification: 5 = exactly six correctly named and coloured swatches with a clear selected state on the paper-atelier palette; 4 = minor imperfections (one swatch colour or label slightly off); 3 = partial match (a name wrong or selected state unclear); 2 = poor match (wrong count or multiple labels/colours off); 1 = missing or completely off-spec."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.17"
+name = "block_fidelity_prize_draw_form"
+description = "Block: prize-draw entry form — first name, last name, email, a country select of exactly eight options (United States, United Kingdom, France, Germany, Spain, Italy, Japan, Australia), and a required terms checkbox whose label links to an in-page rules overlay, styled in the paper-atelier language with inline per-field errors. Score this block against the specification: 5 = all fields, the eight-value country list, terms checkbox, and rules link present and correctly labelled on the paper-atelier palette; 4 = minor imperfections (one label or option slip); 3 = partial match (missing a field or wrong option count); 2 = poor match (multiple fields missing or off-spec); 1 = missing or completely off-spec."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.18"
+name = "block_fidelity_confirmation_summary"
+description = "Block: confirmation — the headline Congratulations, a confirmation paragraph, and a summary card leading with the entrant name then a dye swatch chip, hall checklist, and run count. Score this block against the specification: 5 = headline, paragraph, and summary card with all four data facets present and hierarchically ordered on the paper-atelier palette; 4 = minor imperfections (one facet or label slip); 3 = partial match (missing a facet or weak hierarchy); 2 = poor match (multiple facets missing or off-spec); 1 = missing or completely off-spec."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.19"
+name = "block_fidelity_export_controls"
+description = "Block: export controls — a Download pass button and a Copy pass button on the confirmation chapter with copy-with-confirmation feedback, styled in the paper-atelier language. Score this block against the specification: 5 = both controls present, correctly labelled, styled on the paper-atelier palette with visible copy confirmation; 4 = minor imperfections (one label or feedback slip); 3 = partial match (one control missing or feedback unclear); 2 = poor match (both off-spec or unstyled); 1 = missing or completely off-spec."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "specified_motion_states_present"
+description = "Spec-required motion states are present: preloader progress animates to completion and clears, choreographed chapter transitions between lobby/halls/form/confirmation, the press-and-hold charge meter fill and cap depression, the staged machine run ending in a spotlight polo reveal, and the early-release drain — verified via the real UI path."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "responsive_patterns_match_spec"
+description = "Responsive behavior matches the spec: landscape desktop 1440x900 and 1280x800 primary layout, landscape tablet reflowing chrome (progress rail may collapse to compact form) with full functionality, a usable compact layout for every chapter on a landscape phone (about 844x390), and the rotate-device overlay in portrait below tablet width."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "controls_styled_not_browser_defaults"
+description = "The swatch picker, country select, terms checkbox, sound toggle, dialogs, and export buttons are styled in the paper-atelier language (Reka UI primitives themed with the design tokens) rather than unstyled browser or component-library defaults."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "display_vs_body_hierarchy"
+description = "Typography hierarchy clearly distinguishes the bundled rounded display treatment (lobby headline, hall names, Congratulations) from the bundled sans body/label text across chapters."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "component_states_match_spec"
+description = "Specified control states match the spec: progress-rail completed vs active vs locked states, selected dye swatch vs unselected, submit disabled or blocked until the form validates, and inline per-field error states rendering distinctly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "palette_surfaces_and_accent_disciplined"
+description = "Color treatment matches the paper-atelier system: a warm off-white paper field, deep botanical green primary, a single warm clay accent, and ink-dark text, with the green and clay used on chrome, rail, and controls rather than flooding large section backgrounds, and no colors outside this system."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "microinteractions_match_spec_timing"
+description = "Microinteraction feedback follows the spec's language and timing: chapter transitions of 600-900ms on a non-linear ease, the roughly one-second charge fill, and the roughly four-to-seven-second staged machine run — verified on the real controls rather than via state shortcuts."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "no_source_brand_or_second_theme"
+description = "The build introduces no source-brand identity (no crocodile mascot, the real name Lacoste, its logotype, or source-site links or copy) and no second unrelated UI theme; every chapter stays within the one paper-atelier token system."
+type = "binary"
+weight = 1.0
+negate = true

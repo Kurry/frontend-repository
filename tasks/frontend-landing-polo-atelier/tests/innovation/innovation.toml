@@ -1,0 +1,156 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+weight = 0.25
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "11.1"
+name = "signature_arcade_button_delight"
+description = "The press-and-hold arcade button is a delightful, original signature interaction: three-part cap depression, circumferential charge meter fill over about one second, and lamp feedback tied to charge state combine into a moment that feels crafted and satisfying rather than a plain button with a progress bar."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.2"
+name = "staged_machine_run_choreography"
+description = "The four-to-seven-second machine runs are advanced, choreographed sequences (parts move in sequence, not all at once) that visibly narrate the polo transformation — wireframe-to-knit assembly, submerge-and-lift dyeing in the chosen color, crest stitching — ending in a spotlight reveal, going well beyond a minimal state flip."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.3"
+name = "chaptered_3d_factory_tour_immersion"
+description = "The chaptered 3D factory-tour concept is realized as an immersive experience: Three.js machine scenes with orbit, idle ambient life (bobbing, blinking lamps, drifting steam), and choreographed full-viewport chapter transitions between lobby, halls, form, and confirmation, rather than static screens with sprinkled effects."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.7"
+name = "heron_loom_brand_world_narrative"
+description = "The experience reads as one cohesive original Heron & Loom paper-atelier brand world with a narrative arc from preloader through lobby, the three machine halls, prize-draw entry, and confirmation — an authored knitwear-house story rather than disconnected template blocks."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.a1"
+name = "designed_experience_narrative_arc"
+description = "The app reads as a designed guided experience where chapters build on each other and the signature press-and-hold machine-run interaction is memorable, not a component-library default theme with animations added on top."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.a2"
+name = "webgl_fallback_preserves_experience"
+description = "The 2D illustrated fallback for halls where WebGL is unavailable is a genuinely finished alternative composition (arcade button still charges and runs via staged 2D animation, run log and progress update) that keeps the tour completable end to end, rather than a dead-end or degraded stub."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.8"
+name = "atelier_pass_export_execution"
+description = "Score execution quality of the atelier-pass export end state: live-compiled JSON reflecting entrant fields, ordered run log, chosen dye color, hall completion, and a generated pass id, with Download and Copy plus copy-with-confirmation feedback, feels finished rather than stubbed static text."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.9"
+name = "progress_rail_and_run_log_execution"
+description = "The progress rail (completed/active/locked with ordered unlocking and a locked affordance) and the session run log (appending entries, re-run support) execute as polished, informative operator surfaces rather than unfinished placeholders."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "innovation.catchall"
+name = "innovation_catchall"
+description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick, and must not name, trace, or derive from the source brand (no crocodile mascot, no real brand name or logotype, no source-site copy or links). If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0

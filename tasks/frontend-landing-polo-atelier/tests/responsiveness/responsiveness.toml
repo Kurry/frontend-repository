@@ -1,0 +1,192 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "7.1"
+name = "desktop_primary_layout"
+description = "At the primary landscape desktop widths (1440x900 and 1280x800) the experience presents its full layout: the machine-hall canvas, the progress rail, and the persistent chrome (sound toggle) are all visible without overlap."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.2"
+name = "compact_tap_targets_adequate"
+description = "On a landscape phone (e.g. 844x390), primary interactive controls (Begin the tour, arcade button, sound toggle, swatch picker, submit) present tap targets at least about 44px in height or width."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.3"
+name = "landscape_tablet_reflows_chrome"
+description = "On landscape tablet widths the chrome reflows (the progress rail may collapse to a compact form) while every chapter and control remains fully functional."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.4"
+name = "no_illegible_overlap_key_widths"
+description = "At 1440x900 and 844x390 the 3D canvas, chrome, and overlays never overlap illegibly and text never truncates meaningfully."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.5"
+name = "portrait_below_tablet_rotate_overlay"
+description = "On viewports in portrait orientation below tablet width, a full-screen rotate-device overlay with an original illustration and the exact text 'Rotate your device to continue' covers the experience, and the underlying chapter state is preserved."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.6"
+name = "swatch_and_form_usable_compact"
+description = "On a landscape phone the six dye swatches and the prize-draw form fields stack or wrap into a usable compact layout without clipping the swatch labels or field errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.7"
+name = "compact_arcade_button_operable"
+description = "On a landscape phone the machine hall's arcade button remains present and the press-and-hold charge/run interaction stays operable within the compact layout."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.8"
+name = "no_horizontal_scrollbar_compact"
+description = "On a landscape phone (844x390) no horizontal scrollbar appears and content does not force horizontal page scroll."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.9"
+name = "canvas_and_media_resize"
+description = "The 3D canvas, machine-hall illustrations, mascot and floating-polo art, and the confirmation summary card size responsively to fit the layout at 1440x900 and 844x390 without fixed-size overflow."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.10"
+name = "chrome_reachable_all_widths"
+description = "The persistent chrome (sound toggle, progress rail, and chapter controls) remains reachable and operable at 1440x900 and 844x390 across the lobby, halls, form, and confirmation chapters."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.a1"
+name = "compact_reflow_preserves_hierarchy"
+description = "On a landscape phone the lobby (mascot, headline, invitation, Begin the tour) and the machine halls are re-choreographed into a compact composition that preserves hierarchy rather than a flat squeezed dump of the desktop layout."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "7.11"
+name = "overlays_stay_inside_viewport_compact"
+description = "On a landscape phone the rules overlay and confirmation summary card stay inside the viewport, and the rotate-device overlay covers the full viewport when portrait, without clipped controls or text."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.12"
+name = "resize_orientation_preserves_state"
+description = "Rotating between portrait and landscape, or resizing across breakpoints, preserves the underlying chapter and session state rather than resetting the tour to the preloader or lobby."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "7.13"
+name = "open_ended_responsive_defect"
+description = "The experience exhibits a significant responsive-layout failure not covered by any other criterion in this dimension."
+type = "binary"
+weight = 1.0
+negate = true

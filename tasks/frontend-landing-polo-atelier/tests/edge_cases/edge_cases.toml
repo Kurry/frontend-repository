@@ -1,0 +1,220 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "rapid_button_no_overlapping_run"
+description = "Rapid double-activation of a machine's arcade button during a run does not start a second overlapping run, duplicate run-log entries, or corrupt the progress rail; exactly one run completes and one log entry is appended."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "escape_with_no_overlay_noop"
+description = "Pressing Escape while no overlay (rules overlay, rotate-device overlay) is open changes nothing on the page; the current chapter and its state are unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "invalid_entry_blocked_with_errors"
+description = "Submitting the prize-draw form with an empty first name, a malformed email, and the terms checkbox unchecked renders three inline field errors, moves focus to the first invalid field, and shows no confirmation chapter."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "double_submit_one_entrant"
+description = "Double-clicking the submit control on one valid prize-draw entry creates exactly one entrant record and one confirmation chapter."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "resize_mid_run_no_abort"
+description = "Resizing the window mid-run keeps the 3D canvas correctly sized with no stretched or letterboxed rendering and does not abort the machine run."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "webgl_unavailable_tour_completable"
+description = "If WebGL rendering is unavailable, every machine hall falls back to a static 2D illustrated composition of the same machine with the arcade button fully functional (charge, staged 2D run animation, log, progress), and all thirteen edge-case behaviors remain reachable so the tour is completable end to end."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "email_rejects_missing_domain_and_trims"
+description = "Email validation rejects values without a domain (e.g. name@) and whitespace-only names; trimmed first/last name and email values are what the exported atelier pass contains."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "form_controls_semantic_labeled"
+description = "The prize-draw fields (first name, last name, email, country select, terms checkbox) and the submit control use semantic input/select/button elements with visible labels or accessible-name equivalents rather than unlabeled div shells."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "rules_overlay_close_paths_restore_focus"
+description = "The rules overlay opened from the terms label closes via its close control and via Escape, returns focus to the terms checkbox label, and never navigates away from the experience."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "early_release_no_run_no_log"
+description = "Pressing the arcade button briefly and releasing before full charge visibly drains the charge meter, triggers no machine run, appends no run-log entry, and leaves the hall incomplete."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "locked_hall_does_not_activate"
+description = "Attempting to jump to a locked hall (e.g. Embroidering from Knitting with nothing run) via the progress rail does not activate the locked hall and surfaces a visible locked affordance explaining that halls unlock in order."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "replay_appends_export_entries"
+description = "From the confirmation chapter, navigating back to a completed hall via the progress rail, re-running the machine, and returning to confirmation appends further run-log entries rather than overwriting; a fresh export contains the appended run entries."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "rotate_overlay_mid_charge_cancels_safely"
+description = "The rotate-device overlay appearing mid-charge cancels the charge safely; returning to landscape restores the hall in its pre-charge state with underlying state preserved."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "sound_off_suppresses_run_audio"
+description = "Toggling sound off in the lobby then running a machine in any hall plays no audio; toggling sound back on makes subsequent button presses produce audio."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.20"
+name = "country_out_of_enum_rejected"
+description = "The country select offers exactly the eight declared options (United States, United Kingdom, France, Germany, Spain, Italy, Japan, Australia); a submission with no country or a value outside that closed enum is blocked with an inline error naming the field and no confirmation appears."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.21"
+name = "copy_denied_context_visible_fallback"
+description = "Copy pass in an insecure or clipboard-denied context degrades to a visible fallback (selectable atelier-pass JSON in a dialog) rather than failing silently, and produces no console errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.22"
+name = "no_source_brand_in_edge_states"
+description = "No source-brand artifact (crocodile mascot, the name 'Lacoste', its logotype, source-site links or copied copy) appears in any edge-state surface such as the rotate-device overlay, WebGL fallback illustration, rules overlay, or error messaging."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.23"
+name = "open_ended_edge_case_defect"
+description = "The experience exhibits a significant edge-case or resilience failure not covered by any other criterion in this dimension."
+type = "binary"
+weight = 1.0
+negate = true

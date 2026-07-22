@@ -1,0 +1,205 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "interactive_controls_keyboard_operable"
+description = "Every interactive control (Begin the tour, progress rail hall targets, swatch picker options, sound toggle, Claim your entry, prize-draw form fields and submit, rules-overlay trigger, Download pass, Copy pass) is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "arcade_button_keyboard_charge_equivalent"
+description = "The oversized arcade machine button supports a keyboard equivalent: holding Space or Enter charges the machine over about one second and shows the same visible charge feedback (meter fill / lamp state) as press-and-hold, and releasing the key before completion drains the meter without triggering a run."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "rules_overlay_focus_trap_and_return"
+description = "The rules overlay opened from the terms label behaves as a modal dialog: it traps focus while open, closes on Escape and via its close control, and returns focus to the terms checkbox label on close."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "canvas_scenes_accessible_names"
+description = "Each machine hall's 3D canvas (or its 2D fallback composition) carries a descriptive accessible name conveying which machine and hall it depicts (Knitting, Dyeing, Embroidering), rather than an unlabeled canvas."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "form_fields_explicit_labels"
+description = "The prize-draw form fields (first name, last name, email, country select, terms-of-participation checkbox) each use an explicit label association or equivalent accessible name."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "headings_logical_order"
+description = "Headings across the chapters (preloader, lobby, hall states, confirmation with the Congratulations headline) follow a logical heading order with no skipped levels that break the outline."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "landmarks_and_dom_state_text"
+description = "The document exposes HTML-first landmarks (a main content region and persistent chrome), and all meaningful session state also exists as DOM text: progress rail hall labels (completed/active/locked), the run log entries, and the confirmation summary card — not conveyed by the canvas alone."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "contrast_paper_atelier_surfaces"
+description = "Text over the warm off-white paper field, the deep botanical green surfaces, and the clay accent controls all meet WCAG AA contrast, including text rendered over textured/grain backgrounds and control labels."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "semantic_interactive_chrome"
+description = "Interactive chrome uses real controls (button, label, native select/checkbox, links) with semantic roles; custom overlays and the arcade button expose matching ARIA roles only where native elements cannot carry the behavior."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "reduced_motion_settles_immediately"
+description = "With prefers-reduced-motion emulated on a fresh load, the preloader progress does not permanently block content, chapter transitions reduce to short fades rather than large choreography, idle scene motion and machine-run choreography are minimized, and every state change (charge, run completion, hall unlock, chapter advance) remains perceivable while the experience stays fully operable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.a1"
+name = "swatch_options_accessible_names"
+description = "The six dye swatches expose their color names (Marsh Green, River Blue, Clay Red, Sand, Ink, Chalk) as accessible names rather than being color-only chips whose meaning is conveyed by hue alone."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.a2"
+name = "webgl_layer_labelled_or_decorative"
+description = "Each hall's WebGL layer is treated correctly: it is either labelled (role=img with a descriptive aria-label) or marked aria-hidden when a labelled sibling or DOM text already conveys the scene, so the accessibility tree is never left with an unnamed interactive canvas."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "sound_toggle_state_exposed"
+description = "The persistent sound toggle exposes its on/off state to assistive technology (e.g. aria-pressed / checked or a role with accessible name reflecting muted/unmuted) consistently across all chapters, not by a purely visual icon swap."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "live_region_announcements"
+description = "Charge progress, run completion, hall unlocks, prize-draw form errors, and copy-pass confirmation are announced via ARIA live regions in addition to their visual presentation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "form_errors_focus_and_association"
+description = "On an invalid prize-draw submission, inline per-field errors are programmatically associated with their fields (e.g. aria-describedby / aria-invalid) and focus moves to the first invalid field rather than errors being visual-only."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "no_keyboard_inaccessible_or_unlabeled_barrier"
+description = "NEGATIVE: fail if a required control cannot be reached or activated by keyboard alone (e.g. the arcade button offers no keyboard charge path, the progress rail or swatches are mouse-only), OR a meaningful icon-only control (sound toggle, swatch, close button) exposes no accessible name, OR form errors and copy confirmation are conveyed only visually with no screen-reader-accessible equivalent. Answer yes only if such a barrier is directly observed."
+type = "binary"
+weight = 1.0
+

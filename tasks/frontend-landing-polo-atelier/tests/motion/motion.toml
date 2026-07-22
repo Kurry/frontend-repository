@@ -1,0 +1,255 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "preloader_animates_out"
+description = "On a fresh real page load the preloader progress indicator animates smoothly to completion and then the preloader clears (fading or transitioning out) to reveal the lobby, and does not stay permanently covering content"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "chapter_transitions_choreographed"
+description = "Advancing between chapters via the real controls (Begin the tour, hall completion, Claim your entry, valid form submit) plays a choreographed full-viewport transition rather than content popping instantly between chapters"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "arcade_button_charge_choreography"
+description = "Pressing and holding the arcade button with the real pointer visibly depresses the cap and fills the circumferential charge meter over about one second with lamp state changes, rather than jumping straight to the run with no charge feedback"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "early_release_drain_distinct"
+description = "Releasing the arcade button before full charge plays a distinct drain or settle animation that is clearly different from the completion animation, and no run triggers"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "signature_staged_machine_run"
+description = "Signature interaction on a fresh load: completing the charge triggers a staged, choreographed machine run of roughly four to seven seconds in which the machine's sub-animations move in sequence rather than all at once, ending in a spotlight reveal of the transformed polo"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "idle_scenes_alive"
+description = "The idle scenes are alive and continuous via the real UI path: the lobby mascot drifts, polos float, and hall scenes show soft bobbing, blinking indicator lamps, and drifting steam particles running continuously rather than a frozen static scene"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "dye_run_color_reveal"
+description = "In the Dyeing hall the machine run visibly submerges the white polo and lifts it out in the session's chosen swatch color as an animated transformation rather than a hard swap to a static colored image"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "sound_toggle_visual_feedback"
+description = "Toggling the sound control via the real UI animates its state change (a short transition of its knob or icon) rather than snapping with no feedback"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.9"
+name = "progress_rail_state_transitions"
+description = "On a fresh load, completing a hall animates that hall's progress-rail state from active to complete and the next hall from locked to active rather than the rail states snapping instantly"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.10"
+name = "reduced_motion_respected"
+description = "Under prefers-reduced-motion reduce, large chapter and run choreography collapse to short fades while every state change stays perceivable, the preloader still clears without blocking content, and idle continuous animations (mascot drift, floating polos, steam particles) do not run"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.14"
+name = "chapter_transition_timing_spec"
+description = "On a real chapter advance the full-viewport transition runs for 600-900ms on a non-linear ease, with getAnimations on the transitioning element reporting a duration in that range and a non-linear easing rather than a linear tween"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "idle_particles_run_at_target_framerate"
+description = "The idle steam particles, mascot drift, and lamp blinks run as continuous looping animation targeting 60fps without visible jank or stutter while the hall is idle"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.16"
+name = "copy_confirmation_animates"
+description = "After activating Copy pass, the copy-with-confirmation feedback animates in with a short fade or slide of roughly 200 to 300 milliseconds rather than appearing and disappearing instantly"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.18"
+name = "charge_meter_fill_timing_spec"
+description = "On a real press-and-hold the charge meter fills over about one second, with the fill progressing continuously (getAnimations or a measurable transform/width change over roughly 1000ms) rather than snapping to full instantly"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.19"
+name = "form_error_feedback_animates"
+description = "After submitting the prize-draw form with invalid fields, the inline per-field error messages animate in with a short fade or slide of roughly 200 to 300 milliseconds rather than appearing instantly"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.20"
+name = "non_linear_easing_on_choreography"
+description = "Chapter transitions, the machine run choreography, and the button charge use non-linear easing (getAnimations reports a non-linear ease) rather than mechanical linear tweens"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.21"
+name = "run_not_interruptible_no_double_start"
+description = "Rapid double-activation of a machine button during a run does not start a second overlapping run, and resizing the window mid-run keeps the canvas correctly sized without aborting the run"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.23"
+name = "session_narrative_sequence"
+description = "On a fresh load, driving the real happy path advances through preloader, lobby, the three machine halls in order, showcase, form, and confirmation as a choreographed sequential narrative with transitions between chapters rather than unrelated static screens swapping abruptly"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.24"
+name = "no_state_shortcut_snap_masquerade"
+description = "Animations are driven by the real UI control path and not faked: charging, running, and chapter transitions produce genuine intermediate frames when driven by pointer or keyboard, and are not pre-rendered snaps that only appear animated, nor animations that only play when a WebMCP tool bypasses the visible control"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.25"
+name = "keyboard_charge_shows_same_feedback"
+description = "Charging the arcade button via the keyboard equivalent (hold Space or Enter) shows the same visible charge-meter fill and cap-depression feedback as the pointer press rather than jumping straight to the run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.26"
+name = "rules_overlay_open_close_animates"
+description = "Opening the rules overlay from the terms label enters with a short fade or scale transition and closing it via its close control or Escape reverses that transition rather than snapping open and shut"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.27"
+name = "orbit_and_reveal_feel_responsive"
+description = "Pointer-drag orbiting of the machine scene within its clamped bounds and the end-of-run spotlight polo reveal both feel responsive and smooth via the real UI path rather than a hard snap with no easing"
+type = "binary"
+weight = 1.0

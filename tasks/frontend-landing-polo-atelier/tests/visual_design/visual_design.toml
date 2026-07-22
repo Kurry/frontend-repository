@@ -1,0 +1,269 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "paper_atelier_palette_system"
+description = "The composition reads as an original crafted paper-atelier brand world rather than a component-library default theme: surfaces compute to a warm off-white paper field with deep botanical green as the primary and a single warm clay accent, ink-dark text, soft grain, and subtle topographic or knit-line pattern texture; the green and clay accents are used purposefully on chrome, progress rail, and controls rather than flooding every large section with saturated fills"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "display_and_sans_type_pairing"
+description = "Headlines (lobby headline The Polo Atelier Experience, hall blurbs, Congratulations) render in a bundled open-license display face with rounded, sporty character while UI text renders in a bundled open-license sans, and rendered text resolves to those bundled faces rather than a system fallback"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.3"
+name = "arcade_button_signature_object"
+description = "The arcade push button reads as a signature three-part object (cap, collar, base): oversized in the hall foreground, with a visible pressed state on the cap, a circumferential charge meter, and indicator lamps whose treatment is tied to charge state rather than a plain flat circle"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "machine_hall_material_language"
+description = "The three machine scenes share one material language (matte painted metal, brass accents, fabric surfaces, emissive indicator lamps) while each hall keeps a distinct silhouette and signature mechanism — Knitting needle carriage, Dyeing vat and hoist, Embroidering gantry"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.7"
+name = "lobby_hero_composition"
+description = "The lobby composes as an intentional depth scene at 1440x900: the origami heron mascot, drifting knitted polo shirts, the display-face headline The Polo Atelier Experience, an original one-paragraph invitation, and a Begin the tour call-to-action layer over the textured paper field rather than a single flat block or empty field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "progress_rail_paper_language"
+description = "The progress rail expresses the paper-atelier language with clearly distinct completed, active, and locked hall states (texture, green/clay accents, stitched or perforated edge detail) rather than unstyled default list items"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.9"
+name = "swatch_picker_named_colors"
+description = "The Dyeing hall swatch picker presents exactly six named dye chips — Marsh Green, River Blue, Clay Red, Sand, Ink, Chalk — each rendering a swatch fill that plausibly matches its name, with a visibly selected state, styled in the paper-atelier language rather than default form controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "form_and_overlay_treatment"
+description = "The prize-draw form, rules overlay, and export cards all express the paper-atelier language (paper texture, green/clay accents, rounded card geometry, stitched or perforated edge detail) rather than unstyled default inputs, dialogs, and buttons"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.12"
+name = "confirmation_summary_card_hierarchy"
+description = "The confirmation summary card presents the session data with clear visual hierarchy: the entrant name leads, followed by a dye swatch chip, a hall checklist, and the run count, styled in the paper-atelier card language rather than an undifferentiated text dump"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.13"
+name = "export_controls_and_feedback_treatment"
+description = "The Download pass and Copy pass controls are clearly styled paper-atelier buttons with green/clay accents, and the copy-with-confirmation feedback renders in a clearly distinct, legible treatment rather than an unstyled default button and silent state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.14"
+name = "chrome_layout_desktop"
+description = "At landscape desktop (1440x900) the persistent chrome composes cleanly: the progress rail and sound toggle are visible and legible over the textured field, the 3D canvas fills its intended stage, and chrome, canvas, and overlays never overlap illegibly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "compact_landscape_phone_adaptation"
+description = "At a landscape phone viewport (about 844x390) every chapter presents a usable compact layout: the progress rail may collapse to a compact form, the arcade button and canvas remain visible, and text does not truncate meaningfully"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.16"
+name = "rotate_overlay_original_illustration"
+description = "In portrait orientation below tablet width the rotate-device overlay covers the experience with an original illustration and the text Rotate your device to continue, styled in the paper-atelier language rather than plain unstyled text"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.18"
+name = "label_case_conventions_consistent"
+description = "Chapter headings, hall names, and button labels keep a consistent case convention while body and microcopy use one consistent sentence-case convention across chapters"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.21"
+name = "no_source_brand_crocodile_or_lacoste"
+description = "No source-brand identity appears anywhere on any judge-visible surface: no crocodile mascot, no real brand name Lacoste in text, title, alt text, or copy, no source logotype, and no source-site links; the only mascot is the original origami heron"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.22"
+name = "no_component_library_default_look"
+description = "The experience does not fall back to an unstyled component-library default appearance for its core surfaces: the halls, swatch picker, form, overlays, and cards do not read as raw Reka UI or browser defaults with no paper-atelier tokens applied"
+type = "binary"
+weight = 0.5
+optional = true
+negate = true
+
+[[criterion]]
+id = "3.23"
+name = "paper_atelier_tokens_resolve"
+description = "Computed styles resolve a coherent token set: a warm off-white paper surface, a deep botanical green primary, a warm clay accent, and ink-dark text applied consistently across sections and controls rather than arbitrary one-off colors per element"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.25"
+name = "original_media_variety"
+description = "The newly authored media forms a purposefully art-directed craft world: the origami heron mark, drifting knitted polos, distinct per-hall machine imagery, and the rotate-device illustration are distinct original assets rather than gradients, repeated placeholders, or generic stock thumbnails"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.26"
+name = "run_result_polo_reads_as_transformed"
+description = "At the end of a machine run the transformed polo reads as visibly changed under a spotlight: the knitting run shows assembled knitted fabric, the dyeing run shows the polo in the session's chosen dye color, and the embroidering run shows the heron crest on the chest, art-directed rather than an unchanged placeholder"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.27"
+name = "distinct_machine_silhouettes"
+description = "The three machine halls have recognizably different machine silhouettes and signature mechanisms (needle carriage, dye vat and hoist, embroidery gantry) with consistent lamp, brass, and fabric detailing rather than the same machine model reskinned three times"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.28"
+name = "three_d_material_response_and_crisp_marks"
+description = "The 3D machine scenes show visibly different matte, brass, and emissive material responses under scene lighting, and the original heron marks and pattern motifs stay crisp at desktop and compact sizes rather than appearing as blurry raster substitutes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.30"
+name = "form_and_rules_microcopy_actionable"
+description = "The prize-draw inline field errors name the offending field and state how to fix the input, and the rules overlay text describes the fictional prize draw in plain original language rather than vague filler or copied source copy"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.40"
+name = "run_log_list_anatomy"
+description = "Session run-log entries share one dense list anatomy (hall name, timestamp, outcome, and dye color for dyeing) styled on the paper-atelier surface rather than inconsistent ad-hoc rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.31"
+name = "webgl_fallback_matches_visual_system"
+description = "When WebGL is unavailable the 2D illustrated hall composition uses the same paper-atelier visual system (green/clay palette, machine silhouette, signature arcade button and charge meter) rather than introducing a second unrelated look or a bare placeholder"
+type = "binary"
+weight = 1.0

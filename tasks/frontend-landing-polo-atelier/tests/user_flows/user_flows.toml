@@ -1,0 +1,204 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "6.1"
+name = "preloader_to_lobby_flow"
+description = "Loading / plays the full-viewport preloader (animated origami heron, Welcome to the Heron & Loom Polo Atelier, loading progress) which completes and clears to reveal the lobby with its mascot, headline The Polo Atelier Experience, invitation, Begin the tour call-to-action, and sound toggle — no second document loads."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.2"
+name = "begin_tour_enters_knitting"
+description = "Activating Begin the tour from the lobby closes the lobby and enters the Knitting hall within the same page (/), showing its 3D machine scene and arcade button, with the progress rail marking Knitting active and Dyeing and Embroidering locked."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.3"
+name = "hold_charge_runs_knitting"
+description = "In the Knitting hall, pressing and holding the arcade button to full charge (cap depresses, meter fills over about one second) triggers the staged knitting run that assembles a wireframe polo into knitted fabric, ends with a spotlighted polo, and marks the Knitting hall complete on the progress rail with a run-log entry appended."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.4"
+name = "dye_swatch_selection_flow"
+description = "Advancing to the Dyeing hall, picking River Blue from the six-swatch picker (Marsh Green, River Blue, Clay Red, Sand, Ink, Chalk) and holding to full charge runs the dye animation that lifts the polo out in blue, and the run log records the dyeing run with color River Blue."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.5"
+name = "embroidering_run_to_showcase"
+description = "Advancing to the Embroidering hall and holding to full charge runs the crest-stitching animation that embroiders the heron crest onto the chest; completing it presents the finished polo in a showcase moment and unlocks the prize-draw chapter via a Claim your entry call-to-action — no reload or navigation away."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.6"
+name = "early_release_no_run_flow"
+description = "In any hall, pressing the arcade button briefly and releasing before full charge visibly drains the meter, triggers no machine run, creates no run-log entry, and leaves the hall incomplete; a second press-and-release cycle behaves identically with no stuck intermediate state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.7"
+name = "reload_baseline_resets_session"
+description = "After running a hall, choosing a dye color, and opening the prize-draw form, reloading returns the initial state: the preloader plays again, the experience returns to the lobby, no halls are completed, the run log is empty, no dye color is chosen, no entrant data remains, and no prior visit state persists."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.8"
+name = "locked_hall_flow"
+description = "From the Knitting hall with nothing run yet, attempting to jump to Embroidering via the progress rail does not activate the locked hall; a visible locked affordance explains that halls unlock in order and the experience stays on the Knitting hall within /."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.9"
+name = "chrome_and_rules_stay_in_page"
+description = "Activating chapter chrome — the sound toggle, progress rail items, swatch picker, and the terms label that opens the in-page rules overlay — either changes client-side state or opens an in-page overlay; none reload the document or navigate to another origin, and the rules overlay never links to an external site."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.10"
+name = "post_run_progress_rail_persists"
+description = "After completing a hall and advancing, the progress rail stays visible and coherent (completed halls marked, active hall marked, locked halls marked) and no document reload has occurred at any step of the tour."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "happy_path_export_reflects_session"
+description = "Happy path flow: from load, complete Knitting, choose River Blue and complete Dyeing, complete Embroidering, reach the showcase, Claim your entry, fill the prize-draw form validly, reach the Congratulations chapter, then Download pass and confirm the JSON contains the entrant fields, three completed halls (knitting/dyeing/embroidering true), dye_color River Blue, and three runs entries, with a copied confirmation on Copy pass."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "invalid_entry_flow"
+description = "Invalid-entry flow: on the prize-draw form submit with an empty first name, a malformed email (e.g. name@), and the terms checkbox unchecked; three inline field errors render, focus moves to the first invalid field, and no confirmation chapter appears; correcting all fields allows submission to the Congratulations chapter."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "replay_flow_appends_export"
+description = "Replay flow: from the confirmation chapter, navigate back to a completed hall via the progress rail, re-run its machine (a further run-log entry appends), return to confirmation, and export again; the new atelier-pass JSON contains the appended run entries rather than the earlier count."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "sound_flow"
+description = "Sound flow: toggle sound off in the lobby, run a machine in any hall and confirm no audio plays; toggle sound back on and confirm subsequent arcade-button presses produce audio, with the toggle state visible in the chrome throughout."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "no_source_brand_across_flow"
+description = "Negative: at no point across the end-to-end tour flow (preloader, lobby, halls, prize-draw, confirmation, export) does any source-brand element appear — no crocodile mascot, no real brand name Lacoste or its logotype, and no source-site links or copied source copy."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "user_flow_catch_all"
+description = "Open-ended: a critical end-to-end flow of the Polo Atelier Experience (preloader-to-lobby, begin-tour, charge-and-run per hall, dye selection, ordered unlocking, prize-draw entry, confirmation, or atelier-pass export) fails or dead-ends in a way not covered by any other criterion in this dimension."
+type = "binary"
+weight = 1.0
