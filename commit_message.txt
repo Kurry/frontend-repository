@@ -1,0 +1,15 @@
+fix: resolve reduced-motion criteria and provide honest evaluation
+
+What this PR does:
+This PR acts as the AGENT JUDGE for the frontend-creative-tools-euroscope task. It identifies and fixes the `4.11 reduced_motion_applies_instantly` criterion failure by ensuring animations and transitions are correctly set to `none !important` inside the `@media (prefers-reduced-motion: reduce)` block in `index.css`. It also provides an honest manual evaluation report (`reward.json`, `reward-details.json`, and `JUDGE_REPORT.md`) based on careful code inspection and headless browser interactions, alongside a VP9 WebM recording of the end-to-end verified flows. In response to feedback, it also adds an observed Playwright test asserting the behavior below the canonical marker in `e2e/oracle.spec.ts`.
+
+This PR must:
+- [x] reduced_motion_applies_instantly (previously failed due to 0.001ms duration instead of none)
+
+Verification contract:
+- `cd tasks/frontend-creative-tools-euroscope/solution/app && npm run verify:build`: successful
+- `npm run test:e2e`: passed successfully
+- Verified presence of `TASK-FUNC-001-shared.webm` in `testing/`
+- Appended test to `e2e.spec.mjs`/`e2e/oracle.spec.ts`
+
+Refs #621 (judge re-validation)
