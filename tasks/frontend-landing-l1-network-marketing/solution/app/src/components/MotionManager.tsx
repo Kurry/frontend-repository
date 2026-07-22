@@ -13,7 +13,7 @@ export default function MotionManager() {
       document.documentElement.style.scrollBehavior = 'auto';
       document.documentElement.classList.add('is-mounted');
       const headline = document.getElementById('eventsHeadline');
-      if (headline) { headline.textContent = 'RIDGE GLOBAL EVENTS'; headline.setAttribute('aria-label', 'RIDGE GLOBAL EVENTS'); }
+      if (headline) { headline.textContent = 'Ridge Global Events'; headline.setAttribute('aria-label', 'Ridge Global Events'); }
       const trio = document.getElementById('trio');
       if (trio) trio.classList.add('trio-in');
 
@@ -77,7 +77,7 @@ export default function MotionManager() {
     }
 
     // --- Global Events character-decode + line-mask reveal ---
-    const headlineText = 'RIDGE GLOBAL EVENTS';
+    const headlineText = 'Ridge Global Events';
     const headlineElement = document.getElementById('eventsHeadline');
     const blurbElement = document.getElementById('eventsBlurb');
     const glyphs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*<>?';

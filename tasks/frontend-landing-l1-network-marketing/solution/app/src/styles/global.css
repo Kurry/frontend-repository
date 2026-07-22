@@ -15,6 +15,10 @@
 :root {
   --ridge-radius-module: 1.5rem;
   --ridge-radius-control: 0.5rem;
+  --color-void: #000000;
+  --color-surface: #111111;
+  --color-ink: #1e3a8a;
+  --color-accent: #e11d48;
 }
 
 /* ---- Bundled open-license display + body faces (no CDN) ---- */
@@ -238,3 +242,31 @@ tbody tr.row-exit {
 
 :root[data-theme="light"] .void { color: #f8fafc; }
 :root[data-theme="dark"] .void { color: #f8fafc; }
+
+
+/* --- Microinteractions --- */
+.why-card {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.why-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -10px rgba(0,0,0,0.15);
+}
+.events-card {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.events-card:hover {
+  transform: translateY(-4px);
+}
+tr[data-event-row] {
+  transition: background-color 0.2s ease;
+}
+tr[data-event-row]:hover, li[data-event-row]:hover {
+  background-color: color-mix(in srgb, var(--color-ink) 10%, transparent);
+}
+.cta:hover {
+  filter: brightness(1.1);
+}
+.cta:hover svg {
+  transform: translateX(4px);
+}
