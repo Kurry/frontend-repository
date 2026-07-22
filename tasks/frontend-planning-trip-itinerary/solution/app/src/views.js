@@ -887,8 +887,8 @@ function mkSelect(value, opts, fmt = (o) => o) { return h("select", { class: "se
 
 export function openStopForm(stop) {
   const s = st();
-  const editing = !!stop;
-  const v = stop ? { ...stop } : { title: "", day: s.dayFilter || DATES[0], category: "sightseeing", location: "", startTime: "", endTime: "", notes: "" };
+  const editing = !!stop?.id;
+  const v = editing ? { ...stop } : { title: stop?.title || "", day: stop?.day || s.dayFilter || DATES[0], category: "sightseeing", location: "", startTime: "", endTime: "", notes: "" };
   const title = mkInput("text", v.title, { maxlength: "80" });
   const day = mkSelect(v.day, DATES, dayLabel);
   const category = mkSelect(v.category, STOP_CATS, cap);
