@@ -1,0 +1,9 @@
+[judge]
+mode = "manual"
+
+[[criterion]]
+id = "AC-04"
+title = "Query the current state and export after the mutation"
+description = "The tool result and artifact contain the declared API-shaped fields."
+weight = 1.0
+type = "behavior"

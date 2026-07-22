@@ -1,0 +1,16 @@
+[judge]
+mode = "manual"
+
+[[criterion]]
+id = "AC-11"
+title = "Mutate a record and use the linked representation to make the next decision"
+description = "Linked views provide domain utility beyond CRUD."
+weight = 1.0
+type = "behavior"
+
+[[criterion]]
+id = "innovation.catchall"
+title = "Catch-all for innovative features"
+description = "This catch-all criterion allows for rewarding innovative features not covered by specific criteria, provided there is sufficient evidence."
+weight = 1.0
+type = "behavior"
