@@ -6,13 +6,13 @@
   "scripts": {
     "start": "vite --host 0.0.0.0 --port 3000",
     "verify:build": "vite build",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test e2e.spec.mjs"
   },
   "dependencies": {
     "@kobalte/core": "0.13.12",
     "@tabler/icons-solidjs": "3.34.1",
-    "@tanstack/solid-form": "1.33.2",
     "@tailwindcss/vite": "4.3.2",
+    "@tanstack/solid-form": "1.33.2",
     "motion": "12.23.12",
     "qrious": "4.0.2",
     "solid-js": "1.9.14",
