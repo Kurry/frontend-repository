@@ -45,18 +45,7 @@
 
   async function writeClipboard(value: string, key: string) {
     try {
-            try {
-        await navigator.clipboard.writeText(value);
-      } catch (err) {
-        const textarea = document.createElement('textarea');
-        textarea.value = value;
-        textarea.style.position = 'fixed';
-        textarea.style.opacity = '0';
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-      }
+      await navigator.clipboard.writeText(value);
     } catch {
       const textarea = document.createElement('textarea');
       textarea.value = value;
@@ -65,11 +54,12 @@
       document.body.appendChild(textarea);
       textarea.select();
       document.execCommand('copy');
-      textarea.remove();
+      document.body.removeChild(textarea);
     }
     copied = key;
-    consoleStore.showToast(key === 'fingerprint' ? 'Fingerprint copied' : 'Preview copied');
-    setTimeout(() => { if (copied === key) copied = null; }, 1800);
+    setTimeout(() => {
+      if (copied === key) copied = null;
+    }, 2000);
   }
 
   function downloadPreview() {
