@@ -88,10 +88,14 @@ function displayTableTitle(title) {
   return title.length > 60 ? `${title.slice(0, 59)}…` : title;
 }
 
-function useModalFocusTrap(active) {
+function useModalFocusTrap(active, onClose) {
   useEffect(() => {
     if (!active) return undefined;
     const onKeyDown = (event) => {
+      if (event.key === 'Escape' && onClose) {
+        onClose();
+        return;
+      }
       if (event.key !== 'Tab') return;
       const modal = document.querySelector('.cds--modal.is-visible, .side-panel[aria-modal="true"]');
       if (!modal) return;
@@ -1592,7 +1596,18 @@ function App() {
   );
 
   useEffect(() => registerWebMCPTools(), []);
-  useModalFocusTrap(Boolean(activeModal) || Boolean(detailPromptId) || Boolean(historyPromptId));
+  useModalFocusTrap(Boolean(activeModal) || Boolean(detailPromptId) || Boolean(historyPromptId), () => {
+    const state = useLibraryStore.getState();
+    if (state.activeModal) {
+      closeModalWithFocus();
+    } else if (state.detailPromptId) {
+      state.closeDetail();
+      restoreModalFocus();
+    } else if (state.historyPromptId) {
+      state.closeHistory();
+      restoreModalFocus();
+    }
+  });
   useEffect(() => {
     const onClick = (e) => {
       if (e.target.classList.contains('cds--modal') && e.target.classList.contains('is-visible')) {
