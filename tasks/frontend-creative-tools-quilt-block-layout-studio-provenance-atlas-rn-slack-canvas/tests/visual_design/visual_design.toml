@@ -1,0 +1,9 @@
+[judge]
+mode = "manual"
+
+[[criterion]]
+id = "AC-02"
+title = "Inspect the primary work surface, linked summary, and detail panel"
+description = "The visual hierarchy makes current state and next action clear."
+weight = 1.0
+type = "behavior"

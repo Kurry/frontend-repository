@@ -1,0 +1,9 @@
+[judge]
+mode = "manual"
+
+[[criterion]]
+id = "AC-03"
+title = "Causal motion on mutation"
+description = "Motion connects the acted-on item to its new state and has a reduced-motion equivalent."
+weight = 1.0
+type = "behavior"

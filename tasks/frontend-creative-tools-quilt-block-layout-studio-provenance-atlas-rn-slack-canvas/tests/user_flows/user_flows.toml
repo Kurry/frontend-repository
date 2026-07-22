@@ -1,0 +1,9 @@
+[judge]
+mode = "manual"
+
+[[criterion]]
+id = "AC-05"
+title = "Create, edit, mutate, undo, and complete one record"
+description = "The end-to-end job is recoverable without reload."
+weight = 1.0
+type = "behavior"

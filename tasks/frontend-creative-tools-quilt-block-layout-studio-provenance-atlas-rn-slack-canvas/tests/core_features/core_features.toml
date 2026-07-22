@@ -1,0 +1,9 @@
+[judge]
+mode = "manual"
+
+[[criterion]]
+id = "AC-01"
+title = "trace a selected record to source evidence and quarantine a bad lineage"
+description = "The provenance atlas mutation changes the primary record, linked view, and status together."
+weight = 1.0
+type = "behavior"
