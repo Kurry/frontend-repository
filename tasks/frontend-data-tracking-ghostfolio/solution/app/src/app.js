@@ -242,11 +242,12 @@ function perfSummary() {
   dividendIncome = round2(dividendIncome);
   totalFees = round2(totalFees);
   const totalReturn = round2(unrealizedGain + realizedGain + dividendIncome - totalFees);
-  // Net worth tracks the VISIBLE holdings — the exact same derivation as the
-  // top net-worth summary — so the two surfaces can never disagree, filtered
-  // or not.
-  const visibleNW = round2(netWorth(visibleHoldings()));
-  return { netWorth: visibleNW, totalCostBasis, realizedGain, unrealizedGain, dividendIncome, totalFees, totalReturn };
+  // The performance card and report are portfolio-wide. The separate overview
+  // summary intentionally follows the visible (filtered) holdings, but mixing
+  // that filtered net worth with portfolio-wide cost basis and gains makes the
+  // performance identity internally inconsistent.
+  const portfolioNetWorth = round2(netWorth(state.holdings));
+  return { netWorth: portfolioNetWorth, totalCostBasis, realizedGain, unrealizedGain, dividendIncome, totalFees, totalReturn };
 }
 // Display dollars for the performance summary, with total return computed from
 // the displayed components so the on-screen identity (total return =
@@ -1686,6 +1687,17 @@ function registerWebMcp() {
         window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
         return { ok: true, destination: dest };
       } },
+    { name: 'browse.search', module: 'browse-query-v1', description: 'Search holdings by name, symbol, or asset class without changing portfolio state.',
+      input_schema: { type: 'object', required: ['query'], properties: { query: { type: 'string', maxLength: 200 } } },
+      annotations: { readOnlyHint: true },
+      handler: (a = {}) => {
+        const query = String(a.query || '').trim().toLowerCase().slice(0, 200);
+        const matches = state.holdings
+          .filter((holding) => !query || [holding.name, holding.symbol, holding.assetClass].some((value) => String(value).toLowerCase().includes(query)))
+          .slice(0, 25)
+          .map((holding) => ({ id: holding.id, name: holding.name, symbol: holding.symbol, assetClass: holding.assetClass }));
+        return { ok: true, query, count: matches.length, matches };
+      } },
     { name: 'browse.apply_filter', module: 'browse-query-v1', description: 'Filter holdings by asset class or activities by type.',
       input_schema: { type: 'object', required: ['filter', 'value'], properties: { filter: { type: 'string', enum: ['asset-class', 'activity-type'] }, value: { type: 'string' } } },
       handler: (a = {}) => {
@@ -1752,7 +1764,7 @@ function registerWebMcp() {
 
   const registry = new Map(tools.map((t) => [t.name, t]));
   window.webmcp_session_info = () => ({ contract_version: 'zto-webmcp-v1', app: 'ghostfolio', modules: ['browse-query-v1', 'entity-collection-v1', 'artifact-transfer-v1'], tool_count: tools.length });
-  window.webmcp_list_tools = () => tools.map((t) => ({ name: t.name, module: t.module, description: t.description, input_schema: t.input_schema }));
+  window.webmcp_list_tools = () => tools.map((t) => ({ name: t.name, module: t.module, description: t.description, input_schema: t.input_schema, annotations: t.annotations }));
   window.webmcp_invoke_tool = (name, args) => {
     const tool = registry.get(name);
     if (!tool) return { ok: false, error: `Unknown tool: ${name}` };
