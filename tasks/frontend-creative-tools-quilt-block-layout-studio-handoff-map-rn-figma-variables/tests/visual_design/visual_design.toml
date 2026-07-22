@@ -1,0 +1,36 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+
+[[criterion]]
+id = "AC-02"
+name = "visual_hierarchy"
+description = "The visual hierarchy makes current state and next action clear across the primary work surface, linked summary, and detail panel."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AC-18"
+name = "clear_state_tokens"
+description = "The workbench features clear state tokens and intentional density."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AC-19"
+name = "semantic_controls_feedback"
+description = "Semantic controls provide visible focus and live feedback."
+type = "binary"
+weight = 1.0

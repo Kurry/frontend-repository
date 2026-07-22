@@ -1,0 +1,29 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+
+[[criterion]]
+id = "AC-09"
+name = "large_collection"
+description = "The signature interaction remains responsive and unrelated rows stay stable when exercising a seeded collection with at least 100 records."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AC-27"
+name = "no_unrelated_rebuilds"
+description = "Editing a record does not rebuild unrelated surfaces."
+type = "binary"
+weight = 1.0

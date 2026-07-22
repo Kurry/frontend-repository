@@ -1,0 +1,29 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+
+[[criterion]]
+id = "AC-13"
+name = "artifact_round_trip"
+description = "Authored order/selection/geometry and domain state survive export, clear, and import; invalid import is a no-op."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AC-29"
+name = "export_cleared_import_test"
+description = "The state after clearing and valid importing matches the originally exported artifact."
+type = "binary"
+weight = 1.0

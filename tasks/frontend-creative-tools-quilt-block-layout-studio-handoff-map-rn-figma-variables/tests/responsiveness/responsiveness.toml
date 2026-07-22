@@ -1,0 +1,29 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+
+[[criterion]]
+id = "AC-07"
+name = "mobile_mode"
+description = "The desktop surface becomes a usable stack/drawer/stepper without horizontal overflow at a narrow viewport."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AC-25"
+name = "touch_targets"
+description = "Touch targets are preserved and large enough on mobile mode."
+type = "binary"
+weight = 1.0
