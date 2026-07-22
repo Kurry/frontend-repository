@@ -109,6 +109,11 @@
     "instruction": "tasks/frontend-creative-tools-schema-builder/instruction.md",
     "description": "Output schema builder with tree editor, playground, and versions."
   },
+  "frontend-creative-tools-stack-trace-path-finder": {
+    "source": "Stack-Trace Path Finder",
+    "instruction": "tasks/frontend-creative-tools-stack-trace-path-finder/instruction.md",
+    "description": "Stack-trace hypothesis workspace for frames, causal paths, and saved investigations."
+  },
   "frontend-creative-tools-shapeshift-grid": {
     "source": "Shapeshift",
     "instruction": "Shapeshift/instruction.md",

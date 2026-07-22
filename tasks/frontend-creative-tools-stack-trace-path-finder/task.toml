@@ -2,7 +2,7 @@ schema_version = "1.3"
 
 [task]
 name = "mercor-intelligence/frontend-creative-tools-stack-trace-path-finder"
-description = "Stack-Trace Path Finder hard browser app/tool eval."
+description = "Stack-trace hypothesis workspace for frames, causal paths, and saved investigations."
 
 [agent]
 timeout_sec = 3600.0

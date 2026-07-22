@@ -135,20 +135,15 @@ Module specs:
 </module_spec>
 
 Bindings:
-- Editor object types: frame; candidate; node
-- Editor properties: weights; pinned
-- Editor modes: normal; edit
 - Editor operations: select; update_property; preview; set_content
 - Entity: hypothesis
 - Entity operations: create; select; delete
-- Entity fields: name
 - Artifact operations: export; import; copy
-- Export formats: stack-path-hypothesis-json
-- Import modes: stack-path-hypothesis-json
+- Export formats: stack-path-hypothesis/v1
+- Import modes: stack-path-hypothesis/v1
 
 Mechanics exclusions:
-- Drag-and-drop operations for frames and candidate mappings stay Playwright (gesture mechanics)
-- Raw file paths/blobs forbidden in WebMCP args
+- Timeline dragging, keyboard shortcuts, and downloaded bytes stay Playwright-observed
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

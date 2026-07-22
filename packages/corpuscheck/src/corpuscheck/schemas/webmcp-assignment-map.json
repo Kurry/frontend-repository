@@ -7892,5 +7892,18 @@
       "Multi-select marquee geometry and Shift-click chord timing stay Playwright when mechanism matters",
       "Timeline status filter chips and Saved Workflows / Artifact panel open toggles stay Playwright-driven; no browse-query module is assigned"
     ]
+  },
+  {
+    "task": "frontend-creative-tools-stack-trace-path-finder",
+    "modules": ["structured-editor-v1", "entity-collection-v1", "artifact-transfer-v1"],
+    "bindings": {
+      "editor_operations": ["select", "update_property", "preview", "set_content"],
+      "entity": "hypothesis",
+      "entity_operations": ["create", "select", "delete"],
+      "artifact_operations": ["export", "import", "copy"],
+      "export_formats": ["stack-path-hypothesis/v1"],
+      "import_modes": ["stack-path-hypothesis/v1"]
+    },
+    "mechanics_exclusions": ["Timeline dragging, keyboard shortcuts, and downloaded bytes stay Playwright-observed"]
   }
 ]
