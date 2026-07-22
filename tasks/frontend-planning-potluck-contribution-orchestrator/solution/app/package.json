@@ -17,8 +17,11 @@
   },
   "devDependencies": {
     "vite": "^5.2.0",
-    "vite-plugin-solid": "^2.10.2",
-    "@playwright/test": "^1.61.0"
+    "vite-plugin-solid": "2.10.2",
+    "@playwright/test": "^1.61.0",
+    "baseline-browser-mapping": "2.10.43",
+    "browserslist": "4.28.6",
+    "electron-to-chromium": "1.5.393"
   },
   "overrides": {
     "baseline-browser-mapping": "2.10.43",
