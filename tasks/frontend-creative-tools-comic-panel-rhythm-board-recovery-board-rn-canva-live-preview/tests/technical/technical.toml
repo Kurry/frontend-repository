@@ -1,0 +1,118 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+[[criterion]]
+id = "AC-04"
+name = "schema_contract"
+type = "browser-observable"
+description = "The tool result and artifact contain the declared API-shaped fields."
+weight = 1.0
+
+[[criterion]]
+id = "AC-05"
+name = "complete_user_flow"
+type = "browser-observable"
+description = "The end-to-end job is recoverable without reload."
+weight = 1.0
+
+[[criterion]]
+id = "AC-06"
+name = "boundaries_recovery"
+type = "browser-observable"
+description = "Each invalid action gives field-level recovery and preserves prior valid state."
+weight = 1.0
+
+[[criterion]]
+id = "AC-07"
+name = "mobile_mode"
+type = "browser-observable"
+description = "The desktop surface becomes a usable stack/drawer/stepper without horizontal overflow."
+weight = 1.0
+
+[[criterion]]
+id = "AC-08"
+name = "alternate_input"
+type = "browser-observable"
+description = "Alternate input produces identical state with visible focus and live feedback."
+weight = 1.0
+
+[[criterion]]
+id = "AC-09"
+name = "large_collection"
+type = "browser-observable"
+description = "The signature interaction remains responsive and unrelated rows stay stable."
+weight = 1.0
+
+[[criterion]]
+id = "AC-11"
+name = "linked_utility"
+type = "browser-observable"
+description = "Linked views provide domain utility beyond CRUD."
+weight = 0.5
+
+[[criterion]]
+id = "AC-13"
+name = "artifact_round_trip"
+type = "browser-observable"
+description = "Authored order/selection/geometry and domain state survive; invalid import is a no-op."
+weight = 1.0
