@@ -1,0 +1,9 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+
+[[criterion]]
+id = "technical.1.n1"
+dimension = "technical"
+description = "AC-04 technical: No console or page errors, layout shifts, or network requests"
+weight = 1.0

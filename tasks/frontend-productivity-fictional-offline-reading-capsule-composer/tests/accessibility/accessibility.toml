@@ -1,0 +1,9 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+
+[[criterion]]
+id = "accessibility.1.n1"
+dimension = "accessibility"
+description = "AC-XX accessibility: Placeholder description"
+weight = 1.0

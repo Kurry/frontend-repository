@@ -1,0 +1,9 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+
+[[criterion]]
+id = "performance.1.n1"
+dimension = "performance"
+description = "AC-XX performance: Placeholder description"
+weight = 1.0

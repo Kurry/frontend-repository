@@ -1,0 +1,9 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+
+[[criterion]]
+id = "innovation.catchall"
+dimension = "innovation"
+description = "Any other not covered issue discovered by evidence."
+weight = 1.0

@@ -1,0 +1,9 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+
+[[criterion]]
+id = "visual_design.1.n1"
+dimension = "visual_design"
+description = "AC-02 visual_design: Desktop 1440x900 view matches states"
+weight = 1.0

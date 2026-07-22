@@ -1,0 +1,9 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+
+[[criterion]]
+id = "core_features.1.n1"
+dimension = "core_features"
+description = "AC-01 core_features: Brush and fold canonical range into seam 3"
+weight = 1.0
