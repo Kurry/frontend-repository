@@ -21,19 +21,11 @@ export function requestDelete(ids, onDone) {
 
 export function animatedDelete(ids, onDone) {
   const n = ids.length;
-  const finish = () => {
-    deletePalettes(ids);
-    announce(
-      n === 1
-        ? 'Palette deleted — Undo restores it.'
-        : `${n} palettes deleted — Undo restores them.`
-    );
-    onDone?.();
-  };
-  if (prefersReducedMotion()) { finish(); return; }
-  for (const id of ids) {
-    const card = document.querySelector(`.palette-card[data-palette-id="${CSS.escape(id)}"]`);
-    card?.classList.add('card-exit');
-  }
-  setTimeout(finish, 240);
+  deletePalettes(ids);
+  announce(
+    n === 1
+      ? 'Palette deleted — Undo restores it.'
+      : `${n} palettes deleted — Undo restores them.`
+  );
+  onDone?.();
 }

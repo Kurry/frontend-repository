@@ -12,21 +12,31 @@ const $ = (sel, root = document) => root.querySelector(sel);
 
 // ---------- swatch copy (shared micro-interaction) ---------------------------
 
-const copyTimers = new WeakMap();
+const copyTimers = new Map();
 
 export async function copySwatch(el) {
   const hex = fmtHex(el.getAttribute('data-hex'));
+  const copyId = el.getAttribute('data-copy-id') || hex;
   if (!hex) return;
   const ok = await copyText(hex);
   if (!ok) return;
+
+  // Update state so re-renders preserve it
+  ui.copiedSwatches.add(copyId);
+
   el.classList.remove('is-copied', 'is-flashing');
   // restart the flash animation even on rapid repeat clicks
   void el.offsetWidth;
   el.classList.add('is-copied', 'is-flashing');
-  if (copyTimers.has(el)) clearTimeout(copyTimers.get(el));
-  copyTimers.set(el, setTimeout(() => {
-    el.classList.remove('is-copied', 'is-flashing');
+
+  if (copyTimers.has(copyId)) clearTimeout(copyTimers.get(copyId));
+  copyTimers.set(copyId, setTimeout(() => {
+    ui.copiedSwatches.delete(copyId);
+    document.querySelectorAll(`[data-copy-id="${CSS.escape(copyId)}"], [data-hex="${CSS.escape(hex)}"]`).forEach(n => {
+      n.classList.remove('is-copied', 'is-flashing');
+    });
   }, 1000));
+
   const { name } = nearestColorName(hex);
   announce(`Copied ${hex} — ${name} — to the clipboard.`);
 }
@@ -134,6 +144,9 @@ export function renderCanvas() {
       <p class="empty-state__title">The archive is empty</p>
       <p class="empty-state__copy">Every collection starts with a single palette. Add the first one — a name, an artist, a period, and at least three swatches.</p>
       <button type="button" class="btn btn--solid js-create">Create palette</button>`;
+    nomen.innerHTML = '';
+    paletteV.innerHTML = '';
+    swatchV.innerHTML = '';
     renderCountLine(0, 0, 0);
     return;
   }
@@ -147,6 +160,9 @@ export function renderCanvas() {
       <p class="empty-state__copy">Nothing in the archive carries this combination. Loosen the search or clear the active filters to see the full collection.</p>
       <button type="button" class="btn btn--solid js-clear-all">Clear all filters</button>`;
     const inScope = state.palettes.filter((p) => (state.archivedFacet ? p.archived : !p.archived)).length;
+    nomen.innerHTML = '';
+    paletteV.innerHTML = '';
+    swatchV.innerHTML = '';
     renderCountLine(0, inScope, 0);
     return;
   }
@@ -183,7 +199,7 @@ function renderNomenclature(container, list) {
       .map((row) => {
         const { name, note } = nearestColorName(row.hex);
         return `<div class="nomenclature-row" data-hex-row="${escapeHtml(row.hex)}">
-          <button type="button" class="nomenclature-swatch js-copy" data-hex="${escapeHtml(row.hex)}"
+          <button type="button" class="nomenclature-swatch js-copy${ui.copiedSwatches.has(row.hex) ? ' is-copied is-flashing' : ''}" data-hex="${escapeHtml(row.hex)}"
             style="background-color:${escapeHtml(row.hex)}" aria-label="Copy ${escapeHtml(row.hex)} (${escapeHtml(name)})">
             <span class="copy-label" aria-hidden="true">Copied</span></button>
           <span class="nomenclature-hex">${escapeHtml(row.hex)}</span>
@@ -219,16 +235,19 @@ function renderPaletteView(container, list) {
   container.innerHTML = list
     .map((p) => {
       const swatches = p.swatches
-        .map((hex) => {
+        .map((hex, idx) => {
           const h = fmtHex(hex);
-          return `<button type="button" class="palette-card__swatch js-copy" data-hex="${escapeHtml(h)}"
-            style="background-color:${escapeHtml(h)}" aria-label="Copy ${escapeHtml(h)}">
+          const copyId = `${p.id}-${idx}`;
+          const ink = isLight(h) ? 'rgba(18,18,16,0.85)' : 'rgba(249,248,242,0.95)';
+          return `<button type="button" class="palette-card__swatch js-copy${ui.copiedSwatches.has(copyId) ? ' is-copied is-flashing' : ''}" data-copy-id="${escapeHtml(copyId)}" data-hex="${escapeHtml(h)}"
+            style="background-color:${escapeHtml(h)}; color:${ink}" aria-label="Copy ${escapeHtml(h)}">
             <span class="palette-card__swatch-hex">${escapeHtml(h)}</span>
             <span class="copy-label" aria-hidden="true">Copied</span></button>`;
         })
         .join('');
       const selected = state.multiSelect.includes(p.id);
       const enter = ui.lastCreatedId === p.id ? ' card-enter' : '';
+      const exit = ui.exitingIds.includes(p.id) ? ' card-exit' : '';
       const archivedBadge = p.archived
         ? `<span class="palette-card__badge">Archived</span>
            <button type="button" class="btn btn--ghost btn--mini js-restore" data-palette-id="${escapeHtml(p.id)}">Restore</button>`
@@ -237,7 +256,7 @@ function renderPaletteView(container, list) {
         ? `<div class="palette-card__meta-row"><span class="palette-card__meta-label">tags</span>
              <span class="palette-card__meta-tags">${p.tags.map((t) => escapeHtml(t)).join(' · ')}</span></div>`
         : '';
-      return `<article class="palette-card${selected ? ' is-selected' : ''}${enter}" data-palette-id="${escapeHtml(p.id)}">
+      return `<article class="palette-card${selected ? ' is-selected' : ''}${enter}${exit}" data-palette-id="${escapeHtml(p.id)}">
         <label class="palette-card__select">
           <input type="checkbox" class="js-select" data-palette-id="${escapeHtml(p.id)}" ${selected ? 'checked' : ''}
             aria-label="Select ${escapeHtml(p.name)}">
@@ -272,10 +291,11 @@ function renderPaletteView(container, list) {
 function renderSwatchView(container, list) {
   const tiles = swatchTiles(list);
   container.innerHTML = tiles
-    .map((t) => {
+    .map((t, idx) => {
       const { name } = nearestColorName(t.hex);
       const ink = isLight(t.hex) ? 'rgba(18,18,16,0.85)' : 'rgba(249,248,242,0.95)';
-      return `<button type="button" class="swatch-tile js-copy" data-hex="${escapeHtml(t.hex)}"
+      const copyId = `tile-${idx}`;
+      return `<button type="button" class="swatch-tile js-copy${ui.copiedSwatches.has(copyId) ? ' is-copied is-flashing' : ''}" data-copy-id="${escapeHtml(copyId)}" data-hex="${escapeHtml(t.hex)}"
         style="background-color:${escapeHtml(t.hex)}"
         aria-label="Copy ${escapeHtml(t.hex)} (${escapeHtml(name)}) from ${escapeHtml(t.palette)}">
         <span class="swatch-tile__title" style="color:${ink}">${escapeHtml(t.palette)}</span>
@@ -296,7 +316,7 @@ export function renderHueStrip() {
   const rows = nomenclatureRows(list);
   strip.innerHTML = rows
     .map(
-      (r) => `<button type="button" class="hue-chip js-hue-chip" data-hex="${escapeHtml(r.hex)}"
+      (r) => `<button type="button" class="hue-chip js-hue-chip${ui.copiedSwatches.has(r.hex) ? ' is-copied' : ''}" data-hex="${escapeHtml(r.hex)}"
         style="background-color:${escapeHtml(r.hex)}"
         aria-label="Locate ${escapeHtml(r.hex)} in the nomenclature index"></button>`
     )

@@ -143,15 +143,8 @@ $('#tray-tag').addEventListener('click', () => { if (state.multiSelect.length) o
 $('#tray-archive').addEventListener('click', () => {
   const ids = [...state.multiSelect];
   if (!ids.length) return;
-  if (!prefersReducedMotion()) {
-    for (const id of ids) {
-      document.querySelector(`.palette-card[data-palette-id="${CSS.escape(id)}"]`)?.classList.add('card-exit');
-    }
-    setTimeout(() => { batchArchive(ids); announce(`${ids.length} palettes archived — find them under the Archived facet.`); }, 240);
-  } else {
-    batchArchive(ids);
-    announce(`${ids.length} palettes archived.`);
-  }
+  batchArchive(ids);
+  announce(`${ids.length} palettes archived — find them under the Archived facet.`);
 });
 $('#tray-compare').addEventListener('click', (e) => openCompare(e.currentTarget));
 $('#tray-delete').addEventListener('click', () => requestDelete([...state.multiSelect]));
@@ -206,6 +199,10 @@ $('#batch-tag-cancel').addEventListener('click', closeBatchTag);
 $('#popup-close').addEventListener('click', () => dismissPopup());
 $('#popup-form').addEventListener('submit', (e) => { e.preventDefault(); submitPopup(); });
 initPopup();
+document.querySelectorAll('.js-newsletter').forEach(btn => btn.addEventListener('click', () => {
+  ui.popupDismissed = false; // allow it to open even if dismissed
+  import('./overlays.js').then(m => m.showPopup());
+}));
 
 // ---------- menu + cart + coachmark ----------------------------------------------------------------
 
@@ -262,7 +259,7 @@ document.addEventListener('keydown', (e) => {
     announce(`${next === 'nomenclature' ? 'Nomenclature' : next === 'palette' ? 'Palette' : 'Swatch'} view active.`);
     e.preventDefault();
   } else if (e.key === 'e' || e.key === 'E') {
-    openExport(undefined, $('#btn-export'));
+    openExport(undefined, document.activeElement);
     e.preventDefault();
   } else if (e.key === '/') {
     e.preventDefault();

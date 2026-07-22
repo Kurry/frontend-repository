@@ -11,10 +11,21 @@ export const EXPORT_TABS = [
 ];
 
 export function buildExportText(format, palettes) {
-  if (format === 'css') return buildCss(palettes);
-  if (format === 'utility-theme') return buildUtilityTheme(palettes);
-  if (format === 'scss') return buildScss(palettes);
-  return buildArchiveJson(palettes);
+  const active = palettes.filter((p) => !p.archived);
+
+  // For CSS/JS/SCSS formats, returning a comment string directly breaks parsing
+  // if tools expect actual variables, but the instructions say "reflect an empty palettes array when empty".
+  // The JSON format must return valid JSON empty state.
+  if (active.length === 0) {
+    if (format === 'css') return '/* The archive is empty — no palettes to export. */';
+    if (format === 'utility-theme') return '// The archive is empty — no palettes to export.';
+    if (format === 'scss') return '// The archive is empty — no palettes to export.';
+  }
+
+  if (format === 'css') return buildCss(active);
+  if (format === 'utility-theme') return buildUtilityTheme(active);
+  if (format === 'scss') return buildScss(active);
+  return buildArchiveJson(active);
 }
 
 function paletteVars(p) {
@@ -24,9 +35,6 @@ function paletteVars(p) {
 
 function buildCss(palettes) {
   const lines = [':root {'];
-  if (palettes.length === 0) {
-    lines.push('  /* The archive is empty — no palettes to export. */');
-  }
   for (const p of palettes) {
     lines.push(`  /* ${p.name} — ${p.artist}, ${p.period} */`);
     for (const v of paletteVars(p)) lines.push(`  ${v.prop}: ${v.hex};`);
@@ -37,9 +45,6 @@ function buildCss(palettes) {
 
 function buildUtilityTheme(palettes) {
   const lines = ['// Tailwind-style theme fragment — palette-archive.v1', 'module.exports = {', '  theme: {', '    extend: {', '      colors: {'];
-  if (palettes.length === 0) {
-    lines.push("        // The archive is empty — no palettes to export.");
-  }
   for (const p of palettes) {
     const slug = slugify(p.name) || 'untitled';
     lines.push(`        // ${p.name} — ${p.artist}`);
@@ -55,9 +60,6 @@ function buildUtilityTheme(palettes) {
 
 function buildScss(palettes) {
   const lines = ['// SCSS colour map — palette-archive.v1', '$palettes: ('];
-  if (palettes.length === 0) {
-    lines.push('  // The archive is empty — no palettes to export.');
-  }
   for (const p of palettes) {
     const slug = slugify(p.name) || 'untitled';
     const hexes = p.swatches.map((h) => `'${fmtHex(h)}'`).join(', ');

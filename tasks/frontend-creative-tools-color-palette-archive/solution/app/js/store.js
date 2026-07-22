@@ -31,6 +31,7 @@ export const ui = {
   cartOpen: false,
   lastCreatedId: null,           // for card enter animation
   exitingIds: [],                // ids animating out before removal
+  copiedSwatches: new Set(),     // hex codes or unique swatch ids currently showing 'Copied'
 };
 
 let undoStack = [];
@@ -190,10 +191,21 @@ export function deletePalettes(ids) {
   const doomed = new Set(ids.filter((id) => paletteById(id)));
   if (doomed.size === 0) return false;
   pushHistory();
-  state.palettes = state.palettes.filter((p) => !doomed.has(p.id));
-  state.multiSelect = state.multiSelect.filter((id) => !doomed.has(id));
-  if (ui.editor && doomed.has(ui.editor.id)) ui.editor = null;
+
+  // Set exiting IDs to trigger exit animation in render
+  ui.exitingIds = [...doomed];
   emit();
+
+  // Wait for animation, then actually remove
+  const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240;
+  setTimeout(() => {
+    state.palettes = state.palettes.filter((p) => !doomed.has(p.id));
+    state.multiSelect = state.multiSelect.filter((id) => !doomed.has(id));
+    if (ui.editor && doomed.has(ui.editor.id)) ui.editor = null;
+    ui.exitingIds = [];
+    emit();
+  }, duration);
+
   return true;
 }
 
@@ -244,12 +256,22 @@ export function batchArchive(ids) {
   const targets = new Set(ids.filter((id) => paletteById(id)));
   if (targets.size === 0) return false;
   pushHistory();
-  state.palettes = state.palettes.map((p) =>
-    targets.has(p.id) ? { ...p, archived: true } : p
-  );
-  state.multiSelect = state.multiSelect.filter((id) => !targets.has(id));
-  if (ui.editor && targets.has(ui.editor.id)) ui.editor = null;
+
+  // Animate exit if not already archived
+  ui.exitingIds = [...targets];
   emit();
+
+  const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240;
+  setTimeout(() => {
+    state.palettes = state.palettes.map((p) =>
+      targets.has(p.id) ? { ...p, archived: true } : p
+    );
+    state.multiSelect = state.multiSelect.filter((id) => !targets.has(id));
+    if (ui.editor && targets.has(ui.editor.id)) ui.editor = null;
+    ui.exitingIds = [];
+    emit();
+  }, duration);
+
   return true;
 }
 

@@ -323,12 +323,14 @@ export function initPopup() {
   }, { passive: true });
   window.addEventListener('scroll', () => {
     if (!userScrollArmed) return;
-    userScrollArmed = false;
     reset();
     if (ui.popupDismissed || ui.popupOpen) return;
     const doc = document.documentElement;
     const scrolled = window.scrollY + window.innerHeight;
-    if (scrolled >= doc.scrollHeight * 0.5) showPopup();
+    if (scrolled >= doc.scrollHeight * 0.5) {
+      showPopup();
+      userScrollArmed = false; // reset only after it triggered
+    }
   }, { passive: true });
   reset();
 }
@@ -357,6 +359,7 @@ export function dismissPopup(viaSubmit = false) {
   if (!ui.popupOpen) return;
   ui.popupOpen = false;
   ui.popupDismissed = true; // stays dismissed for the rest of the session
+  clearTimeout(idleTimer);
   const el = $('#subscribe-popup');
   el.classList.remove('is-visible');
   if (popupEntry) { closeOverlay(popupEntry); popupEntry = null; }
