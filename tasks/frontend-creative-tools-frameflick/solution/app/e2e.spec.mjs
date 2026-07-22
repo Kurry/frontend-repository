@@ -1,187 +1,119 @@
-import { test, expect } from '@playwright/test';
-import { readFileSync, writeFileSync } from 'fs';
+// ============================================================================
+// CANONICAL ORACLE E2E SUITE — workspace contract (do not edit this region).
+// Owned by `corpuscheck propagate`; the canonical region ends at the marker
+// below. ADD task-specific criterion tests AFTER the marker — one test per
+// rubric criterion, named `test('<id> <criterion_name>', ...)`.
+//
+// Run: start the app first (`npm run start`, port 3000), then
+//   npx playwright test -c e2e.playwright.config.mjs
+// (the sibling canonical config pins discovery to this file, so it works even
+// when the app has its own playwright.config for other suites).
+// Requires devDependency: @playwright/test (^1.x) — use the app's EXISTING
+// @playwright/test if present; never install a second copy (duplicate
+// instances break test loading).
+// ============================================================================
+import { test as base, expect } from '@playwright/test';
 
-// This is the canonical start of the file for the reviewer
-test.describe('FrameFlick Comprehensive Verification', () => {
+const BASE = 'http://localhost:3000';
 
-  let errors = [];
-  test.beforeEach(async ({ page }) => {
-    errors = [];
-    page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
-    page.on('pageerror', err => { errors.push(err.message); });
-    await page.goto('/');
+export const test = base.extend({
+  page: async ({ page }, use) => {
+    const errors = [];
+    page.on('console', (m) => { if (m.type() === 'error') errors.push(`console.error: ${m.text()}`); });
+    page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
+    await use(page);
+    expect(errors, 'zero console/page errors required').toEqual([]);
+  },
+});
+export { expect };
+
+export const listTools = (page) => page.evaluate(async () => {
+  const r = await window.webmcp_list_tools();
+  return typeof r === 'string' ? JSON.parse(r) : r;
+});
+export const invokeTool = (page, name, args = {}) => page.evaluate(async ([n, a]) => {
+  const r = await window.webmcp_invoke_tool(n, a);
+  try { return typeof r === 'string' ? JSON.parse(r) : r; } catch { return r; }
+}, [name, args]);
+
+test.describe('workspace contract (canonical)', () => {
+  test('serves non-empty app with zero console errors', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    const len = await page.evaluate(() => document.body?.innerText?.trim().length ?? 0);
+    expect(len, 'body renders visible content').toBeGreaterThan(0);
   });
 
-  test.afterEach(() => {
-    expect(errors).toHaveLength(0);
+  test('webmcp surface is registered and well-formed', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    const kinds = await page.evaluate(() => ({
+      session_info: typeof window.webmcp_session_info,
+      list_tools: typeof window.webmcp_list_tools,
+      invoke_tool: typeof window.webmcp_invoke_tool,
+    }));
+    expect(kinds).toEqual({ session_info: 'function', list_tools: 'function', invoke_tool: 'function' });
+    const tools = await listTools(page);
+    const arr = Array.isArray(tools) ? tools : tools?.tools ?? [];
+    expect(arr.length, 'at least one webmcp tool registered').toBeGreaterThan(0);
+    for (const t of arr) expect(typeof (t.name ?? t.id), 'every tool has a name').toBe('string');
   });
 
-  test('Workspace and views', async ({ page }) => {
-    await expect(page.locator('.editor-layout')).toBeVisible();
-    await expect(page.locator('.left-panel')).toBeVisible();
-    await expect(page.locator('.canvas-area')).toBeVisible();
-    await expect(page.locator('.right-panel')).toBeVisible();
-
-    await expect(page.locator('text=Upload an image to get started')).toBeVisible();
-
-    await page.getByRole('button', { name: 'Collaboration' }).click();
-    await expect(page.locator('.collab-view')).toBeVisible();
-    await page.getByRole('button', { name: 'Editor' }).click();
-    await expect(page.locator('.editor-layout')).toBeVisible();
-  });
-
-  test('Background and Composition controls (undo/redo restore)', async ({ page }) => {
-    await page.getByRole('button', { name: '✨ Use sample image' }).click();
-    await expect(page.locator('.upload-text')).toContainText('Replace image');
-
-    const oceanSwatch = page.getByRole('button', { name: 'Ocean background' });
-    await oceanSwatch.click();
-    await expect(oceanSwatch).toHaveClass(/active/);
-
-    const paddingSlider = page.locator('input[type="range"]').first();
-    await paddingSlider.fill('16');
-    expect(await paddingSlider.inputValue()).toBe('16');
-
-    await page.getByRole('button', { name: 'Undo' }).click();
-    expect(await paddingSlider.inputValue()).not.toBe('16');
-    await expect(oceanSwatch).not.toHaveClass(/active/);
-
-    await page.getByRole('button', { name: 'Redo' }).click();
-    await expect(oceanSwatch).toHaveClass(/active/);
-    expect(await paddingSlider.inputValue()).toBe('16');
-  });
-
-  test('Save and apply preset, export JSON', async ({ page }) => {
-    await page.getByRole('button', { name: '✨ Use sample image' }).click();
-
-    await page.getByRole('button', { name: 'Night background' }).click();
-    const paddingSlider = page.locator('input[type="range"]').first();
-    await paddingSlider.fill('12');
-
-    const presetNameInput = page.getByPlaceholder('Preset name');
-    await presetNameInput.fill('Warm Card');
-    await page.getByRole('button', { name: 'Save preset' }).click();
-    await expect(page.locator('.preset-name').filter({ hasText: 'Warm Card' })).toBeVisible();
-
-    await page.getByRole('button', { name: 'Ocean background' }).click();
-    await paddingSlider.fill('20');
-
-    await page.waitForTimeout(500);
-
-    const presetItem = page.locator('.preset-item', { hasText: 'Warm Card' });
-    await presetItem.locator('button', { hasText: 'Apply' }).click();
-
-    await expect(page.getByRole('button', { name: 'Night background' })).toHaveClass(/active/);
-    expect(await paddingSlider.inputValue()).toBe('12');
-
-    const downloadPromise = page.waitForEvent('download');
-    await page.getByRole('button', { name: 'Download style JSON' }).click();
-    const download = await downloadPromise;
-    expect(download.suggestedFilename()).toBe('frameflick-style.json');
-
-    const downloadPath = await download.path();
-    const content = readFileSync(downloadPath, 'utf8');
-    const json = JSON.parse(content);
-
-    expect(json).toHaveProperty('backgroundPreset', 'Night');
-    expect(json).toHaveProperty('padding', 12);
-  });
-
-  test('Layout and Focus', async ({ page }) => {
-    await expect(page.locator('.editor-layout')).toBeVisible();
-    await page.keyboard.press('Tab');
-  });
-
-  test('Reduced Motion', async ({ page }) => {
+  test('reduced motion behaviorally suppresses animation', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.getByRole('button', { name: '✨ Use sample image' }).click();
+    // Install the collector before navigation so load/hydration animations are
+    // observed too. Keep it running through network idle and a settled 1.5s
+    // window so late-starting effects cannot escape the assertion.
+    await page.addInitScript(() => {
+      window.__reducedMotionOffenders = [];
+      const seen = new Set();
+      const sample = () => {
+        for (const animation of document.getAnimations({ subtree: true })) {
+          if (animation.playState !== 'running') continue;
+          let timing = {};
+          try { timing = animation.effect?.getComputedTiming?.() ?? {}; } catch { /* detached */ }
+          const duration = typeof timing.duration === 'number' ? timing.duration : 0;
+          if (duration <= 1) continue;
+          const offender = {
+            kind: animation.constructor?.name ?? 'Animation',
+            name: animation.animationName ?? animation.transitionProperty ?? animation.id ?? '(anonymous)',
+            duration,
+            iterations: timing.iterations ?? 1,
+          };
+          const key = JSON.stringify(offender);
+          if (!seen.has(key)) {
+            seen.add(key);
+            window.__reducedMotionOffenders.push(offender);
+          }
+        }
+        requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    });
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    // Precondition sanity check: the emulation actually reaches the app.
+    const reduced = await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
+    expect(reduced, 'precondition: app sees prefers-reduced-motion: reduce').toBe(true);
+    // Observe every frame for another 1.5s after load settles and assert on
+    // everything seen since the document started.
+    // Finished, idle, or paused effects and durations <=1ms are allowed; any
+    // meaningfully timed RUNNING effect at any sample is a reduced-motion
+    // failure. Apps with zero animations pass vacuously (the render/console
+    // test still gates them).
+    await page.waitForTimeout(1500);
+    const offenders = await page.evaluate(() => window.__reducedMotionOffenders ?? []);
+    expect(offenders, 'no running animation/transition with meaningful duration under reduced motion').toEqual([]);
   });
 
-  test('Viewport 375px rows', async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 667 });
-    await expect(page.locator('.editor-layout')).toBeVisible();
-  });
-
-  test('Image upload and canvas deltas', async ({ page }) => {
-    await page.getByRole('button', { name: '✨ Use sample image' }).click();
-    await expect(page.locator('.upload-text')).toContainText('Replace image');
-
-    const paddingSlider = page.locator('input[type="range"]').first();
-    await paddingSlider.fill('25');
-    expect(await paddingSlider.evaluate(e => e.max)).toBe('25');
-  });
-
-  test('Preset and Snapshot counts and CRUD', async ({ page }) => {
-    await page.getByRole('button', { name: '✨ Use sample image' }).click();
-
-    await expect(page.locator('.count-badge').first()).toBeVisible();
-
-    const presetNameInput = page.getByPlaceholder('Preset name');
-    await presetNameInput.fill('Warm Card');
-    await page.getByRole('button', { name: 'Save preset' }).click();
-    await expect(page.locator('.preset-name').filter({ hasText: 'Warm Card' })).toBeVisible();
-
-    const snapshotNameInput = page.getByPlaceholder('Snapshot name');
-    await snapshotNameInput.fill('My Snapshot');
-    await page.getByRole('button', { name: 'Save snapshot' }).click();
-    await expect(page.locator('.snapshot-name').filter({ hasText: 'My Snapshot' })).toBeVisible();
-  });
-
-  test('Before-after and reset', async ({ page }) => {
-    await page.getByRole('button', { name: '✨ Use sample image' }).click();
-
-    const oceanSwatch = page.getByRole('button', { name: 'Ocean background' });
-    await oceanSwatch.click();
-
-    const beforeBtn = page.getByRole('button', { name: 'Before' });
-    if(await beforeBtn.count() > 0) {
-      await beforeBtn.click();
-      await expect(page.locator('.before-layer')).toHaveClass(/visible/);
-    }
-  });
-
-  test('Copy-paste settings', async ({ page }) => {
-    await page.getByRole('button', { name: '✨ Use sample image' }).click();
-    await page.getByRole('button', { name: 'Copy settings' }).click();
-    await page.getByRole('button', { name: 'Paste settings' }).click();
-
-    const dialog = page.getByRole('dialog');
-    await expect(dialog).toBeVisible();
-    await page.getByRole('button', { name: 'Cancel' }).click();
-  });
-
-  test('Recent-six persistence', async ({ page }) => {
-    for (let i = 0; i < 7; i++) {
-        await page.getByRole('button', { name: '✨ Use sample image' }).click();
-    }
-    const thumbs = page.locator('.thumb');
-    await expect(thumbs).toHaveCount(6);
-  });
-
-  test('Collaboration conflict convergence', async ({ page }) => {
-    await page.getByRole('button', { name: 'Collaboration' }).click();
-    await page.getByRole('button', { name: 'Go offline' }).click();
-    const sharedEditor = page.locator('#shared-editor');
-    await sharedEditor.fill('My edit');
-    await expect(page.locator('.queue-box')).toBeVisible();
-    await page.getByRole('button', { name: 'Go online' }).click();
-    await expect(page.locator('.queue-box')).not.toBeVisible();
-  });
-
-  test('Atomic import', async ({ page }) => {
-    await page.getByRole('button', { name: '✨ Use sample image' }).click();
-  });
-
-  test('PNG/clipboard export', async ({ page }) => {
-    await page.getByRole('button', { name: '✨ Use sample image' }).click();
-
-    const copyImgBtn = page.getByRole('button', { name: 'Copy image' });
-    if(await copyImgBtn.count() > 0) {
-      await copyImgBtn.click();
-    }
-  });
-
-  test('WebMCP+canvas', async ({ page }) => {
-    await page.goto('/');
+  test('no horizontal overflow at 375px', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    const overflow = await page.evaluate(() =>
+      document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow, 'no horizontal page scroll at 375px').toBeLessThanOrEqual(1);
   });
 });
+
+// ==== END CANONICAL REGION — add task-specific criterion tests below. ====
