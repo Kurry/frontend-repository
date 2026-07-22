@@ -1,0 +1,15 @@
+[dimensions.writing]
+id = "writing"
+name = "Writing"
+
+[[criterion]]
+id = "writing.domain_copy"
+name = "Domain copy"
+description = "Copy names the domain consequence and recovery action precisely."
+weight = 1
+
+[[criterion]]
+id = "writing.catchall"
+name = "Writing (General)"
+description = "Other writing issues not covered by specific criteria."
+weight = 0.5

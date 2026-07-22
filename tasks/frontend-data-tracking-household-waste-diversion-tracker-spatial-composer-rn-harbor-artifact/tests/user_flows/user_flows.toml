@@ -1,0 +1,15 @@
+[dimensions.user_flows]
+id = "user_flows"
+name = "User Flows"
+
+[[criterion]]
+id = "user_flows.complete_user_flow"
+name = "Complete user flow"
+description = "The end-to-end job is recoverable without reload."
+weight = 1
+
+[[criterion]]
+id = "user_flows.catchall"
+name = "User Flows (General)"
+description = "Other user flow issues not covered by specific criteria."
+weight = 0.5

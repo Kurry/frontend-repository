@@ -1,0 +1,15 @@
+[dimensions.core_features]
+id = "core_features"
+name = "Core Features"
+
+[[criterion]]
+id = "core_features.signature_mutation"
+name = "Signature mutation"
+description = "The spatial composer mutation changes the primary record, linked view, and status together."
+weight = 1
+
+[[criterion]]
+id = "core_features.catchall"
+name = "Core Features (General)"
+description = "Other core features issues not covered by specific criteria."
+weight = 0.5

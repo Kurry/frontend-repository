@@ -1,0 +1,15 @@
+[dimensions.accessibility]
+id = "accessibility"
+name = "Accessibility"
+
+[[criterion]]
+id = "accessibility.alternate_input"
+name = "Alternate input"
+description = "Alternate input produces identical state with visible focus and live feedback."
+weight = 1
+
+[[criterion]]
+id = "accessibility.catchall"
+name = "Accessibility (General)"
+description = "Other accessibility issues not covered by specific criteria."
+weight = 0.5

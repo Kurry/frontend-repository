@@ -1,0 +1,15 @@
+[dimensions.performance]
+id = "performance"
+name = "Performance"
+
+[[criterion]]
+id = "performance.large_collection"
+name = "Large collection"
+description = "The signature interaction remains responsive and unrelated rows stay stable."
+weight = 1
+
+[[criterion]]
+id = "performance.catchall"
+name = "Performance (General)"
+description = "Other performance issues not covered by specific criteria."
+weight = 0.5

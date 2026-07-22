@@ -1,0 +1,15 @@
+[dimensions.edge_cases]
+id = "edge_cases"
+name = "Edge Cases"
+
+[[criterion]]
+id = "edge_cases.boundaries_recovery"
+name = "Boundaries and recovery"
+description = "Each invalid action gives field-level recovery and preserves prior valid state."
+weight = 1
+
+[[criterion]]
+id = "edge_cases.catchall"
+name = "Edge Cases (General)"
+description = "Other edge case issues not covered by specific criteria."
+weight = 0.5

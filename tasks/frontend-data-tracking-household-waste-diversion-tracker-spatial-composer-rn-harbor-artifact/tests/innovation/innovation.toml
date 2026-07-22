@@ -1,0 +1,15 @@
+[dimensions.innovation]
+id = "innovation"
+name = "Innovation"
+
+[[criterion]]
+id = "innovation.linked_utility"
+name = "Linked utility"
+description = "Linked views provide domain utility beyond CRUD."
+weight = 1
+
+[[criterion]]
+id = "innovation.catchall"
+name = "Innovation (General)"
+description = "Other innovation issues not covered by specific evidence."
+weight = 0.5

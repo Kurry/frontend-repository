@@ -1,0 +1,15 @@
+[dimensions.visual_design]
+id = "visual_design"
+name = "Visual Design"
+
+[[criterion]]
+id = "visual_design.visual_hierarchy"
+name = "Visual hierarchy"
+description = "The visual hierarchy makes current state and next action clear."
+weight = 1
+
+[[criterion]]
+id = "visual_design.catchall"
+name = "Visual Design (General)"
+description = "Other visual design issues not covered by specific criteria."
+weight = 0.5

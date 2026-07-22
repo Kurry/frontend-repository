@@ -1,0 +1,15 @@
+[dimensions.design_fidelity]
+id = "design_fidelity"
+name = "Design Fidelity"
+
+[[criterion]]
+id = "design_fidelity.source_fidelity"
+name = "Source fidelity"
+description = "The visual and interaction thesis is coherent without copying unrelated screens."
+weight = 1
+
+[[criterion]]
+id = "design_fidelity.catchall"
+name = "Design Fidelity (General)"
+description = "Other design fidelity issues not covered by specific criteria."
+weight = 0.5

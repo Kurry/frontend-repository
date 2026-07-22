@@ -1,0 +1,15 @@
+[dimensions.behavioral]
+id = "behavioral"
+name = "Behavioral"
+
+[[criterion]]
+id = "behavioral.artifact_round_trip"
+name = "Artifact round trip"
+description = "Export, clear, import, and inspect the edited variant record and derived state. Authored order/selection/geometry and domain state survive; invalid import is a no-op."
+weight = 1
+
+[[criterion]]
+id = "behavioral.catchall"
+name = "Behavioral (General)"
+description = "Other behavioral issues not covered by specific criteria."
+weight = 0.5
