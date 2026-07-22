@@ -1,0 +1,6 @@
+[criteria]
+
+[[criterion]]
+id = "technical.schema_contract"
+description = "The tool result and artifact contain the declared API-shaped fields, adhering to the evacuation-drill-v1 schema."
+weight = 1

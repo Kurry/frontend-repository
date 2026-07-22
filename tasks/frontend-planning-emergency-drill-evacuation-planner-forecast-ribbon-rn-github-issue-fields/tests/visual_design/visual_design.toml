@@ -1,0 +1,11 @@
+[criteria]
+
+[[criterion]]
+id = "visual_design.workbench_layout"
+description = "A distinctive, domain-specific workbench layout is used with clear state tokens and an intentional density."
+weight = 1
+
+[[criterion]]
+id = "visual_design.hierarchy"
+description = "The visual hierarchy links the primary work surface, linked summary, and detail panel, making current state and next action clear."
+weight = 1

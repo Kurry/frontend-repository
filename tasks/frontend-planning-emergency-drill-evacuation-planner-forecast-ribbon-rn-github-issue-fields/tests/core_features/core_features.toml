@@ -1,0 +1,26 @@
+[criteria]
+
+[[criterion]]
+id = "core_features.drill_checkpoint_crud"
+description = "The user can create, edit, archive, and filter drill checkpoints with explicit domain statuses."
+weight = 1
+
+[[criterion]]
+id = "core_features.forecast_ribbon_signature"
+description = "The signature interaction: adjusting a selected record on a forecast ribbon projects outcomes and compares them against target bounds."
+weight = 1
+
+[[criterion]]
+id = "core_features.forecast_ribbon_undo"
+description = "The user can undo the last mutation and inspect the linked representation, which restores ordering, selection, and derived values."
+weight = 1
+
+[[criterion]]
+id = "core_features.artifact_export"
+description = "The user can export the current artifact containing the full drill checkpoint list, forecast states, derived outcome statistics, and event history."
+weight = 1
+
+[[criterion]]
+id = "core_features.artifact_import"
+description = "The user can import a valid JSON artifact which restores authored structure and regenerates exportedAt."
+weight = 1

@@ -1,0 +1,11 @@
+[criteria]
+
+[[criterion]]
+id = "accessibility.alternate_input"
+description = "Keyboard and touch-equivalent controls produce the identical canonical mutation; Ctrl/Cmd+Z undoes it."
+weight = 1
+
+[[criterion]]
+id = "accessibility.focus_and_semantics"
+description = "Visible focus, semantic controls, and live updates are required."
+weight = 1
