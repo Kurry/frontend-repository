@@ -8,7 +8,8 @@
     "build": "vite build",
     "verify:build": "vite build",
     "preview": "vite preview --host --port 3000 --strictPort",
-    "start": "PATH=\"$PWD/node_modules/.bin:$PATH\" vite build && PATH=\"$PWD/node_modules/.bin:$PATH\" vite preview --host --port 3000 --strictPort"
+    "start": "PATH=\"$PWD/node_modules/.bin:$PATH\" vite build && PATH=\"$PWD/node_modules/.bin:$PATH\" vite preview --host --port 3000 --strictPort",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
   },
   "dependencies": {
     "@phosphor-icons/vue": "^2.2.1",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",
-    "vite": "^7.1.7"
+    "vite": "^7.1.7",
+    "@playwright/test": "1.61.0"
   }
 }
