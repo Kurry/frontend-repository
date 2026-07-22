@@ -1702,15 +1702,13 @@
         }
       },
       "browse.search": {
-        description: "Set a bounded task title search query.",
+        description: "Read matching tasks for a bounded title query without changing visible filters.",
         handler: function (args) {
           var query = String(args && args.query || "").trim();
           if (!query || query.length > 200) return { ok: false, error: "query must be 1-200 characters" };
-          state.filter.search = query;
-          var inp = byId("search-input");
-          if (inp) inp.value = state.filter.search;
-          render();
-          return { ok: true, search: state.filter.search };
+          var lower = query.toLowerCase();
+          var matches = state.tasks.filter(function (task) { return task.title.toLowerCase().indexOf(lower) !== -1; });
+          return { ok: true, query: query, count: matches.length, tasks: matches.map(publicTask) };
         }
       },
       "browse.apply_filter": {
@@ -1863,7 +1861,16 @@
           form: "form-workflow-v1",
           artifact: "artifact-transfer-v1"
         };
-        return { name: name, module: moduleByPrefix[name.split(".")[0]], description: tools[name].description };
+        var descriptor = { name: name, module: moduleByPrefix[name.split(".")[0]], description: tools[name].description };
+        if (name === "browse.search") {
+          descriptor.inputSchema = {
+            type: "object",
+            properties: { query: { type: "string", default: "Weekly" } },
+            required: ["query"]
+          };
+          descriptor.annotations = { readOnlyHint: true };
+        }
+        return descriptor;
       });
     };
     window.webmcp_invoke_tool = function (name, args) {
