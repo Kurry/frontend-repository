@@ -514,6 +514,20 @@ input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="
   .pop { width: min(380px, calc(100vw - 480px)); }
 }
 
+/* Phone widths: the fixed three-column grid (nav rail + board + calendar
+   rail) never shrinks below its 1080px breakpoint minimums, so at a 375px
+   viewport the shell itself overflows horizontally. Collapse to a
+   single-column board-only layout so the page has no horizontal scroll. */
+@media (max-width: 700px) {
+  .app { display: block; width: 100%; min-width: 0; height: 100dvh; }
+  .nav, .rail { display: none; }
+  .board { width: 100%; min-width: 0; height: 100%; }
+  .board-head { flex-wrap: wrap; padding: 10px 12px; gap: 6px; }
+  .columns { padding: 10px 12px 16px; gap: 10px; }
+  .col { flex-basis: min(224px, calc(100vw - 48px)); }
+  .pop { left: 12px; right: 12px; width: auto; min-width: 0; max-width: none; }
+}
+
 /* Reduced motion: remove animations/transitions, state changes apply instantly */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
