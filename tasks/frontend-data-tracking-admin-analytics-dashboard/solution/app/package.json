@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "verify:build": "esbuild src/index.tsx --bundle --minify --define:process.env.NODE_ENV=\\\"production\\\" --outfile=app.js && node -e \"require('fs').accessSync('index.html')\"",
-    "start": "npx --yes serve -l 3000 -n"
+    "start": "npx --yes serve -l 3000 -n",
+    "test:e2e": "playwright test e2e.spec.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -20,6 +21,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "esbuild": "^0.25.12",
