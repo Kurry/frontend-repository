@@ -1,0 +1,141 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "exact_span_selection"
+name = "Exact span selection creates evidence cards"
+description = "The learner selects contiguous text within one line or adjacent lines to create an evidence card using UTF-16 offsets and exact text. Selecting it synchronizes reader, collection rail, Sankey, matrix, and radar."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "motif_taxonomy_workbench"
+name = "Motif taxonomy workbench allows merge and split"
+description = "Eight seed motif cards may be renamed, recolored, reordered, merged, or split. Merge previews combined evidence and edges; split requires distributing every existing span between two named children before commit."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "collection_stage_loom"
+name = "Collection stage nodes and relation linking"
+description = "Each motif has zero or one stage node per collection. Dragging nodes vertically sets narrative order. The learner links a motif across adjacent collections with relations continues|reverses|echoes|resolves."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "sankey_and_arc"
+name = "Sankey and narrative arc visuals"
+description = "Sankey edge width is derived from evidence count and relation confidence. Parallel arc view plots motif centroid by collection. Reclassifying evidence changes weights and centroids."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "recurrence_matrix_radar"
+name = "Recurrence matrix brushing and feature radar"
+description = "Motif × text matrix displays direct evidence. Brushing it filters the evidence rail. Radar compares up to two selected nodes on eight deterministic features."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "conflict_lens"
+name = "Arc conflict and transformation lens"
+description = "Detects relation without evidence, unresolved split, duplicate citation, gap without bridge, etc. Transformation ledger records merge/split/rename/reorder/link/unlink/classify/reversal events with undo/redo."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "atlas_export"
+name = "Atlas comparison and export"
+description = "Two named atlas snapshots can be compared. Export/import preserves exact authored state, graph layout, and derived checksums. A Markdown citation appendix is generated alongside JSON."
+type = "binary"
+weight = 1.0
