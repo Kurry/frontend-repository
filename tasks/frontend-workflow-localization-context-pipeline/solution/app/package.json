@@ -1,0 +1,24 @@
+{
+  "name": "localization-context-pipeline",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "vite --host 0.0.0.0 --port 3000",
+    "build": "vite build",
+    "verify:build": "vite build"
+  },
+  "dependencies": {
+    "@kobalte/core": "^0.13.12",
+    "@tabler/icons-solidjs": "^3.34.1",
+    "@tailwindcss/vite": "^4.0.0",
+    "@tanstack/solid-form": "1.33.2",
+    "motion": "^12.4.1",
+    "qrious": "^4.0.2",
+    "solid-js": "^1.9.4",
+    "tailwindcss": "^4.0.0",
+    "vite": "^6.0.0",
+    "vite-plugin-solid": "^2.11.0",
+    "zod": "^3.24.1"
+  }
+}
