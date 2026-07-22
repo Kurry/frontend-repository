@@ -1,0 +1,10 @@
+[judge]
+module = "app_judge"
+class = "AppJudge"
+
+[[criterion]]
+id = "AC-09"
+title = "Large collection"
+description = "Exercise a seeded collection with at least 100 records. The signature interaction remains responsive and unrelated rows stay stable."
+weight = 1.0
+type = "behavior"

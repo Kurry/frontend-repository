@@ -1,0 +1,31 @@
+[judge]
+module = "app_judge"
+class = "AppJudge"
+
+[[criterion]]
+id = "AC-01"
+title = "Signature mutation"
+description = "Place a selected record in a spatial composer and rebalance capacity. The spatial composer mutation changes the primary record, linked view, and status together."
+weight = 1.0
+type = "behavior"
+
+[[criterion]]
+id = "AC-01-01"
+title = "Capacity conflict rejection"
+description = "Attempting to exceed maximum capacity rejects the mutation entirely without partial updates, keeping the prior valid state and displaying a clear conflict recovery path."
+weight = 1.0
+type = "behavior"
+
+[[criterion]]
+id = "AC-01-02"
+title = "Boundary acceptance and rejection"
+description = "Exact field boundaries (e.g., maximum intensity) are accepted, while out-of-range values are rejected. Invalid required fields preserve prior state."
+weight = 1.0
+type = "behavior"
+
+[[criterion]]
+id = "AC-01-03"
+title = "Undo mutation"
+description = "Undo the last mutation (Ctrl/Cmd+Z or button). Undo restores ordering, selection, and derived values in the linked representation."
+weight = 1.0
+type = "behavior"

@@ -1,0 +1,17 @@
+[judge]
+module = "app_judge"
+class = "AppJudge"
+
+[[criterion]]
+id = "AC-11"
+title = "Linked utility"
+description = "Mutate a record and use the linked representation to make the next decision. Linked views provide domain utility beyond CRUD."
+weight = 1.0
+type = "behavior"
+
+[[criterion]]
+id = "innovation.catchall"
+title = "Unspecified innovation"
+description = "The application implements useful, domain-appropriate features not covered by the primary criteria, with evidence of their value."
+weight = 0.5
+type = "behavior"

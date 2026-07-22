@@ -1,0 +1,10 @@
+[judge]
+module = "app_judge"
+class = "AppJudge"
+
+[[criterion]]
+id = "AC-08"
+title = "Alternate input"
+description = "Repeat the signature interaction with keyboard and touch-equivalent controls. Alternate input produces identical state with visible focus and live feedback."
+weight = 1.0
+type = "behavior"

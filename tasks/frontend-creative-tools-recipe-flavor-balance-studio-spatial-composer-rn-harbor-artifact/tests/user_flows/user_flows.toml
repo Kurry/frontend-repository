@@ -1,0 +1,10 @@
+[judge]
+module = "app_judge"
+class = "AppJudge"
+
+[[criterion]]
+id = "AC-05"
+title = "Complete user flow"
+description = "Create, edit, mutate, undo, and complete one record. The end-to-end job is recoverable without reload."
+weight = 1.0
+type = "behavior"
