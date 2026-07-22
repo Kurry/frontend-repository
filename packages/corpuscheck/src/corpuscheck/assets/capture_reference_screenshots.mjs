@@ -35,6 +35,7 @@ import { execSync, spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { observePageFailures, resolvePlaywright, waitForServer } from './browser_smoke_shared.mjs';
+import { needsPrebuiltOutput } from './start_script_semantics.mjs';
 
 // This script ships inside the corpuscheck python package; the repository is
 // located by walking up from the working directory (the CLI wrapper runs it
@@ -86,15 +87,6 @@ function taskSlugs() {
 // Scripts that already chain a build step (e.g. "npm run build && npm run
 // preview") are left alone — running a second build would be redundant, not
 // harmful, but skipping keeps this a no-op for those tasks.
-function needsPrebuiltOutput(start) {
-  if (!start || start.includes('&&')) return false;
-  if (/\bvite preview\b/.test(start) || /\bastro preview\b/.test(start)) return true;
-  if (/\bhttp-server\b/.test(start) && /(dist|build|out|\.next|\.nuxt|\.svelte-kit|storybook-static)/.test(start)) {
-    return true;
-  }
-  return false;
-}
-
 function buildIfNeeded(appDir, pkg, start) {
   if (!needsPrebuiltOutput(start)) return;
   const buildScript = pkg.scripts?.build ? 'build' : (pkg.scripts?.['verify:build'] ? 'verify:build' : null);
@@ -108,9 +100,10 @@ function startServer(appDir) {
   if (fs.existsSync(pkgPath)) {
     const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
     const start = pkg.scripts?.start || '';
-    const usesServePkg = /(npx\s+(-y\s+|--yes\s+)?serve\b|\bserve@\d)/.test(start) && !start.includes('&&');
-    if (start && !usesServePkg) {
-      // real app server (e.g. vite): needs deps
+    if (start) {
+      // Honor every declared app server. In particular, `npx serve dist` is
+      // semantically different from the static-folder fallback below: it
+      // needs a build first and must serve that output directory.
       if (!fs.existsSync(path.join(appDir, 'node_modules'))) {
         execSync('npm install --no-audit --no-fund', { cwd: appDir, stdio: 'ignore' });
       }
