@@ -1,0 +1,135 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "AC-01"
+name = "signature_mutation"
+description = "The user must be able to move a failed record into a recovery path and repair its downstream consequences."
+prompt = """
+The user must be able to move a failed record into a recovery path and repair its downstream consequences.
+
+To verify this, use the webmcp to seed a collection of records. Perform the recovery board mutation in the UI on a failed record.
+Then, verify that the primary record, the linked view, and its status have changed together.
+
+Return score 1.0 if the mutation updates the primary record, linked view, and status together. Return 0.0 otherwise.
+"""
+weight = 1.0
+score_max = 1.0
+
+[[criterion]]
+id = "AC-05"
+name = "complete_user_flow"
+description = "The user must be able to create, edit, mutate, undo, and complete one record."
+prompt = """
+The user must be able to create, edit, mutate, undo, and complete one record.
+
+Create a new record, edit its fields, use the signature recovery board mutation on it, undo the mutation using the undo action, and complete the record again.
+
+Return score 1.0 if the end-to-end job is recoverable without reload. Return 0.0 otherwise.
+"""
+weight = 1.0
+score_max = 1.0
+
+[[criterion]]
+id = "AC-09"
+name = "large_collection"
+description = "The app must support large collections gracefully."
+prompt = """
+The app must support large collections gracefully.
+
+Seed a collection with at least 100 records. Exercise the signature interaction.
+
+Return score 1.0 if the signature interaction remains responsive and unrelated rows stay stable. Return 0.0 otherwise.
+"""
+weight = 1.0
+score_max = 1.0
