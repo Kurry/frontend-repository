@@ -67,7 +67,7 @@ function handleOpen(value) {
           <label class="form-label" for="submitter-color">Colour</label>
           <div class="color-input-wrap">
             <Field id="submitter-color" name="color" class="color-input" type="color" />
-            <Field name="color" class="form-input" aria-label="Colour hex value" />
+            <Field id="submitter-color-hex" name="color" class="form-input" aria-label="Colour hex value" />
           </div>
           <ErrorMessage name="color" class="form-error" />
           <p v-if="formError" class="form-error" role="alert">{{ formError }}</p>
