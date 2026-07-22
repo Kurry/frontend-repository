@@ -1,0 +1,14 @@
+[[criterion]]
+id = "AC-09"
+name = "performance_scale"
+description = "Operate 1,000 icons, 100,000 path points, 20 variants/sizes, and 1,000 branches → interaction remains responsive and stale solver/preview work cancels."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "performance.catchall"
+name = "performance_catchall"
+description = "The app exhibits a significant, browser-observable defect in performance that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

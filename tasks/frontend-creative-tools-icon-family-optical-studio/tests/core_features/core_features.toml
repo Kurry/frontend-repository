@@ -1,0 +1,98 @@
+[[criterion]]
+id = "AC-01"
+name = "core_loop"
+description = "Edit/transform paths, constrain, inspect metrics, scope variants, hint sizes, branch/merge, preview states, approve, and export → all geometry/files agree."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.1"
+name = "anchor_segment_editor_drag"
+description = "Drag an anchor on the 24x24 grid → path immediately updates."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "anchor_segment_keyboard"
+description = "Select an anchor and move it with the keyboard → moves exactly by grid units."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "path_mirror_transform"
+description = "Select a path and apply mirror transform → path mirrors accurately."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "add_explicit_constraint"
+description = "Add an explicit equal constraint between two segments → constraint preview shows alignment."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "constraint_cycle_prevention"
+description = "Attempt to create a conflicting constraint → constraint solver rejects and shows error."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "variant_inheritance"
+description = "Edit base geometry → filled variant updates to reflect change."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "variant_override_reset"
+description = "Override filled variant and then reset → reverts to base geometry."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "multi_size_hint"
+description = "Add a 16px hint → hint adjusts path without changing base geometry."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "branch_and_compare"
+description = "Create a branch, edit path, view diff → dual overlays correctly highlight changes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "export_json_schema"
+description = "Export JSON → outputs valid project schema containing current paths and constraints."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "import_valid_json"
+description = "Import previously exported JSON → reconstructs exact paths and constraints."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "import_invalid_json"
+description = "Import malformed JSON → shows error and retains previous state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0
