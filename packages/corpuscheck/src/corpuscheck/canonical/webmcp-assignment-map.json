@@ -1264,7 +1264,7 @@
       ]
     },
     "mechanics_exclusions": [
-      "Live GitHub and AI-endpoint calls (account checks, live PR fetching and paging, live chat-completions streaming) are network behaviors the judge grades by observation only \u2014 the judge has no credentials and no tool may simulate a successful connection or Live mode",
+      "Live GitHub and AI-endpoint calls (account checks, live PR fetching and paging, live chat-completions streaming) are network behaviors the judge grades by observation only — the judge has no credentials and no tool may simulate a successful connection or Live mode",
       "Candidates/Triage/Runs/Library navigation, PR source-file bound filters, require-linked-issue toggle, and library filter chips are simple visible controls the judge drives directly via Playwright",
       "Credential masked-field show/hide toggles and the Connections slide-over transition stay Playwright-driven",
       "Evaluate/Generate streaming cadence, the pulsing streaming affordance, and the rate-limit reset countdown ticking stay Playwright-observed",
@@ -1272,5 +1272,64 @@
       "Command palette Cmd+K/Ctrl+K gesture and keyboard navigation stay Playwright-driven",
       "File downloads, file-picker import interaction, and clipboard contents remain Playwright responsibilities"
     ]
+  },
+  {
+    "task": "frontend-workflow-partial-fill-allocation-reconciliation-floor",
+    "modules": [
+      "structured-editor-v1",
+      "entity-collection-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "mapping-cell",
+        "allocation-flow",
+        "exception-row"
+      ],
+      "editor_properties": [
+        "allocation-quantity",
+        "exception-reason"
+      ],
+      "editor_modes": [
+        "repair",
+        "map",
+        "allocate"
+      ],
+      "editor_operations": [
+        "select",
+        "update_property",
+        "switch_mode",
+        "set_content"
+      ],
+      "entity": [
+        "fill",
+        "intent",
+        "checkpoint"
+      ],
+      "entity_operations": [
+        "select",
+        "update",
+        "delete",
+        "toggle"
+      ],
+      "entity_fields": [
+        "symbol",
+        "side",
+        "quantity",
+        "price"
+      ],
+      "artifact_operations": [
+        "export",
+        "import"
+      ],
+      "export_formats": [
+        "batch-json",
+        "exception-csv",
+        "reconciliation-csv"
+      ],
+      "import_modes": [
+        "batch-json"
+      ]
+    }
   }
 ]
