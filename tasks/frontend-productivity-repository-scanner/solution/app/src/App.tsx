@@ -203,6 +203,7 @@ function AddRepositoryModal() {
   }
 
   useModalFocusTrap(open, close)
+  useEscape(close, open)
 
   const submit = handleSubmit((values) => {
     if (submitting.current) return
@@ -925,6 +926,7 @@ function ImportModal() {
     setFeedback('')
   }
   useModalFocusTrap(open, close)
+  useEscape(close, open)
   const submit = handleSubmit(({ payload: source }) => {
     let parsed: unknown
     try { parsed = JSON.parse(source) } catch { setFeedback('payload: Scan Index JSON contains malformed JSON.'); return }
