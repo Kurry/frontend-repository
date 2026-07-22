@@ -137,7 +137,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
+    <div className="min-h-screen bg-gray-50 flex flex-col font-sans overflow-x-hidden">
       <header className="bg-white border-b px-6 py-4 flex items-center justify-between shadow-sm">
         <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2"><Activity className="text-blue-600"/> Practice Loop Studio</h1>
         <div className="flex gap-2">
@@ -152,9 +152,9 @@ export default function App() {
         </div>
       </header>
 
-      <main className="flex-1 overflow-auto flex flex-col p-6 gap-6 max-w-7xl mx-auto w-full">
+      <main className="flex-1 overflow-auto flex flex-col p-4 sm:p-6 gap-6 max-w-7xl mx-auto w-full min-w-0">
         {/* Score Range & Loop Editor */}
-        <section data-workspace="score" className="bg-white p-6 rounded-lg shadow-sm border flex flex-col gap-4">
+        <section data-workspace="score" className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border flex flex-col gap-4 min-w-0">
           <h2 className="text-lg font-semibold flex items-center gap-2">Score Strip & Brush</h2>
           <div className="w-full overflow-x-auto border rounded bg-gray-50 p-4 min-h-[120px] flex items-center" tabIndex={0} onKeyDown={(e) => {
               if (e.key === 'ArrowRight') setSelectedRange(prev => ({...prev, end: Math.min(64, prev.end + 1)}));
