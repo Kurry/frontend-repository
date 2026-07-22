@@ -7920,6 +7920,57 @@
         "Multi-select marquee geometry and Shift-click chord timing stay Playwright when mechanism matters",
         "Timeline status filter chips and Saved Workflows / Artifact panel open toggles stay Playwright-driven; no browse-query module is assigned"
       ]
+    },
+    {
+      "task": "frontend-workflow-opportunity-evidence-pipeline",
+      "modules": [
+        "structured-editor-v1",
+        "entity-collection-v1",
+        "artifact-transfer-v1"
+      ],
+      "bindings": {
+        "editor_object_types": [
+          "requirement-span",
+          "evidence-binding",
+          "packet-block"
+        ],
+        "editor_properties": [
+          "classification",
+          "binding_type",
+          "content"
+        ],
+        "editor_modes": [
+          "edit",
+          "review",
+          "snapshot"
+        ],
+        "entity": [
+          "opportunity",
+          "task"
+        ],
+        "entity_fields": [
+          "stage",
+          "name",
+          "deadline",
+          "status"
+        ],
+        "export_formats": [
+          "dossier-json",
+          "resume-json",
+          "cover-md",
+          "timeline-ics",
+          "ledger-csv"
+        ],
+        "import_modes": [
+          "dossier-json"
+        ]
+      },
+      "mechanics_exclusions": [
+        "Drag-and-drop card physics and invalid snap-backs stay Playwright-driven",
+        "Raw file paths/blobs forbidden in WebMCP args",
+        "Clipboard contents and downloaded file bytes remain Playwright responsibilities",
+        "Inline validation visual styles (e.g., red underlines) stay Playwright-observed"
+      ]
     }
   ]
 }

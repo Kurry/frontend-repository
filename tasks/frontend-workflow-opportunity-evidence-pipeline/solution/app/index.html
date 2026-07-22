@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Opportunity Evidence Pipeline</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/index.jsx"></script>
+    <script>
+      window.webmcp_session_info = () => ({
+        contract_version: "zto-webmcp-v1",
+        modules: ["structured-editor-v1", "entity-collection-v1", "artifact-transfer-v1"]
+      });
+      window.webmcp_list_tools = () => [];
+      window.webmcp_invoke_tool = () => ({ status: "error", error: "Not implemented" });
+    </script>
+  </body>
+</html>

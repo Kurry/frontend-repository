@@ -513,5 +513,9 @@
     "source": "feature-workflow-builder-workflow-builder PRD",
     "instruction": "tasks/frontend-workflow-workflow-builder/instruction.md",
     "description": "Node-graph workflow builder with durable executions and timelines."
+  },
+  "frontend-workflow-opportunity-evidence-pipeline": {
+    "source": "https://github.com/Kurry/harbor/issues/123",
+    "description": "An evidence-bound job application tracker."
   }
 }
