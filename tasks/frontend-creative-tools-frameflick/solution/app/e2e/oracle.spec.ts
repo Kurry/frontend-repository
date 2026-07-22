@@ -20,7 +20,7 @@ test.describe('FrameFlick Oracle E2E Suite', () => {
     expect(consoleErrors).toEqual([]);
   });
 
-  test('Workspace initial state and view switching', async ({ page }) => {
+  test('tab_switch_no_reload', async ({ page }) => {
     // Header check
     await expect(page.locator('.logo-text')).toHaveText('FrameFlick');
     await expect(page.locator('.tab-btn', { hasText: 'Editor' })).toHaveAttribute('aria-pressed', 'true');
@@ -44,12 +44,12 @@ test.describe('FrameFlick Oracle E2E Suite', () => {
     await expect(page.locator('.editor-layout')).toBeVisible();
   });
 
-  test('Image upload via sample button and drop zone label change', async ({ page }) => {
+  test('empty_canvas_placeholder_before_upload', async ({ page }) => {
     // Initial drop zone state
     await expect(page.locator('.upload-text')).toHaveText('Drop PNG/JPG here');
 
     // Click sample image button
-    await page.click('button:has-text("Use sample image")');
+    await page.getByRole('button', { name: /Use sample image/ }).click();
 
     // Canvas placeholder should disappear and replace text should show
     await expect(page.locator('.canvas-area')).not.toContainText('Upload an image to get started');
@@ -59,7 +59,7 @@ test.describe('FrameFlick Oracle E2E Suite', () => {
     await expect(page.locator('canvas.after-layer')).toBeVisible();
   });
 
-  test('Background swatch selection, custom hex input, and override', async ({ page }) => {
+  test('background_swatch_and_custom_color', async ({ page }) => {
     await page.click('button:has-text("Use sample image")');
 
     // Swatches exist
@@ -90,7 +90,7 @@ test.describe('FrameFlick Oracle E2E Suite', () => {
     await expect(oceanSwatch).toHaveClass(/active/);
   });
 
-  test('Composition sliders: padding, corner radius, shadow, frame, canvas size', async ({ page }) => {
+  test('frame_style_browser_phone_none', async ({ page }) => {
     await page.click('button:has-text("Use sample image")');
 
     // Padding slider
@@ -138,7 +138,7 @@ test.describe('FrameFlick Oracle E2E Suite', () => {
     }
   });
 
-  test('Caption and Watermark controls with validation error handling', async ({ page }) => {
+  test('caption_renders_and_invalid_hex_rejected', async ({ page }) => {
     await page.click('button:has-text("Use sample image")');
 
     // Caption panel
@@ -180,23 +180,21 @@ test.describe('FrameFlick Oracle E2E Suite', () => {
     }
   });
 
-  test('Position and Zoom controls', async ({ page }) => {
+  test('move_buttons_and_reset_position', async ({ page }) => {
     await page.click('button:has-text("Use sample image")');
+    const previewJson = page.locator('.json-preview, pre');
 
-    // Move buttons
-    const upBtn = page.locator('button[title="Move up"], button:has-text("⬆️"), button:has-text("Up")');
-    if (await upBtn.count() > 0) {
-      await upBtn.first().click();
-    }
+    const upBtn = page.getByRole('button', { name: 'Move image up' });
+    await expect(upBtn).toBeVisible();
+    await upBtn.click();
+    await expect(previewJson).toContainText('"positionY": -10');
 
-    // Reset position
-    const resetPosBtn = page.locator('button:has-text("Reset position"), button:has-text("Reset Pos")');
-    if (await resetPosBtn.isVisible()) {
-      await resetPosBtn.click();
-    }
+    const resetPosBtn = page.getByRole('button', { name: /Reset position/ });
+    await resetPosBtn.click();
+    await expect(previewJson).toContainText('"positionY": 0');
   });
 
-  test('Export bar actions and Style JSON live preview', async ({ page }) => {
+  test('style_recipe_json_live_export', async ({ page }) => {
     await page.click('button:has-text("Use sample image")');
 
     // Style JSON preview block
@@ -219,7 +217,7 @@ test.describe('FrameFlick Oracle E2E Suite', () => {
     }
   });
 
-  test('Style JSON import valid and invalid schemas', async ({ page }) => {
+  test('style_json_import_round_trip', async ({ page }) => {
     await page.click('button:has-text("Use sample image")');
 
     const importBtn = page.locator('button:has-text("Import style JSON")');
@@ -242,45 +240,53 @@ test.describe('FrameFlick Oracle E2E Suite', () => {
     }
   });
 
-  test('Undo, Redo, Before/After, and Reset style', async ({ page }) => {
+  test('undo_redo_style_mutations', async ({ page }) => {
     await page.click('button:has-text("Use sample image")');
+    const paddingSlider = page.locator('input[type="range"]').nth(0);
 
-    // Night swatch
     const nightSwatch = page.locator('button[title="Night"]');
     await nightSwatch.click();
+    await paddingSlider.fill('8');
+    await expect(nightSwatch).toHaveClass(/active/);
+    await expect(paddingSlider).toHaveValue('8');
 
-    // Ocean swatch
+    // Reloading the sample keeps the current settings and starts a fresh
+    // per-image history context with Night and padding 8 as the baseline.
+    await page.getByRole('button', { name: /Use sample image/ }).click();
+    await expect(nightSwatch).toHaveClass(/active/);
+    await expect(paddingSlider).toHaveValue('8');
+
     const oceanSwatch = page.locator('button[title="Ocean"]');
     await oceanSwatch.click();
+    await paddingSlider.fill('18');
+    await expect(oceanSwatch).toHaveClass(/active/);
+    await expect(paddingSlider).toHaveValue('18');
 
-    // Undo button
     const undoBtn = page.locator('button[title*="Undo"], button:has-text("Undo")');
-    if (await undoBtn.isVisible() && !(await undoBtn.isDisabled())) {
-      await undoBtn.click();
-    }
+    await expect(undoBtn).toBeEnabled();
+    await undoBtn.click();
+    await expect(nightSwatch).toHaveClass(/active/);
+    await expect(paddingSlider).toHaveValue('8');
 
-    // Redo button
     const redoBtn = page.locator('button[title*="Redo"], button:has-text("Redo")');
-    if (await redoBtn.isVisible() && !(await redoBtn.isDisabled())) {
-      await redoBtn.click();
-    }
+    await expect(redoBtn).toBeEnabled();
+    await redoBtn.click();
+    await expect(oceanSwatch).toHaveClass(/active/);
+    await expect(paddingSlider).toHaveValue('18');
 
-    // Before/After toggle
     const beforeBtn = page.locator('button:has-text("Before")');
     const afterBtn = page.locator('button:has-text("After")');
-    if (await beforeBtn.isVisible()) {
-      await beforeBtn.click();
-      await afterBtn.click();
-    }
+    await beforeBtn.click();
+    await expect(beforeBtn).toHaveAttribute('aria-pressed', 'true');
+    await afterBtn.click();
+    await expect(afterBtn).toHaveAttribute('aria-pressed', 'true');
 
-    // Reset style button
     const resetStyleBtn = page.locator('button:has-text("Reset style")');
-    if (await resetStyleBtn.isVisible()) {
-      await resetStyleBtn.click();
-    }
+    await resetStyleBtn.click();
+    await expect(paddingSlider).toHaveValue('8');
   });
 
-  test('Presets panel: name validation, save, apply, and delete lifecycle', async ({ page }) => {
+  test('preset_save_apply_delete_lifecycle', async ({ page }) => {
     await page.click('button:has-text("Use sample image")');
 
     const presetInput = page.locator('#preset-name');
@@ -318,7 +324,7 @@ test.describe('FrameFlick Oracle E2E Suite', () => {
     await expect(page.locator('[data-testid="preset-count"]')).toHaveText('0');
   });
 
-  test('Snapshots panel: save, apply, and delete', async ({ page }) => {
+  test('snapshots_save_apply_delete', async ({ page }) => {
     await page.click('button:has-text("Use sample image")');
 
     const snapshotInput = page.locator('input[placeholder="Snapshot name…"]');
@@ -340,7 +346,7 @@ test.describe('FrameFlick Oracle E2E Suite', () => {
     }
   });
 
-  test('Copy & Paste settings modal', async ({ page }) => {
+  test('copy_paste_settings_groups', async ({ page }) => {
     await page.click('button:has-text("Use sample image")');
 
     const copySettingsBtn = page.locator('button:has-text("Copy settings")');
@@ -359,7 +365,7 @@ test.describe('FrameFlick Oracle E2E Suite', () => {
     }
   });
 
-  test('Recent strip: multiple uploads and thumbnail switching', async ({ page }) => {
+  test('recent_switch_round_trip_keeps_per_image_settings', async ({ page }) => {
     // Load first sample
     await page.click('button:has-text("Use sample image")');
     await expect(page.locator('.thumbnails .thumb')).toHaveCount(1);
@@ -373,7 +379,7 @@ test.describe('FrameFlick Oracle E2E Suite', () => {
     await expect(page.locator('.thumbnails .thumb').first()).toHaveClass(/active/);
   });
 
-  test('Collaboration scenario offline queue, merge, and apply to canvas', async ({ page }) => {
+  test('collab_offline_merge_convergence', async ({ page }) => {
     await page.locator('.tab-btn', { hasText: 'Collaboration' }).click();
 
     // Click Go offline
@@ -417,7 +423,7 @@ test.describe('FrameFlick Oracle E2E Suite', () => {
     await expect(palette).not.toBeVisible();
   });
 
-  test('LocalStorage persistence across full page reload', async ({ page }) => {
+  test('refresh_restores_settings_presets_recents', async ({ page }) => {
     await page.click('button:has-text("Use sample image")');
 
     // Save a preset named "Persisted Preset"
