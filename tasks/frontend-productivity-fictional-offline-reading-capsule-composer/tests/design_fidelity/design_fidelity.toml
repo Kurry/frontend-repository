@@ -1,0 +1,9 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+
+[[criterion]]
+id = "design_fidelity.1.n1"
+dimension = "design_fidelity"
+description = "AC-XX design_fidelity: Placeholder description"
+weight = 1.0

@@ -1,0 +1,9 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+
+[[criterion]]
+id = "responsiveness.1.n1"
+dimension = "responsiveness"
+description = "AC-XX responsiveness: Placeholder description"
+weight = 1.0

@@ -1,0 +1,4 @@
+[task]
+name = "mercor-intelligence/frontend-productivity-fictional-offline-reading-capsule-composer"
+description = "Fictional Offline Reading Capsule Composer"
+authors = [{ name = "Jules", email = "jules@example.com" }]

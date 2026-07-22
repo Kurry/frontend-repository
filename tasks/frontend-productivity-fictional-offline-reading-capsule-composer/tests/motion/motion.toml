@@ -1,0 +1,9 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+
+[[criterion]]
+id = "motion.1.n1"
+dimension = "motion"
+description = "AC-03 motion: Causal motion explains fold travel"
+weight = 1.0

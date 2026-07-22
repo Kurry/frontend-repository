@@ -1,0 +1,9 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+
+[[criterion]]
+id = "user_flows.1.n1"
+dimension = "user_flows"
+description = "AC-XX user_flows: Placeholder description"
+weight = 1.0

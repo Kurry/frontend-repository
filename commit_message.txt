@@ -1,0 +1,28 @@
+Draft Fictional Offline Reading Capsule Composer task
+
+This PR creates the draft for the `frontend-productivity-fictional-offline-reading-capsule-composer` Harbor task.
+
+Completes the following deliverables:
+1. `instruction.md` — Includes `summary`, `core_features`, `visual_design`, `motion`, `requirements`, and `webmcp_action_contract` tags in canonical order, matching the genre specified.
+2. `solution/app` — Oracle is a working React app built with Vite, Tailwind CSS 4, and Zustand. Clean build with no brand name violations or external resources.
+3. WebMCP contract — Exposed `window.webmcp_session_info`, `window.webmcp_list_tools`, and `window.webmcp_invoke_tool` binding to the Zustand store, exactly as instructed.
+4. Dimension tomls — Generated using `corpuscheck scaffold`.
+5. Evidence — Ran Playwright to record a valid VP9 WebM walkthrough of adding a section range to the capsule seam, saved as `evidence.webm`.
+
+`corpuscheck validate` output is clean of task-level issues (only expected `shared_shape` and `contract` errors for an unregistered task):
+```
+FAIL frontend-productivity-fictional-offline-reading-capsule-composer
+    WARN layout: missing optional oracle path: environment/reference-screenshots
+    - shared_shape: no description in corpuscheck
+schemas/webmcp-task-sources.json
+    - contract: no WebMCP assignment for task slug
+
+Regression summary
+  newly-failing: 0
+  known-failing: 2
+(frontend-productivity-fictional-offline-reading-capsule-composer/contract,
+frontend-productivity-fictional-offline-reading-capsule-composer/shared_shape)
+  fixed: 0
+
+0/1 checked tasks passed
+```

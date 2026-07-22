@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fictional Offline Reading Capsule Composer</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+        // WebMCP implementation
+        window.webmcp_session_info = { "status": "ready" };
+        window.webmcp_list_tools = () => {
+            return [
+                { "name": "get_fixture", "description": "Get the deterministic fictional fixture dataset.", "inputSchema": { "type": "object", "properties": {} } },
+                { "name": "get_state", "description": "Get the current reading capsule state.", "inputSchema": { "type": "object", "properties": {} } },
+                { "name": "get_derived", "description": "Get derived metrics including totals, coverage, navigation, and state hash.", "inputSchema": { "type": "object", "properties": {} } },
+                { "name": "get_packet_preview", "description": "Preview the files generated for the exported packet.", "inputSchema": { "type": "object", "properties": {} } },
+                { "name": "preview_range", "description": "Preview the addition of a range to a capsule seam.", "inputSchema": { "type": "object", "properties": { "articleId": { "type": "string" }, "firstSectionId": { "type": "string" }, "lastSectionId": { "type": "string" }, "insertAt": { "type": "number" } }, "required": ["articleId", "firstSectionId", "lastSectionId", "insertAt"] } },
+                { "name": "add_range", "description": "Add a contiguous semantic range to the capsule.", "inputSchema": { "type": "object", "properties": { "articleId": { "type": "string" }, "firstSectionId": { "type": "string" }, "lastSectionId": { "type": "string" }, "insertAt": { "type": "number" } }, "required": ["articleId", "firstSectionId", "lastSectionId", "insertAt"] } },
+                { "name": "cancel_range", "description": "Cancel a prospective range preview or operation.", "inputSchema": { "type": "object", "properties": {} } },
+                { "name": "remove_entry", "description": "Remove an entry from the capsule.", "inputSchema": { "type": "object", "properties": { "entryId": { "type": "string" } }, "required": ["entryId"] } },
+                { "name": "reorder_entry", "description": "Reorder an entry in the capsule.", "inputSchema": { "type": "object", "properties": { "entryId": { "type": "string" }, "insertAt": { "type": "number" } }, "required": ["entryId", "insertAt"] } },
+                { "name": "select_entity", "description": "Select an article, section, or entry.", "inputSchema": { "type": "object", "properties": { "entityType": { "type": "string" }, "entityId": { "type": "string" } }, "required": ["entityType", "entityId"] } },
+                { "name": "set_time_brush", "description": "Filter visible entries by brushing an interval on the reading-time ruler.", "inputSchema": { "type": "object", "properties": { "startMin": { "type": "number" }, "endMin": { "type": "number" } }, "required": ["startMin", "endMin"] } },
+                { "name": "set_filters", "description": "Set workspace filters.", "inputSchema": { "type": "object", "properties": { "filters": { "type": "object" } }, "required": ["filters"] } },
+                { "name": "set_reader_location", "description": "Set the current location and progress in the reader.", "inputSchema": { "type": "object", "properties": { "entryId": { "type": "string" }, "sectionId": { "type": "string" }, "progress": { "type": "number" } }, "required": ["entryId", "sectionId"] } },
+                { "name": "search_sources", "description": "Search available sources.", "inputSchema": { "type": "object", "properties": { "query": { "type": "string" } }, "required": ["query"] } },
+                { "name": "set_source_status", "description": "Set the availability status of an article.", "inputSchema": { "type": "object", "properties": { "articleId": { "type": "string" }, "status": { "type": "string", "enum": ["available", "unavailable", "changed"] } }, "required": ["articleId", "status"] } },
+                { "name": "compare_source_revision", "description": "Compare a source revision.", "inputSchema": { "type": "object", "properties": { "articleId": { "type": "string" } }, "required": ["articleId"] } },
+                { "name": "preview_replace_snapshot", "description": "Preview replacing a fallback snapshot with a changed source.", "inputSchema": { "type": "object", "properties": { "articleId": { "type": "string" } }, "required": ["articleId"] } },
+                { "name": "cancel_replace_snapshot", "description": "Cancel a snapshot replacement.", "inputSchema": { "type": "object", "properties": {} } },
+                { "name": "fork_branch", "description": "Fork a new branch from the active branch.", "inputSchema": { "type": "object", "properties": { "name": { "type": "string" } }, "required": ["name"] } },
+                { "name": "compare_branch", "description": "Compare the current capsule branch against another target.", "inputSchema": { "type": "object", "properties": { "targetBranchId": { "type": "string" } }, "required": ["targetBranchId"] } },
+                { "name": "append_note", "description": "Append a note to an entry.", "inputSchema": { "type": "object", "properties": { "entryId": { "type": "string" }, "content": { "type": "string" }, "actorId": { "type": "string" } }, "required": ["entryId", "content", "actorId"] } },
+                { "name": "selective_undo", "description": "Undo a specific historical event.", "inputSchema": { "type": "object", "properties": { "eventId": { "type": "string" } }, "required": ["eventId"] } },
+                { "name": "selective_redo", "description": "Redo a previously undone event.", "inputSchema": { "type": "object", "properties": { "eventId": { "type": "string" } }, "required": ["eventId"] } },
+                { "name": "seek_history", "description": "Seek history to a specific event cursor.", "inputSchema": { "type": "object", "properties": { "eventId": { "type": "string" } }, "required": ["eventId"] } },
+                { "name": "get_history_anchor", "description": "Get the most recent compacted history anchor.", "inputSchema": { "type": "object", "properties": {} } },
+                { "name": "start_rehearsal", "description": "Start a read-through rehearsal of the capsule.", "inputSchema": { "type": "object", "properties": {} } },
+                { "name": "step_rehearsal", "description": "Advance the rehearsal cursor to the next section.", "inputSchema": { "type": "object", "properties": {} } },
+                { "name": "reset_rehearsal", "description": "Reset rehearsal to the beginning.", "inputSchema": { "type": "object", "properties": {} } },
+                { "name": "review_warning", "description": "Review an approval warning.", "inputSchema": { "type": "object", "properties": { "warningId": { "type": "string" } }, "required": ["warningId"] } },
+                { "name": "approve_capsule", "description": "Approve the capsule for export.", "inputSchema": { "type": "object", "properties": {} } },
+                { "name": "export_packet", "description": "Export the approved capsule as a ZIP packet.", "inputSchema": { "type": "object", "properties": {} } },
+                { "name": "import_json", "description": "Import capsule state from a JSON string.", "inputSchema": { "type": "object", "properties": { "jsonString": { "type": "string" } }, "required": ["jsonString"] } },
+                { "name": "import_packet", "description": "Import an offline capsule packet from a ZIP blob.", "inputSchema": { "type": "object", "properties": { "zipBlob": { "type": "string" } }, "required": ["zipBlob"] } },
+                { "name": "reset_session", "description": "Reset the entire application session.", "inputSchema": { "type": "object", "properties": {} } }
+            ];
+        };
+        window.webmcp_invoke_tool = async (toolName, args) => {
+            const store = window.__ZUSTAND_STORE?.getState();
+            if (!store) throw new Error("Store not initialized");
+            switch (toolName) {
+                case "get_fixture": return store.getFixture();
+                case "get_state": return store.getStateSnapshot();
+                case "get_derived": return store.getDerived();
+                case "get_packet_preview": return store.getPacketPreview();
+                case "preview_range": return store.previewRange(args.articleId, args.firstSectionId, args.lastSectionId, args.insertAt);
+                case "add_range": return store.addRange(args.articleId, args.firstSectionId, args.lastSectionId, args.insertAt);
+                case "cancel_range": return store.cancelRange();
+                case "remove_entry": return store.removeEntry(args.entryId);
+                case "reorder_entry": return store.reorderEntry(args.entryId, args.insertAt);
+                case "select_entity": return store.selectEntity(args.entityType, args.entityId);
+                case "set_time_brush": return store.setTimeBrush(args.startMin, args.endMin);
+                case "set_filters": return store.setFilters(args.filters);
+                case "set_reader_location": return store.setReaderLocation(args.entryId, args.sectionId, args.progress);
+                case "search_sources": return store.searchSources(args.query);
+                case "set_source_status": return store.setSourceStatus(args.articleId, args.status);
+                case "compare_source_revision": return store.compareSourceRevision(args.articleId);
+                case "preview_replace_snapshot": return store.previewReplaceSnapshot(args.articleId);
+                case "cancel_replace_snapshot": return store.cancelReplaceSnapshot();
+                case "fork_branch": return store.forkBranch(args.name);
+                case "compare_branch": return store.compareBranch(args.targetBranchId);
+                case "append_note": return store.appendNote(args.entryId, args.content, args.actorId);
+                case "selective_undo": return store.selectiveUndo(args.eventId);
+                case "selective_redo": return store.selectiveRedo(args.eventId);
+                case "seek_history": return store.seekHistory(args.eventId);
+                case "get_history_anchor": return store.getHistoryAnchor();
+                case "start_rehearsal": return store.startRehearsal();
+                case "step_rehearsal": return store.stepRehearsal();
+                case "reset_rehearsal": return store.resetRehearsal();
+                case "review_warning": return store.reviewWarning(args.warningId);
+                case "approve_capsule": return store.approveCapsule();
+                case "export_packet": return store.exportPacket();
+                case "import_json": return store.importJson(args.jsonString);
+                case "import_packet": return store.importPacket(args.zipBlob);
+                case "reset_session": return store.resetSession();
+                default: throw new Error(`Unknown tool: ${toolName}`);
+            }
+        };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,9 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+
+[[criterion]]
+id = "writing.1.n1"
+dimension = "writing"
+description = "AC-XX writing: Placeholder description"
+weight = 1.0

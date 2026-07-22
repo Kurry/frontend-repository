@@ -1,0 +1,9 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+
+[[criterion]]
+id = "edge_cases.1.n1"
+dimension = "edge_cases"
+description = "AC-XX edge_cases: Placeholder description"
+weight = 1.0
