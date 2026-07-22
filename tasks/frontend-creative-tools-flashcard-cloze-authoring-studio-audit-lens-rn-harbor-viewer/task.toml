@@ -1,0 +1,5 @@
+[task]
+name = "mercor-intelligence/frontend-creative-tools-flashcard-cloze-authoring-studio-audit-lens-rn-harbor-viewer"
+description = "Flashcard Cloze Authoring Studio — Audit Lens — Harbor Viewer"
+category = "frontend"
+tags = ["react", "vite", "tailwind"]
