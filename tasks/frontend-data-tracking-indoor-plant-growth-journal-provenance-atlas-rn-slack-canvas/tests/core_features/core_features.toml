@@ -97,10 +97,3 @@ name = "signature_mutation"
 description = "When a record is selected and the provenance atlas mutation is applied, the primary record status updates, the linked view changes appropriately, and the status changes concurrently."
 type = "binary"
 weight = 1
-
-[[criterion]]
-id = "core_features.ac-05"
-name = "complete_user_flow"
-description = "A user can successfully create, edit, mutate, undo, and complete a record without any page reload, and the end-to-end job is fully recoverable from memory."
-type = "binary"
-weight = 1

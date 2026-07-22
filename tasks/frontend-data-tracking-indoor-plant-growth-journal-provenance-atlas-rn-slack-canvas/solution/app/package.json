@@ -9,7 +9,7 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "start": "npx serve dist -p 3000",
-    "verify:build": "test -d dist && test -f dist/index.html"
+    "verify:build": "npm run build"
   },
   "dependencies": {
     "date-fns": "^4.4.0",

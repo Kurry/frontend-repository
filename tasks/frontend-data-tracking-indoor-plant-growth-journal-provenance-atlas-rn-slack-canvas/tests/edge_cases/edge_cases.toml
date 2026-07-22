@@ -248,3 +248,10 @@ description = "The app exhibits a significant, browser-observable defect in edge
 type = "binary"
 negate = true
 weight = 1.0
+
+[[criterion]]
+id = "edge_cases.ac-06"
+name = "boundaries_recovery"
+description = "When trying exact bounds, an invalid cross-field value, an empty state, and a malformed import, each invalid action gives field-level recovery and preserves prior valid state."
+type = "binary"
+weight = 1

@@ -234,3 +234,10 @@ description = "The app exhibits a significant, browser-observable defect in perf
 type = "binary"
 negate = true
 weight = 1.0
+
+[[criterion]]
+id = "performance.ac-09"
+name = "large_collection"
+description = "When exercising a seeded collection with at least 100 records, the signature interaction remains responsive and unrelated rows stay stable."
+type = "binary"
+weight = 1
