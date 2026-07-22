@@ -1,0 +1,124 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "signature_mutation"
+description = "Adjust a selected record on a forecast ribbon and compare projected outcomes. The forecast ribbon mutation changes the primary record, linked view, and status together."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "linked_views"
+description = "The forecast ribbon surface, derived summary, and artifact query share one state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "undo_mutation"
+description = "Undo the last mutation and inspect the linked representation. Undo restores ordering, selection, and derived values."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "filter_by_domain_state"
+description = "Filter or reorder records by domain state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "invalid_mutation_rejected"
+description = "A conflicting or incomplete mutation is rejected without partial updates."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "export_artifact"
+description = "Export the current artifact. The exported JSON captures the authored records, derived state, forecast-ribbon history, and a generated exportedAt timestamp."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "import_artifact"
+description = "Clear and import it with field-level validation. A valid import restores authored structure and regenerates exportedAt."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "invalid_import_rejected"
+description = "Malformed schema, duplicate IDs, unknown references, and invalid bounds make no state change."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "scenario_cards_collection_crud"
+description = "Create, edit, archive scenario cards with explicit domain statuses."
+type = "binary"
+weight = 1.0
