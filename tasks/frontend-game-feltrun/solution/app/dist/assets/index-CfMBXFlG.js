@@ -13,7 +13,7 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
             })));
           }
         }
-
+        
         if (${n}.value === undefined) {
           if (${o} in input) {
             newResult[${o}] = undefined;
@@ -21,7 +21,7 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
         } else {
           newResult[${o}] = ${n}.value;
         }
-
+        
       `):c?t.write(`
         if (${n}.issues.length) {
           payload.issues = payload.issues.concat(${n}.issues.map(iss => ({
@@ -29,7 +29,7 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
             path: iss.path ? [${o}, ...iss.path] : [${o}]
           })));
         }
-
+        
         if (${n}.value === undefined) {
           if (${o} in input) {
             newResult[${o}] = undefined;
@@ -37,7 +37,7 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
         } else {
           newResult[${o}] = ${n}.value;
         }
-
+        
       `):t.write(`
         const ${n}_present = ${o} in input;
         if (${n}.issues.length) {
