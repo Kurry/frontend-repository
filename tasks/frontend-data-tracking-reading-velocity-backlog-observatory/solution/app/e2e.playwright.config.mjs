@@ -1,27 +1,15 @@
-import { defineConfig, devices } from '@playwright/test';
+// Canonical config for the workspace-contract suite (e2e.spec.mjs). Owned by
+// `corpuscheck propagate` — never hand-edit. Exists so the canonical suite runs
+// identically even when an app ships its own playwright.config for other tests:
+//   npx playwright test -c e2e.playwright.config.mjs
+// The app must already be serving on port 3000 (`npm run start`).
+import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   testDir: '.',
   testMatch: 'e2e.spec.mjs',
-  fullyParallel: false,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: 1,
-  reporter: 'line',
-  use: {
-    trace: 'on-first-retry',
-    baseURL: 'http://localhost:3000',
-  },
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-  ],
-  webServer: {
-    command: 'npm start',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120000,
-  },
+  timeout: 30_000,
+  retries: 0,
+  reporter: [['list']],
+  use: { baseURL: 'http://127.0.0.1:3000' },
 });
