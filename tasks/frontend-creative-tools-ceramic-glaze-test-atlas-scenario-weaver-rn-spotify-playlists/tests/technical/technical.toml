@@ -1,0 +1,6 @@
+[[criterion]]
+id = "4.0"
+name = "schema_contract"
+description = "Query the current state and export after the mutation. The tool result and artifact contain the declared API-shaped fields."
+type = "binary"
+weight = 1.0

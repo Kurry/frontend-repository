@@ -1,0 +1,6 @@
+[[criterion]]
+id = "8.0"
+name = "alternate_input"
+description = "Repeat the signature interaction with keyboard and touch-equivalent controls. Alternate input produces identical state with visible focus and live feedback."
+type = "binary"
+weight = 1.0
