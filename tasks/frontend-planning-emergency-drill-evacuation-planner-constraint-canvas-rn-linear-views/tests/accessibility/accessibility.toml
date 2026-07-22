@@ -1,0 +1,4 @@
+[[criterion]]
+id = "AC-08"
+description = "Alternate input produces identical state with visible focus and live feedback."
+weight = 1

@@ -1,0 +1,4 @@
+[[criterion]]
+id = "AC-10"
+description = "Copy names the domain consequence and recovery action precisely."
+weight = 1

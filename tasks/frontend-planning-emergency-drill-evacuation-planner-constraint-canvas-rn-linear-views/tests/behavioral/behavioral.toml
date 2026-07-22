@@ -1,0 +1,4 @@
+[[criterion]]
+id = "AC-13"
+description = "Authored order/selection/geometry and domain state survive; invalid import is a no-op."
+weight = 1
