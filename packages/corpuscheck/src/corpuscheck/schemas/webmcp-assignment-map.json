@@ -7013,6 +7013,25 @@
     ]
   },
   {
+    "task": "frontend-workflow-partial-fill-allocation-reconciliation-floor",
+    "modules": ["entity-collection-v1", "structured-editor-v1", "artifact-transfer-v1"],
+    "bindings": {
+      "entity": "fill-intent-allocation-record",
+      "entity_operations": ["create", "select", "update", "delete", "toggle"],
+      "entity_fields": ["fill-id", "intent-id", "source-id", "account-id", "symbol", "side", "quantity", "price", "occurred-at", "exception-reason", "override-reason"],
+      "editor_object_types": ["mapping-cell", "allocation-flow", "lot-split", "correction-link", "variance-cell", "checkpoint"],
+      "editor_operations": ["select", "update_property", "set_content", "switch_mode", "preview"],
+      "editor_properties": ["mapped-field", "typed-value", "excluded", "allocation-quantity", "ratio", "exception-reason", "override-reason", "ledger-time", "checkpoint-name"],
+      "editor_modes": ["import-repair", "allocation-floor", "execution-ledger", "variance-matrix", "checkpoint-compare", "export"],
+      "artifact_operations": ["export", "import", "copy"],
+      "export_formats": ["api-batch-json", "reconciliation-csv", "exception-csv"],
+      "import_modes": ["api-batch-json"],
+      "value_bounds": ["intent and fill ids are unique non-empty strings and quantities are positive integers", "allocation quantities are positive integers bounded by both remaining fill quantity and remaining intent quantity", "short-side allocations consume non-negative locate inventory in occurred-at event order", "rule overrides require a declared reason code and non-empty note", "API batch JSON preserves authored decisions, layout, checkpoints, and execution history"],
+      "visible_postconditions": ["repairing a typed import cell updates its preview and row/column diagnostics; committing remains blocked while duplicate ids or invalid numeric fields remain", "allocating or splitting a fill creates Sankey edges and updates imported, excluded, allocatable, allocated, remaining, and excepted conservation totals without loss", "merging compatible sibling allocations replaces them with one allocation of equal conserved quantity", "a rejected rule or locate allocation names the violated guard; a valid reason-bound override records the exception and permits the bounded action", "scrubbing the ordered execution ledger reconstructs allocation and correction state at the selected event", "selecting or bulk-updating variance cells highlights their allocation edges and records exception reasons", "checkpoint comparison reports differences between two named authored states", "export then import reconstructs the visible allocations, exceptions, checkpoints, layout, and history; invalid artifacts leave state unchanged and name offending fields"]
+    },
+    "mechanics_exclusions": ["File dropzones, native file selection, drag-and-drop fill placement, Sankey-edge selection, quantity-slider and ledger-scrubber gestures are driven through Playwright; equivalent state mutations use declared entity/editor tools", "Responsive rail-to-drawer transitions, keyboard navigation, focus indicators, hover highlights, and matrix virtualization remain Playwright-observed", "File downloads and clipboard contents remain Playwright responsibilities"]
+  },
+  {
     "task": "frontend-workflow-podcast-episode-assembly-board",
     "modules": ["entity-collection-v1", "structured-editor-v1", "command-session-v1", "artifact-transfer-v1"],
     "bindings": {
