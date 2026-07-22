@@ -2,11 +2,15 @@
 
 These examples are grounded in the 28-task cohort ranked 76–103 in the repository dashboard. The cohort's recurring weakness is not missing visual bullets: its mean penalty-side scores are approximately visual design `0.862`, motion `0.592`, accessibility `0.640`, responsiveness `0.725`, and innovation `0.401`. Use these as patterns, not as a universal style.
 
+Preserve the cohort's assigned technology profiles from `docs/distribution.md`. The profiles below demonstrate how the Awwwards evidence should refine an existing stack rather than replace it.
+
 ## Planning and productivity
 
 ### `planning-execution-kanban`
 
 Weak direction: a horizontal board with colored card accents and ordinary hover/drag transitions.
+
+Technology profile: preserve React + Zustand, Carbon, and `@dnd-kit/core`. Use the Awwwards dense-operational bundle, retained-CSS grid/flex/transforms/transitions evidence, and stable utility/numeric typography. Reject 3D, smooth-scroll interception, and cinematic route transitions because they do not improve board execution.
 
 Upgrade the visual brief with:
 
@@ -27,6 +31,8 @@ Upgrade the visual brief with:
 
 Weak direction: many generic note bubbles, chips, trays, and toasts with no clear visual distinction between capture, organization, and resolution.
 
+Technology profiles: preserve TagNote's Qwik + DaisyUI + AutoAnimate + ProseKit assignment and MindThread's Vue 3 + Tailwind + Reka UI + VueUse Motion/AutoAnimate + TipTap assignment. Use AutoAnimate for list continuity and the framework motion layer only for the signature capture/assignment sequence. Typography and editorial rhythm—not a heavier animation stack—carry the identity.
+
 Upgrade with:
 
 ```xml
@@ -45,6 +51,8 @@ Upgrade with:
 
 Weak direction: dense tables with green/red diff colors but limited visual narrative.
 
+Technology profile: preserve Vue 3 + Pinia + shadcn-vue. Apply the dense-operational and storytelling evidence through CSS grid, sticky table regions, stable numerals, linked status treatment, and restrained framework-native transitions. Reject WebGL, parallax, and landing-page scroll choreography.
+
 Upgrade with:
 
 ```xml
@@ -60,6 +68,8 @@ Upgrade with:
 ### `workflow-gate-console`
 
 Weak direction: rows, chevrons, banners, and progress indicators without a strong control-room composition.
+
+Technology profile: preserve Svelte 5 runes stores and shadcn-svelte. Use Svelte transitions or CSS for row disclosure and status continuity; add no general timeline library unless the staged rerun cannot be expressed coherently with the assigned stack. Use tabular numerals and a compact utility face for evidence metadata.
 
 Upgrade with:
 
@@ -78,6 +88,8 @@ Upgrade with:
 ### `game-repquest` and `game-feltrun`
 
 Weak direction: a functional map/table and controls with decorative feedback added afterward.
+
+Technology profiles: preserve RepQuest's Svelte + Skeleton + hand-authored Canvas assignment and bounded Svelte confetti; preserve FeltRun's Vue 3 + Reka UI + Motion for Vue + canvas-confetti assignment. The Awwwards playful-game bundle supports causal result motion, not ambient spectacle. Canvas owns the play field, DOM controls own accessibility, and confetti remains disposable secondary feedback.
 
 Upgrade with:
 
@@ -98,6 +110,8 @@ Upgrade with:
 
 Weak direction: a competent wizard or settings editor whose visual language does not communicate a focused professional instrument.
 
+Technology profiles: preserve EuroScope's Solid + Kobalte + vanilla-motion assignment and Ghostty Config's Svelte 5 + Bits UI + AutoAnimate/Svelte transitions assignment. Use CSS custom properties, grid/flex composition, controlled utility typography, and framework-native state transitions. Reject 3D, video, and smooth-scroll layers.
+
 Upgrade with:
 
 ```xml
@@ -110,6 +124,8 @@ Upgrade with:
 ## Website-fidelity tasks
 
 For `landing-l1-network-marketing`, `landing-readymag`, and `landing-units-gr`, do not replace the reference composition with a generic “premium landing page.” Preserve the reference's type contrast, art-directed crops, scroll rhythm, unusual alignment, copy register, and signature interaction. Add requirements only when the reference evidence supports them, then specify how the same composition transforms at mobile widths and how decorative layers are hidden from assistive technology without removing meaningful content.
+
+Preserve their assigned fidelity stacks: Astro islands + GSAP/ScrollTrigger + Lenis for L1 Network Marketing; Astro with React islands + GSAP/Motion for Readymag; and Astro + GSAP family + Lenis + Swiper + Lottie + native view transitions for Units GR. Every library must have one named role. ScrollTrigger/Lenis must preserve native scroll, anchors, focus, and reduced motion; Swiper owns carousel gestures; Lottie owns only authored vector sequences; Motion/GSAP responsibilities must not overlap.
 
 ## Review checklist
 

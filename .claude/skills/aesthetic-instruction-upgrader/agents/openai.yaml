@@ -1,4 +1,4 @@
 interface:
   display_name: "Aesthetic Instruction Upgrader"
-  short_description: "Make frontend task briefs visually distinctive"
-  default_prompt: "Use $aesthetic-instruction-upgrader to rewrite this frontend task with stronger art direction and browser-observable aesthetic requirements."
+  short_description: "Apply Awwwards evidence to frontend task briefs"
+  default_prompt: "Use $aesthetic-instruction-upgrader to rewrite this frontend task with Awwwards-grounded frameworks, libraries, motion, typography, and browser-observable art direction."
