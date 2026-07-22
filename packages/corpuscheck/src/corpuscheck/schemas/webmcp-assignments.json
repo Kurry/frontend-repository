@@ -7920,6 +7920,76 @@
         "Multi-select marquee geometry and Shift-click chord timing stay Playwright when mechanism matters",
         "Timeline status filter chips and Saved Workflows / Artifact panel open toggles stay Playwright-driven; no browse-query module is assigned"
       ]
+    },
+    {
+      "task": "frontend-data-tracking-household-receipt-reconciliation-floor",
+      "modules": [
+        "structured-editor-v1",
+        "entity-collection-v1",
+        "artifact-transfer-v1",
+        "command-session-v1"
+      ],
+      "bindings": {
+        "editor_object_types": [
+          "allocation-ribbon",
+          "split-rule",
+          "receipt-match"
+        ],
+        "editor_properties": [
+          "allocation-type",
+          "allocation-targets",
+          "amount",
+          "priority",
+          "matching-relationship"
+        ],
+        "editor_modes": [
+          "allocation",
+          "matching",
+          "review"
+        ],
+        "editor_operations": [
+          "select",
+          "add",
+          "update_property",
+          "delete",
+          "preview"
+        ],
+        "entity": "record",
+        "entity_operations": [
+          "select",
+          "update",
+          "toggle"
+        ],
+        "entity_fields": [
+          "resolved",
+          "note",
+          "matched"
+        ],
+        "artifact_operations": [
+          "export",
+          "import"
+        ],
+        "export_formats": [
+          "session-json",
+          "csv-ledger",
+          "svg-graph"
+        ],
+        "import_modes": [
+          "session-json"
+        ],
+        "session_operations": [
+          "execute",
+          "undo",
+          "redo",
+          "reset",
+          "query_state"
+        ],
+        "session_queries": [
+          "derived-obligations",
+          "settlement-plan",
+          "budget-status"
+        ]
+      }
     }
   ]
 }
