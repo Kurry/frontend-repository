@@ -1,0 +1,8 @@
+[task]
+name = "mercor-intelligence/frontend-creative-tools-quilt-block-layout-studio-audit-lens-rn-harbor-viewer"
+description = "Manage quilt blocks through a domain-native browser surface where one meaningful mutation updates linked views and an interoperable artifact."
+version = "1.0.0"
+
+[task.metadata]
+authors = []
+maintainers = []
