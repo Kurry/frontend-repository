@@ -348,10 +348,10 @@ table.tbl tr.selected { background: color-mix(in oklab, var(--accent) 12%, trans
 .pop .pop-row { width: 100%; display: flex; align-items: center; gap: .6rem; padding: .5rem .6rem; border-radius: .5rem; background: transparent; border: 0; cursor: pointer; text-align: left; color: var(--color-base-content); transition: background .15s ease; }
 .pop .pop-row:hover, .pop .pop-row:focus-visible { background: var(--wash); }
 .pop .pop-row .badge { margin-left: auto; }
-.pop-backdrop { position: fixed; inset: 0; z-index: 55; }
+.pop-backdrop { position: fixed; inset: 0; z-index: 997; }
 
 /* -------------------------------------------------------------- drawer (export) */
-.drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 70; opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+.drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 9998; opacity: 0; pointer-events: none; transition: opacity .25s ease; }
 .drawer-overlay.open { opacity: 1; pointer-events: auto; }
 .export-drawer {
   position: fixed; top: 0; right: 0; bottom: 0; width: min(28rem, 100%); z-index: 80;
@@ -384,7 +384,7 @@ table.tbl tr.selected { background: color-mix(in oklab, var(--accent) 12%, trans
 .mutation-chip .dot { width: .45rem; height: .45rem; border-radius: 50%; background: var(--accent); }
 
 /* -------------------------------------------------------------- confirm dialog */
-.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 130; display: grid; place-items: center; padding: 1rem; }
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 1001; display: grid; place-items: center; padding: 1rem; }
 .modal { background: var(--color-base-100); border: var(--hairline); border-radius: var(--radius-box); box-shadow: var(--shadow-pop); width: min(26rem, 100%); padding: 1.3rem; }
 .modal h3 { font-size: 1.05rem; margin-bottom: .4rem; }
 .modal p { color: var(--muted); font-size: .85rem; margin: 0 0 1.1rem; }
@@ -404,7 +404,7 @@ table.tbl tr.selected { background: color-mix(in oklab, var(--accent) 12%, trans
 .legend button { display: inline-flex; align-items: center; gap: .35rem; background: transparent; border: 0; cursor: pointer; font-size: .76rem; color: var(--color-base-content); opacity: 1; transition: opacity .18s ease; }
 .legend button.off { opacity: .35; text-decoration: line-through; }
 .legend .lg-dot { width: .6rem; height: .6rem; border-radius: 50%; }
-.chart-tooltip { position: fixed; z-index: 200; pointer-events: none; background: #0b0d12; color: #fff; border: 1px solid #2a2f3a; border-radius: .5rem; padding: .35rem .55rem; font-size: .72rem; box-shadow: var(--shadow-pop); white-space: nowrap; }
+.chart-tooltip { position: fixed; z-index: 999; pointer-events: none; background: #0b0d12; color: #fff; border: 1px solid #2a2f3a; border-radius: .5rem; padding: .35rem .55rem; font-size: .72rem; box-shadow: var(--shadow-pop); white-space: nowrap; }
 .progress { height: .5rem; background: var(--color-base-300); border-radius: var(--radius-pill); overflow: hidden; }
 .progress > i { display: block; height: 100%; border-radius: var(--radius-pill); background: var(--color-base-content); }
 .radial { position: relative; display: grid; place-items: center; }

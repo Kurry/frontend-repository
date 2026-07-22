@@ -54,6 +54,7 @@ function Popover({ open, onClose, up, right, width, triggerRef, children, label 
         <>
           <div className="pop-backdrop" onClick={onClose} aria-hidden="true" />
           <motion.div ref={ref} role="menu" aria-label={label}
+
             className={`pop ${up ? 'up' : ''} ${right ? 'right' : ''}`}
             style={{ width: width || 14 * 16, left: right ? undefined : 0 }}
             initial={{ opacity: 0, scale: 0.94, y: up ? 8 : -8 }}
@@ -103,10 +104,10 @@ function Header() {
       {lastMutation && <span className="mutation-chip" aria-live="polite"><span className="dot" />{lastMutation}</span>}
       <div className="search">
         <MagnifyingGlassIcon className="si" />
-        <input ref={searchRef} type="search" value={search} aria-label="Search users"
+        <input ref={searchRef} type="search" value={search} aria-label="Search Users"
           onFocus={() => dispatch(setActiveView('all-users'))}
           onChange={(e) => { dispatch(setSearch(e.target.value)); }}
-          placeholder="Search users" autoComplete="off" />
+          placeholder="Search Users" autoComplete="off" />
       </div>
       <label className="icon-btn theme-toggle" aria-label="Toggle theme" title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}>
         <input type="checkbox" className="sr-only" checked={theme === 'light'}
@@ -312,7 +313,7 @@ function AllUsers() {
     onRowSelectionChange: (up) => {
       const next = typeof up === 'function' ? up(rowSelection) : up;
       dispatch(setSelection(Object.keys(next).filter((k) => next[k])));
-    }, getCoreRowModel: getCoreRowModel(), getPaginationRowModel: getPaginationRowModel(), initialState: { pagination: { pageSize: 8 } } });
+    }, getCoreRowModel: getCoreRowModel(), getPaginationRowModel: getPaginationRowModel(), initialState: { pagination: { pageSize: 100 } } });
 
   const selCount = selection.length;
   const applyStatus = (st: string) => { if (!st || !selCount) return; dispatch(updateUsersStatus({ ids: selection, status: st as any })); dispatch(pushToast({ kind: 'success', title: 'Status changed', body: `${selCount} user(s) set to ${st}` })); dispatch(setLastMutation(`Status → ${st} (${selCount})`)); };
@@ -322,7 +323,7 @@ function AllUsers() {
     <div className="span-12">
       <div className="ctxbar" style={{ padding: 0, marginBottom: '.4rem' }}>
         <div><div className="crumbs"><h1>All Users</h1></div><p style={{ color: 'var(--muted)', margin: '.1rem 0 0', fontSize: '.85rem' }}>Manage team members and their account permissions.</p></div>
-        <button className="btn btn-primary" onClick={() => dispatch(setActiveView('add-user'))}><PlusIcon className="icon-sm" /> Add user</button>
+        <button className="btn btn-primary" onClick={() => dispatch(setActiveView('add-user'))}><PlusIcon className="icon-sm" /> Add User</button>
       </div>
       <div style={{ marginBottom: '1rem' }}><KpiStrip users={kpiUsers} /></div>
       <div className="card">
@@ -358,9 +359,9 @@ function AllUsers() {
         </div>
 
         {filtered.length === 0 ? (
-          <div className="empty"><UsersIcon className="e-ico" /><h3>No users match these filters</h3>
+          <div className="empty"><UsersIcon className="e-ico" /><h2>No users match these filters</h2>
             <p>Try clearing the search or filters, or add a new user to the directory.</p>
-            <button className="btn btn-primary" onClick={() => dispatch(setActiveView('add-user'))}><PlusIcon className="icon-sm" /> Add user</button>
+            <button className="btn btn-primary" onClick={() => dispatch(setActiveView('add-user'))}><PlusIcon className="icon-sm" /> Add User</button>
           </div>
         ) : (
           <div className={`table-wrap ${density === 'compact' ? 'density-compact' : ''}`}>
@@ -477,7 +478,7 @@ function UserForm() {
   return (
     <div className="span-12">
       <div className="ctxbar" style={{ padding: 0 }}>
-        <div><div className="crumbs"><h1>{isEdit ? 'Edit user' : 'Add user'}</h1></div>
+        <div><div className="crumbs"><h1>{isEdit ? 'Edit user' : 'Add User'}</h1></div>
           <p style={{ color: 'var(--muted)', margin: '.1rem 0 0', fontSize: '.85rem' }}>The submit payload is the API-shaped UserCreate body the directory would accept.</p></div>
         <button className="btn btn-ghost" onClick={cancel}>Cancel</button>
       </div>
@@ -604,26 +605,26 @@ function Overview() {
         <div style={{ display: 'flex', gap: '.5rem' }}>
           <button className="btn btn-primary" onClick={() => dispatch(setActiveView('add-user'))}><PlusIcon className="icon-sm" /> New product</button>
           <button className="btn" onClick={() => dispatch(setExportOpen(true))}><ArrowDownTrayIcon className="icon-sm" /> Export session</button>
-          <button className="btn"><ShieldCheckIcon className="icon-sm" /> System health</button>
+          <button className="btn"><ShieldCheckIcon className="icon-sm" /> System Health</button>
         </div>
       </div>
       <div className="kpi-strip" style={{ margin: '1rem 0 1.5rem' }}>
         <div className="kpi"><div className="k-label">Revenue</div><div className="k-val">$842K</div><div className="k-chip up">▲ 12.8% vs prior period</div></div>
         <div className="kpi"><div className="k-label">Orders</div><div className="k-val">18.2K</div><div className="k-chip">624 awaiting fulfillment</div></div>
-        <div className="kpi"><div className="k-label">Active users</div><div className="k-val">{k.active * 4700} </div><div className="k-chip up">▲ new this month</div></div>
+        <div className="kpi"><div className="k-label">Active users</div><div className="k-val">{(k.active * 4700 / 1000).toFixed(1)}K</div><div className="k-chip up">▲ new this month</div></div>
         <div className="kpi"><div className="k-label">Support SLA</div><div className="k-val">94.2%</div><div className="k-chip">7 high-priority threads</div></div>
       </div>
       <div className="grid12" style={{ padding: 0 }}>
         <Card title="Revenue and demand" sub="Commerce revenue, product demand, and checkout activity" icon={ChartBarIcon} span="span-8" link="Open sales analytics">
-          <div style={{ marginTop: '1rem' }}><ColumnChart values={OV.revenue} labels={OV.revenueLabels} showAvg /></div>
+          <div style={{ marginTop: '1rem' }}><ColumnChart values={OV.revenue} labels={OV.revenueLabels} showAvg color="var(--c-teal)" /></div>
           <div className="stat-row" style={{ marginTop: '.8rem' }}><div><div className="stat-big">$842K</div><span className="card-sub">Revenue</span></div><div><div className="stat-big">18.2K</div><span className="card-sub">Orders</span></div><div><div className="stat-big">4.8%</div><span className="card-sub">Checkout lift</span></div></div>
         </Card>
-        <Card title="Order status" sub="Current order volume by fulfillment stage" icon={ShoppingCartIcon} span="span-4">
+        <Card title="Order Status" sub="Current order volume by fulfillment stage" icon={ShoppingCartIcon} span="span-4">
           <div style={{ marginTop: '1rem' }}><DonutChart data={OV.orderStatus} /></div>
           <div className="stat-row" style={{ marginTop: '.6rem', flexDirection: 'column', gap: '.3rem' }}><div>Delivered <b>5,492</b></div><div>In Progress <b>1,820</b></div></div>
         </Card>
 
-        <Card title="Recent commerce activity" icon={ClipboardDocumentListIcon} span="span-8" link="All orders">
+        <Card title="Recent Commerce Activity" icon={ClipboardDocumentListIcon} span="span-8" link="All orders">
           <div className="table-wrap" style={{ marginTop: '1rem' }}><table className="tbl">
             <thead><tr><th>Record</th><th>Customer</th><th>Status</th><th>Amount</th><th></th></tr></thead>
             <tbody>
@@ -668,10 +669,10 @@ function Overview() {
             ))}
           </tbody></table></div>
         </Card>
-        <Card title="Fulfillment throughput" sub="Packed, shipped, returned, and delayed order movement" icon={ArrowsRightLeftIcon} span="span-6"><div style={{ marginTop: '1rem' }}><LineChart values={OV.fulfillment} color="var(--color-info)" /></div><div className="stat-row" style={{ marginTop: '.6rem' }}><div><div className="stat-big" style={{ fontSize: '1.3rem' }}>9,482</div><span className="card-sub">Packed</span></div><div><div className="stat-big" style={{ fontSize: '1.3rem' }}>624</div><span className="card-sub">Queued</span></div><div><div className="stat-big" style={{ fontSize: '1.3rem' }}>118</div><span className="card-sub">Returns</span></div></div></Card>
+        <Card title="Fulfillment Throughput" sub="Packed, shipped, returned, and delayed order movement" icon={ArrowsRightLeftIcon} span="span-6"><div style={{ marginTop: '1rem' }}><LineChart values={OV.fulfillment} color="var(--c-amber)" /></div><div className="stat-row" style={{ marginTop: '.6rem' }}><div><div className="stat-big" style={{ fontSize: '1.3rem' }}>9,482</div><span className="card-sub">Packed</span></div><div><div className="stat-big" style={{ fontSize: '1.3rem' }}>624</div><span className="card-sub">Queued</span></div><div><div className="stat-big" style={{ fontSize: '1.3rem' }}>118</div><span className="card-sub">Returns</span></div></div></Card>
 
-        <Card title="Automation coverage" sub="Campaigns, refunds, imports, and fulfillment handled automatically" icon={BoltIcon} span="span-4"><div style={{ marginTop: '1rem' }}>{prog('Email flows', 82)}{prog('Scheduled jobs', 68)}</div></Card>
-        <Card title="Security watch" icon={ShieldCheckIcon} span="span-4">
+        <Card title="Automation Coverage" sub="Campaigns, refunds, imports, and fulfillment handled automatically" icon={BoltIcon} span="span-4"><div style={{ marginTop: '1rem' }}>{prog('Email flows', 82, 'var(--c-sky)')}{prog('Scheduled jobs', 68, 'var(--c-rose)')}</div></Card>
+        <Card title="Security Watch" icon={ShieldCheckIcon} span="span-4">
           <div style={{ marginTop: '1rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem' }}><span className="ping-dot" style={{ background: 'var(--color-success)' }} /><b>1,284</b> blocked attempts</div>
             <div className="card-sub">-8% from yesterday</div>
@@ -679,7 +680,7 @@ function Overview() {
             <div className="card-sub">3 need review · 1 suspicious</div>
           </div>
         </Card>
-        <Card title="Cash movement" icon={BanknotesIcon} span="span-4">
+        <Card title="Cash Movement" icon={BanknotesIcon} span="span-4">
           <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '.7rem', fontSize: '.85rem' }}>
             <div style={{ display: 'flex', gap: '.6rem' }}><b>In</b><div><b>$428K captured</b><div className="card-sub" style={{ marginTop: 0 }}>Card, wallet, invoice</div></div></div>
             <div style={{ display: 'flex', gap: '.6rem' }}><b>Hold</b><div><b>$22K under review</b><div className="card-sub" style={{ marginTop: 0 }}>Gateway disputes</div></div></div>
@@ -705,10 +706,9 @@ function ExportDrawer() {
   const lastFocus = useRef<HTMLElement | null>(null);
   const kpis = computeKpis(filterUsersForKpis(users, ui.filterRole, ui.filterStatus));
 
-  const doc = useMemo(() => buildSession(users, { role: ui.filterRole, status: ui.filterStatus, sort: ui.sort, theme: ui.theme, activeView: ui.activeView }),
-    [users, ui.filterRole, ui.filterStatus, ui.sort, ui.theme, ui.activeView]);
-  const json = useMemo(() => JSON.stringify(doc, null, 2), [doc]);
-  const csv = useMemo(() => buildCsv(users), [users]);
+  const doc = buildSession(users, { role: ui.filterRole, status: ui.filterStatus, sort: ui.sort, theme: ui.theme, activeView: ui.activeView });
+  const json = JSON.stringify(doc, null, 2);
+  const csv = buildCsv(users);
   const text = exportTab === 'json' ? json : csv;
 
   // open/close effects: focus trap + restore + escape
@@ -728,7 +728,7 @@ function ExportDrawer() {
   useEffect(() => {
     if (!exportOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); dispatch(setExportOpen(false)); return; }
+      if (e.key === 'Escape') { e.stopPropagation(); dispatch(setExportOpen(false)); return; }
       if (e.key === 'Tab' && drawerRef.current) {
         const f = drawerRef.current.querySelectorAll<HTMLElement>('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
         if (!f.length) return; const first = f[0], last = f[f.length - 1];
@@ -765,8 +765,8 @@ function ExportDrawer() {
 
   return (
     <>
-      <div className={`drawer-overlay ${exportOpen ? 'open' : ''}`} onClick={() => dispatch(setExportOpen(false))} aria-hidden="true" />
-      <div ref={drawerRef} className={`export-drawer ${exportOpen ? 'open' : ''}`} role="dialog" aria-modal="true" aria-label="Export and import session" aria-hidden={!exportOpen}>
+      <div className={`drawer-overlay ${exportOpen ? 'open' : ''}`} style={{ zIndex: 9998 }} onClick={() => dispatch(setExportOpen(false))} aria-hidden="true" />
+      <div ref={drawerRef} className={`export-drawer ${exportOpen ? 'open' : ''}`} style={{ zIndex: 9999 }} role="dialog" aria-modal="true" aria-label="Export and import session" aria-hidden={!exportOpen}>
         <div className="export-head">
           <h2 style={{ fontSize: '1.1rem', fontWeight: 700 }}>{importMode ? 'Import session' : 'Export session'}</h2>
           <button className="btn btn-ghost btn-circle" aria-label="Close export drawer" onClick={() => dispatch(setExportOpen(false))}><XMarkIcon className="icon-md" /></button>
@@ -844,7 +844,7 @@ function Toasts() {
       <AnimatePresence>
         {toasts.map((t) => (
           <motion.div key={t.id} className={`toast ${t.kind}`} role="status"
-            initial={{ opacity: 0, x: 320 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 320 }} transition={{ duration: 0.3 }}>
+            initial={{ opacity: 0, y: 50, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }}>
             {Icon(t.kind)}<div><div className="t-title">{t.title}</div>{t.body && <div className="t-body">{t.body}</div>}</div>
             <button className="btn btn-ghost btn-xs" style={{ marginLeft: 'auto' }} aria-label="Dismiss notification" onClick={() => dispatch(dismissToast(t.id))}><XMarkIcon className="icon-sm" /></button>
           </motion.div>
@@ -874,7 +874,7 @@ function ConfirmDialog() {
   return (
     <div className="modal-backdrop" role="alertdialog" aria-modal="true" aria-label={confirm.title} onClick={close}>
       <motion.div className="modal" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} onClick={(e) => e.stopPropagation()}>
-        <h3>{confirm.title}</h3><p>{confirm.body}</p>
+        <h2>{confirm.title}</h2><p>{confirm.body}</p>
         <div className="actions"><button className="btn btn-ghost" onClick={close}>Cancel</button><button className="btn btn-error" onClick={confirmDel} autoFocus>Delete</button></div>
       </motion.div>
     </div>
