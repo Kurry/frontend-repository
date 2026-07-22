@@ -7920,6 +7920,72 @@
         "Multi-select marquee geometry and Shift-click chord timing stay Playwright when mechanism matters",
         "Timeline status filter chips and Saved Workflows / Artifact panel open toggles stay Playwright-driven; no browse-query module is assigned"
       ]
+    },
+    {
+      "task": "frontend-creative-tools-leitner-memory-terrain",
+      "modules": [
+        "structured-editor-v1",
+        "entity-collection-v1",
+        "artifact-transfer-v1",
+        "command-session-v1"
+      ],
+      "bindings": {
+        "editor_object_types": [
+          "card",
+          "deck"
+        ],
+        "editor_properties": [
+          "front",
+          "back",
+          "box",
+          "due",
+          "tags",
+          "group_region"
+        ],
+        "editor_modes": [
+          "edit",
+          "move",
+          "group"
+        ],
+        "editor_operations": [
+          "select",
+          "update_property",
+          "switch_mode"
+        ],
+        "entity": "card",
+        "entity_operations": [
+          "create",
+          "select",
+          "update",
+          "delete"
+        ],
+        "artifact_operations": [
+          "export",
+          "import",
+          "copy"
+        ],
+        "export_formats": [
+          "session-json",
+          "tsv"
+        ],
+        "import_modes": [
+          "session-json",
+          "tsv"
+        ],
+        "session_operations": [
+          "start",
+          "stop",
+          "restart",
+          "advance",
+          "undo"
+        ]
+      },
+      "mechanics_exclusions": [
+        "Drag-and-drop mechanics stay Playwright (gesture mechanics)",
+        "Mobile touch/swipe gestures stay Playwright-observed",
+        "Raw file paths/blobs forbidden in WebMCP args",
+        "Animations and replay effects stay Playwright-observed"
+      ]
     }
   ]
 }
