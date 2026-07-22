@@ -111,3 +111,37 @@ test.describe('workspace contract (canonical)', () => {
 });
 
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
+
+test('interleaved annotation draft retains its line anchor and text', async ({ page }) => {
+  await page.goto(BASE);
+  await page.waitForLoadState('networkidle');
+  await page.evaluate(() => {
+    const lines = [...document.querySelectorAll('.split-diff .diff-line[data-side="base"]')];
+    const first = lines[0]?.querySelector('.line-code');
+    const second = lines[1]?.querySelector('.line-code');
+    if (!first || !second) throw new Error('Expected two visible base lines');
+    const range = document.createRange();
+    range.setStart(first, 0);
+    range.setEnd(second, second.childNodes.length);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    first.closest('.diff-scroll').dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+  });
+  await page.getByRole('button', { name: 'Annotate range' }).click();
+  await page.getByLabel('bodyMarkdown').fill('INTERLEAVED ANNOTATION SENTINEL');
+  await page.keyboard.press('Escape');
+  await page.getByLabel('Studio modes').getByRole('button', { name: 'Graph', exact: true }).click();
+  await page.getByLabel('Studio modes').getByRole('button', { name: 'Diff', exact: true }).click();
+  await expect(page.getByText('Lines 1–2 selected')).toBeVisible();
+  await page.getByLabel('Studio modes').getByRole('button', { name: 'Compare branches', exact: true }).click();
+  await page.getByRole('button', { name: 'Merge branches' }).click();
+  await page.getByRole('button', { name: 'Use all left' }).click();
+  await page.getByRole('button', { name: 'Complete merge' }).click();
+  await page.getByRole('dialog', { name: 'Confirm merge' }).getByRole('button', { name: 'Create merge version' }).click();
+  await expect(page.getByText('Lines 1–2 selected')).toBeVisible();
+  await page.getByRole('button', { name: 'Annotate range' }).click();
+  await expect(page.getByLabel('bodyMarkdown')).toHaveValue('INTERLEAVED ANNOTATION SENTINEL');
+  await page.getByRole('button', { name: 'Post annotation' }).click();
+  await expect(page.getByLabel('Annotation thread on lines 1–2')).toContainText('INTERLEAVED ANNOTATION SENTINEL');
+});

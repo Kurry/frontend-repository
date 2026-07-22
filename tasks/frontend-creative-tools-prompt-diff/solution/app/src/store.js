@@ -59,6 +59,7 @@ export const useStudioStore = create((set, get) => ({
   mergeConfirmOpen: false,
   annotations: cloneSeedAnnotations(),
   selectedRange: null,
+  annotationDraft: null,
   annotationComposerOpen: false,
   threadOpenId: null,
   threadCollapsed: false,
@@ -97,7 +98,7 @@ export const useStudioStore = create((set, get) => ({
     const base = sorted.at(-2) || compare;
     return {
       selectedPromptId: promptId, baseVersionId: base.versionId, compareVersionId: compare.versionId,
-      mergeSession: createMergeSession(prompt), promptQuery: '', globalSearchQuery: '', selectedRange: null,
+      mergeSession: createMergeSession(prompt), promptQuery: '', globalSearchQuery: '', selectedRange: null, annotationDraft: null,
       threadOpenId: null, mergeConfirmOpen: false,
     };
   }),
@@ -121,14 +122,21 @@ export const useStudioStore = create((set, get) => ({
   },
   setActiveMode: (mode) => set((state) => {
     const prompt = activePrompt(state);
-    return { activeMode: mode, mergeSession: mode === 'compare-branches' && (!state.mergeSession || state.mergeSession.promptId !== prompt?.id) ? createMergeSession(prompt) : state.mergeSession, selectedRange: null, mergeConfirmOpen: false };
+    return { activeMode: mode, mergeSession: mode === 'compare-branches' && (!state.mergeSession || state.mergeSession.promptId !== prompt?.id) ? createMergeSession(prompt) : state.mergeSession, mergeConfirmOpen: false };
   }),
   setDiffView: (diffView) => set({ diffView }),
   setIgnoreWhitespace: (ignoreWhitespace) => set({ ignoreWhitespace }),
   setIgnoreCase: (ignoreCase) => set({ ignoreCase }),
   setPromptQuery: (promptQuery) => set({ promptQuery }),
   setGlobalSearchQuery: (globalSearchQuery) => set({ globalSearchQuery }),
-  setSelectedRange: (selectedRange) => set({ selectedRange }),
+  setSelectedRange: (selectedRange) => set((state) => {
+    const sameRange = selectedRange && state.annotationDraft
+      && state.annotationDraft.promptId === state.selectedPromptId
+      && state.annotationDraft.lineStart === selectedRange.lineStart
+      && state.annotationDraft.lineEnd === selectedRange.lineEnd;
+    return { selectedRange, annotationDraft: sameRange ? state.annotationDraft : null };
+  }),
+  setAnnotationDraft: (annotationDraft) => set({ annotationDraft }),
   setAnnotationComposerOpen: (annotationComposerOpen) => set({ annotationComposerOpen }),
   setThreadOpen: (threadOpenId) => set({ threadOpenId, threadCollapsed: false }),
   setThreadCollapsed: (threadCollapsed) => set({ threadCollapsed }),
@@ -298,7 +306,7 @@ export const useStudioStore = create((set, get) => ({
     set({
       undoStack: [...state.undoStack, snapshot(state)].slice(-50), redoStack: [],
       annotations: { ...state.annotations, [state.selectedPromptId]: next }, annotationComposerOpen: false,
-      selectedRange: null, threadOpenId: openId, threadCollapsed: false,
+      selectedRange: null, annotationDraft: null, threadOpenId: openId, threadCollapsed: false,
       toasts: [...state.toasts.slice(-3), toast(message)], liveMessage: message, liveNonce: state.liveNonce + 1,
     });
     return { ok: true, annotationId: openId, extendedExisting: Boolean(existing), lineStart, lineEnd };
