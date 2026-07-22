@@ -1,0 +1,6 @@
+{
+  "webmcp_action_contract": {
+    "state_read": "Reads the current schedule state including branches and execution.",
+    "action_simulate": "Simulates applying a branch diff or execution event."
+  }
+}
