@@ -186,17 +186,26 @@ test('1.38 field_contract_rejects_zero_and_cross_field', async ({ page }) => {
 
 test('1.16 summary_strip_tracks_collection', async ({ page }) => {
   await page.goto(URL);
-  const textContent = await page.locator('body').textContent();
-  const initialCountMatch = textContent.match(/(\d+) txn/);
-  const initialCount = initialCountMatch ? parseInt(initialCountMatch[1]) : 0;
+  const stripCount = page.locator('.strip-tile', { has: page.locator('.strip-key', { hasText: 'Transactions' }) }).locator('.strip-val');
+  const stripLast = page.locator('.strip-tile', { has: page.locator('.strip-key', { hasText: 'Last entry' }) }).locator('.strip-val');
+  const initialCount = parseInt((await stripCount.textContent()).trim(), 10);
+  expect(Number.isNaN(initialCount)).toBe(false);
+  const initialLast = (await stripLast.textContent()).trim();
 
   await page.click('#new-transaction-btn');
+  await page.fill('input[formControlName="date"]', '2030-01-01');
   await page.fill('input[formControlName="payee"]', 'Strip Test');
   await page.fill('input[formControlName="amount"]', '-10.00');
   await page.selectOption('select[formControlName="category"]', { label: 'Restaurants' });
   await page.click('button:has-text("Create transaction")');
 
-  await expect(page.locator('text=' + (initialCount + 1) + ' txn').first()).toBeVisible();
+  await expect(stripCount).toHaveText(String(initialCount + 1));
+  // A far-future date becomes the new most-recent transaction, so "Last entry" must update too.
+  await expect(stripLast).not.toHaveText(initialLast);
+
+  await page.click('tbody tr:has-text("Strip Test") >> button[aria-label="Delete Strip Test"]');
+  await page.click('button:has-text("Delete transaction")');
+  await expect(stripCount).toHaveText(String(initialCount));
 });
 
 
@@ -219,15 +228,17 @@ test('1.45 command_palette_filter_and_escape', async ({ page }) => {
 
 test('1.47 import_append_mode_adds_rows', async ({ page }) => {
   await page.goto(URL);
-  const textContent = await page.locator('body').textContent();
-  const initialCountMatch = textContent.match(/(\d+) txn/);
-  const initialCount = initialCountMatch ? parseInt(initialCountMatch[1]) : 0;
+  const stripCount = page.locator('.strip-tile', { has: page.locator('.strip-key', { hasText: 'Transactions' }) }).locator('.strip-val');
+  const initialCount = parseInt((await stripCount.textContent()).trim(), 10);
+  expect(Number.isNaN(initialCount)).toBe(false);
 
   await page.click('#import-csv-btn');
   await page.fill('textarea', 'date,payee,category,account,amount,status\n2025-01-01,Test Appended,Groceries,Checking,-10.00,cleared');
   await page.click('button:has-text("Append")');
+  await page.click('button:has-text("Commit")');
 
-  await expect(page.locator('text=' + (initialCount + 1) + ' txn').first()).toBeVisible();
+  await expect(stripCount).toHaveText(String(initialCount + 1));
+  await expect(page.locator('text=Test Appended').first()).toBeVisible();
 });
 
 
@@ -256,6 +267,7 @@ test('1.39 date_range_and_payee_search_narrow_list', async ({ page }) => {
   await page.waitForSelector('tbody tr');
   const initialRows = await page.locator('tbody tr').count();
 
+  // --- payee search half of the criterion ---
   await page.fill('#payee-search', 'NonExistentPayee123');
   await page.waitForTimeout(300);
   const filteredRows = await page.locator('tbody tr').count();
@@ -265,6 +277,50 @@ test('1.39 date_range_and_payee_search_narrow_list', async ({ page }) => {
   await page.waitForTimeout(300);
   const restoredRows = await page.locator('tbody tr').count();
   expect(restoredRows).toBe(initialRows);
+
+  // --- date-range half of the criterion: drive #date-start/#date-end for real ---
+  // Read every row's displayed date and derive the earliest one in ISO form
+  // (the app's own isoDate() convention) directly from the DOM, so the test
+  // narrows the range using dates that genuinely exist in the current data
+  // instead of a hardcoded date that could drift out of range.
+  const isoDates = await page.locator('tbody tr td[data-label="Date"]').evaluateAll((cells) =>
+    cells.map((c) => {
+      const d = new Date(c.textContent.trim());
+      const p = (n) => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+    })
+  );
+  const sorted = [...isoDates].sort();
+  const minIso = sorted[0];
+  const maxIso = sorted[sorted.length - 1];
+  const rowsOnMinDate = isoDates.filter((d) => d === minIso).length;
+
+  // Narrowing: an end date equal to the earliest row's date keeps only rows
+  // on that date and must be strictly fewer than the full set (there is more
+  // than one distinct date among the seed rows).
+  await page.fill('#date-end', minIso);
+  await page.waitForTimeout(300);
+  const endNarrowedRows = await page.locator('tbody tr').count();
+  expect(endNarrowedRows).toBe(rowsOnMinDate);
+  expect(endNarrowedRows).toBeLessThan(initialRows);
+
+  await page.fill('#date-end', '');
+  await page.waitForTimeout(300);
+  expect(await page.locator('tbody tr').count()).toBe(initialRows);
+
+  // A start date after the last real transaction date must exclude every row
+  // (proves the lower bound of the range is genuinely enforced, not ignored).
+  const afterMax = new Date(`${maxIso}T00:00:00`);
+  afterMax.setDate(afterMax.getDate() + 1);
+  const p2 = (n) => String(n).padStart(2, '0');
+  const startIso = `${afterMax.getFullYear()}-${p2(afterMax.getMonth() + 1)}-${p2(afterMax.getDate())}`;
+  await page.fill('#date-start', startIso);
+  await page.waitForTimeout(300);
+  expect(await page.locator('tbody tr').count()).toBe(0);
+
+  await page.fill('#date-start', '');
+  await page.waitForTimeout(300);
+  expect(await page.locator('tbody tr').count()).toBe(initialRows);
 });
 
 
@@ -348,28 +404,64 @@ test('1.4 expense_create_updates_kpi', async ({ page }) => {
 test('1.5 forms_have_explicit_labels', async ({ page }) => {
   await page.goto(URL);
   await page.click('#new-transaction-btn');
-  const fields = await page.locator('label, [aria-label], [aria-labelledby]').all();
-  expect(fields.length).toBeGreaterThan(0);
+  // Every named create/edit field must resolve a non-empty accessible name
+  // via a programmatic association (wrapping <label>, aria-label or
+  // aria-labelledby) — not just "some label exists somewhere on the page".
+  for (const name of ['date', 'payee', 'category', 'account', 'amount', 'status']) {
+    const field = page.locator(`[formControlName="${name}"]`);
+    const accessibleName = await field.evaluate((el) => {
+      const wrappingLabel = el.closest('label');
+      if (wrappingLabel) return wrappingLabel.innerText.trim();
+      const labelledBy = el.getAttribute('aria-labelledby');
+      if (labelledBy) return (document.getElementById(labelledBy)?.innerText ?? '').trim();
+      return (el.getAttribute('aria-label') ?? '').trim();
+    });
+    expect(accessibleName.length, `formControlName="${name}" has a programmatic label`).toBeGreaterThan(0);
+  }
+  await page.click('button:has-text("Cancel")');
+
+  // The burn-rate ceiling input, called out explicitly by the criterion.
+  const ceiling = page.locator('#ceiling-input');
+  const ceilingLabel = await ceiling.evaluate((el) => (el.closest('label')?.innerText ?? '').trim());
+  expect(ceilingLabel.length, 'burn-rate ceiling input has a programmatic label').toBeGreaterThan(0);
 });
 
 
 test('1.6 headings_follow_logical_order', async ({ page }) => {
   await page.goto(URL);
-  await expect(page.locator('h1')).toBeVisible();
-  await expect(page.locator('h2').first()).toBeVisible();
+  const levels = await page.locator('h1, h2, h3, h4, h5, h6').evaluateAll((els) =>
+    els.map((el) => Number(el.tagName[1]))
+  );
+  expect(levels[0], 'page starts with an h1').toBe(1);
+  for (let i = 1; i < levels.length; i++) {
+    expect(levels[i] - levels[i - 1], `heading level jump at index ${i}: ${levels[i - 1]} -> ${levels[i]}`).toBeLessThanOrEqual(1);
+  }
 });
 
 
 test('1.7 landmark_navigation_is_present', async ({ page }) => {
   await page.goto(URL);
-  await expect(page.locator('main')).toBeVisible();
-  await expect(page.locator('nav').first()).toBeVisible(); await expect(page.locator('aside').first()).toBeVisible();
+  // The sidebar's <nav> and the reports column's <main> must be distinct,
+  // independently-labelled landmarks (not just "a <nav> and a <main> exist
+  // somewhere"), so assistive tech can actually tell them apart.
+  const nav = page.locator('nav[aria-label]').first();
+  await expect(nav).toBeVisible();
+  const main = page.locator('main');
+  await expect(main).toBeVisible();
+  await expect(main.locator('[aria-label="Transactions"]')).toBeVisible();
+  const navLabel = await nav.getAttribute('aria-label');
+  expect(navLabel && navLabel.length).toBeTruthy();
 });
 
 
 test('1.9 semantic_html_roles_are_used', async ({ page }) => {
   await page.goto(URL);
-  await expect(page.locator('button').first()).toBeVisible();
+  // Overlays must expose role="dialog"; the sidebar must be a <nav>.
+  await expect(page.locator('nav').first()).toBeVisible();
+  await page.click('#new-transaction-btn');
+  const dialog = page.locator('[role="dialog"]');
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toHaveAttribute('aria-modal', 'true');
 });
 
 
@@ -712,18 +804,73 @@ test('7.6 stacking_reflows_logically', async ({ page }) => {
 
 test('1.1 controls_are_keyboard_accessible', async ({ page }) => {
   await page.goto(URL);
-  await page.keyboard.press('Tab');
-  await expect(page.locator('*:focus')).toBeVisible();
+
+  // Export report: keyboard focus + Enter opens the drawer; Escape closes it.
+  await page.locator('#export-report-btn').focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#drawer-title')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#drawer-title')).toBeHidden();
+
+  // Import CSV: keyboard focus + Enter opens the panel; Escape closes it.
+  await page.locator('#import-csv-btn').focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#import-title')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#import-title')).toBeHidden();
+
+  // Burn-rate ceiling input: keyboard-focusable and editable without a mouse.
+  await page.locator('#ceiling-input').focus();
+  await page.keyboard.press('End');
+  for (let i = 0; i < 8; i++) await page.keyboard.press('Backspace');
+  await page.keyboard.type('500');
+  await expect(page.locator('#ceiling-input')).toHaveValue('500');
+
+  // Command palette: Ctrl+K opens it and lands keyboard focus in its filter input.
+  await page.keyboard.press('Control+k');
+  await expect(page.locator('.overlay-card')).toBeVisible();
+  await expect(page.locator('.overlay-card input')).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.overlay-card')).toBeHidden();
 });
 
 test('1.3 images_and_icons_have_alt_text', async ({ page }) => {
   await page.goto(URL);
-  await expect(page.locator('img:not([alt])')).toHaveCount(0);
+  // The oracle uses PrimeIcon <i class="pi ..."> glyphs, never <img> tags, so
+  // an img[alt] check passes vacuously here. The real requirement is that any
+  // icon-only control (no adjacent visible text) exposes an accessible name.
+  const iconButtons = await page.locator('button:has(i.pi)').all();
+  let iconOnlyChecked = 0;
+  for (const btn of iconButtons) {
+    const info = await btn.evaluate((el) => {
+      const clone = el.cloneNode(true);
+      clone.querySelectorAll('i.pi, [aria-hidden="true"]').forEach((n) => n.remove());
+      return {
+        visibleText: clone.textContent.trim(),
+        accessibleName: (el.getAttribute('aria-label') || el.getAttribute('title') || '').trim(),
+      };
+    });
+    if (info.visibleText.length > 0) continue; // icon has an adjacent visible label; not icon-only
+    iconOnlyChecked++;
+    expect(info.accessibleName.length, 'icon-only control exposes an accessible name').toBeGreaterThan(0);
+  }
+  expect(iconOnlyChecked, 'at least one icon-only control was found and checked').toBeGreaterThan(0);
 });
 
 test('1.4 feedback_uses_live_regions', async ({ page }) => {
   await page.goto(URL);
-  await expect(page.locator('[aria-live]')).toHaveCount(1);
+  const toastRegion = page.locator('[role="status"][aria-live="polite"]');
+  await expect(toastRegion).toBeAttached();
+  await expect(toastRegion).toHaveText('');
+
+  // Creating a transaction must announce success through the live region,
+  // not only via the visible toast.
+  await page.click('#new-transaction-btn');
+  await page.fill('input[formControlName="payee"]', 'Live Region Test');
+  await page.fill('input[formControlName="amount"]', '-10.00');
+  await page.selectOption('select[formControlName="category"]', { label: 'Restaurants' });
+  await page.click('button:has-text("Create transaction")');
+  await expect(toastRegion).toContainText('Live Region Test');
 });
 
 // DROPPED (fails live oracle): '14.10 import_export_round_trip_restores_state'
@@ -731,8 +878,23 @@ test('1.4 feedback_uses_live_regions', async ({ page }) => {
 test('1.10 reduced_motion_is_respected', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(URL);
-  const animatedElements = await page.locator('.overlay-card, .toast').all();
-  for (const el of animatedElements) {
-    await expect(el).toHaveCSS('animation', /none/);
-  }
+
+  // Open a real overlay under reduced motion and confirm its entry animation
+  // duration actually collapses (the global @media rule forces 0.01ms), not
+  // just that some CSS elsewhere says "none" while nothing is on screen.
+  await page.click('#new-transaction-btn');
+  const dialog = page.locator('.overlay-card');
+  await expect(dialog).toBeVisible();
+  const dialogDurationMs = await dialog.evaluate((el) => parseFloat(getComputedStyle(el).animationDuration));
+  expect(dialogDurationMs, 'overlay entry animation collapses under reduced motion').toBeLessThanOrEqual(1);
+
+  // Trigger a toast (also animated) and check the same thing.
+  await page.fill('input[formControlName="payee"]', 'Reduced Motion Test');
+  await page.fill('input[formControlName="amount"]', '-10.00');
+  await page.selectOption('select[formControlName="category"]', { label: 'Restaurants' });
+  await page.click('button:has-text("Create transaction")');
+  const toast = page.locator('.toast-card');
+  await expect(toast).toBeVisible();
+  const toastDurationMs = await toast.evaluate((el) => parseFloat(getComputedStyle(el).animationDuration));
+  expect(toastDurationMs, 'toast entry animation collapses under reduced motion').toBeLessThanOrEqual(1);
 });
