@@ -1,0 +1,8 @@
+[judge]
+system_prompt_filename = "tests/system_prompt.md"
+agent_message_prompt_filename = "tests/agent_message.md"
+
+[[criterion]]
+id = "AC-04"
+description = "Perform canonical UI and WebMCP flows in clean sessions; visible geometry/order/profile/inventory/rehearsal, tool state, persistence, hashes, and all ten parsed artifacts agree with no console/page error, stale view, layout shift, or network dependency."
+weight = 1.0

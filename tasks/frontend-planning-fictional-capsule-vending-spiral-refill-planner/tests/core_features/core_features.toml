@@ -1,0 +1,8 @@
+[judge]
+system_prompt_filename = "tests/system_prompt.md"
+agent_message_prompt_filename = "tests/agent_message.md"
+
+[[criterion]]
+id = "AC-01"
+description = "Complete the canonical pointer insertion; one event seats CAP-17 at Track A bay 3, produces exact 8/5 counts, 8/8 coverage, zero mismatch, prefix 8, covered/target indigo counts 4/4, resolved ISSUE-04, conserved totals, updated queue hash, and selected capsule."
+weight = 1.0
