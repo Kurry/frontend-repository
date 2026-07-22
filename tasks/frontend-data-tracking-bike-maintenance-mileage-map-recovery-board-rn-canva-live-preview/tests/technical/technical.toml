@@ -1,0 +1,10 @@
+[judge]
+node_version = "20"
+browser = "chromium"
+
+
+[[criterion]]
+id = "AC-04"
+title = "schema_contract"
+description = "The tool result and artifact contain the declared API-shaped fields."
+weight = 1.0

@@ -1,0 +1,10 @@
+[judge]
+node_version = "20"
+browser = "chromium"
+
+
+[[criterion]]
+id = "AC-02"
+title = "visual_hierarchy"
+description = "The visual hierarchy makes current state and next action clear."
+weight = 1.0
