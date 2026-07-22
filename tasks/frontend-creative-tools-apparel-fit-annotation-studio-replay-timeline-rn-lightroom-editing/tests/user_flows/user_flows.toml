@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-05"
+name = "complete_user_flow"
+description = "The end-to-end job is recoverable without reload."
+type = "binary"
+weight = 1.0

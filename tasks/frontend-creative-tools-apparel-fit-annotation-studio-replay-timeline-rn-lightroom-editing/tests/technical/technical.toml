@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-04"
+name = "schema_contract"
+description = "The tool result and artifact contain the declared API-shaped fields."
+type = "binary"
+weight = 1.0

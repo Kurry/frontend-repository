@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-07"
+name = "mobile_mode"
+description = "The desktop surface becomes a usable stack/drawer/stepper without horizontal overflow."
+type = "binary"
+weight = 1.0
