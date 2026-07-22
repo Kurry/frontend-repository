@@ -1,0 +1,9 @@
+{
+  "exports": [
+    { "type": "instruction", "path": "instruction.md", "status": "ready" },
+    { "type": "feature-status", "path": "solution/app/instructions/hardening/feature-status.md", "status": "ready" },
+    { "type": "design-status", "path": "solution/app/instructions/hardening/design-status.md", "status": "ready" },
+    { "type": "evidence-video", "path": "hardening-delivery/vp9/evidence.webm", "status": "pending" },
+    { "type": "evidence-image", "path": "hardening-delivery/vp9/screenshot.png", "status": "pending" }
+  ]
+}
