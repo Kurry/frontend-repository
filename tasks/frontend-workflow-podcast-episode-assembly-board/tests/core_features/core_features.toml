@@ -1,0 +1,226 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "navigate",
+  "click",
+  "fill",
+  "select",
+  "press",
+  "hover",
+  "evaluate",
+  "screenshot",
+  "get_url",
+  "get_html",
+  "get_text",
+  "wait_for_timeout",
+  "wait_for_selector",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level.
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[[criterion]]
+id = "1.1"
+name = "cf_1"
+description = "The app provides a Source Bin listing 24 deterministic source clips with duration, speaker/type, transcript snippet, rights state, and immutable media hash."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "cf_2"
+description = "Users create timeline clip instances from source in/out ranges by dragging or clicking Insert, without mutating source media state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "cf_3"
+description = "Selecting a timeline instance highlights exact transcript tokens, rights record, source waveform, and other instances of the same source."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "cf_4"
+description = "The board has dialogue, music, ambient, and marker lanes supporting drag, trim, split, ripple move, nonripple move, gap close, mute, fade, and crossfade."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "cf_5"
+description = "Timeline operations use integer milliseconds and snap to transcript token boundaries, 10-ms increments, or chapter markers."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "cf_6"
+description = "Dialogue overlaps require declared cross-talk lanes, and fades/crossfades obey clip bounds."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "cf_7"
+description = "Keyboard and mobile numeric operations equal pointer gestures for inserting, moving, trimming, splitting, and rippling clips."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "cf_8"
+description = "Active dialogue instances derive transcript tokens inside source ranges."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "cf_9"
+description = "Editors can mark tokens as included/excluded, correct fixture errors with provenance, and bind exact spans to show-note claims/quotes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "cf_10"
+description = "Ripple edits shift episode times without changing source times, and orphaned citations block approval."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "cf_11"
+description = "A narrative outline supports cold open, introduction, three chapters, transition, and credits blocks with title, role, time range, required speakers/topics, and show-note summary."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "cf_12"
+description = "Reordering blocks moves their clip groups under explicit ripple preview. Chapters cannot overlap and must cover the approved timeline."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "cf_13"
+description = "Clip gain and lane automation points produce deterministic sampled loudness/peak fixture values via linear interpolation, and curves drag on time/value axes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "cf_14"
+description = "A validator checks dialogue target band, jump thresholds, clipping, music-under-dialogue ducking, and fade continuity."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "cf_15"
+description = "Every included source requires allowed usage, territory fixture, attribution text, and expiry after publish date."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "cf_16"
+description = "Transcript/citation, editorial, rights, accessibility, and master approvals freeze exact cut checksums; any material edit marks affected approvals stale."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "cf_17"
+description = "Users can fork cuts to compare clip membership/order/ranges, transcript, chapters, mix, duration, rights, and notes, then merge property/time-range conflicts."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "cf_18"
+description = "The first batch deterministically fails transcript timestamp and RSS enclosure checks; a retry failed-only preserves successful outputs and attempts."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "cf_19"
+description = "Export produces Canonical JSON schemaVersion podcast-episode-package/v1, CSV EDL/transcript ledger, WebVTT transcript, RSS XML item, Markdown show notes/credits, and SVG timeline/loudness report."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "cf_20"
+description = "Import reconstructs state exactly and rejects invalid artifacts. Canonical re-export changes only exportedAt while CSV/VTT/RSS/Markdown/SVG remain byte-identical."
+type = "binary"
+weight = 1.0

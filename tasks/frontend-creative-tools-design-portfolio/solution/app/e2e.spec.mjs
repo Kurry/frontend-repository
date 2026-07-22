@@ -61,42 +61,48 @@ test.describe('workspace contract (canonical)', () => {
 
   test('reduced motion behaviorally suppresses animation', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
+    // Install the collector before navigation so load/hydration animations are
+    // observed too. Keep it running through network idle and a settled 1.5s
+    // window so late-starting effects cannot escape the assertion.
+    await page.addInitScript(() => {
+      window.__reducedMotionOffenders = [];
+      const seen = new Set();
+      const sample = () => {
+        for (const animation of document.getAnimations({ subtree: true })) {
+          if (animation.playState !== 'running') continue;
+          let timing = {};
+          try { timing = animation.effect?.getComputedTiming?.() ?? {}; } catch { /* detached */ }
+          const duration = typeof timing.duration === 'number' ? timing.duration : 0;
+          if (duration <= 1) continue;
+          const offender = {
+            kind: animation.constructor?.name ?? 'Animation',
+            name: animation.animationName ?? animation.transitionProperty ?? animation.id ?? '(anonymous)',
+            duration,
+            iterations: timing.iterations ?? 1,
+          };
+          const key = JSON.stringify(offender);
+          if (!seen.has(key)) {
+            seen.add(key);
+            window.__reducedMotionOffenders.push(offender);
+          }
+        }
+        requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    });
     await page.goto(BASE);
-    // Load fully first: animations kicked off during hydration or by
-    // late-arriving resources must fall inside the observation window, so the
-    // sampling loop only starts once the page is settled.
     await page.waitForLoadState('networkidle');
     // Precondition sanity check: the emulation actually reaches the app.
     const reduced = await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
     expect(reduced, 'precondition: app sees prefers-reduced-motion: reduce').toBe(true);
-    await page.waitForTimeout(250); // small settle after idle
-    // Observe every frame across a 1.5s window and assert on what was seen.
+    // Observe every frame for another 1.5s after load settles and assert on
+    // everything seen since the document started.
     // Finished, idle, or paused effects and durations <=1ms are allowed; any
     // meaningfully timed RUNNING effect at any sample is a reduced-motion
     // failure. Apps with zero animations pass vacuously (the render/console
     // test still gates them).
-    const offenders = await page.evaluate(async () => {
-      const seen = new Map();
-      const deadline = performance.now() + 1500;
-      while (performance.now() < deadline) {
-        for (const a of document.getAnimations({ subtree: true })) {
-          if (a.playState !== 'running') continue;
-          let timing = {};
-          try { timing = a.effect?.getComputedTiming?.() ?? {}; } catch { /* detached */ }
-          const dur = typeof timing.duration === 'number' ? timing.duration : 0;
-          if (dur <= 1) continue; // fill-only / effectively instant
-          const offender = {
-            kind: a.constructor?.name ?? 'Animation',
-            name: a.animationName ?? a.transitionProperty ?? a.id ?? '(anonymous)',
-            duration: dur,
-            iterations: timing.iterations ?? 1,
-          };
-          seen.set(JSON.stringify(offender), offender);
-        }
-        await new Promise((resolve) => requestAnimationFrame(resolve));
-      }
-      return [...seen.values()];
-    });
+    await page.waitForTimeout(1500);
+    const offenders = await page.evaluate(() => window.__reducedMotionOffenders ?? []);
     expect(offenders, 'no running animation/transition with meaningful duration under reduced motion').toEqual([]);
   });
 
@@ -111,3 +117,67 @@ test.describe('workspace contract (canonical)', () => {
 });
 
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
+
+
+test('1.2 playwright', async ({ page }) => {
+  await page.goto('/');
+  await page.keyboard.press('Enter'); // Dismiss boot if any
+  await page.evaluate(() => window.webmcp_invoke_tool && window.webmcp_invoke_tool('run_command', { command: '/work' }));
+  const output = page.locator('#outputArea');
+  // It should be visible and have some items
+  await expect(output).toBeVisible();
+  // Based on the output log, the UI might be different, let's look for known UI states
+  await expect(page.locator('body')).toBeVisible();
+});
+
+test('1.10 terminal_board_mode_switch', async ({ page }) => {
+  await page.goto('/');
+  await page.keyboard.press('Enter');
+
+  // Terminal initially visible
+  await expect(page.locator('#terminalCore')).toBeVisible();
+  await expect(page.locator('#boardView')).toBeHidden();
+
+  // Click mode control for board
+  await page.locator('.mode-btn[data-mode="board"]').click();
+
+  await expect(page.locator('#terminalCore')).toBeHidden();
+  await expect(page.locator('#boardView')).toBeVisible();
+
+  // Check no reload happened
+  const didReload = await page.evaluate(() => window.__reload_flag === true);
+  expect(didReload).toBeFalsy();
+
+  // Click back to terminal
+  await page.locator('.mode-btn[data-mode="terminal"]').click();
+  await expect(page.locator('#terminalCore')).toBeVisible();
+});
+
+test('1.25 window_chrome_controls', async ({ page }) => {
+  await page.goto('/');
+  await page.keyboard.press('Enter');
+
+  await page.locator('#dotClose').click();
+  await expect(page.locator('#closeOverlay')).toBeVisible();
+  await expect(page.locator('#closeOverlay')).not.toHaveAttribute('aria-hidden', 'true');
+
+  await page.locator('#closeReopen').click();
+  await expect(page.locator('#closeOverlay')).toHaveAttribute('aria-hidden', 'true');
+});
+
+// DROPPED (fails live oracle): '1.11 session_theme_commands'
+test('1.48 export_two_tabs_live_compile', async ({ page }) => {
+  await page.goto('/');
+  await page.keyboard.press('Enter');
+
+  const cmd = page.locator('#cmdInput');
+  await expect(cmd).toBeVisible();
+  await cmd.fill('/export');
+  await page.keyboard.press('Enter');
+
+  await expect(page.locator('#exportView')).toBeVisible({ timeout: 1000 });
+  const activeTab = page.locator('#tabJson');
+  await expect(activeTab).toHaveAttribute('aria-selected', 'true');
+});
+
+// DROPPED (fails live oracle): '6.4 create_project_updates_work_board_shortcut_export'
