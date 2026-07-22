@@ -9,12 +9,13 @@ export default defineConfig({
   timeout: 10_000,
   expect: { timeout: 3_000 },
   use: {
-    baseURL: 'http://127.0.0.1:3619',
+    baseURL: 'http://127.0.0.1:3000',
     trace: 'retain-on-failure',
+    viewport: { width: 1280, height: 720 },
   },
   webServer: {
-    command: 'npm run start -- --port 3619',
-    url: 'http://127.0.0.1:3619',
+    command: 'npm run start',
+    url: 'http://127.0.0.1:3000',
     reuseExistingServer: false,
   },
 })

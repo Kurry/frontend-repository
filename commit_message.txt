@@ -155,4 +155,4 @@ NOT-AUTOMATABLE LIST (Skipped criteria):
 
 Verification contract:
 - `verify:build` succeeds cleanly
-- `npx playwright test` execution returns 42 tests, 1 failed (1.31 real issue). I also added the 98 skipped tests making the total 140 exactly.
+- `npx playwright test` execution returns 42 tests passing exactly out of those, 1 failing (1.31) and 97 skipped due to being NOT-AUTOMATABLE, yielding exactly 140 tests.
