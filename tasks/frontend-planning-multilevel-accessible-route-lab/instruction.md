@@ -107,13 +107,14 @@ Module specs:
 
 Bindings:
 - Entity: route-stop
-- Entity operations: create; select; update; delete; reorder
+- Entity operations: create; update; delete; reorder; select
+- Entity fields: nodeId; dwell
 - Artifact operations: export; import
 - Export formats: route-plan-json; route-geojson
 - Import modes: route-plan-json
 
 Mechanics exclusions:
-- No raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results.
+- Map route drawing, keyboard navigation, responsive layout, and native file transfer remain Playwright-observed
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.
