@@ -513,5 +513,10 @@
     "source": "feature-workflow-builder-workflow-builder PRD",
     "instruction": "tasks/frontend-workflow-workflow-builder/instruction.md",
     "description": "Node-graph workflow builder with durable executions and timelines."
+  },
+  "frontend-creative-tools-session-compression-loom": {
+    "source": "mercor-trajectory and agenttrace",
+    "instruction": "tasks/frontend-creative-tools-session-compression-loom/instruction.md",
+    "description": "Session Compression Loom tool."
   }
 }
