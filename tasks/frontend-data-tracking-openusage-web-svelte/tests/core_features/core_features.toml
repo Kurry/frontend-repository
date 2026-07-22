@@ -1,0 +1,82 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "cf-ac01-01"
+name = "Providers display their status and resources after refresh"
+description = "Clicking Start Refresh transitions provider cards through updating states and finally shows their normalized limits or error states."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf-ac01-02"
+name = "Pin up to two resources to focus strip"
+description = "Hovering a resource shows a pin icon; clicking it adds the resource to the Focus Strip up to a maximum of two."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf-ac01-03"
+name = "Export workspace functionality works and omits credentials"
+description = "Clicking export downloads a JSON file matching the specified schema format and excludes ephemeral credentials."
+type = "binary"
+weight = 1.0

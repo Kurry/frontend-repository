@@ -1,0 +1,4 @@
+[task]
+name = "mercor-intelligence/frontend-data-tracking-openusage-web-svelte"
+description = "OpenUsage Web Console — Svelte 5 runes client-side framework rebuild."
+authors = [{ name = "Jules", email = "jules@example.com" }]
