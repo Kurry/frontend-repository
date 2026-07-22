@@ -155,3 +155,10 @@ description = "The app exhibits a significant, browser-observable defect in beha
 type = "binary"
 negate = true
 weight = 1.0
+
+[[criterion]]
+id = "AC-13"
+name = "Artifact round trip."
+description = "Export, clear, import, and inspect the edited variant record and derived state; verify authored order/selection/geometry and domain state survive, and invalid imports are a no-op."
+type = "binary"
+weight = 1.0

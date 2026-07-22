@@ -217,3 +217,10 @@ description = "The app exhibits a significant, browser-observable defect in resp
 type = "binary"
 negate = true
 weight = 1.0
+
+[[criterion]]
+id = "AC-07"
+name = "Mobile mode preserves usability."
+description = "Use the signature interaction at a narrow viewport; verify the desktop surface becomes a usable stack/drawer/stepper without horizontal overflow."
+type = "binary"
+weight = 1.0
