@@ -114,20 +114,20 @@
     "instruction": "tasks/frontend-creative-tools-schema-builder/instruction.md",
     "description": "Output schema builder with tree editor, playground, and versions."
   },
-  "frontend-creative-tools-session-compression-loom": {
-    "source": "Session Compression Loom",
-    "instruction": "tasks/frontend-creative-tools-session-compression-loom/instruction.md",
-    "description": "Session compression editor with capsule summaries, preview, and artifact export."
-  },
-  "frontend-creative-tools-session-compression-loom": {
-    "source": "Session Compression Loom",
-    "instruction": "tasks/frontend-creative-tools-session-compression-loom/instruction.md",
-    "description": "Session compression editor with capsule summaries, preview, and artifact export."
+  "frontend-creative-tools-stack-trace-path-finder": {
+    "source": "Stack-Trace Path Finder",
+    "instruction": "tasks/frontend-creative-tools-stack-trace-path-finder/instruction.md",
+    "description": "Stack-trace hypothesis workspace for frames, causal paths, and saved investigations."
   },
   "frontend-creative-tools-shapeshift-grid": {
     "source": "Shapeshift",
     "instruction": "Shapeshift/instruction.md",
     "description": "SHAPESHIFT QR color grid painter good-app eval."
+  },
+  "frontend-creative-tools-stack-trace-path-finder": {
+    "source": "Stack-trace path finder task PRD",
+    "instruction": "tasks/frontend-creative-tools-stack-trace-path-finder/instruction.md",
+    "description": "Interactive stack-trace cartographer with frame mapping, path hypotheses, and portable session artifacts."
   },
   "frontend-creative-tools-story-docs": {
     "source": "StoryDocs",

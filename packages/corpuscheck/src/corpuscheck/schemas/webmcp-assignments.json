@@ -1769,6 +1769,31 @@
       ]
     },
     {
+      "task": "frontend-creative-tools-stack-trace-path-finder",
+      "modules": [
+        "structured-editor-v1",
+        "entity-collection-v1",
+        "artifact-transfer-v1"
+      ],
+      "bindings": {
+        "editor_object_types": ["frame", "candidate", "node"],
+        "editor_operations": ["select", "update_property", "set_content", "preview"],
+        "editor_properties": ["weight", "pinned-node", "collapsed"],
+        "editor_modes": ["normal", "edit"],
+        "entity": "hypothesis",
+        "entity_operations": ["create", "select", "delete"],
+        "entity_fields": ["name", "frame-count", "path-status"],
+        "artifact_operations": ["export", "import", "copy"],
+        "export_formats": ["stack-path-hypothesis-json"],
+        "import_modes": ["stack-path-hypothesis-json"],
+        "visible_postconditions": ["selected-frame", "mapped-node", "path-validity", "saved-hypothesis"]
+      },
+      "mechanics_exclusions": [
+        "Frame reordering and candidate drag mapping stay Playwright-driven when gesture mechanics matter",
+        "Raw file paths, blobs, clipboard contents, and downloaded artifact bytes stay Playwright-observed"
+      ]
+    },
+    {
       "task": "frontend-creative-tools-story-docs",
       "modules": [
         "browse-query-v1",
