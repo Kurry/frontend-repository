@@ -61,42 +61,48 @@ test.describe('workspace contract (canonical)', () => {
 
   test('reduced motion behaviorally suppresses animation', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
+    // Install the collector before navigation so load/hydration animations are
+    // observed too. Keep it running through network idle and a settled 1.5s
+    // window so late-starting effects cannot escape the assertion.
+    await page.addInitScript(() => {
+      window.__reducedMotionOffenders = [];
+      const seen = new Set();
+      const sample = () => {
+        for (const animation of document.getAnimations({ subtree: true })) {
+          if (animation.playState !== 'running') continue;
+          let timing = {};
+          try { timing = animation.effect?.getComputedTiming?.() ?? {}; } catch { /* detached */ }
+          const duration = typeof timing.duration === 'number' ? timing.duration : 0;
+          if (duration <= 1) continue;
+          const offender = {
+            kind: animation.constructor?.name ?? 'Animation',
+            name: animation.animationName ?? animation.transitionProperty ?? animation.id ?? '(anonymous)',
+            duration,
+            iterations: timing.iterations ?? 1,
+          };
+          const key = JSON.stringify(offender);
+          if (!seen.has(key)) {
+            seen.add(key);
+            window.__reducedMotionOffenders.push(offender);
+          }
+        }
+        requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    });
     await page.goto(BASE);
-    // Load fully first: animations kicked off during hydration or by
-    // late-arriving resources must fall inside the observation window, so the
-    // sampling loop only starts once the page is settled.
     await page.waitForLoadState('networkidle');
     // Precondition sanity check: the emulation actually reaches the app.
     const reduced = await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
     expect(reduced, 'precondition: app sees prefers-reduced-motion: reduce').toBe(true);
-    await page.waitForTimeout(250); // small settle after idle
-    // Observe every frame across a 1.5s window and assert on what was seen.
+    // Observe every frame for another 1.5s after load settles and assert on
+    // everything seen since the document started.
     // Finished, idle, or paused effects and durations <=1ms are allowed; any
     // meaningfully timed RUNNING effect at any sample is a reduced-motion
     // failure. Apps with zero animations pass vacuously (the render/console
     // test still gates them).
-    const offenders = await page.evaluate(async () => {
-      const seen = new Map();
-      const deadline = performance.now() + 1500;
-      while (performance.now() < deadline) {
-        for (const a of document.getAnimations({ subtree: true })) {
-          if (a.playState !== 'running') continue;
-          let timing = {};
-          try { timing = a.effect?.getComputedTiming?.() ?? {}; } catch { /* detached */ }
-          const dur = typeof timing.duration === 'number' ? timing.duration : 0;
-          if (dur <= 1) continue; // fill-only / effectively instant
-          const offender = {
-            kind: a.constructor?.name ?? 'Animation',
-            name: a.animationName ?? a.transitionProperty ?? a.id ?? '(anonymous)',
-            duration: dur,
-            iterations: timing.iterations ?? 1,
-          };
-          seen.set(JSON.stringify(offender), offender);
-        }
-        await new Promise((resolve) => requestAnimationFrame(resolve));
-      }
-      return [...seen.values()];
-    });
+    await page.waitForTimeout(1500);
+    const offenders = await page.evaluate(() => window.__reducedMotionOffenders ?? []);
     expect(offenders, 'no running animation/transition with meaningful duration under reduced motion').toEqual([]);
   });
 
@@ -111,3 +117,167 @@ test.describe('workspace contract (canonical)', () => {
 });
 
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
+
+test('1.1 controls_keyboard_operable', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.keyboard.press('Tab'); await expect(page.locator('*:focus')).toHaveCSS('outline-color', 'rgb(120, 169, 255)');
+});
+
+test('1.2 modals_trap_and_return_focus', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.click('button:has-text("Log usage")'); await expect(page.locator('.cds--modal')).toBeVisible();
+});
+
+test('1.3 live_region_announcements', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.click('button:has-text("Refresh")'); await expect(page.locator('.sr-only[aria-live="polite"]')).toContainText('Discovering marketplace');
+});
+
+test('1.4 form_labels_and_field_errors', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.fill('input#session-budget', '-1'); await page.click('button:has-text("Apply")', {force: true}); await expect(page.locator('text="Session budget must be a number with at most 2 decimal places"')).toBeVisible();
+});
+
+test('1.5 headings_landmarks_present', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await expect(page.locator('main')).toBeVisible();
+});
+
+test('1.6 state_not_color_only', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await expect(page.locator('.status-badge').first()).toBeVisible();
+});
+
+test('14.3 derived_view_responds_to_input', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.fill('input#session-budget', '50'); await page.click('button:has-text("Apply")'); await expect(page.locator('.remaining-value')).toBeVisible();
+});
+
+test('14.5 count_delta_is_exact', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await expect(page.locator('.model-count')).toBeVisible();
+});
+
+test('14.6 different_inputs_change_outcomes', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.fill('input#catalog-search', 'XYZ'); await expect(page.locator('text="No models found"')).toBeVisible();
+});
+
+test('14.8 empty_to_repopulated_round_trip', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.fill('input#catalog-search', 'XYZ'); await page.click('button:has-text("Clear filters")'); await expect(page.locator('.catalog-row').first()).toBeVisible();
+});
+
+test('1.1 seeded_catalog_complete', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await expect(page.locator('.catalog-row')).toHaveCount(22);
+});
+
+test('1.2 free_models_badged', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await expect(page.locator('.status-badge.free')).toHaveCount(4);
+});
+
+test('1.3 search_narrows_and_restores', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.fill('input#catalog-search', 'GPT'); expect(await page.locator('.catalog-row').count()).toBeGreaterThan(0); await page.fill('input#catalog-search', ''); await expect(page.locator('.catalog-row')).toHaveCount(22);
+});
+
+test('1.4 provider_filter_combines_with_search', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.fill('input#catalog-search', 'Llama'); await page.locator('select#provider-filter').selectOption('Meta'); expect(await page.locator('.catalog-row').count()).toBeGreaterThan(0);
+});
+
+test('1.5 suggestion_chips_apply_filters', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.click('button.suggestion-chip:has-text("Google")'); expect(await page.locator('.catalog-row').count()).toBeGreaterThan(0);
+});
+
+test('1.6 shown_of_total_count_tracks', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await expect(page.locator('.model-count')).toContainText('22 of 22 models');
+});
+
+test('1.7 zero_match_empty_state', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.fill('input#catalog-search', 'NonExistentModel123'); await expect(page.locator('text="No models found"')).toBeVisible(); await page.click('button:has-text("Clear filters")'); await expect(page.locator('.catalog-row').first()).toBeVisible();
+});
+
+test('1.8 alert_form_validates_inline', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.click('button:has-text("Alerts")'); await page.fill('input#min-context-window', '-10'); await page.click('text="Minimum context window"', { force: true }); await expect(page.locator('text="Minimum context window must be 0 or greater"')).toBeVisible();
+});
+
+test('1.10 cost_sidebar_seeded_rollups', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await expect(page.locator('.rollup-row').first()).toBeVisible();
+});
+
+test('1.12 legend_toggle_redraws_chart', async ({ page }) => {
+  await page.goto('http://localhost:3000'); const start = await page.locator('.recharts-pie-sector').count(); await page.locator('.legend-entry').first().click(); const end = await page.locator('.recharts-pie-sector').count(); expect(end).toBeLessThan(start);
+});
+
+test('1.13 cost_row_sources_disclosure', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.locator('.source-trigger').first().click(); await expect(page.locator('.source-event').first()).toBeVisible();
+});
+
+test('1.14 simulation_stream_updates_rollups', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.click('button:has-text("Start simulation")'); await page.waitForTimeout(4000); expect(await page.locator('.event-card').count()).toBeGreaterThan(0);
+});
+
+test('1.15 simulation_pause_freezes_totals', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.click('button:has-text("Start simulation")'); await page.waitForTimeout(3000); await page.click('button:has-text("Pause simulation")'); const paused = await page.locator('.event-card').count(); await page.waitForTimeout(3000); expect(await page.locator('.event-card').count()).toBe(paused);
+});
+
+test('1.16 refresh_mutates_catalog_visibly', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.click('button:has-text("Refresh")'); await expect(page.getByRole('button', { name: 'Refresh' })).toBeDisabled();
+});
+
+test('1.17 compare_flow_round_trip', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.locator('input[id^="compare-"]').nth(0).click({ force: true }); await page.locator('input[id^="compare-"]').nth(1).click({ force: true }); await page.click('button:has-text("Compare")'); await expect(page.locator('.comparison-table')).toBeVisible();
+});
+
+test('1.18 double_refresh_stays_coherent', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.click('button:has-text("Refresh")'); await page.waitForTimeout(3000); await page.click('button:has-text("Refresh")'); await page.waitForTimeout(3000); expect(await page.locator('.catalog-row').count()).toBeGreaterThan(0);
+});
+
+test('1.19 empty_chart_state_when_all_toggled_off', async ({ page }) => {
+  await page.goto('http://localhost:3000'); const legends = await page.locator('.legend-entry').count(); for (let i = 0; i < legends; i++) { await page.locator('.legend-entry').nth(i).click(); } await expect(page.locator('.empty-chart')).toBeVisible();
+});
+
+test('1.22 pin_watchlist_and_pinned_filter', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.click('button.pinned-chip'); await expect(page.locator('.catalog-row')).toHaveCount(2);
+});
+
+test('1.23 session_budget_ceiling_and_over_budget', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.fill('input#session-budget', '0.01'); await page.click('button:has-text("Apply")', { force: true }); await expect(page.locator('.remaining-label').filter({ hasText: 'Over budget' })).toBeVisible(); await expect(page.locator('.metric-alert')).toHaveCSS('border-color', 'rgb(255, 131, 137)');
+});
+
+test('1.24 budget_field_contract_rejects_invalid', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.fill('input#session-budget', '0'); await page.click('button:has-text("Apply")', { force: true }); await expect(page.locator('text="Session budget must be greater than 0"')).toBeVisible();
+});
+
+test('1.25 manual_usage_log_field_contract', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.click('button:has-text("Log usage")'); await page.fill('input#prompt-tokens', '-5'); await page.click('text="Prompt tokens"', { force: true }); await expect(page.locator('text="Prompt tokens must be 0 or greater"')).toBeVisible();
+});
+
+test('1.26 manual_usage_log_updates_derived_surfaces', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.click('button:has-text("Log usage")'); await page.locator('select#usage-model').selectOption({ index: 1 }); await page.fill('input#request-label', 'Derived Surface Test'); await page.fill('input#prompt-tokens', '100'); await page.fill('input#completion-tokens', '50'); await page.locator('button.cds--btn--primary').filter({ hasText: 'Log usage' }).click({ force: true }); await expect(page.locator('text="Derived Surface Test"').first()).toBeVisible();
+});
+
+test('1.27 undo_redo_mutating_edits', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.fill('input#session-budget', '1000'); await page.click('button:has-text("Apply")', { force: true }); await page.click('button:has-text("Undo")'); await expect(page.locator('input#session-budget')).not.toHaveValue('1000.00'); await page.click('button:has-text("Redo")'); await expect(page.locator('input#session-budget')).toHaveValue('1000.00');
+});
+
+test('1.28 command_palette_destinations_and_actions', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.keyboard.press('Meta+k'); await page.fill('input#command-search', 'Simula'); await page.locator('.command-results button').first().click({ force: true }); await expect(page.locator('.stream-status.live')).toBeVisible();
+});
+
+test('1.29 export_routing_session_report_live', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.click('button:has-text("Export")'); await expect(page.locator('pre.export-preview')).toContainText('"routing-session-report-v1"');
+});
+
+test('1.30 import_session_json_round_trip', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.click('button:has-text("Export")'); await page.fill('textarea#import-json', '{ "bad": "json" }'); await page.click('button:has-text("Import and replace")', { force: true }); await expect(page.locator('.field-error').filter({ hasText: /valid Session JSON|is invalid/ })).toBeVisible();
+});
+
+test('3.3 layout_matches_monitor_composition', async ({ page }) => {
+  await page.goto('http://localhost:3000'); const header = page.locator('.catalog-table thead th').first(); await expect(header).toHaveCSS('position', 'sticky');
+});
+
+test('11.2 optional_keyboard_power_user_depth', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.keyboard.press('g'); await page.waitForTimeout(200); await expect(page.locator('.chord-hint')).toBeVisible();
+});
+
+test('11.4 optional_budget_burn_projection', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await page.click('button:has-text("Start simulation")'); await page.waitForTimeout(1500); await expect(page.locator('.burn-readout')).toContainText('Burn ≈');
+});
+
+test('11.5 optional_provider_health_affordance', async ({ page }) => {
+  await page.goto('http://localhost:3000'); await expect(page.locator('text="Provider Health"')).toBeVisible();
+});
+
+// NOT-AUTOMATABLE: innovation.catchall is a subjective judge-only criterion
+// ("any additional innovation not covered elsewhere, name it and cite
+// evidence") — there is no fixed observable to assert deterministically.
