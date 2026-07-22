@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "vite --port 3000 --strictPort",
+    "start": "vite --host 0.0.0.0 --port 3000 --strictPort",
     "verify:build": "vite build",
     "preview": "vite preview",
     "test:e2e": "playwright test e2e.spec.mjs",
