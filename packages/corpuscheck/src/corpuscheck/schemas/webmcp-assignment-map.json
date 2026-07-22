@@ -6992,6 +6992,27 @@
     ]
   },
   {
+    "task": "frontend-workflow-podcast-episode-assembly-board",
+    "modules": ["entity-collection-v1", "structured-editor-v1", "command-session-v1", "artifact-transfer-v1"],
+    "bindings": {
+      "entity": "source-clip-and-timeline-instance",
+      "entity_operations": ["create", "select", "update", "delete", "reorder", "toggle"],
+      "entity_fields": ["source-range", "lane", "episode-time", "transcript-inclusion", "citation", "rights-state", "approval-state"],
+      "editor_object_types": ["timeline-instance", "transcript-token", "citation", "narrative-block", "automation-point", "branch-cut"],
+      "editor_operations": ["select", "add", "delete", "update_property", "switch_mode", "preview"],
+      "editor_properties": ["source-in", "source-out", "start-ms", "duration-ms", "lane", "gain", "fade", "included", "title", "summary", "approval"],
+      "editor_modes": ["sources", "timeline", "transcript", "chapters", "mix", "rights", "branches", "render"],
+      "session_operations": ["start", "pause", "resume", "stop", "restart", "advance"],
+      "demos": ["validation-run", "render-run", "retry-failed-render"],
+      "artifact_operations": ["export", "import", "copy"],
+      "export_formats": ["canonical-json", "edl-csv", "transcript-csv", "webvtt", "rss-xml", "show-notes-markdown", "timeline-svg"],
+      "import_modes": ["canonical-json"],
+      "value_bounds": ["timeline time and source ranges are non-negative integer milliseconds and remain within source bounds", "chapters do not overlap and cover the approved timeline under declared intro and credit rules", "rights require allowed usage, territory, attribution, and expiry after publish date", "PodcastEpisodePackage schemaVersion is exactly podcast-episode-package/v1"],
+      "visible_postconditions": ["inserting a source range creates a timeline instance without changing the source clip and selecting it highlights bound transcript, rights, waveform, and sibling instances", "timeline and transcript edits update episode timing while preserving source timing and immediately refresh validation findings and stale approval indicators", "reordering narrative blocks shows a ripple preview and moves the corresponding clip groups when confirmed", "a material edit after approval marks the affected checksum-bound approvals stale", "the first render run fails transcript timestamp and RSS enclosure outputs while preserving successful outputs; retry-failed completes only those failed outputs", "canonical JSON import reconstructs the visible cut and invalid import names offending fields without changing state", "re-export changes only exportedAt in canonical JSON while CSV, VTT, RSS, Markdown, and SVG remain byte-identical"]
+    },
+    "mechanics_exclusions": ["Timeline drag, trim, split, ripple/nonripple movement, gap close, fades, crossfades, and automation-curve dragging are gesture mechanics graded through Playwright; equivalent state mutations use bound editor operations", "Keyboard shortcuts, mobile numeric editing, lane hover states, responsive layout, focus indicators, dialogs, and visual transitions remain Playwright-driven", "Waveform, loudness, peak, clipping, ducking, and fade-continuity visuals are observed through Playwright; validation session state uses command-session bindings", "File downloads, native file-picker interaction, and clipboard contents remain Playwright responsibilities"]
+  },
+  {
     "task": "frontend-workflow-quality-audit-desk",
     "modules": [
       "browse-query-v1",

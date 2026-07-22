@@ -469,6 +469,11 @@
     "instruction": "tasks/frontend-workflow-live-task-factory/instruction.md",
     "description": "Live PR-to-task factory console with real GitHub/AI integration."
   },
+  "frontend-workflow-podcast-episode-assembly-board": {
+    "source": "podcast episode assembly workflow concept",
+    "instruction": "tasks/frontend-workflow-podcast-episode-assembly-board/instruction.md",
+    "description": "Podcast assembly board with source provenance, multitrack editing, approvals, branch cuts, and interoperable episode artifacts."
+  },
   "frontend-workflow-quality-audit-desk": {
     "source": "codebase-atlas quality audit (debranded)",
     "instruction": "tasks/frontend-workflow-quality-audit-desk/instruction.md",
