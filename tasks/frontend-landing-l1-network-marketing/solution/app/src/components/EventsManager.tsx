@@ -61,11 +61,10 @@ export default function EventsManager() {
       if (filter.category && e.category !== filter.category) return false;
       return true;
     }).sort((a, b) => {
-      const va = a[sort.by];
-      const vb = b[sort.by];
-      if (va < vb) return sort.direction === 'asc' ? -1 : 1;
-      if (va > vb) return sort.direction === 'asc' ? 1 : -1;
-      return 0;
+      const va = String(a[sort.by]).toLowerCase();
+      const vb = String(b[sort.by]).toLowerCase();
+      const comp = va.localeCompare(vb);
+      return sort.direction === 'asc' ? comp : -comp;
     });
   }, [events, leavingEvents, filter, sort]);
 
@@ -187,7 +186,7 @@ export default function EventsManager() {
           <select
             className="select select-bordered h-11 min-h-11 notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             value={filter.status}
-            onChange={e => $eventsFilter.set({ ...filter, status: e.target.value as any })}
+            onChange={e => $eventsFilter.set({ status: e.target.value as any, category: '' })}
             aria-label="Filter by status"
           >
             <option value="">All Statuses</option>
@@ -199,7 +198,7 @@ export default function EventsManager() {
           <select
             className="select select-bordered h-11 min-h-11 notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             value={filter.category}
-            onChange={e => $eventsFilter.set({ ...filter, category: e.target.value as any })}
+            onChange={e => $eventsFilter.set({ status: '', category: e.target.value as any })}
             aria-label="Filter by category"
           >
             <option value="">All Categories</option>

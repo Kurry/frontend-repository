@@ -24,11 +24,11 @@ export default function ExportCatalog() {
   const requestClose = () => {
     if (closing) return;
     setClosing(true);
+    lastFocused.current?.focus({ preventScroll: true });
+    lastFocused.current = null;
     window.setTimeout(() => {
       $exportCatalogOpen.set(false);
       setClosing(false);
-      lastFocused.current?.focus({ preventScroll: true });
-      lastFocused.current = null;
     }, 160);
   };
 
@@ -137,9 +137,9 @@ export default function ExportCatalog() {
                 <button aria-label="Copy catalog JSON" className="btn btn-sm btn-ghost gap-2 text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => copyText(jsonPayload, setCopiedJson, 'Export JSON')}>
                   <Copy size={16} /> {copiedJson ? 'Copied' : 'Copy'}
                 </button>
-                <button aria-label="Download catalog JSON" className="btn btn-sm btn-primary gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => downloadFile(jsonPayload, 'ridge-catalog.json', 'application/json')}>
+                <a href={`data:application/json;charset=utf-8,${encodeURIComponent(jsonPayload)}`} download="ridge-catalog.json" aria-label="Download catalog JSON" className="btn btn-sm btn-primary gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => announce('Downloaded ridge-catalog.json.')}>
                   <Download size={16} /> Export JSON
-                </button>
+                </a>
               </div>
             </div>
             <div className="surface-copy flex-1 bg-surface border border-current/10 rounded-lg p-4 overflow-auto text-sm font-mono whitespace-pre opacity-90" aria-label="JSON preview">
@@ -155,9 +155,9 @@ export default function ExportCatalog() {
                   <button aria-label="Copy catalog ICS" className="btn btn-sm btn-ghost gap-2 text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => copyText(icsPayload, setCopiedIcs, 'Export ICS')}>
                     <Copy size={16} /> {copiedIcs ? 'Copied' : 'Copy'}
                   </button>
-                  <button aria-label="Download catalog ICS" className="btn btn-sm btn-primary gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => downloadFile(icsPayload, 'ridge-events.ics', 'text/calendar')}>
+                  <a href={`data:text/calendar;charset=utf-8,${encodeURIComponent(icsPayload)}`} download="ridge-events.ics" aria-label="Download catalog ICS" className="btn btn-sm btn-primary gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => announce('Downloaded ridge-events.ics.')}>
                     <Download size={16} /> Export ICS
-                  </button>
+                  </a>
                 </div>
               </div>
               <div className="surface-copy flex-1 bg-surface border border-current/10 rounded-lg p-4 overflow-auto text-sm font-mono whitespace-pre opacity-90" aria-label="ICS preview">

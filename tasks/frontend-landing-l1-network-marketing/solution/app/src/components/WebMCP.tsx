@@ -151,7 +151,7 @@ export default function WebMCP() {
         if (filter === 'status' && value !== '' && !EVENT_STATUSES.includes(value as EventStatus)) return { success: false, error: `Invalid status: ${value}` };
         if (filter === 'category' && value !== '' && !EVENT_CATEGORIES.includes(value as EventCategory)) return { success: false, error: `Invalid category: ${value}` };
         if (filter !== 'status' && filter !== 'category') return { success: false, error: 'filter must be status or category' };
-        $eventsFilter.set({ ...$eventsFilter.get(), [filter]: value });
+        $eventsFilter.set({ status: '', category: '', [filter]: value });
         $eventsManagerOpen.set(true);
         return { success: true, filter, value };
       } },
@@ -258,10 +258,14 @@ export default function WebMCP() {
       } },
     ];
 
-    const invoke = (name: string, args: Record<string, unknown> = {}) => {
+    const invoke = async (name: string, args: Record<string, unknown> = {}) => {
       const tool = tools.find(candidate => candidate.name === name);
       if (!tool) return { success: false, error: `Unknown tool: ${name}` };
-      try { return tool.handler(args ?? {}); }
+      try {
+        const result = await tool.handler(args ?? {});
+        if (result && typeof result === 'object' && result.operation) return result; // already used afterRender
+        return afterRender(() => result);
+      }
       catch (error) { return { success: false, error: error instanceof Error ? error.message : String(error) }; }
     };
 
