@@ -460,18 +460,20 @@
 
 {#snippet queueList(compact)}
   {#if app.queue.length}
-    <div class="space-y-2" role="list" aria-label="Ordered build queue">
+    <ol class="space-y-2" aria-label="Ordered build queue">
       {#each app.queueEntries() as entry,index (entry.candidate.id)}
-        <article class="queue-entry" class:opacity-60={dragId===entry.candidate.id} role="listitem" tabindex="0"
-          aria-label={`Queue position ${entry.position}: ${entry.candidate.name}. Press Alt+ArrowUp or Alt+ArrowDown to move it.`}
-          draggable="true" ondragstart={()=>dragId=entry.candidate.id} ondragover={(event)=>event.preventDefault()} ondrop={(event)=>queueDrop(event,index)}
-          onkeydown={(event)=>queueKey(event,entry.candidate.id,index)}
+        <li class="queue-entry" class:opacity-60={dragId===entry.candidate.id}
           animate:flip={{duration:D(260)}} in:fly={{x:24,duration:D(240)}} out:fly={{x:24,duration:D(200)}}>
-          <div class="flex items-start gap-2"><span class="grid size-6 shrink-0 place-items-center bg-[#55d6be] text-xs font-bold text-[#071714]">{entry.position}</span><IconGripVertical class="mt-1 shrink-0 cursor-grab text-[#54718b]" size={15}/><div class="min-w-0 flex-1"><div class="mono truncate text-xs font-semibold">{entry.candidate.name}</div><div class="mt-1 text-[10px] text-[#8099b0]">Difficulty {entry.candidate.difficulty.toFixed(1)} · {entry.candidate.clusterId}</div></div></div>
+          <button type="button" class="flex w-full items-start gap-2 text-left"
+            aria-label={`Queue position ${entry.position}: ${entry.candidate.name}. Press Alt+ArrowUp or Alt+ArrowDown to move it.`}
+            draggable="true" ondragstart={()=>dragId=entry.candidate.id} ondragover={(event)=>event.preventDefault()} ondrop={(event)=>queueDrop(event,index)}
+            onkeydown={(event)=>queueKey(event,entry.candidate.id,index)}>
+            <span class="grid size-6 shrink-0 place-items-center bg-[#55d6be] text-xs font-bold text-[#071714]">{entry.position}</span><IconGripVertical class="mt-1 shrink-0 cursor-grab text-[#54718b]" size={15}/><span class="min-w-0 flex-1"><span class="mono block truncate text-xs font-semibold">{entry.candidate.name}</span><span class="mt-1 block text-[10px] text-[#8099b0]">Difficulty {entry.candidate.difficulty.toFixed(1)} · {entry.candidate.clusterId}</span></span>
+          </button>
           <div class="mt-3 flex gap-1"><button class="btn-soft icon-btn" disabled={index===0} onclick={()=>app.reorder(entry.candidate.id,index-1)} aria-label={`Move ${entry.candidate.name} up`}><IconChevronUp size={14}/></button><button class="btn-soft icon-btn" disabled={index===app.queue.length-1} onclick={()=>app.reorder(entry.candidate.id,index+1)} aria-label={`Move ${entry.candidate.name} down`}><IconChevronDown size={14}/></button><button class="btn-soft btn-danger ml-auto {compact?'icon-btn':''}" onclick={()=>app.removeFromQueue(entry.candidate.id)} aria-label={`Remove ${entry.candidate.name} from queue`}><IconTrash size={14}/>{#if !compact}Remove{/if}</button></div>
-        </article>
+        </li>
       {/each}
-    </div>
+    </ol>
   {:else}<div class="grid min-h-48 place-items-center p-5 text-center"><div><IconListCheck class="mx-auto text-[#4d6a84]" size={30}/><h3 class="mt-3 text-sm font-semibold">Queue is ready</h3><p class="mt-1 text-xs leading-relaxed text-[#7f99b0]">Pin a selected repository, then queue its frozen commit.</p></div></div>{/if}
 {/snippet}
 
@@ -485,7 +487,7 @@
 {/if}
 
 {#if app.modal?.type==='reject'}
-  <div class="dialog-backdrop" onclick={(event)=>{if(event.currentTarget===event.target)closeModal()}}>
+  <div class="dialog-backdrop" role="presentation" onclick={(event)=>{if(event.currentTarget===event.target)closeModal()}}>
     <div class="dialog-card card-sm" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="reject-title" bind:this={modalCard} onkeydown={(event)=>trapTab(event,modalCard)} transition:scale={{start:.96,duration:D(240)}}>
       <div class="border-b border-[#2a4159] p-4"><div class="eyebrow">{app.modal.bulk?'Bulk workflow':'Candidate workflow'}</div><h2 id="reject-title" class="mt-1 text-lg font-semibold">{app.modal.bulk?`Reject ${app.modal.ids.length} selected candidates`:`Reject ${app.find(app.modal.ids[0])?.name ?? 'candidate'}`}</h2></div>
       <form class="p-4" id="reject-form" onsubmit={(event)=>{event.preventDefault();submitReject()}}>
@@ -501,7 +503,7 @@
 
 {#if app.modal?.type==='pin'}
   {@const pinCandidate=app.find(app.modal.id)}
-  <div class="dialog-backdrop" onclick={(event)=>{if(event.currentTarget===event.target)closeModal()}}>
+  <div class="dialog-backdrop" role="presentation" onclick={(event)=>{if(event.currentTarget===event.target)closeModal()}}>
     <div class="dialog-card card-sm" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="pin-title" bind:this={modalCard} onkeydown={(event)=>trapTab(event,modalCard)} transition:scale={{start:.96,duration:D(240)}}>
       <div class="border-b border-[#2a4159] p-4"><div class="eyebrow">Freeze source</div><h2 id="pin-title" class="mt-1 text-lg font-semibold">Pin {pinCandidate?.name ?? 'candidate'}</h2></div>
       <form class="p-4" onsubmit={(event)=>{event.preventDefault();submitPin()}}>
@@ -516,7 +518,7 @@
 {/if}
 
 {#if app.modal?.type==='help'}
-  <div class="dialog-backdrop" onclick={(event)=>{if(event.currentTarget===event.target)closeModal()}}>
+  <div class="dialog-backdrop" role="presentation" onclick={(event)=>{if(event.currentTarget===event.target)closeModal()}}>
     <div class="dialog-card card-sm" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="help-title" bind:this={modalCard} onkeydown={(event)=>trapTab(event,modalCard)} transition:scale={{start:.96,duration:D(240)}}>
       <div class="flex items-center justify-between border-b border-[#2a4159] p-4"><div><div class="eyebrow">Power use</div><h2 id="help-title" class="mt-1 text-lg font-semibold">Keyboard shortcuts</h2></div><button class="btn-soft icon-btn" onclick={closeModal} aria-label="Close keyboard shortcuts" data-autofocus><IconX size={16}/></button></div>
       <dl class="space-y-3 p-4 text-sm">
@@ -529,7 +531,7 @@
 {/if}
 
 {#if app.panel==='export'}
-  <div class="dialog-backdrop layer-panel" onclick={(event)=>{if(event.currentTarget===event.target)closePanel()}}>
+  <div class="dialog-backdrop layer-panel" role="presentation" onclick={(event)=>{if(event.currentTarget===event.target)closePanel()}}>
     <div class="dialog-card card-lg" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="export-title" bind:this={panelCard} onkeydown={(event)=>trapTab(event,panelCard)} transition:scale={{start:.97,duration:D(240)}}>
       <div class="flex items-center justify-between border-b border-[#2a4159] p-4">
         <div><div class="eyebrow">Session artifact</div><h2 id="export-title" class="mt-1 text-lg font-semibold">Export sourcing pack</h2></div>
@@ -569,7 +571,7 @@
 {/if}
 
 {#if app.panel==='import'}
-  <div class="dialog-backdrop layer-panel" onclick={(event)=>{if(event.currentTarget===event.target)closePanel()}}>
+  <div class="dialog-backdrop layer-panel" role="presentation" onclick={(event)=>{if(event.currentTarget===event.target)closePanel()}}>
     <div class="dialog-card card-lg" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="import-title" bind:this={panelCard} onkeydown={(event)=>trapTab(event,panelCard)} transition:scale={{start:.97,duration:D(240)}}>
       <div class="flex items-center justify-between border-b border-[#2a4159] p-4">
         <div><div class="eyebrow">Restore session</div><h2 id="import-title" class="mt-1 text-lg font-semibold">Import sourcing pack</h2></div>
