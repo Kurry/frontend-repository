@@ -8088,6 +8088,20 @@
       ]
     },
     {
+      "task": "frontend-planning-potluck-contribution-orchestrator",
+      "modules": ["entity-collection-v1", "structured-editor-v1", "artifact-transfer-v1"],
+      "bindings": {
+        "entity": "commitment",
+        "entity_operations": ["create", "select", "update", "delete"],
+        "entity_fields": ["dish", "portions", "owner", "state", "targetId", "dietary"],
+        "editor_operations": ["select", "update_property", "set_content", "preview"],
+        "artifact_operations": ["export", "import"],
+        "export_formats": ["potluck-event-plan-v1"],
+        "import_modes": ["potluck-event-plan-v1"]
+      },
+      "mechanics_exclusions": ["Navigation, drag positioning, native downloads, and clipboard contents stay Playwright-observed"]
+    },
+    {
       "task": "frontend-creative-tools-session-compression-loom",
       "modules": ["structured-editor-v1", "artifact-transfer-v1"],
       "bindings": {
@@ -8098,9 +8112,7 @@
         "artifact_operations": ["export", "import"],
         "import_modes": ["compressed-session-pack-v1"]
       },
-      "mechanics_exclusions": [
-        "Text selection, range highlighting, preview layout, and download bytes stay Playwright-observed"
-      ]
+      "mechanics_exclusions": ["Text selection, range highlighting, preview layout, and download bytes stay Playwright-observed"]
     }
   ]
 }

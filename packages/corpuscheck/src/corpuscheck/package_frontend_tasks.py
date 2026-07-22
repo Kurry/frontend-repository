@@ -369,7 +369,12 @@ TASK_SPECS.update({
         "description": "Session compression editor with capsule summaries, preview, and artifact export.",
         "modules": ["structured-editor-v1", "artifact-transfer-v1"],
         "bindings": "see corpuscheck schemas/webmcp-assignments.json",
-        "mechanics_exclusions": ["Text selection, range highlighting, preview layout, and download bytes stay Playwright-observed"],
+    },
+    "frontend-planning-potluck-contribution-orchestrator": {
+        "source": "Potluck Contribution Orchestrator",
+        "description": "Potluck planning workspace for commitments, coverage, buffet layout, and event-day run coordination.",
+        "modules": ["entity-collection-v1", "structured-editor-v1", "artifact-transfer-v1"],
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
     },
     "frontend-landing-avax-network": {
         "source": "AvaxNetwork",

@@ -114,6 +114,11 @@
     "instruction": "tasks/frontend-creative-tools-session-compression-loom/instruction.md",
     "description": "Session compression editor with capsule summaries, preview, and artifact export."
   },
+  "frontend-creative-tools-session-compression-loom": {
+    "source": "Session Compression Loom",
+    "instruction": "tasks/frontend-creative-tools-session-compression-loom/instruction.md",
+    "description": "Session compression editor with capsule summaries, preview, and artifact export."
+  },
   "frontend-creative-tools-shapeshift-grid": {
     "source": "Shapeshift",
     "instruction": "Shapeshift/instruction.md",
@@ -318,6 +323,11 @@
     "source": "variants/TravelItineraryPlanner",
     "instruction": "variants/TravelItineraryPlanner/instruction.md",
     "description": "French Riviera trip itinerary planner variant."
+  },
+  "frontend-planning-potluck-contribution-orchestrator": {
+    "source": "Potluck Contribution Orchestrator",
+    "instruction": "tasks/frontend-planning-potluck-contribution-orchestrator/instruction.md",
+    "description": "Potluck planning workspace for commitments, coverage, buffet layout, and event-day run coordination."
   },
   "frontend-planning-trip-itinerary": {
     "source": "TripItinerary",
