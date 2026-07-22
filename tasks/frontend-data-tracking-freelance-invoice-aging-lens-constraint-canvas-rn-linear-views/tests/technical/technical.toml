@@ -1,0 +1,11 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+
+[[criterion]]
+id = "AC-04"
+weight = 1.0
+title = "The tool result and artifact contain the declared API-shaped fields."
+description = "Query the current state and export after the mutation. The tool result and artifact contain the declared API-shaped fields."

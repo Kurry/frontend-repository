@@ -1,0 +1,11 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+
+[[criterion]]
+id = "AC-09"
+weight = 1.0
+title = "The signature interaction remains responsive and unrelated rows stay stable."
+description = "Exercise a seeded collection with at least 100 records. The signature interaction remains responsive and unrelated rows stay stable."

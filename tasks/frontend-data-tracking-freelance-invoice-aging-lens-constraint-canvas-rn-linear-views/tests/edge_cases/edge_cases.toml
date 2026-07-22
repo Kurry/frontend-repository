@@ -1,0 +1,11 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+
+[[criterion]]
+id = "AC-06"
+weight = 1.0
+title = "Each invalid action gives field-level recovery and preserves prior valid state."
+description = "Try exact bounds, an invalid cross-field value, an empty state, and malformed import. Each invalid action gives field-level recovery and preserves prior valid state."

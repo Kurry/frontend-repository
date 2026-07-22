@@ -1,0 +1,11 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+
+[[criterion]]
+id = "AC-12"
+weight = 1.0
+title = "The visual and interaction thesis is coherent without copying unrelated screens."
+description = "Compare the implementation with the cited source interaction vocabulary. The visual and interaction thesis is coherent without copying unrelated screens."

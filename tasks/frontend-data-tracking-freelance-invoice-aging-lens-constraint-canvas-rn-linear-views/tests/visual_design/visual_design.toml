@@ -1,0 +1,11 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+
+[[criterion]]
+id = "AC-02"
+weight = 1.0
+title = "The visual hierarchy makes current state and next action clear."
+description = "Inspect the primary work surface, linked summary, and detail panel. The visual hierarchy makes current state and next action clear."
