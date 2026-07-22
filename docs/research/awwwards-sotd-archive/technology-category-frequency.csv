@@ -1,0 +1,80 @@
+category,site_count,percent_of_live_sites
+Security,2530,55.458
+CDN,2473,54.209
+Miscellaneous,2048,44.893
+Web servers,1938,42.481
+Programming languages,1858,40.728
+Analytics,1585,34.744
+CMS,1514,33.187
+JavaScript libraries,1445,31.675
+PaaS,1392,30.513
+JavaScript frameworks,1235,27.071
+Tag managers,974,21.35
+Web frameworks,898,19.684
+Databases,844,18.501
+Blogs,806,17.668
+WordPress plugins,698,15.3
+Reverse proxies,663,14.533
+RUM,659,14.445
+Static site generator,555,12.166
+SEO,487,10.675
+Caching,398,8.724
+Font scripts,370,8.11
+Page builders,366,8.023
+Ecommerce,326,7.146
+Cookie compliance,293,6.423
+UI frameworks,214,4.691
+Operating systems,188,4.121
+Marketing automation,179,3.924
+Form builders,175,3.836
+Video players,166,3.639
+Hosting,154,3.376
+Translation,142,3.113
+Widgets,126,2.762
+Performance,117,2.565
+JavaScript graphics,112,2.455
+IaaS,96,2.104
+Load balancers,92,2.017
+Advertising,86,1.885
+A/B Testing,84,1.841
+Maps,79,1.732
+Development,64,1.403
+Email,57,1.249
+WordPress themes,51,1.118
+Personalisation,44,0.964
+Payment processors,42,0.921
+Mobile frameworks,32,0.701
+Web server extensions,28,0.614
+Hosting panels,25,0.548
+CRM,24,0.526
+Issue trackers,21,0.46
+Reviews,18,0.395
+Photo galleries,18,0.395
+Customer data platform,17,0.373
+Shopify apps,16,0.351
+Buy now pay later,12,0.263
+Appointment scheduling,12,0.263
+Live chat,11,0.241
+Affiliate programs,11,0.241
+Surveys,10,0.219
+Search engines,9,0.197
+Authentication,9,0.197
+Accessibility,8,0.175
+Documentation,5,0.11
+Geolocation,4,0.088
+Digital asset management,3,0.066
+Recruitment & staffing,3,0.066
+Content curation,3,0.066
+Cross border ecommerce,3,0.066
+Loyalty & rewards,2,0.044
+Referral marketing,2,0.044
+Editors,2,0.044
+Augmented reality,1,0.022
+Fulfilment,1,0.022
+Reservations & delivery,1,0.022
+Returns,1,0.022
+Segmentation,1,0.022
+Fundraising & donations,1,0.022
+Browser fingerprinting,1,0.022
+Retargeting,1,0.022
+Ecommerce frontends,1,0.022
