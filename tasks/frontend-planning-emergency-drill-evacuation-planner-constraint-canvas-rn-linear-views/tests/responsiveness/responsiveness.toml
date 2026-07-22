@@ -1,0 +1,4 @@
+[[criterion]]
+id = "AC-07"
+description = "The desktop surface becomes a usable stack/drawer/stepper without horizontal overflow."
+weight = 1

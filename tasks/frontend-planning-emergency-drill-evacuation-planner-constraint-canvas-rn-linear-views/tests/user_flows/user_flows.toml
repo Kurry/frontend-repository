@@ -1,0 +1,4 @@
+[[criterion]]
+id = "AC-05"
+description = "The end-to-end job is recoverable without reload."
+weight = 1

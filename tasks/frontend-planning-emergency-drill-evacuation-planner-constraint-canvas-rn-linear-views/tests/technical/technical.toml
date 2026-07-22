@@ -1,0 +1,4 @@
+[[criterion]]
+id = "AC-04"
+description = "The tool result and artifact contain the declared API-shaped fields."
+weight = 1

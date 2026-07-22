@@ -1,0 +1,4 @@
+[[criterion]]
+id = "AC-01"
+description = "The constraint canvas mutation changes the primary record, linked view, and status together."
+weight = 1

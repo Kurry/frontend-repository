@@ -1,0 +1,6 @@
+[task]
+task_id = "frontend-planning-emergency-drill-evacuation-planner-constraint-canvas-rn-linear-views"
+name = "mercor-intelligence/frontend-planning-emergency-drill-evacuation-planner-constraint-canvas-rn-linear-views"
+task_type = "frontend"
+tags = ["react", "vite", "tailwind", "state-management", "drag-and-drop", "ui", "good-app"]
+description = "Manage drill checkpoints through a domain-native browser surface where one meaningful mutation updates linked views and an interoperable artifact. Variant focus: drag a selected record across constraint lanes and resolve a conflict."

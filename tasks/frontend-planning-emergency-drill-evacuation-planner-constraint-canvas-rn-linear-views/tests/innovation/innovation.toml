@@ -1,0 +1,9 @@
+[[criterion]]
+id = "AC-11"
+description = "Linked views provide domain utility beyond CRUD."
+weight = 1
+
+[[criterion]]
+id = "innovation.catchall"
+description = "Any other innovative aspects not covered above, supported by evidence."
+weight = 1
