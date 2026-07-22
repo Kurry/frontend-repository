@@ -1,0 +1,8 @@
+[judge]
+model = "claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-08"
+title = "alternate_input"
+description = "Alternate input produces identical state with visible focus and live feedback."
+weight = 1.0

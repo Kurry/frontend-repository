@@ -1,0 +1,8 @@
+[judge]
+model = "claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-07"
+title = "mobile_mode"
+description = "The desktop surface becomes a usable stack/drawer/stepper without horizontal overflow."
+weight = 1.0

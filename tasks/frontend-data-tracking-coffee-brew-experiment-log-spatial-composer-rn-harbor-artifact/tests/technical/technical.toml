@@ -1,0 +1,8 @@
+[judge]
+model = "claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-04"
+title = "schema_contract"
+description = "The tool result and artifact contain the declared API-shaped fields."
+weight = 1.0
