@@ -2,7 +2,7 @@
 name: Oracle validation checklist
 about: File every failing/blocked criterion from a harbor oracle-validation run as a checklist, with the judge's full justification per item.
 title: "oracle-fix: frontend-<slug> (reward <X.XXX>, <judge-model> sweep <YYYY-MM-DD>)"
-labels: oracle-fix
+labels: oracle-validation-failure
 assignees: ""
 ---
 
@@ -23,14 +23,16 @@ HOW TO FILL THIS OUT
      python3 -c "
      import json
      d = json.load(open('jobs/<job-id>/<trial-dir>/verifier/reward-details.json'))
-     for dimname, dim in d.items():
+     dimensions = d.get('dimensions', d)
+     for dimname, dim in dimensions.items():
          for c in dim.get('criteria', []):
              v = c.get('value')
              if v is None or v < 1.0:
-                 verdict = 'FAIL' if str(c.get('reasoning','')).strip().upper().startswith('FAIL') else 'BLOCKED'
+                 reasoning = str(c.get('reasoning', '')).strip()
+                 verdict = next((p for p in ('FAIL', 'BLOCKED') if reasoning.startswith(f'{p}:')), 'UNPREFIXED')
                  print(f\"- [ ] **{c.get('id')} {c.get('name')}** ({verdict})\")
                  print(f\"  Requires: {c.get('description','').strip()}\")
-                 print(f\"  Judge finding: {c.get('reasoning','').strip()}\")
+                 print(f\"  Judge finding: {reasoning}\")
      "
 
 4. Fill in the dimension score table below from the job's summary table (or
@@ -42,7 +44,8 @@ CONVENTIONS
 - FAIL = the judge directly observed the defect. BLOCKED = the judge didn't complete the
   interaction needed to verify the criterion — could be a real gap or a judge-exploration
   limitation. Keep both, but don't conflate them: BLOCKED items need reproduction before
-  assuming a code bug.
+  assuming a code bug. UNPREFIXED means the failed criterion's reasoning violated the judge
+  contract by starting with neither exact prefix; inspect the artifact rather than guessing.
 - Every criterion gets its own checkbox — never bundle multiple criteria into one line.
 - Include "Requires:" (the criterion's spec, so the item is actionable without opening the
   toml) and "Judge finding:" (verbatim reasoning + evidence filename) for every item.
@@ -87,7 +90,7 @@ weaken or skip tests to make these pass), and attach passing rerun evidence.
 
 ### accessibility (<score>)
 
-- [ ] **<id> <name>** (FAIL|BLOCKED)
+- [ ] **<id> <name>** (FAIL|BLOCKED|UNPREFIXED)
   Requires: <criterion description>
   Judge finding: <reasoning + evidence file>
 
