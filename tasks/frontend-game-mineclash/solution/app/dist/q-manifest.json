@@ -1,6 +1,6 @@
 {
 	"version": "1",
-	"manifestHash": "9otoe4",
+	"manifestHash": "e9kepn",
 	"options": {
 		"target": "client",
 		"buildMode": "production",
@@ -10,7 +10,7 @@
 	},
 	"core": "../assets/core.min-DVALGa4Q.js",
 	"preloader": "../assets/preloader-Bns9QiKi.js",
-	"bundleGraphAsset": "assets/bundle-graph-B2sBt4wl.json",
+	"bundleGraphAsset": "assets/bundle-graph-CilAkw5l.json",
 	"injections": [
 		{
 			"tag": "style",
@@ -72,10 +72,10 @@
 		"s_aBQHsmYNI04": "../assets/App.tsx_App_component_useVisibleTask_2_aBQHsmYNI04-DTwCZY5U.js",
 		"s_brSDhVKHAYs": "../assets/HistoryPanel.tsx_HistoryPanel_component_useVisibleTask_brSDhVKHAYs-DXXaPgCA.js",
 		"s_g6jJ5iiT0cs": "../assets/App.tsx_App_component_useVisibleTask_3_g6jJ5iiT0cs-DQ8v85eR.js",
-		"s_h00hjwWyXnI": "../assets/App.tsx_App_component_useVisibleTask_1_h00hjwWyXnI-KNJvm2Hw.js",
+		"s_h00hjwWyXnI": "../assets/App.tsx_App_component_useVisibleTask_1_h00hjwWyXnI-EoTEV_kO.js",
 		"s_0ZDMGydeKSw": "../assets/MatchLogScreen.tsx_MatchLogScreen_component_0ZDMGydeKSw-Bw7oG2YY.js",
 		"s_4vu2fcO2qTg": "../assets/GameBoard.tsx_GameBoard_component_4vu2fcO2qTg-jX5_DnkE.js",
-		"s_BDsq7Z6XZxs": "../assets/App.tsx_App_component_BDsq7Z6XZxs-vxzoZc7F.js",
+		"s_BDsq7Z6XZxs": "../assets/App.tsx_App_component_BDsq7Z6XZxs-DUFOySmN.js",
 		"s_IcXLrc5UqwU": "../assets/Scoreboard.tsx_Scoreboard_component_IcXLrc5UqwU-BzQ5Zz3v.js",
 		"s_JW2EPiCEiOI": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_JW2EPiCEiOI-D27g8Cu5.js",
 		"s_PO80pwp8je0": "../assets/HistoryPanel.tsx_HistoryPanel_component_PO80pwp8je0-mruXnZ4L.js",
@@ -97,7 +97,7 @@
 		"s_sWgQQHAVx58": "../assets/HistoryPanel.tsx_HistoryPanel_component_canRedo_useComputed_sWgQQHAVx58-CMfZWxY-.js"
 	},
 	"bundles": {
-		"../assets/App-AFiihWSP.js": {
+		"../assets/App-DdvI5TN0.js": {
 			"size": 948,
 			"total": 63199,
 			"imports": [
@@ -106,18 +106,18 @@
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/App.tsx_App_component_BDsq7Z6XZxs-vxzoZc7F.js"
+				"../assets/App.tsx_App_component_BDsq7Z6XZxs-DUFOySmN.js"
 			],
 			"origins": [
 				"src/components/App.tsx"
 			],
 			"interactivity": 0
 		},
-		"../assets/App.tsx_App_component_BDsq7Z6XZxs-vxzoZc7F.js": {
+		"../assets/App.tsx_App_component_BDsq7Z6XZxs-DUFOySmN.js": {
 			"size": 2171,
 			"total": 374980,
 			"imports": [
-				"../assets/App-AFiihWSP.js",
+				"../assets/App-DdvI5TN0.js",
 				"../assets/context-D9nmXemK.js",
 				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js",
@@ -128,7 +128,7 @@
 				"../assets/StatsScreen-Cn4J2323.js"
 			],
 			"dynamicImports": [
-				"../assets/App.tsx_App_component_useVisibleTask_1_h00hjwWyXnI-KNJvm2Hw.js",
+				"../assets/App.tsx_App_component_useVisibleTask_1_h00hjwWyXnI-EoTEV_kO.js",
 				"../assets/App.tsx_App_component_useVisibleTask_2_aBQHsmYNI04-DTwCZY5U.js",
 				"../assets/App.tsx_App_component_useVisibleTask_3_g6jJ5iiT0cs-DQ8v85eR.js",
 				"../assets/App.tsx_App_component_useVisibleTask_4_NbCPVgdXbTo-ClBOMAOq.js",
@@ -150,9 +150,9 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/App.tsx_App_component_useVisibleTask_1_h00hjwWyXnI-KNJvm2Hw.js": {
-			"size": 7193,
-			"total": 68190,
+		"../assets/App.tsx_App_component_useVisibleTask_1_h00hjwWyXnI-EoTEV_kO.js": {
+			"size": 9261,
+			"total": 70258,
 			"imports": [
 				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js"
@@ -840,11 +840,11 @@
 			],
 			"interactivity": 3
 		},
-		"../assets/index-DErrKGQv.js": {
+		"../assets/index-Cl0r9f0w.js": {
 			"size": 3566,
 			"total": 129016,
 			"imports": [
-				"../assets/App-AFiihWSP.js",
+				"../assets/App-DdvI5TN0.js",
 				"../assets/core.min-DVALGa4Q.js",
 				"../assets/gameLogic-BOGBTXck.js",
 				"../assets/preload-helper-CVfkMyKi.js"
@@ -1542,7 +1542,7 @@
 		"index.html": {
 			"size": 683
 		},
-		"assets/bundle-graph-B2sBt4wl.json": {
+		"assets/bundle-graph-CilAkw5l.json": {
 			"name": "bundle-graph.json",
 			"size": 569
 		}
