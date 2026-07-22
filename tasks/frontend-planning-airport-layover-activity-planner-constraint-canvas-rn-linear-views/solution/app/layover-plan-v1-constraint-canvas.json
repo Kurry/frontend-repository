@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "v1",
+  "exportedAt": "2026-07-22T14:13:04.519Z",
+  "records": [
+    {
+      "id": "1",
+      "title": "Security check",
+      "status": "ready",
+      "lane": "Hour 1",
+      "duration": 30
+    },
+    {
+      "id": "2",
+      "title": "Lounge access",
+      "status": "draft",
+      "lane": "Hour 2",
+      "duration": 45
+    },
+    {
+      "id": "3",
+      "title": "Gate walk",
+      "status": "draft",
+      "lane": "Hour 3",
+      "duration": 15
+    },
+    {
+      "id": "4",
+      "title": "Duty free",
+      "status": "archived",
+      "lane": "Hour 2",
+      "duration": 30
+    }
+  ],
+  "history": [],
+  "derived": {
+    "conflictCount": 0,
+    "readyCount": 1
+  }
+}
