@@ -1,0 +1,6 @@
+[[criterion]]
+id = "3.0"
+name = "causal_motion"
+description = "branch a selected record into a scenario and compare linked outcomes. Motion connects the acted-on item to its new state and has a reduced-motion equivalent."
+type = "binary"
+weight = 1.0

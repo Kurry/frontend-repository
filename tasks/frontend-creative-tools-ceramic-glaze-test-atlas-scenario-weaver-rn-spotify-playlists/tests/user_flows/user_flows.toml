@@ -1,0 +1,6 @@
+[[criterion]]
+id = "5.0"
+name = "complete_user_flow"
+description = "Create, edit, mutate, undo, and complete one record. The end-to-end job is recoverable without reload."
+type = "binary"
+weight = 1.0
