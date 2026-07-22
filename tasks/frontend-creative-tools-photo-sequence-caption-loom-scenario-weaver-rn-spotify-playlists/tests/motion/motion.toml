@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-03"
+title = "Motion connects the acted-on item to its new state and has a reduced-motion equivalent."
+description = "Motion connects the acted-on item to its new state and has a reduced-motion equivalent."
+weight = 1.0
+type = "must-have"

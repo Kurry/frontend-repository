@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-07"
+title = "The desktop surface becomes a usable stack/drawer/stepper without horizontal overflow."
+description = "The desktop surface becomes a usable stack/drawer/stepper without horizontal overflow."
+weight = 1.0
+type = "must-have"

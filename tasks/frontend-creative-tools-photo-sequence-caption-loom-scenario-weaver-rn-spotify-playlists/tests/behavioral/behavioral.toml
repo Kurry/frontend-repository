@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-13"
+title = "Authored order/selection/geometry and domain state survive; invalid import is a no-op."
+description = "Authored order/selection/geometry and domain state survive; invalid import is a no-op."
+weight = 1.0
+type = "must-have"

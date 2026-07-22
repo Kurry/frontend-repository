@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-02"
+title = "The visual hierarchy makes current state and next action clear."
+description = "The visual hierarchy makes current state and next action clear."
+weight = 1.0
+type = "must-have"

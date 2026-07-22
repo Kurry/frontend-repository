@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-01"
+title = "The scenario weaver mutation changes the primary record, linked view, and status together."
+description = "The scenario weaver mutation changes the primary record, linked view, and status together."
+weight = 1.0
+type = "must-have"

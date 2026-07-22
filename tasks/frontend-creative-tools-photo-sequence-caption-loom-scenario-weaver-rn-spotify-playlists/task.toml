@@ -1,0 +1,7 @@
+[task]
+name = "mercor-intelligence/frontend-creative-tools-photo-sequence-caption-loom-scenario-weaver-rn-spotify-playlists"
+version = "1.0.0"
+description = "Build a Photo Sequence Caption Loom with a Scenario Weaver surface."
+
+[task.metadata]
+genre = "good-app"
