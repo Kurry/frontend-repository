@@ -309,6 +309,11 @@
     "instruction": "variants/TravelItineraryPlanner/instruction.md",
     "description": "French Riviera trip itinerary planner variant."
   },
+  "frontend-planning-potluck-contribution-orchestrator": {
+    "source": "Potluck Contribution Orchestrator",
+    "instruction": "tasks/frontend-planning-potluck-contribution-orchestrator/instruction.md",
+    "description": "Potluck planning workspace for commitments, coverage, buffet layout, and event-day run coordination."
+  },
   "frontend-planning-trip-itinerary": {
     "source": "TripItinerary",
     "instruction": "TripItinerary/instruction.md",

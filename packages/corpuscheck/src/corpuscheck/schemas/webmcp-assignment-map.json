@@ -7892,5 +7892,19 @@
       "Multi-select marquee geometry and Shift-click chord timing stay Playwright when mechanism matters",
       "Timeline status filter chips and Saved Workflows / Artifact panel open toggles stay Playwright-driven; no browse-query module is assigned"
     ]
+  },
+  {
+    "task": "frontend-planning-potluck-contribution-orchestrator",
+    "modules": ["entity-collection-v1", "structured-editor-v1", "artifact-transfer-v1"],
+    "bindings": {
+      "entity": "commitment",
+      "entity_operations": ["create", "select", "update", "delete"],
+      "entity_fields": ["dish", "portions", "owner", "state", "targetId", "dietary"],
+      "editor_operations": ["select", "update_property", "set_content", "preview"],
+      "artifact_operations": ["export", "import"],
+      "export_formats": ["potluck-event-plan-v1"],
+      "import_modes": ["potluck-event-plan-v1"]
+    },
+    "mechanics_exclusions": ["Navigation, drag positioning, native downloads, and clipboard contents stay Playwright-observed"]
   }
 ]

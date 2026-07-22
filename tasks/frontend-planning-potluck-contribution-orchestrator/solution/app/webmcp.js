@@ -2,7 +2,9 @@
 
 window.webmcp_session_info = () => {
     return {
-        "status": "ready"
+        "status": "ready",
+        "contract_version": "zto-webmcp-v1",
+        "modules": ["entity-collection-v1", "structured-editor-v1", "artifact-transfer-v1"]
     };
 };
 window.webmcp_list_tools = () => {
@@ -178,6 +180,14 @@ window.webmcp_list_tools = () => {
     ];
 };
 window.webmcp_invoke_tool = (toolName, parameters) => {
+    let status = document.getElementById('webmcp-status');
+    if (!status) {
+        status = document.createElement('div');
+        status.id = 'webmcp-status';
+        status.style.cssText = 'position:fixed;bottom:8px;right:8px;z-index:9999;background:#312e81;color:white;padding:4px 8px;font-size:12px;border-radius:4px';
+        document.body.appendChild(status);
+    }
+    status.textContent = `WebMCP: ${toolName}`;
     return {
         "status": "success",
         "message": `Tool ${toolName} invoked successfully.`
