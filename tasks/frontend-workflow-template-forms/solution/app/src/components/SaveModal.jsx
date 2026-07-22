@@ -107,7 +107,6 @@ export default function SaveModal({ launcherButtonRef }) {
       onRequestSubmit={handleSubmit(confirm)}
       onRequestClose={close}
       onSecondarySubmit={close}
-      preventCloseOnClickOutside={false}
       shouldSubmitOnEnter
       size="sm"
       className="scale-modal"

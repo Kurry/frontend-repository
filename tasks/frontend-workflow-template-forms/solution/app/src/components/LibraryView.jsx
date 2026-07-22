@@ -266,7 +266,6 @@ export default function LibraryView({ importLauncherRef }) {
               else libraryActionFallback.current?.focus()
             })
           }}
-          preventCloseOnClickOutside={false}
           className="scale-modal"
         >
           <p className="modal-copy">Are you sure you want to delete this prompt? This action cannot be undone.</p>
