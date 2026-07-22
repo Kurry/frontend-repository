@@ -1,0 +1,29 @@
+{
+  "name": "carry-on-packing-optimizer",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "verify:build": "npm run build",
+    "start": "vite preview",
+    "start+verify:build": "npm run verify:build && npm run start"
+  },
+  "dependencies": {
+    "@zto/webmcp-contracts": "file:../../../../packages/webmcp-contracts",
+    "lucide-react": "^0.454.0",
+    "playwright": "^1.61.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}
