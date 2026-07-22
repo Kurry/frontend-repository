@@ -9,6 +9,6 @@
     "test:e2e": "playwright test -c e2e.playwright.config.mjs"
   },
   "devDependencies": {
-    "@playwright/test": "^1.61.0"
+    "@playwright/test": "1.61.0"
   }
 }
