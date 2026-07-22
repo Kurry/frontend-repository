@@ -1,0 +1,168 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "9.1"
+name = "cold_start_under_two_seconds"
+description = "On a local cold load the PaneCraft workspace becomes interactive within 2 seconds, with PaneCraft header, Dashboard, Data Source Library, and the three default panes already visible."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.2"
+name = "console_clean_during_full_exercise"
+description = "No console errors or warnings appear during a full exercise: creating/editing/deleting panes and pages, date-range changes, refresh ticks, Share/Copy Link, saved analyses, and Collaboration Scenario offline/online merges."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.3"
+name = "date_range_and_refresh_respond_quickly"
+description = "Changing the shared date range or a pane's source/metric/dimension updates affected pane content with UI response under 100ms perceived delay (immediate recompute), without a full page reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.4"
+name = "shell_visible_while_settling"
+description = "While the app settles after first paint, the navy header, page tabs, and pane grid remain visible rather than a blank white screen with no controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.5"
+name = "source_preview_large_tables_smooth"
+description = "Opening Website Analytics (90 rows), Sales Sheet (60 rows), or Support Tickets (50 rows) in the preview modal and filtering rows shows no perceived lag while typing."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.6"
+name = "ui_interactive_during_recompute"
+description = "During simulated refresh ticks and date-range recomputes, page tabs and other pane controls remain interactive — the UI does not freeze until updates finish."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.7"
+name = "chart_updates_hold_stable_frame_rate"
+description = "Driven through real date-range and metric controls, chart mark transitions maintain a smooth frame rate without visible hitching during continuous changes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.8"
+name = "rapid_input_never_hangs"
+description = "Rapid repeated input (at least several Create Pane attempts, date-range toggles, or move/resize actions in quick succession) keeps the UI responsive with no hangs or dropped interactions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.9"
+name = "extended_session_stable"
+description = "After an extended session of pane CRUD, page switches, refresh ticks, and collaboration toggles, the tab remains responsive without runaway memory growth that freezes the UI."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.10"
+name = "refresh_updates_in_place_no_layout_jump"
+description = "Simulated refresh ticks and date-range recomputes update pane content in place without shifting surrounding panes or the page layout."
+type = "binary"
+weight = 1.0
+
