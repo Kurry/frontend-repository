@@ -513,10 +513,5 @@
     "source": "feature-workflow-builder-workflow-builder PRD",
     "instruction": "tasks/frontend-workflow-workflow-builder/instruction.md",
     "description": "Node-graph workflow builder with durable executions and timelines."
-  },
-  "frontend-planning-multilevel-accessible-route-lab": {
-    "source": "frontend-planning-multilevel-accessible-route-lab",
-    "instruction": "tasks/frontend-planning-multilevel-accessible-route-lab/instruction.md",
-    "description": "Multilevel Accessible Route Lab hard browser app eval."
   }
 }

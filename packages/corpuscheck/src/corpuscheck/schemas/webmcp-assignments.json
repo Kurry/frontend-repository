@@ -7920,39 +7920,6 @@
         "Multi-select marquee geometry and Shift-click chord timing stay Playwright when mechanism matters",
         "Timeline status filter chips and Saved Workflows / Artifact panel open toggles stay Playwright-driven; no browse-query module is assigned"
       ]
-    },
-    {
-      "task": "frontend-planning-multilevel-accessible-route-lab",
-      "modules": [
-        "entity-collection-v1",
-        "artifact-transfer-v1"
-      ],
-      "bindings": {
-        "entity": [
-          "route-stop"
-        ],
-        "entity_operations": [
-          "create",
-          "select",
-          "update",
-          "delete",
-          "reorder"
-        ],
-        "artifact_operations": [
-          "export",
-          "import"
-        ],
-        "export_formats": [
-          "route-plan-json",
-          "route-geojson"
-        ],
-        "import_modes": [
-          "route-plan-json"
-        ]
-      },
-      "mechanics_exclusions": [
-        "No raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results."
-      ]
     }
   ]
 }
