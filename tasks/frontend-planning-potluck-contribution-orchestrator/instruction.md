@@ -65,10 +65,7 @@ Feature: Responsive run pack and artifacts —
 - All libraries installed via npm and bundled locally; no CDN imports of any library, font, or icon set.
 </requirements>
 
-<delivery>
-- Produce an original self-contained app in `/app`. `/app/package.json` MUST define npm scripts named exactly `start` (serves the app on port 3000) and `verify:build` (exits 0 when the app entry/build is present and succeeds).
-- Run via `npm start` on port 3000.
-- Implement exactly the `<integrity>
+<integrity>
 - Work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
 </integrity>
 
