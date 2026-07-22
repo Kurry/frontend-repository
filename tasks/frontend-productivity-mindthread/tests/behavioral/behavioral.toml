@@ -1,0 +1,158 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "14.1"
+name = "multi_facet_reload_resets_blank"
+description = "Multi-facet round-trip: capture a spark, create a thread, assign the spark, add a tag, set status to Dormant, pin the thread, open Export, then reload. Confirm every facet coherently resets to the blank baseline — empty inbox, empty threads, empty undo history, closed export — never a mix of surviving and reverted facets."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "14.2"
+name = "inbox_order_reversal_via_capture_times"
+description = "Sort-reversal stand-in: capture spark A then spark B; confirm B is above A (most-recent-first). After assigning both into a thread Timeline, confirm they appear oldest-first (A then B) — proving list order is derived from live timestamps rather than a hardcoded order."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "14.3"
+name = "tag_filter_derived_view_sensitivity"
+description = "Derived-view sensitivity: add distinct tags to two sparks, select one tag chip, and confirm the visible sparks/threads narrow to matches; clear filters and confirm the full lists restore — the derived filter view changes with its inputs."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "14.4"
+name = "assign_echoes_inbox_timeline_today"
+description = "Cross-view echo: assign an inbox spark to a thread; without reload confirm the inbox count drops, the thread Timeline contains the spark, and Today regroups it under that thread."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "14.5"
+name = "capture_count_delta_exact"
+description = "Count-delta integrity: measure the inbox spark count, capture one valid spark, and re-measure immediately — the count increases by exactly one."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "14.6"
+name = "different_spark_texts_different_export"
+description = "Input-dependent output: capture spark text A, note Workspace JSON; capture spark text B instead in a fresh session path (or after undo/delete of A); confirm Export Workspace JSON differs in the ways the inputs dictate."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "14.7"
+name = "interleaved_capture_and_export_flows"
+description = "Interleaved-flow integrity: start typing in the capture bar, open Export and note the pre-submit JSON, return and submit the spark, reopen Export; confirm the new spark appears in Workspace JSON and the typing interruption did not corrupt either flow."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "14.8"
+name = "empty_then_repopulate_inbox"
+description = "Edge-state round-trip: delete every spark until 'Capture your first spark' shows, then capture two sparks; confirm the empty state clears, both appear most-recent-first, and the inbox count is exactly two."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "14.9"
+name = "export_import_round_trip_pipeline"
+description = "Mutate → derived → export → import: capture, thread, assign, tag, reflect, set status; confirm Today and Export Workspace JSON (schemaVersion mindthread-workspace-v1 plus sparks/threads/reflections) reflect the work; Download Workspace JSON; mutate away; Import the JSON; confirm Home/Today/Archived/Export match the exported session."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "14.10"
+name = "undo_round_trip_restores_surfaces"
+description = "Undo round-trip: bulk-tag three sparks (filter counts update), Undo restores prior tags and counts everywhere including the Filter by tag panel, Redo reapplies the bulk tag — never a surface left stale."
+type = "binary"
+weight = 1.0
