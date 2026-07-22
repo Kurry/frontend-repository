@@ -10,9 +10,9 @@ import {
 import { adjudicationFormSchema, bulkSchema, classifications } from "./schemas";
 
 const destinations = [
+  "review-workspace",
   "task-list",
   "task-detail",
-  "review-workspace",
   "agent-trajectory-pane",
   "scorer-trajectory-pane",
   "verdict-table",
@@ -55,7 +55,7 @@ function navigate(destination, args = {}) {
     };
   }
   if (destination === "task-detail") {
-    const taskId = args.taskId || useReviewStore.getState().activeTaskId;
+    const taskId = args.taskId || useReviewStore.getState().activeTaskId || tasks[0].id;
     if (!getTask(taskId))
       return {
         ok: false,
@@ -72,7 +72,7 @@ function navigate(destination, args = {}) {
     };
   }
   if (destination === "review-workspace") {
-    const trialId = args.trialId || useReviewStore.getState().activeTrialId;
+    const trialId = args.trialId || useReviewStore.getState().activeTrialId || allTrials[0].trial.id;
     const found = ensureOpenTrial(trialId);
     if (!found)
       return {
@@ -265,7 +265,7 @@ const definitions = [
         taskId: { type: "string", enum: tasks.map((t) => t.id) },
         trialId: { type: "string", enum: allTrials.map((x) => x.trial.id) },
       },
-      required: ["destination"],
+      required: ["destination", "trialId"],
       additionalProperties: false,
     },
     execute: (args) => result(navigate(args.destination, args)),

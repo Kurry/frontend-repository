@@ -61,42 +61,48 @@ test.describe('workspace contract (canonical)', () => {
 
   test('reduced motion behaviorally suppresses animation', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
+    // Install the collector before navigation so load/hydration animations are
+    // observed too. Keep it running through network idle and a settled 1.5s
+    // window so late-starting effects cannot escape the assertion.
+    await page.addInitScript(() => {
+      window.__reducedMotionOffenders = [];
+      const seen = new Set();
+      const sample = () => {
+        for (const animation of document.getAnimations({ subtree: true })) {
+          if (animation.playState !== 'running') continue;
+          let timing = {};
+          try { timing = animation.effect?.getComputedTiming?.() ?? {}; } catch { /* detached */ }
+          const duration = typeof timing.duration === 'number' ? timing.duration : 0;
+          if (duration <= 1) continue;
+          const offender = {
+            kind: animation.constructor?.name ?? 'Animation',
+            name: animation.animationName ?? animation.transitionProperty ?? animation.id ?? '(anonymous)',
+            duration,
+            iterations: timing.iterations ?? 1,
+          };
+          const key = JSON.stringify(offender);
+          if (!seen.has(key)) {
+            seen.add(key);
+            window.__reducedMotionOffenders.push(offender);
+          }
+        }
+        requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    });
     await page.goto(BASE);
-    // Load fully first: animations kicked off during hydration or by
-    // late-arriving resources must fall inside the observation window, so the
-    // sampling loop only starts once the page is settled.
     await page.waitForLoadState('networkidle');
     // Precondition sanity check: the emulation actually reaches the app.
     const reduced = await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
     expect(reduced, 'precondition: app sees prefers-reduced-motion: reduce').toBe(true);
-    await page.waitForTimeout(250); // small settle after idle
-    // Observe every frame across a 1.5s window and assert on what was seen.
+    // Observe every frame for another 1.5s after load settles and assert on
+    // everything seen since the document started.
     // Finished, idle, or paused effects and durations <=1ms are allowed; any
     // meaningfully timed RUNNING effect at any sample is a reduced-motion
     // failure. Apps with zero animations pass vacuously (the render/console
     // test still gates them).
-    const offenders = await page.evaluate(async () => {
-      const seen = new Map();
-      const deadline = performance.now() + 1500;
-      while (performance.now() < deadline) {
-        for (const a of document.getAnimations({ subtree: true })) {
-          if (a.playState !== 'running') continue;
-          let timing = {};
-          try { timing = a.effect?.getComputedTiming?.() ?? {}; } catch { /* detached */ }
-          const dur = typeof timing.duration === 'number' ? timing.duration : 0;
-          if (dur <= 1) continue; // fill-only / effectively instant
-          const offender = {
-            kind: a.constructor?.name ?? 'Animation',
-            name: a.animationName ?? a.transitionProperty ?? a.id ?? '(anonymous)',
-            duration: dur,
-            iterations: timing.iterations ?? 1,
-          };
-          seen.set(JSON.stringify(offender), offender);
-        }
-        await new Promise((resolve) => requestAnimationFrame(resolve));
-      }
-      return [...seen.values()];
-    });
+    await page.waitForTimeout(1500);
+    const offenders = await page.evaluate(() => window.__reducedMotionOffenders ?? []);
     expect(offenders, 'no running animation/transition with meaningful duration under reduced motion').toEqual([]);
   });
 
@@ -111,3 +117,78 @@ test.describe('workspace contract (canonical)', () => {
 });
 
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
+
+async function waitForApp(page) {
+  await page.waitForFunction(() => typeof window.webmcp_invoke_tool === 'function');
+}
+
+async function startTwoPlayerGame(page, { timer = false } = {}) {
+  await page.getByLabel('Player 1 name').fill('Alice');
+  await page.getByLabel('Player 2 name').fill('Bob');
+  if (timer) await page.getByRole('switch', { name: 'Round timer' }).click();
+  await page.getByRole('button', { name: 'Start game' }).click();
+  await expect(page.getByText("Alice's turn", { exact: true })).toBeVisible();
+}
+
+test('1.13 undo_restores_prior_card', async ({ page }) => {
+  await page.goto('/');
+  await waitForApp(page);
+  await expect(page.getByRole('main')).toBeVisible();
+  await expect(page.getByRole('form', { name: 'Players (2–8)' })).toBeVisible();
+  await expect(page.getByRole('complementary', { name: 'Custom card editor' })).toBeVisible();
+  await startTwoPlayerGame(page, { timer: true });
+  await expect(page.getByRole('complementary', { name: 'Live event feed' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Draw card' }).click();
+  const cardPrompt = page.locator('.card-flip p').last();
+  const prompt = await cardPrompt.textContent();
+  expect(prompt).toBeTruthy();
+
+  // Let the 15s round timer forfeit the card, which is itself a resolving
+  // action undo must be able to revert exactly like a Done/Skip.
+  await expect(page.getByRole('button', { name: 'Undo last turn' })).toBeVisible({ timeout: 18_000 });
+  await page.getByRole('button', { name: 'Undo last turn' }).click();
+  await expect(page.getByText("Alice's turn", { exact: true })).toBeVisible();
+  await expect(page.locator('.card-flip p').last()).toHaveText(prompt);
+  await expect(page.getByRole('button', { name: 'Undo last turn' })).toHaveCount(0);
+
+  // The restored timer-forfeit snapshot must not immediately forfeit again,
+  // and undo must not be re-usable on the already-reverted action.
+  await page.waitForTimeout(1_250);
+  await expect(page.locator('.card-flip p').last()).toHaveText(prompt);
+  await expect(page.getByRole('button', { name: 'Undo last turn' })).toHaveCount(0);
+});
+
+test('1.21 double_activated_done_resolves_one_turn', async ({ page }) => {
+  await page.goto('/');
+  await waitForApp(page);
+  await startTwoPlayerGame(page);
+  await page.getByRole('button', { name: 'Draw card' }).click();
+  await page.getByRole('button', { name: 'Done' }).evaluate((button) => {
+    button.click();
+    button.click();
+  });
+  await expect(page.getByRole('progressbar', { name: 'Alice points' })).toHaveAttribute('aria-valuenow', '1');
+  await expect(page.getByText("Bob's turn", { exact: true })).toBeVisible();
+});
+
+test('7.10 winner_and_export_reachable', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto('/');
+  await waitForApp(page);
+  await page.getByRole('button', { name: 'Export Session' }).click();
+
+  const dialog = page.getByRole('dialog', { name: 'Export Session' });
+  await expect(dialog).toBeVisible();
+  const box = await dialog.boundingBox();
+  if (!box) throw new Error('Export dialog has no visible bounds');
+  expect(box.y).toBeGreaterThanOrEqual(0);
+  expect(box.y + box.height).toBeLessThanOrEqual(812);
+
+  const download = page.getByRole('button', { name: 'Download JSON' });
+  await download.scrollIntoViewIfNeeded();
+  await download.click();
+  await expect(page.getByRole('status')).toContainText('Session JSON downloaded');
+  await page.getByRole('button', { name: 'Close', exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+});

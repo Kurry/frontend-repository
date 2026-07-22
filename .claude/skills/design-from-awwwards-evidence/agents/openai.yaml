@@ -1,0 +1,4 @@
+interface:
+  display_name: "Awwwards Evidence Design"
+  short_description: "Design from measured award-site patterns"
+  default_prompt: "Use $design-from-awwwards-evidence to design a distinctive frontend grounded in the Awwwards archive study."

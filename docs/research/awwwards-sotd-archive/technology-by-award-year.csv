@@ -1,0 +1,3556 @@
+award_year,technology,site_count,percent_of_live_sites_in_year
+2026,HSTS,146,74.872
+2026,HTTP/3,98,50.256
+2026,Cloudflare,85,43.59
+2026,Node.js,53,27.179
+2026,jQuery,48,24.615
+2026,Vercel,47,24.103
+2026,Google Tag Manager,41,21.026
+2026,jsDelivr,38,19.487
+2026,Vue.js,37,18.974
+2026,Nuxt.js,36,18.462
+2026,Google Analytics,31,15.897
+2026,Cloudflare Browser Insights,27,13.846
+2026,Unpkg,24,12.308
+2026,React,23,11.795
+2026,Webflow,20,10.256
+2026,Netlify,18,9.231
+2026,PHP,17,8.718
+2026,Next.js,17,8.718
+2026,Webpack,17,8.718
+2026,Nginx,16,8.205
+2026,Amazon Web Services,16,8.205
+2026,MySQL,15,7.692
+2026,WordPress,15,7.692
+2026,Google Font API,14,7.179
+2026,Google Hosted Libraries,14,7.179
+2026,Amazon CloudFront,13,6.667
+2026,cdnjs,12,6.154
+2026,Yoast SEO,10,5.128
+2026,Apache HTTP Server,9,4.615
+2026,Ubuntu,8,4.103
+2026,Cloudflare Bot Management,7,3.59
+2026,Adobe Fonts,6,3.077
+2026,Typekit,6,3.077
+2026,reCAPTCHA,6,3.077
+2026,Shopify,6,3.077
+2026,Amazon S3,6,3.077
+2026,Astro,6,3.077
+2026,Firebase,4,2.051
+2026,LiteSpeed,4,2.051
+2026,Framer Sites,4,2.051
+2026,CookieYes,4,2.051
+2026,Plesk,4,2.051
+2026,Akamai,4,2.051
+2026,WPML,3,1.538
+2026,Three.js,3,1.538
+2026,Contact Form 7,3,1.538
+2026,Akamai Bot Manager,3,1.538
+2026,Tealium,3,1.538
+2026,Klaviyo,3,1.538
+2026,WP Rocket,2,1.026
+2026,Lenis,2,1.026
+2026,Locomotive Scroll,2,1.026
+2026,Usercentrics,2,1.026
+2026,iubenda,2,1.026
+2026,OneTrust,2,1.026
+2026,Craft CMS,2,1.026
+2026,Yii,2,1.026
+2026,WordPress Block Editor,2,1.026
+2026,Google Cloud,2,1.026
+2026,Cookiebot,2,1.026
+2026,Linkedin Ads,2,1.026
+2026,Hostinger,2,1.026
+2026,Howler.js,2,1.026
+2026,W3 Total Cache,2,1.026
+2026,Prismic,2,1.026
+2026,Google Publisher Tag,2,1.026
+2026,WP Engine,2,1.026
+2026,MailChimp,2,1.026
+2026,Fathom,1,0.513
+2026,Bootstrap,1,0.513
+2026,Weglot,1,0.513
+2026,List.js,1,0.513
+2026,LottieFiles,1,0.513
+2026,Kinsta,1,0.513
+2026,Google Maps,1,0.513
+2026,Imperva,1,0.513
+2026,Glide.js,1,0.513
+2026,Google Cloud CDN,1,0.513
+2026,Google Cloud Storage,1,0.513
+2026,YouTube,1,0.513
+2026,Zendesk,1,0.513
+2026,Adobe Experience Manager,1,0.513
+2026,Java,1,0.513
+2026,Snowplow Analytics,1,0.513
+2026,p5.js,1,0.513
+2026,Google Tag Manager for WordPress,1,0.513
+2026,Vercel Analytics,1,0.513
+2026,Bluehost,1,0.513
+2026,Debian,1,0.513
+2026,LiteSpeed Cache,1,0.513
+2026,Litespeed Cache,1,0.513
+2026,hCaptcha,1,0.513
+2026,Site Kit,1,0.513
+2026,Bunny,1,0.513
+2026,Hydrogen,1,0.513
+2026,Vite,1,0.513
+2026,Varnish,1,0.513
+2026,MailChimp for WooCommerce,1,0.513
+2026,WooCommerce,1,0.513
+2026,jQuery Migrate,1,0.513
+2026,Cart Functionality,1,0.513
+2026,Cookie Script,1,0.513
+2026,Rebuy,1,0.513
+2026,Bricks,1,0.513
+2026,Cloudways,1,0.513
+2026,Ruby,1,0.513
+2026,Ruby on Rails,1,0.513
+2026,Azure,1,0.513
+2026,Azure Front Door,1,0.513
+2026,Prototype,1,0.513
+2026,Klarna Checkout,1,0.513
+2026,Platform.sh,1,0.513
+2026,AB Tasty,1,0.513
+2026,Salesforce,1,0.513
+2026,Salesforce Commerce Cloud,1,0.513
+2026,Alpine.js,1,0.513
+2025,HSTS,221,65.192
+2025,HTTP/3,163,48.083
+2025,Cloudflare,156,46.018
+2025,Node.js,102,30.088
+2025,jQuery,87,25.664
+2025,Vercel,76,22.419
+2025,Vue.js,65,19.174
+2025,jsDelivr,65,19.174
+2025,Nuxt.js,64,18.879
+2025,Google Tag Manager,55,16.224
+2025,Google Analytics,54,15.929
+2025,React,47,13.864
+2025,Cloudflare Browser Insights,43,12.684
+2025,Unpkg,41,12.094
+2025,PHP,39,11.504
+2025,Next.js,35,10.324
+2025,Webpack,35,10.324
+2025,cdnjs,35,10.324
+2025,MySQL,35,10.324
+2025,WordPress,35,10.324
+2025,Nginx,32,9.44
+2025,Apache HTTP Server,29,8.555
+2025,Netlify,24,7.08
+2025,Webflow,23,6.785
+2025,Amazon Web Services,20,5.9
+2025,Yoast SEO,19,5.605
+2025,Google Hosted Libraries,18,5.31
+2025,Google Font API,14,4.13
+2025,Astro,13,3.835
+2025,Ubuntu,13,3.835
+2025,Cloudflare Bot Management,13,3.835
+2025,Adobe Fonts,13,3.835
+2025,Typekit,13,3.835
+2025,reCAPTCHA,12,3.54
+2025,Amazon CloudFront,12,3.54
+2025,Shopify,10,2.95
+2025,Prismic,10,2.95
+2025,Amazon S3,9,2.655
+2025,jQuery Migrate,8,2.36
+2025,Three.js,7,2.065
+2025,Framer Sites,7,2.065
+2025,LiteSpeed,7,2.065
+2025,Varnish,6,1.77
+2025,C3.js,6,1.77
+2025,Contact Form 7,6,1.77
+2025,W3 Total Cache,6,1.77
+2025,jQuery CDN,6,1.77
+2025,WPML,6,1.77
+2025,Linkedin Ads,5,1.475
+2025,WP Rocket,5,1.475
+2025,Plyr,5,1.475
+2025,Craft CMS,5,1.475
+2025,CookieYes,5,1.475
+2025,Matter.js,4,1.18
+2025,Hydrogen,4,1.18
+2025,Vite,4,1.18
+2025,Alpine.js,4,1.18
+2025,Firebase,4,1.18
+2025,Klaviyo,4,1.18
+2025,WP Engine,3,0.885
+2025,Lightbox,3,0.885
+2025,Express,3,0.885
+2025,SEOmatic,3,0.885
+2025,Google Cloud,3,0.885
+2025,Google Cloud CDN,3,0.885
+2025,Flickity,3,0.885
+2025,Fastly,3,0.885
+2025,Contentful,3,0.885
+2025,Stripe,3,0.885
+2025,Cookiebot,3,0.885
+2025,Envoy,3,0.885
+2025,Site Kit,3,0.885
+2025,Akamai,2,0.59
+2025,iubenda,2,0.59
+2025,UIKit,2,0.59
+2025,Howler.js,2,0.59
+2025,MailChimp,2,0.59
+2025,Blitz,2,0.59
+2025,Swiper,2,0.59
+2025,Azure,2,0.59
+2025,Azure Front Door,2,0.59
+2025,Moment.js,2,0.59
+2025,Polylang,2,0.59
+2025,WooCommerce,2,0.59
+2025,LottieFiles,2,0.59
+2025,Complianz,2,0.59
+2025,Swup,2,0.59
+2025,LiteSpeed Cache,2,0.59
+2025,Litespeed Cache,2,0.59
+2025,Yii,2,0.59
+2025,OneTrust,2,0.59
+2025,WordPress Super Cache,2,0.59
+2025,Onsen UI,2,0.59
+2025,Sanity,2,0.59
+2025,Sanity.io,2,0.59
+2025,ZURB Foundation,2,0.59
+2025,Adobe Dynamic Media Classic,1,0.295
+2025,Adobe Experience Manager,1,0.295
+2025,Java,1,0.295
+2025,Gravity Forms,1,0.295
+2025,Redis,1,0.295
+2025,Redis Object Cache,1,0.295
+2025,Yoast SEO Premium,1,0.295
+2025,Drupal,1,0.295
+2025,Hostinger,1,0.295
+2025,Hostinger CDN,1,0.295
+2025,Infinite Scroll,1,0.295
+2025,Simpli.fi,1,0.295
+2025,CreateJS,1,0.295
+2025,<model-viewer>,1,0.295
+2025,FirstPromoter,1,0.295
+2025,Slick,1,0.295
+2025,PIXIjs,1,0.295
+2025,Contentsquare,1,0.295
+2025,The Hotels Network,1,0.295
+2025,OpenResty,1,0.295
+2025,Bricks,1,0.295
+2025,Cloudways,1,0.295
+2025,Debian,1,0.295
+2025,Bootstrap,1,0.295
+2025,MariaDB,1,0.295
+2025,OWL Carousel,1,0.295
+2025,Pantheon,1,0.295
+2025,Underscore.js,1,0.295
+2025,YouTube,1,0.295
+2025,Hammer.js,1,0.295
+2025,Google Cloud Load Balancing,1,0.295
+2025,Amazon ALB,1,0.295
+2025,ProcessWire,1,0.295
+2025,EWWW Image Optimizer,1,0.295
+2025,Microsoft ASP.NET,1,0.295
+2025,Sitecore,1,0.295
+2025,GitHub Pages,1,0.295
+2025,Segment,1,0.295
+2025,CentOS,1,0.295
+2025,OpenSSL,1,0.295
+2025,WP-Optimize,1,0.295
+2025,Prism,1,0.295
+2025,Snowplow Analytics,1,0.295
+2025,Moment Timezone,1,0.295
+2025,WordPress Site Editor,1,0.295
+2025,Wistia,1,0.295
+2025,Fathom,1,0.295
+2025,Ruby,1,0.295
+2025,Ruby on Rails,1,0.295
+2025,Stimulus,1,0.295
+2025,theTradeDesk,1,0.295
+2025,Lodash,1,0.295
+2025,Wix,1,0.295
+2025,Kinsta,1,0.295
+2025,Mixitup,1,0.295
+2025,Packery,1,0.295
+2024,HSTS,218,64.497
+2024,HTTP/3,156,46.154
+2024,Cloudflare,133,39.349
+2024,Node.js,97,28.698
+2024,Google Analytics,76,22.485
+2024,Vue.js,71,21.006
+2024,jQuery,70,20.71
+2024,Vercel,70,20.71
+2024,Nuxt.js,67,19.822
+2024,Google Tag Manager,57,16.864
+2024,jsDelivr,49,14.497
+2024,Cloudflare Browser Insights,48,14.201
+2024,Netlify,45,13.314
+2024,PHP,43,12.722
+2024,WordPress,37,10.947
+2024,MySQL,35,10.355
+2024,cdnjs,32,9.467
+2024,Unpkg,31,9.172
+2024,Nginx,30,8.876
+2024,Apache HTTP Server,30,8.876
+2024,React,27,7.988
+2024,Amazon Web Services,25,7.396
+2024,Yoast SEO,23,6.805
+2024,Webpack,23,6.805
+2024,Next.js,22,6.509
+2024,Amazon CloudFront,22,6.509
+2024,Cloudflare Bot Management,13,3.846
+2024,Google Hosted Libraries,13,3.846
+2024,Webflow,12,3.55
+2024,Ubuntu,11,3.254
+2024,Shopify,9,2.663
+2024,Klaviyo,9,2.663
+2024,Astro,9,2.663
+2024,Adobe Fonts,9,2.663
+2024,Typekit,9,2.663
+2024,Google Font API,9,2.663
+2024,Amazon S3,8,2.367
+2024,Firebase,8,2.367
+2024,Express,8,2.367
+2024,jQuery Migrate,7,2.071
+2024,Google Cloud,7,2.071
+2024,reCAPTCHA,7,2.071
+2024,jQuery CDN,7,2.071
+2024,Contentful,7,2.071
+2024,Three.js,6,1.775
+2024,LiteSpeed,6,1.775
+2024,Flickity,6,1.775
+2024,Contact Form 7,6,1.775
+2024,W3 Total Cache,6,1.775
+2024,hCaptcha,5,1.479
+2024,WP Rocket,5,1.479
+2024,C3.js,5,1.479
+2024,Prismic,5,1.479
+2024,WooCommerce,4,1.183
+2024,Matter.js,4,1.183
+2024,Google Cloud CDN,4,1.183
+2024,Onsen UI,4,1.183
+2024,CookieYes,4,1.183
+2024,Site Kit,3,0.888
+2024,WordPress Block Editor,3,0.888
+2024,Gravity Forms,3,0.888
+2024,WP Engine,3,0.888
+2024,Craft CMS,3,0.888
+2024,Linkedin Ads,3,0.888
+2024,SEOmatic,3,0.888
+2024,WP-Optimize,3,0.888
+2024,Swiper,3,0.888
+2024,OneTrust,3,0.888
+2024,WPML,3,0.888
+2024,Howler.js,3,0.888
+2024,imagesLoaded,3,0.888
+2024,Lenis,3,0.888
+2024,Locomotive Scroll,3,0.888
+2024,Modernizr,3,0.888
+2024,Alpine.js,3,0.888
+2024,Stripe,2,0.592
+2024,Google Cloud Load Balancing,2,0.592
+2024,iubenda,2,0.592
+2024,SVG Support,2,0.592
+2024,Google Tag Manager for WordPress,2,0.592
+2024,Yoast SEO Premium,2,0.592
+2024,CreateJS,2,0.592
+2024,YouTube,2,0.592
+2024,Plyr,2,0.592
+2024,Sanity,2,0.592
+2024,Sanity.io,2,0.592
+2024,Kirby,2,0.592
+2024,Framer Sites,2,0.592
+2024,Cookiebot,2,0.592
+2024,Complianz,2,0.592
+2024,Mapbox GL JS,1,0.296
+2024,WooCommerce Stripe Payment Gateway,1,0.296
+2024,Hydrogen,1,0.296
+2024,Vite,1,0.296
+2024,MemberStack,1,0.296
+2024,UIKit,1,0.296
+2024,Google Cloud Trace,1,0.296
+2024,Aruba.it,1,0.296
+2024,Gatsby,1,0.296
+2024,MonsterInsights,1,0.296
+2024,Slick,1,0.296
+2024,Kliken,1,0.296
+2024,Calendly,1,0.296
+2024,Clickbank,1,0.296
+2024,Rewardful,1,0.296
+2024,GoatCounter,1,0.296
+2024,Blitz,1,0.296
+2024,Snowplow Analytics,1,0.296
+2024,theTradeDesk,1,0.296
+2024,Google Cloud Storage,1,0.296
+2024,OpenResty,1,0.296
+2024,Autoptimize,1,0.296
+2024,Lightbox,1,0.296
+2024,WordPress Super Cache,1,0.296
+2024,Platform.sh,1,0.296
+2024,WordPress VIP,1,0.296
+2024,RawGit,1,0.296
+2024,LottieFiles,1,0.296
+2024,Cecil,1,0.296
+2024,AB Tasty,1,0.296
+2024,Bootstrap,1,0.296
+2024,Debian,1,0.296
+2024,Optibase,1,0.296
+2024,Cloudways,1,0.296
+2024,Elementor,1,0.296
+2024,Fathom,1,0.296
+2024,Lodash,1,0.296
+2024,Wix,1,0.296
+2024,Lead Forensics,1,0.296
+2024,ProgressBar.js,1,0.296
+2024,PixelYourSite,1,0.296
+2024,Umami,1,0.296
+2024,Hostinger,1,0.296
+2024,Hostinger CDN,1,0.296
+2024,ZURB Foundation,1,0.296
+2024,Htmx,1,0.296
+2024,ProcessWire,1,0.296
+2024,Google Maps,1,0.296
+2024,LiteSpeed Cache,1,0.296
+2024,Litespeed Cache,1,0.296
+2024,Sendinblue,1,0.296
+2024,GenerateBlocks,1,0.296
+2024,GeneratePress,1,0.296
+2024,GeneratePress GP Premium,1,0.296
+2024,Intelligems,1,0.296
+2024,Kinsta,1,0.296
+2024,Bluehost,1,0.296
+2024,Endurance Page Cache,1,0.296
+2023,HSTS,208,65.204
+2023,HTTP/3,137,42.947
+2023,Cloudflare,122,38.245
+2023,Google Analytics,92,28.84
+2023,Node.js,86,26.959
+2023,Google Tag Manager,82,25.705
+2023,jQuery,72,22.571
+2023,Vercel,69,21.63
+2023,Nuxt.js,57,17.868
+2023,Vue.js,57,17.868
+2023,PHP,48,15.047
+2023,Cloudflare Browser Insights,47,14.734
+2023,cdnjs,41,12.853
+2023,jsDelivr,41,12.853
+2023,Netlify,39,12.226
+2023,MySQL,38,11.912
+2023,WordPress,38,11.912
+2023,React,32,10.031
+2023,Nginx,30,9.404
+2023,Webpack,29,9.091
+2023,Unpkg,27,8.464
+2023,Next.js,26,8.15
+2023,Amazon Web Services,25,7.837
+2023,Yoast SEO,24,7.524
+2023,Amazon CloudFront,20,6.27
+2023,Apache HTTP Server,19,5.956
+2023,reCAPTCHA,16,5.016
+2023,Cloudflare Bot Management,16,5.016
+2023,Google Hosted Libraries,15,4.702
+2023,Amazon S3,14,4.389
+2023,Google Font API,12,3.762
+2023,Webflow,12,3.762
+2023,jQuery Migrate,11,3.448
+2023,LiteSpeed,9,2.821
+2023,Adobe Fonts,9,2.821
+2023,Typekit,9,2.821
+2023,Prismic,9,2.821
+2023,Contentful,9,2.821
+2023,WPML,8,2.508
+2023,Shopify,8,2.508
+2023,WP Engine,8,2.508
+2023,Firebase,7,2.194
+2023,jQuery CDN,7,2.194
+2023,Contact Form 7,6,1.881
+2023,LiteSpeed Cache,6,1.881
+2023,Litespeed Cache,6,1.881
+2023,WP Rocket,6,1.881
+2023,Cookiebot,6,1.881
+2023,Ubuntu,6,1.881
+2023,YouTube,6,1.881
+2023,C3.js,6,1.881
+2023,Three.js,5,1.567
+2023,Akamai,5,1.567
+2023,iubenda,5,1.567
+2023,GSAP,4,1.254
+2023,Google Cloud,4,1.254
+2023,Weglot,4,1.254
+2023,Bootstrap,4,1.254
+2023,Modernizr,4,1.254
+2023,OpenResty,4,1.254
+2023,Envoy,3,0.94
+2023,Express,3,0.94
+2023,Astro,3,0.94
+2023,LottieFiles,3,0.94
+2023,Linkedin Ads,3,0.94
+2023,Flickity,3,0.94
+2023,Klaviyo,3,0.94
+2023,Gatsby,3,0.94
+2023,Java,3,0.94
+2023,Lodash,3,0.94
+2023,Varnish,3,0.94
+2023,OneTrust,3,0.94
+2023,WooCommerce,3,0.94
+2023,Plesk,3,0.94
+2023,Google Cloud Load Balancing,2,0.627
+2023,Google Cloud Trace,2,0.627
+2023,Elementor,2,0.627
+2023,Redis,2,0.627
+2023,Redis Object Cache,2,0.627
+2023,Akamai Bot Manager,2,0.627
+2023,PayPal,2,0.627
+2023,Framer Sites,2,0.627
+2023,Swiper,2,0.627
+2023,Polylang,2,0.627
+2023,MailChimp,2,0.627
+2023,Complianz,2,0.627
+2023,Plyr,2,0.627
+2023,FancyBox,2,0.627
+2023,Apache Tomcat,2,0.627
+2023,Storyblok,2,0.627
+2023,Site Kit,2,0.627
+2023,Amazon ALB,2,0.627
+2023,jQuery UI,2,0.627
+2023,Zoho,2,0.627
+2023,Zoho PageSense,2,0.627
+2023,Google Cloud CDN,2,0.627
+2023,Google Maps,2,0.627
+2023,Draftpress HFCM,2,0.627
+2023,Howler.js,1,0.313
+2023,JetEngine,1,0.313
+2023,imagesLoaded,1,0.313
+2023,AB Tasty,1,0.313
+2023,Salesforce,1,0.313
+2023,Salesforce Commerce Cloud,1,0.313
+2023,Gravity Forms,1,0.313
+2023,WordPress Super Cache,1,0.313
+2023,Kameleoon,1,0.313
+2023,Klarna Checkout,1,0.313
+2023,PCI Proxy,1,0.313
+2023,Platform.sh,1,0.313
+2023,Usercentrics,1,0.313
+2023,Humblytics,1,0.313
+2023,Bluehost,1,0.313
+2023,Endurance Page Cache,1,0.313
+2023,ProgressBar.js,1,0.313
+2023,AMP,1,0.313
+2023,Cookie Notice,1,0.313
+2023,Cabin,1,0.313
+2023,Craft CMS,1,0.313
+2023,SEOmatic,1,0.313
+2023,Stripe,1,0.313
+2023,Tiny Slider,1,0.313
+2023,Slick,1,0.313
+2023,Caddy,1,0.313
+2023,Google PageSpeed:on,1,0.313
+2023,Umami,1,0.313
+2023,ZURB Foundation,1,0.313
+2023,EWWW Image Optimizer,1,0.313
+2023,W3 Total Cache,1,0.313
+2023,Twitter,1,0.313
+2023,Alpine.js,1,0.313
+2023,Typeform,1,0.313
+2023,Morphext,1,0.313
+2023,Matter.js,1,0.313
+2023,SVG Support,1,0.313
+2023,CookieYes,1,0.313
+2023,Debian,1,0.313
+2023,Vercel Analytics,1,0.313
+2023,Elfsight,1,0.313
+2023,Algolia,1,0.313
+2023,TrustArc,1,0.313
+2023,BootstrapCDN,1,0.313
+2023,Lenis,1,0.313
+2023,Locomotive Scroll,1,0.313
+2023,Popper,1,0.313
+2023,Clutch,1,0.313
+2023,CreateJS,1,0.313
+2023,Adobe Experience Manager,1,0.313
+2023,Plausible,1,0.313
+2023,HubSpot,1,0.313
+2023,Squarespace,1,0.313
+2023,Squarespace Commerce,1,0.313
+2023,Stimulus,1,0.313
+2023,Backbone.js,1,0.313
+2023,Clipboard.js,1,0.313
+2023,Moxie,1,0.313
+2023,Plupload,1,0.313
+2023,Underscore.js,1,0.313
+2023,TYPO3 CMS,1,0.313
+2023,Hostinger,1,0.313
+2022,HSTS,178,58.553
+2022,HTTP/3,109,35.855
+2022,Cloudflare,105,34.539
+2022,Google Tag Manager,81,26.645
+2022,Node.js,77,25.329
+2022,Google Analytics,76,25.0
+2022,jQuery,58,19.079
+2022,Vue.js,57,18.75
+2022,PHP,55,18.092
+2022,Nuxt.js,52,17.105
+2022,Vercel,45,14.803
+2022,Netlify,44,14.474
+2022,WordPress,42,13.816
+2022,MySQL,40,13.158
+2022,Nginx,40,13.158
+2022,Cloudflare Browser Insights,37,12.171
+2022,React,36,11.842
+2022,cdnjs,31,10.197
+2022,Amazon Web Services,28,9.211
+2022,Apache HTTP Server,27,8.882
+2022,Webpack,26,8.553
+2022,Amazon CloudFront,23,7.566
+2022,jsDelivr,23,7.566
+2022,Yoast SEO,22,7.237
+2022,Next.js,22,7.237
+2022,Amazon S3,16,5.263
+2022,jQuery Migrate,16,5.263
+2022,reCAPTCHA,15,4.934
+2022,Unpkg,15,4.934
+2022,Google Hosted Libraries,13,4.276
+2022,Cloudflare Bot Management,12,3.947
+2022,Lenis,12,3.947
+2022,Locomotive Scroll,12,3.947
+2022,LiteSpeed,10,3.289
+2022,Adobe Fonts,10,3.289
+2022,Typekit,10,3.289
+2022,Shopify,10,3.289
+2022,WPML,9,2.961
+2022,Ubuntu,8,2.632
+2022,Craft CMS,8,2.632
+2022,Contact Form 7,8,2.632
+2022,Google Font API,8,2.632
+2022,Firebase,7,2.303
+2022,SEOmatic,7,2.303
+2022,Modernizr,7,2.303
+2022,Varnish,7,2.303
+2022,Klaviyo,7,2.303
+2022,Webflow,6,1.974
+2022,jQuery CDN,6,1.974
+2022,Contentful,6,1.974
+2022,WP Engine,5,1.645
+2022,LiteSpeed Cache,5,1.645
+2022,Litespeed Cache,5,1.645
+2022,OpenResty,5,1.645
+2022,Google Cloud,5,1.645
+2022,Site Kit,5,1.645
+2022,Alpine.js,4,1.316
+2022,AMP,4,1.316
+2022,ZURB Foundation,4,1.316
+2022,CookieYes,4,1.316
+2022,Matter.js,4,1.316
+2022,OneTrust,4,1.316
+2022,Polyfill,4,1.316
+2022,Google Cloud Load Balancing,4,1.316
+2022,Google Cloud Trace,4,1.316
+2022,Gatsby,4,1.316
+2022,WP Rocket,3,0.987
+2022,Drupal,3,0.987
+2022,Linkedin Ads,3,0.987
+2022,Blitz,3,0.987
+2022,Polylang,3,0.987
+2022,Osano,3,0.987
+2022,Sucuri,3,0.987
+2022,imagesLoaded,3,0.987
+2022,Bootstrap,3,0.987
+2022,Yii,3,0.987
+2022,Stripe,3,0.987
+2022,Stimulus,3,0.987
+2022,Express,3,0.987
+2022,YouTube,3,0.987
+2022,Fathom,3,0.987
+2022,Sentry,2,0.658
+2022,Cookiebot,2,0.658
+2022,Complianz,2,0.658
+2022,Google Tag Manager for WordPress,2,0.658
+2022,WooCommerce,2,0.658
+2022,WooCommerce Multilingual,2,0.658
+2022,Azure,2,0.658
+2022,Azure Front Door,2,0.658
+2022,Tengine,2,0.658
+2022,LottieFiles,2,0.658
+2022,Gravity Forms,2,0.658
+2022,MODX,2,0.658
+2022,Fastly,2,0.658
+2022,Google Maps,2,0.658
+2022,Performance Lab,2,0.658
+2022,Flickity,2,0.658
+2022,Usercentrics,2,0.658
+2022,iubenda,2,0.658
+2022,WordPress Site Editor,2,0.658
+2022,Astro,2,0.658
+2022,Select2,2,0.658
+2022,C3.js,2,0.658
+2022,RxJS,1,0.329
+2022,Calendly,1,0.329
+2022,ProcessWire,1,0.329
+2022,Underscore.js,1,0.329
+2022,Wholesale Suite,1,0.329
+2022,Aruba.it,1,0.329
+2022,Sanity,1,0.329
+2022,Sanity.io,1,0.329
+2022,Snowplow Analytics,1,0.329
+2022,Alibaba Cloud Object Storage Service,1,0.329
+2022,Simple Analytics,1,0.329
+2022,StoreRocket,1,0.329
+2022,Readymag,1,0.329
+2022,Google PageSpeed,1,0.329
+2022,Plesk,1,0.329
+2022,jQuery UI,1,0.329
+2022,Sulu,1,0.329
+2022,Symfony,1,0.329
+2022,OWL Carousel,1,0.329
+2022,Tally,1,0.329
+2022,FitVids.JS,1,0.329
+2022,Twenty Twenty,1,0.329
+2022,html2canvas,1,0.329
+2022,GitHub Pages,1,0.329
+2022,Flywheel,1,0.329
+2022,Semplice,1,0.329
+2022,Google Cloud CDN,1,0.329
+2022,Lodash,1,0.329
+2022,Wix,1,0.329
+2022,Web Font Loader,1,0.329
+2022,Contentsquare,1,0.329
+2022,Framer Sites,1,0.329
+2022,MariaDB,1,0.329
+2022,Pantheon,1,0.329
+2022,Yoast SEO Premium,1,0.329
+2022,Extend,1,0.329
+2022,Optimizely,1,0.329
+2022,Salesforce,1,0.329
+2022,Salesforce Commerce Cloud,1,0.329
+2022,W3 Total Cache,1,0.329
+2022,Google PageSpeed:on,1,0.329
+2022,Slick,1,0.329
+2022,Weglot,1,0.329
+2022,UserWay,1,0.329
+2022,Trustpilot,1,0.329
+2022,Attentive,1,0.329
+2022,Cart Functionality,1,0.329
+2022,Rebuy,1,0.329
+2022,Akamai,1,0.329
+2022,Kameleoon,1,0.329
+2022,Klarna Checkout,1,0.329
+2022,PCI Proxy,1,0.329
+2022,PayPal,1,0.329
+2022,Platform.sh,1,0.329
+2022,parallax.js,1,0.329
+2022,Caddy,1,0.329
+2022,Custom Twitter Feeds,1,0.329
+2022,Plyr,1,0.329
+2022,Swiper,1,0.329
+2022,Matomo Analytics,1,0.329
+2022,Mantis,1,0.329
+2022,Clicky,1,0.329
+2022,HubSpot,1,0.329
+2022,HubSpot CMS Hub,1,0.329
+2022,ShareThis,1,0.329
+2022,Tiny Slider,1,0.329
+2022,Onsen UI,1,0.329
+2022,Typed.js,1,0.329
+2022,GSAP,1,0.329
+2022,Debian,1,0.329
+2022,Snap.svg,1,0.329
+2022,Three.js,1,0.329
+2022,PIXIjs,1,0.329
+2022,Kinsta,1,0.329
+2022,DDoS-Guard,1,0.329
+2022,Highlight.js,1,0.329
+2022,Tilda,1,0.329
+2022,Prismic,1,0.329
+2022,All in One SEO,1,0.329
+2022,All in One SEO Pack,1,0.329
+2022,WordPress Block Editor,1,0.329
+2022,wpBakery,1,0.329
+2022,Chart.js,1,0.329
+2022,Elementor,1,0.329
+2022,Plausible,1,0.329
+2022,Kakao,1,0.329
+2022,Acquia Cloud Platform:next,1,0.329
+2022,Campaign Monitor,1,0.329
+2022,Jekyll,1,0.329
+2022,Ruby,1,0.329
+2021,HSTS,153,53.125
+2021,HTTP/3,115,39.931
+2021,Cloudflare,87,30.208
+2021,Google Analytics,86,29.861
+2021,Google Tag Manager,72,25.0
+2021,PHP,64,22.222
+2021,jQuery,50,17.361
+2021,Node.js,50,17.361
+2021,Nginx,47,16.319
+2021,Vue.js,47,16.319
+2021,MySQL,46,15.972
+2021,WordPress,45,15.625
+2021,Nuxt.js,42,14.583
+2021,Apache HTTP Server,39,13.542
+2021,Cloudflare Browser Insights,32,11.111
+2021,Netlify,29,10.069
+2021,Vercel,26,9.028
+2021,Amazon Web Services,26,9.028
+2021,Yoast SEO,24,8.333
+2021,jsDelivr,23,7.986
+2021,cdnjs,22,7.639
+2021,React,21,7.292
+2021,Amazon CloudFront,20,6.944
+2021,Amazon S3,17,5.903
+2021,Adobe Fonts,17,5.903
+2021,Typekit,17,5.903
+2021,Shopify,14,4.861
+2021,Cloudflare Bot Management,14,4.861
+2021,LiteSpeed,13,4.514
+2021,Unpkg,11,3.819
+2021,Webpack,11,3.819
+2021,jQuery Migrate,11,3.819
+2021,Contentful,10,3.472
+2021,Firebase,10,3.472
+2021,WPML,9,3.125
+2021,Klaviyo,9,3.125
+2021,Ubuntu,9,3.125
+2021,reCAPTCHA,8,2.778
+2021,Swiper,7,2.431
+2021,LiteSpeed Cache,7,2.431
+2021,Litespeed Cache,7,2.431
+2021,Google Hosted Libraries,7,2.431
+2021,Stimulus,7,2.431
+2021,YouTube,7,2.431
+2021,WP Rocket,6,2.083
+2021,Gatsby,6,2.083
+2021,Squarespace,6,2.083
+2021,Squarespace Commerce,6,2.083
+2021,Google Cloud,6,2.083
+2021,Next.js,5,1.736
+2021,Varnish,5,1.736
+2021,Contact Form 7,5,1.736
+2021,Cookiebot,4,1.389
+2021,WP Engine,4,1.389
+2021,Elementor,4,1.389
+2021,Google Font API,4,1.389
+2021,ZURB Foundation,4,1.389
+2021,AMP,4,1.389
+2021,Google Cloud CDN,4,1.389
+2021,C3.js,4,1.389
+2021,Modernizr,4,1.389
+2021,Slick,4,1.389
+2021,WooCommerce,4,1.389
+2021,Express,4,1.389
+2021,Readymag,4,1.389
+2021,Three.js,4,1.389
+2021,Craft CMS,4,1.389
+2021,OpenResty,4,1.389
+2021,CookieYes,3,1.042
+2021,Lenis,3,1.042
+2021,Locomotive Scroll,3,1.042
+2021,Alpine.js,3,1.042
+2021,parallax.js,3,1.042
+2021,OneTrust,3,1.042
+2021,Google Tag Manager for WordPress,3,1.042
+2021,Kinsta,3,1.042
+2021,MailChimp,3,1.042
+2021,jQuery UI,3,1.042
+2021,jQuery CDN,3,1.042
+2021,Google Cloud Load Balancing,3,1.042
+2021,Google Cloud Trace,3,1.042
+2021,Yii,3,1.042
+2021,Bootstrap,3,1.042
+2021,GSAP,3,1.042
+2021,Debian,2,0.694
+2021,GoDaddy Website Builder,2,0.694
+2021,PIXIjs,2,0.694
+2021,Prismic,2,0.694
+2021,Complianz,2,0.694
+2021,Framer Sites,2,0.694
+2021,Optimizely,2,0.694
+2021,Adobe Experience Manager,2,0.694
+2021,Java,2,0.694
+2021,Webflow,2,0.694
+2021,Linkedin Ads,2,0.694
+2021,Site Kit,2,0.694
+2021,FancyBox,2,0.694
+2021,OWL Carousel,2,0.694
+2021,Caddy,2,0.694
+2021,Polylang,2,0.694
+2021,Hostinger,2,0.694
+2021,Pinterest,2,0.694
+2021,Lodash,2,0.694
+2021,Google Web Server,2,0.694
+2021,WordPress Block Editor,2,0.694
+2021,Laravel,2,0.694
+2021,Amazon ALB,2,0.694
+2021,Calendly,1,0.347
+2021,Fathom,1,0.347
+2021,PixelYourSite,1,0.347
+2021,MODX,1,0.347
+2021,Yoast SEO for Shopify,1,0.347
+2021,Mapbox GL JS,1,0.347
+2021,Google Cloud Storage,1,0.347
+2021,Getsitecontrol,1,0.347
+2021,RD Station,1,0.347
+2021,Usercentrics,1,0.347
+2021,1C-Bitrix,1,0.347
+2021,Intellimize,1,0.347
+2021,Osano,1,0.347
+2021,Hydrogen,1,0.347
+2021,Klarna Checkout,1,0.347
+2021,Vite,1,0.347
+2021,Magnific Popup,1,0.347
+2021,Redux Framework,1,0.347
+2021,imagesLoaded,1,0.347
+2021,IIS,1,0.347
+2021,Windows Server,1,0.347
+2021,MailChimp for WordPress,1,0.347
+2021,Yoast SEO Premium,1,0.347
+2021,Weglot,1,0.347
+2021,The SEO Framework,1,0.347
+2021,Fastly,1,0.347
+2021,GitHub Pages,1,0.347
+2021,CoverManager,1,0.347
+2021,Imperva,1,0.347
+2021,Resy,1,0.347
+2021,Stripe,1,0.347
+2021,Inertia.js,1,0.347
+2021,Finsweet,1,0.347
+2021,CookieFirst,1,0.347
+2021,Plausible,1,0.347
+2021,WooCommerce Multilingual,1,0.347
+2021,MailerLite,1,0.347
+2021,DatoCMS,1,0.347
+2021,Lever,1,0.347
+2021,Lovable,1,0.347
+2021,Apple MapKit JS,1,0.347
+2021,RxJS,1,0.347
+2021,Akamai,1,0.347
+2021,Akamai Bot Manager,1,0.347
+2021,IBM Carbon Design System,1,0.347
+2021,Hugo,1,0.347
+2021,Envoy,1,0.347
+2021,6sense,1,0.347
+2021,EWWW Image Optimizer,1,0.347
+2021,W3 Total Cache,1,0.347
+2021,Azure,1,0.347
+2021,Azure Front Door,1,0.347
+2021,Cart Functionality,1,0.347
+2021,Facebook Pixel,1,0.347
+2021,Google Analytics Enhanced eCommerce,1,0.347
+2021,Microsoft Advertising,1,0.347
+2021,Quantum Metric,1,0.347
+2021,Ruby,1,0.347
+2021,Ruby on Rails,1,0.347
+2021,PrestaShop,1,0.347
+2021,Neos CMS,1,0.347
+2021,Neos Flow,1,0.347
+2021,jQuery-pjax,1,0.347
+2021,Google Maps,1,0.347
+2021,iubenda,1,0.347
+2021,MailChimp for WooCommerce,1,0.347
+2021,Underscore.js,1,0.347
+2021,Font Awesome,1,0.347
+2021,All in One SEO,1,0.347
+2021,All in One SEO Pack,1,0.347
+2021,Gravatar,1,0.347
+2021,WOW,1,0.347
+2021,Max Mega Menu,1,0.347
+2021,hCaptcha,1,0.347
+2021,Mars Flag,1,0.347
+2021,Astro,1,0.347
+2021,BugSnag,1,0.347
+2021,Statamic,1,0.347
+2021,Elfsight,1,0.347
+2021,Engintron,1,0.347
+2021,SEOmatic,1,0.347
+2021,Sentry,1,0.347
+2021,SmtpJS,1,0.347
+2021,Drupal,1,0.347
+2021,Instagram Feed for WordPress,1,0.347
+2021,Polyfill,1,0.347
+2021,Wix,1,0.347
+2021,Roadiz CMS,1,0.347
+2021,Symfony,1,0.347
+2021,Afterpay,1,0.347
+2021,Yotpo Loyalty & Referrals,1,0.347
+2021,Naver Analytics,1,0.347
+2021,bxSlider,1,0.347
+2021,mobile-detect.js,1,0.347
+2021,LazySizes unveilhooks plugin,1,0.347
+2020,HSTS,141,48.958
+2020,HTTP/3,96,33.333
+2020,Google Analytics,86,29.861
+2020,Cloudflare,86,29.861
+2020,Node.js,66,22.917
+2020,Google Tag Manager,61,21.181
+2020,PHP,59,20.486
+2020,Nginx,56,19.444
+2020,WordPress,50,17.361
+2020,MySQL,49,17.014
+2020,Vue.js,49,17.014
+2020,Cloudflare Browser Insights,45,15.625
+2020,jQuery,45,15.625
+2020,Nuxt.js,44,15.278
+2020,Apache HTTP Server,34,11.806
+2020,Netlify,32,11.111
+2020,Vercel,25,8.681
+2020,React,24,8.333
+2020,Yoast SEO,23,7.986
+2020,cdnjs,20,6.944
+2020,Amazon Web Services,20,6.944
+2020,Adobe Fonts,17,5.903
+2020,Typekit,17,5.903
+2020,Amazon CloudFront,17,5.903
+2020,Webpack,15,5.208
+2020,Google Hosted Libraries,13,4.514
+2020,Next.js,13,4.514
+2020,reCAPTCHA,12,4.167
+2020,LiteSpeed,12,4.167
+2020,Google Cloud,11,3.819
+2020,Ubuntu,11,3.819
+2020,Express,11,3.819
+2020,jsDelivr,10,3.472
+2020,Contentful,10,3.472
+2020,WP Rocket,10,3.472
+2020,Amazon S3,10,3.472
+2020,YouTube,9,3.125
+2020,Unpkg,8,2.778
+2020,jQuery Migrate,8,2.778
+2020,Klaviyo,8,2.778
+2020,Google Cloud Load Balancing,7,2.431
+2020,Google Cloud Trace,7,2.431
+2020,jQuery CDN,7,2.431
+2020,GSAP,7,2.431
+2020,Cookiebot,6,2.083
+2020,CookieYes,6,2.083
+2020,Cloudflare Bot Management,6,2.083
+2020,Craft CMS,6,2.083
+2020,Shopify,6,2.083
+2020,Contact Form 7,5,1.736
+2020,Modernizr,5,1.736
+2020,AMP,5,1.736
+2020,WPML,5,1.736
+2020,LiteSpeed Cache,5,1.736
+2020,Litespeed Cache,5,1.736
+2020,Google Maps,5,1.736
+2020,Yii,5,1.736
+2020,WordPress Block Editor,5,1.736
+2020,Elementor,5,1.736
+2020,Readymag,4,1.389
+2020,Squarespace,4,1.389
+2020,Squarespace Commerce,4,1.389
+2020,Slick,4,1.389
+2020,MailChimp,4,1.389
+2020,WP Engine,4,1.389
+2020,Bootstrap,4,1.389
+2020,Stimulus,4,1.389
+2020,Polyfill,4,1.389
+2020,SEOmatic,4,1.389
+2020,Site Kit,4,1.389
+2020,Google Font API,3,1.042
+2020,Google PageSpeed,3,1.042
+2020,parallax.js,3,1.042
+2020,jQuery UI,3,1.042
+2020,IIS,3,1.042
+2020,Windows Server,3,1.042
+2020,Firebase,3,1.042
+2020,Webflow,3,1.042
+2020,Google Cloud CDN,3,1.042
+2020,Linkedin Ads,3,1.042
+2020,Polylang,3,1.042
+2020,Swiper,3,1.042
+2020,imagesLoaded,3,1.042
+2020,Varnish,3,1.042
+2020,Hostinger,3,1.042
+2020,Apple MapKit JS,3,1.042
+2020,ZURB Foundation,2,0.694
+2020,Lenis,2,0.694
+2020,Locomotive Scroll,2,0.694
+2020,Paper.js,2,0.694
+2020,Envoy,2,0.694
+2020,Alpine.js,2,0.694
+2020,Stripe,2,0.694
+2020,Azure,2,0.694
+2020,Microsoft ASP.NET,2,0.694
+2020,Gatsby,2,0.694
+2020,BugSnag,2,0.694
+2020,Google AdSense,2,0.694
+2020,WooCommerce,2,0.694
+2020,Fathom,2,0.694
+2020,Three.js,2,0.694
+2020,iubenda,2,0.694
+2020,MailChimp for WordPress,2,0.694
+2020,Yoast SEO Premium,2,0.694
+2020,Underscore.js,2,0.694
+2020,WordPress Site Editor,2,0.694
+2020,Framer Sites,2,0.694
+2020,OpenResty,2,0.694
+2020,Drupal,1,0.347
+2020,Google Web Server,1,0.347
+2020,scrollreveal,1,0.347
+2020,Divi,1,0.347
+2020,FitVids.JS,1,0.347
+2020,Packery,1,0.347
+2020,Font Awesome,1,0.347
+2020,Klarna Checkout,1,0.347
+2020,Google Optimize,1,0.347
+2020,Adobe Experience Manager,1,0.347
+2020,Java,1,0.347
+2020,Astro,1,0.347
+2020,AOS,1,0.347
+2020,HubSpot,1,0.347
+2020,HubSpot CMS Hub,1,0.347
+2020,VWO,1,0.347
+2020,Material Design Lite,1,0.347
+2020,OneTrust,1,0.347
+2020,Zipkin,1,0.347
+2020,Sentry,1,0.347
+2020,Prismic,1,0.347
+2020,Tally,1,0.347
+2020,Vercel Analytics,1,0.347
+2020,Vercel Speed Insights,1,0.347
+2020,Cloudways,1,0.347
+2020,Prototype,1,0.347
+2020,RequireJS,1,0.347
+2020,Complianz,1,0.347
+2020,Cookie Notice,1,0.347
+2020,Plesk,1,0.347
+2020,WP-Optimize,1,0.347
+2020,wpBakery,1,0.347
+2020,Ensighten,1,0.347
+2020,Fastly,1,0.347
+2020,GitHub Pages,1,0.347
+2020,Sanity,1,0.347
+2020,Sanity.io,1,0.347
+2020,Amazon ALB,1,0.347
+2020,Debian,1,0.347
+2020,W3 Total Cache,1,0.347
+2020,Akamai,1,0.347
+2020,TrustArc,1,0.347
+2020,Google Tag Manager for WordPress,1,0.347
+2020,Glider.js,1,0.347
+2020,Lodash,1,0.347
+2020,Wix,1,0.347
+2020,The SEO Framework,1,0.347
+2020,Autoptimize,1,0.347
+2020,BuySellAds,1,0.347
+2020,FirstPromoter,1,0.347
+2020,PIXIjs,1,0.347
+2020,Handlebars,1,0.347
+2020,p5.js,1,0.347
+2020,Magnific Popup,1,0.347
+2020,PixelYourSite,1,0.347
+2020,Slider Revolution,1,0.347
+2020,Google Cloud Storage,1,0.347
+2020,Flywheel,1,0.347
+2020,All in One SEO,1,0.347
+2020,All in One SEO Pack,1,0.347
+2020,MonsterInsights,1,0.347
+2020,Bazaarvoice Reviews,1,0.347
+2020,Silverstripe,1,0.347
+2020,theTradeDesk,1,0.347
+2020,Weglot,1,0.347
+2020,Jetpack,1,0.347
+2020,WordPress.com,1,0.347
+2020,Cart Functionality,1,0.347
+2020,Junip,1,0.347
+2020,Rebuy,1,0.347
+2020,Axios,1,0.347
+2020,Blitz,1,0.347
+2020,SimplexNoise.js,1,0.347
+2020,OWL Carousel,1,0.347
+2020,Backbone.js,1,0.347
+2020,Cart.js,1,0.347
+2020,chroma.js,1,0.347
+2020,C3.js,1,0.347
+2020,Onsen UI,1,0.347
+2020,PayPal,1,0.347
+2020,Laravel,1,0.347
+2020,October CMS,1,0.347
+2019,HSTS,126,47.368
+2019,HTTP/3,111,41.729
+2019,Google Analytics,88,33.083
+2019,Cloudflare,88,33.083
+2019,PHP,75,28.195
+2019,jQuery,57,21.429
+2019,Google Tag Manager,55,20.677
+2019,Nginx,48,18.045
+2019,WordPress,48,18.045
+2019,MySQL,47,17.669
+2019,Apache HTTP Server,46,17.293
+2019,Node.js,38,14.286
+2019,Cloudflare Browser Insights,33,12.406
+2019,Vue.js,30,11.278
+2019,Yoast SEO,26,9.774
+2019,Nuxt.js,25,9.398
+2019,cdnjs,23,8.647
+2019,Amazon Web Services,22,8.271
+2019,React,20,7.519
+2019,Vercel,19,7.143
+2019,Netlify,18,6.767
+2019,Webpack,17,6.391
+2019,jsDelivr,17,6.391
+2019,Amazon CloudFront,16,6.015
+2019,LiteSpeed,15,5.639
+2019,Adobe Fonts,15,5.639
+2019,Typekit,15,5.639
+2019,Cloudflare Bot Management,14,5.263
+2019,jQuery Migrate,14,5.263
+2019,Shopify,14,5.263
+2019,Google Hosted Libraries,14,5.263
+2019,Amazon S3,13,4.887
+2019,Next.js,12,4.511
+2019,YouTube,11,4.135
+2019,WPML,10,3.759
+2019,Modernizr,9,3.383
+2019,reCAPTCHA,9,3.383
+2019,Ubuntu,8,3.008
+2019,Unpkg,8,3.008
+2019,Klaviyo,7,2.632
+2019,Site Kit,7,2.632
+2019,Varnish,7,2.632
+2019,Slick,7,2.632
+2019,WP Engine,6,2.256
+2019,LiteSpeed Cache,6,2.256
+2019,Litespeed Cache,6,2.256
+2019,Google Font API,6,2.256
+2019,Contact Form 7,6,2.256
+2019,Readymag,5,1.88
+2019,GSAP,5,1.88
+2019,CookieYes,5,1.88
+2019,Contentful,5,1.88
+2019,Gatsby,5,1.88
+2019,imagesLoaded,5,1.88
+2019,Firebase,4,1.504
+2019,Kinsta,4,1.504
+2019,jQuery CDN,4,1.504
+2019,Laravel,4,1.504
+2019,ZURB Foundation,4,1.504
+2019,Webflow,4,1.504
+2019,Stimulus,4,1.504
+2019,Swiper,4,1.504
+2019,Linkedin Ads,4,1.504
+2019,Three.js,4,1.504
+2019,MailChimp,4,1.504
+2019,OneTrust,4,1.504
+2019,OpenResty,4,1.504
+2019,iubenda,4,1.504
+2019,Elementor,4,1.504
+2019,Polyfill,3,1.128
+2019,Onsen UI,3,1.128
+2019,FancyBox,3,1.128
+2019,Fastly,3,1.128
+2019,Tilda,3,1.128
+2019,PIXIjs,3,1.128
+2019,Polylang,3,1.128
+2019,The SEO Framework,3,1.128
+2019,particles.js,3,1.128
+2019,Google Cloud,3,1.128
+2019,Craft CMS,3,1.128
+2019,Yii,3,1.128
+2019,Bootstrap,3,1.128
+2019,Font Awesome,3,1.128
+2019,WordPress Block Editor,3,1.128
+2019,Hostinger,2,0.752
+2019,Complianz,2,0.752
+2019,Black Crow,2,0.752
+2019,WP Rocket,2,0.752
+2019,parallax.js,2,0.752
+2019,Aruba.it,2,0.752
+2019,Express,2,0.752
+2019,Drupal,2,0.752
+2019,CentOS,2,0.752
+2019,Imperva,2,0.752
+2019,OpenSSL,2,0.752
+2019,Alpine.js,2,0.752
+2019,wpBakery,2,0.752
+2019,WooCommerce,2,0.752
+2019,BugHerd,2,0.752
+2019,C3.js,2,0.752
+2019,Google Web Server,2,0.752
+2019,Lodash,2,0.752
+2019,MODX,2,0.752
+2019,Google Maps,2,0.752
+2019,Yoast SEO Premium,2,0.752
+2019,Google Cloud Load Balancing,2,0.752
+2019,Google Cloud Trace,2,0.752
+2019,Dynamic Conditions,2,0.752
+2019,jQuery UI,2,0.752
+2019,AMP,2,0.752
+2019,BuySellAds,1,0.376
+2019,FirstPromoter,1,0.376
+2019,BugSnag,1,0.376
+2019,Converge,1,0.376
+2019,mobile-detect.js,1,0.376
+2019,October CMS,1,0.376
+2019,W3 Total Cache,1,0.376
+2019,Matter.js,1,0.376
+2019,Snowplow Analytics,1,0.376
+2019,Akismet,1,0.376
+2019,OWL Carousel,1,0.376
+2019,FitVids.JS,1,0.376
+2019,Gridsome,1,0.376
+2019,Gumroad,1,0.376
+2019,MariaDB,1,0.376
+2019,Pantheon,1,0.376
+2019,ProcessWire,1,0.376
+2019,DDoS-Guard,1,0.376
+2019,Cookiebot,1,0.376
+2019,JUST,1,0.376
+2019,SimplexNoise.js,1,0.376
+2019,WordPress Super Cache,1,0.376
+2019,MailChimp for WooCommerce,1,0.376
+2019,Pinterest,1,0.376
+2019,Framer Sites,1,0.376
+2019,Intelligems,1,0.376
+2019,Tolstoy,1,0.376
+2019,Super Page Cache,1,0.376
+2019,Attentive,1,0.376
+2019,Bold Commerce,1,0.376
+2019,Convert,1,0.376
+2019,Google Cloud CDN,1,0.376
+2019,Wix,1,0.376
+2019,Optimizely,1,0.376
+2019,SEOmatic,1,0.376
+2019,DataDome,1,0.376
+2019,Envoy,1,0.376
+2019,RequireJS,1,0.376
+2019,Zipkin,1,0.376
+2019,Candid Themes Fairy,1,0.376
+2019,All in One SEO,1,0.376
+2019,All in One SEO Pack,1,0.376
+2019,Draftpress HFCM,1,0.376
+2019,Gravity Forms,1,0.376
+2019,Caddy,1,0.376
+2019,RawGit,1,0.376
+2019,SmtpJS,1,0.376
+2019,Conditional Fields for Contact Form 7,1,0.376
+2019,Hammer.js,1,0.376
+2019,IP2Location.io,1,0.376
+2019,Redis,1,0.376
+2019,Redis Object Cache,1,0.376
+2019,Howler.js,1,0.376
+2019,Intersection Observer,1,0.376
+2019,Variti,1,0.376
+2019,fullPage.js,1,0.376
+2019,CookieBAR,1,0.376
+2019,p5.js,1,0.376
+2019,Tidio,1,0.376
+2019,Shuttle,1,0.376
+2019,bowser,1,0.376
+2019,Snipcart,1,0.376
+2019,Cornerstone,1,0.376
+2019,Enzuzo,1,0.376
+2019,Cowboy,1,0.376
+2019,Erlang,1,0.376
+2019,Stripe,1,0.376
+2019,Adobe Portfolio,1,0.376
+2019,Elementor Addon Elements,1,0.376
+2019,Linkedin Sign-in,1,0.376
+2019,Google PageSpeed,1,0.376
+2019,Squarespace,1,0.376
+2019,Squarespace Commerce,1,0.376
+2019,Elfsight,1,0.376
+2019,Essential Addons for Elementor,1,0.376
+2019,Google Tag Manager for WordPress,1,0.376
+2019,Underscore.js,1,0.376
+2019,Popper,1,0.376
+2019,Screenfull.js,1,0.376
+2019,TYPO3 CMS,1,0.376
+2019,UNIX,1,0.376
+2019,Returnflows,1,0.376
+2019,Paper.js,1,0.376
+2019,Clipboard.js,1,0.376
+2019,Magnific Popup,1,0.376
+2019,Infinite Scroll,1,0.376
+2019,Debian,1,0.376
+2019,Performance Lab,1,0.376
+2019,Microsoft Advertising,1,0.376
+2019,Ruby,1,0.376
+2019,Ruby on Rails,1,0.376
+2019,Livewire,1,0.376
+2019,Usercentrics,1,0.376
+2018,HSTS,110,43.137
+2018,HTTP/3,97,38.039
+2018,Cloudflare,92,36.078
+2018,Google Analytics,82,32.157
+2018,jQuery,71,27.843
+2018,PHP,71,27.843
+2018,Google Tag Manager,57,22.353
+2018,MySQL,49,19.216
+2018,WordPress,48,18.824
+2018,Apache HTTP Server,47,18.431
+2018,Nginx,42,16.471
+2018,Cloudflare Browser Insights,34,13.333
+2018,Node.js,30,11.765
+2018,Yoast SEO,28,10.98
+2018,Amazon Web Services,27,10.588
+2018,cdnjs,21,8.235
+2018,Vue.js,18,7.059
+2018,jQuery Migrate,18,7.059
+2018,React,18,7.059
+2018,Amazon S3,18,7.059
+2018,reCAPTCHA,17,6.667
+2018,Shopify,17,6.667
+2018,Nuxt.js,16,6.275
+2018,Amazon CloudFront,16,6.275
+2018,Google Hosted Libraries,16,6.275
+2018,Netlify,15,5.882
+2018,LiteSpeed,15,5.882
+2018,jsDelivr,14,5.49
+2018,Adobe Fonts,14,5.49
+2018,Typekit,14,5.49
+2018,Vercel,14,5.49
+2018,Ubuntu,14,5.49
+2018,Cloudflare Bot Management,13,5.098
+2018,LiteSpeed Cache,13,5.098
+2018,Litespeed Cache,13,5.098
+2018,YouTube,11,4.314
+2018,Three.js,10,3.922
+2018,Webpack,10,3.922
+2018,Modernizr,10,3.922
+2018,Unpkg,9,3.529
+2018,Bootstrap,9,3.529
+2018,Klaviyo,9,3.529
+2018,GSAP,8,3.137
+2018,Google Maps,8,3.137
+2018,Swiper,8,3.137
+2018,Next.js,8,3.137
+2018,WPML,8,3.137
+2018,Express,6,2.353
+2018,Varnish,6,2.353
+2018,Contact Form 7,6,2.353
+2018,Slick,6,2.353
+2018,imagesLoaded,6,2.353
+2018,Google Cloud,6,2.353
+2018,Kinsta,5,1.961
+2018,OpenResty,5,1.961
+2018,Firebase,5,1.961
+2018,parallax.js,5,1.961
+2018,Cookiebot,5,1.961
+2018,Drupal,5,1.961
+2018,Google Font API,5,1.961
+2018,WP Engine,4,1.569
+2018,WooCommerce,4,1.569
+2018,Contentful,4,1.569
+2018,OneTrust,4,1.569
+2018,WP Rocket,4,1.569
+2018,Elementor,4,1.569
+2018,Google Cloud Load Balancing,4,1.569
+2018,Google Cloud Trace,4,1.569
+2018,FitVids.JS,4,1.569
+2018,Azure,4,1.569
+2018,W3 Total Cache,3,1.176
+2018,Hostinger,3,1.176
+2018,Laravel,3,1.176
+2018,Java,3,1.176
+2018,Polylang,3,1.176
+2018,jQuery CDN,3,1.176
+2018,Craft CMS,3,1.176
+2018,OWL Carousel,3,1.176
+2018,Redux Framework,3,1.176
+2018,CookieYes,3,1.176
+2018,Prismic,3,1.176
+2018,Redis,3,1.176
+2018,Redis Object Cache,3,1.176
+2018,WordPress Super Cache,3,1.176
+2018,Plesk,3,1.176
+2018,Alpine.js,3,1.176
+2018,Squarespace,3,1.176
+2018,Squarespace Commerce,3,1.176
+2018,TrustArc,3,1.176
+2018,Yoast SEO Premium,3,1.176
+2018,Azure Front Door,3,1.176
+2018,Onsen UI,3,1.176
+2018,Popper,3,1.176
+2018,Stimulus,3,1.176
+2018,Lightbox,3,1.176
+2018,Webflow,3,1.176
+2018,Lenis,2,0.784
+2018,Locomotive Scroll,2,0.784
+2018,Chart.js,2,0.784
+2018,PIXIjs,2,0.784
+2018,MailChimp,2,0.784
+2018,Framer Sites,2,0.784
+2018,AMP,2,0.784
+2018,Adobe Experience Manager,2,0.784
+2018,ZURB Foundation,2,0.784
+2018,SEOmatic,2,0.784
+2018,Site Kit,2,0.784
+2018,BeTheme,2,0.784
+2018,Slider Revolution,2,0.784
+2018,WooCommerce Multilingual,2,0.784
+2018,WordPress Block Editor,2,0.784
+2018,Yii,2,0.784
+2018,Django,2,0.784
+2018,Python,2,0.784
+2018,Linkedin Ads,2,0.784
+2018,AddToAny,2,0.784
+2018,Sucuri,2,0.784
+2018,Microsoft ASP.NET,2,0.784
+2018,Lodash,2,0.784
+2018,Magnific Popup,2,0.784
+2018,Fastly,2,0.784
+2018,iubenda,2,0.784
+2018,Caddy,2,0.784
+2018,Gravity Forms,2,0.784
+2018,Amazon ALB,2,0.784
+2018,Google Cloud CDN,2,0.784
+2018,jQuery UI,2,0.784
+2018,Gatsby,2,0.784
+2018,Mixitup,2,0.784
+2018,OpenSSL,1,0.392
+2018,Hugo,1,0.392
+2018,MailChimp for WooCommerce,1,0.392
+2018,CodeIgniter,1,0.392
+2018,Sirdata,1,0.392
+2018,IIS,1,0.392
+2018,Windows Server,1,0.392
+2018,Livewire,1,0.392
+2018,All in One SEO,1,0.392
+2018,All in One SEO Pack,1,0.392
+2018,html2canvas,1,0.392
+2018,NitroPack,1,0.392
+2018,Twitter,1,0.392
+2018,GoDaddy Website Builder,1,0.392
+2018,Ruby,1,0.392
+2018,Ruby on Rails,1,0.392
+2018,Tally,1,0.392
+2018,MindBody,1,0.392
+2018,FancyBox,1,0.392
+2018,Hammer.js,1,0.392
+2018,Semplice,1,0.392
+2018,MailerLite,1,0.392
+2018,The SEO Framework,1,0.392
+2018,Beusable,1,0.392
+2018,Decibel,1,0.392
+2018,Facebook Pixel,1,0.392
+2018,Insider,1,0.392
+2018,Optimise,1,0.392
+2018,Qualtrics,1,0.392
+2018,Sprinklr,1,0.392
+2018,Twitter Ads,1,0.392
+2018,Algolia,1,0.392
+2018,Azure Edge Network,1,0.392
+2018,Google PageSpeed:on,1,0.392
+2018,MODX,1,0.392
+2018,Yoast SEO for Shopify,1,0.392
+2018,Perfmatters,1,0.392
+2018,Cookie Script,1,0.392
+2018,EveryAction,1,0.392
+2018,Instant.Page,1,0.392
+2018,SVG Support,1,0.392
+2018,Hydrogen,1,0.392
+2018,Klarna Checkout,1,0.392
+2018,Vite,1,0.392
+2018,Fathom,1,0.392
+2018,PayPal,1,0.392
+2018,Statcounter,1,0.392
+2018,Plyr,1,0.392
+2018,Apache Tomcat,1,0.392
+2018,WPMU DEV Smush,1,0.392
+2018,Amplitude,1,0.392
+2018,Gravatar,1,0.392
+2018,OneSignal,1,0.392
+2018,GitHub Pages,1,0.392
+2018,MailChimp for WordPress,1,0.392
+2018,Typeform,1,0.392
+2018,BootstrapCDN,1,0.392
+2018,AB Tasty,1,0.392
+2018,Email Encoder for Wordpress,1,0.392
+2018,Tippy.js,1,0.392
+2018,Akamai,1,0.392
+2018,Akamai Bot Manager,1,0.392
+2018,IBM Carbon Design System,1,0.392
+2018,Wix,1,0.392
+2018,MariaDB,1,0.392
+2018,Material Design Lite,1,0.392
+2018,Pantheon,1,0.392
+2018,Trustpilot,1,0.392
+2018,Cart Functionality,1,0.392
+2018,Recharge,1,0.392
+2018,Shopware,1,0.392
+2018,Symfony,1,0.392
+2018,HashThemes Total,1,0.392
+2018,Underscore.js,1,0.392
+2018,Mapbox GL JS,1,0.392
+2018,Akismet,1,0.392
+2018,Easy Pie Chart,1,0.392
+2018,Infinite Scroll,1,0.392
+2018,Typed.js,1,0.392
+2018,prettyPhoto,1,0.392
+2018,waitForImages,1,0.392
+2018,wpBakery,1,0.392
+2018,Snowplow Analytics,1,0.392
+2018,WOW,1,0.392
+2018,AWIN,1,0.392
+2018,Attentive,1,0.392
+2018,Intelligems,1,0.392
+2018,Zip,1,0.392
+2018,Polyfill,1,0.392
+2018,Hostinger CDN,1,0.392
+2018,Osano,1,0.392
+2018,Debian,1,0.392
+2018,EWWW Image Optimizer,1,0.392
+2018,Font Awesome,1,0.392
+2018,Conditional Fields for Contact Form 7,1,0.392
+2018,MonsterInsights,1,0.392
+2018,Themify Builder,1,0.392
+2018,A-Frame,1,0.392
+2018,Readymag,1,0.392
+2018,Matter.js,1,0.392
+2017,Cloudflare,97,38.956
+2017,HSTS,97,38.956
+2017,HTTP/3,90,36.145
+2017,jQuery,66,26.506
+2017,PHP,57,22.892
+2017,Google Tag Manager,54,21.687
+2017,Apache HTTP Server,41,16.466
+2017,Cloudflare Browser Insights,41,16.466
+2017,WordPress,39,15.663
+2017,MySQL,38,15.261
+2017,Amazon Web Services,34,13.655
+2017,Google Analytics,34,13.655
+2017,Nginx,33,13.253
+2017,cdnjs,25,10.04
+2017,Amazon CloudFront,23,9.237
+2017,Yoast SEO,21,8.434
+2017,Node.js,20,8.032
+2017,Amazon S3,18,7.229
+2017,React,18,7.229
+2017,jQuery Migrate,18,7.229
+2017,Modernizr,17,6.827
+2017,Google Hosted Libraries,16,6.426
+2017,Netlify,16,6.426
+2017,reCAPTCHA,15,6.024
+2017,Cloudflare Bot Management,14,5.622
+2017,jsDelivr,13,5.221
+2017,Webpack,13,5.221
+2017,Shopify,12,4.819
+2017,Vue.js,12,4.819
+2017,Bootstrap,12,4.819
+2017,LiteSpeed,10,4.016
+2017,Three.js,10,4.016
+2017,Varnish,10,4.016
+2017,Next.js,10,4.016
+2017,Nuxt.js,10,4.016
+2017,Google Maps,9,3.614
+2017,Unpkg,9,3.614
+2017,YouTube,8,3.213
+2017,LiteSpeed Cache,8,3.213
+2017,Litespeed Cache,8,3.213
+2017,Vercel,8,3.213
+2017,Ubuntu,7,2.811
+2017,GSAP,7,2.811
+2017,Contact Form 7,7,2.811
+2017,Adobe Fonts,6,2.41
+2017,Typekit,6,2.41
+2017,Elementor,6,2.41
+2017,Site Kit,6,2.41
+2017,WPML,6,2.41
+2017,AMP,6,2.41
+2017,jQuery CDN,5,2.008
+2017,MailChimp,5,2.008
+2017,Osano,5,2.008
+2017,imagesLoaded,5,2.008
+2017,Slick,5,2.008
+2017,Google Cloud,5,2.008
+2017,Google Cloud Load Balancing,5,2.008
+2017,Google Cloud Trace,5,2.008
+2017,Gravity Forms,4,1.606
+2017,WooCommerce,4,1.606
+2017,Yii,4,1.606
+2017,Google Font API,4,1.606
+2017,Squarespace,4,1.606
+2017,Squarespace Commerce,4,1.606
+2017,Azure,4,1.606
+2017,Stimulus,4,1.606
+2017,jQuery UI,4,1.606
+2017,Firebase,4,1.606
+2017,WP Rocket,4,1.606
+2017,Polyfill,4,1.606
+2017,Microsoft ASP.NET,4,1.606
+2017,C3.js,3,1.205
+2017,Craft CMS,3,1.205
+2017,SEOmatic,3,1.205
+2017,Onsen UI,3,1.205
+2017,GitHub Pages,3,1.205
+2017,Klaviyo,3,1.205
+2017,Swiper,3,1.205
+2017,Drupal,3,1.205
+2017,Azure Front Door,3,1.205
+2017,Java,3,1.205
+2017,Gatsby,3,1.205
+2017,parallax.js,3,1.205
+2017,OneTrust,3,1.205
+2017,Imperva,3,1.205
+2017,Complianz,3,1.205
+2017,Contentful,3,1.205
+2017,Google Tag Manager for WordPress,2,0.803
+2017,MailChimp for WooCommerce,2,0.803
+2017,W3 Total Cache,2,0.803
+2017,Plesk,2,0.803
+2017,Hostinger,2,0.803
+2017,FancyBox,2,0.803
+2017,Webflow,2,0.803
+2017,Handlebars,2,0.803
+2017,Cookiebot,2,0.803
+2017,Fastly,2,0.803
+2017,Linkedin Ads,2,0.803
+2017,OpenResty,2,0.803
+2017,OpenSSL,2,0.803
+2017,WP Engine,2,0.803
+2017,WordPress Block Editor,2,0.803
+2017,Underscore.js,2,0.803
+2017,HubSpot,2,0.803
+2017,HubSpot CMS Hub,2,0.803
+2017,Amazon ALB,2,0.803
+2017,Framer Sites,2,0.803
+2017,OWL Carousel,2,0.803
+2017,AngularJS,2,0.803
+2017,Apache Tomcat,2,0.803
+2017,Lodash,2,0.803
+2017,ZURB Foundation,2,0.803
+2017,PIXIjs,2,0.803
+2017,Envoy,2,0.803
+2017,Ruby,2,0.803
+2017,Ruby on Rails,2,0.803
+2017,Prismic,2,0.803
+2017,SVG Support,2,0.803
+2017,All in One SEO,1,0.402
+2017,All in One SEO Pack,1,0.402
+2017,Kadence WP Kadence,1,0.402
+2017,Hostinger CDN,1,0.402
+2017,CreateJS,1,0.402
+2017,Craft Commerce,1,0.402
+2017,Font Awesome,1,0.402
+2017,Stripe,1,0.402
+2017,Astro,1,0.402
+2017,WP-Optimize,1,0.402
+2017,MaxMind,1,0.402
+2017,Skio,1,0.402
+2017,GoDaddy Website Builder,1,0.402
+2017,BugSnag,1,0.402
+2017,Usercentrics,1,0.402
+2017,CookieYes,1,0.402
+2017,Kinsta,1,0.402
+2017,Lever,1,0.402
+2017,Dynamic Conditions,1,0.402
+2017,Select2,1,0.402
+2017,iubenda,1,0.402
+2017,CentOS,1,0.402
+2017,Draftpress HFCM,1,0.402
+2017,Yoast SEO Premium,1,0.402
+2017,Gravatar,1,0.402
+2017,Htmx,1,0.402
+2017,_hyperscript,1,0.402
+2017,_hyperscript ,1,0.402
+2017,Adobe Experience Manager,1,0.402
+2017,Greenhouse,1,0.402
+2017,Lightbox,1,0.402
+2017,Essential Addons for Elementor,1,0.402
+2017,RequireJS,1,0.402
+2017,Zendesk,1,0.402
+2017,Packery,1,0.402
+2017,Instagram Feed for WordPress,1,0.402
+2017,Caddy,1,0.402
+2017,Pagely,1,0.402
+2017,Lenis,1,0.402
+2017,Locomotive Scroll,1,0.402
+2017,Moment.js,1,0.402
+2017,Google AdSense,1,0.402
+2017,Backbone.js,1,0.402
+2017,MailChimp for WordPress,1,0.402
+2017,WordPress.com,1,0.402
+2017,jPlayer,1,0.402
+2017,WordPress Super Cache,1,0.402
+2017,Beaver Builder,1,0.402
+2017,Nette Framework,1,0.402
+2017,Roadiz CMS,1,0.402
+2017,Symfony,1,0.402
+2017,UMI.CMS,1,0.402
+2017,Sentry,1,0.402
+2017,Plyr,1,0.402
+2017,Polylang,1,0.402
+2017,Calendly,1,0.402
+2017,Tidio,1,0.402
+2017,Redux Framework,1,0.402
+2017,UNIX,1,0.402
+2017,mod_ssl,1,0.402
+2017,Kestrel,1,0.402
+2017,Jimdo,1,0.402
+2017,waitForImages,1,0.402
+2017,Magnific Popup,1,0.402
+2017,SWFObject,1,0.402
+2017,Zepto,1,0.402
+2017,Algolia,1,0.402
+2017,Aruba.it,1,0.402
+2017,Bricks,1,0.402
+2017,Akamai,1,0.402
+2017,Bazaarvoice Reviews,1,0.402
+2017,Salesforce,1,0.402
+2017,Salesforce Commerce Cloud,1,0.402
+2017,Google Analytics for WooCommerce,1,0.402
+2017,Wordfence Login Security,1,0.402
+2017,Hammer.js,1,0.402
+2017,AddToAny,1,0.402
+2017,AddToAny Share Buttons,1,0.402
+2017,WPMU DEV Smush,1,0.402
+2017,Google Optimize,1,0.402
+2017,Optimizely,1,0.402
+2017,Pingdom RUM,1,0.402
+2017,Matter.js,1,0.402
+2017,IIS,1,0.402
+2017,Windows Server,1,0.402
+2017,Appsflyer,1,0.402
+2017,Cart Functionality,1,0.402
+2017,Contentsquare,1,0.402
+2017,Crazy Egg,1,0.402
+2017,Facebook Pixel,1,0.402
+2017,Google Analytics Enhanced eCommerce,1,0.402
+2017,Insider,1,0.402
+2017,MoEngage,1,0.402
+2017,Twitter Ads,1,0.402
+2017,VWO,1,0.402
+2017,Microsoft Advertising,1,0.402
+2017,Cookie Script,1,0.402
+2017,Sauce Social Commerce,1,0.402
+2017,Snap.svg,1,0.402
+2016,HSTS,103,42.917
+2016,HTTP/3,91,37.917
+2016,jQuery,68,28.333
+2016,PHP,66,27.5
+2016,Cloudflare,66,27.5
+2016,Google Tag Manager,56,23.333
+2016,WordPress,46,19.167
+2016,MySQL,44,18.333
+2016,Apache HTTP Server,43,17.917
+2016,Google Analytics,40,16.667
+2016,Nginx,35,14.583
+2016,Cloudflare Browser Insights,35,14.583
+2016,jQuery Migrate,25,10.417
+2016,Node.js,24,10.0
+2016,Amazon Web Services,23,9.583
+2016,React,22,9.167
+2016,Bootstrap,22,9.167
+2016,Yoast SEO,20,8.333
+2016,Vercel,19,7.917
+2016,Amazon CloudFront,17,7.083
+2016,Modernizr,16,6.667
+2016,reCAPTCHA,16,6.667
+2016,Netlify,14,5.833
+2016,YouTube,13,5.417
+2016,cdnjs,13,5.417
+2016,Vue.js,13,5.417
+2016,Google Hosted Libraries,13,5.417
+2016,Varnish,12,5.0
+2016,Cloudflare Bot Management,12,5.0
+2016,Nuxt.js,12,5.0
+2016,Contact Form 7,11,4.583
+2016,Adobe Fonts,11,4.583
+2016,Typekit,11,4.583
+2016,Ubuntu,10,4.167
+2016,LiteSpeed,10,4.167
+2016,GSAP,9,3.75
+2016,Slick,9,3.75
+2016,Amazon S3,8,3.333
+2016,Stimulus,8,3.333
+2016,Next.js,8,3.333
+2016,Webpack,8,3.333
+2016,WordPress Block Editor,8,3.333
+2016,jsDelivr,8,3.333
+2016,WP Rocket,7,2.917
+2016,OneTrust,6,2.5
+2016,Klaviyo,6,2.5
+2016,Shopify,6,2.5
+2016,Contentful,6,2.5
+2016,Drupal,6,2.5
+2016,AMP,6,2.5
+2016,Three.js,6,2.5
+2016,Squarespace,6,2.5
+2016,Squarespace Commerce,6,2.5
+2016,Google Maps,5,2.083
+2016,Cookiebot,5,2.083
+2016,RequireJS,5,2.083
+2016,Font Awesome,5,2.083
+2016,Underscore.js,5,2.083
+2016,jQuery CDN,5,2.083
+2016,imagesLoaded,5,2.083
+2016,Site Kit,4,1.667
+2016,LiteSpeed Cache,4,1.667
+2016,Litespeed Cache,4,1.667
+2016,OWL Carousel,4,1.667
+2016,Framer Sites,4,1.667
+2016,Express,4,1.667
+2016,Swiper,4,1.667
+2016,Yoast SEO Premium,4,1.667
+2016,WPML,4,1.667
+2016,Microsoft ASP.NET,4,1.667
+2016,Google Font API,4,1.667
+2016,Linkedin Ads,4,1.667
+2016,WooCommerce,3,1.25
+2016,Azure,3,1.25
+2016,Azure Front Door,3,1.25
+2016,Google Optimize,3,1.25
+2016,Optimizely,3,1.25
+2016,Pingdom RUM,3,1.25
+2016,ZURB Foundation,3,1.25
+2016,Adobe Experience Manager,3,1.25
+2016,Java,3,1.25
+2016,Platform.sh,3,1.25
+2016,Elementor,3,1.25
+2016,parallax.js,3,1.25
+2016,Craft CMS,3,1.25
+2016,SEOmatic,3,1.25
+2016,OpenResty,3,1.25
+2016,WP Engine,3,1.25
+2016,Max Mega Menu,3,1.25
+2016,CookieYes,3,1.25
+2016,Unpkg,3,1.25
+2016,jQuery UI,3,1.25
+2016,Firebase,3,1.25
+2016,Alpine.js,2,0.833
+2016,Webflow,2,0.833
+2016,Laravel,2,0.833
+2016,Plesk,2,0.833
+2016,Complianz,2,0.833
+2016,Fathom,2,0.833
+2016,ShareThis,2,0.833
+2016,WordPress Super Cache,2,0.833
+2016,Readymag,2,0.833
+2016,BootstrapCDN,2,0.833
+2016,Google Cloud,2,0.833
+2016,Google Cloud Load Balancing,2,0.833
+2016,Google Cloud Trace,2,0.833
+2016,Backbone.js,2,0.833
+2016,Gravity Forms,2,0.833
+2016,Hostinger,2,0.833
+2016,Flywheel,2,0.833
+2016,Lightbox,2,0.833
+2016,Onsen UI,2,0.833
+2016,Polylang,2,0.833
+2016,Snap.svg,2,0.833
+2016,Fastly,2,0.833
+2016,IIS,2,0.833
+2016,Windows Server,2,0.833
+2016,Semplice,2,0.833
+2016,Calendly,2,0.833
+2016,Google Web Server,1,0.417
+2016,Cart Functionality,1,0.417
+2016,Rebuy,1,0.417
+2016,Trusted Shops,1,0.417
+2016,Slider Revolution,1,0.417
+2016,Prismic,1,0.417
+2016,OpenSSL,1,0.417
+2016,Ensighten,1,0.417
+2016,Raphael,1,0.417
+2016,bun,1,0.417
+2016,Product Personalizer,1,0.417
+2016,Zepto,1,0.417
+2016,Jetpack,1,0.417
+2016,Ninja Forms,1,0.417
+2016,Draftpress HFCM,1,0.417
+2016,MailChimp,1,0.417
+2016,Polyfill,1,0.417
+2016,All in One SEO,1,0.417
+2016,All in One SEO Pack,1,0.417
+2016,WordPress.com,1,0.417
+2016,BetterDocs,1,0.417
+2016,BetterDocs plugin,1,0.417
+2016,bxSlider,1,0.417
+2016,EWWW Image Optimizer,1,0.417
+2016,Oxygen,1,0.417
+2016,PixelYourSite,1,0.417
+2016,W3 Total Cache,1,0.417
+2016,FancyBox,1,0.417
+2016,HubSpot,1,0.417
+2016,HubSpot CMS Hub,1,0.417
+2016,Typed.js,1,0.417
+2016,Google Sign-in,1,0.417
+2016,TRUENDO,1,0.417
+2016,Acquia Cloud Platform:next,1,0.417
+2016,Aruba.it,1,0.417
+2016,Highlight.js,1,0.417
+2016,Negate,1,0.417
+2016,Schema App,1,0.417
+2016,WOW,1,0.417
+2016,Redis,1,0.417
+2016,Redis Object Cache,1,0.417
+2016,Headroom.js,1,0.417
+2016,MariaDB,1,0.417
+2016,Material Design Lite,1,0.417
+2016,Pantheon,1,0.417
+2016,Trustpilot,1,0.417
+2016,LazySizes unveilhooks plugin,1,0.417
+2016,LottieFiles,1,0.417
+2016,Rybbit,1,0.417
+2016,Enquire.js,1,0.417
+2016,Silverstripe,1,0.417
+2016,Infinite Scroll,1,0.417
+2016,Paper.js,1,0.417
+2016,TYPO3 CMS,1,0.417
+2016,Usercentrics,1,0.417
+2016,Age Gate,1,0.417
+2016,Popper,1,0.417
+2016,Twitter typeahead.js,1,0.417
+2016,TrustArc,1,0.417
+2016,Amazon ALB,1,0.417
+2016,Divi,1,0.417
+2016,FitVids.JS,1,0.417
+2016,Adobe Dynamic Media Classic,1,0.417
+2016,CIVIC,1,0.417
+2016,Cookie Control,1,0.417
+2016,The Events Calendar,1,0.417
+2016,PIXIjs,1,0.417
+2016,ContentViews,1,0.417
+2016,Jimdo,1,0.417
+2016,Hugo,1,0.417
+2016,Symfony,1,0.417
+2016,Thelia,1,0.417
+2016,Matter.js,1,0.417
+2016,Astro,1,0.417
+2016,Hammer.js,1,0.417
+2016,Lodash,1,0.417
+2016,Imperva,1,0.417
+2016,Osano,1,0.417
+2016,Chart.js,1,0.417
+2016,jPlayer,1,0.417
+2016,GitHub Pages,1,0.417
+2016,iubenda,1,0.417
+2016,AWIN,1,0.417
+2016,Bazaarvoice Reviews,1,0.417
+2016,Klarna Checkout,1,0.417
+2016,PayPal,1,0.417
+2016,hCaptcha,1,0.417
+2015,HSTS,98,42.982
+2015,HTTP/3,83,36.404
+2015,PHP,72,31.579
+2015,jQuery,71,31.14
+2015,Cloudflare,65,28.509
+2015,MySQL,51,22.368
+2015,WordPress,51,22.368
+2015,Nginx,49,21.491
+2015,Google Tag Manager,48,21.053
+2015,Google Analytics,43,18.86
+2015,Apache HTTP Server,31,13.596
+2015,Cloudflare Browser Insights,31,13.596
+2015,Yoast SEO,28,12.281
+2015,jQuery Migrate,21,9.211
+2015,LiteSpeed,20,8.772
+2015,Modernizr,20,8.772
+2015,Google Hosted Libraries,17,7.456
+2015,Node.js,17,7.456
+2015,React,17,7.456
+2015,Bootstrap,16,7.018
+2015,Amazon Web Services,16,7.018
+2015,Amazon CloudFront,12,5.263
+2015,LiteSpeed Cache,11,4.825
+2015,Litespeed Cache,11,4.825
+2015,Shopify,11,4.825
+2015,jsDelivr,11,4.825
+2015,reCAPTCHA,11,4.825
+2015,Adobe Fonts,10,4.386
+2015,Typekit,10,4.386
+2015,cdnjs,10,4.386
+2015,Contact Form 7,10,4.386
+2015,jQuery CDN,10,4.386
+2015,Vue.js,9,3.947
+2015,Google Cloud,9,3.947
+2015,Vercel,9,3.947
+2015,Next.js,9,3.947
+2015,Webpack,9,3.947
+2015,Nuxt.js,8,3.509
+2015,Klaviyo,8,3.509
+2015,Varnish,7,3.07
+2015,ZURB Foundation,7,3.07
+2015,GSAP,7,3.07
+2015,YouTube,6,2.632
+2015,Netlify,6,2.632
+2015,Site Kit,6,2.632
+2015,Underscore.js,6,2.632
+2015,Ubuntu,6,2.632
+2015,WPML,6,2.632
+2015,Amazon S3,6,2.632
+2015,Cookiebot,6,2.632
+2015,Envoy,6,2.632
+2015,Hostinger,6,2.632
+2015,Contentful,6,2.632
+2015,Cloudflare Bot Management,6,2.632
+2015,jQuery UI,6,2.632
+2015,WP Rocket,5,2.193
+2015,Google Cloud CDN,5,2.193
+2015,Swiper,5,2.193
+2015,RequireJS,5,2.193
+2015,Stimulus,5,2.193
+2015,Debian,4,1.754
+2015,AMP,4,1.754
+2015,OWL Carousel,4,1.754
+2015,imagesLoaded,4,1.754
+2015,Craft CMS,4,1.754
+2015,Yii,4,1.754
+2015,Azure,4,1.754
+2015,Azure Front Door,4,1.754
+2015,Google Optimize,4,1.754
+2015,Google Maps,4,1.754
+2015,Elementor,4,1.754
+2015,CookieYes,4,1.754
+2015,Google Cloud Load Balancing,3,1.316
+2015,Google Cloud Trace,3,1.316
+2015,WordPress Block Editor,3,1.316
+2015,Optimizely,3,1.316
+2015,Pingdom RUM,3,1.316
+2015,Google Font API,3,1.316
+2015,Popper,3,1.316
+2015,Bunny,3,1.316
+2015,Clicky,3,1.316
+2015,W3 Total Cache,3,1.316
+2015,Squarespace,3,1.316
+2015,Squarespace Commerce,3,1.316
+2015,WooCommerce,3,1.316
+2015,Yoast SEO Premium,3,1.316
+2015,Perfmatters,3,1.316
+2015,Slick,3,1.316
+2015,Lodash,3,1.316
+2015,Wix,3,1.316
+2015,FitVids.JS,2,0.877
+2015,WOW,2,0.877
+2015,wpBakery,2,0.877
+2015,SEOmatic,2,0.877
+2015,Google Ads,2,0.877
+2015,Google Ads Conversion Tracking,2,0.877
+2015,Salesforce,2,0.877
+2015,Salesforce Commerce Cloud,2,0.877
+2015,Unpkg,2,0.877
+2015,Drupal,2,0.877
+2015,Laravel,2,0.877
+2015,Complianz,2,0.877
+2015,WP-Optimize,2,0.877
+2015,Semplice,2,0.877
+2015,Pinterest,2,0.877
+2015,Backbone.js,2,0.877
+2015,WP Engine,2,0.877
+2015,Linkedin Ads,2,0.877
+2015,Google Cloud Storage,2,0.877
+2015,iubenda,2,0.877
+2015,Akamai,2,0.877
+2015,Webflow,2,0.877
+2015,jPlayer,2,0.877
+2015,MailChimp,2,0.877
+2015,Google Tag Manager for WordPress,2,0.877
+2015,Select2,2,0.877
+2015,Lightbox,2,0.877
+2015,Mustache,2,0.877
+2015,WordPress Super Cache,2,0.877
+2015,Ruby,2,0.877
+2015,Ruby on Rails,2,0.877
+2015,Magnific Popup,2,0.877
+2015,Retina.js,1,0.439
+2015,waitForImages,1,0.439
+2015,Google Web Server,1,0.439
+2015,Criteo,1,0.439
+2015,AddToAny,1,0.439
+2015,OpenSSL,1,0.439
+2015,UNIX,1,0.439
+2015,AngularJS,1,0.439
+2015,Weglot,1,0.439
+2015,Django,1,0.439
+2015,Python,1,0.439
+2015,JSZip,1,0.439
+2015,PyroCMS,1,0.439
+2015,Adobe ColdFusion,1,0.439
+2015,Nosto,1,0.439
+2015,Solusquare OmniCommerce Cloud,1,0.439
+2015,Ruffle,1,0.439
+2015,Calendly,1,0.439
+2015,Handlebars,1,0.439
+2015,Partial.ly,1,0.439
+2015,All in One SEO,1,0.439
+2015,All in One SEO Pack,1,0.439
+2015,parallax.js,1,0.439
+2015,Gravatar,1,0.439
+2015,PCI Proxy,1,0.439
+2015,CodeIgniter,1,0.439
+2015,ExpressionEngine,1,0.439
+2015,Mediavine,1,0.439
+2015,Google PageSpeed:on,1,0.439
+2015,BugSnag,1,0.439
+2015,TYPO3 CMS,1,0.439
+2015,Plausible,1,0.439
+2015,Fly.io,1,0.439
+2015,Paper.js,1,0.439
+2015,Roadiz CMS,1,0.439
+2015,Symfony,1,0.439
+2015,OpenResty,1,0.439
+2015,Statamic,1,0.439
+2015,Adobe Experience Manager,1,0.439
+2015,Akamai Bot Manager,1,0.439
+2015,Java,1,0.439
+2015,Signifyd,1,0.439
+2015,iGoDigital,1,0.439
+2015,Taboola,1,0.439
+2015,Polylang,1,0.439
+2015,Tilda,1,0.439
+2015,MonsterInsights,1,0.439
+2015,ReCaptcha v2 for Contact Form 7,1,0.439
+2015,Redux Framework,1,0.439
+2015,GeneratePress,1,0.439
+2015,GeneratePress GP Premium,1,0.439
+2015,Conditional Fields for Contact Form 7,1,0.439
+2015,ShareThis,1,0.439
+2015,Poptin,1,0.439
+2015,Yoast SEO for Shopify,1,0.439
+2015,Ensighten,1,0.439
+2015,Aruba.it,1,0.439
+2015,Cookie Notice,1,0.439
+2015,Aklamio,1,0.439
+2015,Algolia,1,0.439
+2015,Ookla Speedtest Custom,1,0.439
+2015,OpinionBar,1,0.439
+2015,Glider.js,1,0.439
+2015,Amazon ALB,1,0.439
+2015,Three.js,1,0.439
+2015,UIKit,1,0.439
+2015,Acuity Scheduling,1,0.439
+2015,Kinsta,1,0.439
+2015,Clipboard.js,1,0.439
+2015,IP2Location.io,1,0.439
+2015,Zepto,1,0.439
+2015,Firebase,1,0.439
+2015,Simple Analytics,1,0.439
+2015,Fortinet FortiGate,1,0.439
+2015,Gravity Forms,1,0.439
+2015,Arkose Labs,1,0.439
+2015,GeeTest,1,0.439
+2015,Klarna Checkout,1,0.439
+2015,PayPal,1,0.439
+2015,Plaid,1,0.439
+2015,Easy Pie Chart,1,0.439
+2015,Stellar.js,1,0.439
+2015,Optibase,1,0.439
+2015,Typed.js,1,0.439
+2015,Redis,1,0.439
+2015,Redis Object Cache,1,0.439
+2015,Leadfeeder,1,0.439
+2014,HSTS,96,44.444
+2014,HTTP/3,77,35.648
+2014,jQuery,70,32.407
+2014,PHP,62,28.704
+2014,Cloudflare,57,26.389
+2014,Google Tag Manager,44,20.37
+2014,MySQL,41,18.981
+2014,WordPress,41,18.981
+2014,Apache HTTP Server,41,18.981
+2014,Google Analytics,39,18.056
+2014,Nginx,30,13.889
+2014,jQuery Migrate,26,12.037
+2014,Cloudflare Browser Insights,25,11.574
+2014,Yoast SEO,22,10.185
+2014,React,21,9.722
+2014,Amazon Web Services,20,9.259
+2014,Node.js,18,8.333
+2014,Bootstrap,17,7.87
+2014,Google Hosted Libraries,17,7.87
+2014,Amazon CloudFront,15,6.944
+2014,Vercel,14,6.481
+2014,jsDelivr,14,6.481
+2014,Modernizr,14,6.481
+2014,Webpack,13,6.019
+2014,Adobe Fonts,11,5.093
+2014,Typekit,11,5.093
+2014,cdnjs,10,4.63
+2014,Next.js,10,4.63
+2014,Amazon S3,10,4.63
+2014,YouTube,10,4.63
+2014,Vue.js,9,4.167
+2014,Contact Form 7,9,4.167
+2014,Cloudflare Bot Management,9,4.167
+2014,reCAPTCHA,9,4.167
+2014,LiteSpeed,8,3.704
+2014,Netlify,8,3.704
+2014,Nuxt.js,7,3.241
+2014,OneTrust,7,3.241
+2014,Stimulus,7,3.241
+2014,parallax.js,7,3.241
+2014,Contentful,6,2.778
+2014,CookieYes,6,2.778
+2014,Elementor,6,2.778
+2014,WP Engine,6,2.778
+2014,Shopify,6,2.778
+2014,Craft CMS,6,2.778
+2014,Ubuntu,6,2.778
+2014,Slick,6,2.778
+2014,Google Cloud,5,2.315
+2014,Squarespace,5,2.315
+2014,Squarespace Commerce,5,2.315
+2014,Site Kit,5,2.315
+2014,WordPress Block Editor,5,2.315
+2014,WP Rocket,5,2.315
+2014,imagesLoaded,5,2.315
+2014,Unpkg,5,2.315
+2014,WooCommerce,4,1.852
+2014,Linkedin Ads,4,1.852
+2014,Google Font API,4,1.852
+2014,SEOmatic,4,1.852
+2014,Varnish,4,1.852
+2014,Yoast SEO Premium,4,1.852
+2014,Azure,3,1.389
+2014,Azure Front Door,3,1.389
+2014,LiteSpeed Cache,3,1.389
+2014,Litespeed Cache,3,1.389
+2014,Google Maps,3,1.389
+2014,Font Awesome,3,1.389
+2014,C3.js,3,1.389
+2014,Alpine.js,3,1.389
+2014,WPML,3,1.389
+2014,RequireJS,3,1.389
+2014,Gatsby,3,1.389
+2014,FitVids.JS,3,1.389
+2014,AMP,3,1.389
+2014,Google Cloud Load Balancing,3,1.389
+2014,Google Cloud Trace,3,1.389
+2014,Getsitecontrol,2,0.926
+2014,Metorik,2,0.926
+2014,Fathom,2,0.926
+2014,Firebase,2,0.926
+2014,Google Cloud CDN,2,0.926
+2014,Lodash,2,0.926
+2014,Wix,2,0.926
+2014,Chart.js,2,0.926
+2014,Akamai,2,0.926
+2014,Swiper,2,0.926
+2014,W3 Total Cache,2,0.926
+2014,Polylang,2,0.926
+2014,Trustpilot,2,0.926
+2014,Snap.svg,2,0.926
+2014,Microsoft ASP.NET,2,0.926
+2014,BugHerd,2,0.926
+2014,Klaviyo,2,0.926
+2014,CodeIgniter,2,0.926
+2014,ExpressionEngine,2,0.926
+2014,GSAP,2,0.926
+2014,AFThemes CoverNews,2,0.926
+2014,TYPO3 CMS,2,0.926
+2014,Google AdSense,2,0.926
+2014,Plesk,2,0.926
+2014,Adobe Experience Manager,2,0.926
+2014,Java,2,0.926
+2014,Yii,2,0.926
+2014,Google Web Server,2,0.926
+2014,Drupal,2,0.926
+2014,Google Tag Manager for WordPress,2,0.926
+2014,Google Optimize,1,0.463
+2014,Optimizely,1,0.463
+2014,Pingdom RUM,1,0.463
+2014,ZURB Foundation,1,0.463
+2014,OpenResty,1,0.463
+2014,Express,1,0.463
+2014,Snipcart,1,0.463
+2014,GenerateBlocks,1,0.463
+2014,GeneratePress,1,0.463
+2014,GeneratePress GP Premium,1,0.463
+2014,Mediavine,1,0.463
+2014,WP-Optimize,1,0.463
+2014,WordPress Site Editor,1,0.463
+2014,GoDaddy Website Builder,1,0.463
+2014,dc.js,1,0.463
+2014,WebNode,1,0.463
+2014,Akamai Bot Manager,1,0.463
+2014,Envoy,1,0.463
+2014,Hostinger,1,0.463
+2014,Lenis,1,0.463
+2014,Locomotive Scroll,1,0.463
+2014,Plausible,1,0.463
+2014,Pinterest,1,0.463
+2014,Usercentrics,1,0.463
+2014,Coveo,1,0.463
+2014,Bento,1,0.463
+2014,Semplice,1,0.463
+2014,Fastly,1,0.463
+2014,GitHub Pages,1,0.463
+2014,Prismic,1,0.463
+2014,Carts Guru,1,0.463
+2014,Elfsight,1,0.463
+2014,PrestaShop,1,0.463
+2014,Complianz,1,0.463
+2014,Google PageSpeed,1,0.463
+2014,Magnific Popup,1,0.463
+2014,Popper,1,0.463
+2014,Tippy.js,1,0.463
+2014,Underscore.js,1,0.463
+2014,PIXIjs,1,0.463
+2014,Black Crow,1,0.463
+2014,Cart Functionality,1,0.463
+2014,Rebuy,1,0.463
+2014,Tolstoy,1,0.463
+2014,Blitz,1,0.463
+2014,BootstrapCDN,1,0.463
+2014,Redis,1,0.463
+2014,Redis Object Cache,1,0.463
+2014,Google Publisher Tag,1,0.463
+2014,Platform.sh,1,0.463
+2014,Ivory Search,1,0.463
+2014,iubenda,1,0.463
+2014,jQuery CDN,1,0.463
+2014,Calendly,1,0.463
+2014,Laravel,1,0.463
+2014,Statamic,1,0.463
+2014,ContentViews,1,0.463
+2014,bowser,1,0.463
+2014,Nette Framework,1,0.463
+2014,Commanders Act TagCommander,1,0.463
+2014,Hugo,1,0.463
+2014,Choices,1,0.463
+2014,Flickity,1,0.463
+2014,Imperva,1,0.463
+2014,Age Gate,1,0.463
+2014,WordPress Super Cache,1,0.463
+2014,Smart Slider 3,1,0.463
+2014,Bunny,1,0.463
+2014,jQuery UI,1,0.463
+2014,Commanders Act TrustCommander,1,0.463
+2014,SweetAlert2,1,0.463
+2014,AddToAny,1,0.463
+2014,FancyBox,1,0.463
+2014,Raphael,1,0.463
+2014,Three.js,1,0.463
+2014,Webflow,1,0.463
+2014,jQuery-pjax,1,0.463
+2014,Colorlib Shapely,1,0.463
+2014,D3,1,0.463
+2014,OWL Carousel,1,0.463
+2014,Plotly,1,0.463
+2014,Supersized,1,0.463
+2014,Apple Sign-in,1,0.463
+2014,Google Sign-in,1,0.463
+2014,Onsen UI,1,0.463
+2014,Osano,1,0.463
+2014,Recurly,1,0.463
+2014,Kinsta,1,0.463
+2014,Cookiebot,1,0.463
+2014,AWIN,1,0.463
+2014,Freshchat,1,0.463
+2014,HubSpot,1,0.463
+2014,Splitbee,1,0.463
+2014,Flywheel,1,0.463
+2014,Gravity Forms,1,0.463
+2014,Lightbox,1,0.463
+2014,Craft Commerce,1,0.463
+2014,MailChimp,1,0.463
+2014,Aruba.it,1,0.463
+2014,Framer Sites,1,0.463
+2014,Astro,1,0.463
+2014,Sitecore,1,0.463
+2014,Siteimprove,1,0.463
+2014,Sucuri,1,0.463
+2014,Draftpress HFCM,1,0.463
+2014,Rybbit,1,0.463
+2014,Debian,1,0.463
+2014,Download Monitor,1,0.463
+2014,Elementor Addon Elements,1,0.463
+2014,MailOptin,1,0.463
+2013,HSTS,109,47.598
+2013,HTTP/3,90,39.301
+2013,jQuery,81,35.371
+2013,Cloudflare,77,33.624
+2013,Google Tag Manager,50,21.834
+2013,PHP,49,21.397
+2013,MySQL,38,16.594
+2013,WordPress,38,16.594
+2013,Cloudflare Browser Insights,35,15.284
+2013,Apache HTTP Server,33,14.41
+2013,Google Analytics,27,11.79
+2013,Nginx,24,10.48
+2013,jQuery Migrate,22,9.607
+2013,Node.js,22,9.607
+2013,Netlify,19,8.297
+2013,Adobe Fonts,19,8.297
+2013,Typekit,19,8.297
+2013,Amazon Web Services,18,7.86
+2013,LiteSpeed,16,6.987
+2013,Shopify,16,6.987
+2013,Yoast SEO,16,6.987
+2013,Amazon S3,15,6.55
+2013,React,15,6.55
+2013,Google Hosted Libraries,15,6.55
+2013,Nuxt.js,15,6.55
+2013,Vue.js,15,6.55
+2013,Modernizr,12,5.24
+2013,WordPress Block Editor,12,5.24
+2013,Klaviyo,12,5.24
+2013,Bootstrap,12,5.24
+2013,jsDelivr,11,4.803
+2013,Stimulus,10,4.367
+2013,Squarespace,9,3.93
+2013,Squarespace Commerce,9,3.93
+2013,Varnish,9,3.93
+2013,Cloudflare Bot Management,9,3.93
+2013,LiteSpeed Cache,8,3.493
+2013,Litespeed Cache,8,3.493
+2013,Vercel,8,3.493
+2013,reCAPTCHA,8,3.493
+2013,Webpack,8,3.493
+2013,Contact Form 7,7,3.057
+2013,jQuery CDN,7,3.057
+2013,cdnjs,7,3.057
+2013,jQuery UI,6,2.62
+2013,WP Rocket,6,2.62
+2013,CookieYes,6,2.62
+2013,Amazon CloudFront,6,2.62
+2013,Google Cloud,6,2.62
+2013,Salesforce,6,2.62
+2013,Salesforce Commerce Cloud,6,2.62
+2013,Tealium,6,2.62
+2013,Next.js,6,2.62
+2013,Site Kit,6,2.62
+2013,Java,5,2.183
+2013,OneTrust,5,2.183
+2013,parallax.js,5,2.183
+2013,Google Cloud Load Balancing,5,2.183
+2013,Onsen UI,5,2.183
+2013,Slick,5,2.183
+2013,RequireJS,4,1.747
+2013,Microsoft ASP.NET,4,1.747
+2013,AddToAny,4,1.747
+2013,AMP,4,1.747
+2013,GSAP,4,1.747
+2013,Google Cloud Trace,4,1.747
+2013,Unpkg,4,1.747
+2013,WPML,4,1.747
+2013,Craft CMS,4,1.747
+2013,Akamai,3,1.31
+2013,All in One SEO,3,1.31
+2013,All in One SEO Pack,3,1.31
+2013,Webflow,3,1.31
+2013,imagesLoaded,3,1.31
+2013,Alpine.js,3,1.31
+2013,YouTube,3,1.31
+2013,Sitecore,3,1.31
+2013,Cookiebot,3,1.31
+2013,Stripe,2,0.873
+2013,Windows Server,2,0.873
+2013,Adobe Experience Manager,2,0.873
+2013,Akamai Bot Manager,2,0.873
+2013,Clicky,2,0.873
+2013,Genesis theme,2,0.873
+2013,OWL Carousel,2,0.873
+2013,MonsterInsights,2,0.873
+2013,Hostinger,2,0.873
+2013,Weglot,2,0.873
+2013,Contentful,2,0.873
+2013,Ubuntu,2,0.873
+2013,Google Maps,2,0.873
+2013,Framer Sites,2,0.873
+2013,Linkedin Ads,2,0.873
+2013,AddToAny Share Buttons,2,0.873
+2013,Blitz,2,0.873
+2013,SEOmatic,2,0.873
+2013,Elementor,2,0.873
+2013,Polylang,2,0.873
+2013,Swiper,2,0.873
+2013,Flickity,2,0.873
+2013,MyFonts,2,0.873
+2013,TrustArc,2,0.873
+2013,Fastly,2,0.873
+2013,GitHub Pages,2,0.873
+2013,Bunny,2,0.873
+2013,Ruby,2,0.873
+2013,Ruby on Rails,2,0.873
+2013,Debian,2,0.873
+2013,WP Engine,2,0.873
+2013,Lightbox,2,0.873
+2013,GeneratePress,2,0.873
+2013,GeneratePress GP Premium,2,0.873
+2013,OpenSSL,2,0.873
+2013,FitVids.JS,2,0.873
+2013,Yottaa,2,0.873
+2013,Gravatar,2,0.873
+2013,Gravity Forms,2,0.873
+2013,WooCommerce,2,0.873
+2013,Express,2,0.873
+2013,Gatsby,2,0.873
+2013,Twitter,1,0.437
+2013,IIS,1,0.437
+2013,Blocksy,1,0.437
+2013,Adobe Dynamic Media Classic,1,0.437
+2013,Chart.js,1,0.437
+2013,Email Encoder for Wordpress,1,0.437
+2013,MailChimp,1,0.437
+2013,Google Publisher Tag,1,0.437
+2013,Hostinger CDN,1,0.437
+2013,Amazon ALB,1,0.437
+2013,Instant.Page,1,0.437
+2013,Intelligems,1,0.437
+2013,Foursixty,1,0.437
+2013,Glide.js,1,0.437
+2013,Snowplow Analytics,1,0.437
+2013,Trustpilot,1,0.437
+2013,Google Tag Manager for WordPress,1,0.437
+2013,Max Mega Menu,1,0.437
+2013,Magnific Popup,1,0.437
+2013,waitForImages,1,0.437
+2013,Zendesk,1,0.437
+2013,Bluecore,1,0.437
+2013,Google Optimize,1,0.437
+2013,Azure,1,0.437
+2013,Azure Front Door,1,0.437
+2013,Firebase,1,0.437
+2013,Klarna Checkout,1,0.437
+2013,Lodash,1,0.437
+2013,PayPal,1,0.437
+2013,FancyBox,1,0.437
+2013,Cart Functionality,1,0.437
+2013,Rebuy,1,0.437
+2013,Recharge,1,0.437
+2013,SocialLadder,1,0.437
+2013,Skimlinks,1,0.437
+2013,Kadence WP Blocks,1,0.437
+2013,Kadence WP Kadence,1,0.437
+2013,Modern Image Formats,1,0.437
+2013,Performance Lab,1,0.437
+2013,Yoast SEO Premium,1,0.437
+2013,UNIX,1,0.437
+2013,CodeIgniter,1,0.437
+2013,ExpressionEngine,1,0.437
+2013,spin.js,1,0.437
+2013,Prismic,1,0.437
+2013,Complianz,1,0.437
+2013,CreateJS,1,0.437
+2013,CIVIC,1,0.437
+2013,Cookie Control,1,0.437
+2013,GOV.UK Frontend,1,0.437
+2013,AddThis,1,0.437
+2013,p5.js,1,0.437
+2013,bxSlider,1,0.437
+2013,MDBootstrap,1,0.437
+2013,Popper,1,0.437
+2013,Yii,1,0.437
+2013,Zepto,1,0.437
+2013,SAP Commerce Cloud,1,0.437
+2013,Redux Framework,1,0.437
+2013,Hugo,1,0.437
+2013,Magnolia CMS,1,0.437
+2013,Addsearch,1,0.437
+2013,Akamai Connected Cloud,1,0.437
+2013,Envoy,1,0.437
+2013,F5 Distributed Cloud Services,1,0.437
+2013,Caddy,1,0.437
+2013,Calendly,1,0.437
+2013,Phusion Passenger,1,0.437
+2013,Siteimprove,1,0.437
+2013,Hydrogen,1,0.437
+2013,Rokt,1,0.437
+2013,Sanity,1,0.437
+2013,Sanity.io,1,0.437
+2013,Vite,1,0.437
+2013,Kinsta,1,0.437
+2013,AB Tasty,1,0.437
+2013,Google Cloud CDN,1,0.437
+2013,Qualified,1,0.437
+2013,Lucky Orange,1,0.437
+2013,Warmly,1,0.437
+2013,Campaign Monitor,1,0.437
+2013,Aruba.it,1,0.437
+2013,RackCache,1,0.437
+2013,Apache Traffic Server,1,0.437
+2013,Slider Revolution,1,0.437
+2013,Underscore.js,1,0.437
+2013,WooCommerce Multilingual,1,0.437
+2013,X-Clacks-Overhead,1,0.437
+2013,Mixitup,1,0.437
+2013,Conditional Fields for Contact Form 7,1,0.437
+2013,Statcounter,1,0.437
+2013,Platform.sh,1,0.437
+2013,Trusted Shops,1,0.437
+2013,Varify,1,0.437
+2013,iubenda,1,0.437
+2013,Howler.js,1,0.437
+2013,GenerateBlocks,1,0.437
+2013,Perfmatters,1,0.437
+2013,FlyingPress,1,0.437
+2013,Fathom,1,0.437
+2013,Rybbit,1,0.437
+2013,crypto-js,1,0.437
+2012,HSTS,96,43.049
+2012,HTTP/3,90,40.359
+2012,jQuery,85,38.117
+2012,Cloudflare,80,35.874
+2012,PHP,68,30.493
+2012,Google Tag Manager,53,23.767
+2012,MySQL,52,23.318
+2012,WordPress,52,23.318
+2012,Google Analytics,41,18.386
+2012,jQuery Migrate,38,17.04
+2012,Cloudflare Browser Insights,37,16.592
+2012,Apache HTTP Server,30,13.453
+2012,Yoast SEO,29,13.004
+2012,Nginx,28,12.556
+2012,React,21,9.417
+2012,Google Hosted Libraries,20,8.969
+2012,Adobe Fonts,19,8.52
+2012,Typekit,19,8.52
+2012,Node.js,18,8.072
+2012,Amazon Web Services,17,7.623
+2012,Modernizr,17,7.623
+2012,Vercel,15,6.726
+2012,Bootstrap,15,6.726
+2012,Cloudflare Bot Management,15,6.726
+2012,LiteSpeed,13,5.83
+2012,Amazon CloudFront,13,5.83
+2012,WP Rocket,12,5.381
+2012,jQuery UI,12,5.381
+2012,jsDelivr,11,4.933
+2012,reCAPTCHA,11,4.933
+2012,Varnish,11,4.933
+2012,Webpack,11,4.933
+2012,Shopify,11,4.933
+2012,Elementor,10,4.484
+2012,Vue.js,10,4.484
+2012,Next.js,10,4.484
+2012,OneTrust,9,4.036
+2012,WordPress Block Editor,9,4.036
+2012,YouTube,9,4.036
+2012,Contact Form 7,8,3.587
+2012,FitVids.JS,8,3.587
+2012,Nuxt.js,8,3.587
+2012,Ubuntu,8,3.587
+2012,Google Cloud,8,3.587
+2012,Lightbox,7,3.139
+2012,imagesLoaded,7,3.139
+2012,AMP,7,3.139
+2012,Amazon S3,7,3.139
+2012,Font Awesome,7,3.139
+2012,Slick,7,3.139
+2012,Unpkg,7,3.139
+2012,Site Kit,7,3.139
+2012,Swiper,6,2.691
+2012,LiteSpeed Cache,6,2.691
+2012,Litespeed Cache,6,2.691
+2012,ZURB Foundation,6,2.691
+2012,parallax.js,6,2.691
+2012,Klaviyo,6,2.691
+2012,cdnjs,6,2.691
+2012,Yoast SEO Premium,5,2.242
+2012,jQuery CDN,5,2.242
+2012,Contentful,5,2.242
+2012,Google Maps,5,2.242
+2012,Gravity Forms,5,2.242
+2012,OWL Carousel,5,2.242
+2012,Microsoft ASP.NET,5,2.242
+2012,GSAP,5,2.242
+2012,Fastly,5,2.242
+2012,Netlify,5,2.242
+2012,Akamai,4,1.794
+2012,Stimulus,4,1.794
+2012,Azure,4,1.794
+2012,Google Cloud Load Balancing,4,1.794
+2012,Google Cloud Trace,4,1.794
+2012,Salesforce,4,1.794
+2012,Salesforce Commerce Cloud,4,1.794
+2012,Google Cloud CDN,4,1.794
+2012,Squarespace,4,1.794
+2012,Squarespace Commerce,4,1.794
+2012,Alpine.js,3,1.345
+2012,Bluehost,3,1.345
+2012,All in One SEO,3,1.345
+2012,All in One SEO Pack,3,1.345
+2012,WPML,3,1.345
+2012,WooCommerce,3,1.345
+2012,ShareThis,3,1.345
+2012,Azure Front Door,3,1.345
+2012,CookieYes,3,1.345
+2012,Google Sign-in,3,1.345
+2012,Plesk,3,1.345
+2012,Underscore.js,3,1.345
+2012,MailChimp,3,1.345
+2012,OpenResty,3,1.345
+2012,Lodash,3,1.345
+2012,Wix,3,1.345
+2012,WordPress Site Editor,3,1.345
+2012,WP Engine,3,1.345
+2012,Select2,3,1.345
+2012,WordPress Super Cache,3,1.345
+2012,UserWay,3,1.345
+2012,Framer Sites,2,0.897
+2012,BootstrapCDN,2,0.897
+2012,prettyPhoto,2,0.897
+2012,MooTools,2,0.897
+2012,Raphael,2,0.897
+2012,Google Optimize,2,0.897
+2012,Optimizely,2,0.897
+2012,Pingdom RUM,2,0.897
+2012,Linkedin Ads,2,0.897
+2012,Magnific Popup,2,0.897
+2012,Pinterest,2,0.897
+2012,Chosen,2,0.897
+2012,Adobe Experience Manager,2,0.897
+2012,Java,2,0.897
+2012,IIS,2,0.897
+2012,Windows Server,2,0.897
+2012,Backbone.js,2,0.897
+2012,Moment.js,2,0.897
+2012,GitHub Pages,2,0.897
+2012,Weglot,2,0.897
+2012,Crazy Egg,2,0.897
+2012,Google Font API,2,0.897
+2012,OptinMonster,2,0.897
+2012,OptinMonster plugin,2,0.897
+2012,Handlebars,2,0.897
+2012,Divi,2,0.897
+2012,Redux Framework,2,0.897
+2012,jQuery Mobile,2,0.897
+2012,Popper,2,0.897
+2012,Cookiebot,2,0.897
+2012,Global-e,2,0.897
+2012,WPMU DEV Smush,2,0.897
+2012,wpBakery,2,0.897
+2012,Twitter,2,0.897
+2012,Adobe Portfolio,2,0.897
+2012,Complianz,2,0.897
+2012,OpenSSL,2,0.897
+2012,UNIX,2,0.897
+2012,JW Player,2,0.897
+2012,Vercel Analytics,1,0.448
+2012,Vercel Speed Insights,1,0.448
+2012,Choices,1,0.448
+2012,Hyva Themes,1,0.448
+2012,Tailwind CSS,1,0.448
+2012,Redis,1,0.448
+2012,Redis Object Cache,1,0.448
+2012,Creativ.eMail,1,0.448
+2012,Endurance Page Cache,1,0.448
+2012,Astro,1,0.448
+2012,Drupal,1,0.448
+2012,Microsoft Power BI,1,0.448
+2012,Gravatar,1,0.448
+2012,JetEngine,1,0.448
+2012,Mapplic,1,0.448
+2012,Weblication,1,0.448
+2012,XSLT,1,0.448
+2012,Crisp Live Chat,1,0.448
+2012,AddToAny,1,0.448
+2012,PushPushGo,1,0.448
+2012,libphonenumber,1,0.448
+2012,Cloudways,1,0.448
+2012,Blitz,1,0.448
+2012,Craft CMS,1,0.448
+2012,SEOmatic,1,0.448
+2012,Ruby,1,0.448
+2012,Ruby on Rails,1,0.448
+2012,Stripe,1,0.448
+2012,Aruba.it,1,0.448
+2012,Backstretch,1,0.448
+2012,Cludo,1,0.448
+2012,Jotform,1,0.448
+2012,Laravel,1,0.448
+2012,Livewire,1,0.448
+2012,ContentViews,1,0.448
+2012,HashThemes Total,1,0.448
+2012,Headroom.js,1,0.448
+2012,Stellar.js,1,0.448
+2012,Material Design Lite,1,0.448
+2012,Beaver Builder,1,0.448
+2012,Linkedin Sign-in,1,0.448
+2012,Tealium,1,0.448
+2012,Zendesk Chat,1,0.448
+2012,Hydrogen,1,0.448
+2012,Vite,1,0.448
+2012,Autoptimize,1,0.448
+2012,MariaDB,1,0.448
+2012,Pantheon,1,0.448
+2012,Google PageSpeed,1,0.448
+2012,Imperva,1,0.448
+2012,Enhanced Responsive Images,1,0.448
+2012,Modern Image Formats,1,0.448
+2012,Performance Lab,1,0.448
+2012,Highlight.js,1,0.448
+2012,Osano,1,0.448
+2012,p5.js,1,0.448
+2012,GoDaddy Website Builder,1,0.448
+2012,MonsterInsights,1,0.448
+2012,bxSlider,1,0.448
+2012,C3.js,1,0.448
+2012,BuySellAds,1,0.448
+2012,FirstPromoter,1,0.448
+2012,Readymag,1,0.448
+2012,Wistia,1,0.448
+2012,Genesis theme,1,0.448
+2012,Siteimprove,1,0.448
+2012,SpeedCurve,1,0.448
+2012,Sucuri,1,0.448
+2012,Polylang,1,0.448
+2012,SiteOrigin Page Builder,1,0.448
+2012,Cookie Notice,1,0.448
+2012,Flywheel,1,0.448
+2012,Semplice,1,0.448
+2012,Amazon ELB,1,0.448
+2012,NitroPack,1,0.448
+2012,Plyr,1,0.448
+2012,DoubleClick for Publishers (DFP),1,0.448
+2012,Google Publisher Tag,1,0.448
+2012,StackPath,1,0.448
+2012,Yii,1,0.448
+2012,Flickity,1,0.448
+2012,Highcharts,1,0.448
+2012,Envoy,1,0.448
+2012,bowser,1,0.448
+2012,Webflow,1,0.448
+2012,AddThis,1,0.448
+2012,Fast Simon,1,0.448
+2012,Kameleoon,1,0.448
+2012,AnythingSlider,1,0.448
+2012,Webyn,1,0.448
+2012,Enable,1,0.448
+2012,LottieFiles,1,0.448
+2012,Optimizely Commerce,1,0.448
+2012,Optimizely Content Management,1,0.448
+2012,WOW,1,0.448
+2012,Hammer.js,1,0.448
+2012,PixelYourSite,1,0.448
+2012,Attentive,1,0.448
+2012,Arkose Labs,1,0.448
+2012,Plaid,1,0.448
+2012,Easy Pie Chart,1,0.448
+2012,Axios,1,0.448
+2012,Cart Functionality,1,0.448
+2012,Rebuy,1,0.448
+2012,HubSpot,1,0.448
+2012,HubSpot CMS Hub,1,0.448
+2012,AdOpt,1,0.448
+2012,History,1,0.448
+2012,LazySizes unveilhooks plugin,1,0.448
+2012,Ramda,1,0.448
+2012,Svelte,1,0.448
+2012,Zoho,1,0.448
+2012,Zoho PageSense,1,0.448
+2012,Fathom,1,0.448
+2012,Appsflyer,1,0.448
+2012,Facebook Pixel,1,0.448
+2012,Insider,1,0.448
+2012,MoEngage,1,0.448
+2012,VWO,1,0.448
+2012,WooCommerce Multilingual,1,0.448
+2012,iubenda,1,0.448
+2012,Gatsby,1,0.448
+2012,Campaign Monitor,1,0.448
+2012,Clipboard.js,1,0.448
+2012,Moxie,1,0.448
+2012,Plupload,1,0.448
+2012,Essential Addons for Elementor,1,0.448
+2012,Gutenberg,1,0.448
+2011,HSTS,94,38.211
+2011,jQuery,92,37.398
+2011,Cloudflare,86,34.959
+2011,PHP,85,34.553
+2011,HTTP/3,81,32.927
+2011,MySQL,65,26.423
+2011,WordPress,64,26.016
+2011,Nginx,48,19.512
+2011,Apache HTTP Server,46,18.699
+2011,Cloudflare Browser Insights,44,17.886
+2011,Google Tag Manager,40,16.26
+2011,Google Analytics,39,15.854
+2011,jQuery Migrate,39,15.854
+2011,Yoast SEO,27,10.976
+2011,Adobe Fonts,21,8.537
+2011,Typekit,21,8.537
+2011,Bootstrap,17,6.911
+2011,Node.js,16,6.504
+2011,Google Hosted Libraries,16,6.504
+2011,Cloudflare Bot Management,15,6.098
+2011,Elementor,14,5.691
+2011,LiteSpeed,14,5.691
+2011,React,14,5.691
+2011,Vercel,13,5.285
+2011,WordPress Block Editor,13,5.285
+2011,Amazon Web Services,12,4.878
+2011,Site Kit,12,4.878
+2011,imagesLoaded,12,4.878
+2011,Shopify,11,4.472
+2011,Netlify,11,4.472
+2011,Swiper,11,4.472
+2011,Modernizr,11,4.472
+2011,jsDelivr,11,4.472
+2011,LiteSpeed Cache,10,4.065
+2011,Litespeed Cache,10,4.065
+2011,Varnish,10,4.065
+2011,reCAPTCHA,9,3.659
+2011,Contact Form 7,9,3.659
+2011,YouTube,9,3.659
+2011,Webpack,9,3.659
+2011,cdnjs,9,3.659
+2011,Google Maps,9,3.659
+2011,AMP,8,3.252
+2011,Linkedin Ads,8,3.252
+2011,Slick,8,3.252
+2011,Next.js,8,3.252
+2011,Amazon CloudFront,7,2.846
+2011,jQuery UI,7,2.846
+2011,WP Engine,7,2.846
+2011,Nuxt.js,6,2.439
+2011,Vue.js,6,2.439
+2011,parallax.js,6,2.439
+2011,Fastly,6,2.439
+2011,Akamai,5,2.033
+2011,MailChimp,5,2.033
+2011,Cufon,5,2.033
+2011,WP Rocket,5,2.033
+2011,Craft CMS,5,2.033
+2011,Font Awesome,5,2.033
+2011,GitHub Pages,5,2.033
+2011,Ubuntu,5,2.033
+2011,OWL Carousel,5,2.033
+2011,Squarespace,5,2.033
+2011,Squarespace Commerce,5,2.033
+2011,Stimulus,5,2.033
+2011,Popper,5,2.033
+2011,Microsoft ASP.NET,4,1.626
+2011,Unpkg,4,1.626
+2011,OneTrust,4,1.626
+2011,Complianz,4,1.626
+2011,Select2,4,1.626
+2011,wpBakery,4,1.626
+2011,Contentful,4,1.626
+2011,Hostinger,4,1.626
+2011,Twitter,4,1.626
+2011,Klaviyo,4,1.626
+2011,Amazon S3,4,1.626
+2011,jQuery CDN,4,1.626
+2011,Cookiebot,4,1.626
+2011,FancyBox,4,1.626
+2011,All in One SEO,4,1.626
+2011,All in One SEO Pack,4,1.626
+2011,Magnific Popup,4,1.626
+2011,Amazon ALB,3,1.22
+2011,WordPress Super Cache,3,1.22
+2011,Underscore.js,3,1.22
+2011,Polylang,3,1.22
+2011,Yii,3,1.22
+2011,Plesk,3,1.22
+2011,OpenResty,3,1.22
+2011,Gravity Forms,3,1.22
+2011,WPML,3,1.22
+2011,WooCommerce,3,1.22
+2011,jPlayer,3,1.22
+2011,StackPath,3,1.22
+2011,W3 Total Cache,3,1.22
+2011,Lightbox,3,1.22
+2011,WordPress Site Editor,3,1.22
+2011,WP-Optimize,3,1.22
+2011,Alpine.js,3,1.22
+2011,CookieYes,3,1.22
+2011,Chosen,3,1.22
+2011,AB Tasty,2,0.813
+2011,Akamai Bot Manager,2,0.813
+2011,Salesforce,2,0.813
+2011,Salesforce Commerce Cloud,2,0.813
+2011,Tealium,2,0.813
+2011,Google Font API,2,0.813
+2011,Weglot,2,0.813
+2011,Craft Commerce,2,0.813
+2011,SEOmatic,2,0.813
+2011,Plausible,2,0.813
+2011,WooCommerce Multilingual,2,0.813
+2011,Matter.js,2,0.813
+2011,Stripe,2,0.813
+2011,Yoast SEO Premium,2,0.813
+2011,EWWW Image Optimizer,2,0.813
+2011,Express,2,0.813
+2011,OpenSSL,2,0.813
+2011,Slider Revolution,2,0.813
+2011,Laravel,2,0.813
+2011,Debian,2,0.813
+2011,Ruby,2,0.813
+2011,Ruby on Rails,2,0.813
+2011,Java,2,0.813
+2011,CentOS,2,0.813
+2011,Sailthru,1,0.407
+2011,MailChimp for WordPress,1,0.407
+2011,GSAP,1,0.407
+2011,Spectra,1,0.407
+2011,Blocksy,1,0.407
+2011,Campaign Monitor,1,0.407
+2011,Silverstripe,1,0.407
+2011,WPForms,1,0.407
+2011,Packery,1,0.407
+2011,MooTools,1,0.407
+2011,Glider.js,1,0.407
+2011,Loloyal,1,0.407
+2011,SWFObject,1,0.407
+2011,Shopware,1,0.407
+2011,Symfony,1,0.407
+2011,Alibaba Cloud CDN,1,0.407
+2011,Attentive,1,0.407
+2011,Redis,1,0.407
+2011,Redis Object Cache,1,0.407
+2011,Drupal,1,0.407
+2011,Agility CMS,1,0.407
+2011,Onsen UI,1,0.407
+2011,Highlight.js,1,0.407
+2011,Google AdSense,1,0.407
+2011,Cloudways,1,0.407
+2011,scrollreveal,1,0.407
+2011,Big Cartel,1,0.407
+2011,PIXIjs,1,0.407
+2011,Tagembed,1,0.407
+2011,All in One SEO:pro 4.4.1,1,0.407
+2011,Google Optimize,1,0.407
+2011,CodeIgniter,1,0.407
+2011,UNIX,1,0.407
+2011,spin.js,1,0.407
+2011,Gatsby,1,0.407
+2011,FlyingPress,1,0.407
+2011,Supersized,1,0.407
+2011,HeadJS,1,0.407
+2011,Livewire,1,0.407
+2011,Statcounter,1,0.407
+2011,theTradeDesk,1,0.407
+2011,Adobe Portfolio,1,0.407
+2011,Aruba.it,1,0.407
+2011,Stellar.js,1,0.407
+2011,BugHerd,1,0.407
+2011,GenerateBlocks,1,0.407
+2011,Adobe Experience Manager,1,0.407
+2011,Azure Edge Network,1,0.407
+2011,Microsoft Power BI,1,0.407
+2011,Chart.js,1,0.407
+2011,Easy Pie Chart,1,0.407
+2011,FitVids.JS,1,0.407
+2011,Infinite Scroll,1,0.407
+2011,Mixitup,1,0.407
+2011,MonsterInsights,1,0.407
+2011,ProgressBar.js,1,0.407
+2011,Typed.js,1,0.407
+2011,prettyPhoto,1,0.407
+2011,waitForImages,1,0.407
+2011,Lenis,1,0.407
+2011,Locomotive Scroll,1,0.407
+2011,Polyfill,1,0.407
+2011,Statamic,1,0.407
+2011,Blitz,1,0.407
+2011,Framer Sites,1,0.407
+2011,Debian:lenny,1,0.407
+2011,Imagely NextGEN Gallery,1,0.407
+2011,NextGEN Gallery,1,0.407
+2011,BeTheme,1,0.407
+2011,Essential Addons for Elementor,1,0.407
+2011,particles.js,1,0.407
+2011,WPMU DEV Smush,1,0.407
+2011,MetaSlider,1,0.407
+2011,WOW,1,0.407
+2011,Dynatrace,1,0.407
+2011,Dynatrace RUM,1,0.407
+2011,Plyr,1,0.407
+2011,ProcessWire,1,0.407
+2011,Zendesk,1,0.407
+2011,Gravatar,1,0.407
+2011,Instagram Feed for WordPress,1,0.407
+2011,Smash Balloon Instagram Feed,1,0.407
+2011,YUI,1,0.407
+2011,Slimbox 2,1,0.407
+2011,Twenty Sixteen,1,0.407
+2011,Intersection Observer,1,0.407
+2011,PixelYourSite,1,0.407
+2011,Backbone.js,1,0.407
+2011,EmbedPress,1,0.407
+2011,Google Tag Manager for WordPress,1,0.407
+2011,Google Cloud,1,0.407
+2011,Google Cloud CDN,1,0.407
+2011,Lodash,1,0.407
+2011,Wix,1,0.407
+2011,ZURB Foundation,1,0.407
+2011,fullPage.js,1,0.407
+2011,Django,1,0.407
+2011,Python,1,0.407
+2011,Kinsta,1,0.407
+2011,HubSpot,1,0.407
+2011,HubSpot CMS Hub,1,0.407
+2011,AddToAny,1,0.407
+2011,AddToAny Share Buttons,1,0.407
+2011,wpCache,1,0.407
+2011,RequireJS,1,0.407
+2011,Readymag,1,0.407
+2011,TYPO3 CMS,1,0.407
+2011,Usercentrics,1,0.407
+2011,Sendinblue,1,0.407
+2010,jQuery,101,45.089
+2010,HSTS,87,38.839
+2010,PHP,80,35.714
+2010,HTTP/3,72,32.143
+2010,MySQL,60,26.786
+2010,WordPress,60,26.786
+2010,Cloudflare,57,25.446
+2010,Apache HTTP Server,47,20.982
+2010,Nginx,39,17.411
+2010,jQuery Migrate,38,16.964
+2010,Google Tag Manager,34,15.179
+2010,Cloudflare Browser Insights,33,14.732
+2010,Google Analytics,32,14.286
+2010,Yoast SEO,29,12.946
+2010,Adobe Fonts,22,9.821
+2010,Typekit,22,9.821
+2010,Contact Form 7,21,9.375
+2010,LiteSpeed,21,9.375
+2010,Google Hosted Libraries,14,6.25
+2010,Modernizr,13,5.804
+2010,Bootstrap,13,5.804
+2010,LiteSpeed Cache,13,5.804
+2010,Litespeed Cache,13,5.804
+2010,React,12,5.357
+2010,jQuery CDN,11,4.911
+2010,reCAPTCHA,11,4.911
+2010,Amazon Web Services,10,4.464
+2010,Node.js,10,4.464
+2010,WordPress Block Editor,10,4.464
+2010,Netlify,9,4.018
+2010,jsDelivr,9,4.018
+2010,Varnish,9,4.018
+2010,Slick,9,4.018
+2010,Google Maps,8,3.571
+2010,cdnjs,8,3.571
+2010,Lightbox,8,3.571
+2010,Vercel,8,3.571
+2010,Craft CMS,8,3.571
+2010,AMP,8,3.571
+2010,Cloudflare Bot Management,7,3.125
+2010,Amazon S3,7,3.125
+2010,Squarespace,7,3.125
+2010,Squarespace Commerce,7,3.125
+2010,parallax.js,6,2.679
+2010,All in One SEO,6,2.679
+2010,All in One SEO Pack,6,2.679
+2010,Next.js,6,2.679
+2010,Webpack,6,2.679
+2010,Fastly,6,2.679
+2010,Yii,6,2.679
+2010,Unpkg,6,2.679
+2010,Stimulus,6,2.679
+2010,Cookiebot,5,2.232
+2010,Java,5,2.232
+2010,Amazon CloudFront,5,2.232
+2010,Shopify,5,2.232
+2010,jQuery UI,5,2.232
+2010,OWL Carousel,5,2.232
+2010,Site Kit,5,2.232
+2010,SEOmatic,5,2.232
+2010,FitVids.JS,5,2.232
+2010,ZURB Foundation,4,1.786
+2010,Ubuntu,4,1.786
+2010,Magnific Popup,4,1.786
+2010,Vue.js,4,1.786
+2010,WP Engine,4,1.786
+2010,WP Rocket,4,1.786
+2010,Klaviyo,4,1.786
+2010,Google Cloud,4,1.786
+2010,Elementor,4,1.786
+2010,imagesLoaded,4,1.786
+2010,wpBakery,4,1.786
+2010,YouTube,3,1.339
+2010,Nuxt.js,3,1.339
+2010,Gravity Forms,3,1.339
+2010,WooCommerce,3,1.339
+2010,Framer Sites,3,1.339
+2010,Swiper,3,1.339
+2010,Lodash,3,1.339
+2010,WPML,3,1.339
+2010,Adobe Portfolio,3,1.339
+2010,Akamai,3,1.339
+2010,Alpine.js,3,1.339
+2010,Ruby,3,1.339
+2010,Ruby on Rails,3,1.339
+2010,Hostinger,3,1.339
+2010,Fathom,3,1.339
+2010,Semplice,3,1.339
+2010,Yoast SEO Premium,3,1.339
+2010,FancyBox,3,1.339
+2010,Google Cloud CDN,3,1.339
+2010,Adobe Experience Manager,2,0.893
+2010,Mint,2,0.893
+2010,BootstrapCDN,2,0.893
+2010,Font Awesome,2,0.893
+2010,Headroom.js,2,0.893
+2010,Max Mega Menu,2,0.893
+2010,Akismet,2,0.893
+2010,RequireJS,2,0.893
+2010,Stamped,2,0.893
+2010,Divi,2,0.893
+2010,MonsterInsights,2,0.893
+2010,Kinsta,2,0.893
+2010,Sucuri,2,0.893
+2010,Google Sign-in,2,0.893
+2010,Themeansar Newsup,2,0.893
+2010,GSAP,2,0.893
+2010,Select2,2,0.893
+2010,Microsoft ASP.NET,2,0.893
+2010,OneTrust,2,0.893
+2010,CookieYes,2,0.893
+2010,Underscore.js,2,0.893
+2010,Optimizely,2,0.893
+2010,Google Font API,2,0.893
+2010,AddThis,2,0.893
+2010,Endurance Page Cache,2,0.893
+2010,WOW,2,0.893
+2010,hCaptcha,2,0.893
+2010,MailChimp,2,0.893
+2010,Envoy,2,0.893
+2010,GitHub Pages,2,0.893
+2010,Bunny,2,0.893
+2010,Wix,2,0.893
+2010,Slider Revolution,2,0.893
+2010,Easy Pie Chart,2,0.893
+2010,Amazon ALB,1,0.446
+2010,Debian,1,0.446
+2010,CodeIgniter,1,0.446
+2010,ExpressionEngine,1,0.446
+2010,Hugo,1,0.446
+2010,Global-e,1,0.446
+2010,Salesforce,1,0.446
+2010,Salesforce Commerce Cloud,1,0.446
+2010,iGoDigital,1,0.446
+2010,Instagram Feed for WordPress,1,0.446
+2010,MindBody,1,0.446
+2010,EWWW Image Optimizer,1,0.446
+2010,Render,1,0.446
+2010,Age Gate,1,0.446
+2010,Elfsight,1,0.446
+2010,Mixitup,1,0.446
+2010,SVG Support,1,0.446
+2010,UserWay,1,0.446
+2010,Contao,1,0.446
+2010,Tablesorter,1,0.446
+2010,Chatway,1,0.446
+2010,Draftpress HFCM,1,0.446
+2010,Kadence WP Blocks,1,0.446
+2010,Kadence WP Kadence,1,0.446
+2010,Linkedin Ads,1,0.446
+2010,AB Tasty,1,0.446
+2010,Google Cloud Load Balancing,1,0.446
+2010,Yottaa,1,0.446
+2010,Handlebars,1,0.446
+2010,JetEngine,1,0.446
+2010,Moment.js,1,0.446
+2010,jQuery Mobile,1,0.446
+2010,Clutch,1,0.446
+2010,bxSlider,1,0.446
+2010,Adimo,1,0.446
+2010,Juicer,1,0.446
+2010,theTradeDesk,1,0.446
+2010,Blogger,1,0.446
+2010,Google AdSense,1,0.446
+2010,Onsen UI,1,0.446
+2010,OpenGSE,1,0.446
+2010,Osano,1,0.446
+2010,Python,1,0.446
+2010,RawGit,1,0.446
+2010,MODX,1,0.446
+2010,Azure,1,0.446
+2010,Optimizely Content Management,1,0.446
+2010,Performance Lab,1,0.446
+2010,Smart Slider 3,1,0.446
+2010,Spektrix,1,0.446
+2010,Zipkin,1,0.446
+2010,Sentry,1,0.446
+2010,Collective Audience,1,0.446
+2010,Integral Ad Science,1,0.446
+2010,Complianz,1,0.446
+2010,Parsley.js,1,0.446
+2010,Unbounce,1,0.446
+2010,Google Optimize,1,0.446
+2010,Google Tag Manager for WordPress,1,0.446
+2010,WooCommerce Multilingual,1,0.446
+2010,Gravatar,1,0.446
+2010,Flickity,1,0.446
+2010,Polyfill,1,0.446
+2010,Polylang,1,0.446
+2010,OpenResty,1,0.446
+2010,Backbone.js,1,0.446
+2010,MariaDB,1,0.446
+2010,Pantheon,1,0.446
+2010,Spectra,1,0.446
+2010,Flockler,1,0.446
+2010,MailChimp for WordPress,1,0.446
+2010,Akamai Bot Manager,1,0.446
+2010,Apache Tomcat,1,0.446
+2010,CentOS,1,0.446
+2010,OpenSSL,1,0.446
+2010,mod_jk,1,0.446
+2010,TYPO3 CMS,1,0.446
+2010,Download Monitor,1,0.446
+2010,W3 Total Cache,1,0.446
+2010,eBay Partner Network,1,0.446
+2010,Apache Traffic Server,1,0.446
+2010,Drupal,1,0.446
+2010,Prismic,1,0.446
+2010,Prototype,1,0.446
+2010,YUI,1,0.446
+2010,MailerLite,1,0.446
+2010,Commerce7,1,0.446
+2010,WordPress Site Editor,1,0.446
+2010,ActiveCampaign,1,0.446
+2010,Twenty Twenty-One,1,0.446
+2010,Carbon Ads,1,0.446
+2010,Plesk,1,0.446
+2010,BeTheme,1,0.446
+2010,The SEO Framework,1,0.446
+2010,WP-Optimize,1,0.446
+2010,Imperva,1,0.446
+2010,Trustpilot,1,0.446
+2010,Firebase,1,0.446
+2010,sidr,1,0.446
+2010,ContentViews,1,0.446
+2010,Cufon,1,0.446
+2010,Crazy Egg,1,0.446
+2010,Plyr,1,0.446
+2010,Webflow,1,0.446
+2010,Redux Framework,1,0.446
+2010,Infinite Scroll,1,0.446
+2010,Packery,1,0.446
+2010,Cart Functionality,1,0.446
+2010,Recharge,1,0.446
+2010,HTTP/2,1,0.446
+2010,Express,1,0.446
+2009,HTTP/3,45,39.13
+2009,PHP,45,39.13
+2009,jQuery,44,38.261
+2009,HSTS,35,30.435
+2009,MySQL,34,29.565
+2009,WordPress,34,29.565
+2009,Cloudflare,32,27.826
+2009,Apache HTTP Server,25,21.739
+2009,Cloudflare Browser Insights,20,17.391
+2009,jQuery Migrate,18,15.652
+2009,Google Analytics,17,14.783
+2009,Nginx,15,13.043
+2009,Google Tag Manager,15,13.043
+2009,Yoast SEO,14,12.174
+2009,LiteSpeed,14,12.174
+2009,Bootstrap,10,8.696
+2009,React,9,7.826
+2009,Contact Form 7,9,7.826
+2009,Adobe Fonts,9,7.826
+2009,Typekit,9,7.826
+2009,Node.js,7,6.087
+2009,Varnish,7,6.087
+2009,LiteSpeed Cache,7,6.087
+2009,Litespeed Cache,7,6.087
+2009,Netlify,7,6.087
+2009,Amazon Web Services,6,5.217
+2009,Amazon CloudFront,5,4.348
+2009,Next.js,5,4.348
+2009,Webpack,5,4.348
+2009,Google Hosted Libraries,5,4.348
+2009,Modernizr,5,4.348
+2009,cdnjs,5,4.348
+2009,Stimulus,4,3.478
+2009,W3 Total Cache,4,3.478
+2009,AMP,4,3.478
+2009,Google Maps,4,3.478
+2009,WordPress Block Editor,4,3.478
+2009,Elementor,4,3.478
+2009,reCAPTCHA,4,3.478
+2009,Vercel,4,3.478
+2009,OpenResty,3,2.609
+2009,imagesLoaded,3,2.609
+2009,Amazon S3,3,2.609
+2009,Swiper,3,2.609
+2009,Laravel,3,2.609
+2009,Unpkg,3,2.609
+2009,MailChimp,3,2.609
+2009,Slider Revolution,3,2.609
+2009,wpBakery,3,2.609
+2009,Popper,3,2.609
+2009,Framer Sites,3,2.609
+2009,jQuery UI,3,2.609
+2009,AddThis,2,1.739
+2009,Google Font API,2,1.739
+2009,C3.js,2,1.739
+2009,Squarespace,2,1.739
+2009,Squarespace Commerce,2,1.739
+2009,FitVids.JS,2,1.739
+2009,Hostinger,2,1.739
+2009,Nuxt.js,2,1.739
+2009,Vue.js,2,1.739
+2009,Bluehost,2,1.739
+2009,WooCommerce,2,1.739
+2009,WP Rocket,2,1.739
+2009,WOW,2,1.739
+2009,Underscore.js,2,1.739
+2009,GSAP,2,1.739
+2009,Clicky,2,1.739
+2009,jQuery CDN,2,1.739
+2009,Cloudflare Bot Management,1,0.87
+2009,Lightbox,1,0.87
+2009,Webflow,1,0.87
+2009,IIS,1,0.87
+2009,Microsoft ASP.NET,1,0.87
+2009,Windows Server,1,0.87
+2009,CentOS,1,0.87
+2009,Java,1,0.87
+2009,Java Servlet,1,0.87
+2009,JavaServer Pages,1,0.87
+2009,OpenSSL,1,0.87
+2009,Perl,1,0.87
+2009,mod_perl,1,0.87
+2009,Taboola,1,0.87
+2009,WPML,1,0.87
+2009,Debian,1,0.87
+2009,AnythingSlider,1,0.87
+2009,SWFObject,1,0.87
+2009,Twitter,1,0.87
+2009,Polylang,1,0.87
+2009,Site Kit,1,0.87
+2009,Tiny Slider,1,0.87
+2009,Contao,1,0.87
+2009,OneSignal,1,0.87
+2009,Klaviyo,1,0.87
+2009,Shopify,1,0.87
+2009,Unbounce,1,0.87
+2009,Complianz,1,0.87
+2009,Font Awesome,1,0.87
+2009,Alpine.js,1,0.87
+2009,Livewire,1,0.87
+2009,Joomla,1,0.87
+2009,UNIX,1,0.87
+2009,DatoCMS,1,0.87
+2009,Clutch,1,0.87
+2009,Elfsight,1,0.87
+2009,Endurance Page Cache,1,0.87
+2009,MailChimp for WooCommerce,1,0.87
+2009,Magnific Popup,1,0.87
+2009,OWL Carousel,1,0.87
+2009,Weglot,1,0.87
+2009,Divi,1,0.87
+2009,MailChimp for WordPress,1,0.87
+2009,Moment.js,1,0.87
+2009,WP Fastest Cache,1,0.87
+2009,parallax.js,1,0.87
+2009,BootstrapCDN,1,0.87
+2009,Bunny,1,0.87
+2009,ElasticPress,1,0.87
+2009,Elasticsearch,1,0.87
+2009,Google AdSense,1,0.87
+2009,Redux Framework,1,0.87
+2009,Akamai,1,0.87
+2009,Akamai Bot Manager,1,0.87
+2009,Contentful,1,0.87
+2009,GenerateBlocks,1,0.87
+2009,Yoast SEO Premium,1,0.87
+2009,ZURB Foundation,1,0.87
+2009,YouTube,1,0.87
+2009,Fathom,1,0.87
+2009,Stripe,1,0.87
+2009,ShareThis,1,0.87
+2009,Semplice,1,0.87
+2009,HashThemes Total,1,0.87
+2009,sidr,1,0.87
+2009,Plyr,1,0.87
+2009,OneTrust,1,0.87
+2009,Fastly,1,0.87
+2009,GitHub Pages,1,0.87
+2009,GoDaddy Website Builder,1,0.87
+2009,October CMS,1,0.87
+2009,jsDelivr,1,0.87
+2009,Campaign Monitor,1,0.87
+2009,Ubuntu,1,0.87
+2009,bun,1,0.87
+2009,Cookiebot,1,0.87
+2009,All in One SEO,1,0.87
+2009,All in One SEO Pack,1,0.87
+2009,Google Cloud,1,0.87
+2009,Google Cloud CDN,1,0.87
+2009,Lodash,1,0.87
+2009,Wix,1,0.87
+2009,MooTools,1,0.87
+2009,Download Monitor,1,0.87

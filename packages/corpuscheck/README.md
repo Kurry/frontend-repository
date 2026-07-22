@@ -93,15 +93,26 @@ The NOP scaffold contains an empty body, WebMCP contract stubs, and exactly the
 
 ## Oracle contract CI
 
-`oracle-ci` is the deterministic pre-scoring gate for solution oracles. It runs
-the same six stages locally and in `.github/workflows/oracle-ci.yml`: all
-static validation tiers; `npm ci` plus `verify:build`; a port-3000 Chromium
-smoke with non-empty HTML and zero console/page errors; assigned-module,
-read-only, and visible-mutation WebMCP probes; the task's canonical Playwright
-e2e suite (`solution/app/e2e.spec.mjs`, run against the same served app —
-skipped with a log line when the spec is absent); and a structural boot of every
-dimension TOML's judge MCP servers against the primary and reduced-motion CDP
-browsers. It never installs rewardkit, calls an LLM, or needs API keys.
+`oracle-ci` is the deterministic pre-scoring gate for solution oracles. By
+default it runs six stages: all static validation tiers; `npm ci` plus
+`verify:build`; a port-3000 Chromium smoke with non-empty HTML and zero
+console/page errors; assigned-module, read-only, and visible-mutation WebMCP
+probes; the task's canonical Playwright e2e suite (`solution/app/e2e.spec.mjs`,
+run against the same served app and skipped with a log line when absent); and a
+structural boot of every dimension TOML's judge MCP servers against the primary
+and reduced-motion CDP browsers. It never installs rewardkit, calls an LLM, or
+needs API keys.
+
+GitHub splits those responsibilities between two checks. Oracle contract CI
+passes `--skip-e2e` and runs the other five stages; the Playwright Tests matrix
+owns e2e execution and report artifacts for each changed task, then updates one
+PR comment with every task's pass, fail, or skip status. Local invocations
+continue to run all six stages unless they explicitly pass `--skip-e2e`.
+
+When a PR changes a task's `e2e.spec.mjs` or recursive `e2e/` suite, the
+Playwright check also requires an executed task-specific test whose title
+matches a criterion name from that task's dimension TOMLs. The four propagated
+workspace-contract tests do not satisfy this gate by themselves.
 
 The command copies each `solution/app` to a temporary directory before install,
 build, and serve, so tracked oracle files stay unchanged. Install the root Node

@@ -116,6 +116,7 @@ test.describe('workspace contract (canonical)', () => {
   });
 });
 
+
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
 
 

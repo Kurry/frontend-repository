@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from corpuscheck.cli import app
 from corpuscheck.oracle_ci import (
     OracleCIError,
     _build_stage,
@@ -318,6 +319,65 @@ def test_runtime_stage_preserves_named_runtime_failure(
     assert caught.value.message == "expected failure"
 
 
+@pytest.mark.parametrize("run_e2e", [True, False])
+def test_runtime_stage_passes_e2e_selection_to_runtime(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    run_e2e: bool,
+) -> None:
+    task = tmp_path / "tasks/frontend-example"
+    write_dimension(task / "tests/core_features/core_features.toml")
+    monkeypatch.setattr(
+        "corpuscheck.oracle_ci.schemas_path", lambda *_: tmp_path / "assignments.json"
+    )
+    monkeypatch.setattr(
+        "corpuscheck.oracle_ci.package_data", lambda *_: tmp_path / "runtime.mjs"
+    )
+    payload = None
+
+    def run(command, **_kwargs):
+        nonlocal payload
+        payload = json.loads(Path(command[-1]).read_text())
+        return completed(command)
+
+    _runtime_stage(task, tmp_path, run=run, run_e2e=run_e2e)
+
+    assert payload is not None
+    assert payload["runE2e"] is run_e2e
+
+
+@pytest.mark.parametrize(
+    ("extra_args", "run_e2e"),
+    [([], True), (["--skip-e2e"], False)],
+)
+def test_oracle_ci_cli_forwards_e2e_selection(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    runner,
+    extra_args: list[str],
+    run_e2e: bool,
+) -> None:
+    captured = None
+
+    def run_oracle_ci(slugs, **kwargs):
+        nonlocal captured
+        captured = {"slugs": slugs, **kwargs}
+        return 0
+
+    monkeypatch.setattr("corpuscheck.oracle_ci.run_oracle_ci", run_oracle_ci)
+    monkeypatch.setattr("corpuscheck.repo.find_repo_root", lambda _: tmp_path)
+
+    result = runner.invoke(
+        app,
+        ["oracle-ci", "frontend-example", "--root", str(tmp_path / "tasks"), *extra_args],
+    )
+
+    assert result.exit_code == 0
+    assert captured is not None
+    assert captured["slugs"] == ["frontend-example"]
+    assert captured["run_e2e"] is run_e2e
+
+
 # --- e2e stage (assets/oracle_ci_e2e.mjs) ------------------------------------
 
 _E2E_HELPER = Path(__file__).parents[1] / "src/corpuscheck/assets/oracle_ci_e2e.mjs"
@@ -332,6 +392,22 @@ _PASSING_SPEC = """
 import { test, expect } from '@playwright/test';
 test('adds numbers', () => { expect(1 + 1).toBe(2); });
 test('joins strings', () => { expect('a' + 'b').toBe('ab'); });
+"""
+_CANONICAL_ONLY_SPEC = """
+import { test, expect } from '@playwright/test';
+test('serves non-empty app with zero console errors', () => { expect(true).toBe(true); });
+test('webmcp surface is registered and well-formed', () => { expect(true).toBe(true); });
+test('reduced motion behaviorally suppresses animation', () => { expect(true).toBe(true); });
+test('no horizontal overflow at 375px', () => { expect(true).toBe(true); });
+"""
+_RUBRIC_CRITERION_TEST = """
+test('1.2 created_scene_visible_on_board', () => { expect(true).toBe(true); });
+"""
+_FAILING_RUBRIC_CRITERION_TEST = """
+test('1.2 created_scene_visible_on_board', () => { expect(true).toBe(false); });
+"""
+_UNMATCHED_TASK_TEST = """
+test('looks task specific but is not rubric aligned', () => { expect(true).toBe(true); });
 """
 _FAILING_SPEC = """
 import { test, expect } from '@playwright/test';
@@ -376,7 +452,30 @@ def make_e2e_app(
     return app
 
 
-def run_e2e_suite(tmp_path: Path, app: Path) -> dict:
+def make_e2e_task(tmp_path: Path) -> Path:
+    task = tmp_path / "task"
+    rubric = task / "tests/core_features/core_features.toml"
+    rubric.parent.mkdir(parents=True)
+    rubric.write_text(
+        """
+[[criterion]]
+id = "1.2"
+name = "created_scene_visible_on_board"
+description = "Creating a scene adds it to the board"
+type = "binary"
+weight = 1.0
+"""
+    )
+    return task
+
+
+def run_e2e_suite(
+    tmp_path: Path,
+    app: Path,
+    *,
+    task_dir: Path | None = None,
+    require_task_tests: bool = False,
+) -> dict:
     runtime = tmp_path / "runtime"
     runtime.mkdir(exist_ok=True)
     script = f"""
@@ -385,6 +484,8 @@ def run_e2e_suite(tmp_path: Path, app: Path) -> dict:
         slug: 'fixture',
         appDir: {json.dumps(str(app))},
         runtimeDir: {json.dumps(str(runtime))},
+        taskDir: {json.dumps(str(task_dir) if task_dir else None)},
+        requireTaskTests: {json.dumps(require_task_tests)},
       }});
       console.log(JSON.stringify(result));
     """
@@ -403,6 +504,25 @@ def test_e2e_stage_skips_when_task_has_no_spec(tmp_path: Path) -> None:
     (app / "package.json").write_text('{"name": "fixture", "private": true}')
 
     assert run_e2e_suite(tmp_path, app) == {"status": "skip"}
+
+
+def test_e2e_stage_rejects_missing_suite_when_task_tests_are_required(
+    tmp_path: Path,
+) -> None:
+    app = make_e2e_app(tmp_path, spec=None)
+    task = make_e2e_task(tmp_path)
+
+    result = run_e2e_suite(
+        tmp_path,
+        app,
+        task_dir=task,
+        require_task_tests=True,
+    )
+
+    assert result["status"] == "fail"
+    assert result["taskSpecificTests"] == 0
+    assert result["rubricMatchedTests"] == 0
+    assert "no runnable" in result["message"]
 
 
 def test_e2e_stage_fails_clearly_when_playwright_test_is_missing(
@@ -435,15 +555,45 @@ def test_e2e_stage_names_task_directory_when_playwright_test_is_missing(
     assert "e2e.spec.mjs exists" not in result["message"]
 
 
-def test_playwright_workflow_uses_the_shared_pinned_discovery_runner() -> None:
+def test_playwright_workflow_runs_every_changed_task_with_shared_runner() -> None:
     workflow = (
         Path(__file__).parents[3] / ".github/workflows/playwright.yml"
     ).read_text()
 
+    assert 'paths:\n      - "tasks/**/solution/**"' in workflow
+    assert "sort -u" in workflow
+    assert "slug: ${{ fromJson(needs.detect.outputs.slugs) }}" in workflow
+    assert "fail-fast: false" in workflow
     assert "runE2eSuite" in workflow
     assert "oracle_ci_e2e.mjs" in workflow
+    assert "playwright-status-${{ matrix.slug }}" in workflow
+    assert "<!-- playwright-task-status -->" in workflow
+    assert "needs: [detect, playwright]" in workflow
+    assert "Post or update PR status comment" in workflow
+    assert "Detect task-specific E2E changes" in workflow
+    assert "requireTaskTests: process.env.REQUIRE_TASK_TESTS === 'true'" in workflow
+    assert 'if "taskSpecificTests" in result:' in workflow
+    detect_step = workflow.split("- name: Detect task-specific E2E changes", 1)[1].split(
+        "- uses: actions/setup-node", 1
+    )[0]
+    assert "working-directory: ${{ github.workspace }}" in detect_step
     assert "npx playwright test e2e/" not in workflow
     assert "solution/app/e2e/**" not in workflow
+
+
+def test_oracle_workflow_delegates_e2e_to_playwright() -> None:
+    workflow = (
+        Path(__file__).parents[3] / ".github/workflows/oracle-ci.yml"
+    ).read_text()
+    runtime = (
+        Path(__file__).parents[1]
+        / "src/corpuscheck/assets/oracle_ci_runtime.mjs"
+    ).read_text()
+
+    assert "corpuscheck oracle-ci --changed" in workflow
+    assert "--skip-e2e" in workflow
+    assert "config.runE2e === false" in runtime
+    assert "delegated to Playwright Tests workflow" in runtime
 
 
 def test_task_directory_config_parallelizes_the_pinned_suite(tmp_path: Path) -> None:
@@ -481,6 +631,94 @@ def test_e2e_stage_passes_with_stub_passing_suite(tmp_path: Path) -> None:
     assert (result["passed"], result["failed"], result["skipped"]) == (2, 0, 0)
     assert "warning" not in result
     assert result["detail"] == "passed=2 failed=0 skipped=0 flaky=0 (suites: canonical)"
+
+
+@requires_playwright_test
+def test_e2e_stage_rejects_canonical_only_when_task_tests_are_required(
+    tmp_path: Path,
+) -> None:
+    app = make_e2e_app(tmp_path, spec=_CANONICAL_ONLY_SPEC)
+    task = make_e2e_task(tmp_path)
+
+    result = run_e2e_suite(
+        tmp_path,
+        app,
+        task_dir=task,
+        require_task_tests=True,
+    )
+
+    assert result["status"] == "fail"
+    assert result["passed"] == 4
+    assert result["taskSpecificTests"] == 0
+    assert "only the four propagated workspace-contract tests executed" in result["message"]
+
+
+@requires_playwright_test
+def test_e2e_stage_reports_executed_rubric_matched_tests(tmp_path: Path) -> None:
+    app = make_e2e_app(
+        tmp_path,
+        spec=_CANONICAL_ONLY_SPEC + _RUBRIC_CRITERION_TEST,
+    )
+    task = make_e2e_task(tmp_path)
+
+    result = run_e2e_suite(
+        tmp_path,
+        app,
+        task_dir=task,
+        require_task_tests=True,
+    )
+
+    assert result["status"] == "pass"
+    assert result["passed"] == 5
+    assert result["taskSpecificTests"] == 1
+    assert result["rubricMatchedTests"] == 1
+    assert "task-specific=1 rubric-matched=1" in result["detail"]
+
+
+@requires_playwright_test
+def test_e2e_stage_reports_rubric_coverage_when_task_test_fails(
+    tmp_path: Path,
+) -> None:
+    app = make_e2e_app(
+        tmp_path,
+        spec=_CANONICAL_ONLY_SPEC + _FAILING_RUBRIC_CRITERION_TEST,
+    )
+    task = make_e2e_task(tmp_path)
+
+    result = run_e2e_suite(
+        tmp_path,
+        app,
+        task_dir=task,
+        require_task_tests=True,
+    )
+
+    assert result["status"] == "fail"
+    assert result["passed"] == 4
+    assert result["failed"] == 1
+    assert result["taskSpecificTests"] == 1
+    assert result["rubricMatchedTests"] == 1
+    assert "created_scene_visible_on_board" in result["message"]
+
+
+@requires_playwright_test
+def test_e2e_stage_rejects_task_tests_without_rubric_match(tmp_path: Path) -> None:
+    app = make_e2e_app(
+        tmp_path,
+        spec=_CANONICAL_ONLY_SPEC + _UNMATCHED_TASK_TEST,
+    )
+    task = make_e2e_task(tmp_path)
+
+    result = run_e2e_suite(
+        tmp_path,
+        app,
+        task_dir=task,
+        require_task_tests=True,
+    )
+
+    assert result["status"] == "fail"
+    assert result["taskSpecificTests"] == 1
+    assert result["rubricMatchedTests"] == 0
+    assert "none matched a criterion name" in result["message"]
 
 
 @requires_playwright_test
@@ -525,6 +763,10 @@ _DIR_SPEC_TS = """
 import { test, expect } from '@playwright/test';
 test('task-dir spec runs', () => { expect(2 * 2).toBe(4); });
 """
+_DIR_RUBRIC_SPEC_TS = """
+import { test, expect } from '@playwright/test';
+test('1.2 created_scene_visible_on_board', () => { expect(2 * 2).toBe(4); });
+"""
 _DIR_SPEC_FAILING_TS = """
 import { test, expect } from '@playwright/test';
 test('task-dir spec fails', () => { expect(2 * 2).toBe(5); });
@@ -543,6 +785,27 @@ def test_e2e_stage_runs_task_owned_e2e_directory_suite(tmp_path: Path) -> None:
     assert result["status"] == "pass"
     assert (result["passed"], result["failed"]) == (1, 0)
     assert "(suites: task-dir)" in result["detail"]
+
+
+@requires_playwright_test
+def test_e2e_stage_accepts_rubric_matched_task_directory_suite(
+    tmp_path: Path,
+) -> None:
+    app = make_e2e_app(tmp_path, spec=None)
+    (app / "e2e").mkdir()
+    (app / "e2e/core_features.spec.ts").write_text(_DIR_RUBRIC_SPEC_TS)
+    task = make_e2e_task(tmp_path)
+
+    result = run_e2e_suite(
+        tmp_path,
+        app,
+        task_dir=task,
+        require_task_tests=True,
+    )
+
+    assert result["status"] == "pass"
+    assert result["taskSpecificTests"] == 1
+    assert result["rubricMatchedTests"] == 1
 
 
 @requires_playwright_test
