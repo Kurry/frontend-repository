@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Alert, Badge, Button, Group, Paper, Radio, Stack, Switch, Text, Textarea, Title } from '@mantine/core';
+import { Alert, Badge, Button, Group, Paper, Radio, Stack, Checkbox, Text, Textarea, Title } from '@mantine/core';
 import { Controller, useForm } from 'react-hook-form';
 import { IconAlertCircle, IconCheck, IconLockOpen, IconShieldCheck } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
@@ -66,7 +66,7 @@ export default function VerdictPanel({ bundle }: { bundle: ReviewBundle }) {
             </Radio.Group>
           )} />
           <Controller name="overrideEnabled" control={control} render={({ field }) => (
-            <Switch mt="lg" checked={field.value} onChange={(event) => { const enabled = event.currentTarget.checked; field.onChange(enabled); setOverrideEnabled(bundle.slug, enabled); if (!enabled && recommendation && !constraint.allowed.includes(recommendation)) { reset({ recommendation: null, overrideEnabled: false, overrideJustification: '' }); clearErrors('recommendation'); clearErrors('overrideJustification'); saveRecommendation(bundle.slug, null, null, false); } }} label="Override constraint" description="Unlock out-of-set recommendations and require a written justification." thumbIcon={field.value ? <IconLockOpen size={12} /> : undefined} />
+            <Checkbox mt="lg" checked={field.value} onChange={(event) => { const enabled = event.currentTarget.checked; field.onChange(enabled); setOverrideEnabled(bundle.slug, enabled); if (!enabled && recommendation && !constraint.allowed.includes(recommendation)) { reset({ recommendation: null, overrideEnabled: false, overrideJustification: '' }); clearErrors('recommendation'); clearErrors('overrideJustification'); saveRecommendation(bundle.slug, null, null, false); } }} label="Override constraint" description="Unlock out-of-set recommendations and require a written justification." />
           )} />
           {overrideEnabled && outside && (
             <Controller name="overrideJustification" control={control} render={({ field }) => (
