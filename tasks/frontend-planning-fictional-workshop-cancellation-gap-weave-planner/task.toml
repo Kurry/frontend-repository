@@ -1,0 +1,5 @@
+[task]
+name = "mercor-intelligence/frontend-planning-fictional-workshop-cancellation-gap-weave-planner"
+authors = [{ name = "Kurry", email = "kurry@example.com" }]
+version = "1.0.0"
+description = "A frontend application for filling a cancellation gap in a fictional workshop day."
