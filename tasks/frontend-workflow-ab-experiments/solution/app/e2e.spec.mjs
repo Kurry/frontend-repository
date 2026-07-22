@@ -221,7 +221,7 @@ test.describe('deterministic rubric criteria', () => {
     await expect(page.locator('.active-filter-row')).toContainText('1 experiment');
     await page.getByLabel('Search experiments').fill('');
     await expect(page.locator('.active-filter-row')).toContainText('2 experiments');
-    await page.getByTitle('Remove Pending filter').click();
+    await page.getByRole('button', { name: 'Clear filters' }).click();
     await expect(page.locator('.active-filter-row')).toContainText('5 experiments');
   });
 
