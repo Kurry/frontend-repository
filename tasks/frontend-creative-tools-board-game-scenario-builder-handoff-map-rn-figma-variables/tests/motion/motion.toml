@@ -1,0 +1,30 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[criteria]]
+id = "causal_motion"
+title = "The acted-on item moves or morphs into its new state."
+weight = 1.0
+
+[[criteria]]
+id = "reduced_motion"
+title = "Reduced motion preserves feedback without transforms."
+weight = 1.0

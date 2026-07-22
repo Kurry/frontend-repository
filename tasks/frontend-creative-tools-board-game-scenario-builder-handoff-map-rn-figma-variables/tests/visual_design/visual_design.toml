@@ -1,0 +1,35 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[criteria]]
+id = "visual_hierarchy"
+title = "The visual hierarchy makes current state and next action clear."
+weight = 0.5
+
+[[criteria]]
+id = "domain_workbench"
+title = "A distinctive, domain-specific workbench with clear state tokens, intentional density, and a calm focused canvas."
+weight = 0.5
+
+[[criteria]]
+id = "desktop_layout"
+title = "Desktop layout has a primary surface plus summary and inspector."
+weight = 0.5
