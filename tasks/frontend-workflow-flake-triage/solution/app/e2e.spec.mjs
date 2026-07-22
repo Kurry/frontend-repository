@@ -157,7 +157,8 @@ test('1.4 detail_panel_condition_schedule', async ({ page }) => {
   const row = page.locator('.queue-table tbody tr, .queue-item, tr').first();
   await expect(row).toBeVisible();
   await row.click();
-  await expect(page.locator('.side-stack, #test-detail, .detail-panel').first()).toBeVisible();
+  await expect(page.locator('#test-detail')).toBeVisible();
+  await expect(page.locator('#test-detail .schedule-heading')).toBeVisible();
 });
 
 test('1.5 diverging_run_highlighted', async ({ page }) => {
@@ -337,7 +338,8 @@ test('1.17 test_record_field_contract_visible', async ({ page }) => {
   const row = page.locator('.queue-table tbody tr, .queue-item, tr').first();
   await expect(row).toBeVisible();
   await row.click();
-  await expect(page.locator('.side-stack, #test-detail, .detail-panel').first()).toBeVisible();
+  await expect(page.locator('#test-detail')).toBeVisible();
+  await expect(page.locator('#test-detail .schedule-heading')).toBeVisible();
 });
 
 test('1.18 triage_report_json_field_contract', async ({ page }) => {
@@ -558,31 +560,25 @@ test('6.5 suite_switch_retains_chrome', async ({ page }) => {
 test('6.6 empty_quarantine_is_clear', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
-  // Quarantine membership (triage.allFailTests / triage.flakyTests) is derived
-  // from the ACTIVE SUITE's verdicts, independent of the queue's visible-row
-  // filters (src/lib/triage.svelte.ts: allFailTests/flakyTests read
-  // this.activeSuite.tests directly, never this.visibleTests). Queue filters
-  // therefore cannot drive quarantine to empty, and every seeded suite's
-  // pattern mix (src/lib/seed.ts) includes at least one all-fail and one
-  // mixed-result test, so the true empty-quarantine state is not
-  // deterministically reachable from the UI without relying on the random
-  // re-run outcome generator. This test instead exercises the designed
-  // empty-list markup and count/membership agreement that the non-empty
-  // groups already render, and documents why the fully-empty edge case is
-  // out of reach for a deterministic suite (see comment above).
-  const allFailGroup = page.locator('#all-fail-heading').locator('xpath=ancestor::section[1]');
-  const flakyGroup = page.locator('#flaky-heading').locator('xpath=ancestor::section[1]');
-  const allFailCount = Number(await allFailGroup.locator('.fail-count').innerText());
-  const flakyCount = Number(await flakyGroup.locator('.flaky-count').innerText());
-  expect(allFailCount).toBe(await allFailGroup.locator('li:not(.empty-list)').count());
-  expect(flakyCount).toBe(await flakyGroup.locator('li:not(.empty-list)').count());
-  // Every seeded suite has at least one held test in each group (asserted
-  // here rather than assumed, so a future all-keep suite would be caught).
-  expect(allFailCount).toBeGreaterThan(0);
-  expect(flakyCount).toBeGreaterThan(0);
-  // The designed empty-list copy exists in the template (verified via the
-  // {:else} branch in QuarantineMap.svelte) even though it is not reachable
-  // from this seed data through the UI alone.
+  await page.getByRole('button', { name: /Export triage report/i }).click();
+  await page.getByRole('tab', { name: /Triage report JSON/i }).click();
+  const report = JSON.parse(await page.locator('[data-export-preview="triage-report-json"]').innerText());
+  for (const testRecord of report.tests) {
+    testRecord.verdict = 'keep';
+    for (const run of testRecord.runs) run.result = 'pass';
+  }
+  report.quarantine = { allFail: [], flaky: [] };
+  await page.getByRole('button', { name: /Close export triage report/i }).click();
+  await page.getByRole('button', { name: /Import triage report/i }).click();
+  await page.locator('#import-json').fill(JSON.stringify(report));
+  await page.getByRole('button', { name: /Import and replace suite/i }).click();
+
+  await expect(page.locator('#all-fail-heading').locator('xpath=ancestor::section[1]')).toContainText('No tests whose five runs all fail.');
+  await expect(page.locator('#flaky-heading').locator('xpath=ancestor::section[1]')).toContainText('No tests with mixed pass and fail runs.');
+  await page.getByRole('button', { name: /Export triage report/i }).click();
+  await page.getByRole('tab', { name: /Triage report JSON/i }).click();
+  const exported = JSON.parse(await page.locator('[data-export-preview="triage-report-json"]').innerText());
+  expect(exported.quarantine).toEqual({ allFail: [], flaky: [] });
 });
 
 test('6.7 filters_update_queue_everywhere', async ({ page }) => {
@@ -624,7 +620,8 @@ test('6.8 detail_panel_preserves_workflow', async ({ page }) => {
   const row = page.locator('.queue-table tbody tr, .queue-item, tr').first();
   await expect(row).toBeVisible();
   await row.click();
-  await expect(page.locator('.side-stack, #test-detail, .detail-panel').first()).toBeVisible();
+  await expect(page.locator('#test-detail')).toBeVisible();
+  await expect(page.locator('#test-detail .schedule-heading')).toBeVisible();
 });
 
 test('6.9 export_import_overlays_support_flows', async ({ page }) => {
