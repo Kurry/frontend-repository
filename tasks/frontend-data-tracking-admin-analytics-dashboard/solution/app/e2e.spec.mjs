@@ -126,7 +126,7 @@ test('1.1 controls_are_keyboard_accessible', async ({ page }) => {
   await expect(fab, 'the FAB is reachable via keyboard focus').toBeFocused();
   const hasVisibleFocus = await fab.evaluate((el) => {
     const cs = getComputedStyle(el);
-    return cs.outlineStyle !== 'none' || (cs.boxShadow && cs.boxShadow !== 'none');
+    return cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) > 0;
   });
   expect(hasVisibleFocus, 'focused control shows a visible focus indicator').toBe(true);
   await page.keyboard.press('Enter');
