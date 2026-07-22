@@ -522,15 +522,14 @@ a:focus-visible,
   color: #fff;
   background: #202632;
   box-shadow: 0 8px 26px rgba(0,0,0,.2);
-  transition: opacity 90ms ease, transform 90ms ease;
-  transform: translateY(4px);
+  transition: opacity 90ms ease;
 }
 
 .asset-preview strong { font-size: 12px; }
 .asset-preview > span { color: #c4cad3; font-size: 11px; line-height: 1.4; }
 .asset-badge:hover .asset-preview,
 .asset-badge:focus .asset-preview,
-.asset-badge:focus-within .asset-preview { visibility: visible; opacity: 1; transform: none; }
+.asset-badge:focus-within .asset-preview { visibility: visible; opacity: 1; }
 .asset-remove { display: inline-flex; align-items: center; gap: 5px; align-self: flex-start; margin-top: 3px; border: 0; padding: 5px 8px; color: #fff; background: #da1e28; cursor: pointer; }
 
 .asset-picker { margin-top: 12px; border: 1px solid #cfd5de; background: #fff; box-shadow: 0 12px 30px rgba(32,38,50,.1); animation: form-fade 90ms var(--ease-out); }
