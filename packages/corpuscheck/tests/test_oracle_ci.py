@@ -880,7 +880,7 @@ def test_full_corpus_aggregate_rejects_invalid_duplicate_and_unexpected_results(
     assert any("Could not parse broken/app-result.json" in value for value in diagnostics)
 
 
-def test_task_directory_config_parallelizes_the_pinned_suite(tmp_path: Path) -> None:
+def test_task_directory_config_serializes_the_pinned_suite(tmp_path: Path) -> None:
     helper = (
         Path(__file__).parents[1]
         / "src/corpuscheck/assets/oracle_ci_e2e.mjs"
@@ -896,8 +896,10 @@ def test_task_directory_config_parallelizes_the_pinned_suite(tmp_path: Path) -> 
         text=True,
     )
 
-    assert "fullyParallel: true" in result.stdout
-    assert "workers: 4" in result.stdout
+    assert "fullyParallel: false" in result.stdout
+    assert "workers: 1" in result.stdout
+    assert "timeout: 60_000" in result.stdout
+    assert "expect: { timeout: 8_000 }" in result.stdout
     assert "name: 'functional'" in result.stdout
     assert "testIgnore: '**/performance.spec.{mjs,cjs,js,ts,tsx,jsx}'" in result.stdout
     assert "name: 'performance'" in result.stdout
