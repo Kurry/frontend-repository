@@ -59,13 +59,10 @@ allowed_tools = [
 
 [scoring]
 aggregation = "weighted_mean"
-[dimension]
-name = "motion"
-description = "Verifies the required causal motion and transition logic."
-baseline_weight = 1.0
 
 [[criterion]]
-id = "motion.AC-03"
-title = "Causal motion connects the acted-on item to its new state."
+id = "AC-03"
+name = "Causal motion connects the acted-on item to its new state."
 description = "Verify that when a record is selected or its volume is adjusted, motion connects the item to its new state (e.g. morphing colors or animated projection bars) and has a reduced-motion equivalent."
-weight = 1
+type = "binary"
+weight = 1.0

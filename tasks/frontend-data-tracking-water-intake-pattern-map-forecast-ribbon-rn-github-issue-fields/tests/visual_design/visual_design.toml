@@ -59,13 +59,10 @@ allowed_tools = [
 
 [scoring]
 aggregation = "weighted_mean"
-[dimension]
-name = "visual_design"
-description = "Verifies the visual hierarchy, layout intent, and visual state rendering according to the proposal."
-baseline_weight = 1.0
 
 [[criterion]]
-id = "visual_design.AC-02"
-title = "Visual hierarchy clearly differentiates the primary work surface, linked summary, and detail panel."
+id = "AC-02"
+name = "Visual hierarchy clearly differentiates the primary work surface, linked summary, and detail panel."
 description = "Verify that the visual design separates the records list from the forecast ribbon and the daily projection summary, with clear state tokens indicating selected or changed status."
-weight = 1
+type = "binary"
+weight = 1.0

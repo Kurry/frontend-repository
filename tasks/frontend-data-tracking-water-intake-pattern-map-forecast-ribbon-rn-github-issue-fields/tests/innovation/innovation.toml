@@ -217,9 +217,8 @@ name = "innovation_catchall"
 description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
-id = "innovation.AC-11"
+id = "AC-11"
 name = "Linked utility"
 description = "Mutate a record and verify the linked representation provides domain utility beyond CRUD to make the next decision."
 type = "binary"

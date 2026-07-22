@@ -59,13 +59,10 @@ allowed_tools = [
 
 [scoring]
 aggregation = "weighted_mean"
-[dimension]
-name = "core_features"
-description = "Verifies the core structural capabilities of the application as promised in the PRD."
-baseline_weight = 1.0
 
 [[criterion]]
-id = "core_features.AC-01"
-title = "Signature mutation affects primary record, linked view, and status together."
+id = "AC-01"
+name = "Signature mutation affects primary record, linked view, and status together."
 description = "Verify that adjusting a selected record on a forecast ribbon instantly updates the record volume, its domain status, and the derived projection summary without a reload."
-weight = 1
+type = "binary"
+weight = 1.0
