@@ -1,0 +1,14 @@
+[[criterion]]
+id = "AC-07"
+name = "responsive_design"
+description = "Complete at 1440/768/375 → icon/canvas/anchor/path/constraint/variant/size-state mobile flows retain every action, 44-pixel targets, no overflow."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "responsiveness.catchall"
+name = "responsiveness_catchall"
+description = "The app exhibits a significant, browser-observable defect in responsiveness that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

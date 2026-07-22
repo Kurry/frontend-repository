@@ -1,0 +1,14 @@
+[[criterion]]
+id = "AC-13"
+name = "behavioral_roundtrip"
+description = "Interleave path edits, solver commit, variant scope/reset, size hints, branch merge, undo, approval, export/import → geometry, lineage, derived metrics, and files round-trip exactly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "behavioral.catchall"
+name = "behavioral_catchall"
+description = "The app exhibits a significant, browser-observable defect in behavioral aspects that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0
