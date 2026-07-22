@@ -1681,7 +1681,7 @@ export default function App() {
     createEffect(() => drawThumbnail(thumb, props.board.cells));
     const stats = createMemo(() => calculateStats(props.board.cells));
     const armDelete = () => {
-      if (confirming()) { removeBoard(props.board.name); return; }
+      if (confirming()) { removeBoard(props.board.name, true); return; }
       setConfirming(true);
       clearTimeout(confirmTimer);
       confirmTimer = setTimeout(() => setConfirming(false), 2600);
