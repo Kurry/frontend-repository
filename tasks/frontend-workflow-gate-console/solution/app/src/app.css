@@ -132,11 +132,11 @@ button:focus, [role="button"]:focus, input:focus, select:focus, textarea:focus {
   }
 }
 @media (max-width: 768px) {
-  button, .action, .header-action, .close-button, .icon-button, select, input, nav button, .stage-segment, .add-note-inline, .gate-state {
-    min-height: 44px;
+  button:not(:disabled), .action, .header-action, .close-button, .icon-button, select, input, nav button, .stage-segment:not(:disabled), .add-note-inline, .gate-state:not(:disabled) {
+    min-height: 44px !important;
   }
-  .close-button, .icon-button, .header-action, nav button {
-    min-width: 44px;
+  .close-button, .icon-button, .header-action, .theme-toggle, .whatif-toggle input, nav button {
+    min-width: 44px !important;
     justify-content: center;
     align-items: center;
   }

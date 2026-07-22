@@ -78,10 +78,10 @@
     </nav>
 
     <div class="header-actions">
-      <button type="button" class="header-action" onclick={() => consoleStore.openImport()}>
+      <button type="button" class="header-action" aria-label="Import acceptance package" onclick={() => consoleStore.openImport()}>
         <UploadSimple size={17} weight="bold" /><span>Import acceptance package</span>
       </button>
-      <button type="button" class="header-action primary" onclick={() => consoleStore.openExport()}>
+      <button type="button" class="header-action primary" aria-label="Export acceptance package" onclick={() => consoleStore.openExport()}>
         <Export size={17} weight="bold" /><span>Export acceptance package</span>
       </button>
       <button

@@ -1,7 +1,5 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import { createForm } from 'felte';
-  import { validator } from '@felte/validator-zod';
   import {
     X, Copy, Check, DownloadSimple, FileCode, MarkdownLogo, UploadSimple,
     Certificate as CertificateIcon, ShieldCheck
@@ -15,21 +13,18 @@
   const certificateStage = $derived(consoleStore.selectedRun.stages.find((stage) => stage.name === consoleStore.certificateStageName));
   const activePreview = $derived(consoleStore.exportTab === 'json' ? consoleStore.jsonPreview : consoleStore.markdownPreview);
 
-  const { form: importForm, errors: importErrors, data: importData, setFields } = createForm<{ payload: string }>({
-    initialValues: { payload: consoleStore.importDraft },
-    extend: validator({ schema: importFormSchema }),
-    validateOnMount: true,
-    onSubmit(values) {
-      consoleStore.importPackageText(values.payload);
-    }
-  });
-  const importValid = $derived(importFormSchema.safeParse($importData).success);
-  const importIssue = $derived.by(() => {
-    const checked = importFormSchema.safeParse($importData);
-    return checked.success ? '' : checked.error.issues[0]?.message ?? 'payload is invalid';
-  });
+  let importDraft = $state(consoleStore.importDraft);
+  let importValid = $state(false);
+  let importIssue = $state('payload is required');
+
+  function validateImport(value: string) {
+    const checked = importFormSchema.safeParse({ payload: value });
+    importValid = checked.success;
+    importIssue = checked.success ? '' : checked.error.issues[0]?.message ?? 'payload is invalid';
+  }
 
   onMount(async () => {
+    validateImport(importDraft);
     await tick();
     const first = document.querySelector<HTMLElement>('[data-modal-card] textarea, [data-modal-card] button');
     first?.focus();
@@ -131,22 +126,29 @@
         <button type="button" class="close-button" aria-label="Close import" onclick={close}><X size={19} weight="bold" aria-hidden="true" /></button>
       </header>
 
-      <form use:importForm class="import-form">
+      <form
+        class="import-form"
+        onsubmit={(event) => {
+          event.preventDefault();
+          if (importValid) consoleStore.importPackageText(importDraft);
+        }}
+      >
         <label for="import-payload">Acceptance Package JSON <span>Required</span></label>
         <textarea
           id="import-payload" name="payload" rows="16"
-          value={consoleStore.importDraft}
+          value={importDraft}
           aria-describedby="import-error"
-          aria-invalid={Boolean($importErrors.payload || consoleStore.importError)}
+          aria-invalid={Boolean(importIssue || consoleStore.importError)}
           oninput={(event) => {
             const value = event.currentTarget.value;
+            importDraft = value;
             consoleStore.importDraft = value;
             consoleStore.importError = '';
-            setFields('payload', value, true);
+            validateImport(value);
           }}
         ></textarea>
-        {#if importIssue || $importErrors.payload || consoleStore.importError}
-          <p id="import-error" class="import-error" role="alert">{importIssue || $importErrors.payload?.[0] || consoleStore.importError}</p>
+        {#if importIssue || consoleStore.importError}
+          <p id="import-error" class="import-error" role="alert">{importIssue || consoleStore.importError}</p>
         {:else}
           <p class="schema-hint">Schema: gate-console.acceptance-package.v1 · exactly five ordered stages</p>
         {/if}
