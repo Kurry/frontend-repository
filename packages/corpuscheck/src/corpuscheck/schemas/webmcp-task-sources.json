@@ -129,6 +129,11 @@
     "instruction": "tasks/frontend-creative-tools-stack-trace-path-finder/instruction.md",
     "description": "Interactive stack-trace cartographer with frame mapping, path hypotheses, and portable session artifacts."
   },
+  "frontend-creative-tools-icon-family-optical-studio": {
+    "source": "Icon Family Optical Studio",
+    "instruction": "tasks/frontend-creative-tools-icon-family-optical-studio/instruction.md",
+    "description": "Vector icon-family editor with anchors, constraints, variants, pixel previews, and portable artifacts."
+  },
   "frontend-creative-tools-story-docs": {
     "source": "StoryDocs",
     "instruction": "StoryDocs/instruction.md",
