@@ -1,0 +1,684 @@
+[[criterion]]
+id = "1.1"
+name = "keyboard_operable_editor_controls"
+description = "Every interactive control — Code and Config tabs, Sample diagrams buttons (Flowchart, Class, Sequence, Entity Relationship, State, Mindmap and any Pie/Gantt), SVG/PNG/MMD/Session JSON/Import/Copy image actions, and the header theme toggle — is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), each showing a visible focus indicator when focused."
+--
+[[criterion]]
+id = "1.2"
+name = "code_config_tabs_expose_active_state"
+description = "The Code and Config tabs are keyboard-operable and expose their active state to assistive technology so the selected tab is programmatically distinguishable from the inactive one (for example aria-selected or equivalent)."
+--
+[[criterion]]
+id = "1.3"
+name = "icon_actions_have_accessible_names"
+description = "The theme toggle and each icon-bearing action control (export, copy, samples, tabs) carry an accessible name describing the action, not just an unlabeled icon."
+--
+[[criterion]]
+id = "1.4"
+name = "syntax_error_announced_via_live_region"
+description = "When invalid Mermaid syntax produces the Syntax error region beneath the editor, the message is exposed through an ARIA live region so its appearance is announced, not only shown visually."
+--
+[[criterion]]
+id = "1.5"
+name = "config_validation_associated_for_at"
+description = "When Config contains invalid JSON or fails the Mermaid Config field contract, or Session JSON import fails its field contract, the inline validation message is associated for assistive technology (described-by, label wiring, or live region) naming the offending field."
+--
+[[criterion]]
+id = "1.6"
+name = "diagram_preview_accessible_label"
+description = "The rendered diagram region carries an accessible label identifying it as the diagram preview."
+--
+[[criterion]]
+id = "1.7"
+name = "workspace_landmarks_present"
+description = "The app exposes semantic landmarks (for example main for the editor-plus-preview workspace and complementary or nav regions for samples/actions/header) so assistive technology can navigate the tool."
+--
+[[criterion]]
+id = "1.8"
+name = "text_and_controls_have_contrast"
+description = "Header title, tab labels, sample/action labels, error-region text, and primary controls have sufficient color contrast against their surfaces in both light and dark themes."
+--
+[[criterion]]
+id = "1.9"
+name = "semantic_roles_on_tabs_and_buttons"
+description = "Code/Config tabs, sample buttons, export actions, and the theme toggle use semantic button/tab roles rather than unlabeled clickable divs."
+--
+[[criterion]]
+id = "1.10"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, preview dim/cross-fade, error-region enter/leave, theme recolor easing, and copy-confirmation motion are removed or reduced to instant state changes while edit, sample, export, and theme flows remain completable."
+--
+[[criterion]]
+id = "14.1"
+name = "multi_facet_reload_persists_all"
+description = "Starting from seed: edit the source to a distinct valid diagram, switch to Config and change the theme value to another valid theme, leave Config as the active tab, and toggle the app theme to dark; then reload. Confirm every facet survives together — restored source, active Config tab, edited configuration, dark theme, and a preview consistent with those documents — never a mix of surviving and reverted facets."
+--
+[[criterion]]
+id = "14.2"
+name = "sample_type_reversal_proves_live_state"
+description = "Selection-reversal proof (genre stand-in for sort reversal): click Sequence and note source/preview/badge, click Flowchart and note the different type, then click Sequence again. Confirm sequence source, sequence preview marks, and sequence badge return — proving editor/preview/badge are derived from live sample state, not two hardcoded snapshots."
+--
+[[criterion]]
+id = "14.3"
+name = "source_edit_derived_preview_sensitivity"
+description = "Derived-view sensitivity: replace the source with two clearly different valid diagrams in sequence. Confirm the preview changes meaningfully for each input rather than redrawing an identical diagram regardless of source."
+--
+[[criterion]]
+id = "14.4"
+name = "source_edit_echoes_preview_and_badge"
+description = "Cross-view echo: after selecting Mindmap, confirm without reload that the editor source, the preview render, and the header diagram-type badge all reflect the mindmap type together."
+--
+[[criterion]]
+id = "14.5"
+name = "export_availability_delta_on_error"
+description = "Count-delta integrity (export availability): with valid source note that SVG/PNG/Copy image/MMD are enabled; introduce invalid syntax and re-check immediately — those controls become unavailable; correct the source and re-check — they become available again (exact enablement delta, no lagging controls)."
+--
+[[criterion]]
+id = "14.6"
+name = "different_sources_different_outcomes"
+description = "Input-dependent output: load Sequence then Class via samples (or two distinct valid sources). Confirm the two outcomes differ in the ways the inputs dictate (not byte-identical preview marks or identical badge labels)."
+--
+[[criterion]]
+id = "14.7"
+name = "interleaved_config_and_code_flows"
+description = "Interleaved-flow integrity: start editing Code with a valid change, switch to Config and enter invalid JSON or an illegal theme enum (validation visible naming the theme field or config document, last valid config kept), switch back to Code and finish a second distinct valid edit; confirm Code shows the finished edit, Config still shows the validation error, and the preview reflects the latest valid Code without corrupting either document."
+--
+[[criterion]]
+id = "14.8"
+name = "empty_then_repopulate_source"
+description = "Edge-state round-trip: clear the source to empty (error/empty treatment, exports unavailable), then paste or type a valid flowchart (or click Flowchart sample); confirm the empty/error treatment clears, the preview renders the new diagram, exports re-enable, and the badge matches."
+--
+[[criterion]]
+id = "14.9"
+name = "session_json_export_import_roundtrip"
+description = "Full-pipeline artifact probe: mutate source to a distinctive valid diagram, set config.theme to another valid Mermaid Config enum, select Sequence, toggle appTheme to dark; confirm Session JSON preview contains those values under schemaVersion mermaid-session-v1 with every required MermaidSession key; Download then Import reconstructs the same source, config theme, sequence badge, and dark theme; MMD export then Import restores matching Code text; a second Session JSON import with wrong schemaVersion or illegal theme leaves state unchanged with field-named validation."
+--
+[[criterion]]
+id = "1.1"
+name = "workspace_opens_without_auth"
+description = "The root opens directly to a Mermaid Live Editor workspace with a source editor on the left and live diagram preview on the right, with no authentication wall or unrelated starter dashboard"
+--
+[[criterion]]
+id = "1.2"
+name = "seeded_source_and_preview"
+description = "On first load the code document contains the non-empty Christmas flowchart and the preview immediately renders its nodes and edges, so both panes are populated before interaction"
+--
+[[criterion]]
+id = "1.3"
+name = "latest_source_preview_flow"
+description = "Replacing the source with a valid diagram shows exactly the typed text, then re-renders matching marks after a brief settle; making a distinct second edit removes the first edit's marks and leaves only the latest diagram"
+--
+[[criterion]]
+id = "1.6"
+name = "syntax_error_recovery_flow"
+description = "Starting from a valid render, entering invalid syntax shows a Syntax error region with parser detail, dims but retains the last valid preview, and disables export/copy; correcting the source clears the error, restores full opacity, renders the correction, and re-enables actions"
+--
+[[criterion]]
+id = "1.8"
+name = "sample_diagram_replacement"
+description = "Flowchart, Class, Sequence, Entity Relationship, State, and Mindmap are all offered; choosing two different samples in sequence replaces source and preview each time with the selected type, updates the type badge, and leaves no residual marks"
+--
+[[criterion]]
+id = "1.10"
+name = "svg_export_download"
+description = "With valid source, SVG downloads the current rendered diagram in a file named like mermaid-diagram-YYYY-MM-DD-HHmmss.svg, and changing the source before a second export produces content corresponding to the new diagram"
+--
+[[criterion]]
+id = "1.11"
+name = "theme_recolors_app_and_diagram"
+description = "Toggling the header theme changes the header, cards, editor, panels, preview surface, and rendered diagram between coherent light and dark palettes without reloading"
+--
+[[criterion]]
+id = "1.12"
+name = "code_config_document_roundtrip"
+description = "Editing Code, switching to Config, changing its seeded theme value to another valid Mermaid Config theme enum (default, base, dark, forest, or neutral), then switching back preserves the exact Code text; returning to Config preserves its edit and the preview reflects the valid configuration"
+--
+[[criterion]]
+id = "1.13"
+name = "multi_facet_reload_roundtrip"
+description = "After editing source and config, selecting Config as the active tab, and choosing dark theme, a full reload restores all four facets together and renders a preview consistent with the restored documents rather than a mixed baseline"
+--
+[[criterion]]
+id = "1.24"
+name = "png_and_clipboard_actions"
+description = "With valid source, PNG downloads an equivalent .png image and Copy image produces visible clipboard success feedback; both actions become unavailable in the syntax-error state"
+--
+[[criterion]]
+id = "1.25"
+name = "editor_undo_redo_roundtrip"
+description = "Through the visible code editor, typing two distinct changes, invoking Undo, and then Redo makes the editor and live preview round-trip from latest to prior and back to latest content without losing selection or corrupting syntax"
+--
+[[criterion]]
+id = "1.26"
+name = "config_inline_validation"
+description = "Entering Config text that is not valid JSON, or valid JSON that fails the Mermaid Config field contract (missing theme, theme outside default|base|dark|forest|neutral, or a non-object root), shows an inline validation message naming the theme field or the config document before apply, preserves the last valid diagram configuration, and correcting to a valid theme enum clears the error and applies the config"
+--
+[[criterion]]
+id = "1.14"
+name = "in_app_controls_only"
+description = "Editing, tab switching, sample selection, theme switching, export, import, and copy remain in the workspace with no outbound navigation or backend-dependent step"
+--
+[[criterion]]
+id = "1.30"
+name = "code_editor_affordances"
+description = "The source pane behaves as a real code editor: it renders monospace source with visible line numbers and syntax coloring that distinguishes keywords from node text"
+--
+[[criterion]]
+id = "1.31"
+name = "empty_source_stability"
+description = "Clearing the source to empty keeps the workspace stable: the preview shows the error treatment or an empty-source message rather than a stale diagram presented as current, and export controls become unavailable"
+--
+[[criterion]]
+id = "1.32"
+name = "session_json_field_contract_export"
+description = "Session JSON preview/Copy/Download conforms to the MermaidSession field contract: a single object with required schemaVersion exactly mermaid-session-v1 plus code, config (theme closed enum default|base|dark|forest|neutral), appTheme (light|dark), activeTab (code|config), and diagramType (flowchart|class|sequence|entity-relationship|state|mindmap|pie|gantt); after editing source, config.theme, sample type, and dark app theme, the preview contains those live values and every required key"
+--
+[[criterion]]
+id = "1.33"
+name = "mmd_export_matches_source"
+description = "With valid source, MMD downloads a .mmd file whose text matches the Code document exactly, and the control is unavailable while the source has a syntax error"
+--
+[[criterion]]
+id = "1.34"
+name = "session_json_import_roundtrip"
+description = "Import of a previously exported Session JSON that satisfies the MermaidSession field contract restores code, config.theme, appTheme, activeTab, and diagramType so editor, preview, badge, Config pane, and theme match without reload; Import of parseable JSON that fails the contract (wrong schemaVersion, illegal theme/appTheme/activeTab/diagramType, or missing keys) shows validation naming the offending field and changes nothing"
+--
+[[criterion]]
+id = "1.35"
+name = "mmd_export_import_roundtrip"
+description = "With valid source, MMD download text matches the Code document; Import of that same .mmd text replaces Code and re-renders the preview to match; after a distinctive source edit, a fresh MMD export contains the new source"
+--
+[[criterion]]
+id = "3.1"
+name = "spacing_matches_two_region_workspace"
+description = "At 1440px, spacing among the header, narrower left column (tabbed editor, Sample diagrams, Actions), and wider right preview follows a consistent scale matching the reference screenshots — no arbitrary one-off gaps that break the linked editor-preview composition."
+--
+[[criterion]]
+id = "3.2"
+name = "typography_matches_editor_workspace_spec"
+description = "Header title Mermaid Live Editor, tab labels, panel titles, and monospace editor source match the reference hierarchy — chrome sans labels distinct from monospace source — not a default system UI stack for the whole tool."
+--
+[[criterion]]
+id = "3.3"
+name = "desktop_composition_matches_reference"
+description = "At 1440px the layout matches the reference composition within a small tolerance: two-region workspace with left editor/samples/actions stack and right diagram preview on a subtle grid backdrop, plus a small diagram-type badge in the header — a live editor tool, not a marketing landing."
+--
+[[criterion]]
+id = "3.4"
+name = "specified_state_changes_have_motion"
+description = "State changes the spec calls out — preview re-render after edit, preview dim on syntax error, error-region enter/leave, theme recolor, sample swap, copy confirmation — show the specified transitions rather than hard cuts (verified via real UI controls)."
+--
+[[criterion]]
+id = "3.5"
+name = "responsive_behavior_matches_reference_patterns"
+description = "At about 375px vs 1280px+, responsive behavior matches the reference patterns: phone width stacks to one readable column; desktop keeps editor and preview side by side."
+--
+[[criterion]]
+id = "3.6"
+name = "editor_and_panels_styled_not_browser_default"
+description = "Code/Config tab strip, editor card, Sample diagrams and Actions cards (hairline borders and soft shadows), and primary export buttons use the studio treatments from the spec rather than unstyled browser defaults."
+--
+[[criterion]]
+id = "3.7"
+name = "clear_hierarchy_header_editor_preview"
+description = "Typography hierarchy clearly distinguishes the Mermaid Live Editor header, denser panel titles, and monospace source/error message body."
+--
+[[criterion]]
+id = "3.8"
+name = "component_states_match_spec"
+description = "Tabs, sample buttons, and export controls show distinct default, hover wash, visible focus ring, active/pressed, and disabled (syntax-error) treatments as specified."
+--
+[[criterion]]
+id = "3.9"
+name = "surfaces_and_error_banner_match_spec"
+description = "Light/dark theme surfaces recolor header, editor card, panels, and preview coherently; the error region uses a dark banner with a clearly destructive-colored icon and readable monospace message body as in the reference."
+--
+[[criterion]]
+id = "3.10"
+name = "microinteraction_timing_matches_spec"
+description = "Hover wash on buttons/tabs, error-region fade/slide, preview dim cross-fade, and copy-confirmation enter/dismiss follow the specified microinteraction timing when driven through real controls."
+--
+[[criterion]]
+id = "4.1"
+name = "empty_source_stable_feedback"
+description = "Clearing the source to empty leaves the app stable: the preview shows the error treatment or an empty-source message rather than a stale diagram presented as current, export controls become unavailable, and no uncaught errors appear in the console."
+--
+[[criterion]]
+id = "4.2"
+name = "invalid_config_json_inline_validation"
+description = "Entering configuration text that is not valid JSON, or valid JSON that fails the Mermaid Config field contract (missing theme, theme outside default|base|dark|forest|neutral, or a non-object root), shows an inline validation message under the Config pane naming the theme field or the config document before apply, and the invalid configuration is not applied."
+--
+[[criterion]]
+id = "4.3"
+name = "syntax_error_names_parser_message"
+description = "When source syntax is invalid, the error region uses a Syntax error heading and surfaces the parser's actual message rather than only a bare 'Invalid'."
+--
+[[criterion]]
+id = "4.4"
+name = "copy_image_shows_confirmation"
+description = "With valid source, Copy image shows a visible confirmation that the diagram was copied."
+--
+[[criterion]]
+id = "4.5"
+name = "rapid_edits_settle_to_one_render"
+description = "Typing at least three quick consecutive source changes leaves exactly one rendered diagram matching the final source, with no overlapping or duplicated renders in the preview region."
+--
+[[criterion]]
+id = "4.6"
+name = "invalid_config_keeps_last_valid"
+description = "Invalid JSON in the Config tab never breaks the workspace: the diagram keeps rendering with the last valid configuration and the Code tab remains fully usable while the config error is shown."
+--
+[[criterion]]
+id = "4.7"
+name = "large_diagram_stays_contained"
+description = "Rendering a sample with at least eight nodes (for example Mindmap or Class) keeps the drawing inside the preview region without overflowing the page or forcing horizontal scrolling of the whole document."
+--
+[[criterion]]
+id = "4.8"
+name = "editor_controls_use_semantic_tags"
+description = "Code/Config tabs, sample buttons, SVG/PNG/MMD/Session JSON/Import/Copy image actions, and the theme toggle use semantic button/input elements rather than unlabeled decorative wrappers."
+--
+[[criterion]]
+id = "4.9"
+name = "exports_blocked_on_syntax_error"
+description = "While a Syntax error is shown, SVG, PNG, Copy image, and MMD are unavailable; correcting the source re-enables them."
+--
+[[criterion]]
+id = "4.10"
+name = "undo_after_edit_restores_prior"
+description = "After editing the source, pressing the undo keyboard shortcut restores the previous source and the preview follows that prior diagram."
+--
+[[criterion]]
+id = "4.11"
+name = "config_theme_enum_rejected"
+description = "A Config document that parses as JSON but sets theme outside default|base|dark|forest|neutral (or omits theme) is rejected with validation naming the theme field or the config document, is not applied, and leaves the last valid configuration on the preview."
+--
+[[criterion]]
+id = "4.12"
+name = "session_json_import_rejects_bad_contract"
+description = "Importing malformed Session JSON, or JSON that fails the MermaidSession field contract (wrong schemaVersion, missing required keys, illegal config.theme/appTheme/activeTab/diagramType), leaves source, config, theme, tab, and badge unchanged and shows visible validation naming the offending field."
+--
+[[criterion]]
+id = "4.13"
+name = "empty_mmd_import_stable"
+description = "Importing an empty or whitespace-only mmd payload leaves the workspace stable with the same empty-source or error treatment as clearing Code, without an uncaught console error or crash."
+--
+[[criterion]]
+id = "11.1"
+name = "editor_microinteraction_beyond_minimum"
+description = "Beyond required hover/focus, the editor or sample buttons include an extra delightful microinteraction on press or sample selection that remains browser-observable (bonus execution polish)."
+--
+[[criterion]]
+id = "11.2"
+name = "preview_transition_beyond_basic_swap"
+description = "Preview updates offer an advanced transition beyond a hard cut — for example a coordinated cross-fade when samples change or when recovering from a dimmed error state — verified through real UI controls (bonus)."
+--
+[[criterion]]
+id = "11.3"
+name = "guided_first_run_for_workspace"
+description = "A brief guided first-run or coachmark introduces the Code/Config tabs, Sample diagrams, and Actions without blocking the tool (bonus beyond required seeded workspace)."
+--
+[[criterion]]
+id = "11.4"
+name = "diagram_preview_extra_usability"
+description = "An interactive preview aid beyond the required render — for example zoom/pan cues that stay Playwright-observed, or a clearer type badge treatment — adds usability while staying local (bonus)."
+--
+[[criterion]]
+id = "11.5"
+name = "editor_power_user_affordances"
+description = "Beyond basic typing and undo, the code editor exposes an extra power-user affordance such as find, fold, or multi-cursor that remains browser-observable (bonus)."
+--
+[[criterion]]
+id = "11.6"
+name = "session_personalization_beyond_required"
+description = "Beyond required persistence of source/tab/config/theme, the app offers a small personalization (for example remembering last sample or preview zoom) that survives reload (bonus)."
+--
+[[criterion]]
+id = "11.7"
+name = "branded_mermaid_tool_narrative"
+description = "The Mermaid Live Editor header, two-region workspace, and panels read as a cohesive branded diagram tool rather than generic unstyled controls (bonus execution quality)."
+--
+[[criterion]]
+id = "11.8"
+name = "theme_craft_across_surfaces"
+description = "Light/dark theming craft goes beyond bare compliance — coherent recolor of header, cards, editor, preview grid, and diagram palette without a conflicting second product look (bonus)."
+--
+[[criterion]]
+id = "11.9"
+name = "local_platform_enhancement"
+description = "A genre-appropriate local enhancement (for example high-quality local editor fonts or offline-capable app shell assets) is visible without CDN dependence (bonus)."
+--
+[[criterion]]
+id = "11.10"
+name = "competition_level_live_editor_feel"
+description = "The overall tool feels competition-grade: live preview fidelity, sample switching, and export polish read as a professional Mermaid instrument rather than a wired demo (bonus)."
+--
+[[criterion]]
+id = "innovation.catchall"
+name = "innovation_catchall"
+description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+--
+[[criterion]]
+id = "4.1"
+name = "live_preview_in_place_transition"
+description = "Typing a valid source edit through the visible editor re-renders the preview in place after a brief settle without document navigation, blank-page flash, or a stale intermediate render"
+--
+[[criterion]]
+id = "4.2"
+name = "error_dim_and_recovery_transition"
+description = "Entering invalid source visibly cross-fades the retained preview to a dimmed state and correcting it returns the newly rendered diagram to full opacity"
+--
+[[criterion]]
+id = "4.3"
+name = "coordinated_theme_transition"
+description = "The visible theme toggle recolors surfaces and rendered diagram together in place, without mismatched intermediate colors or a full reload"
+--
+[[criterion]]
+id = "4.4"
+name = "control_microinteractions"
+description = "Using real pointer and keyboard paths, buttons and tabs show a hover wash and focus ring, the active tab reads distinctly, and the pressed sample control gives immediate visible state feedback"
+--
+[[criterion]]
+id = "4.7"
+name = "sample_and_tab_content_transition"
+description = "Switching Code and Config or selecting different samples replaces the affected content smoothly in place while the preview and diagram-type badge settle to the same latest state"
+--
+[[criterion]]
+id = "4.8"
+name = "reduced_motion_behavior"
+description = "With prefers-reduced-motion enabled before a fresh load, preview, error, tab, and theme transitions are removed or substantially reduced while state changes remain immediately understandable"
+--
+[[criterion]]
+id = "4.9"
+name = "feedback_entry_motion"
+description = "Triggered through the real UI controls, the syntax-error region enters with a brief fade or slide rather than popping instantly, and the Copy image confirmation slides or fades in, remains readable, and dismisses with a fade"
+--
+[[criterion]]
+id = "9.1"
+name = "cold_start_under_two_seconds"
+description = "On a local cold load the workspace becomes interactive within 2 seconds, with both the seeded Christmas flowchart source and its rendered diagram visible."
+--
+[[criterion]]
+id = "9.2"
+name = "console_clean_during_full_exercise"
+description = "No console errors or warnings appear during a full exercise of editing source, switching Code/Config, invalid syntax and recovery, sample switching, theme toggle, SVG/PNG/MMD/Session JSON export, Session JSON or mmd import, copy, and reload restoration; the console also stays free of hydration mismatch errors or warnings on first load and after in-app view changes."
+--
+[[criterion]]
+id = "9.3"
+name = "preview_rerender_feels_immediate"
+description = "After a valid source edit settles, the preview re-render response feels immediate (under about 100ms of UI lag) rather than blocking the editor."
+--
+[[criterion]]
+id = "9.4"
+name = "shell_visible_while_settling"
+description = "While the app settles after first paint, the header, editor, and preview regions remain visible rather than a blank white screen with no controls."
+--
+[[criterion]]
+id = "9.5"
+name = "sample_switches_without_lag"
+description = "Clicking through several sample diagrams (Flowchart, Sequence, Mindmap) in succession re-renders without perceived multi-second lag."
+--
+[[criterion]]
+id = "9.6"
+name = "typing_stays_responsive_during_rerender"
+description = "Typing in the editor stays responsive during preview re-renders: rapid keystrokes are never dropped and the editor never visibly freezes while the diagram redraws."
+--
+[[criterion]]
+id = "9.7"
+name = "preview_redraw_holds_stable_frame_rate"
+description = "Driven through real source edits or sample clicks, preview re-renders maintain a smooth frame rate without visible hitching during continuous typing."
+--
+[[criterion]]
+id = "9.8"
+name = "rapid_input_never_hangs"
+description = "Rapid consecutive edits and sample switches keep the UI responsive with no hangs and leave editor and preview in agreement with the final source."
+--
+[[criterion]]
+id = "9.9"
+name = "extended_editor_session_stable"
+description = "After an extended session of many edits, sample switches, theme toggles, and config changes, the tab remains responsive without runaway memory growth that freezes the UI."
+--
+[[criterion]]
+id = "9.10"
+name = "no_flash_between_paint_and_interactive"
+description = "The content visible at first paint does not flash or get replaced by different content once the app becomes interactive: the header, seeded source, and layout hold steady between first render and full interactivity."
+--
+[[criterion]]
+id = "7.1"
+name = "layout_adapts_desktop_to_375"
+description = "Resizing from 1280px+ desktop to about 375px mobile keeps a usable Mermaid workspace: editor, preview, samples, and actions remain present and operable at both widths."
+--
+[[criterion]]
+id = "7.2"
+name = "mobile_tap_targets_adequate"
+description = "At about 375px width, sample buttons, SVG/PNG/Copy image controls, Code/Config tabs, and the theme toggle present tap targets at least 44px in at least one dimension."
+--
+[[criterion]]
+id = "7.3"
+name = "typography_readable_both_widths"
+description = "Header title, tab labels, sample/action labels, and error text remain legible at both 1280px+ and about 375px — type scales or reflows without becoming unreadably small on mobile."
+--
+[[criterion]]
+id = "7.4"
+name = "no_clip_or_overflow_at_375"
+description = "At about 375px width, editor, preview, samples, and actions never clip or overflow the viewport."
+--
+[[criterion]]
+id = "7.5"
+name = "regions_stack_at_phone_width"
+description = "At a narrow phone width around 375px the two regions reflow into a single readable column and the export controls stay reachable without horizontal page scrolling."
+--
+[[criterion]]
+id = "7.6"
+name = "narrow_stack_order_stays_usable"
+description = "At about 375px width, editor and preview reflow into a logical stacking order without covering each other into an unusable pile."
+--
+[[criterion]]
+id = "7.7"
+name = "mobile_controls_tappable"
+description = "At about 375px width, tap/click activation works on Code/Config tabs, sample buttons, export/copy controls, and the theme toggle."
+--
+[[criterion]]
+id = "7.8"
+name = "no_horizontal_scroll_at_375"
+description = "At about 375px width the page does not produce horizontal scrolling of the document."
+--
+[[criterion]]
+id = "7.9"
+name = "preview_diagram_scales"
+description = "The rendered diagram SVG/canvas sizes responsively inside the preview region rather than staying a fixed overflowing size at 375px or desktop widths."
+--
+[[criterion]]
+id = "7.10"
+name = "side_by_side_at_desktop"
+description = "At desktop widths 1280px and above the editor column and preview region sit side by side; resizing between desktop and phone widths never produces horizontal scrolling of the document or content cut off outside the viewport."
+--
+[[criterion]]
+id = "2.1"
+name = "interactive_workspace_delivery"
+description = "The root and a direct reload render the same complete interactive editor, preview, samples, and actions without a blank page, fatal overlay, starter content, or server-dependent operation"
+--
+[[criterion]]
+id = "2.2"
+name = "console_clean_editor_flows"
+description = "First load, source and config editing, undo/redo, syntax failure and recovery, sample switching, theme switching, reload restoration, SVG/PNG/MMD/Session JSON export, Session JSON or mmd import, and copy complete with no uncaught error, unhandled rejection, or failed same-origin asset request"
+--
+[[criterion]]
+id = "2.3"
+name = "shared_surface_state_coherence"
+description = "A source, config, tab, type, error, theme, or Session JSON import change appears consistently across editor, preview, badge, actions, Session JSON preview, error region, and theme surfaces without a disconnected stale copy"
+--
+[[criterion]]
+id = "2.4"
+name = "persistent_state_roundtrip"
+description = "Reload restores last-edited source, active tab, valid config, and theme together, and the resulting preview and badge agree with that restored state"
+--
+[[criterion]]
+id = "2.5"
+name = "local_assets_and_theme_tokens"
+description = "Computed styling shows coherent design-token and component states, while scripts, styles, icons, editor assets, and diagram-rendering assets load from the app origin with no third-party CDN request"
+--
+[[criterion]]
+id = "2.6"
+name = "keyboard_accessible_controls"
+description = "Editor tabs, samples, theme, exports, copy, and configuration controls expose accessible names and are reachable and operable by keyboard with visible focus"
+--
+[[criterion]]
+id = "2.12"
+name = "hydration_clean_console"
+description = "On first load and reload, the console contains no hydration mismatch error or warning and the editor remains interactive after client startup"
+--
+[[criterion]]
+id = "2.13"
+name = "direct_load_parity"
+description = "Loading the root URL directly produces the same editor chrome, seeded or persisted baseline, preview, and working controls as returning to it through an in-app state change and reload"
+--
+[[criterion]]
+id = "2.15"
+name = "aria_states_and_announcements"
+description = "The active editor tab is programmatically distinguishable from the inactive one through its ARIA state, the syntax-error message is exposed through a live region so its appearance is announced, and the preview region carries an accessible label identifying it as the diagram preview"
+--
+[[criterion]]
+id = "2.16"
+name = "responsive_load_and_typing"
+description = "The workspace is interactive with seeded source and rendered diagram within roughly 2 seconds of a local cold load, and rapid typing in the editor stays responsive during preview re-renders without dropped keystrokes or visible freezes"
+--
+[[criterion]]
+id = "2.17"
+name = "api_shaped_config_and_session_schemas"
+description = "Config apply and Session JSON import reject payloads that fail the declared Mermaid Config / MermaidSession field contracts with inline field-named errors (theme enum, schemaVersion mermaid-session-v1, appTheme, activeTab, diagramType), while a valid Config apply produces a config object whose theme matches the closed enum and appears in the Session JSON preview under the same keys"
+--
+[[criterion]]
+id = "6.1"
+name = "edit_break_recover_and_reload"
+description = "Edit/break/recover flow: starting from the seeded Christmas flowchart, typing an edit that leaves syntax invalid shows the Syntax error region with the parser's message, dims the preview while the last valid diagram stays visible, and disables SVG, PNG, Copy image, and MMD; correcting the source clears the error, restores full-opacity corrected preview, and re-enables those exports; reloading then restores the corrected source, matching preview, and no error region."
+--
+[[criterion]]
+id = "6.2"
+name = "invalid_config_inline_validation"
+description = "Config validation flow: switching to Config and entering text that is not valid JSON, or JSON that fails the Mermaid Config field contract (missing theme or theme outside default|base|dark|forest|neutral), shows an inline validation message naming the theme field or the config document, does not apply the invalid configuration, and keeps the preview on the last valid configuration."
+--
+[[criterion]]
+id = "6.3"
+name = "config_theme_edit_preserves_code"
+description = "Config follows-through flow: on Config, changing the theme value to another valid Mermaid Config theme enum (default, base, dark, forest, or neutral) re-renders the preview with visibly different diagram colors; switching back to Code shows the diagram source unchanged by the config edit; reloading restores both the edited configuration and the active tab."
+--
+[[criterion]]
+id = "6.4"
+name = "sample_replaces_source_preview_badge"
+description = "Sample flow: clicking Sequence replaces the editor source with sequence syntax, re-renders the preview as a sequence diagram with no flowchart marks remaining, and updates the header badge to name the sequence type."
+--
+[[criterion]]
+id = "6.5"
+name = "code_config_tab_switch_retains_docs"
+description = "Tab switch: switching Code ↔ Config swaps which document the editor pane edits without a full page reload and without losing either document's content."
+--
+[[criterion]]
+id = "6.6"
+name = "empty_source_disables_exports"
+description = "Empty-source edge: clearing the source to empty leaves the workspace stable with error treatment or an empty-source message (not a stale diagram presented as current) and export controls unavailable."
+--
+[[criterion]]
+id = "6.7"
+name = "sample_export_theme_reload_roundtrip"
+description = "Sample/export/theme round-trip: after Sequence sample selection, clicking SVG downloads a file matching mermaid-diagram-YYYY-MM-DD-HHmmss.svg; toggling theme to dark recolors header, panels, editor, and diagram together without reloading; reloading restores dark theme, sequence source, sequence render, and matching badge."
+--
+[[criterion]]
+id = "6.8"
+name = "panels_remain_reachable_during_edit"
+description = "During source editing and sample switching, the Sample diagrams and Actions panels remain reachable and usable without a dead end requiring reload."
+--
+[[criterion]]
+id = "6.9"
+name = "copy_image_confirmation_visible"
+description = "With valid source, Copy image copies the diagram and shows a visible confirmation that appears with motion and remains readable before dismissing."
+--
+[[criterion]]
+id = "6.10"
+name = "syntax_error_recovery_without_reload"
+description = "After a syntax error, correcting the source recovers the workspace (clears error, restores preview opacity, re-enables exports) without requiring a full page reload."
+--
+[[criterion]]
+id = "6.11"
+name = "session_json_artifact_end_state"
+description = "Session artifact end state: edit Code to a distinctive valid diagram, set Config theme to a different valid Mermaid Config enum value, leave Config active, toggle app theme to dark, confirm Session JSON preview shows schemaVersion mermaid-session-v1 with matching code, config.theme, appTheme dark, activeTab config, and diagramType plus every required MermaidSession key; Copy Session JSON confirms; Download then Import of that JSON reconstructs the same source, config theme, dark theme, active tab, and badge; MMD download matches the Code text; Import of that MMD after a further Code edit restores the downloaded source."
+--
+[[criterion]]
+id = "3.1"
+name = "editor_preview_visual_priority"
+description = "A narrower left region stacking editor, samples, and actions pairs with a wider preview region, giving the source and rendered diagram clear priority over header chrome and metadata"
+--
+[[criterion]]
+id = "3.2"
+name = "controls_grouped_by_purpose"
+description = "Code and Config controls are grouped with the monospace editor, sample controls occupy their own panel, and SVG, PNG, and Copy image controls are grouped in a distinct Actions panel"
+--
+[[criterion]]
+id = "3.3"
+name = "preview_grid_and_type_badge"
+description = "The preview centers a crisp rendered SVG over a subtle grid backdrop and the header displays a compact, legible badge naming the current diagram type"
+--
+[[criterion]]
+id = "3.4"
+name = "coherent_light_dark_surfaces"
+description = "Light and dark themes keep header, editor, cards, panels, preview, controls, error text, and diagram marks readable with a coherent surface and contrast system"
+--
+[[criterion]]
+id = "3.5"
+name = "tab_card_and_alert_craft"
+description = "The active editor tab is unmistakable, cards use consistent hairline borders and soft shadows, buttons and toggles share one polished component language, and the syntax error is a readable dark destructive banner with icon and monospace detail"
+--
+[[criterion]]
+id = "3.6"
+name = "phone_single_column_layout"
+description = "At roughly 375px wide, editor, samples, actions, and preview reflow to one readable column with reachable exports, no clipped or overlapping controls, and no page-level horizontal scrolling"
+--
+[[criterion]]
+id = "3.9"
+name = "large_diagram_containment"
+description = "Rendering a sample with many nodes keeps the drawing contained inside the preview region without overflowing the page or forcing horizontal scrolling of the whole document"
+--
+[[criterion]]
+id = "3.10"
+name = "consistent_icon_set"
+description = "Icons in the header and panels come from one consistent visual set, rendered at consistent sizes and weights rather than a mix of mismatched icon styles"
+--
+[[criterion]]
+id = "15.1"
+name = "consistent_capitalization"
+description = "Where the app renders headings, tab labels (Code, Config), panel titles (Sample diagrams, Actions), and action labels, they use one consistent capitalization convention throughout."
+--
+[[criterion]]
+id = "15.2"
+name = "specific_export_and_copy_labels"
+description = "Where the app renders button or action labels, export controls name their format (SVG, PNG, MMD, Session JSON) and the copy control names what it copies (Copy image), rather than generic Submit/OK when a specific label is possible."
+--
+[[criterion]]
+id = "15.3"
+name = "errors_name_problem"
+description = "Where the app renders error messages, the syntax-error region surfaces the parser's actual message, and Mermaid Config or MermaidSession validation messages name the offending field (theme, schemaVersion, appTheme, activeTab, diagramType, or the config document) and the rule that failed, not only a bare rejection like 'Invalid'."
+--
+[[criterion]]
+id = "15.4"
+name = "empty_source_explains_state"
+description = "Where the app renders empty-source or error feedback after clearing the editor, the copy explains the empty/error state rather than leaving a blank unlabeled void."
+--
+[[criterion]]
+id = "15.5"
+name = "chrome_and_panel_copy_polished"
+description = "Where the app renders header, tab, panel, and action copy, rate how free the text is of spelling and grammatical errors."
+--
+[[criterion]]
+id = "15.6"
+name = "terminology_consistent_across_surfaces"
+description = "Where the app renders labels for the same concept in multiple places (diagram type in samples vs header badge, Code/Config tab names, SVG/PNG/MMD/Session JSON export wording), terminology stays consistent."
+--
+[[criterion]]
+id = "15.7"
+name = "export_filename_pattern_readable"
+description = "Where the app surfaces export naming or confirmation copy related to downloads, the mermaid-diagram naming pattern remains clear and consistently presented."
+--
+[[criterion]]
+id = "15.8"
+name = "copy_confirmation_is_specific"
+description = "Where the app renders Copy image confirmation, the copy states what happened (image copied) rather than a vague affirmation alone."
