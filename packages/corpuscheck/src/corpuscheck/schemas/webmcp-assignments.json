@@ -10,6 +10,23 @@
   ],
   "assignments": [
     {
+      "task": "frontend-data-tracking-reading-velocity-backlog-observatory",
+      "modules": ["browse-query-v1", "entity-collection-v1", "form-workflow-v1", "artifact-transfer-v1"],
+      "bindings": {
+        "filters": ["all", "ready", "blocked", "done"],
+        "entity": "backlog-item",
+        "entity_operations": ["select", "update", "toggle"],
+        "entity_fields": ["title", "points", "status", "lane"],
+        "form_operations": ["submit"],
+        "form_fields": ["title", "points"],
+        "artifact_operations": ["export", "import"],
+        "export_formats": ["reading-velocity-json"],
+        "import_modes": ["reading-velocity-json"],
+        "visible_postconditions": ["selected-item", "filtered-queue", "phase-advanced", "artifact-ready"]
+      },
+      "mechanics_exclusions": ["Backlog drag ordering remains Playwright-driven when gesture mechanics matter"]
+    },
+    {
       "task": "frontend-creative-tools-annotation-studio",
       "modules": [
         "entity-collection-v1",
