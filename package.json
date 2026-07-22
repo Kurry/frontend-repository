@@ -10,6 +10,6 @@
     "typecheck:webmcp-contracts": "npm run typecheck -w @zto/webmcp-contracts"
   },
   "devDependencies": {
-    "playwright": "^1.61.1"
+    "playwright": "^1.61.0"
   }
 }
