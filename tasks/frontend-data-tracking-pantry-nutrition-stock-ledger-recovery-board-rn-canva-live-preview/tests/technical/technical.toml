@@ -1,0 +1,41 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+command = "node"
+args = ["/app/webmcp_stdio_server.mjs"]
+
+[[judge.mcp_servers]]
+name = "system"
+command = "node"
+args = ["/app/packages/webmcp/dist/index.js", "system"]
+
+[[judge.mcp_servers]]
+name = "browser"
+command = "node"
+args = ["/app/packages/webmcp/dist/index.js", "browser", "chromium"]
+
+[schema]
+version = 1
+
+[[criterion]]
+id = "technical.catchall"
+title = "Technical constraints not covered"
+description = "Technical features are not covered by any specific criterion but lack evidence."
+type = "behavioral"
+polarity = "negative"
+weight = 1
+
+[[criterion]]
+id = "technical.schema_contract"
+title = "Schema API contract is enforced"
+description = "The export artifact contains the declared API-shaped fields (schemaVersion v1, exportedAt, records, derived, history) matching the provided shapes."
+type = "behavioral"
+polarity = "negative"
+weight = 1

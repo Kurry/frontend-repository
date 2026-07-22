@@ -1,0 +1,33 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+command = "node"
+args = ["/app/webmcp_stdio_server.mjs"]
+
+[[judge.mcp_servers]]
+name = "system"
+command = "node"
+args = ["/app/packages/webmcp/dist/index.js", "system"]
+
+[[judge.mcp_servers]]
+name = "browser"
+command = "node"
+args = ["/app/packages/webmcp/dist/index.js", "browser", "chromium"]
+
+[schema]
+version = 1
+
+[[criterion]]
+id = "user_flows.catchall"
+title = "User flows not covered"
+description = "User flows are not covered by any specific criterion but lack evidence."
+type = "behavioral"
+polarity = "negative"
+weight = 1
