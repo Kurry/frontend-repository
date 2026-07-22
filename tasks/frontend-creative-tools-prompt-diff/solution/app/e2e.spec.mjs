@@ -61,42 +61,48 @@ test.describe('workspace contract (canonical)', () => {
 
   test('reduced motion behaviorally suppresses animation', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
+    // Install the collector before navigation so load/hydration animations are
+    // observed too. Keep it running through network idle and a settled 1.5s
+    // window so late-starting effects cannot escape the assertion.
+    await page.addInitScript(() => {
+      window.__reducedMotionOffenders = [];
+      const seen = new Set();
+      const sample = () => {
+        for (const animation of document.getAnimations({ subtree: true })) {
+          if (animation.playState !== 'running') continue;
+          let timing = {};
+          try { timing = animation.effect?.getComputedTiming?.() ?? {}; } catch { /* detached */ }
+          const duration = typeof timing.duration === 'number' ? timing.duration : 0;
+          if (duration <= 1) continue;
+          const offender = {
+            kind: animation.constructor?.name ?? 'Animation',
+            name: animation.animationName ?? animation.transitionProperty ?? animation.id ?? '(anonymous)',
+            duration,
+            iterations: timing.iterations ?? 1,
+          };
+          const key = JSON.stringify(offender);
+          if (!seen.has(key)) {
+            seen.add(key);
+            window.__reducedMotionOffenders.push(offender);
+          }
+        }
+        requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    });
     await page.goto(BASE);
-    // Load fully first: animations kicked off during hydration or by
-    // late-arriving resources must fall inside the observation window, so the
-    // sampling loop only starts once the page is settled.
     await page.waitForLoadState('networkidle');
     // Precondition sanity check: the emulation actually reaches the app.
     const reduced = await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
     expect(reduced, 'precondition: app sees prefers-reduced-motion: reduce').toBe(true);
-    await page.waitForTimeout(250); // small settle after idle
-    // Observe every frame across a 1.5s window and assert on what was seen.
+    // Observe every frame for another 1.5s after load settles and assert on
+    // everything seen since the document started.
     // Finished, idle, or paused effects and durations <=1ms are allowed; any
     // meaningfully timed RUNNING effect at any sample is a reduced-motion
     // failure. Apps with zero animations pass vacuously (the render/console
     // test still gates them).
-    const offenders = await page.evaluate(async () => {
-      const seen = new Map();
-      const deadline = performance.now() + 1500;
-      while (performance.now() < deadline) {
-        for (const a of document.getAnimations({ subtree: true })) {
-          if (a.playState !== 'running') continue;
-          let timing = {};
-          try { timing = a.effect?.getComputedTiming?.() ?? {}; } catch { /* detached */ }
-          const dur = typeof timing.duration === 'number' ? timing.duration : 0;
-          if (dur <= 1) continue; // fill-only / effectively instant
-          const offender = {
-            kind: a.constructor?.name ?? 'Animation',
-            name: a.animationName ?? a.transitionProperty ?? a.id ?? '(anonymous)',
-            duration: dur,
-            iterations: timing.iterations ?? 1,
-          };
-          seen.set(JSON.stringify(offender), offender);
-        }
-        await new Promise((resolve) => requestAnimationFrame(resolve));
-      }
-      return [...seen.values()];
-    });
+    await page.waitForTimeout(1500);
+    const offenders = await page.evaluate(() => window.__reducedMotionOffenders ?? []);
     expect(offenders, 'no running animation/transition with meaningful duration under reduced motion').toEqual([]);
   });
 
@@ -111,3 +117,60 @@ test.describe('workspace contract (canonical)', () => {
 });
 
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
+
+test('1.3 pickers_rerender_without_reload', async ({ page }) => {
+  await page.goto(BASE);
+  await page.locator('select').first().selectOption({ index: 1 });
+  await expect(page.locator('.diff-split, .split-diff, .diff-scroll').first()).toBeVisible();
+});
+
+test('1.7 unified_toggle_context_lines', async ({ page }) => {
+  await page.goto(BASE);
+  await page.getByRole('button', { name: 'Unified', exact: true }).click();
+  await expect(page.locator('.unified-caption').first()).toBeVisible();
+});
+
+test('1.8 summary_counters_recompute', async ({ page }) => {
+  await page.goto(BASE);
+  await page.locator('select').first().selectOption({ index: 1 });
+  await expect(page.locator('.summary-counter.added')).toBeVisible();
+});
+
+test('4.4 actions_show_confirmation', async ({ page }) => {
+  await page.goto(BASE);
+  await page.getByRole('button', { name: 'Restore to base' }).click();
+  await expect(page.getByRole('button', { name: /Cancel/i })).toBeVisible();
+});
+
+test('4.9 modal_close_paths', async ({ page }) => {
+  await page.goto(BASE);
+  await page.getByRole('button', { name: /Export/i }).click();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).toBeHidden();
+});
+
+test('1.25 undo_redo_version_operations', async ({ page }) => {
+  // Real merge flow verified against the running oracle: Studio-modes ->
+  // Compare branches -> launch the merge modal -> resolve every region via
+  // "Use all left" -> Complete merge -> confirm with "Create merge version".
+  // The app deliberately ignores Ctrl+Z (see App.jsx keydown handler, which
+  // early-returns on ctrlKey/metaKey/altKey) so undo must go through the
+  // dedicated toolbar Undo button.
+  await page.goto(BASE);
+  const rowsBefore = await page.locator('.history-row').count();
+
+  await page.getByLabel('Studio modes').getByRole('button', { name: 'Compare branches' }).click();
+  await page.locator('.merge-launch button').first().click();
+  await page.getByRole('button', { name: 'Use all left' }).click();
+  const completeMergeBtn = page.getByRole('button', { name: 'Complete merge' });
+  await expect(completeMergeBtn).toBeEnabled();
+  await completeMergeBtn.click();
+  await page.getByRole('button', { name: 'Create merge version' }).click();
+
+  await expect(page.locator('.history-row')).toHaveCount(rowsBefore + 1, { timeout: 2000 });
+
+  const undoBtn = page.getByRole('button', { name: 'Undo' });
+  await expect(undoBtn).toBeEnabled();
+  await undoBtn.click();
+  await expect(page.locator('.history-row')).toHaveCount(rowsBefore, { timeout: 2000 });
+});
