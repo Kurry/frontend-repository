@@ -269,14 +269,22 @@ export const useStudioStore = defineStore('studio', () => {
       const rubric = activeRubric.value
       if (pending.action === 'edit') {
         const index = rubric.criteria.findIndex((item) => item.id === pending.criterionId)
+        const previousThreshold = thresholds.value[activeSlug.value][pending.criterionId]
         rubric.criteria.splice(index, 1, clone(pending.after))
         if (pending.after.id !== pending.criterionId) {
           verdicts.value[activeSlug.value][pending.after.id] = verdicts.value[activeSlug.value][pending.criterionId]
           delete verdicts.value[activeSlug.value][pending.criterionId]
-          if (thresholds.value[activeSlug.value][pending.criterionId] != null) {
-            thresholds.value[activeSlug.value][pending.after.id] = thresholds.value[activeSlug.value][pending.criterionId]
-            delete thresholds.value[activeSlug.value][pending.criterionId]
-          }
+          delete thresholds.value[activeSlug.value][pending.criterionId]
+        }
+        if (pending.after.type === 'likert') {
+          const thresholdIsValid = Number.isInteger(previousThreshold)
+            && previousThreshold >= pending.after.likertMin
+            && previousThreshold <= pending.after.likertMax
+          thresholds.value[activeSlug.value][pending.after.id] = thresholdIsValid
+            ? previousThreshold
+            : Math.ceil((pending.after.likertMin + pending.after.likertMax) / 2)
+        } else {
+          delete thresholds.value[activeSlug.value][pending.after.id]
         }
       } else {
         rubric.criteria = rubric.criteria.filter((item) => item.id !== pending.criterionId)
@@ -371,7 +379,7 @@ export const useStudioStore = defineStore('studio', () => {
     return {
       schemaVersion: 'rubric-document-v1', name: rubric.name, version: rubric.version,
       arbiterModel: rubric.arbiterModel, aggregationMode: rubric.aggregationMode,
-      criteria: clone(rubric.criteria),
+      criteria: clone(rubric.criteria), history: clone(rubric.history || []),
     }
   }
   const rubricDocument = computed(() => documentFor(activeRubric.value))

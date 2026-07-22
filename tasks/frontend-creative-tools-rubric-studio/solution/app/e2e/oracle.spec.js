@@ -66,3 +66,38 @@ test('partial add draft survives a Tune case toggle and submits exactly once', a
   });
   expect(focusStyle.outlineWidth === '3px' || focusStyle.boxShadow !== 'none').toBeTruthy();
 });
+
+test('package export preserves the rubric version history', async ({ page }) => {
+  await page.goto('/');
+  await waitForStudio(page);
+
+  await page.getByRole('button', { name: 'Export', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Export center' });
+  await dialog.getByRole('tab', { name: 'Package JSON' }).click();
+
+  const exported = JSON.parse(await dialog.locator('.export-preview').textContent());
+  const responseQuality = exported.rubrics.find((rubric) => rubric.name === 'Response Quality');
+  expect(responseQuality.history).toHaveLength(4);
+  expect(responseQuality.history[0]).toMatchObject({ version: '2.1.0', diff: { kind: 'changed' } });
+});
+
+test('a versioned Likert range edit reconciles the Tune threshold', async ({ page }) => {
+  await page.goto('/');
+  await waitForStudio(page);
+
+  const result = await page.evaluate(() => window.webmcp_invoke_tool({
+    name: 'editor_update_property',
+    arguments: {
+      objectType: 'criterion',
+      id: 'clarity-check',
+      property: 'likert-min',
+      value: 4,
+      version: '2.2.0',
+    },
+  }));
+  expect(result).toMatchObject({ ok: true, visibleState: { version: '2.2.0' } });
+
+  await page.getByRole('button', { name: 'Tune', exact: true }).click();
+  const threshold = page.getByLabel('Pass threshold for Clarity and directness');
+  await expect(threshold).toHaveText('5');
+});
