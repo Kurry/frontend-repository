@@ -2,7 +2,10 @@ import { test } from '@playwright/test'
 import { criterionProbe } from './helpers'
 
 test.describe('behavioral rubric', () => {
-  test.setTimeout(90_000)
+  // durability_export_pipeline waits up to 120s for the 240-item simulated
+  // run to settle (real wall-clock timestamps); give the surrounding test
+  // enough budget to still run its export/assert steps after that wait.
+  test.setTimeout(150_000)
   test('14.1 multi_facet_seeded_reset', async ({ page }, testInfo) => criterionProbe(page, testInfo, 'multi_facet_seeded_reset'))
   test('14.2 queue_order_round_trip', async ({ page }, testInfo) => criterionProbe(page, testInfo, 'queue_order_round_trip'))
   test('14.3 rollups_track_step_states', async ({ page }, testInfo) => criterionProbe(page, testInfo, 'rollups_track_step_states'))
