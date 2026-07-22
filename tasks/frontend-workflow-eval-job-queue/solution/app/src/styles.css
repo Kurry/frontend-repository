@@ -293,6 +293,7 @@ main { width: min(1540px, 100%); margin: 0 auto; padding: 20px 28px 46px; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  body [class], body [class]::before, body [class]::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
 
 /* Missing animations added */

@@ -157,9 +157,8 @@ function invoke(name, args = {}) {
   }
   if (name === 'entity_delete') {
     if (args.confirm !== true) return { ok: false, error: 'confirm=true is required' }
-    state.setField('selectedIds', [args.experimentId])
-    state.deleteSelected()
-    return { ok: true }
+    const deleted = useStudio.getState().deleteOneDirect(args.experimentId)
+    return deleted ? { ok: true } : { ok: false, error: 'experimentId was not found' }
   }
 
   if (name === 'artifact_export') {

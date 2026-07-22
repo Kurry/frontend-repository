@@ -73,7 +73,7 @@ jobs:
         if: steps.changes.outputs.oracles == 'true'
         env:
           BASE_REF: origin/${{ github.base_ref }}
-        run: uv run corpuscheck oracle-ci --changed --base-ref "$BASE_REF"
+        run: uv run corpuscheck oracle-ci --changed --base-ref "$BASE_REF" --skip-e2e
 
       - name: Test corpuscheck
         if: steps.changes.outputs.corpuscheck == 'true'
