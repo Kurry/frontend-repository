@@ -455,10 +455,10 @@ function onShortcut(event) {
                   <AccordionContent>
                     <div class="criterion-detail">
                       <p class="criterion-description">{{ item.description }}</p>
-                      <button type="button" class="rationale-toggle" :aria-expanded="store.ui.expandedRationales.includes(item.id)" @click="toggleRationale(item.id)">
+                      <button type="button" class="rationale-toggle" :aria-expanded="store.ui.expandedRationales.includes(item.id) ? 'true' : 'false'" :aria-controls="`rationale-${item.id}`" @click="toggleRationale(item.id)">
                         <CaretDown :size="16" aria-hidden="true" :class="{ rotated: store.ui.expandedRationales.includes(item.id) }" />Rationale notes
                       </button>
-                      <div class="rationale-wrap" :class="{ open: store.ui.expandedRationales.includes(item.id) }">
+                      <div :id="`rationale-${item.id}`" class="rationale-wrap" :class="{ open: store.ui.expandedRationales.includes(item.id) }">
                         <p>Use this signal {{ item.importance === 'must-have' ? 'as a required quality floor' : 'to distinguish otherwise strong responses' }}. Its weight of {{ formatWeight(item.weight) }} {{ item.weight >= 3 ? 'makes it load-bearing in the rollup.' : 'keeps it intentionally secondary.' }}</p>
                       </div>
                       <div class="criterion-actions"><Button label="Edit criterion" severity="secondary" text size="small" :disabled="store.ui.versionCommitBusy" @click="openEdit(item.id)"><template #icon><PencilSimple :size="16" aria-hidden="true" /></template></Button><Button label="Delete" severity="danger" text size="small" :disabled="store.ui.versionCommitBusy" @click="requestDelete(item.id)"><template #icon><Trash :size="16" aria-hidden="true" /></template></Button></div>
