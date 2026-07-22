@@ -1,0 +1,9 @@
+[judge]
+model = "claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-02"
+type = "visual"
+weight = 1.0
+title = "visual_hierarchy"
+description = "Inspect the primary work surface, linked summary, and detail panel. The visual hierarchy makes current state and next action clear."

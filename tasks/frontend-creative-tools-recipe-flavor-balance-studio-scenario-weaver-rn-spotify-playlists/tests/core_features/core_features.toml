@@ -1,0 +1,9 @@
+[judge]
+model = "claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-01"
+type = "behavioral"
+weight = 1.0
+title = "signature_mutation"
+description = "branch a selected record into a scenario and compare linked outcomes. The scenario weaver mutation changes the primary record, linked view, and status together."

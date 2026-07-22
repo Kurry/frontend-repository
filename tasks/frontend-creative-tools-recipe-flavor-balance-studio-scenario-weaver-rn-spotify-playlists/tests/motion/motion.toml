@@ -1,0 +1,9 @@
+[judge]
+model = "claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-03"
+type = "motion"
+weight = 1.0
+title = "causal_motion"
+description = "branch a selected record into a scenario and compare linked outcomes. Motion connects the acted-on item to its new state and has a reduced-motion equivalent."

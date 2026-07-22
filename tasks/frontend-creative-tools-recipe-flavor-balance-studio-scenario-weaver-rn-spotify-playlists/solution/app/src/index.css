@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #1db954; /* Spotify inspired primary */
+  --color-primary-hover: #1ed760;
+  --color-bg-base: #121212;
+  --color-bg-elevated: #181818;
+  --color-bg-highlight: #282828;
+  --color-text-base: #ffffff;
+  --color-text-subdued: #a7a7a7;
+}
+
+body {
+  background-color: var(--color-bg-base);
+  color: var(--color-text-base);
+}
