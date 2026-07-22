@@ -1,0 +1,24 @@
+schema_version = "1.3"
+
+[task]
+name = "mercor-intelligence/frontend-data-tracking-coffee-brew-experiment-log-provenance-atlas-rn-slack-canvas"
+description = "Manage brew experiments through a domain-native browser surface where one meaningful mutation updates linked views and an interoperable artifact."
+
+[agent]
+timeout_sec = 3600.0
+
+[verifier]
+timeout_sec = 14400.0
+
+[environment]
+workdir = "/app"
+build_timeout_sec = 1200.0
+memory_mb = 8192
+cpus = 4
+
+[[artifacts]]
+source = "/app"
+destination = "app"
+exclude = [
+    "node_modules",
+]
