@@ -123,6 +123,34 @@ test.describe('workspace contract (canonical)', () => {
 });
 
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
+const REASON_VOCABULARY = [
+  'timing-sensitive',
+  'environment-dependent',
+  'ordering-dependent',
+  'resource-quota',
+  'locale-dependent',
+  'filesystem-path',
+  'parallelism',
+];
+
+const queueRows = (page) => page.locator('.triage-table tbody tr');
+
+async function selectQueueRow(page, index = 1) {
+  const row = queueRows(page).nth(index);
+  const id = await row.locator('.test-id').evaluate((element) => element.textContent.trim());
+  await row.click();
+  await expect(row).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#test-detail .test-id')).toHaveText(id);
+  return { row, id };
+}
+
+async function readTriageReport(page) {
+  await page.getByRole('button', { name: 'Export triage report', exact: true }).click();
+  await page.getByRole('tab', { name: 'Triage report JSON' }).click();
+  return page.locator('[data-export-preview="triage-report-json"]').evaluate((element) =>
+    JSON.parse(element.textContent));
+}
+
 test('1.1 seeded_suites_and_queue_anatomy', async ({ page }) => {
   await page.goto(BASE);
   await expect(page.locator('header').first()).toBeVisible();
@@ -138,27 +166,53 @@ test('1.2 verdict_derives_from_matrix', async ({ page }) => {
 
 test('1.3 reason_select_constrained_to_vocabulary', async ({ page }) => {
   await page.goto(BASE);
-  const selects = page.locator('select');
-  await expect(selects.first()).toBeEnabled();
-  await selects.first().selectOption({ index: 1 });
-  await expect(selects.first()).toHaveValue(/.+/);
+  const { row, id } = await selectQueueRow(page, 1);
+  const reasonSelect = row.locator('.reason-select');
+  await expect(reasonSelect.locator('option')).toHaveText(REASON_VOCABULARY);
+  await reasonSelect.selectOption('locale-dependent');
+  await expect(reasonSelect).toHaveValue('locale-dependent');
+  const event = page.locator('.timeline-list .event').first();
+  await expect(event).toContainText(id);
+  await expect(event).toContainText(/reason change/i);
+  await expect(event).toContainText('locale-dependent');
 });
 
 test('1.4 detail_panel_condition_schedule', async ({ page }) => {
   await page.goto(BASE);
-  const row = page.locator('.queue-table tbody tr, .queue-item, tr').first();
-  await expect(row).toBeVisible();
-  await row.click();
-  await expect(page.locator('#test-detail')).toBeVisible();
-  await expect(page.locator('#test-detail .schedule-heading')).toBeVisible();
+  const { row } = await selectQueueRow(page, 1);
+  const detail = page.locator('#test-detail');
+  await expect(detail.locator('.schedule-list li')).toHaveCount(5);
+  await expect(detail.locator('.matrix li')).toHaveCount(5);
+  await expect(detail.locator('.verdict-chip')).toHaveAttribute(
+    'data-verdict',
+    await row.locator('.verdict-chip').getAttribute('data-verdict'),
+  );
+  const schedule = await detail.locator('.schedule-list li').evaluateAll((items) => items.map((item) => ({
+    index: item.querySelector('.run-number')?.textContent?.trim(),
+    condition: item.querySelector('.condition strong')?.textContent?.trim(),
+    result: item.querySelector('.result')?.textContent?.trim(),
+  })));
+  expect(schedule.map(({ index }) => index)).toEqual(['1', '2', '3', '4', '5']);
+  expect(schedule.every(({ condition }) => [
+    'CPU quota', 'terminal size', 'hostname', 'timezone', 'temp-dir length', 'parallel execution',
+  ].includes(condition))).toBe(true);
+  expect(schedule.every(({ result }) => ['pass', 'fail'].includes(result))).toBe(true);
 });
 
 test('1.5 diverging_run_highlighted', async ({ page }) => {
   await page.goto(BASE);
-  const h2 = page.locator('h2');
-  await expect(h2.first()).toBeVisible();
-  const text = await h2.first().textContent();
-  expect(text.length).toBeGreaterThan(0);
+  const flakyRow = queueRows(page).filter({ has: page.locator('.verdict-chip[data-verdict="flaky"]') }).first();
+  const id = await flakyRow.locator('.test-id').evaluate((element) => element.textContent.trim());
+  await flakyRow.click();
+  await expect(page.locator('#test-detail .test-id')).toHaveText(id);
+  const schedule = page.locator('#test-detail .schedule-list');
+  await expect(schedule.locator('li.divergent')).not.toHaveCount(0);
+  await expect(schedule.locator('li:not(.divergent)')).not.toHaveCount(0);
+  const highlighted = await schedule.locator('li.divergent').evaluateAll((items) => items.map((item) => ({
+    minority: item.querySelector('.minority')?.textContent?.trim(),
+    condition: item.querySelector('.condition strong')?.textContent?.trim(),
+  })));
+  expect(highlighted.every(({ minority, condition }) => minority === 'Minority' && condition.length > 0)).toBe(true);
 });
 
 test('1.6 filters_narrow_and_combine', async ({ page }) => {
@@ -201,6 +255,10 @@ test('1.6 filters_narrow_and_combine', async ({ page }) => {
     (els) => els.map((el) => el.getAttribute('data-verdict')),
   );
   expect(combinedVerdicts.every((v) => v === 'fail')).toBe(true);
+  const combinedReasons = await rows.locator('.reason-select').evaluateAll(
+    (selects) => selects.map((select) => select.value),
+  );
+  expect(combinedReasons.every((reason) => reason === 'parallelism')).toBe(true);
 
   // Clearing restores the full, unfiltered queue exactly. Scope to the
   // filter-bar's own button: when the combined filter above matches zero
@@ -345,11 +403,18 @@ test('1.16 audit_timeline_ordered_and_filterable', async ({ page }) => {
 
 test('1.17 test_record_field_contract_visible', async ({ page }) => {
   await page.goto(BASE);
-  const row = page.locator('.queue-table tbody tr, .queue-item, tr').first();
-  await expect(row).toBeVisible();
-  await row.click();
-  await expect(page.locator('#test-detail')).toBeVisible();
-  await expect(page.locator('#test-detail .schedule-heading')).toBeVisible();
+  const { row, id } = await selectQueueRow(page, 1);
+  expect(id.length).toBeGreaterThan(0);
+  const verdict = await row.locator('.verdict-chip').getAttribute('data-verdict');
+  expect(['keep', 'flaky', 'fail']).toContain(verdict);
+  await expect(row.locator('.matrix li')).toHaveCount(5);
+  await expect(row.locator('.reason-select')).toHaveValue(new RegExp(`^(${REASON_VOCABULARY.join('|')})$`));
+  const runs = await page.locator('#test-detail .schedule-list li').evaluateAll((items) => items.map((item) => ({
+    index: item.querySelector('.run-number')?.textContent?.trim(),
+    result: item.querySelector('.result')?.textContent?.trim(),
+  })));
+  expect(runs.map(({ index }) => index)).toEqual(['1', '2', '3', '4', '5']);
+  expect(runs.every(({ result }) => result === 'pass' || result === 'fail')).toBe(true);
 });
 
 test('1.18 triage_report_json_field_contract', async ({ page }) => {
@@ -520,10 +585,16 @@ test('6.2 invalid_rerun_shows_inline_validation', async ({ page }) => {
 
 test('6.3 reason_change_updates_related_displays', async ({ page }) => {
   await page.goto(BASE);
-  const select = page.locator('select').first();
-  await expect(select).toBeEnabled();
-  await select.selectOption({ index: 1 });
-  await expect(select).toHaveValue(/.+/);
+  const { row, id } = await selectQueueRow(page, 1);
+  const reasonSelect = row.locator('.reason-select');
+  await reasonSelect.selectOption('filesystem-path');
+  await expect(reasonSelect).toHaveValue('filesystem-path');
+  await expect(page.locator('#test-detail .reason-tag')).toHaveText('filesystem-path');
+  const timelineEvent = page.locator('.timeline-list .event').first();
+  await expect(timelineEvent).toContainText(id);
+  await expect(timelineEvent).toContainText('filesystem-path');
+  const report = await readTriageReport(page);
+  expect(report.tests.find((testRecord) => testRecord.id === id)?.reason).toBe('filesystem-path');
 });
 
 test('6.4 rerun_updates_all_surfaces', async ({ page }) => {
@@ -601,11 +672,13 @@ test('6.7 filters_update_queue_everywhere', async ({ page }) => {
 
 test('6.8 detail_panel_preserves_workflow', async ({ page }) => {
   await page.goto(BASE);
-  const row = page.locator('.queue-table tbody tr, .queue-item, tr').first();
-  await expect(row).toBeVisible();
-  await row.click();
-  await expect(page.locator('#test-detail')).toBeVisible();
-  await expect(page.locator('#test-detail .schedule-heading')).toBeVisible();
+  const suite = page.getByLabel('Filter by suite');
+  await expect(suite).toHaveValue('suite-web-runtime');
+  const firstSelection = await selectQueueRow(page, 1);
+  const secondSelection = await selectQueueRow(page, 2);
+  expect(secondSelection.id).not.toBe(firstSelection.id);
+  await expect(page.locator('#test-detail .schedule-list li')).toHaveCount(5);
+  await expect(suite).toHaveValue('suite-web-runtime');
 });
 
 test('6.9 export_import_overlays_support_flows', async ({ page }) => {
@@ -639,9 +712,21 @@ test('9.1 cold_start_is_under_two_seconds', async ({ page }) => {
   await page.goto(BASE, { waitUntil: 'commit' });
   const remaining = 2000 - (Date.now() - start);
   expect(remaining, 'navigation commits before the cold-start interaction deadline').toBeGreaterThan(0);
-  const firstRow = page.locator('.triage-table tbody tr').first();
-  await firstRow.click({ timeout: remaining });
-  await expect(page.locator('#test-detail')).toBeVisible({ timeout: Math.max(1, 2000 - (Date.now() - start)) });
+  const targetRow = queueRows(page).nth(1);
+  const targetId = await targetRow.locator('.test-id').evaluate(
+    (element) => element.textContent.trim(),
+    undefined,
+    { timeout: remaining },
+  );
+  await targetRow.click({ timeout: Math.max(1, 2000 - (Date.now() - start)) });
+  await expect(page.locator('#test-detail .test-id')).toHaveText(
+    targetId,
+    { timeout: Math.max(1, 2000 - (Date.now() - start)) },
+  );
+  await expect(page.locator('#test-detail .schedule-list li')).toHaveCount(
+    5,
+    { timeout: Math.max(1, 2000 - (Date.now() - start)) },
+  );
   expect(Date.now() - start).toBeLessThan(2000);
 });
 
@@ -838,10 +923,10 @@ test('14.3 quarantine_lists_track_verdict', async ({ page }) => {
 
 test('14.4 reason_echoes_into_export_json', async ({ page }) => {
   await page.goto(BASE);
-  const select = page.locator('select').first();
-  await expect(select).toBeEnabled();
-  await select.selectOption({ index: 1 });
-  await expect(select).toHaveValue(/.+/);
+  const { row, id } = await selectQueueRow(page, 1);
+  await row.locator('.reason-select').selectOption('resource-quota');
+  const report = await readTriageReport(page);
+  expect(report.tests.find((testRecord) => testRecord.id === id)?.reason).toBe('resource-quota');
 });
 
 test('14.5 quarantine_count_delta_exact', async ({ page }) => {
@@ -852,18 +937,39 @@ test('14.5 quarantine_count_delta_exact', async ({ page }) => {
 
 test('14.6 different_reasons_change_export', async ({ page }) => {
   await page.goto(BASE);
-  const select = page.locator('select').first();
-  await expect(select).toBeEnabled();
-  await select.selectOption({ index: 1 });
-  await expect(select).toHaveValue(/.+/);
+  const rows = queueRows(page);
+  const firstId = await rows.nth(0).locator('.test-id').evaluate((element) => element.textContent.trim());
+  const secondId = await rows.nth(1).locator('.test-id').evaluate((element) => element.textContent.trim());
+  await rows.nth(0).locator('.reason-select').selectOption('timing-sensitive');
+  await rows.nth(1).locator('.reason-select').selectOption('environment-dependent');
+  const report = await readTriageReport(page);
+  const reasons = Object.fromEntries(report.tests.map((testRecord) => [testRecord.id, testRecord.reason]));
+  expect(reasons[firstId]).toBe('timing-sensitive');
+  expect(reasons[secondId]).toBe('environment-dependent');
+  expect(reasons[firstId]).not.toBe(reasons[secondId]);
 });
 
 test('14.7 interleaved_rerun_and_reason', async ({ page }) => {
   await page.goto(BASE);
-  const select = page.locator('select').first();
-  await expect(select).toBeEnabled();
-  await select.selectOption({ index: 1 });
-  await expect(select).toHaveValue(/.+/);
+  const rows = queueRows(page);
+  const rerunRow = rows.nth(0);
+  const reasonRow = rows.nth(1);
+  const rerunId = await rerunRow.locator('.test-id').evaluate((element) => element.textContent.trim());
+  const beforeRuns = await rerunRow.locator('.matrix li').evaluateAll((cells) =>
+    cells.map((cell) => cell.getAttribute('aria-label')));
+  await rerunRow.click();
+  await rerunRow.getByRole('button', { name: /Open re-run form/i }).click();
+  await page.getByLabel('Run count').selectOption('3');
+  await page.getByRole('button', { name: 'Start re-run', exact: true }).click();
+  await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0');
+  await reasonRow.locator('.reason-select').selectOption('filesystem-path');
+  await expect(reasonRow.locator('.reason-select')).toHaveValue('filesystem-path');
+  await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '3', { timeout: 5000 });
+  const afterRuns = await rerunRow.locator('.matrix li').evaluateAll((cells) =>
+    cells.map((cell) => cell.getAttribute('aria-label')));
+  expect(afterRuns).not.toEqual(beforeRuns);
+  await expect(reasonRow.locator('.reason-select')).toHaveValue('filesystem-path');
+  await expect(page.locator('#test-detail .test-id')).toHaveText(rerunId);
 });
 
 test('14.8 empty_quarantine_export_round_trip', async ({ page }) => {
