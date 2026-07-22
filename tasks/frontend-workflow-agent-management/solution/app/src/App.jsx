@@ -434,7 +434,7 @@ function ExportModal() {
         </section>
         <div className="export-meta"><span>fleet-json</span><span>{new Blob([text]).size.toLocaleString()} bytes</span></div>
         <pre className="json-preview" tabIndex={0} aria-label="Fleet JSON preview">{text}</pre>
-        <div className="modal-actions-row"><Button size="sm" kind="ghost" onClick={() => window.print()}>Print summary</Button><Button size="sm" renderIcon={Copy} onClick={copy}>Copy</Button><Button size="sm" kind="tertiary" renderIcon={Download} onClick={download}>Download</Button></div>
+        <div className="modal-actions-row"><Button size="sm" kind="ghost" onClick={() => window.print()}>Print summary</Button><Button size="sm" renderIcon={Copy} onClick={() => copy(text)}>Copy</Button><Button size="sm" kind="tertiary" renderIcon={Download} onClick={() => download(text)}>Download</Button></div>
       </div>
     </Modal>
   )
@@ -516,14 +516,12 @@ function CommandPalette() {
 function Toasts() {
   const toasts = useFleetStore((state) => state.toasts)
   const dismiss = useFleetStore((state) => state.dismissToast)
-  return <div className="toast-stack" aria-label="Notifications">{toasts.map((toast) => <ToastNotification key={toast.id} timeout={0} lowContrast kind={toast.kind} title={toast.title} onCloseButtonClick={() => dismiss(toast.id)} />)}</div>
+  return <div className="toast-stack" aria-label="Notifications">{toasts.map((toast) => <ToastNotification key={toast.id} timeout={3600} lowContrast kind={toast.kind} title={toast.title} onClose={() => dismiss(toast.id)} />)}</div>
 }
 
 export default function App() {
   const agents = useFleetStore((state) => state.agents)
   const detailAgentId = useFleetStore((state) => state.detailAgentId)
-  const exportOpen = useFleetStore((state) => state.exportOpen)
-  const refreshExport = useFleetStore((state) => state.refreshExport)
   const announcement = useFleetStore((state) => state.announcement)
   const theme = useFleetStore((state) => state.theme)
   const timer = useRef(null)
@@ -531,7 +529,6 @@ export default function App() {
     timer.current = window.setInterval(() => useFleetStore.getState().tickRuns(), 1000)
     return () => window.clearInterval(timer.current)
   }, [])
-  useEffect(() => { if (exportOpen) refreshExport() }, [agents, exportOpen, refreshExport])
   useEffect(() => registerWebMCP(), [])
   useEffect(() => {
     const onKeyDown = (event) => {

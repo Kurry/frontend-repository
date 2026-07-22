@@ -315,7 +315,7 @@ button.timeline-label { background: none; border: 0; padding: 0; cursor: pointer
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+  *, *::before, *::after { animation-name: none !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
 }
 
 .agent-row-exit {

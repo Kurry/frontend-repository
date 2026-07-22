@@ -48,7 +48,7 @@ export async function removeAgent(page: Page, name: string) {
   const dialog = page.getByRole('dialog').filter({ hasText: `Remove ${name}?` }); await dialog.getByRole('button', { name: 'Remove agent' }).click(); await expect(target).toHaveCount(0); return dialog;
 }
 
-export async function downloadedText(download: Download) { const path = await download.path(); expect(path).toBeTruthy(); return readFile(path!, 'utf8'); }
+export async function downloadedText(download: Download) { const path = await download.path(); expect(path).toBeTruthy(); return readFile(path!, { encoding: 'utf8' }); }
 
 export async function importText(page: Page, text: string) {
   await page.getByRole('button', { name: 'Import fleet' }).first().click(); const modal = page.locator('.cds--modal-container').filter({ hasText: 'Paste a complete fleet JSON' }); await modal.getByLabel('Fleet JSON').fill(text); return modal;
