@@ -700,6 +700,7 @@ a:focus-visible,
 
 @media (max-width: 430px) {
   .brand > span:last-child { display: none; }
+  .view-nav .header-preference { display: none; }
   .view-nav .cds--btn { padding-inline: 9px; font-size: 12px; }
   .nav-count { margin-left: 4px; }
   .technique-hero { min-height: 130px; }

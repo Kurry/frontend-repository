@@ -192,7 +192,7 @@ function AppHeader() {
           type="button"
           kind="ghost"
           size="md"
-          className="theme-toggle"
+          className="header-preference theme-toggle"
           renderIcon={(props) => (theme === 'dark' ? <Light {...props} aria-hidden="true" /> : <Asleep {...props} aria-hidden="true" />)}
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
           aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
@@ -203,6 +203,7 @@ function AppHeader() {
           type="button"
           kind="ghost"
           size="md"
+          className="header-preference"
           onClick={() => setDensity(density === 'comfortable' ? 'compact' : 'comfortable')}
           aria-label={density === 'comfortable' ? 'Switch to compact density' : 'Switch to comfortable density'}
         >
@@ -212,7 +213,7 @@ function AppHeader() {
           type="button"
           kind="ghost"
           size="md"
-          className={voiceListening ? 'nav-active' : ''}
+          className={`header-preference${voiceListening ? ' nav-active' : ''}`}
           renderIcon={(props) => <Microphone {...props} aria-hidden="true" />}
           onClick={toggleVoice}
           aria-pressed={voiceListening}
