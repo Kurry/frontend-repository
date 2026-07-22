@@ -53,31 +53,37 @@ export function registerWebMCP() {
     switch (tool) {
       case "editor_select":
         setState('selectedCapsuleId', args.id);
+        setState('lastAction', 'editor_select');
         return { status: "success" };
       case "editor_update_property":
         if (args.property === 'title' || args.property === 'variant') {
            setState('capsules', (c) => c.id === args.id, args.property, args.value);
         }
+        setState('lastAction', 'editor_update_property');
         return { status: "success" };
       case "editor_add":
-        if (state.selectedRange) {
+        const range = state.selectedRange ?? (state.events.length ? { start: state.events[0].id, end: state.events[Math.min(4, state.events.length - 1)].id } : null);
+        if (range) {
           const newCapsule = {
             id: `capsule-${Date.now()}`,
             title: 'New Summary',
-            startId: state.selectedRange.start,
-            endId: state.selectedRange.end,
+            startId: range.start,
+            endId: range.end,
             variant: 'concise' as const,
             includedFacts: [],
             omittedFacts: [],
           };
           setState('capsules', (prev) => [...prev, newCapsule]);
           setState('selectedRange', null);
+          setState('lastAction', 'editor_add');
           return { status: "success", capsuleId: newCapsule.id };
         }
-        return { status: "error", message: "No range selected" };
+        return { status: "error", message: "No events available" };
       case "editor_preview":
+        setState('lastAction', 'editor_preview');
         return { status: "success", preview_state: "visible" };
       case "artifact_export":
+        setState('lastAction', 'artifact_export');
         return {
           status: "success",
           artifact: {
@@ -91,6 +97,7 @@ export function registerWebMCP() {
         if (args.payload?.schemaVersion === "compressed-session-pack/v1") {
           setState('capsules', args.payload.capsules || []);
           if (args.payload.cap) setState('cap', args.payload.cap);
+          setState('lastAction', 'artifact_import');
           return { status: "success" };
         }
         return { status: "error", message: "Invalid schema" };

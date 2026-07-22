@@ -6,7 +6,7 @@ import { TokenRuler } from './TokenRuler';
 import { LossLens } from './LossLens';
 import { SessionPreview } from './SessionPreview';
 import { ExportImport } from './ExportImport';
-import { setState, type Event } from './store';
+import { state, setState, type Event } from './store';
 
 const App: Component = () => {
   onMount(() => {
@@ -23,6 +23,7 @@ const App: Component = () => {
 
   return (
     <div class="h-screen w-full flex flex-col md:flex-row p-4 gap-4 bg-slate-900 text-slate-100">
+      <div class="fixed bottom-2 right-2 text-xs text-slate-400" data-testid="webmcp-status">{state.lastAction}</div>
       <div class="flex-1 flex flex-col gap-4">
           <LoomUI />
           <CapsuleEditor />

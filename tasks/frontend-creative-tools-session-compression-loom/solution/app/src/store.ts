@@ -24,6 +24,7 @@ export type GlobalState = {
   cap: number;
   selectedRange: { start: string; end: string } | null;
   selectedCapsuleId: string | null;
+  lastAction: string;
 };
 
 export const [state, setState] = createStore<GlobalState>({
@@ -32,4 +33,5 @@ export const [state, setState] = createStore<GlobalState>({
   cap: 4200,
   selectedRange: null,
   selectedCapsuleId: null,
+  lastAction: '',
 });
