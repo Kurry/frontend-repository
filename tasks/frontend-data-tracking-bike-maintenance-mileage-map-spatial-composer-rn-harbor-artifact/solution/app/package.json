@@ -1,0 +1,30 @@
+{
+  "name": "bike-maintenance-spatial-composer",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "vite preview --host 0.0.0.0 --port 3000",
+    "verify:build": "vite build",
+    "start+verify:build": "npm run verify:build && npm start",
+    "dev": "vite",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "4.3.2",
+    "@tanstack/react-table": "^8.21.3",
+    "lucide-react": "^0.454.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "4.3.2",
+    "zod": "^4.4.3",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "typescript": "^5.5.3",
+    "vite": "5.4.1"
+  }
+}
