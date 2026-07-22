@@ -181,7 +181,7 @@ test.describe('workflow builder (task-specific)', () => {
     const outputNode = page.locator('.workflow-node', { has: page.locator('.node-type', { hasText: 'Output' }) });
     // Shortly after Run, the source node has started while the sink is still pending —
     // nodes advance one at a time rather than all at once.
-    await expect(promptNode.locator('.status-tag')).toBeVisible({ timeout: 2000 });
+    await expect(promptNode.locator('.status-running')).toBeVisible({ timeout: 2000 });
     await expect(outputNode.locator('.status-running, .status-complete')).toHaveCount(0);
     // Eventually the whole run reaches completion in topological order.
     await expect(page.locator('.rollup')).toContainText('5/5', { timeout: 15000 });
