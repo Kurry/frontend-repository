@@ -1,0 +1,22 @@
+  {
+    "task": "frontend-creative-tools-escape-room-puzzle-studio",
+    "modules": [
+      "structured-editor-v1",
+      "entity-collection-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "editor_object_types": ["prop", "node", "edge"],
+      "editor_properties": ["x", "y", "width", "height", "type"],
+      "editor_modes": ["layout", "graph", "simulate"],
+      "editor_operations": ["select", "add", "delete", "update_property", "switch_mode"],
+      "entity": "playtest-event",
+      "entity_operations": ["create", "select"],
+      "artifact_operations": ["export", "import"],
+      "export_formats": ["json", "svg", "csv", "markdown"],
+      "import_modes": ["json"]
+    },
+    "mechanics_exclusions": [
+      "Dragging props stays Playwright-driven."
+    ]
+  }

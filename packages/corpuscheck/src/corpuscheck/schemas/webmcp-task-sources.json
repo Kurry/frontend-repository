@@ -513,5 +513,10 @@
     "source": "feature-workflow-builder-workflow-builder PRD",
     "instruction": "tasks/frontend-workflow-workflow-builder/instruction.md",
     "description": "Node-graph workflow builder with durable executions and timelines."
+  },
+  "frontend-creative-tools-escape-room-puzzle-studio": {
+    "source": "EscapeRoom",
+    "instruction": "EscapeRoom/instruction.md",
+    "description": "Escape Room Puzzle Studio eval."
   }
 }

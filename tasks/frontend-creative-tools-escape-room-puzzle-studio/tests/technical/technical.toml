@@ -1,0 +1,170 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "shared_state_coherence"
+description = "A change made in one surface (renaming a board, toggling a favorite, saving a new board) is immediately reflected in every other surface showing that datum — gallery cards, tag-filtered lists, and the current selection — without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "reload_returns_seeded_baseline"
+description = "A page reload returns the app to its seeded in-memory baseline — blank canvas, unlocked cell-size slider, exactly the seeded boards — with no facet (favorites, filters, saved boards) surviving the reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "local_qrious_festival_mask"
+description = "The QR mask is generated client-side from a locally shipped QRious (or equivalent) under vendor/, encoding the fixed festival URL with no network calls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "keyboard_operable_with_focus_ring"
+description = "Every toolbar control, palette swatch, and gallery action is reachable and operable with the keyboard alone, and the focused control shows a visible focus indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "camera_dialog_traps_focus"
+description = "The camera overlay behaves as a modal dialog: focus moves into it when opened, stays trapped inside while open, and returns to the triggering control on close"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "swatches_expose_color_names"
+description = "Each palette swatch exposes an accessible name identifying its color in the accessibility tree, rather than being an unlabeled colored square"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "validation_message_announced"
+description = "The inline save-validation message is exposed to assistive technology (an aria-live region or role='alert') in addition to being shown visually"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.11"
+name = "interactive_within_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "drag_painting_stays_smooth"
+description = "Continuous drag-painting across many cells stays smooth, with no visible lag between pointer movement and cells filling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.15"
+name = "form_and_export_share_board_session_schema"
+description = "Save board, rename, and Import enforce the same Board/Session field contracts the Export session JSON uses (name ≤40 unique, tag ≤24 non-empty, schemaVersion shapeshift-session-v1, closed brushMode/paletteColor/mirrorMode enums, cellSize 16–64): invalid values show inline per-field errors before commit, and Export/Import round-trip only contracted shapes"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "TE-01"
+title = "State Consistency"
+description = "In-memory state remains consistent across canvas, graph, and simulator."
+type = "behavioral"
+weight = 1.0
