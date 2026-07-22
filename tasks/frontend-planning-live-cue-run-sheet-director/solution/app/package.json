@@ -1,0 +1,25 @@
+{
+  "name": "live-cue-run-sheet-director",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "vite --host 0.0.0.0 --port 3000",
+    "verify:build": "vite build"
+  },
+  "dependencies": {
+    "@kobalte/core": "0.13.12",
+    "@tabler/icons-solidjs": "3.34.1",
+    "@tanstack/solid-form": "1.33.2",
+    "@tailwindcss/vite": "4.3.2",
+    "motion": "12.23.12",
+    "qrious": "4.0.2",
+    "solid-js": "1.9.14",
+    "tailwindcss": "4.3.2",
+    "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "vite": "8.1.5",
+    "vite-plugin-solid": "2.11.13"
+  }
+}
