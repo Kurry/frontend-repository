@@ -1,0 +1,10 @@
+[judge]
+module = "app_judge"
+class = "AppJudge"
+
+[[criterion]]
+id = "AC-07"
+title = "Mobile mode"
+description = "Use the signature interaction at a narrow viewport. The desktop surface becomes a usable stack/drawer/stepper without horizontal overflow."
+weight = 1.0
+type = "behavior"

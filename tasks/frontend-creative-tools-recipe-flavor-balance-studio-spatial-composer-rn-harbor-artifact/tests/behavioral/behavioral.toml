@@ -1,0 +1,10 @@
+[judge]
+module = "app_judge"
+class = "AppJudge"
+
+[[criterion]]
+id = "AC-13"
+title = "Artifact round trip"
+description = "Export, clear, import, and inspect the edited variant record and derived state. Authored order/selection/geometry and domain state survive; invalid import is a no-op."
+weight = 1.0
+type = "behavior"

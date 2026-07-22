@@ -1,0 +1,10 @@
+[judge]
+module = "app_judge"
+class = "AppJudge"
+
+[[criterion]]
+id = "AC-04"
+title = "Schema contract"
+description = "Query the current state and export after the mutation. The tool result and artifact contain the declared API-shaped fields."
+weight = 1.0
+type = "behavior"

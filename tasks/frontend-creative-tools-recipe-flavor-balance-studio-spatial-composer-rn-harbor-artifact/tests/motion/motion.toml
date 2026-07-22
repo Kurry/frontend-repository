@@ -1,0 +1,10 @@
+[judge]
+module = "app_judge"
+class = "AppJudge"
+
+[[criterion]]
+id = "AC-03"
+title = "Causal motion"
+description = "Place a selected record in a spatial composer and rebalance capacity. Motion connects the acted-on item to its new state and has a reduced-motion equivalent."
+weight = 1.0
+type = "behavior"
