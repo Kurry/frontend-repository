@@ -1,0 +1,29 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "vite preview --port 3000 --host 0.0.0.0",
+    "build": "vite build",
+    "verify:build": "vite build",
+    "start+verify:build": "npm run build && npm start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@kobalte/core": "^0.13.1",
+    "@tailwindcss/vite": "^4.0.0",
+    "lucide-solid": "^0.395.0",
+    "solid-js": "^1.8.18",
+    "tailwindcss": "^4.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "playwright": "^1.61.1",
+    "vite": "^5.4.21",
+    "vite-plugin-solid": "^2.10.2"
+  }
+}
