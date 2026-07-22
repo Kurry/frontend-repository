@@ -1,0 +1,682 @@
+technology,site_count,percent_of_live_sites
+HSTS,2316,50.767
+HTTP/3,1801,39.478
+Cloudflare,1571,34.437
+jQuery,1236,27.093
+PHP,1055,23.126
+Google Analytics,983,21.548
+Google Tag Manager,955,20.934
+WordPress,783,17.164
+MySQL,777,17.032
+Node.js,751,16.462
+Cloudflare Browser Insights,647,14.182
+Nginx,642,14.073
+Apache HTTP Server,617,13.525
+Vue.js,511,11.201
+Vercel,489,10.719
+Nuxt.js,474,10.39
+Yoast SEO,405,8.878
+React,397,8.702
+jsDelivr,369,8.089
+Amazon Web Services,365,8.001
+Netlify,359,7.869
+jQuery Migrate,339,7.431
+cdnjs,330,7.234
+Webpack,265,5.809
+Amazon CloudFront,262,5.743
+Google Hosted Libraries,256,5.612
+Adobe Fonts,238,5.217
+Typekit,238,5.217
+Next.js,232,5.085
+LiteSpeed,217,4.757
+Unpkg,217,4.757
+Cloudflare Bot Management,196,4.296
+reCAPTCHA,196,4.296
+Amazon S3,189,4.143
+Shopify,173,3.792
+Modernizr,167,3.661
+Bootstrap,163,3.573
+Contact Form 7,142,3.113
+Ubuntu,137,3.003
+Varnish,117,2.565
+LiteSpeed Cache,116,2.543
+Litespeed Cache,116,2.543
+YouTube,113,2.477
+Klaviyo,105,2.302
+Webflow,98,2.148
+Google Font API,98,2.148
+WPML,94,2.06
+WP Rocket,93,2.039
+jQuery CDN,93,2.039
+Google Cloud,88,1.929
+Contentful,87,1.907
+WordPress Block Editor,84,1.841
+Site Kit,81,1.776
+Slick,77,1.688
+Stimulus,76,1.666
+Elementor,74,1.622
+Google Maps,71,1.556
+imagesLoaded,70,1.534
+Craft CMS,69,1.512
+Swiper,69,1.512
+WP Engine,68,1.491
+AMP,68,1.491
+GSAP,67,1.469
+Firebase,64,1.403
+OneTrust,63,1.381
+CookieYes,63,1.381
+Three.js,60,1.315
+Cookiebot,60,1.315
+jQuery UI,60,1.315
+Squarespace,60,1.315
+Squarespace Commerce,60,1.315
+Linkedin Ads,52,1.14
+parallax.js,52,1.14
+WooCommerce,51,1.118
+Express,50,1.096
+Google Cloud Load Balancing,48,1.052
+ZURB Foundation,45,0.986
+SEOmatic,44,0.964
+Google Cloud Trace,44,0.964
+OpenResty,43,0.943
+MailChimp,42,0.921
+Framer Sites,41,0.899
+Yii,41,0.899
+Alpine.js,41,0.899
+Astro,39,0.855
+Prismic,39,0.855
+Google Cloud CDN,38,0.833
+W3 Total Cache,38,0.833
+OWL Carousel,38,0.833
+Hostinger,37,0.811
+Fastly,37,0.811
+Akamai,36,0.789
+Yoast SEO Premium,36,0.789
+Java,35,0.767
+C3.js,35,0.767
+Lightbox,34,0.745
+Underscore.js,33,0.723
+Gatsby,33,0.723
+Azure,32,0.701
+Polylang,32,0.701
+Gravity Forms,31,0.68
+Microsoft ASP.NET,31,0.68
+FitVids.JS,31,0.68
+Complianz,30,0.658
+Lodash,30,0.658
+Font Awesome,30,0.658
+iubenda,29,0.636
+Drupal,29,0.636
+Lenis,28,0.614
+Locomotive Scroll,28,0.614
+Onsen UI,27,0.592
+Azure Front Door,26,0.57
+Plesk,25,0.548
+All in One SEO,25,0.548
+All in One SEO Pack,25,0.548
+Kinsta,23,0.504
+Envoy,23,0.504
+RequireJS,23,0.504
+Adobe Experience Manager,22,0.482
+GitHub Pages,22,0.482
+Debian,21,0.46
+Popper,21,0.46
+Magnific Popup,21,0.46
+Laravel,21,0.46
+Fathom,20,0.438
+Stripe,20,0.438
+WordPress Super Cache,20,0.438
+FancyBox,20,0.438
+Polyfill,20,0.438
+wpBakery,20,0.438
+Google Tag Manager for WordPress,19,0.416
+Salesforce,19,0.416
+Salesforce Commerce Cloud,19,0.416
+Matter.js,19,0.416
+Flickity,19,0.416
+Wix,19,0.416
+Readymag,19,0.416
+Ruby,18,0.395
+Ruby on Rails,17,0.373
+Amazon ALB,17,0.373
+Weglot,16,0.351
+Plyr,16,0.351
+OpenSSL,16,0.351
+Optimizely,16,0.351
+Akamai Bot Manager,15,0.329
+PIXIjs,15,0.329
+Google Optimize,15,0.329
+Osano,14,0.307
+Select2,14,0.307
+WP-Optimize,13,0.285
+WordPress Site Editor,13,0.285
+Windows Server,13,0.285
+Tealium,12,0.263
+Redis,12,0.263
+Redis Object Cache,12,0.263
+Blitz,12,0.263
+Semplice,12,0.263
+IIS,12,0.263
+Slider Revolution,12,0.263
+Usercentrics,11,0.241
+LottieFiles,11,0.241
+Imperva,11,0.241
+Cart Functionality,11,0.241
+Aruba.it,11,0.241
+Backbone.js,11,0.241
+Redux Framework,11,0.241
+WOW,11,0.241
+AddToAny,11,0.241
+Howler.js,10,0.219
+hCaptcha,10,0.219
+Bunny,10,0.219
+Hydrogen,10,0.219
+Vite,10,0.219
+MonsterInsights,10,0.219
+Twitter,10,0.219
+BootstrapCDN,10,0.219
+WooCommerce Multilingual,10,0.219
+Pingdom RUM,10,0.219
+Klarna Checkout,9,0.197
+Platform.sh,9,0.197
+Calendly,9,0.197
+Caddy,9,0.197
+HubSpot,9,0.197
+Sucuri,9,0.197
+Google Web Server,9,0.197
+Gravatar,9,0.197
+Bluehost,8,0.175
+AB Tasty,8,0.175
+EWWW Image Optimizer,8,0.175
+CentOS,8,0.175
+PayPal,8,0.175
+TrustArc,8,0.175
+TYPO3 CMS,8,0.175
+Clicky,8,0.175
+ShareThis,8,0.175
+Chart.js,8,0.175
+MailChimp for WordPress,8,0.175
+Pinterest,8,0.175
+Google AdSense,8,0.175
+UNIX,8,0.175
+Snowplow Analytics,7,0.153
+MailChimp for WooCommerce,7,0.153
+Rebuy,7,0.153
+Moment.js,7,0.153
+MariaDB,7,0.153
+Pantheon,7,0.153
+Sanity,7,0.153
+Sanity.io,7,0.153
+SVG Support,7,0.153
+Draftpress HFCM,7,0.153
+Plausible,7,0.153
+Google PageSpeed,7,0.153
+MODX,7,0.153
+Symfony,7,0.153
+Trustpilot,7,0.153
+HubSpot CMS Hub,7,0.153
+GoDaddy Website Builder,7,0.153
+The SEO Framework,7,0.153
+Max Mega Menu,7,0.153
+Divi,7,0.153
+Handlebars,7,0.153
+Adobe Portfolio,7,0.153
+CodeIgniter,7,0.153
+jPlayer,7,0.153
+Google Sign-in,7,0.153
+Google Cloud Storage,6,0.132
+Cloudways,6,0.132
+Infinite Scroll,6,0.132
+CreateJS,6,0.132
+Hammer.js,6,0.132
+Mixitup,6,0.132
+PixelYourSite,6,0.132
+Endurance Page Cache,6,0.132
+Apache Tomcat,6,0.132
+Elfsight,6,0.132
+Sentry,6,0.132
+Flywheel,6,0.132
+Performance Lab,6,0.132
+Snap.svg,6,0.132
+Hugo,6,0.132
+BugSnag,6,0.132
+Easy Pie Chart,6,0.132
+AddThis,6,0.132
+Cufon,6,0.132
+p5.js,5,0.11
+Google Publisher Tag,5,0.11
+Hostinger CDN,5,0.11
+ProcessWire,5,0.11
+Sitecore,5,0.11
+theTradeDesk,5,0.11
+Packery,5,0.11
+GenerateBlocks,5,0.11
+GeneratePress,5,0.11
+GeneratePress GP Premium,5,0.11
+UserWay,5,0.11
+Attentive,5,0.11
+Typed.js,5,0.11
+Tilda,5,0.11
+Campaign Monitor,5,0.11
+bxSlider,5,0.11
+Paper.js,5,0.11
+BugHerd,5,0.11
+Livewire,5,0.11
+Python,5,0.11
+Perfmatters,5,0.11
+WPMU DEV Smush,5,0.11
+waitForImages,5,0.11
+ExpressionEngine,5,0.11
+Chosen,5,0.11
+Zendesk,4,0.088
+Vercel Analytics,4,0.088
+UIKit,4,0.088
+FirstPromoter,4,0.088
+Intelligems,4,0.088
+Cookie Notice,4,0.088
+Google PageSpeed:on,4,0.088
+Algolia,4,0.088
+Clipboard.js,4,0.088
+Highlight.js,4,0.088
+Apple MapKit JS,4,0.088
+Facebook Pixel,4,0.088
+Statamic,4,0.088
+Instagram Feed for WordPress,4,0.088
+Material Design Lite,4,0.088
+Akismet,4,0.088
+particles.js,4,0.088
+Conditional Fields for Contact Form 7,4,0.088
+Essential Addons for Elementor,4,0.088
+BeTheme,4,0.088
+Django,4,0.088
+prettyPhoto,4,0.088
+Craft Commerce,4,0.088
+Zepto,4,0.088
+AddToAny Share Buttons,4,0.088
+Crazy Egg,4,0.088
+Raphael,4,0.088
+Headroom.js,4,0.088
+ContentViews,4,0.088
+MooTools,4,0.088
+StackPath,4,0.088
+Cookie Script,3,0.066
+Bricks,3,0.066
+Prototype,3,0.066
+Adobe Dynamic Media Classic,3,0.066
+Contentsquare,3,0.066
+Mapbox GL JS,3,0.066
+Autoptimize,3,0.066
+RawGit,3,0.066
+ProgressBar.js,3,0.066
+JetEngine,3,0.066
+Kameleoon,3,0.066
+PCI Proxy,3,0.066
+Tiny Slider,3,0.066
+Zoho,3,0.066
+Zoho PageSense,3,0.066
+Clutch,3,0.066
+Tally,3,0.066
+Yoast SEO for Shopify,3,0.066
+Getsitecontrol,3,0.066
+MailerLite,3,0.066
+Microsoft Advertising,3,0.066
+Roadiz CMS,3,0.066
+LazySizes unveilhooks plugin,3,0.066
+VWO,3,0.066
+Zipkin,3,0.066
+Ensighten,3,0.066
+Glider.js,3,0.066
+BuySellAds,3,0.066
+Bazaarvoice Reviews,3,0.066
+Silverstripe,3,0.066
+WordPress.com,3,0.066
+October CMS,3,0.066
+Black Crow,3,0.066
+Dynamic Conditions,3,0.066
+bowser,3,0.066
+Insider,3,0.066
+Statcounter,3,0.066
+Recharge,3,0.066
+HashThemes Total,3,0.066
+AWIN,3,0.066
+Kadence WP Kadence,3,0.066
+AngularJS,3,0.066
+SWFObject,3,0.066
+Rybbit,3,0.066
+Age Gate,3,0.066
+Stellar.js,3,0.066
+Siteimprove,3,0.066
+Download Monitor,3,0.066
+Genesis theme,3,0.066
+Yottaa,3,0.066
+jQuery Mobile,3,0.066
+Global-e,3,0.066
+Glide.js,2,0.044
+Swup,2,0.044
+Wistia,2,0.044
+Kirby,2,0.044
+Optibase,2,0.044
+Umami,2,0.044
+Htmx,2,0.044
+Sendinblue,2,0.044
+Storyblok,2,0.044
+Typeform,2,0.044
+Moxie,2,0.044
+Plupload,2,0.044
+RxJS,2,0.044
+Tengine,2,0.044
+Simple Analytics,2,0.044
+html2canvas,2,0.044
+DDoS-Guard,2,0.044
+Acquia Cloud Platform:next,2,0.044
+DatoCMS,2,0.044
+Lever,2,0.044
+IBM Carbon Design System,2,0.044
+Google Analytics Enhanced eCommerce,2,0.044
+PrestaShop,2,0.044
+jQuery-pjax,2,0.044
+SmtpJS,2,0.044
+mobile-detect.js,2,0.044
+scrollreveal,2,0.044
+Vercel Speed Insights,2,0.044
+Jetpack,2,0.044
+Axios,2,0.044
+SimplexNoise.js,2,0.044
+Tolstoy,2,0.044
+IP2Location.io,2,0.044
+Intersection Observer,2,0.044
+fullPage.js,2,0.044
+Tidio,2,0.044
+Snipcart,2,0.044
+Elementor Addon Elements,2,0.044
+Linkedin Sign-in,2,0.044
+NitroPack,2,0.044
+MindBody,2,0.044
+Twitter Ads,2,0.044
+Azure Edge Network,2,0.044
+Instant.Page,2,0.044
+OneSignal,2,0.044
+Email Encoder for Wordpress,2,0.044
+Tippy.js,2,0.044
+Shopware,2,0.044
+Beaver Builder,2,0.044
+Nette Framework,2,0.044
+Jimdo,2,0.044
+Appsflyer,2,0.044
+MoEngage,2,0.044
+Trusted Shops,2,0.044
+bun,2,0.044
+CIVIC,2,0.044
+Cookie Control,2,0.044
+Google Ads,2,0.044
+Google Ads Conversion Tracking,2,0.044
+Mediavine,2,0.044
+iGoDigital,2,0.044
+Taboola,2,0.044
+Mustache,2,0.044
+Arkose Labs,2,0.044
+Plaid,2,0.044
+Metorik,2,0.044
+AFThemes CoverNews,2,0.044
+Choices,2,0.044
+Smart Slider 3,2,0.044
+Supersized,2,0.044
+Blocksy,2,0.044
+MyFonts,2,0.044
+Kadence WP Blocks,2,0.044
+Modern Image Formats,2,0.044
+spin.js,2,0.044
+Apache Traffic Server,2,0.044
+FlyingPress,2,0.044
+Microsoft Power BI,2,0.044
+OptinMonster,2,0.044
+OptinMonster plugin,2,0.044
+AnythingSlider,2,0.044
+JW Player,2,0.044
+Optimizely Content Management,2,0.044
+Spectra,2,0.044
+YUI,2,0.044
+Mint,2,0.044
+Contao,2,0.044
+Stamped,2,0.044
+Themeansar Newsup,2,0.044
+Unbounce,2,0.044
+sidr,2,0.044
+List.js,1,0.022
+Simpli.fi,1,0.022
+<model-viewer>,1,0.022
+The Hotels Network,1,0.022
+Segment,1,0.022
+Prism,1,0.022
+Moment Timezone,1,0.022
+WooCommerce Stripe Payment Gateway,1,0.022
+MemberStack,1,0.022
+Kliken,1,0.022
+Clickbank,1,0.022
+Rewardful,1,0.022
+GoatCounter,1,0.022
+WordPress VIP,1,0.022
+Cecil,1,0.022
+Lead Forensics,1,0.022
+Humblytics,1,0.022
+Cabin,1,0.022
+Morphext,1,0.022
+Wholesale Suite,1,0.022
+Alibaba Cloud Object Storage Service,1,0.022
+StoreRocket,1,0.022
+Sulu,1,0.022
+Twenty Twenty,1,0.022
+Web Font Loader,1,0.022
+Extend,1,0.022
+Custom Twitter Feeds,1,0.022
+Matomo Analytics,1,0.022
+Mantis,1,0.022
+Kakao,1,0.022
+Jekyll,1,0.022
+RD Station,1,0.022
+1C-Bitrix,1,0.022
+Intellimize,1,0.022
+CoverManager,1,0.022
+Resy,1,0.022
+Inertia.js,1,0.022
+Finsweet,1,0.022
+CookieFirst,1,0.022
+Lovable,1,0.022
+6sense,1,0.022
+Quantum Metric,1,0.022
+Neos CMS,1,0.022
+Neos Flow,1,0.022
+Mars Flag,1,0.022
+Engintron,1,0.022
+Afterpay,1,0.022
+Yotpo Loyalty & Referrals,1,0.022
+Naver Analytics,1,0.022
+AOS,1,0.022
+Junip,1,0.022
+Cart.js,1,0.022
+chroma.js,1,0.022
+Converge,1,0.022
+Gridsome,1,0.022
+Gumroad,1,0.022
+JUST,1,0.022
+Super Page Cache,1,0.022
+Bold Commerce,1,0.022
+Convert,1,0.022
+DataDome,1,0.022
+Candid Themes Fairy,1,0.022
+Variti,1,0.022
+CookieBAR,1,0.022
+Shuttle,1,0.022
+Cornerstone,1,0.022
+Enzuzo,1,0.022
+Cowboy,1,0.022
+Erlang,1,0.022
+Screenfull.js,1,0.022
+Returnflows,1,0.022
+Sirdata,1,0.022
+Beusable,1,0.022
+Decibel,1,0.022
+Optimise,1,0.022
+Qualtrics,1,0.022
+Sprinklr,1,0.022
+EveryAction,1,0.022
+Amplitude,1,0.022
+Zip,1,0.022
+Themify Builder,1,0.022
+A-Frame,1,0.022
+MaxMind,1,0.022
+Skio,1,0.022
+_hyperscript,1,0.022
+_hyperscript ,1,0.022
+Greenhouse,1,0.022
+Pagely,1,0.022
+UMI.CMS,1,0.022
+mod_ssl,1,0.022
+Kestrel,1,0.022
+Google Analytics for WooCommerce,1,0.022
+Wordfence Login Security,1,0.022
+Sauce Social Commerce,1,0.022
+Product Personalizer,1,0.022
+Ninja Forms,1,0.022
+BetterDocs,1,0.022
+BetterDocs plugin,1,0.022
+Oxygen,1,0.022
+TRUENDO,1,0.022
+Negate,1,0.022
+Schema App,1,0.022
+Enquire.js,1,0.022
+Twitter typeahead.js,1,0.022
+The Events Calendar,1,0.022
+Thelia,1,0.022
+Retina.js,1,0.022
+Criteo,1,0.022
+JSZip,1,0.022
+PyroCMS,1,0.022
+Adobe ColdFusion,1,0.022
+Nosto,1,0.022
+Solusquare OmniCommerce Cloud,1,0.022
+Ruffle,1,0.022
+Partial.ly,1,0.022
+Fly.io,1,0.022
+Signifyd,1,0.022
+ReCaptcha v2 for Contact Form 7,1,0.022
+Poptin,1,0.022
+Aklamio,1,0.022
+Ookla Speedtest Custom,1,0.022
+OpinionBar,1,0.022
+Acuity Scheduling,1,0.022
+Fortinet FortiGate,1,0.022
+GeeTest,1,0.022
+Leadfeeder,1,0.022
+dc.js,1,0.022
+WebNode,1,0.022
+Coveo,1,0.022
+Bento,1,0.022
+Carts Guru,1,0.022
+Ivory Search,1,0.022
+Commanders Act TagCommander,1,0.022
+Commanders Act TrustCommander,1,0.022
+SweetAlert2,1,0.022
+Colorlib Shapely,1,0.022
+D3,1,0.022
+Plotly,1,0.022
+Apple Sign-in,1,0.022
+Recurly,1,0.022
+Freshchat,1,0.022
+Splitbee,1,0.022
+MailOptin,1,0.022
+Foursixty,1,0.022
+Bluecore,1,0.022
+SocialLadder,1,0.022
+Skimlinks,1,0.022
+GOV.UK Frontend,1,0.022
+MDBootstrap,1,0.022
+SAP Commerce Cloud,1,0.022
+Magnolia CMS,1,0.022
+Addsearch,1,0.022
+Akamai Connected Cloud,1,0.022
+F5 Distributed Cloud Services,1,0.022
+Phusion Passenger,1,0.022
+Rokt,1,0.022
+Qualified,1,0.022
+Lucky Orange,1,0.022
+Warmly,1,0.022
+RackCache,1,0.022
+X-Clacks-Overhead,1,0.022
+Varify,1,0.022
+crypto-js,1,0.022
+Hyva Themes,1,0.022
+Tailwind CSS,1,0.022
+Creativ.eMail,1,0.022
+Mapplic,1,0.022
+Weblication,1,0.022
+XSLT,1,0.022
+Crisp Live Chat,1,0.022
+PushPushGo,1,0.022
+libphonenumber,1,0.022
+Backstretch,1,0.022
+Cludo,1,0.022
+Jotform,1,0.022
+Zendesk Chat,1,0.022
+Enhanced Responsive Images,1,0.022
+SpeedCurve,1,0.022
+SiteOrigin Page Builder,1,0.022
+Amazon ELB,1,0.022
+DoubleClick for Publishers (DFP),1,0.022
+Highcharts,1,0.022
+Fast Simon,1,0.022
+Webyn,1,0.022
+Enable,1,0.022
+Optimizely Commerce,1,0.022
+AdOpt,1,0.022
+History,1,0.022
+Ramda,1,0.022
+Svelte,1,0.022
+Gutenberg,1,0.022
+Sailthru,1,0.022
+WPForms,1,0.022
+Loloyal,1,0.022
+Alibaba Cloud CDN,1,0.022
+Agility CMS,1,0.022
+Big Cartel,1,0.022
+Tagembed,1,0.022
+All in One SEO:pro 4.4.1,1,0.022
+HeadJS,1,0.022
+Debian:lenny,1,0.022
+Imagely NextGEN Gallery,1,0.022
+NextGEN Gallery,1,0.022
+MetaSlider,1,0.022
+Dynatrace,1,0.022
+Dynatrace RUM,1,0.022
+Smash Balloon Instagram Feed,1,0.022
+Slimbox 2,1,0.022
+Twenty Sixteen,1,0.022
+EmbedPress,1,0.022
+wpCache,1,0.022
+Render,1,0.022
+Tablesorter,1,0.022
+Chatway,1,0.022
+Adimo,1,0.022
+Juicer,1,0.022
+Blogger,1,0.022
+OpenGSE,1,0.022
+Spektrix,1,0.022
+Collective Audience,1,0.022
+Integral Ad Science,1,0.022
+Parsley.js,1,0.022
+Flockler,1,0.022
+mod_jk,1,0.022
+eBay Partner Network,1,0.022
+Commerce7,1,0.022
+ActiveCampaign,1,0.022
+Twenty Twenty-One,1,0.022
+Carbon Ads,1,0.022
+HTTP/2,1,0.022
+Java Servlet,1,0.022
+JavaServer Pages,1,0.022
+Perl,1,0.022
+mod_perl,1,0.022
+Joomla,1,0.022
+WP Fastest Cache,1,0.022
+ElasticPress,1,0.022
+Elasticsearch,1,0.022

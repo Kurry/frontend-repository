@@ -8,6 +8,7 @@ on:
 permissions:
   contents: read
   issues: write
+  pull-requests: write
 
 concurrency:
   group: playwright-${{ github.event.pull_request.number }}
@@ -53,6 +54,7 @@ jobs:
           node-version: "22"
 
       - name: Install dependencies
+        id: install
         run: |
           if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
@@ -64,22 +66,28 @@ jobs:
           restore-keys: playwright-${{ runner.os }}-
 
       - name: Install Playwright browsers
+        id: browsers
         run: npx playwright install --with-deps chromium
 
       - name: Build
+        id: build
         run: |
           if npm run | grep -q "verify:build"; then npm run verify:build; fi
 
       - name: Start app
+        id: start
         run: |
           (npm run start &> /tmp/serve.log &)
           npx --yes wait-on@8 http://localhost:3000 --timeout 90000 || { cat /tmp/serve.log; exit 1; }
 
       - name: Run Playwright suites
+        id: suites
         env:
+          RESULT_PATH: ${{ runner.temp }}/playwright-status-${{ matrix.slug }}.json
           TASK_SLUG: ${{ matrix.slug }}
         run: |
           node --input-type=module <<'NODE'
+          import fs from 'node:fs';
           import path from 'node:path';
           import { pathToFileURL } from 'node:url';
 
@@ -93,6 +101,10 @@ jobs:
             appDir: process.cwd(),
             runtimeDir: process.env.RUNNER_TEMP,
           });
+          fs.writeFileSync(
+            process.env.RESULT_PATH,
+            `${JSON.stringify({ slug: process.env.TASK_SLUG, ...result })}\n`,
+          );
 
           if (result.status === 'skip') {
             console.log(`::notice::${process.env.TASK_SLUG} has no Playwright suites yet — coverage arrives progressively`);
@@ -105,6 +117,51 @@ jobs:
           }
           NODE
 
+      - name: Record workflow failure
+        if: always()
+        env:
+          BROWSERS_OUTCOME: ${{ steps.browsers.outcome }}
+          BUILD_OUTCOME: ${{ steps.build.outcome }}
+          INSTALL_OUTCOME: ${{ steps.install.outcome }}
+          RESULT_PATH: ${{ runner.temp }}/playwright-status-${{ matrix.slug }}.json
+          START_OUTCOME: ${{ steps.start.outcome }}
+          SUITES_OUTCOME: ${{ steps.suites.outcome }}
+          TASK_SLUG: ${{ matrix.slug }}
+        working-directory: ${{ github.workspace }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+
+          if (!fs.existsSync(process.env.RESULT_PATH)) {
+            const steps = [
+              ['Install dependencies', process.env.INSTALL_OUTCOME],
+              ['Install Playwright browsers', process.env.BROWSERS_OUTCOME],
+              ['Build', process.env.BUILD_OUTCOME],
+              ['Start app', process.env.START_OUTCOME],
+              ['Run Playwright suites', process.env.SUITES_OUTCOME],
+            ];
+            const failed = steps.find(([, outcome]) =>
+              outcome === 'failure' || outcome === 'cancelled'
+            );
+            const message = failed
+              ? `${failed[0]} ended with status ${failed[1]}`
+              : 'workflow did not produce a Playwright result';
+            fs.writeFileSync(
+              process.env.RESULT_PATH,
+              `${JSON.stringify({ slug: process.env.TASK_SLUG, status: 'fail', message })}\n`,
+            );
+          }
+          NODE
+
+      - name: Upload task status
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-status-${{ matrix.slug }}
+          path: ${{ runner.temp }}/playwright-status-${{ matrix.slug }}.json
+          retention-days: 14
+          if-no-files-found: error
+
       - name: Upload report
         if: always()
         uses: actions/upload-artifact@v4
@@ -115,3 +172,119 @@ jobs:
             tasks/${{ matrix.slug }}/solution/app/test-results/
           retention-days: 14
           if-no-files-found: ignore
+
+  report:
+    needs: [detect, playwright]
+    if: always() && needs.detect.result == 'success' && needs.detect.outputs.slugs != '[]'
+    permissions:
+      actions: read
+      contents: read
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download task statuses
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          pattern: playwright-status-*
+          path: ${{ runner.temp }}/playwright-statuses
+          merge-multiple: true
+
+      - name: Build PR status comment
+        env:
+          EXPECTED_SLUGS: ${{ needs.detect.outputs.slugs }}
+          REPORT_MD: ${{ runner.temp }}/playwright-comment.md
+          STATUS_DIR: ${{ runner.temp }}/playwright-statuses
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          expected = json.loads(os.environ["EXPECTED_SLUGS"])
+          results = {}
+          for path in Path(os.environ["STATUS_DIR"]).glob("*.json"):
+              result = json.loads(path.read_text())
+              results[result["slug"]] = result
+
+          def table_text(value):
+              text = str(value or "").replace("|", "\\|").replace("\n", "<br>")
+              return text if len(text) <= 700 else f"{text[:699]}…"
+
+          labels = {
+              "pass": "✅ Passed",
+              "fail": "❌ Failed",
+              "skip": "⚪ Skipped",
+              "missing": "❓ Missing",
+          }
+          rows = []
+          totals = {"pass": 0, "fail": 0, "skip": 0, "missing": 0}
+          for slug in expected:
+              result = results.get(slug)
+              if result is None:
+                  status = "missing"
+                  detail = "No status artifact was uploaded"
+              else:
+                  status = result.get("status", "missing")
+                  if status not in totals:
+                      status = "missing"
+                  if status == "pass":
+                      detail = result.get("detail") or (
+                          f"passed={result.get('passed', 0)} failed={result.get('failed', 0)} "
+                          f"skipped={result.get('skipped', 0)} flaky={result.get('flaky', 0)}"
+                      )
+                      if result.get("warning"):
+                          detail += f"; warning: {result['warning']}"
+                  elif status == "skip":
+                      detail = "No canonical or task-owned Playwright suite discovered"
+                  else:
+                      detail = result.get("message", "No failure detail reported")
+              totals[status] = totals.get(status, 0) + 1
+              rows.append(
+                  f"| `{table_text(slug)}` | {labels.get(status, labels['missing'])} | {table_text(detail)} |"
+              )
+
+          run_url = (
+              f"{os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}"
+              f"/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+          )
+          marker = "<!-- playwright-task-status -->"
+          summary = (
+              f"{totals['pass']} passed · {totals['fail']} failed · "
+              f"{totals['skip']} skipped · {totals['missing']} missing"
+          )
+          lines = [
+              marker,
+              "### Playwright task status",
+              "",
+              summary,
+              "",
+              "| Changed task | Status | Details |",
+              "| --- | --- | --- |",
+              *rows,
+              "",
+              f"[Actions run]({run_url})",
+          ]
+          Path(os.environ["REPORT_MD"]).write_text("\n".join(lines) + "\n")
+          PY
+
+      - name: Post or update PR status comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPORT_MD: ${{ runner.temp }}/playwright-comment.md
+        run: |
+          set -euo pipefail
+          marker='<!-- playwright-task-status -->'
+          comment_id="$(
+            gh api --paginate "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" \
+              --jq ".[] | select(.user.login == \"github-actions[bot]\" and (.body | startswith(\"$marker\"))) | .id" |
+              head -n 1
+          )"
+          payload="$(jq -n --rawfile body "$REPORT_MD" '{body: $body}')"
+          if [[ -n "$comment_id" ]]; then
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$comment_id" --input - <<<"$payload"
+          else
+            gh api --method POST "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --input - <<<"$payload"
+          fi

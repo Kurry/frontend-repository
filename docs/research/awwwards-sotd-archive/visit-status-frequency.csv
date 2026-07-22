@@ -1,0 +1,13 @@
+status,site_count,percent_of_archive_sites
+live_html,4562,73.616
+dns_error,613,9.892
+not_found,229,3.695
+access_blocked,213,3.437
+timeout,213,3.437
+network_error,113,1.823
+tls_error,103,1.662
+server_error,74,1.194
+parked,44,0.71
+http_error,22,0.355
+redirect_error,9,0.145
+non_html,2,0.032
