@@ -596,6 +596,259 @@ def test_oracle_workflow_delegates_e2e_to_playwright() -> None:
     assert "delegated to Playwright Tests workflow" in runtime
 
 
+_ALL_REPORT_HELPER = (
+    Path(__file__).parents[1]
+    / "src/corpuscheck/assets/oracle_ci_all_report.mjs"
+)
+
+
+def run_all_report_helper(body: str) -> dict:
+    script = f"""
+      import {{ createAppResult, aggregateAppResults, renderMarkdownReport }}
+        from {json.dumps(_ALL_REPORT_HELPER.as_uri())};
+      {body}
+    """
+    result = subprocess.run(
+        ["node", "--input-type=module", "--eval", script],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return json.loads(result.stdout.strip().splitlines()[-1])
+
+
+def test_manual_playwright_workflow_covers_and_reports_the_full_corpus() -> None:
+    workflow = (
+        Path(__file__).parents[3] / ".github/workflows/playwright-all.yml"
+    ).read_text()
+
+    assert "on:\n  workflow_dispatch:" in workflow
+    assert "pull_request:" not in workflow
+    assert "push:" not in workflow
+    assert "contents: read" in workflow
+    assert "tasks-quarantine" not in workflow
+    assert "solution/app/package.json" in workflow
+    assert "fromJson(needs.discover.outputs.slugs)" in workflow
+    assert "fail-fast: false" in workflow
+    assert "max-parallel: 10" in workflow
+    assert "runE2eSuite" in workflow
+    assert "oracle_ci_e2e.mjs" in workflow
+    assert "taskDir: path.join(" in workflow
+    assert "process.env.TASK_SLUG" in workflow
+    assert "aggregateAppResults" in workflow
+    assert "oracle_ci_all_report.mjs" in workflow
+    assert "artifactError:" in workflow
+    assert "if: ${{ always() }}" in workflow
+    assert "steps.aggregate.outputs.failed == 'true'" in workflow
+    assert "retention-days: 14" in workflow
+
+
+def test_full_corpus_app_result_normalizes_setup_build_and_start_failures() -> None:
+    payload = run_all_report_helper(
+        """
+        const cases = [
+          {
+            expected: 'setup',
+            steps: { checkout: 'success', node: 'failure' },
+          },
+          {
+            expected: 'build',
+            steps: {
+              checkout: 'success', node: 'success', dependencies: 'success',
+              browser: 'success', build: 'failure',
+            },
+          },
+          {
+            expected: 'start',
+            steps: {
+              checkout: 'success', node: 'success', dependencies: 'success',
+              browser: 'success', build: 'success', start: 'failure',
+            },
+          },
+        ];
+        console.log(JSON.stringify(cases.map(({ expected, steps }) => ({
+          expected,
+          result: createAppResult({ slug: 'frontend-fixture', stepOutcomes: steps }),
+        }))));
+        """
+    )
+
+    for case in payload:
+        assert case["result"]["status"] == "fail"
+        assert case["result"]["phase"] == case["expected"]
+        assert case["result"]["diagnostics"]
+
+
+def test_full_corpus_app_result_preserves_playwright_failure_details() -> None:
+    payload = run_all_report_helper(
+        """
+        const result = createAppResult({
+          slug: 'frontend-fixture',
+          stepOutcomes: {
+            checkout: 'success', node: 'success', dependencies: 'success',
+            browser: 'success', build: 'success', start: 'success', tests: 'failure',
+          },
+          suiteResult: {
+            status: 'fail', passed: 4, failed: 1, skipped: 2, flaky: 0,
+            taskSpecificTests: 5, rubricMatchedTests: 4, rubricCriteria: 20,
+            failingTests: ['core features > saves an item'],
+            message: 'e2e suite failed',
+          },
+        });
+        console.log(JSON.stringify(result));
+        """
+    )
+
+    assert payload["status"] == "fail"
+    assert payload["phase"] == "test"
+    assert payload["passed"] == 4
+    assert payload["failed"] == 1
+    assert payload["skipped"] == 2
+    assert payload["taskSpecificTests"] == 5
+    assert payload["rubricMatchedTests"] == 4
+    assert payload["rubricCriteria"] == 20
+    assert payload["failingTests"] == ["core features > saves an item"]
+    assert payload["diagnostics"] == "e2e suite failed"
+
+
+def test_full_corpus_aggregate_passes_when_every_app_passes() -> None:
+    payload = run_all_report_helper(
+        """
+        const report = aggregateAppResults({
+          expectedSlugs: ['frontend-a', 'frontend-b'],
+          results: [
+            {
+              schemaVersion: 1, slug: 'frontend-a', status: 'pass', phase: 'complete',
+              passed: 3, failed: 0, skipped: 0, flaky: 0,
+              taskSpecificTests: 3, rubricMatchedTests: 3, rubricCriteria: 10,
+              failingTests: [], diagnostics: '',
+            },
+            {
+              schemaVersion: 1, slug: 'frontend-b', status: 'pass', phase: 'complete',
+              passed: 5, failed: 0, skipped: 1, flaky: 0,
+              taskSpecificTests: 5, rubricMatchedTests: 4, rubricCriteria: 12,
+              failingTests: [], diagnostics: '',
+            },
+          ],
+        });
+        console.log(JSON.stringify({ report, markdown: renderMarkdownReport(report) }));
+        """
+    )
+
+    assert payload["report"]["failed"] is False
+    assert payload["report"]["summary"] == {
+        "expectedApps": 2,
+        "reportedApps": 2,
+        "passedApps": 2,
+        "failedApps": 0,
+        "skippedApps": 0,
+        "missingApps": 0,
+        "passedTests": 8,
+        "failedTests": 0,
+        "skippedTests": 1,
+        "flakyTests": 0,
+        "taskSpecificTests": 8,
+        "rubricMatchedTests": 7,
+        "rubricCriteria": 22,
+    }
+    assert "**PASSED**" in payload["markdown"]
+    assert "Task coverage: 8 task-specific tests, 7 rubric-matched across 22 criteria" in payload["markdown"]
+    assert "`frontend-a`" in payload["markdown"]
+
+
+def test_full_corpus_aggregate_fails_on_test_failure_and_missing_result() -> None:
+    payload = run_all_report_helper(
+        """
+        const report = aggregateAppResults({
+          expectedSlugs: ['frontend-a', 'frontend-b', 'frontend-c'],
+          results: [
+            {
+              schemaVersion: 1, slug: 'frontend-a', status: 'pass', phase: 'complete',
+              passed: 3, failed: 0, skipped: 0, flaky: 0,
+              taskSpecificTests: 3, rubricMatchedTests: 2, rubricCriteria: 10,
+              failingTests: [], diagnostics: '',
+            },
+            {
+              schemaVersion: 1, slug: 'frontend-b', status: 'fail', phase: 'test',
+              passed: 2, failed: 1, skipped: 0, flaky: 0,
+              taskSpecificTests: 2, rubricMatchedTests: 1, rubricCriteria: 11,
+              failingTests: ['saves an item'], diagnostics: 'e2e suite failed',
+            },
+          ],
+          matrixOutcome: 'failure',
+        });
+        console.log(JSON.stringify({ report, markdown: renderMarkdownReport(report) }));
+        """
+    )
+
+    report = payload["report"]
+    assert report["failed"] is True
+    assert report["summary"]["expectedApps"] == 3
+    assert report["summary"]["reportedApps"] == 2
+    assert report["summary"]["failedApps"] == 2
+    assert report["summary"]["missingApps"] == 1
+    assert report["summary"]["failedTests"] == 1
+    missing = next(row for row in report["results"] if row["slug"] == "frontend-c")
+    assert missing["missing"] is True
+    assert "No per-app result artifact" in missing["diagnostics"]
+    assert "**FAILED**" in payload["markdown"]
+    assert "Failing tests: saves an item" in payload["markdown"]
+
+
+def test_full_corpus_aggregate_fails_when_an_app_has_no_playwright_suite() -> None:
+    payload = run_all_report_helper(
+        """
+        const report = aggregateAppResults({
+          expectedSlugs: ['frontend-a'],
+          results: [{
+            schemaVersion: 1, slug: 'frontend-a', status: 'skip', phase: 'test',
+            passed: 0, failed: 0, skipped: 0, flaky: 0,
+            taskSpecificTests: 0, rubricMatchedTests: 0, rubricCriteria: 10,
+            failingTests: [], diagnostics: 'No Playwright suite was discovered',
+          }],
+        });
+        console.log(JSON.stringify({ report, markdown: renderMarkdownReport(report) }));
+        """
+    )
+
+    assert payload["report"]["failed"] is True
+    assert payload["report"]["summary"]["skippedApps"] == 1
+    assert "**FAILED**" in payload["markdown"]
+
+
+def test_full_corpus_aggregate_rejects_invalid_duplicate_and_unexpected_results() -> None:
+    payload = run_all_report_helper(
+        """
+        const valid = (slug) => ({
+          schemaVersion: 1, slug, status: 'pass', phase: 'complete',
+          passed: 4, failed: 0, skipped: 0, flaky: 0,
+          taskSpecificTests: 1, rubricMatchedTests: 1, rubricCriteria: 10,
+          failingTests: [], diagnostics: '',
+        });
+        const report = aggregateAppResults({
+          expectedSlugs: ['frontend-a', 'frontend-b'],
+          results: [
+            valid('frontend-a'),
+            valid('frontend-a'),
+            { ...valid('frontend-b'), schemaVersion: 2 },
+            valid('frontend-unexpected'),
+            { status: 'pass' },
+            { artifactError: 'Could not parse broken/app-result.json: bad JSON' },
+          ],
+        });
+        console.log(JSON.stringify(report));
+        """
+    )
+
+    assert payload["failed"] is True
+    diagnostics = [row["diagnostics"] for row in payload["results"]]
+    assert any("invalid schemaVersion" in value for value in diagnostics)
+    assert any("Multiple result records" in value for value in diagnostics)
+    assert any("not present in the discovered app matrix" in value for value in diagnostics)
+    assert any("no non-empty slug" in value for value in diagnostics)
+    assert any("Could not parse broken/app-result.json" in value for value in diagnostics)
+
+
 def test_task_directory_config_parallelizes_the_pinned_suite(tmp_path: Path) -> None:
     helper = (
         Path(__file__).parents[1]

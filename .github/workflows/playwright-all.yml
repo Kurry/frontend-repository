@@ -1,0 +1,315 @@
+name: Full corpus Playwright tests
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: playwright-all-solutions
+  cancel-in-progress: false
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      slugs: ${{ steps.matrix.outputs.slugs }}
+      count: ${{ steps.matrix.outputs.count }}
+    steps:
+      - id: checkout
+        uses: actions/checkout@v4
+
+      - name: Discover solution apps
+        id: matrix
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+
+          const slugs = fs.readdirSync('tasks', { withFileTypes: true })
+            .filter((entry) => entry.isDirectory() && /^frontend-[a-z0-9-]+$/.test(entry.name))
+            .map((entry) => entry.name)
+            .filter((slug) => fs.existsSync(path.join('tasks', slug, 'solution/app/package.json')))
+            .sort();
+
+          if (slugs.length === 0) {
+            throw new Error('No tasks/frontend-*/solution/app/package.json files were found');
+          }
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `slugs=${JSON.stringify(slugs)}\n`);
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `count=${slugs.length}\n`);
+          console.log(`Discovered ${slugs.length} solution apps`);
+          NODE
+
+  playwright:
+    name: Playwright (${{ matrix.slug }})
+    needs: discover
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        slug: ${{ fromJson(needs.discover.outputs.slugs) }}
+    defaults:
+      run:
+        working-directory: tasks/${{ matrix.slug }}/solution/app
+    steps:
+      - id: checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        id: node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: tasks/${{ matrix.slug }}/solution/app/package-lock.json
+
+      - name: Install dependencies
+        id: dependencies
+        if: ${{ steps.node.outcome == 'success' }}
+        run: npm ci
+
+      - name: Cache Playwright Chromium
+        if: ${{ steps.dependencies.outcome == 'success' }}
+        continue-on-error: true
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles(format('tasks/{0}/solution/app/package-lock.json', matrix.slug)) }}
+          restore-keys: playwright-${{ runner.os }}-
+
+      - name: Install Playwright Chromium
+        id: browser
+        if: ${{ steps.dependencies.outcome == 'success' }}
+        run: npx playwright install --with-deps chromium
+
+      - name: Build
+        id: build
+        if: ${{ steps.browser.outcome == 'success' }}
+        run: npm run verify:build
+
+      - name: Start app
+        id: start
+        if: ${{ steps.build.outcome == 'success' }}
+        env:
+          RESULT_DIR: ${{ runner.temp }}/playwright-results/${{ matrix.slug }}
+        run: |
+          mkdir -p "$RESULT_DIR"
+          npm run start > "$RESULT_DIR/server.log" 2>&1 &
+          echo "$!" > "$RESULT_DIR/server.pid"
+          npx --yes wait-on@8 http://127.0.0.1:3000 --timeout 90000 || {
+            cat "$RESULT_DIR/server.log"
+            exit 1
+          }
+
+      - name: Run Playwright suites
+        id: tests
+        if: ${{ steps.start.outcome == 'success' }}
+        env:
+          RESULT_DIR: ${{ runner.temp }}/playwright-results/${{ matrix.slug }}
+          TASK_SLUG: ${{ matrix.slug }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import { pathToFileURL } from 'node:url';
+
+          const helperPath = path.join(
+            process.env.GITHUB_WORKSPACE,
+            'packages/corpuscheck/src/corpuscheck/assets/oracle_ci_e2e.mjs',
+          );
+          const { runE2eSuite } = await import(pathToFileURL(helperPath));
+          fs.mkdirSync(process.env.RESULT_DIR, { recursive: true });
+          const result = await runE2eSuite({
+            slug: process.env.TASK_SLUG,
+            appDir: process.cwd(),
+            runtimeDir: process.env.RESULT_DIR,
+            taskDir: path.join(
+              process.env.GITHUB_WORKSPACE,
+              'tasks',
+              process.env.TASK_SLUG,
+            ),
+          });
+          fs.writeFileSync(
+            path.join(process.env.RESULT_DIR, 'suite-result.json'),
+            `${JSON.stringify(result, null, 2)}\n`,
+          );
+
+          if (result.status === 'skip') {
+            console.log(`::notice::${process.env.TASK_SLUG} has no Playwright suites`);
+          } else if (result.status === 'fail') {
+            console.error(`::error::${result.message}`);
+            process.exitCode = 1;
+          } else {
+            console.log(result.detail);
+            if (result.warning) console.log(`::warning::${result.warning}`);
+          }
+          NODE
+
+      - name: Write structured app result
+        if: ${{ always() && steps.checkout.outcome == 'success' }}
+        env:
+          RESULT_DIR: ${{ runner.temp }}/playwright-results/${{ matrix.slug }}
+          TASK_SLUG: ${{ matrix.slug }}
+          CHECKOUT_OUTCOME: ${{ steps.checkout.outcome }}
+          NODE_OUTCOME: ${{ steps.node.outcome }}
+          DEPENDENCIES_OUTCOME: ${{ steps.dependencies.outcome }}
+          BROWSER_OUTCOME: ${{ steps.browser.outcome }}
+          BUILD_OUTCOME: ${{ steps.build.outcome }}
+          START_OUTCOME: ${{ steps.start.outcome }}
+          TESTS_OUTCOME: ${{ steps.tests.outcome }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import { pathToFileURL } from 'node:url';
+
+          const helperPath = path.join(
+            process.env.GITHUB_WORKSPACE,
+            'packages/corpuscheck/src/corpuscheck/assets/oracle_ci_all_report.mjs',
+          );
+          const { createAppResult } = await import(pathToFileURL(helperPath));
+          fs.mkdirSync(process.env.RESULT_DIR, { recursive: true });
+          const suitePath = path.join(process.env.RESULT_DIR, 'suite-result.json');
+          const suiteResult = fs.existsSync(suitePath)
+            ? JSON.parse(fs.readFileSync(suitePath, 'utf8'))
+            : null;
+          const result = createAppResult({
+            slug: process.env.TASK_SLUG,
+            stepOutcomes: {
+              checkout: process.env.CHECKOUT_OUTCOME,
+              node: process.env.NODE_OUTCOME,
+              dependencies: process.env.DEPENDENCIES_OUTCOME,
+              browser: process.env.BROWSER_OUTCOME,
+              build: process.env.BUILD_OUTCOME,
+              start: process.env.START_OUTCOME,
+              tests: process.env.TESTS_OUTCOME,
+            },
+            suiteResult,
+          });
+          fs.writeFileSync(
+            path.join(process.env.RESULT_DIR, 'app-result.json'),
+            `${JSON.stringify(result, null, 2)}\n`,
+          );
+          console.log(`${result.slug}: ${result.status} (${result.phase})`);
+          NODE
+
+      - name: Collect Playwright output
+        if: ${{ always() && steps.checkout.outcome == 'success' }}
+        env:
+          RESULT_DIR: ${{ runner.temp }}/playwright-results/${{ matrix.slug }}
+        run: |
+          mkdir -p "$RESULT_DIR/app-output"
+          for output in playwright-report test-results; do
+            if [[ -d "$output" ]]; then
+              cp -R "$output" "$RESULT_DIR/app-output/"
+            fi
+          done
+
+      - name: Upload app result
+        if: ${{ always() && steps.checkout.outcome == 'success' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-result-${{ matrix.slug }}
+          path: ${{ runner.temp }}/playwright-results/
+          retention-days: 14
+          if-no-files-found: warn
+
+  report:
+    name: Full-corpus report
+    if: ${{ always() }}
+    needs: [discover, playwright]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download app results
+        id: download
+        continue-on-error: true
+        uses: actions/download-artifact@v5
+        with:
+          pattern: playwright-result-*
+          path: ${{ runner.temp }}/all-playwright-results
+          merge-multiple: true
+
+      - name: Build aggregate report
+        id: aggregate
+        env:
+          RESULTS_DIR: ${{ runner.temp }}/all-playwright-results
+          REPORT_DIR: ${{ runner.temp }}/playwright-all-report
+          EXPECTED_SLUGS: ${{ needs.discover.outputs.slugs || '[]' }}
+          DISCOVERY_OUTCOME: ${{ needs.discover.result }}
+          MATRIX_OUTCOME: ${{ needs.playwright.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          RUN_REF: ${{ github.ref }}
+          RUN_SHA: ${{ github.sha }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import { pathToFileURL } from 'node:url';
+
+          const helperPath = path.join(
+            process.env.GITHUB_WORKSPACE,
+            'packages/corpuscheck/src/corpuscheck/assets/oracle_ci_all_report.mjs',
+          );
+          const { aggregateAppResults, renderMarkdownReport } = await import(pathToFileURL(helperPath));
+
+          function findResultFiles(root) {
+            if (!fs.existsSync(root)) return [];
+            const files = [];
+            for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+              const candidate = path.join(root, entry.name);
+              if (entry.isDirectory()) files.push(...findResultFiles(candidate));
+              else if (entry.isFile() && entry.name === 'app-result.json') files.push(candidate);
+            }
+            return files;
+          }
+
+          const results = findResultFiles(process.env.RESULTS_DIR).map((file) => {
+            try {
+              return JSON.parse(fs.readFileSync(file, 'utf8'));
+            } catch (error) {
+              return {
+                artifactError:
+                  `Could not parse ${path.relative(process.env.RESULTS_DIR, file)}: ${error.message}`,
+              };
+            }
+          });
+          const report = aggregateAppResults({
+            expectedSlugs: JSON.parse(process.env.EXPECTED_SLUGS),
+            results,
+            discoveryOutcome: process.env.DISCOVERY_OUTCOME,
+            matrixOutcome: process.env.MATRIX_OUTCOME,
+            metadata: {
+              generatedAt: new Date().toISOString(),
+              ref: process.env.RUN_REF,
+              sha: process.env.RUN_SHA,
+              runUrl: process.env.RUN_URL,
+            },
+          });
+          const markdown = renderMarkdownReport(report);
+          fs.mkdirSync(process.env.REPORT_DIR, { recursive: true });
+          fs.writeFileSync(
+            path.join(process.env.REPORT_DIR, 'playwright-all-results.json'),
+            `${JSON.stringify(report, null, 2)}\n`,
+          );
+          fs.writeFileSync(path.join(process.env.REPORT_DIR, 'playwright-all-results.md'), markdown);
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, markdown);
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `failed=${report.failed}\n`);
+          NODE
+
+      - name: Upload aggregate report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-all-results
+          path: ${{ runner.temp }}/playwright-all-report/
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Fail when any app did not pass
+        if: ${{ steps.aggregate.outputs.failed == 'true' }}
+        run: exit 1
