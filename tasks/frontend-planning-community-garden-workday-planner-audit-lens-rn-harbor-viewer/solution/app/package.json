@@ -1,0 +1,31 @@
+{
+  "name": "workday-planner",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "vite preview",
+    "verify:build": "vite build",
+    "start+verify:build": "npm run verify:build && npm start"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "@zto/webmcp-contracts": "file:../../../../packages/webmcp-contracts",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.474.0",
+    "motion": "^12.0.0",
+    "qrious": "^4.0.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^2.6.0",
+    "tailwindcss": "^4.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.3",
+    "vite": "^6.4.3"
+  }
+}
