@@ -1,0 +1,142 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+[[criterion]]
+id = "AC-01-agenda-clock"
+name = "AC-01-agenda-clock"
+description = "Verifies that agenda blocks can be dragged/resized on the minute timeline, and logical clock controls correctly manage the meeting timeline."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AC-01-proposals"
+name = "AC-01-proposals"
+description = "Verifies proposals bind to exact evidence text and maintain a revision history on edits instead of replacing text."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AC-01-amendments"
+name = "AC-01-amendments"
+description = "Verifies that amendments branch deterministically and can be merged to create new proposal revisions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AC-01-quorum"
+name = "AC-01-quorum"
+description = "Verifies attendance append-only tracking correctly determines quorum status and blocks closing decisions when quorum fails."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AC-01-decisions"
+name = "AC-01-decisions"
+description = "Verifies that adopted decisions freeze all associated data and subsequent superseding creates new graph edges without rewriting history."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AC-01-actions"
+name = "AC-01-actions"
+description = "Verifies adopted decisions generate valid action items and superseding correctly flags dependencies for review."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AC-01-export"
+name = "AC-01-export"
+description = "Verifies the application exports canonical JSON, Markdown, CSV, ICS, and SVG artifacts matching the canonical ledger exactly."
+type = "binary"
+weight = 1.0
