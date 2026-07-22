@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-08"
+name = "alternate_input"
+description = "Alternate input produces identical state with visible focus and live feedback."
+type = "binary"
+weight = 1.0
