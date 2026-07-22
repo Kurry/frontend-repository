@@ -1,0 +1,11 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+
+[[criterion]]
+id = "AC-05"
+weight = 1.0
+title = "The end-to-end job is recoverable without reload."
+description = "Create, edit, mutate, undo, and complete one record. The end-to-end job is recoverable without reload."

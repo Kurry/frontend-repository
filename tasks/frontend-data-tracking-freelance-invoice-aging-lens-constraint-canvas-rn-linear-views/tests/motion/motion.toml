@@ -1,0 +1,11 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+
+[[criterion]]
+id = "AC-03"
+weight = 1.0
+title = "Motion connects the acted-on item to its new state and has a reduced-motion equivalent."
+description = "Drag a selected record across constraint lanes and resolve a conflict. Motion connects the acted-on item to its new state and has a reduced-motion equivalent."

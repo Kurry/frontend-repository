@@ -1,0 +1,11 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+
+[[criterion]]
+id = "AC-01"
+weight = 1.0
+title = "The constraint canvas mutation changes the primary record, linked view, and status together."
+description = "Drag a selected record across constraint lanes and resolve a conflict. The constraint canvas mutation changes the primary record, linked view, and status together."

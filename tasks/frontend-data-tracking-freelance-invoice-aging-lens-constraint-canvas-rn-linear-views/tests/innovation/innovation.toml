@@ -1,0 +1,17 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+
+[[criterion]]
+id = "AC-11"
+weight = 1.0
+title = "Linked views provide domain utility beyond CRUD."
+description = "Mutate a record and use the linked representation to make the next decision. Linked views provide domain utility beyond CRUD."
+
+[[criterion]]
+id = "innovation.catchall"
+weight = 1.0
+title = "Any additional unexpected innovation."
+description = "Reward features not covered by standard criteria but adding value, provide evidence."
