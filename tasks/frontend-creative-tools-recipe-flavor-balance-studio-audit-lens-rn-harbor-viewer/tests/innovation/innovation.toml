@@ -1,0 +1,29 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+
+[[criterion]]
+id = "AC-11"
+name = "linked_utility"
+description = "Linked views provide domain utility beyond CRUD."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "innovation.catchall"
+name = "catchall_innovation"
+description = "Any other observable domain innovation or evidence not covered by other criteria."
+type = "binary"
+weight = 0.0
