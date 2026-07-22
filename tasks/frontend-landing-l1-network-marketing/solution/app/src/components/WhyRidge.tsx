@@ -11,7 +11,7 @@ export default function WhyRidge() {
   return (
     <section className="why chapter min-h-screen py-24 relative z-20 bg-void" id="why" aria-label="Why">
       <div className="container mx-auto px-6 md:px-10 py-10 md:py-14 chapter-shell why-module surface-copy bg-surface notch-br-lg">
-        <h2 className="chapter-title sticky-title text-4xl md:text-5xl font-bold mb-16 tracking-tight">WHY RIDGE</h2>
+        <h2 className="chapter-title sticky-title text-4xl md:text-5xl font-bold mb-16 tracking-tight">Why Ridge</h2>
         <div className="why-pile space-y-8 md:space-y-0" id="whyPile">
           {pillars.map((pillar, i) => (
             <article

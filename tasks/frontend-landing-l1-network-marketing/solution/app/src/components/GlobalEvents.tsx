@@ -44,11 +44,10 @@ export default function GlobalEvents() {
       if (filter.category && e.category !== filter.category) return false;
       return true;
     }).sort((a, b) => {
-      const va = a[sort.by];
-      const vb = b[sort.by];
-      if (va < vb) return sort.direction === 'asc' ? -1 : 1;
-      if (va > vb) return sort.direction === 'asc' ? 1 : -1;
-      return 0;
+      const va = String(a[sort.by]).toLowerCase();
+      const vb = String(b[sort.by]).toLowerCase();
+      const comp = va.localeCompare(vb);
+      return sort.direction === 'asc' ? comp : -comp;
     });
   }, [events, filter, sort]);
 

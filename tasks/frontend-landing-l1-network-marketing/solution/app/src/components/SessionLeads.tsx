@@ -67,13 +67,15 @@ export default function SessionLeads() {
              >
                <Copy size={16} /> {copied ? 'Copied' : 'Copy leads JSON'}
              </button>
-             <button
+             <a
+               href={`data:application/json;charset=utf-8,${encodeURIComponent(getExportData())}`}
+               download="ridge-session-leads.json"
                aria-label="Download leads JSON"
-               className="btn btn-sm btn-primary notch-br gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-               onClick={handleDownload}
+               className="btn btn-sm btn-primary notch-br gap-2 flex items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+               onClick={() => announce('Downloaded ridge-session-leads.json.')}
              >
                <Download size={16} /> Download leads JSON
-             </button>
+             </a>
           </div>
         </div>
 
