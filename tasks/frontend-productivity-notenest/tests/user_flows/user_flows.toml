@@ -1,0 +1,224 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "6.1"
+name = "create_flow_updates_all_surfaces"
+description = "Create flow: submitting a valid New Note inside a selected folder increases that folder's list and badge by one, shows the note in All Notes, and includes its title in Nest JSON and Markdown vault export previews — without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.2"
+name = "invalid_create_shows_inline_validation"
+description = "Invalid create: a blank, whitespace-only, or over-200-character title shows an inline error naming the title field and adds no note to any list, badge, or export preview."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.3"
+name = "edit_flow_updates_related_displays"
+description = "Edit flow: renaming a note, changing its color, or toggling pin updates the same record in All Notes, its folder list, Pinned section when applicable, search results, and Nest JSON without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.4"
+name = "delete_flow_updates_all_surfaces"
+description = "Delete flow: deleting a note removes it from its folder list, decreases that folder's badge by one, adds exactly one Trash entry, and moves it from Nest JSON notes into trash."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.5"
+name = "view_switch_retains_state"
+description = "View switch: moving between All Notes, a folder, Trash, and Export Nest retains pin/color/selection state without a full page reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.6"
+name = "last_delete_reveals_empty_state"
+description = "After moving the last active note to Trash (or emptying a folder), that region shows its styled empty-state message rather than a blank pane."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.7"
+name = "search_filters_update_lists"
+description = "Search filters notes by title or body across folders; each result shows a folder-path breadcrumb; clearing the box restores the full list everywhere it was narrowed."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.8"
+name = "collapsible_chrome_preserves_workflow"
+description = "At narrow width the Folders button hides and reopens the folder panel with workflow continuity; note selection and editor content remain."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.9"
+name = "overlays_support_expected_flows"
+description = "Folder-delete, Empty Trash, Batch Trash, Export Nest, Import Nest, and command-palette overlays support confirm/cancel or Escape close and return focus without trapping the user."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.10"
+name = "export_import_flow_without_reload"
+description = "Artifact flow: after mutating the workspace, Export Nest Nest JSON preview reflects mutations; Import Nest of that JSON reconstructs the same visible tree, notes, pins, and colors without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "batch_trash_undo_flow"
+description = "Batch Trash of two selected notes then Session Undo restores both notes, prior badges, and Nest JSON membership without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "command_palette_selects_note"
+description = "Command palette flow: Ctrl+K / Cmd+K opens the palette, choosing a matched note title selects that note in the editor, and Escape closes the palette."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "move_note_updates_both_badges_and_folder_id"
+description = "Move a note through its Move to Folder dropdown from one folder to another; the source direct-note badge decreases by one, the destination badge increases by one, the destination view shows the note, All Notes keeps it visible throughout, and Nest JSON updates that note's folderId"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "pin_and_unpin_echo_across_all_notes_and_folder"
+description = "Pin a note in All Notes and confirm it appears in the Pinned section there and in its home-folder view; unpin it from the folder view and confirm it leaves the Pinned section in All Notes while the note itself remains, with Nest JSON pinned false"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "delete_restore_round_trip_updates_badge_and_export_arrays"
+description = "Delete a note from a folder, confirm its folder badge decreases by one and Trash gains exactly one entry, then Restore it; the note returns to its prior folder, the badge returns to its prior count, and Nest JSON moves the record from trash back to notes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "color_label_edge_bar_matches_every_view"
+description = "Assign a color label to a note and confirm the same colored left-edge bar appears on its folder row, All Notes row, Pinned row when pinned, and matching search result without a reload; Nest JSON records the same color enum"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.17"
+name = "artifact_pipeline_exposes_folder_pin_color_and_round_trip"
+description = "Create a folder and a distinctively titled note inside it, pin the note, set color blue, and open Export Nest; Nest JSON shows schemaVersion notenest-v1 plus that folder and note with pinned true and color blue, Markdown vault shows the title under the folder path, Copy confirms, and downloading then importing that Nest JSON reconstructs the same tree, note, pin, color, and previews"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.18"
+name = "reload_returns_complete_seeded_workspace_baseline"
+description = "After workspace, Trash, selection, and history mutations, a full page reload restores the first-paint seed-only folders and notes, seed-only Trash, empty Undo/Redo, no multi-selection, All Notes selected, and export previews matching that baseline with no partially surviving facet"
+type = "binary"
+weight = 1.0
+
