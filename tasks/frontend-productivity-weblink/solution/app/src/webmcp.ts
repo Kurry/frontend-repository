@@ -21,6 +21,8 @@ interface ToolDescriptor {
   module: string;
   operation: string;
   parameters: Record<string, { type: string; description: string; required?: boolean }>;
+  annotations?: { readOnlyHint?: boolean };
+  inputSchema?: Record<string, unknown>;
 }
 
 const TOOLS: ToolDescriptor[] = [
@@ -107,6 +109,7 @@ const TOOLS: ToolDescriptor[] = [
     module: "artifact-transfer-v1",
     operation: "copy",
     parameters: {},
+    annotations: { readOnlyHint: true },
   }
 ];
 
@@ -114,6 +117,7 @@ function sessionInfo() {
   return {
     contract_version: "zto-webmcp-v1",
     app: "weblink-shell",
+    modules: ["form-workflow-v1", "entity-collection-v1", "command-session-v1", "artifact-transfer-v1"],
     session: {
       client_id: state.identity.clientId,
       name: state.identity.name,
@@ -124,7 +128,12 @@ function sessionInfo() {
 }
 
 function listTools() {
-  return TOOLS;
+  return TOOLS.map((tool) => ({
+    ...tool,
+    inputSchema: tool.name === "artifact_export"
+      ? { type: "object", properties: { format: { type: "string", enum: ["session-json", "transcript-markdown"] } }, required: ["format"] }
+      : { type: "object", properties: {} },
+  }));
 }
 
 function invokeTool(name: string, args: Record<string, unknown> = {}) {
