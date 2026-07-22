@@ -1,0 +1,25 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+command = "node"
+args = ["/opt/webmcp/webmcp_stdio_server.mjs"]
+env = { DEBUG = "webmcp*" }
+
+[[criterion]]
+id = "AC-11-01"
+description = "Move one prerequisite -> timeline, load curve, downstream blocks, graph, deadlines, velocity, comparison, history, and artifact coordinate."
+evaluator = "web-playwright-vision"
+weight = 1.0
+
+[[criterion]]
+id = "innovation.catchall"
+description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user. If present, name the enhancement and cite the concrete evidence."
+evaluator = "web-playwright-vision"
+weight = 1.0

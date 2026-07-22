@@ -1,0 +1,19 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+command = "node"
+args = ["/opt/webmcp/webmcp_stdio_server.mjs"]
+env = { DEBUG = "webmcp*" }
+
+[[criterion]]
+id = "AC-06-01"
+description = "Try overlap, appointment, short split, fourth chunk, non-splittable mismatch, dependency/deadline boundary, locked propagation, invalid interruption, stale fixture, malformed import -> named recovery."
+evaluator = "web-playwright-vision"
+weight = 1.0

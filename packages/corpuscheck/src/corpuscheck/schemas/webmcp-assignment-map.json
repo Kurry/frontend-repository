@@ -7892,5 +7892,56 @@
       "Multi-select marquee geometry and Shift-click chord timing stay Playwright when mechanism matters",
       "Timeline status filter chips and Saved Workflows / Artifact panel open toggles stay Playwright-driven; no browse-query module is assigned"
     ]
+  },
+  {
+    "modules": [
+      "structured-editor-v1",
+      "entity-collection-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "time-block"
+      ],
+      "editor_properties": [
+        "start",
+        "duration",
+        "locked"
+      ],
+      "editor_modes": [
+        "planning",
+        "focus",
+        "compare"
+      ],
+      "editor_operations": [
+        "select",
+        "update_property",
+        "switch_mode",
+        "preview"
+      ],
+      "entity": "task",
+      "entity_operations": [
+        "select",
+        "update",
+        "toggle"
+      ],
+      "entity_fields": [
+        "urgency",
+        "importance",
+        "priority"
+      ],
+      "artifact_operations": [
+        "export",
+        "import"
+      ],
+      "export_formats": [
+        "session-json",
+        "ics"
+      ],
+      "import_modes": [
+        "session-json"
+      ]
+    },
+    "task": "frontend-productivity-cognitive-load-day-sculptor"
   }
 ]

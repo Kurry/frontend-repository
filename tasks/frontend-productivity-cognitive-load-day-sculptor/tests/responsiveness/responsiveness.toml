@@ -1,0 +1,19 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+command = "node"
+args = ["/opt/webmcp/webmcp_stdio_server.mjs"]
+env = { DEBUG = "webmcp*" }
+
+[[criterion]]
+id = "AC-07-01"
+description = "Complete at 1440/768/375 -> mobile priority/time/focus flow retains every action, 44-pixel targets, and no page overflow."
+evaluator = "web-playwright-vision"
+weight = 1.0
