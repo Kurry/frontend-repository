@@ -1,0 +1,208 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+[[criterion]]
+id = "9.1"
+name = "cold_start_is_under_two_seconds"
+description = "Cold start to interactive is under 2 seconds on local render."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.2"
+name = "console_is_clean"
+description = "Browser devtools show no errors or warnings."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.3"
+name = "transitions_respond_under_100ms"
+description = "UI transitions respond in under 100ms."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.4"
+name = "async_work_has_loading_indicators"
+description = "Loading indicators are shown for async or simulated delays."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.5"
+name = "large_collections_render_without_lag"
+description = "Large collections render without perceived lag."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.6"
+name = "state_changes_remain_interactive"
+description = "The UI remains interactive during state changes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.7"
+name = "animations_maintain_smooth_frame_rate"
+description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.8"
+name = "rapid_input_does_not_freeze"
+description = "The app does not hang or freeze even under rapid user input."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.n1"
+name = "local_load_exceeds_two_seconds"
+description = "More than 2 seconds pass before interaction is possible on local render."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n2"
+name = "console_errors_during_flows"
+description = "Errors or warnings are present in the console during flows."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n3"
+name = "transitions_block_or_lag"
+description = "Transitions block or lag."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n4"
+name = "async_work_hangs_ui"
+description = "Async or simulated-async work causes the UI to hang or freeze."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n5"
+name = "large_data_kills_frame_rate"
+description = "Large data sets kill the frame rate."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n6"
+name = "animation_blocks_input"
+description = "Input becomes unresponsive during animation."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n7"
+name = "resource_load_blocks_rendering"
+description = "The UI blocks rendering while loading resources."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n8"
+name = "browser_resources_run_away"
+description = "Memory leaks or runaway browser resource usage occur."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n9"
+name = "loading_state_is_blank"
+description = "Nothing is displayed while data is loading."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n10"
+name = "rapid_or_edge_use_crashes"
+description = "The app crashes under rapid or edge-case use."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "performance.catchall"
+name = "performance_catchall"
+description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "AC-09"
+name = "large_collection"
+description = "The signature interaction remains responsive and unrelated rows stay stable."
+type = "binary"
+weight = 1.0
