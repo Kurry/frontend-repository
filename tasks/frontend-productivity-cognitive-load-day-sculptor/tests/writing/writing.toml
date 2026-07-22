@@ -1,0 +1,19 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+command = "node"
+args = ["/opt/webmcp/webmcp_stdio_server.mjs"]
+env = { DEBUG = "webmcp*" }
+
+[[criterion]]
+id = "AC-10-01"
+description = "Trigger conflicts -> copy names exact task/block/slot/dependency/deadline/capacity rule and concrete recovery."
+evaluator = "web-playwright-vision"
+weight = 1.0

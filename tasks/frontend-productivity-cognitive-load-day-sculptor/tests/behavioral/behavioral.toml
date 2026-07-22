@@ -1,0 +1,19 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+command = "node"
+args = ["/opt/webmcp/webmcp_stdio_server.mjs"]
+env = { DEBUG = "webmcp*" }
+
+[[criterion]]
+id = "AC-13-01"
+description = "Interleave priority, blocks, interruptions, rollover, focus clock, checkpoints, undo, export/import -> times, lineage, history, and ICS round-trip."
+evaluator = "web-playwright-vision"
+weight = 1.0

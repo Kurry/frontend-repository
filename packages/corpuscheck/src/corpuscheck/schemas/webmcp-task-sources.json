@@ -513,5 +513,8 @@
     "source": "feature-workflow-builder-workflow-builder PRD",
     "instruction": "tasks/frontend-workflow-workflow-builder/instruction.md",
     "description": "Node-graph workflow builder with durable executions and timelines."
+  },
+  "frontend-productivity-cognitive-load-day-sculptor": {
+    "description": "Cognitive Load Day Sculptor eval."
   }
 }
