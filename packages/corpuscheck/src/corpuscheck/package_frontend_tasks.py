@@ -364,6 +364,12 @@ TASK_SPECS: dict[str, dict] = {
 
 # Website-fidelity tasks converted from website-prds (pixel-perfect genre).
 TASK_SPECS.update({
+    "frontend-creative-tools-session-compression-loom": {
+        "source": "Session Compression Loom",
+        "description": "Session compression editor with capsule summaries, preview, and artifact export.",
+        "modules": ["structured-editor-v1", "artifact-transfer-v1"],
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
+    },
     "frontend-planning-potluck-contribution-orchestrator": {
         "source": "Potluck Contribution Orchestrator",
         "description": "Potluck planning workspace for commitments, coverage, buffet layout, and event-day run coordination.",

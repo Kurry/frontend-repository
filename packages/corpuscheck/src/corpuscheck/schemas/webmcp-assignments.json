@@ -8100,6 +8100,19 @@
         "import_modes": ["potluck-event-plan-v1"]
       },
       "mechanics_exclusions": ["Navigation, drag positioning, native downloads, and clipboard contents stay Playwright-observed"]
+    },
+    {
+      "task": "frontend-creative-tools-session-compression-loom",
+      "modules": ["structured-editor-v1", "artifact-transfer-v1"],
+      "bindings": {
+        "editor_entity": "capsule",
+        "editor_operations": ["select", "update", "create", "preview"],
+        "editor_fields": ["title", "variant"],
+        "artifact_formats": ["compressed-session-pack-v1"],
+        "artifact_operations": ["export", "import"],
+        "import_modes": ["compressed-session-pack-v1"]
+      },
+      "mechanics_exclusions": ["Text selection, range highlighting, preview layout, and download bytes stay Playwright-observed"]
     }
   ]
 }
