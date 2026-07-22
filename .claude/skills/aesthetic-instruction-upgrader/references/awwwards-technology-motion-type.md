@@ -45,7 +45,7 @@ For each upgraded task:
 2. Select one coherent Awwwards experience bundle: editorial narrative, direct-manipulation studio, dense operational product, playful game loop, or immersive spatial experience.
 3. Record two to five relevant study signals and their evidence layers.
 4. Translate each signal into a visible product purpose.
-5. Preserve the assigned stack; select additional technology only when a simpler existing capability cannot satisfy that purpose.
+5. Preserve the assigned stack and use only its existing capabilities; record any additional technology as an un-applied shape-changing idea.
 6. Define loading, interruption, compact-layout, reduced-motion, and failure behavior.
 7. Record at least two rejected techniques to prevent concept collage and technology accumulation.
 
@@ -62,7 +62,7 @@ Use this ledger:
 Framework frequency is descriptive, not a recommendation. Follow these rules:
 
 - Preserve the framework already assigned in `docs/distribution.md`, task requirements, or the existing solution. Do not switch frameworks to improve aesthetics.
-- For a new frontend-only task, choose one runtime architecture based on state, routing, rendering, and interaction needs.
+- This skill operates on existing tasks. Do not use it to replace or extend their runtime architecture.
 - Use islands or static-first delivery for content-led experiences when most of the page does not need client state.
 - Use a component SPA when the product has dense client state, direct manipulation, undo/redo, or many coordinated panels.
 - Use a DOM framework around Canvas/WebGL rather than forcing the entire UI into the renderer; semantic controls, overlays, dialogs, and exports remain DOM surfaces.
@@ -106,7 +106,7 @@ GSAP is justified when the requirement needs timeline labels, sequencing, pause/
 - Use the assigned drag-and-drop library when direct manipulation is core. Require keyboard and touch alternatives and visible source/destination states.
 - Use the assigned component library as accessible structural chrome, then art-direct its tokens and composition. Do not mix component systems to manufacture visual variety.
 
-Before adding a library, inspect the installed version and fetch current official documentation with `ctx7`. Record payload/lifecycle implications and why existing CSS or framework primitives are insufficient.
+Inspect assigned library versions and fetch current official documentation with `ctx7` before describing their aesthetic responsibility. Do not add a library in shape-lock mode. If the existing stack cannot express an idea, record the idea without applying it.
 
 ## 5. CSS production language
 
@@ -208,7 +208,7 @@ Preserve observed framework constraints and reference composition when mandated.
 
 ## 10. Instruction and rubric boundary
 
-Place assigned framework, required integration, asset pipeline, and lifecycle constraints in `<requirements>`. Place the browser-visible choreography in `<motion>`, composition and type roles in `<visual_design>`, alternate compact composition in `<responsiveness>`, and focus/reduced-motion/non-color behavior in `<accessibility>`.
+Do not edit `<requirements>` in shape-lock mode. Rewrite existing bullets in `<motion>`, `<visual_design>`, `<responsiveness>`, `<accessibility>`, or `<writing>` only when the same behavior and criterion already exist. Preserve bullet counts and all non-aesthetic sections verbatim.
 
 Good technical instruction:
 
@@ -222,4 +222,4 @@ Bad criterion:
 
 > Uses GSAP, Three.js, Tailwind, and variable fonts.
 
-The judge observes rendered behavior and real interactions. It does not inspect dependency strings or source architecture.
+The judge observes rendered behavior and real interactions. It does not inspect dependency strings or source architecture. This workflow leaves every criterion unchanged; aesthetic wording must stay within the existing evaluation envelope.

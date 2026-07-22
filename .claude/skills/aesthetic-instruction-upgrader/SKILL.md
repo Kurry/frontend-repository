@@ -1,6 +1,6 @@
 ---
 name: aesthetic-instruction-upgrader
-description: Rewrite frontend Harbor task instructions so the resulting apps have distinctive, coherent, production-grade aesthetics grounded in the repository's 6,197-site Awwwards study. Use for tasks/frontend-*/instruction.md when selecting or refining frameworks, libraries, CSS technologies, motion systems, typography, advanced assets, visual design, responsive composition, state styling, innovation, or design fidelity without creating a generic technology mega-stack.
+description: Rewrite existing frontend Harbor task instructions in place so aesthetics improve while task shape remains exactly constant, grounded in the repository's 6,197-site Awwwards study. Use for tasks/frontend-*/instruction.md when refining the presentation of already-assigned frameworks, libraries, CSS technologies, motion systems, typography, assets, visual design, responsive composition, or state styling without changing features, flows, controls, schemas, artifacts, WebMCP, dependencies, or rubric structure.
 ---
 
 # Aesthetic Instruction Upgrader
@@ -10,6 +10,23 @@ Improve the aesthetic ceiling of a frontend task by turning measured Awwwards ev
 Always read [references/awwwards-technology-motion-type.md](references/awwwards-technology-motion-type.md) before proposing frameworks, libraries, motion, typography, CSS features, or advanced assets. Read [references/cohort-examples.md](references/cohort-examples.md) when upgrading one of the lower-scoring productivity, workflow, game, data-tracking, creative-tools, or website-fidelity tasks discussed there. Read the existing `design-from-awwwards-evidence` and `upgrade-frontend-production-design` skills for the broader evidence and production-design workflows when available.
 
 ## Workflow
+
+### 0. Freeze task shape
+
+Treat task shape as immutable. Before drafting, inventory and freeze:
+
+- XML tag names and order;
+- every `Feature:` group, user flow, edge case, route, screen, control, action, keyboard shortcut, state transition, seeded record, and exact required string;
+- all field names, types, ranges, enums, validation rules, persistence behavior, import/export formats, and artifact fields;
+- the assigned framework, component system, libraries, dependencies, asset inventory, and delivery architecture;
+- the complete `<integrity>`, `<delivery>`, `<webmcp_action_contract>`, and `<reference_screenshots>` blocks;
+- every rubric file, criterion count, ID, name, description, type, weight, polarity, and judge configuration.
+
+This skill must not add, remove, rename, reorder, broaden, narrow, or reinterpret any frozen item. Do not edit dimension TOMLs, WebMCP assignments, reference screenshots, the oracle, or any task file other than `instruction.md`. Do not add dependencies or replace an assigned library, even when the Awwwards evidence suggests one.
+
+Only rewrite existing bullets in `<visual_design>`, `<motion>`, `<responsiveness>`, `<accessibility>`, and `<writing>`. Preserve each section's bullet count. Every rewritten bullet must map to the same existing behavior and an existing criterion; improve its art direction, hierarchy, typography, material, choreography, or clarity without introducing a new state or obligation.
+
+If an improvement requires a new feature, state, asset, dependency, criterion, or control, do not apply it. List it separately as an un-applied shape-changing idea requiring explicit user authorization.
 
 ### 1. Audit before rewriting
 
@@ -25,7 +42,7 @@ Inspect the complete `instruction.md`, task genre, reference screenshots, dimens
 - focus, contrast, reduced motion, or touch behavior treated as postscript;
 - a polished shell with a visually weak export, dialog, table, canvas, or result state.
 
-Do not infer a visual problem from a low WebMCP or technical score. Do not “fix” aesthetic weaknesses by adding features, libraries, dependencies, routes, persistence, or new data fields.
+Do not infer a visual problem from a low WebMCP or technical score. Do not “fix” aesthetic weaknesses by adding features, libraries, dependencies, routes, persistence, criteria, or new data fields.
 
 ### 2. Run the Awwwards evidence pass
 
@@ -63,9 +80,9 @@ Signature motif: one recurring visual device tied to the product's job.
 State language: how active, selected, empty, loading, error, success, and completed states belong to the system.
 Responsive art direction: what remains primary, what collapses, and what changes interaction mode.
 Motion signature: one causal transition plus a small feedback vocabulary.
-Framework/runtime: preserve the assigned stack or justify one architecture for a new task.
-Libraries: the smallest set that earns its cost through a visible product benefit.
-CSS/asset system: relevant layout, material, type, rendering, and fallback primitives.
+Framework/runtime: the assigned stack, unchanged, and how its existing capabilities support the direction.
+Libraries: the assigned libraries, unchanged, with one clear aesthetic responsibility each.
+CSS/asset system: existing layout, material, type, rendering, and fallback capabilities only.
 Anti-generic constraints: two or three treatments the builder must avoid.
 ```
 
@@ -73,19 +90,19 @@ Choose one concept spine, one signature motif, and no more than two supporting m
 
 ### 4. Select technologies without making a census
 
-Preserve a task's assigned framework and UI system. Aesthetic weakness is not permission to replace React with Vue, Vue with Svelte, or an Astro fidelity build with a client-heavy SPA. For a new task, select one primary framework/runtime from the interaction architecture and delivery constraints, not from archive popularity.
+Preserve a task's assigned framework, UI system, dependency set, and asset inventory exactly. Aesthetic weakness is not permission to replace React with Vue, Vue with Svelte, an Astro fidelity build with a client-heavy SPA, or one motion library with another.
 
 Use the technology ladder in the Awwwards reference:
 
 - prefer semantic HTML and CSS for layout, type, material, hover/focus, and simple transitions;
-- add one framework-native motion solution for component lifecycle or layout continuity;
-- use GSAP when the product needs a coordinated timeline, spatial sequence, SVG/canvas choreography, or carefully bounded scroll narrative that CSS cannot express clearly;
-- use AutoAnimate only for straightforward list insertion, removal, and reorder continuity;
-- use Lottie or Rive for authored vector motion with a defined state role and static fallback;
-- use Canvas, PixiJS, Three.js, or another renderer only when the work surface or scene is intrinsically spatial, graphical, or game-like;
-- use workers, WASM, compressed geometry/textures, and HDR only as a complete loading, failure, cleanup, and fallback system.
+- use an already-assigned framework-native motion solution for component lifecycle or layout continuity;
+- use already-assigned GSAP only for coordinated timelines, spatial sequences, SVG/canvas choreography, or bounded scroll narratives that CSS cannot express clearly;
+- use already-assigned AutoAnimate only for straightforward list insertion, removal, and reorder continuity;
+- use already-assigned Lottie or Rive for authored vector motion with the existing state role and fallback;
+- use the already-assigned Canvas, PixiJS, Three.js, or other renderer only for the existing spatial, graphical, or game-like surface;
+- describe workers, WASM, compressed geometry/textures, and HDR only when they already belong to the task's loading, failure, cleanup, and fallback system.
 
-An instruction may name an assigned framework or required technical integration in `<requirements>`. Rubric criteria must grade the resulting browser-observable behavior, never the dependency name. Before adding or changing any library, inspect the installed version and use `ctx7` to fetch its current official documentation as required by the repository instructions.
+Use the technology ladder only to understand and better specify the capabilities already assigned to the task. Do not add or change a library in shape-lock mode. When explaining how an existing library should serve the aesthetic direction, inspect its installed version and use `ctx7` to fetch current official documentation as required by the repository instructions.
 
 ### 5. Upgrade the instruction by observable dimension
 
@@ -110,11 +127,11 @@ Keep promises in their existing tags. Write each requirement as an action, state
 
 For typography, specify both art direction and delivery: display, reading, utility, and numeric roles; family/weight/width contrast; measure and wrapping; variable axes only when the asset supports them; stable numerals for changing data; fallback behavior; and avoidance of layout shift. Do not require a proprietary font that is not shipped or licensed.
 
-### 6. Convert the brief into criteria
+### 6. Prove existing criterion coverage
 
-If the task's dimension TOMLs are in scope, add or refine only browser-observable criteria in the matching dimensions. Never grade “uses a design system,” a named framework, a dependency, or an aesthetic adjective. Grade the visible hierarchy, role separation, state treatment, motion continuity, responsive transformation, contrast, or content quality produced by that choice.
+Do not edit criterion files. Build a mapping from every rewritten instruction bullet to at least one unchanged, existing criterion in the matching dimension. The rewritten bullet must stay inside that criterion's current semantic envelope; a criterion that would have passed before the rewrite must not fail solely because the rewrite introduced a new obligation.
 
-Preserve existing criterion IDs and protected instruction blocks. Do not silently expand schemas, exports, persistence, or feature groups. Use the `task-authoring` and `rubrics` skills for repository-specific mutation and validation rules.
+If a proposed rewrite lacks existing rubric coverage, omit it and report it as shape-changing. Do not add, delete, renumber, reword, reweight, or repolarize criteria. Use the `rubrics` skill only to audit the mapping, never to mutate the rubric during this workflow.
 
 ### 7. Hand off a copy-ready upgrade
 
@@ -125,9 +142,11 @@ Return:
 3. the framework, library, CSS, asset, motion, and typography profile;
 4. the concrete gaps found in the original brief;
 5. replacement or additive text grouped by instruction tag;
-6. proposed rubric coverage, grouped by dimension;
-7. anti-generic and scope guardrails;
-8. validation commands and any oracle mismatch that must be handled separately.
+6. the unchanged criterion mapping for every rewritten bullet;
+7. the before/after task-shape audit;
+8. un-applied ideas that would have changed shape;
+9. anti-generic and scope guardrails;
+10. validation commands and any oracle mismatch that must be handled separately.
 
 The finished brief must let a capable builder make specific visual decisions and let a browser judge distinguish a coherent product from a decorated default template.
 
@@ -142,8 +161,21 @@ Reject upgrades that:
 - make mobile a smaller desktop screenshot;
 - grade animation presence without causality, interruption, settled state, and reduced motion;
 - improve the hero while leaving work surfaces, errors, dialogs, exports, and completed artifacts generic;
-- introduce new product behavior solely to create more surfaces to style.
+- introduce new product behavior solely to create more surfaces to style;
 - combine React, Vue, Nuxt, Next.js, GSAP, Three.js, WebGL, Lottie, and smooth scrolling as a technology checklist;
 - cite an Awwwards frequency without identifying its evidence layer, product relevance, visible purpose, and fallback;
 - require a library in a visual rubric or treat a framework replacement as an aesthetic improvement;
-- use a display font, variable axis, motion plugin, shader, or advanced asset without a loading and fallback plan.
+- use a display font, variable axis, motion plugin, shader, or advanced asset without a loading and fallback plan;
+- change the number of bullets in an editable instruction section;
+- alter a feature, flow, state, control, schema, artifact, dependency, WebMCP binding, criterion, or any non-instruction task file;
+- apply an attractive idea that cannot be mapped to an unchanged existing criterion.
+
+## Validate the shape lock
+
+Run the bundled checker after every task edit:
+
+```bash
+python3 .claude/skills/aesthetic-instruction-upgrader/scripts/check_task_shape.py tasks/<slug> --base HEAD
+```
+
+The checker must report `TASK SHAPE CONSTANT`. It fails when non-aesthetic sections change, aesthetic bullet counts change, protected blocks change, feature headings change, or any task file other than `instruction.md` differs from the baseline. Also run the repository's normal instruction and corpus validators.
