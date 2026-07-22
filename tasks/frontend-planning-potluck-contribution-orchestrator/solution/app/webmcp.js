@@ -7,7 +7,14 @@ window.webmcp_session_info = () => {
         "modules": ["entity-collection-v1", "structured-editor-v1", "artifact-transfer-v1"]
     };
 };
-window.webmcp_list_tools = () => {
+    tools.forEach((tool) => {
+        tool.module = tool.name.startsWith('entity_')
+            ? 'entity-collection-v1'
+            : tool.name.startsWith('artifact_')
+                ? 'artifact-transfer-v1'
+                : 'structured-editor-v1';
+    });
+    window.webmcp_list_tools = () => {
     return [
         {
             "name": "editor_select",
