@@ -364,6 +364,12 @@ TASK_SPECS: dict[str, dict] = {
 
 # Website-fidelity tasks converted from website-prds (pixel-perfect genre).
 TASK_SPECS.update({
+    "frontend-data-tracking-reading-velocity-backlog-observatory": {
+        "source": "Reading Velocity Backlog Observatory",
+        "description": "Reading-capacity calibration and backlog observatory for ordering, allocation, focus, and rollover.",
+        "modules": ["browse-query-v1", "entity-collection-v1", "form-workflow-v1", "artifact-transfer-v1"],
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
+    },
     "frontend-landing-avax-network": {
         "source": "AvaxNetwork",
         "description": "Avalanche network marketing homepage fidelity eval.",
