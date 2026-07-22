@@ -513,5 +513,16 @@
     "source": "feature-workflow-builder-workflow-builder PRD",
     "instruction": "tasks/frontend-workflow-workflow-builder/instruction.md",
     "description": "Node-graph workflow builder with durable executions and timelines."
+  },
+  "frontend-data-tracking-household-receipt-reconciliation-floor": {
+    "source": "instruction.md",
+    "instruction": "tasks/frontend-data-tracking-household-receipt-reconciliation-floor/instruction.md",
+    "description": "Household Receipt Reconciliation Floor",
+    "modules": [
+      "structured-editor-v1",
+      "entity-collection-v1",
+      "artifact-transfer-v1",
+      "command-session-v1"
+    ]
   }
 }

@@ -1,0 +1,132 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "cf-ac-01"
+name = "allocate_rule_match_resolve_inspect_budgets_compute_pin_approve_plan_pay_recover_review_and_export_agree"
+description = "Allocate/rule, match/resolve, inspect budgets, compute/pin/approve plan, pay/recover, review, and export agree"
+score = 1.0
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf-ac-01-cents"
+name = "every_cent_and_artifact_agrees"
+description = "Every cent and artifact agrees"
+score = 1.0
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf-receipts"
+name = "receipt_line_allocation_exactly_distributes_all_taxes_and_tips"
+description = "Receipt line allocation exactly distributes all taxes and tips"
+score = 1.0
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf-split-rule"
+name = "split_rule_branches_correctly_with_version_lineage"
+description = "Split rule branches correctly with version lineage"
+score = 1.0
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf-bank-records"
+name = "matching_bank_transactions_conserves_totals_exactly"
+description = "Matching bank transactions conserves totals exactly"
+score = 1.0
+type = "binary"
+weight = 1.0
