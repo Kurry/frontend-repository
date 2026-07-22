@@ -163,7 +163,7 @@ export function TabPanel({ id, tab, children, className = '' }) {
       className={`min-h-0 flex-1 ${className}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: dur.fast + 0.02 }}
+      transition={{ duration: dur.fast === 0 ? 0 : dur.fast + 0.02 }}
     >
       {children}
     </motion.div>

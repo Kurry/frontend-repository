@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AnimatePresence, motion, MotionConfig } from 'motion/react'
+import { AnimatePresence, motion, MotionConfig, useReducedMotion } from 'motion/react'
 import {
   Button,
   Checkbox,
@@ -299,6 +299,7 @@ function RenameEditor({ repository, onClose }: { repository: Repository; onClose
 }
 
 function RepositoryRow({ repository, onRemove }: { repository: Repository; onRemove: (repository: Repository) => void }) {
+  const shouldReduceMotion = useReducedMotion()
   const selected = useAppStore((state) => state.selectedRepositoryIds.includes(repository.id))
   const toggleSelection = useAppStore((state) => state.toggleRepositorySelection)
   const run = useAppStore((state) => state.scanRuns[repository.id])
@@ -315,7 +316,7 @@ function RepositoryRow({ repository, onRemove }: { repository: Repository; onRem
       id={`repository-${repository.id}`}
       tabIndex={-1}
       layout
-      initial={{ opacity: 0, y: 8 }}
+      initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: -18, height: 0 }}
       transition={{ duration: 0.2 }}
@@ -1104,6 +1105,7 @@ function CommandPalette() {
 }
 
 function FirstScanCoachmark() {
+  const shouldReduceMotion = useReducedMotion()
   const repositories = useAppStore((state) => state.repositories)
   const scanRuns = useAppStore((state) => state.scanRuns)
   const [dismissed, setDismissed] = useState(false)
@@ -1112,7 +1114,7 @@ function FirstScanCoachmark() {
   return (
     <motion.div
       className="coachmark"
-      initial={{ opacity: 0, y: -6 }}
+      initial={shouldReduceMotion ? false : { opacity: 0, y: -6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
       role="status"

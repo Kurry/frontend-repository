@@ -12,6 +12,12 @@ const CANONICAL_CONFIG = 'e2e.playwright.config.mjs';
 const SPEC_NAME = 'e2e.spec.mjs';
 const TASK_SUITE_DIR = 'e2e';
 const TASK_SPEC_RE = /\.spec\.(mjs|cjs|js|ts|tsx|jsx)$/;
+const CANONICAL_TEST_TITLES = new Set([
+  'serves non-empty app with zero console errors',
+  'webmcp surface is registered and well-formed',
+  'reduced motion behaviorally suppresses animation',
+  'no horizontal overflow at 375px',
+]);
 
 /** Spec files inside solution/app/e2e/ (task-owned per-criterion suites). */
 export function taskSuiteSpecs(appDir) {
@@ -130,12 +136,47 @@ export function generatedDirConfigSource(appDir) {
   ].join('\n');
 }
 
+/** Criterion names authored in one task's dimension TOMLs. */
+export function rubricCriterionNames(taskDir) {
+  const testsDir = taskDir ? path.join(taskDir, 'tests') : null;
+  if (!testsDir || !fs.existsSync(testsDir)) return [];
+  const names = new Set();
+  const files = fs
+    .readdirSync(testsDir, { recursive: true })
+    .map(String)
+    .filter((file) => file.endsWith('.toml'));
+  for (const file of files) {
+    let inCriterion = false;
+    for (const line of fs.readFileSync(path.join(testsDir, file), 'utf8').split(/\r?\n/)) {
+      const trimmed = line.trim();
+      if (trimmed === '[[criterion]]') {
+        inCriterion = true;
+        continue;
+      }
+      if (trimmed.startsWith('[')) inCriterion = false;
+      const match = inCriterion ? trimmed.match(/^name\s*=\s*"([a-z0-9_]+)"$/) : null;
+      if (match) names.add(match[1]);
+    }
+  }
+  return [...names].sort();
+}
+
 function walkFailingSpecs(suite, trail, failing) {
   for (const child of suite?.suites || []) {
     walkFailingSpecs(child, [...trail, child.title].filter(Boolean), failing);
   }
   for (const spec of suite?.specs || []) {
     if (spec.ok === false) failing.push([...trail, spec.title].filter(Boolean).join(' > '));
+  }
+}
+
+function walkExecutedSpecs(suite, titles) {
+  for (const child of suite?.suites || []) walkExecutedSpecs(child, titles);
+  for (const spec of suite?.specs || []) {
+    const executed = (spec.tests || []).some((test) =>
+      (test.results || []).some((result) => result.status !== 'skipped')
+    );
+    if (executed) titles.push(spec.title);
   }
 }
 
@@ -153,26 +194,48 @@ export function summarizeE2eReport(report, exitCode, outputTail = '') {
   const skipped = stats.skipped ?? 0;
   const flaky = stats.flaky ?? 0;
   const failingTests = [];
+  const executedTests = [];
   for (const suite of report?.suites || []) {
     walkFailingSpecs(suite, [suite.title].filter(Boolean), failingTests);
+    walkExecutedSpecs(suite, executedTests);
   }
   const counts = `passed=${passed} failed=${failed} skipped=${skipped} flaky=${flaky}`;
   if (failed > 0 || failingTests.length > 0) {
     return {
-      status: 'fail', passed, failed, skipped, flaky, failingTests,
+      status: 'fail', passed, failed, skipped, flaky, failingTests, executedTests,
       message: `e2e suite failed (${counts}); failing tests: ${failingTests.join('; ') || 'unreported'}`,
     };
   }
   if (exitCode !== 0) {
     return {
-      status: 'fail', passed, failed, skipped, flaky, failingTests,
+      status: 'fail', passed, failed, skipped, flaky, failingTests, executedTests,
       message: `playwright exited ${exitCode} with no failed tests reported (${counts})${outputTail ? `: ${outputTail}` : ''}`,
     };
   }
   const warning = skipped > passed
     ? `skipped (${skipped}) > passed (${passed}) — suite looks like a skip stub`
     : undefined;
-  return { status: 'pass', passed, failed, skipped, flaky, failingTests, warning };
+  return { status: 'pass', passed, failed, skipped, flaky, failingTests, executedTests, warning };
+}
+
+function taskCoverage(summaries, taskDir) {
+  const criterionNames = rubricCriterionNames(taskDir);
+  const taskTests = [];
+  for (const summary of summaries) {
+    for (const title of summary.executedTests || []) {
+      if (summary.label === 'task-dir' || !CANONICAL_TEST_TITLES.has(title)) {
+        taskTests.push(title);
+      }
+    }
+  }
+  const rubricMatched = taskTests.filter((title) =>
+    criterionNames.some((name) => title === name || title.endsWith(` ${name}`))
+  );
+  return {
+    taskSpecificTests: taskTests.length,
+    rubricMatchedTests: rubricMatched.length,
+    rubricCriteria: criterionNames.length,
+  };
 }
 
 /**
@@ -183,9 +246,29 @@ export function summarizeE2eReport(report, exitCode, outputTail = '') {
  *   { status: 'fail', message, ... } |
  *   { status: 'pass', passed, skipped, flaky, warning?, detail }
  */
-export async function runE2eSuite({ slug, appDir, runtimeDir, timeoutMs = 600000 }) {
+export async function runE2eSuite({
+  slug,
+  appDir,
+  runtimeDir,
+  taskDir = null,
+  requireTaskTests = false,
+  timeoutMs = 600000,
+}) {
   const invocation = resolveE2eInvocation(appDir);
-  if (invocation.mode === 'skip') return { status: 'skip' };
+  if (invocation.mode === 'skip') {
+    if (requireTaskTests) {
+      return {
+        status: 'fail',
+        taskSpecificTests: 0,
+        rubricMatchedTests: 0,
+        rubricCriteria: rubricCriterionNames(taskDir).length,
+        message:
+          'task-specific Playwright files changed, but no runnable e2e.spec.mjs ' +
+          'or e2e/**/*.spec.* suite was discovered',
+      };
+    }
+    return { status: 'skip' };
+  }
   if (invocation.mode === 'missing-dependency') {
     return { status: 'fail', message: invocation.message };
   }
@@ -195,7 +278,36 @@ export async function runE2eSuite({ slug, appDir, runtimeDir, timeoutMs = 600000
     summaries.push({ label: run.label, ...summary });
     if (summary.status === 'fail') break; // report the first failure honestly
   }
-  return mergeSuiteSummaries(summaries);
+  const result = mergeSuiteSummaries(summaries);
+  const coverage = taskCoverage(summaries, taskDir);
+  Object.assign(result, coverage);
+  // Executed titles are an internal matching input; keep status artifacts compact.
+  delete result.executedTests;
+  if (result.status === 'fail') return result;
+  if (requireTaskTests && coverage.taskSpecificTests === 0) {
+    return {
+      ...result,
+      status: 'fail',
+      message:
+        'only the four propagated workspace-contract tests executed; ' +
+        'add task-specific Playwright tests derived from rubric criteria',
+    };
+  }
+  if (requireTaskTests && coverage.rubricMatchedTests === 0) {
+    return {
+      ...result,
+      status: 'fail',
+      message:
+        `${coverage.taskSpecificTests} task-specific tests executed, but none matched a ` +
+        'criterion name from tests/<dimension>/<dimension>.toml',
+    };
+  }
+  if (taskDir) {
+    result.detail +=
+      `; task-specific=${coverage.taskSpecificTests}` +
+      ` rubric-matched=${coverage.rubricMatchedTests}`;
+  }
+  return result;
 }
 
 /** Combine per-layout summaries into the stage's single outcome. */
