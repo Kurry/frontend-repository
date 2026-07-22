@@ -1,0 +1,8 @@
+[metadata]
+name = "frontend-planning-carry-on-packing-optimizer-spatial-composer-rn-harbor-artifact"
+description = "Carry-On Packing Optimizer — Spatial Composer"
+version = "1.0.0"
+
+[task]
+name = "mercor-intelligence/frontend-planning-carry-on-packing-optimizer-spatial-composer-rn-harbor-artifact"
+type = "frontend"
