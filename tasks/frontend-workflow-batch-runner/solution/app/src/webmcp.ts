@@ -72,7 +72,7 @@ const tools: ToolDefinition[] = [
         store.setUi({ compareOpen: true, compareA: job?.runs.at(-2)?.id ?? null, compareB: job?.runs.at(-1)?.id ?? null })
       }
       if (destination === 'result-inspector' && Number.isInteger(args.itemIndex)) store.setUi({ inspectorIndex: Number(args.itemIndex) })
-      if (destination === 'export') store.setUi({ exportOpen: true, exportTimestamp: new Date().toISOString() })
+      if (destination === 'export') store.setUi({ exportOpen: true })
       const labels: Partial<Record<(typeof destinations)[number], string>> = { 'execution-grid': 'Execution grid', 'pending-queue': 'Pending queue', 'event-timeline': 'Event timeline', 'run-history': 'Run history' }
       if (labels[destination]) scrollToLabel(labels[destination]!)
       return { ok: true, message: `Opened ${destination}.`, visibleState: { destination, ...visibleSelection() } }
@@ -169,7 +169,7 @@ const tools: ToolDefinition[] = [
     execute: (args = {}) => {
       const format = String(args.format)
       if (format === 'ics-calendar-text') useBatchStore.getState().setUi({ calendarOpen: true })
-      else useBatchStore.getState().setUi({ exportOpen: true, exportTimestamp: new Date().toISOString() })
+      else useBatchStore.getState().setUi({ exportOpen: true })
       return { ok: true, message: `${format} export surface opened.`, visibleState: { format, exportOpen: format !== 'ics-calendar-text', calendarOpen: format === 'ics-calendar-text', ...visibleSelection() } }
     },
   },
@@ -179,7 +179,7 @@ const tools: ToolDefinition[] = [
     inputSchema: objectSchema({ format: stringEnum(['run-report-json', 'ics-calendar-text']) }, ['format']),
     execute: (args = {}) => {
       const format = String(args.format)
-      useBatchStore.getState().setUi(format === 'ics-calendar-text' ? { calendarOpen: true } : { exportOpen: true, exportTimestamp: new Date().toISOString() })
+      useBatchStore.getState().setUi(format === 'ics-calendar-text' ? { calendarOpen: true } : { exportOpen: true })
       return { ok: true, message: `Opened ${format}; activate its visible Copy control to place exact text on the clipboard.`, visibleState: { format, previewVisible: true } }
     },
   },

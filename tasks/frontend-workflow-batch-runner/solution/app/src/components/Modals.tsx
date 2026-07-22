@@ -103,7 +103,6 @@ export function ScheduleModal() {
 
 export function ExportModal() {
   const open = useBatchStore((state) => state.ui.exportOpen)
-  const timestamp = useBatchStore((state) => state.ui.exportTimestamp)
   const selectedJobId = useBatchStore((state) => state.selectedJobId)
   const selectedRunId = useBatchStore((state) => state.selectedRunId)
   const jobs = useBatchStore((state) => state.jobs)
@@ -113,7 +112,7 @@ export function ExportModal() {
   const [copied, setCopied] = useState(false)
   const job = jobs.find((entry) => entry.id === selectedJobId)
   const run = job?.runs.find((entry) => entry.id === selectedRunId) ?? job?.runs.at(-1)
-  const compiledText = useMemo(() => job && run ? JSON.stringify(compileRunReport(job, run, timestamp), null, 2) : '', [job, run, timestamp])
+  const compiledText = useMemo(() => job && run ? JSON.stringify(compileRunReport(job, run), null, 2) : '', [job, run])
   const text = compiledText
   const csv = useMemo(() => run ? compileRunCsv(run) : '', [run])
 
@@ -298,7 +297,7 @@ export function DeleteModal() {
 export function OpenExportButton({ kind = 'tertiary', size = 'md' }: { kind?: 'tertiary' | 'ghost'; size?: 'sm' | 'md' }) {
   const hasRun = useBatchStore((state) => Boolean(selectedEntities(state).run))
   const setUi = useBatchStore((state) => state.setUi)
-  return <Button kind={kind} size={size} renderIcon={DocumentDownload} data-modal-opener="export" disabled={!hasRun} onClick={() => setUi({ exportOpen: true, exportTimestamp: new Date().toISOString() })}>Export run</Button>
+  return <Button kind={kind} size={size} renderIcon={DocumentDownload} data-modal-opener="export" disabled={!hasRun} onClick={() => setUi({ exportOpen: true })}>Export run</Button>
 }
 
 export { copyText, downloadText }
