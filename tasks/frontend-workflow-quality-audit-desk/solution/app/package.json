@@ -8,7 +8,7 @@
     "build": "vite build",
     "verify:build": "vite build",
     "preview": "vite preview --host --port 3000 --strictPort",
-    "start": "PATH=\"$PWD/node_modules/.bin:$PATH\" vite build && PATH=\"$PWD/node_modules/.bin:$PATH\" vite preview --host --port 3000 --strictPort"
+    "start": "PATH=\"$PWD/node_modules/.bin:$PATH\" vite preview --host --port 3000 --strictPort"
   },
   "dependencies": {
     "@phosphor-icons/vue": "^2.2.1",
@@ -25,6 +25,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@vitejs/plugin-vue": "^6.0.1",
     "vite": "^7.1.7"
   }
