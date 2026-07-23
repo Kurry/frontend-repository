@@ -3,6 +3,19 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   plugins: [tailwindcss()],
+  optimizeDeps: {
+    force: true,
+    include: [
+      '@heroicons/react/24/outline',
+      '@hookform/resolvers/zod',
+      '@preact/signals',
+      'chart.js',
+      'preact',
+      'preact/hooks',
+      'react-hook-form',
+      'zod'
+    ]
+  },
   esbuild: {
     jsx: 'automatic',
     jsxImportSource: 'preact'

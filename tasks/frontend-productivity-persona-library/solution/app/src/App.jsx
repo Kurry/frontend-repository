@@ -55,7 +55,7 @@ function ToastRegion() {
     return () => window.clearTimeout(timer)
   }, [toast, clearToast])
   if (!toast) return null
-  return <div className="toast-region"><ToastNotification key={toast.id} kind="success" timeout={0} lowContrast title={toast.message} caption="Workspace state updated" onCloseButtonClick={clearToast} /></div>
+  return <div className="toast-region"><ToastNotification key={toast.id} kind="success" timeout={0} lowContrast title={toast.message} caption="The visible workspace now reflects this action." onCloseButtonClick={clearToast} /></div>
 }
 
 export default function App() {

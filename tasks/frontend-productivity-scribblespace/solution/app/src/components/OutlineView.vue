@@ -55,7 +55,7 @@ const snippet = (text?: string) => {
             class="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:bg-gray-50 bg-white"
             :class="{ 'ring-2 ring-[#6D5BD0]': store.selectedIds.includes(obj.id), 'ring-2 ring-[#E0A030] bg-[#FFF9C4]/30': store.searchMatchIds.includes(obj.id) }"
           >
-             <div class="w-12 h-12 rounded flex items-center justify-center shrink-0 border border-gray-200" :style="{ backgroundColor: obj.type === 'flashcard' ? '#FFF' : obj.color, borderRadius: obj.type === 'circle' ? '50%' : '4px' }">
+             <div class="w-12 h-12 rounded flex items-center justify-center shrink-0 border border-gray-200" :style="{ backgroundColor: obj.color, borderRadius: obj.type === 'circle' ? '50%' : '4px' }">
                 <svg v-if="obj.type === 'arrow'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
              </div>
 

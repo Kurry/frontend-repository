@@ -127,10 +127,15 @@ export function Library({ onEdit }) {
       >
         {sortedEvents.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-gray-500">
-            <p className="mb-4">No events match this range and filters.</p>
-            <Button variant="outline" color="cyan" onClick={() => resetFilters()}>
-              Reset filters
-            </Button>
+            <p className="mb-4">No events match this range and filters. Try resetting filters or create a new event.</p>
+            <Group>
+              <Button variant="outline" color="cyan" onClick={() => resetFilters()}>
+                Reset filters
+              </Button>
+              <Button color="cyan" onClick={() => onEdit(null)}>
+                Add event
+              </Button>
+            </Group>
           </div>
         ) : (
           <div
@@ -154,11 +159,10 @@ export function Library({ onEdit }) {
                   ref={rowVirtualizer.measureElement}
                   className={`library-row absolute top-0 left-0 w-full flex items-center gap-4 px-6 py-3 border-b border-gray-100 hover:bg-cyan-50/70 hover:shadow-[inset_3px_0_0_var(--c-brand)] transition-all duration-150 cursor-pointer ${isChecked ? 'bg-cyan-50' : ''}`}
                   style={{
-                    transform: `translateY(${virtualItem.start}px)`,
-                    transition: reduceMotion ? 'none' : 'transform 220ms var(--ease-settle)',
+                    top: `${virtualItem.start}px`,
                   }}
-                  initial={reduceMotion ? false : { opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  initial={reduceMotion ? false : { opacity: 0, x: 8 }}
+                  animate={{ opacity: 1, x: 0 }}
                   exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -24 }}
                   transition={{ duration: reduceMotion ? 0.01 : 0.22, ease: 'easeOut' }}
                   onClick={() => setSelectedId(ev.id)}
@@ -184,19 +188,21 @@ export function Library({ onEdit }) {
                     </div>
                   </div>
 
-                  <Menu shadow="sm" withinPortal onClick={e => e.stopPropagation()}>
-                    <Menu.Target>
-                      <ActionIcon variant="subtle" color="gray" onClick={e => e.stopPropagation()} aria-label="Event actions">
-                        <IconDots size={18} aria-hidden />
-                      </ActionIcon>
-                    </Menu.Target>
-                    <Menu.Dropdown>
-                      <Menu.Item leftSection={<IconEdit size={14} aria-hidden />} onClick={() => onEdit(ev)}>Edit event</Menu.Item>
-                      <Menu.Item color="red" leftSection={<IconTrash size={14} aria-hidden />} onClick={() => setConfirmReq({ ids: [ev.id] })}>
-                        Delete event
-                      </Menu.Item>
-                    </Menu.Dropdown>
-                  </Menu>
+                  <div onClick={e => e.stopPropagation()}>
+                    <Menu shadow="sm" withinPortal>
+                      <Menu.Target>
+                        <ActionIcon variant="subtle" color="gray" aria-label="Event actions">
+                          <IconDots size={18} aria-hidden />
+                        </ActionIcon>
+                      </Menu.Target>
+                      <Menu.Dropdown>
+                        <Menu.Item leftSection={<IconEdit size={14} aria-hidden />} onClick={() => onEdit(ev)}>Edit event</Menu.Item>
+                        <Menu.Item color="red" leftSection={<IconTrash size={14} aria-hidden />} onClick={() => setConfirmReq({ ids: [ev.id] })}>
+                          Delete event
+                        </Menu.Item>
+                      </Menu.Dropdown>
+                    </Menu>
+                  </div>
                 </motion.div>
               );
             })}

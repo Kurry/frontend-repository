@@ -1,0 +1,36 @@
+[project]
+name = "corpuscheck"
+version = "0.1.0"
+description = "Check-only validation for the Harbor frontend task corpus."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+dependencies = [
+    "pydantic>=2.7",
+    "jsonschema>=4.20",
+    "typer>=0.12",
+    "rich>=13.0",
+    "toml>=0.10.2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
+[project.scripts]
+corpuscheck = "corpuscheck.cli:app"
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+corpuscheck = [
+    "canonical/**/*",
+    "schemas/*",
+    "assets/*",
+]

@@ -165,6 +165,31 @@ export function formatMonthYear(): string {
   return now.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 }
 
+/** Human-readable full date for tooltips, e.g. "Tue, Jul 15, 2026". */
+export function formatFullDate(key: string): string {
+  return parseDateKey(key).toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+/** Streak length as of a given day (consecutive complete days ending on that day). */
+export function calcStreakAt(habit: Habit, endKey: string): number {
+  let streak = 0;
+  const d = parseDateKey(endKey);
+  for (let i = 0; i < 400; i++) {
+    if (isDayComplete(habit, dateKey(d))) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
 /** Get short day label for a date key */
 export function shortDayLabel(key: string): string {
   const d = parseDateKey(key);

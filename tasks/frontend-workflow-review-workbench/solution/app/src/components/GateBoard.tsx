@@ -75,7 +75,9 @@ export default function GateBoard({ bundle }: { bundle: ReviewBundle }) {
                 </Group>
                 <Text className="gate-summary" c="dimmed">No evidence available for {gate.name}.</Text>
                 <div className="gate-rerun-control">
-                  <Button fullWidth leftSection={<IconRefresh size={16} />} onClick={() => startRerun(bundle.slug, gate.name)}>Re-run gate</Button>
+                  <Button fullWidth leftSection={<IconRefresh size={16} />} disabled={rerun?.status === 'running' || rerun?.status === 'paused'} onClick={() => startRerun(bundle.slug, gate.name)}>
+                    {rerun?.status === 'running' ? 'Re-run in progress' : rerun?.status === 'paused' ? 'Re-run paused' : 'Re-run gate'}
+                  </Button>
                 </div>
                 <RerunProgress bundle={bundle} gateName={gate.name} />
               </Paper>

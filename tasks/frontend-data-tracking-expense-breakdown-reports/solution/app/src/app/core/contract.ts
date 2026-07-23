@@ -54,7 +54,7 @@ const txSchema = z
         'Account must be one of Checking, Savings, Credit Card, or Cash',
       ),
     amount: z
-      .number()
+      .number({ error: 'Amount is required and must be a number' })
       .refine((a) => Number.isFinite(a), 'Amount is required')
       .refine((a) => a !== 0, 'Amount must not be zero')
       .refine((a) => Math.abs(a) <= 1_000_000, 'Amount must be at most 1,000,000')

@@ -1,4 +1,4 @@
-import { component$, useContext, useSignal } from '@builder.io/qwik';
+import { component$, useContext, useSignal, useVisibleTask$ } from '@builder.io/qwik';
 import { AppCtx } from '../context';
 import { DIFFICULTY_CONFIG, MAX_HINTS, initNewMatch, resetHistoryRoot, navigateTo } from '../gameLogic';
 import type { Difficulty } from '../types';
@@ -21,6 +21,11 @@ export const SetupScreen = component$(() => {
   const store = useContext(AppCtx);
   const nameError = useSignal('');
   const diffError = useSignal('');
+  const startButton = useSignal<HTMLButtonElement>();
+
+  useVisibleTask$(() => {
+    startButton.value?.focus();
+  });
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
@@ -48,16 +53,18 @@ export const SetupScreen = component$(() => {
             onInput$={(e) => {
               const val = (e.target as HTMLInputElement).value;
               store.playerName = val;
-              if (val.length < 2 || val.length > 20) {
-                nameError.value = 'playerName must be 2 to 20 characters';
+              const trimmed = val.trim();
+              if (trimmed.length < 2 || trimmed.length > 20) {
+                nameError.value = 'playerName field must be 2 to 20 non-space characters';
               } else {
                 nameError.value = '';
               }
             }}
             onBlur$={(e) => {
               const val = (e.target as HTMLInputElement).value;
-              if (val.length < 2 || val.length > 20) {
-                nameError.value = 'playerName must be 2 to 20 characters';
+              const trimmed = val.trim();
+              if (trimmed.length < 2 || trimmed.length > 20) {
+                nameError.value = 'playerName field must be 2 to 20 non-space characters';
               }
             }}
           />
@@ -99,13 +106,15 @@ export const SetupScreen = component$(() => {
       {/* Actions */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', maxWidth: '340px' }}>
         <button
+          ref={startButton}
           class="btn-primary"
           style={{ fontSize: '18px', padding: '14px', width: '100%' }}
-          disabled={!!nameError.value || !!diffError.value || store.playerName.length < 2 || store.playerName.length > 20 || !store.difficulty}
+          disabled={!!nameError.value || !!diffError.value || store.playerName.trim().length < 2 || store.playerName.trim().length > 20 || !store.difficulty}
           onClick$={() => {
             let valid = true;
-            if (!store.playerName || store.playerName.length < 2 || store.playerName.length > 20) {
-              nameError.value = 'playerName must be 2 to 20 characters';
+            const playerName = store.playerName.trim();
+            if (playerName.length < 2 || playerName.length > 20) {
+              nameError.value = 'playerName field must be 2 to 20 non-space characters';
               valid = false;
             }
             if (!store.difficulty) {
@@ -113,6 +122,7 @@ export const SetupScreen = component$(() => {
               valid = false;
             }
             if (valid) {
+              store.playerName = playerName;
               initNewMatch(store);
             }
           }}

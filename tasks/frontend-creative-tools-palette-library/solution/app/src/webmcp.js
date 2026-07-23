@@ -93,10 +93,11 @@ export function registerWebMCP() {
     },
 
     entity_select(args = {}) {
-      if (args.entity !== 'palette') return error("Only the 'palette' entity is declared");
-      if (!findPalette(args.id)) return error('Palette not found');
-      store.openDetail(args.id);
-      return ok({ id: args.id, visible: true });
+      if (args.entity && args.entity !== 'palette') return error("Only the 'palette' entity is declared");
+      const id = args.id ?? store.palettes[0]?.id;
+      if (!id || !findPalette(id)) return error('Palette not found');
+      store.openDetail(id);
+      return ok({ id, visible: true });
     },
 
     entity_update(args = {}) {
@@ -129,7 +130,7 @@ export function registerWebMCP() {
       const existing = findPalette(args.id);
       if (!existing) return error('Palette not found');
       store.toggleFavorite(args.id);
-      return ok({ id: args.id, favorite: !existing.favorite, visible: true });
+      return ok({ id: args.id, favorite: existing.favorite, visible: true });
     },
 
     // ---- artifact-transfer-v1 ----------------------------------------------

@@ -72,7 +72,7 @@ export interface BurnDay {
   amount: number;
 }
 
-export const selectBurnRate = createSelector(selectAppState, (s) => {
+export const selectBurnRate = createSelector(selectAppState, selectFilteredTransactions, (s, transactions) => {
   const now = new Date();
   const y = now.getFullYear();
   const m = now.getMonth();
@@ -80,7 +80,7 @@ export const selectBurnRate = createSelector(selectAppState, (s) => {
   const daysInMonth = new Date(y, m + 1, 0).getDate();
   const monthPrefix = `${y}-${String(m + 1).padStart(2, '0')}`;
   const daily = new Array<number>(daysInMonth).fill(0);
-  for (const t of s.transactions) {
+  for (const t of transactions) {
     if (t.amount < 0 && t.date.startsWith(monthPrefix)) {
       const day = Number(t.date.slice(8, 10));
       if (day >= 1 && day <= daysInMonth) daily[day - 1] += Math.abs(t.amount);

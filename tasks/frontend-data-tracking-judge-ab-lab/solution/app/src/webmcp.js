@@ -44,6 +44,16 @@ async function saveAttributionLikeUi(record) {
 }
 
 const handlers = {
+  async browse_search({ query } = {}) {
+    if (typeof query !== 'string') return { searched: false, error: 'query: must be a string' }
+    const normalized = query.trim().toLowerCase().slice(0, 200)
+    const matches = S().trials
+      .filter((trial) => !normalized || [trial.id, trial.taskName, ...Object.keys(trial.results)].some((value) => value.toLowerCase().includes(normalized)))
+      .slice(0, 25)
+      .map((trial) => ({ id: trial.id, taskName: trial.taskName, labels: Object.keys(trial.results) }))
+    return { searched: true, query: normalized, count: matches.length, matches }
+  },
+
   async browse_open({ destination, trialId } = {}) {
     if (!DESTINATIONS.includes(destination)) return { opened: false, error: `destination: must be one of ${DESTINATIONS.join(', ')}` }
     const state = S()
@@ -195,6 +205,7 @@ const SCHEMA_ATTRIBUTION = {
 
 // Exactly the operations declared in the Bindings block — no extra routes.
 const tools = [
+  ['browse_search', 'Search trials by id, task name, or completed label without changing lab state.', { type: 'object', properties: { query: { type: 'string', maxLength: 200 } }, required: ['query'] }, handlers.browse_search, { readOnlyHint: true }],
   ['browse_open', 'Open a declared lab destination: experiments, compare, cost, or trial-criterion-diff.', { type: 'object', properties: { destination: { enum: DESTINATIONS }, trialId: { type: 'string' } }, required: ['destination'] }, handlers.browse_open],
   ['browse_apply_filter', 'Apply one declared filter: task, pass-fail, delta-size, label-columns, compare-pair, or suggestion-chip.', { type: 'object', properties: { filter: { enum: ['task', 'pass-fail', 'delta-size', 'label-columns', 'compare-pair', 'suggestion-chip'] }, value: {} }, required: ['filter', 'value'] }, handlers.browse_apply_filter],
   ['browse_clear_filter', 'Clear every shared experiment and comparison filter.', { type: 'object', properties: {} }, handlers.browse_clear_filter],
@@ -217,7 +228,7 @@ export function registerWebMcp() {
     modules: ['browse-query-v1', 'entity-collection-v1', 'command-session-v1', 'artifact-transfer-v1'],
     toolNames: tools.map(([name]) => name),
   })
-  window.webmcp_list_tools = () => tools.map(([name, description, inputSchema]) => ({ name, description, inputSchema }))
+  window.webmcp_list_tools = () => tools.map(([name, description, inputSchema, , annotations]) => ({ name, description, inputSchema, annotations }))
   window.webmcp_invoke_tool = async (name, args = {}) => {
     const tool = tools.find(([toolName]) => toolName === name)
     if (!tool) throw new Error(`Unknown WebMCP tool: ${name}`)
@@ -226,12 +237,13 @@ export function registerWebMcp() {
 
   const modelContext = navigator.modelContext
   if (modelContext?.registerTool) {
-    tools.forEach(([name, description, inputSchema, execute]) => {
+    tools.forEach(([name, description, inputSchema, execute, annotations]) => {
       try {
         modelContext.registerTool({
           name,
           description,
           inputSchema,
+          annotations,
           execute: async (input) => ({ content: [{ type: 'text', text: JSON.stringify(await execute(input)) }] }),
         })
       } catch { /* registration is best-effort; window.webmcp_* remain available */ }

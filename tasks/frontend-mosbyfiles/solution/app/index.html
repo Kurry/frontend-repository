@@ -17,10 +17,6 @@
       <nav class="the-nav">
         <button type="button" class="the-nav__item" data-nav="about">About</button>
       </nav>
-      <div class="the-header__tools">
-        <button type="button" id="readingListBtn" aria-label="Reading list">Reading list</button>
-        <button type="button" id="exportDossierBtn" aria-label="Export dossier">Export dossier</button>
-      </div>
     </header>
 
     <!-- Case sub-header (only on case routes) -->
@@ -52,6 +48,11 @@
             <span class="visually-hidden">Search architects</span>
             <input type="search" id="homeSearch" placeholder="Search architects" aria-label="Search architects" />
           </label>
+          <div class="home-toolbar__tools">
+            <button type="button" id="readingListBtn" aria-label="Reading list">Reading list</button>
+            <button type="button" id="exportDossierBtn" aria-label="Export dossier">Export dossier</button>
+            <button type="button" id="paletteBtn" aria-label="Command palette" aria-keyshortcuts="Control+K">Palette Ctrl+K</button>
+          </div>
         </div>
         <div class="stack" id="stack"></div>
       </section>
@@ -97,20 +98,20 @@
         <div class="dossier__actions">
           <button type="button" id="dossierCopy">Copy</button>
           <button type="button" id="dossierDownload">Download</button>
-          <span class="dossier__copied" id="dossierCopied" hidden>Copied</span>
+          <span class="dossier__copied" id="dossierCopied" role="status" aria-live="polite" hidden>Copied</span>
         </div>
         <div class="dossier__import">
           <h3>Import dossier</h3>
           <textarea id="dossierImportArea" aria-label="Import dossier JSON" placeholder="Paste Dossier JSON"></textarea>
           <input type="file" id="dossierImportFile" accept="application/json,.json" aria-label="Import dossier file" />
           <button type="button" id="dossierImportBtn">Import dossier</button>
-          <p class="dossier__error" id="dossierImportError" hidden></p>
+          <p class="dossier__error" id="dossierImportError" role="alert" aria-live="assertive" hidden></p>
         </div>
       </div>
     </div>
 
     <!-- Popup lightbox -->
-    <div class="popup" id="popup" role="dialog" aria-modal="true" aria-label="Media popup">
+    <div class="popup" id="popup" role="dialog" aria-modal="true" aria-label="Media popup" aria-hidden="true">
       <div class="popup__bg" data-popup-close tabindex="-1"></div>
       <div class="popup__box">
         <button type="button" class="popup__close" data-popup-close aria-label="Close popup">✕</button>
@@ -118,6 +119,7 @@
         <div class="popup__info" id="popupInfo"></div>
       </div>
     </div>
+    <div class="visually-hidden" id="liveStatus" role="status" aria-live="polite" aria-atomic="true"></div>
   </div>
 
   <script src="/app.js"></script>

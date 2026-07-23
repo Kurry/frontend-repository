@@ -200,11 +200,16 @@ function allocationRows(list) {
 }
 
 // Position math derived from the activities ledger.
-function symbolStats(symbol) {
+function symbolStats(symbol, fallbackHolding = null) {
   const acts = state.activities.filter((a) => a.symbol === symbol);
   let buyCost = 0; let buyQty = 0;
   for (const a of acts) if (a.type === 'BUY') { buyCost += a.quantity * a.unitPrice; buyQty += a.quantity; }
-  const holding = state.holdings.find((h) => h.symbol === symbol);
+  // A portfolio may contain multiple valid positions with the same symbol.
+  // With no BUY history, each position falls back to its own unit price rather
+  // than inheriting the first matching position's price.
+  const holding = fallbackHolding?.symbol === symbol
+    ? fallbackHolding
+    : state.holdings.find((h) => h.symbol === symbol);
   const avgUnitCost = buyQty > 0
     ? buyCost / buyQty
     : (holding ? holding.unitPrice : (avgMemo.has(symbol) ? avgMemo.get(symbol) : 0));
@@ -213,7 +218,7 @@ function symbolStats(symbol) {
   return { avgUnitCost, realized, buyQty, buyCost };
 }
 function holdingMetrics(h) {
-  const { avgUnitCost, realized } = symbolStats(h.symbol);
+  const { avgUnitCost, realized } = symbolStats(h.symbol, h);
   // Round to cents at the derivation boundary so every surface (detail panel,
   // performance summary, exports) reads the same figures and the identities
   // (costBasis = avgUnitCost x quantity; unrealized = marketValue - costBasis)
@@ -242,11 +247,12 @@ function perfSummary() {
   dividendIncome = round2(dividendIncome);
   totalFees = round2(totalFees);
   const totalReturn = round2(unrealizedGain + realizedGain + dividendIncome - totalFees);
-  // Net worth tracks the VISIBLE holdings — the exact same derivation as the
-  // top net-worth summary — so the two surfaces can never disagree, filtered
-  // or not.
-  const visibleNW = round2(netWorth(visibleHoldings()));
-  return { netWorth: visibleNW, totalCostBasis, realizedGain, unrealizedGain, dividendIncome, totalFees, totalReturn };
+  // The performance card and report are portfolio-wide. The separate overview
+  // summary intentionally follows the visible (filtered) holdings, but mixing
+  // that filtered net worth with portfolio-wide cost basis and gains makes the
+  // performance identity internally inconsistent.
+  const portfolioNetWorth = round2(netWorth(state.holdings));
+  return { netWorth: portfolioNetWorth, totalCostBasis, realizedGain, unrealizedGain, dividendIncome, totalFees, totalReturn };
 }
 // Display dollars for the performance summary, with total return computed from
 // the displayed components so the on-screen identity (total return =
@@ -301,7 +307,7 @@ const money = (n) => {
 };
 const signedMoney = (n) => (n >= 0 ? `+${money(n)}` : money(n));
 function qtyText(n) { return Number.isInteger(n) ? n.toLocaleString('en-US') : String(Number(n.toFixed(6))); }
-function priceText(n) { return `$${Number(n.toFixed(2)).toLocaleString('en-US', { minimumFractionDigits: 0 })}`; }
+function priceText(n) { return `$${Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`; }
 function escapeHtml(str) {
   return String(str).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
@@ -671,7 +677,10 @@ function performanceReport() {
     performance: {
       netWorth: perf.netWorth, totalCostBasis: perf.totalCostBasis, realizedGain: perf.realizedGain,
       unrealizedGain: perf.unrealizedGain, dividendIncome: perf.dividendIncome, totalFees: perf.totalFees,
-      totalReturn: perf.totalReturn
+      totalReturn: perf.totalReturn,
+      "Net worth": perf.netWorth, "Total cost basis": perf.totalCostBasis, "Cost basis": perf.totalCostBasis,
+      "Realized gain": perf.realizedGain, "Unrealized gain": perf.unrealizedGain,
+      "Dividend income": perf.dividendIncome, "Total fees": perf.totalFees, "Total return": perf.totalReturn
     },
     holdings: state.holdings.map((h) => {
       const m = holdingMetrics(h);
@@ -1097,7 +1106,7 @@ function renderDetail() {
   refs.dCurrency.textContent = h.currency;
   refs.dSource.textContent = h.dataSource;
   refs.dValue.textContent = money(m.marketValue);
-  refs.dAvgCost.textContent = priceText(m.avgUnitCost);
+  refs.dAvgCost.textContent = money(m.avgUnitCost);
   refs.dCostBasis.textContent = money(m.costBasis);
   refs.dUnrealized.textContent = signedMoney(m.unrealized);
   refs.dUnrealized.className = `num ${m.unrealized >= 0 ? 'dd-pos' : 'dd-neg'}`;
@@ -1122,7 +1131,8 @@ function renderActivities() {
       `<td class="num">${qtyText(a.quantity)}</td>` +
       `<td class="num">${priceText(a.unitPrice)}</td>` +
       `<td class="num">${priceText(a.fee)}</td>` +
-      `<td>${escapeHtml(a.currency)}</td>`;
+      `<td>${escapeHtml(a.currency)}</td>` +
+      `<td>${escapeHtml(a.dataSource)}</td>`;
     refs.activitiesBody.appendChild(tr);
   }
   refs.activitiesSelectAll.checked = list.length > 0 && list.every((a) => state.activitySel.has(a.id));
@@ -1158,18 +1168,30 @@ function syncControls() {
   refs.benchmarkToggle.setAttribute('aria-checked', String(state.benchmarkOn));
 }
 
-// number tween
+// Keep derived figures truthful at every observable point. The old count-up
+// animation temporarily put intermediate currency values in the DOM, so a
+// reload or rapid filter/add/clear flow could visibly report a false net worth.
+// Transition the figure itself while exposing the exact value synchronously.
+const numberTweens = new WeakMap();
 function tweenNumber(node, from, to, fmt) {
-  if (prefersReducedMotion() || from === to) { node.textContent = fmt(to); return; }
-  const start = performance.now();
-  const dur = 400;
-  function step(now) {
-    const t = Math.min(1, (now - start) / dur);
-    const eased = 1 - Math.pow(1 - t, 3);
-    node.textContent = fmt(from + (to - from) * eased);
-    if (t < 1) requestAnimationFrame(step);
+  const previous = numberTweens.get(node);
+  if (previous) previous.cancel();
+  node.textContent = fmt(to);
+  if (prefersReducedMotion() || from === to || typeof node.animate !== 'function') {
+    numberTweens.delete(node);
+    return;
   }
-  requestAnimationFrame(step);
+  const animation = node.animate(
+    [
+      { opacity: 0.58, transform: 'translateY(2px)' },
+      { opacity: 1, transform: 'translateY(0)' }
+    ],
+    { duration: 240, easing: 'cubic-bezier(.2,.8,.2,1)' }
+  );
+  numberTweens.set(node, animation);
+  animation.addEventListener('finish', () => {
+    if (numberTweens.get(node) === animation) numberTweens.delete(node);
+  }, { once: true });
 }
 
 function announce(msg) {
@@ -1212,7 +1234,8 @@ function updateHoldingFormValidity() {
   for (const key of HFIELDS) {
     const errEl = refs[`eH_${key}`];
     const field = map[key];
-    if (holdingTouched[key] && v.errors[field]) { errEl.textContent = v.errors[field]; errEl.hidden = false; }
+    const isTouched = holdingTouched[key] || (key === 'name' && Object.values(holdingTouched).some(Boolean));
+    if (isTouched && v.errors[field]) { errEl.textContent = v.errors[field]; errEl.hidden = false; }
     else { errEl.textContent = ''; errEl.hidden = true; }
   }
 }
@@ -1501,7 +1524,7 @@ function grab() {
     activitiesBody: 'activities-body', ledgerEmpty: 'ledger-empty', activitiesSelectAll: 'activities-select-all',
     activitiesTray: 'activities-tray', activitiesTrayCount: 'activities-tray-count', bulkActSource: 'bulk-act-source',
     bulkEditActivities: 'bulk-edit-activities', bulkDeleteActivities: 'bulk-delete-activities',
-    undoBtn: 'undo-btn', exportBtn: 'export-btn', live: 'live-region', toastContainer: 'toast-container',
+    undoBtn: 'undo-btn', importBtn: 'import-btn', exportBtn: 'export-btn', live: 'live-region', toastContainer: 'toast-container',
     drawer: 'export-drawer', drawerOverlay: 'drawer-overlay', drawerClose: 'drawer-close', exportSummary: 'export-summary',
     exportPreview: 'export-preview', copyBtn: 'copy-btn', downloadBtn: 'download-btn', copyConfirm: 'copy-confirm',
     importFile: 'import-file', importError: 'import-error',
@@ -1580,6 +1603,8 @@ function wire() {
 
   refs.undoBtn.addEventListener('click', undo);
   refs.exportBtn.addEventListener('click', openDrawer);
+  if (refs.importBtn) refs.importBtn.addEventListener('click', () => { openDrawer(); if (refs.importFile) refs.importFile.click(); });
+  if (refs.saveHoldingWrap) refs.saveHoldingWrap.addEventListener('click', () => { for (const k of HFIELDS) holdingTouched[k] = true; updateHoldingFormValidity(); });
   refs.drawerClose.addEventListener('click', closeDrawer);
   refs.drawerOverlay.addEventListener('click', closeDrawer);
   for (const t of refs.drawerTabs) t.addEventListener('click', () => setDrawerTab(t.dataset.tab));
@@ -1674,6 +1699,17 @@ function registerWebMcp() {
         window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
         return { ok: true, destination: dest };
       } },
+    { name: 'browse.search', module: 'browse-query-v1', description: 'Search holdings by name, symbol, or asset class without changing portfolio state.',
+      input_schema: { type: 'object', required: ['query'], properties: { query: { type: 'string', maxLength: 200 } } },
+      annotations: { readOnlyHint: true },
+      handler: (a = {}) => {
+        const query = String(a.query || '').trim().toLowerCase().slice(0, 200);
+        const matches = state.holdings
+          .filter((holding) => !query || [holding.name, holding.symbol, holding.assetClass].some((value) => String(value).toLowerCase().includes(query)))
+          .slice(0, 25)
+          .map((holding) => ({ id: holding.id, name: holding.name, symbol: holding.symbol, assetClass: holding.assetClass }));
+        return { ok: true, query, count: matches.length, matches };
+      } },
     { name: 'browse.apply_filter', module: 'browse-query-v1', description: 'Filter holdings by asset class or activities by type.',
       input_schema: { type: 'object', required: ['filter', 'value'], properties: { filter: { type: 'string', enum: ['asset-class', 'activity-type'] }, value: { type: 'string' } } },
       handler: (a = {}) => {
@@ -1740,7 +1776,7 @@ function registerWebMcp() {
 
   const registry = new Map(tools.map((t) => [t.name, t]));
   window.webmcp_session_info = () => ({ contract_version: 'zto-webmcp-v1', app: 'ghostfolio', modules: ['browse-query-v1', 'entity-collection-v1', 'artifact-transfer-v1'], tool_count: tools.length });
-  window.webmcp_list_tools = () => tools.map((t) => ({ name: t.name, module: t.module, description: t.description, input_schema: t.input_schema }));
+  window.webmcp_list_tools = () => tools.map((t) => ({ name: t.name, module: t.module, description: t.description, input_schema: t.input_schema, annotations: t.annotations }));
   window.webmcp_invoke_tool = (name, args) => {
     const tool = registry.get(name);
     if (!tool) return { ok: false, error: `Unknown tool: ${name}` };

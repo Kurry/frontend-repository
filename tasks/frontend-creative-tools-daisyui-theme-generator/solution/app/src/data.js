@@ -25,10 +25,10 @@ export const FIELD_HEIGHT = { xs: '1.9rem', sm: '2.15rem', md: '2.5rem', lg: '2.
 export const SELECTOR_SIZE = { xs: '0.9rem', sm: '1.05rem', md: '1.25rem', lg: '1.5rem', xl: '1.75rem' };
 
 export const FONT_FAMILIES = [
-  { id: 'outfit', label: 'Outfit', css: '"Outfit", ui-sans-serif, system-ui, sans-serif' },
-  { id: 'system', label: 'System', css: 'ui-sans-serif, system-ui, "Segoe UI", Helvetica, sans-serif' },
-  { id: 'serif', label: 'Serif', css: 'ui-serif, Georgia, "Times New Roman", serif' },
-  { id: 'mono', label: 'Mono', css: 'ui-monospace, "SF Mono", Menlo, Consolas, monospace' },
+  { id: 'outfit', contract: 'Outfit', label: 'Outfit', css: '"Outfit", ui-sans-serif, system-ui, sans-serif' },
+  { id: 'system', contract: 'system-ui', label: 'System', css: 'ui-sans-serif, system-ui, "Segoe UI", Helvetica, sans-serif' },
+  { id: 'serif', contract: 'serif', label: 'Serif', css: 'ui-serif, Georgia, "Times New Roman", serif' },
+  { id: 'mono', contract: 'monospace', label: 'Mono', css: 'ui-monospace, "SF Mono", Menlo, Consolas, monospace' },
 ];
 
 export const BUILTIN_NAMES = [

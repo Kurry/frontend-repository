@@ -33,7 +33,19 @@ export const registerWebMCP = () => {
   });
 
   (window as any).webmcp_list_tools = () => [
-    { name: "editor_select", module: "structured-editor-v1" },
+    {
+      name: "editor_select",
+      module: "structured-editor-v1",
+      inputSchema: {
+        type: "object",
+        default: { r: 0, c: 0 },
+        properties: {
+          r: { type: "integer", default: 0 },
+          c: { type: "integer", default: 0 }
+        },
+        required: ["r", "c"]
+      }
+    },
     { name: "editor_update_property", module: "structured-editor-v1" },
     { name: "editor_switch_mode", module: "structured-editor-v1" },
     { name: "editor_preview", module: "structured-editor-v1" },

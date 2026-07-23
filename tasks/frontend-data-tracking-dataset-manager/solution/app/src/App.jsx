@@ -151,13 +151,13 @@ function Toolbar({ dataset }) {
           onClick={() => window.matchMedia('(max-width: 768px)').matches ? setUi({ sidebarOpen: !sidebarOpen }) : setUi({ sidebarDesktopOpen: !sidebarDesktopOpen })} />
         <Btn size="sm" icon={Add} onClick={() => setUi({ modal: { type: 'row', mode: 'add' } })}>Add row</Btn>
         <Btn size="sm" kind="ghost" icon={Upload} onClick={openImport}>Import CSV</Btn>
-        <Btn size="sm" kind="ghost" icon={Export} onClick={() => setUi({ panel: 'export', exportGeneratedAt: Date.now() })}>Export</Btn>
+        <Btn size="sm" kind="ghost" icon={Export} onClick={() => setUi({ panel: 'export', exportGeneratedAt: Date.now() })}>Export package</Btn>
         <span className="divider-v mx-1 hidden sm:block" aria-hidden="true" />
         <Btn size="sm" kind={pivotMode ? 'secondary' : 'ghost'} icon={ChartRelationship} aria-pressed={pivotMode} onClick={() => setUi({ pivotMode: !pivotMode })}>{pivotMode ? 'Grid view' : 'Pivot view'}</Btn>
-        <Btn size="sm" kind="ghost" icon={Events} onClick={() => setUi({ panel: 'duplicates' })}>Duplicates</Btn>
-        <Btn size="sm" kind="ghost" icon={Flag} onClick={() => setUi({ panel: 'thresholds' })}>Thresholds</Btn>
-        <Btn size="sm" kind="ghost" onClick={() => setUi({ panel: 'splits' })}>Splits</Btn>
-        <Btn size="sm" kind="ghost" icon={Save} onClick={() => setUi({ panel: 'snapshots' })}>Snapshots</Btn>
+        <Btn size="sm" kind="ghost" icon={Events} onClick={() => setUi({ panel: 'duplicates' })}>Find duplicates</Btn>
+        <Btn size="sm" kind="ghost" icon={Flag} onClick={() => setUi({ panel: 'thresholds' })}>Manage thresholds</Btn>
+        <Btn size="sm" kind="ghost" onClick={() => setUi({ panel: 'splits' })}>Assign splits</Btn>
+        <Btn size="sm" kind="ghost" icon={Save} onClick={() => setUi({ panel: 'snapshots' })}>Compare snapshots</Btn>
         <span className="divider-v mx-1 hidden sm:block" aria-hidden="true" />
         <Btn size="sm" kind="ghost" icon={Undo} iconOnly aria-label="Undo (Ctrl+Z)" title="Undo (Ctrl+Z)" disabled={!history.length} onClick={undo} />
         <Btn size="sm" kind="ghost" icon={Redo} iconOnly aria-label="Redo (Ctrl+Shift+Z)" title="Redo (Ctrl+Shift+Z)" disabled={!future.length} onClick={redo} />
@@ -225,7 +225,7 @@ function VirtualGrid({ dataset, visibleRows }) {
   const recentRows = useStore((s) => s.recentRows)
   const sort = useStore((s) => s.sort)
   const settings = useStore((s) => s.settings)
-  const virtualizer = useVirtualizer({ count: visibleRows.length, getScrollElement: () => parentRef.current, estimateSize: () => settings.density === 'compact' ? 32 : 42, overscan: 10 })
+  const virtualizer = useVirtualizer({ count: visibleRows.length, getScrollElement: () => parentRef.current, estimateSize: () => settings.density === 'compact' ? 32 : 42, overscan: 50 })
   useEffect(() => {
     if (recentRows.ids.length && visibleRows.some((r) => recentRows.ids.includes(r.id))) virtualizer.scrollToIndex(visibleRows.length - 1, { align: 'end' })
   }, [recentRows.ids]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -288,7 +288,7 @@ function VirtualGrid({ dataset, visibleRows }) {
                 <div key={field.name} tabIndex={0}
                   className={cx('cell relative', field.type === 'number' && 'cell-num', flagged.includes(field.name) && 'flagged-cell')}
                   title={String(row.values[field.name])}
-                  onDoubleClick={() => openEditor(row, field.name)}
+                  onDoubleClick={(e) => { e.stopPropagation(); openEditor(row, field.name) }}
                   onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === 'F2') && e.target === e.currentTarget) { e.preventDefault(); openEditor(row, field.name) } }}
                   role="gridcell" aria-label={`${field.name}: ${row.values[field.name]}${flagged.includes(field.name) ? ' (flagged)' : ''}`}>
                   {inline?.rowId === row.id && inline?.field === field.name
@@ -296,7 +296,7 @@ function VirtualGrid({ dataset, visibleRows }) {
                     : <span className="cell-text">{String(row.values[field.name])}</span>}
                 </div>
               ))}
-              <div tabIndex={0} className="cell relative" title={row.expectedOutput} onDoubleClick={() => openEditor(row, 'expectedOutput')}
+              <div tabIndex={0} className="cell relative" title={row.expectedOutput} onDoubleClick={(e) => { e.stopPropagation(); openEditor(row, 'expectedOutput') }}
                 onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === 'F2') && e.target === e.currentTarget) { e.preventDefault(); openEditor(row, 'expectedOutput') } }}
                 role="gridcell" aria-label={`Expected output: ${row.expectedOutput}`}>
                 {inline?.rowId === row.id && inline?.field === 'expectedOutput' ? <InlineEditor row={row} field="expectedOutput" /> : <span className="cell-text">{row.expectedOutput}</span>}

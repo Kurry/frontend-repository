@@ -1,0 +1,19 @@
+{
+  "skill_name": "rubrics",
+  "evals": [
+    {
+      "id": 0,
+      "eval_name": "align-clockcraft-rubrics",
+      "prompt": "In repo /Users/kurrytran/frontend-repository: copy tasks-quarantine/frontend-productivity-clockcraft into <OUTDIR>/frontend-productivity-clockcraft, then update all 13 dimension rubrics in the copy's tests/ tree so they align with the copy's instruction.md in both directions, following docs/rubrics.md and the rubrics skill. Edit only the copy and run the rubrics skill's bundled dimension and rubric validators against it.",
+      "expected_output": "All 13 canonical dimension TOMLs remain present and parse; every dimension has at least one positive criterion; only innovation has exactly one positive open-ended catch-all with evidence, not-covered, and significance clauses; negatives are used only for concrete failure modes, carry negate=true, and state the bad condition as present; uncovered instruction promises gain criteria in their tag-aligned dimensions; orphaned or internal-implementation criteria are rewritten; ids stay stable; [judge], MCP, and [scoring] blocks stay untouched; both bundled validators pass.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "eval_name": "align-mindthread-rubrics",
+      "prompt": "In repo /Users/kurrytran/frontend-repository: copy tasks-quarantine/frontend-productivity-mindthread into <OUTDIR>/frontend-productivity-mindthread, then update all 13 dimension rubrics in the copy's tests/ tree so they align with the copy's instruction.md in both directions, following docs/rubrics.md and the rubrics skill. Edit only the copy and run the rubrics skill's bundled dimension and rubric validators against it.",
+      "expected_output": "The 13-dimension alignment contract from eval 0 is applied to the Vue/UnoCSS thought-threading app: instruction promises map to their tag-aligned dimensions; innovation alone has one positive catch-all; negatives are optional and correctly polarized when used; animation criteria require the real UI control path; no internal-implementation claims remain; ids and protected TOML blocks stay stable; both bundled validators pass.",
+      "files": []
+    }
+  ]
+}

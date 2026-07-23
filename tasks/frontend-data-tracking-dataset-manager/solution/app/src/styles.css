@@ -337,7 +337,7 @@ kbd { font-family: var(--mono); font-size: 11px; background: var(--surface-3); b
 
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .001s !important; animation-delay: 0s !important; transition-duration: .001s !important; scroll-behavior: auto !important; }
+  *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; animation-delay: 0s !important; transition-duration: .001s !important; scroll-behavior: auto !important; }
 }
 .reduce-motion *, .reduce-motion *::before, .reduce-motion *::after { animation-duration: .001s !important; animation-delay: 0s !important; transition-duration: .001s !important; }
 

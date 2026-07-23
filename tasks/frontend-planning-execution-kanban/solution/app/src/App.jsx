@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { compileJSON, compileMarkdown } from "./exporters.js"
+import { compileJSON, compileMarkdown } from './exporters.js'
 import {
   Button,
   Checkbox,
@@ -47,6 +47,7 @@ import {
   KeyboardSensor,
   PointerSensor,
   closestCorners,
+  pointerWithin,
   useDroppable,
   useSensor,
   useSensors,
@@ -71,12 +72,103 @@ const statusTagTypes = {
 const columnNames = Object.fromEntries(columns.map((column) => [column.id, column.name]))
 const columnSortStrategy = (args) => args.activeIndex < 0 ? null : verticalListSortingStrategy(args)
 
+// Pointer drags prefer the droppable under the pointer (exact card
+// targeting) with corner proximity as fallback for gaps and column edges.
+// Keyboard drags keep dnd-kit's canonical one-position-per-keystroke
+// sorting, which closestCorners provides.
+let keyboardDragActive = false
+const kanbanCollision = (args) => {
+  if (keyboardDragActive) return closestCorners(args)
+  const within = pointerWithin(args)
+  return within.length ? within : closestCorners(args)
+}
+
+// ---------------------------------------------------------------------------
+// Surface choreography: drawers and panels register here so a single
+// capture-phase Escape handler always closes the topmost surface (before any
+// library-internal bubble handlers), and focus traps only cycle within it.
+// ---------------------------------------------------------------------------
+const surfaceRegistry = new Map()
+let surfaceSequence = 0
+const registerSurface = (id, close) => {
+  const sequence = ++surfaceSequence
+  surfaceRegistry.set(id, { id, sequence, close })
+  return () => {
+    if (surfaceRegistry.get(id)?.sequence === sequence) surfaceRegistry.delete(id)
+  }
+}
+const topSurface = () => {
+  let best = null
+  for (const entry of surfaceRegistry.values()) {
+    if (!best || entry.sequence > best.sequence) best = entry
+  }
+  return best
+}
+
+// Delayed unmount so surfaces animate out: `rendered` stays true for exitMs
+// after `open` goes false; `shown` drives the enter/exit transition classes.
+function useSurface(open, exitMs = 260) {
+  const [rendered, setRendered] = useState(open)
+  const [shown, setShown] = useState(false)
+  useEffect(() => {
+    if (open) {
+      setRendered(true)
+      let inner
+      const outer = requestAnimationFrame(() => {
+        inner = requestAnimationFrame(() => setShown(true))
+      })
+      return () => {
+        cancelAnimationFrame(outer)
+        if (inner) cancelAnimationFrame(inner)
+      }
+    }
+    setShown(false)
+    const timer = setTimeout(() => setRendered(false), exitMs)
+    return () => clearTimeout(timer)
+  }, [open, exitMs])
+  return { rendered, shown }
+}
+
+const FOCUSABLE_SELECTOR = 'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+
+// Tab-cycle focus trap for a custom dialog surface. Focus restoration to the
+// opener is handled by the store (opener stack), so re-renders never yank
+// focus while the surface is open.
+function useSurfaceFocus(open, ref, surfaceId) {
+  useEffect(() => {
+    if (!open) return undefined
+    const container = ref.current
+    if (!container) return undefined
+    const focusables = () => [...container.querySelectorAll(FOCUSABLE_SELECTOR)].filter((element) => element.getClientRects().length)
+    const raf = requestAnimationFrame(() => focusables()[0]?.focus())
+    const onKeyDown = (event) => {
+      if (event.key !== 'Tab') return
+      const top = topSurface()
+      if (top && top.id !== surfaceId) return
+      const items = focusables()
+      if (!items.length) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      cancelAnimationFrame(raf)
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [open, surfaceId])
+}
+
+// Click events fire after a pointer drag ends; this flag keeps the landing
+// click from opening the card detail.
+let suppressNextClick = false
+
 function StatusTag({ status, compact = false }) {
   return (
     <Tag type={statusTagTypes[status]} size="sm" className={`status-tag status-${status}`}>
       {status === 'running' && <span className="active-dot" aria-hidden="true" />}
       {status}
-      {!compact && status === 'retrying' ? '' : ''}
     </Tag>
   )
 }
@@ -112,7 +204,7 @@ function TaskList({ card, backoff, detailed = false }) {
               <span className="task-attempt">attempt {task.attempts}</span>
             )}
             {task.status === 'retrying' && backoff?.taskId === task.id && (
-              <span className="backoff-copy">waiting {backoff.seconds} seconds before retry {backoff.nextAttempt} of {backoff.maxAttempts}</span>
+              <span className="backoff-copy">waiting {backoff.seconds}s before retry {backoff.nextAttempt} of {backoff.maxAttempts}</span>
             )}
             {task.status === 'failed' && <span className="task-error">The execution step did not return a valid result.</span>}
           </span>
@@ -131,12 +223,12 @@ function CardPreview({ card }) {
   )
 }
 
-function BoardCard({ card, prompt, people, selected, backoff, dropPosition, index }) {
+function BoardCard({ card, prompt, people, selected, backoff, dropPosition, index, columnLength }) {
   const {
     setDetailId, setPromptPanelId, toggleSelection, moveCard, moveRelative, runCard, retryCard,
   } = useBoardStore()
   const {
-    attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging,
+    attributes, listeners, setNodeRef, transform, transition, isDragging,
   } = useSortable({ id: card.id, data: { column: card.column } })
   const complete = card.tasks.filter((task) => task.status === 'complete').length
   const isBusy = card.status === 'running' || card.status === 'retrying'
@@ -145,8 +237,25 @@ function BoardCard({ card, prompt, people, selected, backoff, dropPosition, inde
   const stop = (event) => event.stopPropagation()
 
   const openDetail = (event) => {
+    if (suppressNextClick) {
+      suppressNextClick = false
+      return
+    }
     if (event.target.closest('[data-no-card-open="true"]')) return
     setDetailId(card.id)
+  }
+
+  // Merge dnd-kit's keyboard sensor handler (from listeners) with card
+    // activation: the sensor preventDefaults Space when it starts a keyboard
+    // drag; Enter stays free to open the detail view.
+  const onCardKeyDown = (event) => {
+    const dragInFlight = isDragging || Boolean(document.querySelector('.card-tile.is-dragging'))
+    listeners?.onKeyDown?.(event)
+    if (event.defaultPrevented || dragInFlight) return
+    if ((event.key === 'Enter' || event.key === ' ') && event.target === event.currentTarget) {
+      event.preventDefault()
+      setDetailId(card.id)
+    }
   }
 
   return (
@@ -155,41 +264,43 @@ function BoardCard({ card, prompt, people, selected, backoff, dropPosition, inde
       <article
         ref={setNodeRef}
         style={style}
+        {...attributes}
+        {...listeners}
+        data-card-id={card.id}
+        data-column={card.column}
         className={`card-tile accent-${card.column} ${isDragging ? 'is-dragging' : ''}`}
         tabIndex={0}
         role="button"
         aria-label={`Open ${card.title}`}
         onClick={openDetail}
-        onKeyDown={(event) => {
-          if ((event.key === 'Enter' || event.key === ' ') && event.target === event.currentTarget) {
-            event.preventDefault(); setDetailId(card.id)
-          }
-        }}
+        onKeyDown={onCardKeyDown}
       >
         <div className="card-topline">
-          <div data-no-card-open="true" onClick={stop} className="selection-control">
+          <div
+            className="selection-control"
+            data-no-card-open="true"
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={(event) => {
+              event.stopPropagation()
+              if (event.target.closest('input, label')) return
+              toggleSelection(card.id)
+            }}
+            onKeyDown={stop}
+          >
             <Checkbox
               id={`select-${card.id}`}
               labelText={`Select ${card.title}`}
               hideLabel
               checked={selected}
               onChange={() => toggleSelection(card.id)}
+              onClick={(event) => event.stopPropagation()}
             />
           </div>
-          <button
-            type="button"
-            className="drag-handle"
-            ref={setActivatorNodeRef}
-            {...attributes}
-            {...listeners}
-            data-no-card-open="true"
-            aria-label={`Drag ${card.title}`}
-            onClick={stop}
-          >
+          <span className="drag-handle" aria-hidden="true">
             <DragVertical size={16} />
-          </button>
+          </span>
           <div className="card-status"><StatusTag status={card.status} compact /></div>
-          <div data-no-card-open="true" onClick={stop} className="move-menu-wrap">
+          <div className="move-menu-wrap" data-no-card-open="true" onPointerDown={stop} onClick={stop} onKeyDown={stop}>
             <OverflowMenu size="sm" flipped iconDescription={`Move ${card.title}`} aria-label={`Move ${card.title}`}>
               {columns.map((column) => (
                 <OverflowMenuItem
@@ -199,8 +310,8 @@ function BoardCard({ card, prompt, people, selected, backoff, dropPosition, inde
                   onClick={() => moveCard(card.id, column.id, useBoardStore.getState().order[column.id].length)}
                 />
               ))}
-              <OverflowMenuItem itemText="Move up" onClick={() => moveRelative(card.id, 'up')} />
-              <OverflowMenuItem itemText="Move down" onClick={() => moveRelative(card.id, 'down')} />
+              <OverflowMenuItem itemText="Move up" disabled={index === 0} onClick={() => moveRelative(card.id, 'up')} />
+              <OverflowMenuItem itemText="Move down" disabled={index >= columnLength - 1} onClick={() => moveRelative(card.id, 'down')} />
             </OverflowMenu>
           </div>
         </div>
@@ -214,6 +325,7 @@ function BoardCard({ card, prompt, people, selected, backoff, dropPosition, inde
             className="prompt-chip"
             data-no-card-open="true"
             onClick={(event) => { stop(event); setPromptPanelId(prompt.id) }}
+            onKeyDown={stop}
           >
             <PromptSession size={14} />
             <span>{prompt.title}</span>
@@ -232,16 +344,17 @@ function BoardCard({ card, prompt, people, selected, backoff, dropPosition, inde
             <AssigneeAvatar assignee={card.assignee} people={people} />
             {card.comments.length > 0 && <span className="comment-count"><Chat size={14} />{card.comments.length}</span>}
           </div>
-          <Button
-            size="sm"
-            kind={card.status === 'failed' ? 'danger--tertiary' : 'tertiary'}
-            renderIcon={card.status === 'failed' ? Renew : Play}
-            disabled={isBusy}
-            data-no-card-open="true"
-            onClick={(event) => { stop(event); card.status === 'failed' ? retryCard(card.id) : runCard(card.id, card.status === 'complete') }}
-          >
-            {card.status === 'failed' ? 'Retry' : card.status === 'complete' ? 'Run again' : isBusy ? 'Running' : 'Run'}
-          </Button>
+          <span data-no-card-open="true" onPointerDown={stop} onClick={stop} onKeyDown={stop}>
+            <Button
+              size="sm"
+              kind={card.status === 'failed' ? 'danger--tertiary' : 'tertiary'}
+              renderIcon={card.status === 'failed' ? Renew : Play}
+              disabled={isBusy}
+              onClick={(event) => { stop(event); card.status === 'failed' ? retryCard(card.id) : runCard(card.id, card.status === 'complete') }}
+            >
+              {card.status === 'failed' ? 'Retry' : card.status === 'complete' ? 'Run again' : isBusy ? 'Running' : 'Run'}
+            </Button>
+          </span>
         </div>
       </article>
     </>
@@ -288,6 +401,7 @@ function BoardColumn({ column, visibleIds, dropHint }) {
                 key={cardId}
                 card={card}
                 index={index}
+                columnLength={visibleIds.length}
                 dropPosition={dropPosition}
                 prompt={state.prompts.find((item) => item.id === card.attached_prompt)}
                 people={state.assignees}
@@ -320,39 +434,79 @@ function BoardColumn({ column, visibleIds, dropHint }) {
   )
 }
 
-function CreateCardModal() {
+function CreateCardModal({ column, shown }) {
   const state = useBoardStore()
-  const target = state.createColumn
   const schema = useMemo(
     () => createCardSchema(state.prompts.map((item) => item.id), state.assignees.map((item) => item.id)),
     [state.prompts, state.assignees],
   )
-  const { register, handleSubmit, watch, setValue, reset, formState: { errors, isSubmitting } } = useForm({
+  const seed = state.createFormSeed
+  const { register, handleSubmit, setError, clearErrors, reset, trigger, watch, formState: { errors, isSubmitting, isValid } } = useForm({
     resolver: zodResolver(schema),
     mode: 'onChange',
-    defaultValues: { title: '', description: '', attached_prompt: '', assignee: '', column: target, position: 0 },
+    reValidateMode: 'onChange',
+    defaultValues: {
+      title: seed?.title ?? '',
+      description: seed?.description ?? '',
+      attached_prompt: seed?.attached_prompt ?? '',
+      assignee: seed?.assignee ?? '',
+      column,
+      position: 0,
+    },
   })
-  const title = watch('title') || ''
+  const close = () => state.setCreateColumn(null)
+  const submitted = useRef(false)
+
   useEffect(() => {
-    if (target) {
-      reset({ title: '', description: '', attached_prompt: '', assignee: '', column: target, position: 0 })
-    }
-  }, [target, reset])
-  if (!target) return null
+    if (!seed) return
+    reset({
+      title: seed.title ?? '',
+      description: seed.description ?? '',
+      attached_prompt: seed.attached_prompt ?? '',
+      assignee: seed.assignee ?? '',
+      column,
+      position: 0,
+    })
+  }, [seed, column, reset])
+
+  useEffect(() => {
+    const external = state.createFormErrors || {}
+    const keys = Object.keys(external).filter((key) => external[key])
+    if (!keys.length) return
+    keys.forEach((key) => setError(key, { type: 'manual', message: external[key] }))
+  }, [state.createFormErrors, setError])
 
   const submit = handleSubmit((payload) => {
+    if (submitted.current) return
+    submitted.current = true
+    state.setCreateFormErrors({})
     state.createCard(payload)
     state.setCreateColumn(null)
+  }, (formErrors) => {
+    const mapped = Object.fromEntries(
+      Object.entries(formErrors).map(([key, value]) => [key, value?.message]).filter(([, message]) => message),
+    )
+    state.setCreateFormErrors(mapped)
   })
 
   return (
-    <ComposedModal open onClose={() => state.setCreateColumn(null)} selectorPrimaryFocus="#create-title" preventCloseOnClickOutside size="sm">
-      <ModalHeader label={columnNames[target]} title="Add a prompt execution card" closeModal={() => state.setCreateColumn(null)} />
+    <ComposedModal open onClose={close} selectorPrimaryFocus="#create-title" preventCloseOnClickOutside size="sm" className={`modal-surface ${shown ? 'is-shown' : ''}`}>
+      <ModalHeader label={columnNames[column]} title="Add a prompt execution card" closeModal={close} />
       <ModalBody hasForm>
         <form id="create-card-form" onSubmit={submit} className="modal-form" noValidate>
           <input type="hidden" {...register('column')} />
           <input type="hidden" {...register('position', { valueAsNumber: true })} />
-          <TextInput id="create-title" labelText="Title" placeholder="What should this prompt execution accomplish?" invalid={Boolean(errors.title)} invalidText={errors.title?.message} {...register('title')} />
+          <TextInput
+            id="create-title"
+            labelText="Title"
+            placeholder="What should this prompt execution accomplish?"
+            invalid={Boolean(errors.title)}
+            invalidText={errors.title?.message}
+            {...register('title', {
+              onBlur: () => { void trigger('title') },
+              onChange: () => { clearErrors('title'); state.setCreateFormErrors({ ...state.createFormErrors, title: undefined }) },
+            })}
+          />
           <TextArea id="create-description" labelText="Description (optional)" placeholder="Add useful context, acceptance criteria, or evaluation notes." invalid={Boolean(errors.description)} invalidText={errors.description?.message} {...register('description')} />
           <Select id="create-prompt" labelText="Attached prompt (optional)" invalid={Boolean(errors.attached_prompt)} invalidText={errors.attached_prompt?.message} {...register('attached_prompt')}>
             <SelectItem value="" text="No attached prompt" />
@@ -366,39 +520,95 @@ function CreateCardModal() {
         </form>
       </ModalBody>
       <ModalFooter>
-        <Button kind="secondary" onClick={() => state.setCreateColumn(null)}>Cancel</Button>
-        <Button type="submit" form="create-card-form" disabled={!title.trim() || isSubmitting}>Add Card</Button>
+        <Button kind="secondary" onClick={close}>Cancel</Button>
+        <Button type="submit" form="create-card-form" disabled={isSubmitting || !isValid}>Add Card</Button>
       </ModalFooter>
     </ComposedModal>
   )
 }
 
-function CardDetailModal() {
-  const state = useBoardStore()
-  const card = state.detailId ? state.cards[state.detailId] : null
-  const schema = useMemo(() => detailCardSchema(state.assignees.map((item) => item.id)), [state.assignees])
+function CreateCardModalHost() {
+  const createColumn = useBoardStore((state) => state.createColumn)
+  const createOpenToken = useBoardStore((state) => state.createOpenToken)
+  const open = Boolean(createColumn)
+  const { rendered, shown } = useSurface(open, 240)
+  const [frozenColumn, setFrozenColumn] = useState(null)
+  const [frozenToken, setFrozenToken] = useState(0)
+  useEffect(() => {
+    if (createColumn) {
+      setFrozenColumn(createColumn)
+      setFrozenToken(createOpenToken)
+    }
+  }, [createColumn, createOpenToken])
+  if (!rendered || !frozenColumn) return null
+  return <CreateCardModal key={`${frozenColumn}-${frozenToken}`} column={frozenColumn} shown={shown} />
+}
+
+function DetailEditForm({ card, onSave }) {
+  const assignees = useBoardStore((state) => state.assignees)
+  const schema = useMemo(() => detailCardSchema(assignees.map((item) => item.id)), [assignees])
   const { register, handleSubmit, formState: { errors } } = useForm({
-    resolver: zodResolver(schema), mode: 'onChange',
-    values: card ? { title: card.title, description: card.description, assignee: card.assignee || '' } : { title: '', description: '', assignee: '' },
+    resolver: zodResolver(schema),
+    mode: 'all',
+    defaultValues: { title: card.title, description: card.description, assignee: card.assignee || '' },
   })
-  const commentForm = useForm({ resolver: zodResolver(commentSchema), defaultValues: { comment: '' } })
+  const submitted = useRef(false)
+  const submit = handleSubmit((payload) => {
+    if (submitted.current) return
+    submitted.current = true
+    onSave(payload)
+  })
+  return (
+    <form id="detail-edit-form" onSubmit={submit} className="modal-form" noValidate>
+      <TextInput id="detail-title" labelText="Title" invalid={Boolean(errors.title)} invalidText={errors.title?.message} {...register('title')} />
+      <TextArea id="detail-description" labelText="Description" rows={4} invalid={Boolean(errors.description)} invalidText={errors.description?.message} {...register('description')} />
+      <Select id="detail-assignee" labelText="Assignee" invalid={Boolean(errors.assignee)} invalidText={errors.assignee?.message} {...register('assignee')}>
+        <SelectItem value="" text="Unassigned" />
+        {assignees.map((person) => <SelectItem key={person.id} value={person.id} text={person.name} />)}
+      </Select>
+      <div className="sr-only" aria-live="assertive">{Object.values(errors).map((error) => error?.message).filter(Boolean).join(' ')}</div>
+    </form>
+  )
+}
+
+function CardDetailModal({ cardId, shown }) {
+  const state = useBoardStore()
+  const live = state.cards[cardId] || null
+  const [frozen, setFrozen] = useState(live)
+  useEffect(() => {
+    if (live) setFrozen(live)
+  }, [live])
+  const card = live || frozen
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  useEffect(() => {
+    setConfirmingDelete(false)
+  }, [cardId])
+  useEffect(() => {
+    if (!confirmingDelete) return undefined
+    const timer = setTimeout(() => setConfirmingDelete(false), 2600)
+    return () => clearTimeout(timer)
+  }, [confirmingDelete])
+
+  const commentForm = useForm({
+    resolver: zodResolver(commentSchema),
+    mode: 'all',
+    defaultValues: { comment: '' },
+  })
+
   if (!card) return null
   const prompt = state.prompts.find((item) => item.id === card.attached_prompt)
   const complete = card.tasks.filter((task) => task.status === 'complete').length
   const isBusy = card.status === 'running' || card.status === 'retrying'
+  const close = () => state.setDetailId(null)
 
-  const save = handleSubmit((payload) => {
-    state.updateCard(card.id, payload)
-    state.setDetailId(null)
-  })
   const submitComment = commentForm.handleSubmit(({ comment }) => {
     state.addComment(card.id, comment)
     commentForm.reset()
   })
 
   return (
-    <ComposedModal open onClose={() => state.setDetailId(null)} selectorPrimaryFocus="#detail-title" preventCloseOnClickOutside size="lg">
-      <ModalHeader label={`${columnNames[card.column]} · ${complete} of ${card.tasks.length} complete`} title="Card detail" closeModal={() => state.setDetailId(null)} />
+    <ComposedModal open onClose={close} selectorPrimaryFocus="#detail-title" preventCloseOnClickOutside size="lg" className={`modal-surface ${shown ? 'is-shown' : ''}`}>
+      <ModalHeader label={`${columnNames[card.column]} · ${complete} of ${card.tasks.length} complete`} title={card.title} closeModal={close} />
       <ModalBody className="detail-modal-body">
         <div className="detail-status-row">
           <StatusTag status={card.status} />
@@ -406,15 +616,14 @@ function CardDetailModal() {
         </div>
         <div className="detail-grid">
           <div className="detail-main">
-            <form id="detail-edit-form" onSubmit={save} className="modal-form" noValidate>
-              <TextInput id="detail-title" labelText="Title" invalid={Boolean(errors.title)} invalidText={errors.title?.message} {...register('title')} />
-              <TextArea id="detail-description" labelText="Description" rows={4} invalid={Boolean(errors.description)} invalidText={errors.description?.message} {...register('description')} />
-              <Select id="detail-assignee" labelText="Assignee" invalid={Boolean(errors.assignee)} invalidText={errors.assignee?.message} {...register('assignee')}>
-                <SelectItem value="" text="Unassigned" />
-                {state.assignees.map((person) => <SelectItem key={person.id} value={person.id} text={person.name} />)}
-              </Select>
-              <div className="sr-only" aria-live="assertive">{Object.values(errors).map((error) => error?.message).filter(Boolean).join(' ')}</div>
-            </form>
+            <DetailEditForm
+              key={card.id}
+              card={card}
+              onSave={(payload) => {
+                state.updateCard(card.id, payload)
+                state.setDetailId(null)
+              }}
+            />
 
             <section className="detail-section">
               <div className="section-heading"><h3>Task checklist</h3><span>{complete} of {card.tasks.length}</span></div>
@@ -425,7 +634,7 @@ function CardDetailModal() {
             <section className="detail-section">
               <h3>Attached prompt</h3>
               {prompt ? (
-                <button className="prompt-chip detail-prompt" type="button" onClick={() => state.setPromptPanelId(prompt.id)}><PromptSession size={16} />{prompt.title}</button>
+                <button className="prompt-chip detail-prompt" type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => state.setPromptPanelId(prompt.id)}><PromptSession size={16} />{prompt.title}</button>
               ) : <p className="muted-copy">No prompt attached.</p>}
             </section>
             <section className="detail-section comments-section">
@@ -441,73 +650,80 @@ function CardDetailModal() {
               </div>
               <form className="comment-form" onSubmit={submitComment}>
                 <TextArea id="detail-comment" labelText="Add a comment" rows={2} invalid={Boolean(commentForm.formState.errors.comment)} invalidText={commentForm.formState.errors.comment?.message} {...commentForm.register('comment')} />
-                <Button type="submit" size="sm" kind="tertiary" renderIcon={Chat}>Add comment</Button>
+                {/* preventDefault on mousedown: Carbon centers newly focused
+                    nodes inside scrollable modal content, which would shift the
+                    button out from under the pointer between down and up. */}
+                <Button type="submit" size="sm" kind="tertiary" renderIcon={Chat} onMouseDown={(event) => event.preventDefault()}>Add comment</Button>
               </form>
             </section>
           </aside>
         </div>
       </ModalBody>
       <ModalFooter>
-        <Button kind="danger--tertiary" onClick={() => {
-          if (window.confirm(`Delete “${card.title}”? This can be restored with Undo.`)) state.deleteCard(card.id)
-        }}>Delete Card</Button>
+        <Button
+          kind="danger--tertiary"
+          onClick={() => {
+            if (!confirmingDelete) {
+              setConfirmingDelete(true)
+              return
+            }
+            state.deleteCard(card.id)
+          }}
+        >
+          {confirmingDelete ? 'Confirm delete?' : 'Delete Card'}
+        </Button>
         <Button kind="tertiary" renderIcon={card.status === 'failed' ? Renew : Play} disabled={isBusy} onClick={() => card.status === 'failed' ? state.retryCard(card.id) : state.runCard(card.id, card.status === 'complete')}>
           {card.status === 'failed' ? 'Retry' : card.status === 'complete' ? 'Run again' : isBusy ? 'Running' : 'Run'}
         </Button>
-        <Button kind="secondary" onClick={() => state.setDetailId(null)}>Cancel</Button>
+        <Button kind="secondary" onClick={close}>Cancel</Button>
         <Button type="submit" form="detail-edit-form">Save</Button>
       </ModalFooter>
     </ComposedModal>
   )
 }
 
-function useFocusTrap(open, onClose) {
-  const ref = useRef(null)
+function CardDetailModalHost() {
+  const detailId = useBoardStore((state) => state.detailId)
+  const open = Boolean(detailId)
+  const { rendered, shown } = useSurface(open, 240)
+  const [frozenId, setFrozenId] = useState(null)
+  useEffect(() => {
+    if (detailId) setFrozenId(detailId)
+  }, [detailId])
+  if (!rendered || !frozenId) return null
+  return <CardDetailModal key={frozenId} cardId={frozenId} shown={shown} />
+}
+
+function PromptPanel({ promptId, shown }) {
+  const state = useBoardStore()
+  const prompt = state.prompts.find((item) => item.id === promptId)
+  const open = Boolean(state.promptPanelId)
+  const close = () => state.setPromptPanelId(null)
+  const panelRef = useRef(null)
+  useSurfaceFocus(open, panelRef, 'prompt-panel')
+  const closeRef = useRef(close)
+  closeRef.current = close
   useEffect(() => {
     if (!open) return undefined
-    const origin = document.activeElement
-    const container = ref.current
-    const focusable = () => [...container.querySelectorAll('button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])')]
-    requestAnimationFrame(() => focusable()[0]?.focus())
-    const keydown = (event) => {
-      if (event.key === 'Escape') { event.preventDefault(); onClose(); return }
-      if (event.key !== 'Tab') return
-      const items = focusable(); if (!items.length) return
-      const first = items[0]; const last = items.at(-1)
-      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
-      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
-    }
-    document.addEventListener('keydown', keydown)
-    return () => {
-      document.removeEventListener('keydown', keydown)
-      requestAnimationFrame(() => origin?.focus?.())
-    }
-  }, [open, onClose])
-  return ref
-}
-
-function useReturnFocus(open) {
-  const originRef = useRef(null)
-  useEffect(() => {
-    if (open) {
-      originRef.current = document.activeElement
-    } else if (originRef.current) {
-      const el = originRef.current
-      requestAnimationFrame(() => el?.focus?.())
-      originRef.current = null
-    }
+    return registerSurface('prompt-panel', () => closeRef.current())
   }, [open])
-}
 
-function PromptPanel() {
-  const state = useBoardStore()
-  const prompt = state.prompts.find((item) => item.id === state.promptPanelId)
-  const close = () => state.setPromptPanelId(null)
-  const panelRef = useFocusTrap(Boolean(prompt), close)
   if (!prompt) return null
   return (
-    <div className="drawer-scrim" onMouseDown={(event) => { if (event.target === event.currentTarget) close() }}>
-      <aside ref={panelRef} className="side-panel prompt-panel" role="dialog" aria-modal="true" aria-labelledby="prompt-panel-title">
+    <div className={`drawer-scrim ${shown ? 'is-shown' : ''}`} onMouseDown={(event) => { if (event.target === event.currentTarget) close() }}>
+      <aside
+        ref={panelRef}
+        className={`side-panel prompt-panel ${shown ? 'is-open' : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="prompt-panel-title"
+        onKeyDownCapture={(event) => {
+          if (event.key !== 'Escape') return
+          event.preventDefault()
+          event.stopPropagation()
+          close()
+        }}
+      >
         <header className="drawer-header">
           <div><span className="eyebrow">Prompt library</span><h2 id="prompt-panel-title">{prompt.title}</h2></div>
           <Button hasIconOnly kind="ghost" renderIcon={Close} iconDescription="Close prompt panel" onClick={close} />
@@ -522,13 +738,25 @@ function PromptPanel() {
   )
 }
 
+function PromptPanelHost() {
+  const promptPanelId = useBoardStore((state) => state.promptPanelId)
+  const open = Boolean(promptPanelId)
+  const { rendered, shown } = useSurface(open, 240)
+  const [frozenId, setFrozenId] = useState(null)
+  useEffect(() => {
+    if (promptPanelId) setFrozenId(promptPanelId)
+  }, [promptPanelId])
+  if (!rendered || !frozenId) return null
+  return <PromptPanel promptId={frozenId} shown={shown} />
+}
+
 function ExportPreview({ text, format, onCopy, onDownload }) {
   return (
     <div className="export-preview-wrap">
       <div className="preview-actions">
         <span>{format === 'json' ? 'application/json' : 'text/markdown'}</span>
         <div>
-          <Button size="sm" kind="ghost" renderIcon={Copy} onClick={() => onCopy(text)}>Copy</Button>
+          <Button size="sm" kind="ghost" renderIcon={Copy} data-export-copy onClick={(event) => onCopy(text, event.currentTarget)}>Copy</Button>
           <Button size="sm" kind="ghost" renderIcon={Download} onClick={() => onDownload(text, format)}>Download</Button>
         </div>
       </div>
@@ -537,31 +765,45 @@ function ExportPreview({ text, format, onCopy, onDownload }) {
   )
 }
 
-
-
-function ExportDrawer() {
+function ExportDrawer({ shown }) {
   const state = useBoardStore()
+  const open = state.exportOpen
   const close = () => state.setExportOpen(false)
-  const drawerRef = useFocusTrap(state.exportOpen, close)
-  const importForm = useForm({ resolver: zodResolver(importFormSchema), defaultValues: { import: state.importDraft } })
+  const drawerRef = useRef(null)
+  useSurfaceFocus(open, drawerRef, 'export-drawer')
+  const closeRef = useRef(close)
+  closeRef.current = close
+  useEffect(() => {
+    if (!open) return undefined
+    return registerSurface('export-drawer', () => closeRef.current())
+  }, [open])
 
-  const exportData = useMemo(() => {
-    if (!state.exportOpen) return { json: '', markdown: '' }
-    return {
-      json: compileJSON(state),
-      markdown: compileMarkdown(state)
-    }
-  }, [state.exportOpen, state.board, state.cards, state.order, state.prompts, state.assignees, state.wipLimits])
+  const importForm = useForm({
+    resolver: zodResolver(importFormSchema),
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
+    defaultValues: { import: state.importDraft },
+  })
 
-  if (!state.exportOpen) return null
+  const exportData = useMemo(() => ({
+    json: compileJSON(state),
+    markdown: compileMarkdown(state),
+  }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [state.board, state.cards, state.order, state.prompts, state.assignees, state.wipLimits])
+
   const selectedIndex = state.exportFormat === 'json' ? 0 : 1
   const importReg = importForm.register('import')
 
-  const copy = async (text) => {
+  const copy = async (text, control) => {
+    control.dataset.copyStatus = 'pending'
     try {
       await navigator.clipboard.writeText(text)
+      control.dataset.copyStatus = 'success'
       state.notify('success', 'Copied', 'The exact visible preview is on your clipboard.')
+      state.announce('Export copied to clipboard.')
     } catch {
+      control.dataset.copyStatus = 'error'
       state.notify('error', 'Copy unavailable', 'Select the preview text and copy it manually.')
     }
   }
@@ -573,14 +815,18 @@ function ExportDrawer() {
     URL.revokeObjectURL(url)
   }
   const submitImport = importForm.handleSubmit(({ import: payload }) => {
-    state.importBoard(payload)
+    const imported = state.importBoard(payload)
+    if (imported) {
+      importForm.reset({ import: '' })
+      state.setImportDraft('')
+    }
   }, (errors) => state.setImportError(errors.import?.message || 'Import field is invalid.'))
 
   return (
-    <div className="drawer-scrim" onMouseDown={(event) => { if (event.target === event.currentTarget) close() }}>
-      <aside ref={drawerRef} className="side-panel export-drawer" role="dialog" aria-modal="true" aria-labelledby="export-title">
+    <div className={`drawer-scrim ${shown ? 'is-shown' : ''}`} onMouseDown={(event) => { if (event.target === event.currentTarget) close() }}>
+      <aside ref={drawerRef} className={`side-panel export-drawer ${shown ? 'is-open' : ''}`} role="dialog" aria-modal="true" aria-labelledby="export-title">
         <header className="drawer-header">
-          <div><span className="eyebrow">Live board artifact</span><h2 id="export-title">Export & import</h2></div>
+          <div><span className="eyebrow">Live board artifact</span><h2 id="export-title">Export &amp; import</h2></div>
           <Button hasIconOnly kind="ghost" renderIcon={Close} iconDescription="Close Export drawer" onClick={close} />
         </header>
         <div className="drawer-body export-body">
@@ -601,14 +847,16 @@ function ExportDrawer() {
             <TextArea
               id="import-board-json"
               labelText="Import"
-              rows={6}
+              rows={4}
               placeholder="Paste board JSON here"
               invalid={Boolean(importForm.formState.errors.import || state.importError)}
               invalidText={importForm.formState.errors.import?.message || state.importError}
               {...importReg}
               onChange={(event) => { importReg.onChange(event); state.setImportDraft(event.target.value) }}
             />
-            <Button type="submit" size="sm" renderIcon={Upload}>Import Board</Button>
+            <div className="import-actions">
+              <Button type="submit" size="sm" renderIcon={Upload}>Import Board</Button>
+            </div>
             <div className="sr-only" aria-live="assertive">{importForm.formState.errors.import?.message || state.importError}</div>
           </form>
         </div>
@@ -617,12 +865,18 @@ function ExportDrawer() {
   )
 }
 
-function BulkActionBar() {
+function ExportDrawerHost() {
+  const exportOpen = useBoardStore((state) => state.exportOpen)
+  const { rendered, shown } = useSurface(exportOpen, 240)
+  if (!rendered) return null
+  return <ExportDrawer shown={shown} />
+}
+
+function BulkActionBar({ shown, count }) {
   const state = useBoardStore()
-  if (!state.selection.length) return null
   return (
-    <div className="bulk-bar" role="region" aria-label="Bulk card actions">
-      <div className="bulk-count"><strong>{state.selection.length}</strong><span>selected</span></div>
+    <div className={`bulk-bar ${shown ? 'is-shown' : ''}`} role="region" aria-label="Bulk card actions">
+      <div className="bulk-count"><strong>{count}</strong><span>selected</span></div>
       <div className="bulk-actions">
         {columns.map((column) => <Button key={column.id} size="sm" kind="ghost" onClick={() => state.bulkMove(column.id)}>Move to {column.name}</Button>)}
       </div>
@@ -631,13 +885,64 @@ function BulkActionBar() {
   )
 }
 
+function BulkActionBarHost() {
+  const count = useBoardStore((state) => state.selection.length)
+  const open = count > 0
+  const { rendered, shown } = useSurface(open, 200)
+  const [frozenCount, setFrozenCount] = useState(0)
+  useEffect(() => {
+    if (count) setFrozenCount(count)
+  }, [count])
+  if (!rendered || !open && !frozenCount) return null
+  return <BulkActionBar shown={shown} count={open ? count : frozenCount} />
+}
+
+function ToastHost() {
+  const toast = useBoardStore((state) => state.toast)
+  const clearToast = useBoardStore((state) => state.clearToast)
+  const [leaving, setLeaving] = useState(false)
+  useEffect(() => {
+    if (!toast) {
+      setLeaving(false)
+      return undefined
+    }
+    setLeaving(false)
+    const fade = setTimeout(() => setLeaving(true), 3300)
+    const clear = setTimeout(() => clearToast(), 3650)
+    return () => {
+      clearTimeout(fade)
+      clearTimeout(clear)
+    }
+  }, [toast, clearToast])
+  if (!toast) return null
+  return (
+    <div className={`toast-stack ${leaving ? 'toast-leaving' : ''}`}>
+      <ToastNotification
+        key={toast.id}
+        kind={toast.kind}
+        title={toast.title}
+        subtitle={toast.subtitle}
+        timeout={0}
+        onCloseButtonClick={clearToast}
+        lowContrast
+      />
+    </div>
+  )
+}
+
 function App() {
   const state = useBoardStore()
   const [activeId, setActiveId] = useState(null)
   const [dropHint, setDropHint] = useState(null)
+  const dropHintRef = useRef(null)
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+      // Enter stays reserved for opening the card detail; Space drives
+      // keyboard drag-and-drop.
+      keyboardCodes: { start: ['Space'], cancel: ['Escape'], end: ['Space'] },
+    }),
   )
 
   const visibleByColumn = useMemo(() => {
@@ -649,11 +954,29 @@ function App() {
   }, [state.cards, state.order, state.filterAssignee, state.search])
 
   useEffect(() => registerWebMCP(), [])
+
+  // Escape closes the topmost custom surface (prompt panel / export drawer)
+  // before any library bubble-phase handler can act; Carbon modals handle
+  // their own Escape natively and are not registered here.
   useEffect(() => {
-    if (!state.toast) return undefined
-    const timer = setTimeout(state.clearToast, 3800)
-    return () => clearTimeout(timer)
-  }, [state.toast])
+    const onKeyDown = (event) => {
+      if (event.key !== 'Escape') return
+      const top = topSurface()
+      if (!top) return
+      event.stopPropagation()
+      event.preventDefault()
+      top.close()
+    }
+    window.addEventListener('keydown', onKeyDown, true)
+    return () => window.removeEventListener('keydown', onKeyDown, true)
+  }, [])
+
+  useEffect(() => {
+    const reset = () => { suppressNextClick = false }
+    document.addEventListener('pointerdown', reset)
+    return () => document.removeEventListener('pointerdown', reset)
+  }, [])
+
   useEffect(() => {
     const keydown = (event) => {
       const mod = navigator.platform.toLowerCase().includes('mac') ? event.metaKey : event.ctrlKey
@@ -667,33 +990,106 @@ function App() {
     return () => document.removeEventListener('keydown', keydown)
   }, [])
 
+  const taskStats = useMemo(() => {
+    let total = 0
+    let done = 0
+    for (const id of Object.keys(state.cards)) {
+      const card = state.cards[id]
+      total += card.tasks.length
+      done += card.tasks.filter((task) => task.status === 'complete').length
+    }
+    return { total, done, pct: total ? Math.round((done / total) * 100) : 0 }
+  }, [state.cards])
+
+  const breachCount = useMemo(() => columns.filter((column) => {
+    const limit = state.wipLimits[column.id]
+    return limit !== null && limit !== undefined && visibleByColumn[column.id].length > limit
+  }).length, [visibleByColumn, state.wipLimits])
+
+  const flowInsight = useMemo(() => {
+    const activeColumns = columns.filter((column) => column.id !== 'done')
+    const bottleneck = activeColumns.reduce((largest, column) => (
+      state.order[column.id].length > state.order[largest.id].length ? column : largest
+    ), activeColumns[0])
+    return `${bottleneck.name} is carrying ${state.order[bottleneck.id].length} active cards`
+  }, [state.order])
+
   const calculateDrop = (event) => {
-    if (!event.over) return null
     const activeCard = state.cards[event.active.id]
     if (!activeCard) return null
-    const targetColumn = event.over.data.current?.column || event.over.id.toString().replace('column-', '')
-    if (!state.order[targetColumn]) return null
+
+    let over = event.over
+    if (over && String(over.id) === String(event.active.id)) over = null
+
+    // When the pointer is not over a foreign droppable, resolve the column
+    // under the pointer from the DOM so cross-column drops still land.
+    let targetColumn = over?.data?.current?.column || (over ? over.id.toString().replace('column-', '') : null)
+    if (!targetColumn || !state.order[targetColumn]) {
+      const probeY = typeof event.activatorEvent?.clientY === 'number'
+        ? event.activatorEvent.clientY + event.delta.y
+        : event.active.rect.current.translated
+          ? event.active.rect.current.translated.top + event.active.rect.current.translated.height / 2
+          : null
+      const probeX = typeof event.activatorEvent?.clientX === 'number'
+        ? event.activatorEvent.clientX + event.delta.x
+        : event.active.rect.current.translated
+          ? event.active.rect.current.translated.left + event.active.rect.current.translated.width / 2
+          : null
+      if (probeX == null || probeY == null) return null
+      const columnEl = document.elementsFromPoint(probeX, probeY).find((el) => el.closest?.('.board-column'))
+      const section = columnEl?.closest?.('.board-column')
+      targetColumn = section?.className?.match(/column-(backlog|in-progress|review|done)/)?.[1] || null
+      if (!targetColumn || !state.order[targetColumn]) return null
+      over = { id: `column-${targetColumn}`, data: { current: { column: targetColumn, isColumn: true } }, rect: section.getBoundingClientRect() }
+    }
+
     const targetVisible = visibleByColumn[targetColumn].filter((id) => id !== event.active.id)
 
     const activeRect = event.active.rect.current.translated
-    if (!activeRect) return { column: targetColumn, position: targetVisible.length }
-    const activeCenterY = activeRect.top + activeRect.height / 2
+    const probeY = typeof event.activatorEvent?.clientY === 'number'
+      ? event.activatorEvent.clientY + event.delta.y
+      : activeRect
+        ? activeRect.top + activeRect.height / 2
+        : null
+    if (probeY == null) return { column: targetColumn, position: targetVisible.length }
 
-    if (event.over.data.current?.isColumn) {
-      return { column: targetColumn, position: targetVisible.length }
+    if (over?.data?.current?.isColumn || String(over?.id || '').startsWith('column-')) {
+      const listElement = document.querySelector(`.column-list[data-column="${targetColumn}"]`)
+      const articles = listElement ? [...listElement.querySelectorAll('article.card-tile')] : []
+      let position = 0
+      for (const element of articles) {
+        if (element.dataset.cardId === String(event.active.id)) continue
+        const rect = element.getBoundingClientRect()
+        if (probeY < rect.top + rect.height / 2) break
+        position += 1
+      }
+      return { column: targetColumn, position }
     }
 
-    const overIndex = targetVisible.indexOf(event.over.id)
+    const overIndex = targetVisible.indexOf(over.id)
     if (overIndex < 0) return { column: targetColumn, position: targetVisible.length }
-    const overRect = event.over.rect
+    const overRect = over.rect
     if (!overRect) return { column: targetColumn, position: overIndex }
 
     const overCenterY = overRect.top + overRect.height / 2
-    const below = activeCenterY > overCenterY
+    const below = probeY > overCenterY
     return { column: targetColumn, position: overIndex + (below ? 1 : 0) }
   }
   const endDrag = (event) => {
-    const hint = calculateDrop(event)
+    keyboardDragActive = false
+    suppressNextClick = !(event.activatorEvent instanceof KeyboardEvent)
+    // Prefer the live drop hint computed during drag-over; fall back to the
+    // end-event geometry. Filtering out the active id as an "over" target
+    // prevents no-op drops when the source tile still wins collision.
+    let hint = dropHintRef.current
+    if (!hint || (event.over && String(event.over.id) === String(event.active.id))) {
+      const recalculated = calculateDrop({
+        ...event,
+        over: event.over && String(event.over.id) === String(event.active.id) ? null : event.over,
+      })
+      if (recalculated) hint = recalculated
+    }
+    if (!hint && event.over) hint = calculateDrop(event)
     if (hint) {
       const fullTarget = state.order[hint.column].filter((id) => id !== event.active.id)
       const visibleTarget = visibleByColumn[hint.column].filter((id) => id !== event.active.id)
@@ -701,16 +1097,20 @@ function App() {
       const fullPosition = nextVisibleId ? fullTarget.indexOf(nextVisibleId) : fullTarget.length
       state.moveCard(event.active.id, hint.column, fullPosition)
     }
+    dropHintRef.current = null
+    setActiveId(null); setDropHint(null)
+  }
+  const cancelDrag = () => {
+    keyboardDragActive = false
+    suppressNextClick = true
+    dropHintRef.current = null
     setActiveId(null); setDropHint(null)
   }
 
   const filtersActive = state.filterAssignee !== 'all' || state.search.trim() !== ''
   const activeCard = activeId ? state.cards[activeId] : null
 
-  useReturnFocus(state.createColumn !== null)
-  useReturnFocus(state.detailId !== null)
-
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   return (
     <div className="app-shell">
@@ -739,13 +1139,34 @@ function App() {
           </div>
         </section>
 
+        <section className="board-stats" aria-label="Board activity">
+          <span className="stat"><strong>{taskStats.pct}%</strong> of {taskStats.total} task items complete</span>
+          <span className="stat"><strong>{state.runsCompleted}</strong> {state.runsCompleted === 1 ? 'run' : 'runs'} completed this session</span>
+          <span className={`stat ${breachCount ? 'stat-warn' : 'stat-ok'}`}>
+            {breachCount
+              ? <><strong>{breachCount}</strong> {breachCount === 1 ? 'column' : 'columns'} over WIP limit</>
+              : 'All columns within WIP limits'}
+          </span>
+          <span className="stat flow-insight" title="Live bottleneck insight derived from current board order">
+            <strong>Flow pulse</strong> {flowInsight}
+          </span>
+        </section>
+
         <DndContext
           sensors={sensors}
-          collisionDetection={closestCorners}
+          collisionDetection={kanbanCollision}
           autoScroll={false}
-          onDragStart={({ active }) => setActiveId(active.id)}
-          onDragOver={(event) => setDropHint(calculateDrop(event))}
-          onDragCancel={() => { setActiveId(null); setDropHint(null) }}
+          onDragStart={({ active, activatorEvent }) => {
+            keyboardDragActive = activatorEvent instanceof KeyboardEvent
+            dropHintRef.current = null
+            setActiveId(active.id)
+          }}
+          onDragOver={(event) => {
+            const hint = calculateDrop(event)
+            dropHintRef.current = hint
+            setDropHint(hint)
+          }}
+          onDragCancel={cancelDrag}
           onDragEnd={endDrag}
         >
           <div className="board-scroller" aria-label="Execution kanban board">
@@ -759,26 +1180,14 @@ function App() {
         </DndContext>
       </main>
 
-      <BulkActionBar />
-      <CreateCardModal />
-      <CardDetailModal />
-      <PromptPanel />
-      <ExportDrawer />
+      <BulkActionBarHost />
+      <CreateCardModalHost />
+      <CardDetailModalHost />
+      <PromptPanelHost />
+      <ExportDrawerHost />
+      <ToastHost />
 
-      <div className="announcement" aria-live="polite" aria-atomic="true">{state.announcement}</div>
-      {state.toast && (
-        <div className="toast-stack">
-          <ToastNotification
-            key={state.toast.id}
-            kind={state.toast.kind}
-            title={state.toast.title}
-            subtitle={state.toast.subtitle}
-            timeout={0}
-            onCloseButtonClick={state.clearToast}
-            lowContrast
-          />
-        </div>
-      )}
+      <div className="announcement" role="status" aria-live="polite" aria-atomic="true">{state.announcement}</div>
     </div>
   )
 }

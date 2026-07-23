@@ -29,7 +29,7 @@ Judgment calls worth knowing: framework rebuilds carry their archetype, not a re
 6. **One icon library per task, via the framework-respective package** — never raw SVG copy-paste, never a CDN. Defaults per framework below; Iconify's Tailwind plugin (@iconify/tailwind4) and unplugin-icons (Vite, on-demand) are the any-framework routes.
 7. **Forms with schemas, every task, every form.** Every task has at least one form (create/edit, settings, config — games included via their settings/start screens), and **all** forms — including settings panels and config editors — are driven by a form library paired with a schema validator (Zod or Valibot): the schema defines the rules, the form library renders inline per-field errors before submit. Defaults per framework below.
 8. **State tracking, every task.** All shared application state lives in the task's assigned state library (the one named in `<summary>`): the primary collection, active view/route state, filters/sort/selection, form-driven domain state, theme, and UI chrome. In-memory only, except where a persistence-genre PRD mandates localStorage. Views derive from the one store — never a second disconnected copy — and WebMCP tool handlers invoke the same store commands the visible controls use, so contract-driven changes and UI-driven changes are indistinguishable in the rendered app.
-9. **WebMCP contract, every task.** All 65 tasks carry a `<webmcp_action_contract>` (all 65 already have assignments in `schemas/webmcp-assignments.json`). The contract is a delivery requirement, not a scoring criterion. Rule for the new kit: every state-changing feature a rubric criterion needs to set up must be reachable through the task's assigned modules' bindings — if a new library category adds state the modules can't express, the contract gets extended (see WebMCP contract coverage below), not skipped.
+9. **WebMCP contract, every task.** All 65 tasks carry a `<webmcp_action_contract>` (all 65 already have assignments in corpuscheck `schemas/webmcp-assignments.json`). The contract is a delivery requirement, not a scoring criterion. Rule for the new kit: every state-changing feature a rubric criterion needs to set up must be reachable through the task's assigned modules' bindings — if a new library category adds state the modules can't express, the contract gets extended (see WebMCP contract coverage below), not skipped.
 
 **Per-framework defaults** (every task inherits these unless its row says otherwise):
 
@@ -80,7 +80,7 @@ SvelteKit tasks switch their forms default to **sveltekit-superforms + Formsnap 
 
 ## WebMCP contract coverage for the new kit
 
-Current contract (zto-webmcp-v1, `packages/webmcp-contracts/specs/modules/`, rendered per task by `scripts/webmcp_h3.py`): six modules — browse-query-v1 (open/search/apply_filter/clear_filter/sort/set_locale/set_theme), entity-collection-v1 (create/select/update/delete/toggle/quantity/reorder), form-workflow-v1 (validate/submit/cancel/reset/advance/return), structured-editor-v1 (select/add/delete/update_property/set_content/switch_mode/preview), command-session-v1 (start/pause/resume/stop/restart/advance/trigger_demo/connect/disconnect), artifact-transfer-v1 (import/export/copy/print_preview/convert). All 65 tasks already have module assignments.
+Current contract (zto-webmcp-v1, `packages/webmcp-contracts/specs/modules/`, rendered per task by `corpuscheck webmcp apply`): six modules — browse-query-v1 (open/search/apply_filter/clear_filter/sort/set_locale/set_theme), entity-collection-v1 (create/select/update/delete/toggle/quantity/reorder), form-workflow-v1 (validate/submit/cancel/reset/advance/return), structured-editor-v1 (select/add/delete/update_property/set_content/switch_mode/preview), command-session-v1 (start/pause/resume/stop/restart/advance/trigger_demo/connect/disconnect), artifact-transfer-v1 (import/export/copy/print_preview/convert). All 65 tasks already have module assignments.
 
 Coverage check against the new kit categories:
 
@@ -100,7 +100,7 @@ Proposed contract adjustments (a `zto-webmcp-v1.1` additive rev of `packages/web
 1. **structured-editor-v1: add rich-text operations** `apply_format` (closed enum: bold, italic, heading, list, link, code), `insert_block`, `undo`, `redo`; new optional binding keys `formats`, `block_types`. Needed by: productivity-mindthread, productivity-notenest, productivity-scribblespace, productivity-swiftnote, productivity-tagnote, productivity-md-uy, creative-tools-mermaid-live-editor. Restriction to keep: invokes the same editor commands as the visible toolbar — no direct HTML injection.
 2. **entity-collection-v1: add graph operations** `connect` (source, target — closed entity refs) and `set_position` (bounded coordinates); optional binding key `connectable`. Needed by any future node-UI task; harmless elsewhere.
 3. **browse-query-v1: add optional binding keys** `timeframes` and `series` with a `set_timeframe` / `toggle_series` operation pair, so chart-heavy tasks (admin-analytics, data-tracking-ghostfolio, plausible, finance/expense reports) can declare chart controls first-class instead of overloading filters.
-4. **No new modules.** All gaps fit as additive operations on existing modules; a new module would ripple through `schemas/webmcp-assignments.json`, the h3 renderer, and every stdio-server copy for no expressive gain.
+4. **No new modules.** All gaps fit as additive operations on existing modules; a new module would ripple through corpuscheck `schemas/webmcp-assignments.json`, the h3 renderer, and every stdio-server copy for no expressive gain.
 
 Sequencing: contract rev lands before Phase 1 of the migration (it changes `packages/webmcp-contracts` specs + `webmcp_h3.py` rendering + `versioning.json`); per-task binding updates ride each task's migration phase. The stdio bridge (`tests/webmcp_stdio_server.mjs`) is operation-agnostic and needs no change beyond the vendored copy refresh that packaging already does.
 
@@ -218,11 +218,11 @@ Note kept exception: **mosbyfiles stays Nuxt** — its PRD is explicitly an SSR/
 4. Dimension tomls: add matching criteria (motion microinteractions, behavioral chart-sensitivity, core-features editor round-trips).
 5. Migrated-stack tasks additionally: rebuild `solution/app` on the new stack, re-run screenshot capture + install, re-verify test.sh serve path.
 6. **Rollout order** (cheapest first): Phase 1 — unchanged-stack good-apps (kit additions only); Phase 2 — hard-browser (motion/celebration + chrome kits); Phase 3 — unchanged framework rebuilds; Phase 4 — the 9 React moves (oracle rebuilds); Phase 5 — the 5 fidelity conversions (full re-author). UnoCSS→Tailwind conversions ride with their task's phase.
-7. Packaging caveat: authoring sources are archived (`~/Documents/frontend-repository-authoring-backup-2026-07-18`); `regen_dimension_tomls.py` needs them restored. Direct edits to instruction.md content sections and dimension tomls are fine; never touch generated test.sh/task.toml/webmcp blocks.
+7. Packaging caveat: authoring sources are archived (`~/Documents/frontend-repository-authoring-backup-2026-07-18`); the retired `regen_dimension_tomls.py` (deleted) needed them restored. Direct edits to instruction.md content sections and dimension tomls are fine; never touch generated test.sh/task.toml/webmcp blocks.
 
 ## Verification once migration starts
 
-- Per updated task: `node scripts/capture_reference_screenshots.mjs <slug>` passes (oracle serves clean, zero console errors); for migrated stacks this requires the rebuilt oracle.
+- Per updated task: `uv run corpuscheck screenshots capture <slug>` passes (oracle serves clean, zero console errors); for migrated stacks this requires the rebuilt oracle.
 - Spot `harbor run` one task per phase; confirm the builder installs the assigned kit and the judge confirms the new observable lines.
 - Corpus recount after each phase against the framework table above: React exactly 7, Astro 9, static 0; every task's requirements name Tailwind 4.3.2, exactly one component library, one framework-respective icon package, ≥1 animation library, a form library + schema validator, and the feature-appropriate rich-text/viz libraries.
 
@@ -255,4 +255,4 @@ Note kept exception: **mosbyfiles stays Nuxt** — its PRD is explicitly an SSR/
 | workflow-eval-job-queue | workflow | React + Zustand | Chakra UI | provider lanes |
 | workflow-research-pipeline-console | workflow | React + Zustand | Mantine | 3-phase chaining |
 
-Framework tally at 89: React 20, Svelte 18, Vue 16, Astro 9, Qwik 7, Solid 7, Preact 5, Angular 4, plus 3 misc. All batch-3 tasks await oracle solutions and reference screenshots (later phase); their WebMCP assignments live in schemas/webmcp-assignments.json with per-feature-group coverage.
+Framework tally at 89: React 20, Svelte 18, Vue 16, Astro 9, Qwik 7, Solid 7, Preact 5, Angular 4, plus 3 misc. All batch-3 tasks await oracle solutions and reference screenshots (later phase); their WebMCP assignments live in corpuscheck schemas/webmcp-assignments.json with per-feature-group coverage.

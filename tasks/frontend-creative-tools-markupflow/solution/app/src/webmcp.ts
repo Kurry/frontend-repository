@@ -58,6 +58,12 @@ const ARTIFACT_IMPORT_MODES = ['project-json'] as const;
 
 type Result = Record<string, unknown>;
 type Handler = (args: Record<string, unknown>) => Result;
+type ToolDescriptor = {
+  name: string;
+  description: string;
+  handler: Handler;
+  inputSchema?: Record<string, unknown>;
+};
 
 export function registerWebMcp(bridge: WebMcpBridge) {
   const num = (v: unknown) => (typeof v === 'number' ? v : Number(v));
@@ -213,12 +219,24 @@ export function registerWebMcp(bridge: WebMcpBridge) {
     return { ok: true, operation: 'copy', format: 'json', copied: true, byteLength: bridge.projectByteLength() };
   };
 
-  const TOOLS: { name: string; description: string; handler: Handler }[] = [
+  const TOOLS: ToolDescriptor[] = [
     { name: 'editor_select', description: 'Select an annotation object by id (or pass id=null to clear). Same path as clicking a Layer Panel row.', handler: editorSelect },
     { name: 'editor_add', description: `Add an annotation of args.object_type (one of ${EDITOR_OBJECT_TYPES.join(', ')}) at the default placement position. Same store command as keyboard placement; drawing coordinates are not accepted.`, handler: editorAdd },
     { name: 'editor_delete', description: 'Delete an annotation by id. Requires confirm=true.', handler: editorDelete },
     { name: 'editor_update_property', description: `Update a property (${EDITOR_PROPERTIES.join(', ')}) of the currently selected annotation. Same path as the Style controls.`, handler: editorUpdateProperty },
-    { name: 'editor_switch_mode', description: `Switch the workspace view mode (${EDITOR_MODES.join(', ')}). Same path as the header edit/preview buttons.`, handler: editorSwitchMode },
+    {
+      name: 'editor_switch_mode',
+      description: `Switch the workspace view mode (${EDITOR_MODES.join(', ')}). Same path as the header edit/preview buttons.`,
+      handler: editorSwitchMode,
+      inputSchema: {
+        type: 'object',
+        // Put preview first so schema-driven clients can exercise a visible
+        // state transition from the default edit mode.
+        properties: { mode: { type: 'string', enum: ['preview', 'edit'] } },
+        required: ['mode'],
+        additionalProperties: false,
+      },
+    },
     { name: 'editor_preview', description: 'Re-flatten the image plus annotations onto the canvas and report the current mode and annotation count.', handler: editorPreview },
     { name: 'entity_create', description: 'Save the current workspace as a named project. Same path as the Save project button.', handler: entityCreate },
     { name: 'entity_select', description: 'Open a saved project by id, restoring its image and annotations. Same path as the Open button.', handler: entitySelect },
@@ -235,7 +253,11 @@ export function registerWebMcp(bridge: WebMcpBridge) {
     modules: ['structured-editor-v1', 'entity-collection-v1', 'artifact-transfer-v1'],
     tools: TOOLS.map((t) => t.name),
   });
-  w.webmcp_list_tools = () => TOOLS.map((t) => ({ name: t.name, description: t.description }));
+  w.webmcp_list_tools = () => TOOLS.map((t) => ({
+    name: t.name,
+    description: t.description,
+    ...(t.inputSchema ? { inputSchema: t.inputSchema } : {}),
+  }));
   w.webmcp_invoke_tool = (name: string, args: Record<string, unknown> = {}) => {
     const tool = TOOLS.find((t) => t.name === name);
     if (!tool) return { ok: false, error: `unknown tool: ${name}` };
@@ -251,7 +273,12 @@ export function registerWebMcp(bridge: WebMcpBridge) {
     const nav = navigator as unknown as { modelContext?: { registerTool?: (t: unknown) => void } };
     if (nav.modelContext && typeof nav.modelContext.registerTool === 'function') {
       for (const t of TOOLS) {
-        nav.modelContext.registerTool({ name: t.name, description: t.description, invoke: (a: Record<string, unknown>) => t.handler(a || {}) });
+        nav.modelContext.registerTool({
+          name: t.name,
+          description: t.description,
+          ...(t.inputSchema ? { inputSchema: t.inputSchema } : {}),
+          invoke: (a: Record<string, unknown>) => t.handler(a || {}),
+        });
       }
     }
   } catch {

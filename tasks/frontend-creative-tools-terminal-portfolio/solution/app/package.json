@@ -6,9 +6,11 @@
     "verify:build": "vite build",
     "start": "npx --yes serve -s dist -l 3000 -n",
     "build": "vite build",
-    "dev": "vite"
+    "dev": "vite",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
   },
   "dependencies": {
+    "@iconify-json/tabler": "1.2.35",
     "@iconify/tailwind": "^1.2.0",
     "@preact/signals": "^2.9.4",
     "@tabler/icons": "^3.45.0",
@@ -22,6 +24,7 @@
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.6",
-    "vite": "^8.1.5"
+    "vite": "^8.1.5",
+    "@playwright/test": "^1.61.0"
   }
 }

@@ -11,11 +11,11 @@ const model = (name, provider, context_window, input_cost_per_1k, output_cost_pe
 })
 
 export const seedModels = [
-  model('GPT-4.1 Mini', 'OpenAI', 1047576, 0.0004, 0.0016, 'paid', true),
-  model('GPT-4o Mini', 'OpenAI', 128000, 0.00015, 0.0006),
-  model('o3', 'OpenAI', 200000, 0.002, 0.008),
-  model('Claude 3.7 Sonnet', 'Anthropic', 200000, 0.003, 0.015, 'paid', true),
-  model('Claude 3.5 Haiku', 'Anthropic', 200000, 0.0008, 0.004),
+  model('GPT-4.1 Mini', 'Nimbus AI', 1047576, 0.0004, 0.0016, 'paid', true),
+  model('GPT-4o Mini', 'Nimbus AI', 128000, 0.00015, 0.0006),
+  model('o3', 'Nimbus AI', 200000, 0.002, 0.008),
+  model('Claude 3.7 Sonnet', 'Vertexa', 200000, 0.003, 0.015, 'paid', true),
+  model('Claude 3.5 Haiku', 'Vertexa', 200000, 0.0008, 0.004),
   model('Gemini 2.5 Pro', 'Google', 1048576, 0.00125, 0.01),
   model('Gemini 2.0 Flash', 'Google', 1048576, 0, 0, 'free'),
   model('Llama 4 Scout', 'Meta', 10000000, 0, 0, 'free'),

@@ -7,7 +7,8 @@
     "build": "vite build",
     "start": "http-server dist -a 0.0.0.0 -p 3000 -c-1",
     "dev": "vite",
-    "verify:build": "vite build"
+    "verify:build": "vite build",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
   },
   "dependencies": {
     "@ark-ui/solid": "^5.37.1",
@@ -21,6 +22,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/vite": "4.3.3",
     "http-server": "14.1.1",
     "typescript": "5.6.3",

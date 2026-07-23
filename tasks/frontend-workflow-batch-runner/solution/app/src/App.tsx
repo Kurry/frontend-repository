@@ -243,7 +243,7 @@ function RunWorkspace({ job, run }: { job: Job; run: Run }) {
         <Button kind="ghost" size="sm" renderIcon={Pause} disabled={run.status !== 'running'} onClick={() => pauseJob()}>Pause all</Button>
         <Button kind="ghost" size="sm" renderIcon={Stop} disabled={!['running', 'paused'].includes(run.status)} onClick={() => stopJob()}>Stop all</Button>
         <div className="flex-1" />
-        <Button kind="ghost" size="sm" renderIcon={Restart} disabled={!failedCount || ['running', 'paused'].includes(run.status)} title={!failedCount ? 'There are no failed items to retry' : 'Only failed items are re-queued'} onClick={() => retryFailed()}>Retry failed items ({failedCount})</Button>
+        <Button kind="ghost" size="sm" renderIcon={Restart} disabled={!failedCount} title={!failedCount ? 'There are no failed items to retry' : 'Only failed items are re-queued'} onClick={() => retryFailed()}>Retry failed items ({failedCount})</Button>
       </section>
       <div className="content-grid">
         <ExecutionGrid run={run} />
@@ -306,7 +306,7 @@ function PendingQueue({ run }: { run: Run }) {
 
   const focusQueueEntry = (itemIndex: number) => {
     window.requestAnimationFrame(() => {
-      document.querySelector<HTMLElement>(`[data-queue-item="${itemIndex}"] [aria-label^="Move item"]`)?.focus()
+      document.querySelector<HTMLElement>(`[data-queue-item="${itemIndex}"] button:not(:disabled)`)?.focus()
     })
   }
 

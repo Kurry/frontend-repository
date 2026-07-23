@@ -300,7 +300,7 @@ Grammar:
 | `storage` | Judge inspects localStorage/sessionStorage per the genre rule |
 | `webmcp` | Judge exercises the webmcp contract binding |
 
-**Lifecycle:** these comments exist only in authoring sources and in this template. Packaging strips every `<!-- rubric:... -->` comment before the builder-visible `instruction.md` is produced, so the grading map (which sentence feeds which criterion, and how it is verified) never reaches the builder. (The strip step is a packaging contract owned by `scripts/package_frontend_tasks.py`; adding it there is a follow-up outside this document.)
+**Lifecycle:** these comments exist only in authoring sources and in this template. Packaging strips every `<!-- rubric:... -->` comment before the builder-visible `instruction.md` is produced, so the grading map (which sentence feeds which criterion, and how it is verified) never reaches the builder. (The strip step is a packaging contract owned by `corpuscheck.package_frontend_tasks`; adding it there is a follow-up outside this document.)
 
 ---
 
@@ -513,7 +513,7 @@ Fixed plumbing text: the app is original and self-contained in `/app`; `/app/pac
 
 ### 16. `<webmcp_action_contract>` (protected)
 
-Machine-rendered by `scripts/webmcp_h3.py` from `schemas/webmcp-assignments.json` and the module specs in `packages/webmcp-contracts`. Never hand-authored or hand-edited; task authors only choose the module assignment. The section carries the contract version, module list, and embedded `<module_spec>` JSON blocks.
+Machine-rendered by `corpuscheck webmcp apply` from corpuscheck `schemas/webmcp-assignments.json` and the module specs in `packages/webmcp-contracts`. Never hand-authored or hand-edited; task authors only choose the module assignment. The section carries the contract version, module list, and embedded `<module_spec>` JSON blocks.
 
 ---
 

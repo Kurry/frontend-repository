@@ -2,11 +2,21 @@
 Build a live task factory console — a dual-mode workbench that turns merged GitHub pull requests into downloadable evaluation task packages — using React, Zustand, Tailwind CSS 4.3.2, and shadcn/ui. The useful end state is the portable task package: every completed run produces a TaskPackageBundle JSON the user can copy, download, re-import, and query through WebMCP, conforming to the field contracts below.
 </summary>
 
+<reference_screenshots>
+Screenshots of the reference application are provided in-container at
+/reference-screenshots/: overview.png is a full-page desktop-layout
+overview (downscaled); overview-tablet.png and overview-mobile.png are full-page responsive
+reflows at 1024x768 (tablet) and 390x844 (mobile) viewports; segment-NN.png are full-resolution 1440x900 sections
+in top-to-bottom order with slight overlap. They are part of this instruction:
+recreate what they show. Where a screenshot and the text conflict, the text
+wins. Do not copy the images into /app or ship them as app assets.
+</reference_screenshots>
+
 <core_features>
 Core features (each line is an observable behavior the finished app must exhibit):
 
 Feature: Connections panel and dual mode —
-- A Connections control in the top bar opens a slide-over panel with two credential sections: a GitHub token field, and an AI endpoint section with a base URL field prefilled with https://api.openai.com and an API key field; both key fields are masked by default and each has a show/hide toggle that reveals the value only while active
+- A Connections control in the top bar opens a slide-over panel with two credential sections: a GitHub token field, and an AI endpoint section with a base URL field prefilled with https://api.nimbus-ai.com and an API key field; both key fields are masked by default and each has a show/hide toggle that reveals the value only while active
 - On first load, with no credentials entered, the app runs in demo mode on seeded fixture data: a clearly visible mode indicator in the top bar reads Demo data, and every screen is fully populated and exercisable without any credential
 - Entering a GitHub token and activating its Connect control performs a single lightweight account check against the GitHub API; while the check runs the credential row shows a checking status, on success it shows Connected with the account login, and on failure it shows a visible error carrying the failure status or message and remains Disconnected
 - Entering an AI API key and activating its Connect control performs one lightweight check against the configured base URL, with the same checking, Connected, and Disconnected-with-error presentation

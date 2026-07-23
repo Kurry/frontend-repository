@@ -1,5 +1,5 @@
 <script>
-  import { fly } from 'svelte/transition';
+  import { fade } from 'svelte/transition';
   import { prefersReducedMotion } from 'svelte/motion';
   import { store, setCode, setConfig, setEditorMode } from './state.svelte.js';
   import CodeMirror from './CodeMirror.svelte';
@@ -60,7 +60,8 @@
         oninput={onCodeInput}
         editorLabel="Mermaid diagram source code"
       />
-    {:else}
+    {/if}
+    {#if store.editorMode === 'config'}
       <CodeMirror
         id="diagram-source-config"
         bind:value={store.mermaid}
@@ -73,17 +74,18 @@
   {#if showError}
     <div
       class="flex flex-col text-sm"
+      transition:fade={{ duration: 180 }}
       data-testid="error-container"
       role="alert"
       aria-live="assertive"
-      transition:fly={slide()}
+
     >
       <div class="flex items-center gap-2 bg-slate-900 p-2 text-white">
         <svg viewBox="0 0 24 24" class="size-5 text-red-400" aria-hidden="true" fill="currentColor"
           ><path d="M12 2 1 21h22L12 2zm1 15h-2v-2h2v2zm0-4h-2V9h2v4z" /></svg>
         <h2 class="font-medium text-sm">Syntax error</h2>
       </div>
-      <output class="max-h-32 overflow-auto bg-red-50 p-2 text-red-700 dark:bg-red-950/40 dark:text-red-300" name="mermaid-error" for="diagram-source-code">
+      <output transition:fade={{ duration: 180 }} class="max-h-32 overflow-auto bg-red-50 p-2 text-red-700 dark:bg-red-950/40 dark:text-red-300" name="mermaid-error" for="diagram-source-code">
         <pre class="whitespace-pre-wrap font-mono text-xs">{store.error}</pre>
       </output>
     </div>
@@ -92,17 +94,18 @@
   {#if showConfigError}
     <div
       class="flex flex-col text-sm"
+      transition:fade={{ duration: 180 }}
       data-testid="config-error-container"
       role="alert"
       aria-live="assertive"
-      transition:fly={slide()}
+
     >
       <div class="flex items-center gap-2 bg-slate-900 p-2 text-white">
         <svg viewBox="0 0 24 24" class="size-5 text-orange-400" aria-hidden="true" fill="currentColor"
           ><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" /></svg>
         <h2 class="font-medium text-sm">Config validation failed</h2>
       </div>
-      <output class="max-h-32 overflow-auto bg-orange-50 p-2 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300" name="config-error" for="diagram-source-config">
+      <output transition:fade={{ duration: 180 }} class="max-h-32 overflow-auto bg-orange-50 p-2 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300" name="config-error" for="diagram-source-config">
         <pre class="whitespace-pre-wrap font-mono text-xs">{store.configError}</pre>
       </output>
     </div>

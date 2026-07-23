@@ -1,0 +1,29 @@
+{
+  "name": "vert-oracle",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "verify:build": "vite build",
+    "preview": "vite preview --port 3000 --host --strictPort",
+    "start": "vite preview --port 3000 --host --strictPort",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-static": "^3.0.10",
+    "@sveltejs/kit": "^2.70.1",
+    "@sveltejs/vite-plugin-svelte": "^7.2.0",
+    "@tailwindcss/vite": "^4.3.2",
+    "bits-ui": "^2.18.1",
+    "formsnap": "^2.0.1",
+    "phosphor-svelte": "^3.1.0",
+    "svelte": "^5.43.14",
+    "sveltekit-superforms": "^2.30.2",
+    "tailwindcss": "^4.3.2",
+    "vite": "^8.1.5",
+    "zod": "^4.4.3",
+    "@playwright/test": "1.61.0"
+  }
+}

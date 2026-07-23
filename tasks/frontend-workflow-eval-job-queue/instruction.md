@@ -2,6 +2,16 @@
 Build an evaluation job queue monitor using React, Zustand, Tailwind CSS 4.3.2, and Chakra UI. The app produces the operator's queue snapshot: a structured Queue Snapshot JSON document compiled live from jobs, trials, provider lanes, aggregates, and the completions timeline, downloadable and copyable, reflecting every session mutation.
 </summary>
 
+<reference_screenshots>
+Screenshots of the reference application are provided in-container at
+/reference-screenshots/: overview.png is a full-page desktop-layout
+overview (downscaled); overview-tablet.png and overview-mobile.png are full-page responsive
+reflows at 1024x768 (tablet) and 390x844 (mobile) viewports; segment-NN.png are full-resolution 1440x900 sections
+in top-to-bottom order with slight overlap. They are part of this instruction:
+recreate what they show. Where a screenshot and the text conflict, the text
+wins. Do not copy the images into /app or ship them as app assets.
+</reference_screenshots>
+
 <core_features>
 Core features (each line is an observable behavior the finished app must exhibit). The product is a queue monitor for a cloud evaluation platform: jobs run agent trials against datasets on model providers, with provider-aware scheduling and automatic retries. All providers, datasets, agents, and models are fictional and every job is simulated in the client.
 

@@ -1,0 +1,179 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+weight = 0.5
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "15.1"
+name = "headings_uppercase_display_treatment"
+description = "Where the app renders section headings, they keep the reference's uppercase display treatment consistently across Why Astra, Network, News, Solutions, Community, and Contact."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.2"
+name = "cta_labels_specific"
+description = "Where the app renders primary action labels, they use specific verbs matching the PRD (Start Building, View More, View All Events, Next/Back, Follow @astra) rather than generic Submit/OK alone when a specific label is specified."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.3"
+name = "contact_errors_name_fields"
+description = "Where the app renders contact or newsletter final-submit validation errors, they name the missing/invalid field (including otherDetail when project_type is Other) rather than only saying Invalid."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.4"
+name = "community_empty_feed_reads_intentional"
+description = "Where the app renders the empty community feed track, the surrounding Community copy (Join The Best Community in web3 and channel buttons) still reads as intentional product copy rather than a broken missing-content stub."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.5"
+name = "marketing_copy_spelling_grammar"
+description = "Where the app renders body or marketing copy (hero statement, Developer Hub, Solutions, Events), rate how free it is of spelling and grammatical errors."
+type = "likert"
+points = 5
+weight = 0.5
+
+[[criterion]]
+id = "15.6"
+name = "astra_terminology_consistent"
+description = "Where the app renders the product name and network labels, terminology stays consistent as Astra / Astra Network (not mixed with leftover source-network naming)."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.7"
+name = "numbers_dates_formatted_consistently"
+description = "Where the app renders numbers and dates, formatting is consistent: the Network total uses US thousands separators as 60,932,291 and the Events card shows Sep 16-17, 2026."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.8"
+name = "success_messages_exact_copy"
+description = "Where the app renders confirmation messages, they state the mandated outcomes exactly: Thank you for subscribing after newsletter submit and Success! We'll be in touch. after contact submit."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.9"
+name = "mandated_news_titles_exact"
+description = "Where the app renders News card titles, they match exactly in order: Astra Payments Collective: How a Payments Ecosystem Took Shape; Northstar Systems Explores Biometric-Verified On-Chain Services; LedgerWorks is Now on Astra; Forge9000 Round 4: New Mechanics, Rewards and Opportunities for Builders; Launch Team Applications Are Now Open; The Astra Foundation Introduces Its Research Selection Committee; and The Astra Foundation Opens $50,000 In Research Grants for Network Economics."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.10"
+name = "partner_and_studio_credit_plausible_fiction"
+description = "Where the app renders placeholder partner logos and the footer studio credit, invented names read as plausible copy and do not reference real third-party brands or agencies."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.11"
+name = "session_leads_export_labels_specific"
+description = "Where the app renders Session leads export controls, labels are specific (Download JSON, Copy JSON, Undo last lead, Copied confirmation) rather than generic OK/Submit alone."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.12"
+name = "empty_session_leads_copy_explains"
+description = "Where the app renders the empty Session leads state, the copy explains that newsletter and contact submissions will appear there (not a blank or TODO placeholder)."
+type = "binary"
+weight = 0.5
+

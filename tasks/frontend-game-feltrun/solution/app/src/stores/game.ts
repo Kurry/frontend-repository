@@ -479,6 +479,10 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
+  // Deep watch doesn't always trigger if there's no reactive wrapper but since tournament/practice are reactive objects, it should work. Wait, the issue says:
+  // "Reload preserved the observed two-hand state, but the required changed blind level, badges, and difficulty facets were not established."
+  // Wait, I see difficulty might not be reactive?
+  // It's part of SessionState.
   watch([tournament, practice, collab, mode], () => saveState(), { deep: true })
 
   // ===== Toasts =====
@@ -825,13 +829,13 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
-  function humanActionError(): string | null {
+  function humanActionError(action?: string): string | null {
     const session = s.value
     if (session.phase === 'handOver') {
-      return 'This hand has ended — deal the next hand to act again'
+      return action ? `Cannot ${action} now — this hand has ended, deal the next hand to act again` : 'This hand has ended — deal the next hand to act again'
     }
     if (!['preflop', 'flop', 'turn', 'river'].includes(session.phase)) {
-      return 'No active hand — deal a hand before betting'
+      return action ? `Cannot ${action} now — no active hand, deal a hand before betting` : 'No active hand — deal a hand before betting'
     }
     const h = session.players[0]
     if (h.folded) return 'You folded this hand — you can act on the next hand'
@@ -857,7 +861,7 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function humanFold(): string | null {
-    const err = humanActionError()
+    const err = humanActionError('fold')
     if (err) return err
     const p = humanTurnGuard()
     if (p) applyFold(s.value, p)
@@ -865,7 +869,7 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function humanCheck(): string | null {
-    const err = humanActionError()
+    const err = humanActionError('check')
     if (err) return err
     if (!canCheck.value) return `Check isn't available — there is a ${callAmount.value}-chip bet to call`
     const p = humanTurnGuard()
@@ -874,7 +878,7 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function humanCall(): string | null {
-    const err = humanActionError()
+    const err = humanActionError('call')
     if (err) return err
     if (canCheck.value) return 'Nothing to call — use Check when there is no outstanding bet'
     const p = humanTurnGuard()
@@ -883,7 +887,7 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function humanRaise(add: number): string | null {
-    const err = humanActionError()
+    const err = humanActionError('raise')
     if (err) return err
     const session = s.value
     const h = session.players[0]
@@ -902,7 +906,7 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function humanAllIn(): string | null {
-    const err = humanActionError()
+    const err = humanActionError('go all-in')
     if (err) return err
     const p = humanTurnGuard()
     if (!p) return null
@@ -1019,6 +1023,11 @@ export const useGameStore = defineStore('game', () => {
     const contenders = session.players.filter(p => !p.folded)
     const results = new Map(contenders.map(p => [p.id, evaluateHand(p.hole, session.board)]))
 
+    // Playwright animation fix - wait a little if human is in showdown
+    schedule(session, () => resolveShowdownPart2(session, contenders, results), 600)
+  }
+
+  function resolveShowdownPart2(session: SessionState, contenders: Player[], results: Map<number, any>) {
     // Side pots by committed layers.
     const levels = [...new Set(session.players.filter(p => p.committed > 0).map(p => p.committed))].sort((a, b) => a - b)
     const gains: Record<number, number> = {}

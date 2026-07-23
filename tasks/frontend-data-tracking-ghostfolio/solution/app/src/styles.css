@@ -321,3 +321,8 @@ th.num .sort-btn { justify-content: flex-end; }
     transition-duration: 0.001ms !important;
   }
 }
+
+.diag-table td input:has(+ .diag-fieldmsg), .diag-table td input.input-invalid {
+  border-color: var(--red) !important;
+  background: #fff5f5 !important;
+}

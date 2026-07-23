@@ -432,6 +432,7 @@ export function initWebMCP() {
   w.webmcp_session_info = () => ({
     contract_version: 'zto-webmcp-v1',
     app: 'Story Docs — 1. Getting Started',
+    modules: ['browse-query-v1', 'form-workflow-v1', 'entity-collection-v1', 'artifact-transfer-v1'],
     bound_modules: ['browse-query-v1', 'form-workflow-v1', 'entity-collection-v1', 'artifact-transfer-v1'],
     browsable_entity: 'scenes',
     destinations: [...DESTINATIONS],

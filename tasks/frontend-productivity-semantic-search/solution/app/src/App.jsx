@@ -36,10 +36,10 @@ function Header() {
       <div className="brand-title">Atlas semantic library</div>
     </div>
     <div className="header-actions">
-      <Button className="secondary-header" size="sm" kind="ghost" renderIcon={Undo} title={undo ? `Undo ${undo.label}` : 'Nothing to undo'} disabled={!undo} onClick={state.undo}>{undo ? `Undo · ${undo.label}` : 'Undo'}</Button>
-      <Button className="secondary-header" size="sm" kind="ghost" renderIcon={Redo} title={redo ? `Redo ${redo.label}` : 'Nothing to redo'} disabled={!redo} onClick={state.redo}>{redo ? `Redo · ${redo.label}` : 'Redo'}</Button>
-      <Button kind="ghost" renderIcon={MacCommand} onClick={() => state.setPalette(true)}><span className="action-label">Commands</span></Button>
-      <Button kind="primary" renderIcon={Export} onClick={() => state.openExport('report')}><span className="action-label">Export</span></Button>
+      <Button className="secondary-header" size="sm" kind="ghost" renderIcon={Undo} aria-label={undo ? `Undo ${undo.label}` : 'Nothing to undo'} title={undo ? `Undo ${undo.label}` : 'Nothing to undo'} disabled={!undo} onClick={state.undo}>{undo ? `Undo · ${undo.label}` : 'Undo'}</Button>
+      <Button className="secondary-header" size="sm" kind="ghost" renderIcon={Redo} aria-label={redo ? `Redo ${redo.label}` : 'Nothing to redo'} title={redo ? `Redo ${redo.label}` : 'Nothing to redo'} disabled={!redo} onClick={state.redo}>{redo ? `Redo · ${redo.label}` : 'Redo'}</Button>
+      <Button kind="ghost" renderIcon={MacCommand} aria-label="Commands" onClick={() => state.setPalette(true)}><span className="action-label">Commands</span></Button>
+      <Button kind="primary" renderIcon={Export} aria-label="Export" onClick={() => state.openExport('report')}><span className="action-label">Export</span></Button>
     </div>
   </header>
 }
@@ -99,8 +99,8 @@ function RailEmpty({ icon: Icon, text }) {
 }
 
 function queryChoices(state) {
-  const saved = state.savedSearches.map((item) => ({ id: `saved:${item.name}`, label: item.name, ...item }))
-  const history = state.history.map((item) => ({ id: `history:${item.id}`, label: item.raw || 'All documents', ...item }))
+  const saved = state.savedSearches.map((item) => ({ ...item, id: `saved:${item.name}`, label: item.name }))
+  const history = state.history.map((item) => ({ ...item, id: `history:${item.id}`, label: item.raw || 'All documents' }))
   return [...saved, ...history]
 }
 
@@ -164,8 +164,18 @@ function SearchWorkspace() {
     <section className="search-hero">
       <div className="search-kicker"><WatsonHealthStackedScrolling_1 size={16} /> Semantic workspace</div>
       <h1 className="search-title">Find the idea, not just <em>the words.</em></h1>
-      <form className="search-row" role="search" onSubmit={submit}>
-        <Search size="lg" labelText="Search the knowledge library" placeholder="" value={state.activeRaw} onChange={(e) => state.setRaw(e.target.value)} autoComplete="off" />
+      <form className="search-row" autoComplete="off" role="search" onSubmit={submit}>
+        <Search
+          size="lg"
+          labelText="Search the knowledge library"
+          placeholder=""
+          value={state.activeRaw}
+          onChange={(e) => state.setRaw(e.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') submit(event)
+          }}
+          autoComplete="off"
+        />
         <Button type="submit" renderIcon={SearchIcon}>Search library</Button>
       </form>
       <p className="syntax-help">Filter the corpus with <code>tag:react</code> <code>type:guide</code> or <code>before:2026-01-01</code>. Press <kbd>⌘K</kbd> or <kbd>Ctrl+K</kbd> for commands.</p>
@@ -179,7 +189,7 @@ function ResultControls({ visible }) {
   const state = useAppStore()
   return <div className="result-tools">
     {(state.filters.length > 0 || state.invalidFilters.length > 0) && <div className="chips-row" aria-label="Active search filters">{state.filters.map((filter, index) => <span className="filter-chip" key={`${filter.kind}-${filter.value}`}><Filter size={13} />{filter.kind}:{filter.value}<button aria-label={`Remove ${filter.kind} ${filter.value}`} onClick={() => state.removeFilter(index)}><Close size={12} /></button></span>)}{state.invalidFilters.map((filter) => <span className="unmatched" key={`${filter.kind}-${filter.value}`}><WarningAlt size={14} /> No matching {filter.kind}: “{filter.value}”</span>)}</div>}
-    <div className="controls-line"><div className="slider-wrap"><label id="threshold-label">Minimum score</label><Slider ariaLabelInput="Minimum similarity score" min={0} max={1} step={0.05} value={state.threshold} hideTextInput onChange={({ value }) => state.setThreshold(value)} /><output className="slider-value">{state.threshold.toFixed(2)}</output></div><div className="control-actions"><Toggle id="group-topic" size="sm" labelText="Group by topic" labelA="Off" labelB="On" toggled={state.grouped} onToggle={state.setGrouped} /><Button size="sm" kind="ghost" renderIcon={Reset} disabled={!Object.keys(state.feedbackByQuery[`${state.activeQuery.toLowerCase()}|${state.filters.map((f) => `${f.kind}:${f.value.toLowerCase()}`).sort().join('|')}`] || {}).length} onClick={state.resetFeedback}>Reset feedback</Button><Button size="sm" kind="tertiary" renderIcon={Save} onClick={() => useAppStore.setState({ saveOpen: true })}>Save search</Button></div></div>
+    <div className="controls-line"><div className="slider-wrap"><Slider labelText="Minimum score" ariaLabelInput="Minimum similarity score" min={0} max={1} step={0.05} value={state.threshold} hideTextInput onChange={({ value }) => state.setThreshold(value)} /><output className="slider-value">{state.threshold.toFixed(2)}</output></div><div className="control-actions"><Toggle id="group-topic" size="sm" labelText="Group by topic" labelA="Off" labelB="On" toggled={state.grouped} onToggle={state.setGrouped} /><Button size="sm" kind="ghost" renderIcon={Reset} disabled={!Object.keys(state.feedbackByQuery[`${state.activeQuery.toLowerCase()}|${state.filters.map((f) => `${f.kind}:${f.value.toLowerCase()}`).sort().join('|')}`] || {}).length} onClick={state.resetFeedback}>Reset feedback</Button><Button size="sm" kind="tertiary" renderIcon={Save} onClick={() => useAppStore.setState({ saveOpen: true })}>Save search</Button></div></div>
     <div className="result-summary"><div><div className="eyebrow">Ranked retrieval</div><h2>{visible.mode === 'keyword' ? 'Keyword results (no semantic matches above threshold)' : 'Semantic results'}</h2>{visible.mode === 'keyword' && <span className="fallback-label">No semantic matches above threshold</span>}</div><div role="status" aria-live="polite"><strong>{visible.items.length}</strong> <span className="muted">matching results</span></div></div>
   </div>
 }
@@ -268,7 +278,7 @@ function SaveSearchModal() {
   const schema = SavedSearchSchema.superRefine((value, ctx) => { if (state.savedSearches.some((item) => item.name.toLowerCase() === value.name.toLowerCase())) ctx.addIssue({ code:'custom', path:['name'], message:'name must be unique' }) })
   const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm({ resolver: zodResolver(schema), mode:'onChange', defaultValues:{ name:'', query:state.activeQuery, filters:state.filters, threshold:state.threshold } })
   useEffect(() => { if (state.saveOpen) reset({ name:'', query:state.activeQuery, filters:state.filters, threshold:state.threshold }) }, [state.saveOpen, state.activeQuery, state.filters, state.threshold, reset])
-  return <Modal open={state.saveOpen} modalHeading="Save search" primaryButtonText="Save search" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={close} onRequestSubmit={handleSubmit(state.saveSearch)}><div className="modal-copy" ref={modalRef}><TextInput id="saved-name" labelText="Search name" {...register('name')} invalid={!!errors.name} invalidText={errors.name?.message || 'name is required'} aria-invalid={!!errors.name} aria-describedby={errors.name ? 'saved-name-error' : undefined} /><div className="p-4 bg-gray-50 text-sm"><div><strong>Query</strong> {state.activeQuery || 'All documents'}</div><div><strong>Threshold</strong> {state.threshold.toFixed(2)}</div><div><strong>Filters</strong> {state.filters.map((f) => `${f.kind}:${f.value}`).join(', ') || 'None'}</div></div></div></Modal>
+  return <Modal open={state.saveOpen} modalHeading="Save search" primaryButtonText="Save search" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={close} onRequestSubmit={handleSubmit(state.saveSearch)} selectorPrimaryFocus="#saved-name"><div className="modal-copy" ref={modalRef}><TextInput id="saved-name" autoComplete="off" labelText="Search name" {...register('name')} invalid={!!errors.name} invalidText={errors.name?.message || 'name is required'} aria-invalid={!!errors.name} aria-describedby={errors.name ? 'saved-name-error' : undefined} /><div className="p-4 bg-gray-50 text-sm"><div><strong>Query</strong> {state.activeQuery || 'All documents'}</div><div><strong>Threshold</strong> {state.threshold.toFixed(2)}</div><div><strong>Filters</strong> {state.filters.map((f) => `${f.kind}:${f.value}`).join(', ') || 'None'}</div></div></div></Modal>
 }
 
 function AddDocumentModal() {
@@ -279,7 +289,7 @@ function AddDocumentModal() {
   useOverlayFocusTrap(state.addOpen, close, modalRef)
   const { register, control, handleSubmit, reset, formState:{ errors, isValid } } = useForm({ resolver:zodResolver(DocumentSchema), mode:'onChange', defaultValues:{ title:'', body:'', type:'guide', tags:[] } })
   useEffect(() => { if (state.addOpen) reset({ title:'', body:'', type:'guide', tags:[] }) }, [state.addOpen, reset])
-  return <Modal open={state.addOpen} modalHeading="Add document" primaryButtonText="Add document" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={close} onRequestSubmit={handleSubmit(state.addDocument)}><div className="modal-copy" ref={modalRef}><TextInput id="doc-title" labelText="Title" {...register('title')} invalid={!!errors.title} invalidText={errors.title?.message} /><TextArea id="doc-body" labelText="Body" rows={6} {...register('body')} invalid={!!errors.body} invalidText={errors.body?.message} /><div className="form-row"><Select id="doc-type" labelText="Type" {...register('type')} invalid={!!errors.type} invalidText={errors.type?.message}>{['guide','reference','prompt','checklist','paper','note'].map((type) => <SelectItem value={type} text={type} key={type} />)}</Select><Controller control={control} name="tags" render={({ field }) => <TextInput id="doc-tags" labelText="Tags, comma separated" value={field.value.join(', ')} onChange={(e) => field.onChange(e.target.value.split(',').map((tag) => tag.trim()).filter(Boolean))} onBlur={field.onBlur} invalid={!!errors.tags} invalidText={errors.tags?.message || errors.tags?.root?.message} />} /></div></div></Modal>
+  return <Modal open={state.addOpen} modalHeading="Add document" primaryButtonText="Add document" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={close} onRequestSubmit={handleSubmit(state.addDocument)} selectorPrimaryFocus="#doc-title"><div className="modal-copy" ref={modalRef}><TextInput id="doc-title" autoComplete="off" labelText="Title" {...register('title')} invalid={!!errors.title} invalidText={errors.title?.message} /><TextArea id="doc-body" autoComplete="off" labelText="Body" rows={6} {...register('body')} invalid={!!errors.body} invalidText={errors.body?.message} /><div className="form-row"><Select id="doc-type" labelText="Type" {...register('type')} invalid={!!errors.type} invalidText={errors.type?.message}>{['guide','reference','prompt','checklist','paper','note'].map((type) => <SelectItem value={type} text={type} key={type} />)}</Select><Controller control={control} name="tags" render={({ field }) => <TextInput id="doc-tags" autoComplete="off" labelText="Tags, comma separated" value={field.value.join(', ')} onChange={(e) => field.onChange(e.target.value.split(',').map((tag) => tag.trim()).filter(Boolean))} onBlur={field.onBlur} invalid={!!errors.tags} invalidText={errors.tags?.message || errors.tags?.root?.message} />} /></div></div></Modal>
 }
 
 const ImportFormSchema = z.object({ packageText: z.string().trim().min(1, 'package is required') })
@@ -294,7 +304,7 @@ function ImportModal() {
   useEffect(() => { if (state.importOpen) { reset({ packageText:'' }); setServerError('') } }, [state.importOpen, reset])
   const submit = ({ packageText }) => { const result = state.importPackage(packageText); if (!result.ok) setServerError(result.error) }
   const file = async (event) => { const picked = event.target.files?.[0]; if (picked) setValue('packageText', await picked.text(), { shouldValidate:true }) }
-  return <Modal open={state.importOpen} modalHeading="Import library package" primaryButtonText="Import package" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={close} onRequestSubmit={handleSubmit(submit)}><div className="modal-copy" ref={modalRef}><p className="muted">A valid package replaces the current documents and saved searches. Imported documents remain stale until indexing completes.</p><label className="cds--label" htmlFor="package-file">Choose JSON file</label><input id="package-file" type="file" accept="application/json,.json" onChange={file} /><TextArea id="package-text" labelText="Package JSON" rows={10} {...register('packageText')} invalid={!!errors.packageText || !!serverError} invalidText={errors.packageText?.message || serverError} /></div></Modal>
+  return <Modal open={state.importOpen} modalHeading="Import library package" primaryButtonText="Import package" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={close} onRequestSubmit={handleSubmit(submit)} selectorPrimaryFocus="#package-text"><div className="modal-copy" ref={modalRef}><p className="muted">A valid package replaces the current documents and saved searches. Imported documents remain stale until indexing completes.</p><label className="cds--label" htmlFor="package-file">Choose JSON file</label><input id="package-file" autoComplete="off" type="file" accept="application/json,.json" onChange={file} /><TextArea id="package-text" autoComplete="off" labelText="Package JSON" rows={10} {...register('packageText')} invalid={!!errors.packageText || !!serverError} invalidText={errors.packageText?.message || serverError} /></div></Modal>
 }
 
 function ExportModal() {
@@ -307,7 +317,7 @@ function ExportModal() {
   const text = stringifyArtifact(value)
   const copy = async () => { await navigator.clipboard.writeText(text); state.notify(`${state.exportTab === 'report' ? 'Search report' : 'Library package'} copied`) }
   const download = () => { const blob = new Blob([text], { type:'application/json' }); const url=URL.createObjectURL(blob); const link=document.createElement('a'); link.href=url; link.download=state.exportTab === 'report' ? 'semantic-search-report.json' : 'semantic-library-package.json'; link.click(); URL.revokeObjectURL(url); state.notify('JSON download started') }
-  return <Modal open={state.exportOpen} modalHeading="Export workspace" passiveModal onRequestClose={close}><div className="export-tabs" ref={modalRef} role="tablist"><button className={`export-tab ${state.exportTab === 'report' ? 'active' : ''}`} role="tab" aria-selected={state.exportTab === 'report'} onClick={() => useAppStore.setState({ exportTab:'report', exportGeneratedAt:new Date().toISOString() })}>Search report</button><button className={`export-tab ${state.exportTab === 'package' ? 'active' : ''}`} role="tab" aria-selected={state.exportTab === 'package'} onClick={() => useAppStore.setState({ exportTab:'package', exportGeneratedAt:new Date().toISOString() })}>Library package</button></div><div className="export-meta"><span>{state.exportTab === 'report' ? `${value.results.length} ranked results` : `${value.documents.length} documents · ${value.savedSearches.length} saved searches`}</span><span>Schema v1</span></div><pre className="json-preview" aria-label="JSON export preview">{text}</pre><div className="flex flex-wrap gap-2 mt-4"><Button renderIcon={Download} onClick={download}>{state.exportTab === 'report' ? 'Download report' : 'Download package'}</Button><Button kind="tertiary" renderIcon={Copy} onClick={copy}>{state.exportTab === 'report' ? 'Copy report' : 'Copy package'}</Button>{state.exportTab === 'package' && <Button kind="ghost" renderIcon={Upload} onClick={() => useAppStore.setState({ exportOpen:false, importOpen:true })}>Import package</Button>}</div></Modal>
+  return <Modal open={state.exportOpen} modalHeading="Export workspace" passiveModal onRequestClose={close}><div className="export-tabs" ref={modalRef} role="tablist"><button className={`export-tab ${state.exportTab === 'report' ? 'active' : ''}`} role="tab" aria-selected={state.exportTab === 'report'} onClick={() => useAppStore.setState({ exportTab:'report' })}>Search report</button><button className={`export-tab ${state.exportTab === 'package' ? 'active' : ''}`} role="tab" aria-selected={state.exportTab === 'package'} onClick={() => useAppStore.setState({ exportTab:'package' })}>Library package</button></div><div className="export-meta"><span>{state.exportTab === 'report' ? `${value.results.length} ranked results` : `${value.documents.length} documents · ${value.savedSearches.length} saved searches`}</span><span>Schema v1</span></div><pre className="json-preview" aria-label="JSON export preview">{text}</pre><div className="flex flex-wrap gap-2 mt-4"><Button renderIcon={Download} onClick={download}>{state.exportTab === 'report' ? 'Download report' : 'Download package'}</Button><Button kind="tertiary" renderIcon={Copy} onClick={copy}>{state.exportTab === 'report' ? 'Copy report' : 'Copy package'}</Button>{state.exportTab === 'package' && <Button kind="ghost" renderIcon={Upload} onClick={() => useAppStore.setState({ exportOpen:false, importOpen:true })}>Import package</Button>}</div></Modal>
 }
 
 function CommandPalette() {
@@ -349,7 +359,7 @@ function CommandPalette() {
     }, 10)
   }, [])
   const key = (event) => { if (event.key === 'Escape') state.setPalette(false); if (event.key === 'ArrowDown') { event.preventDefault(); useAppStore.setState({ paletteIndex:Math.min(state.paletteIndex+1,entries.length-1) }) } if(event.key==='ArrowUp'){event.preventDefault();useAppStore.setState({paletteIndex:Math.max(state.paletteIndex-1,0)})} if(event.key==='Enter'){event.preventDefault();entries[state.paletteIndex]?.action()} if(event.key==='Tab'){ const focusables=event.currentTarget.querySelectorAll('input,button'); if(!focusables.length)return; const first=focusables[0],last=focusables[focusables.length-1]; if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()} } }
-  return <div className="palette-backdrop" role="presentation" onMouseDown={(e) => e.target===e.currentTarget && state.setPalette(false)}><div className="palette" role="dialog" aria-modal="true" aria-label="Command palette" onKeyDown={key}><input ref={input} className="palette-input" aria-label="Search commands, documents, and saved searches" value={state.paletteQuery} onChange={(e) => useAppStore.setState({ paletteQuery:e.target.value, paletteIndex:0 })} /><div className="palette-list" role="listbox">{entries.map((entry,index) => { const Icon=entry.icon; return <button key={entry.id} role="option" aria-selected={index===state.paletteIndex} className={`palette-item ${index===state.paletteIndex?'active':''}`} onMouseEnter={() => useAppStore.setState({paletteIndex:index})} onClick={entry.action}><Icon size={17}/><span>{entry.label}</span><span className="palette-kind">{entry.kind}</span></button>})}</div><div className="palette-footer"><span>↑↓ Navigate</span><span>↵ Open</span><span>Esc Close</span></div></div></div>
+  return <div className="palette-backdrop" role="presentation" onMouseDown={(e) => e.target===e.currentTarget && state.setPalette(false)}><div className="palette" role="dialog" aria-modal="true" aria-label="Command palette" onKeyDown={key}><input ref={input} className="palette-input" autoComplete="off" aria-label="Search commands, documents, and saved searches" value={state.paletteQuery} onChange={(e) => useAppStore.setState({ paletteQuery:e.target.value, paletteIndex:0 })} /><div className="palette-list" role="listbox">{entries.map((entry,index) => { const Icon=entry.icon; return <button key={entry.id} role="option" aria-selected={index===state.paletteIndex} className={`palette-item ${index===state.paletteIndex?'active':''}`} onMouseEnter={() => useAppStore.setState({paletteIndex:index})} onClick={entry.action}><Icon size={17}/><span>{entry.label}</span><span className="palette-kind">{entry.kind}</span></button>})}</div><div className="palette-footer"><span>↑↓ Navigate</span><span>↵ Open</span><span>Esc Close</span></div></div></div>
 }
 
 function useKeyboardNavigation() {
@@ -381,8 +391,9 @@ function registerWebMCP() {
   if (window.__atlasWebMCPRegistered) return
   window.__atlasWebMCPRegistered = true
   const invoke = async (name,args={}) => {
-    const state=useAppStore.getState()
-    if(name==='browse_search'){state.runQuery(args.query||'');return {resultCount:useAppStore.getState().getVisible().items.length}}
+    try {
+      const state=useAppStore.getState()
+      if(name==='browse_search'){state.runQuery(args.query||'');return {resultCount:useAppStore.getState().getVisible().items.length}}
     if(name==='browse_open'){const views={history:'history','saved-searches':'saved',compare:'compare','index-panel':'index'};if(args.destination==='results'){state.closeDetail()}else if(args.destination==='document-detail'&&args.id)state.openDetail(args.id);else if(args.destination==='export-report')state.openExport('report');else if(views[args.destination])state.setRailView(views[args.destination]);return {destination:args.destination}}
     if(name==='browse_apply_filter'){
       if(args.kind==='similarity-threshold'){const value=Number(args.value);if(value<0||value>1||!Number.isInteger(value*20))throw new Error('similarity-threshold must be 0.0-1.0 in 0.05 increments');state.setThreshold(value)}
@@ -419,6 +430,10 @@ function registerWebMCP() {
     if(name==='artifact_export'){state.openExport('report');return {format:'search-report-json',visible:true}}
     if(name==='artifact_copy'){state.openExport('report');return {visible:true,requiresClipboardInteraction:true}}
     return {ok:true}
+    } catch(error) {
+      useAppStore.getState().notify(error.message, 'error');
+      throw error;
+    }
   }
   const toolNames=['browse_open','browse_search','browse_apply_filter','browse_clear_filter','browse_sort','entity_create','entity_select','entity_update','entity_delete','entity_toggle','session_start','session_pause','session_resume','artifact_export','artifact_copy']
   const descriptions={

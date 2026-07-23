@@ -5,6 +5,7 @@ import {
   state, activeTheme, selectTheme, selectByName, notify,
   setColor, setRadius, setFontFamily, createTheme, validateRename,
   removeTheme, importFromText, uniqueName, pushExternalHistory, snapshotState,
+  syncHash,
 } from './state.js';
 import { COLOR_KEYS, RADIUS_VALUES, RADIUS_GROUPS, FONT_FAMILIES } from './data.js';
 import { openArtifact, copyArtifact, showToast } from './ui.js';
@@ -17,6 +18,18 @@ const MODULES = [
 
 const obj = (properties, required = []) => ({ type: 'object', properties, required });
 const str = (description, enums) => ({ type: 'string', description, ...(enums ? { enum: enums } : {}) });
+const themeName = (description) => ({
+  type: 'string',
+  description,
+  minLength: 2,
+  maxLength: 30,
+  pattern: '^[a-z][a-z0-9_-]*$',
+});
+const toolModule = (name) => name.startsWith('editor_')
+  ? 'structured-editor-v1'
+  : name.startsWith('entity_')
+    ? 'entity-collection-v1'
+    : 'artifact-transfer-v1';
 
 const TOOLS = [
   {
@@ -40,8 +53,11 @@ const TOOLS = [
   },
   {
     name: 'editor_preview',
-    description: 'Refresh the live preview from the active theme tokens (same state the visible preview renders).',
-    inputSchema: obj({ object_type: str('Object type', ['theme']) }, ['object_type']),
+    description: 'Read a bounded summary of the active theme without changing the visible preview tab or editor state.',
+    inputSchema: obj({
+      object_type: str('Object type', ['theme']),
+    }, ['object_type']),
+    annotations: { readOnlyHint: true },
   },
   {
     name: 'editor_switch_mode',
@@ -60,7 +76,7 @@ const TOOLS = [
         type: 'object',
         description: 'Fields for the new theme',
         properties: {
-          name: str('Theme name (2-30 chars; letters, digits, spaces, - and _)'),
+          name: themeName('Theme name: 2-30 characters, starting with a lowercase letter and containing only lowercase letters, digits, hyphens, and underscores'),
           tokens: { type: 'object', description: "Optional initial tokens, e.g. { colors: { '--color-primary': '#123456' } }" },
         },
       },
@@ -83,7 +99,7 @@ const TOOLS = [
       fields: {
         type: 'object',
         properties: {
-          name: str('New name'),
+          name: themeName('New theme name: 2-30 characters, starting with a lowercase letter and containing only lowercase letters, digits, hyphens, and underscores'),
           tokens: { type: 'object', description: "Token patch, e.g. { colors: { '--color-primary': '#123456' }, radius: { box: '1rem' } }" },
         },
       },
@@ -179,8 +195,20 @@ const handlers = {
     return { ok: true, active: t.name, property: args.property, applied: args.property === 'color' ? { [normalizeColorKey(args.token || args.key)]: t.colors[normalizeColorKey(args.token || args.key)] } : String(args.value) };
   },
 
-  editor_preview() {
-    return { ok: true, preview_tab: state.previewTab, active: activeTheme().name };
+  editor_preview(args) {
+    if (args.object_type !== 'theme') return err("object_type must be 'theme'");
+    const theme = activeTheme();
+    return {
+      ok: true,
+      theme: {
+        id: theme.id,
+        name: theme.name,
+        builtin: theme.builtin,
+        colorCount: Object.keys(theme.colors).length,
+        fontFamily: theme.fontFamily,
+      },
+      preview_tab: state.previewTab,
+    };
   },
 
   editor_switch_mode(args) {
@@ -200,7 +228,10 @@ const handlers = {
     const res = createTheme(name);
     if (!res.ok) return err(res.error);
     // initial tokens are part of the create gesture — no extra history entry
-    if (applyTokenPatch(res.theme, fields.tokens)) notify('structure');
+    if (applyTokenPatch(res.theme, fields.tokens)) {
+      syncHash();
+      notify('structure');
+    }
     return { ok: true, name: res.theme.name, count: state.customs.length };
   },
 
@@ -226,9 +257,13 @@ const handlers = {
       // editing a built-in via entity_update forks like the visible editor
       const res = createTheme(fields.name || uniqueName(`${activeTheme().name}-edit`));
       if (!res.ok) return err(res.error);
-      applyTokenPatch(res.theme, fields.tokens);
+      if (applyTokenPatch(res.theme, fields.tokens)) {
+        syncHash();
+        notify('structure');
+      }
       return { ok: true, name: res.theme.name, count: state.customs.length };
     }
+    state.activeId = target.id;
     if (fields.name && fields.name.trim() !== target.name) {
       const check = validateRename(fields.name);
       if (!check.ok) return err(check.error);
@@ -238,6 +273,7 @@ const handlers = {
     }
     applyTokenPatch(target, fields.tokens);
     pushExternalHistory(before);
+    syncHash();
     notify('structure');
     return { ok: true, name: target.name };
   },
@@ -291,19 +327,32 @@ const handlers = {
 };
 
 export function registerWebMCP() {
+  const afterRender = async (result) => {
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    return result;
+  };
   window.webmcp_session_info = () => ({
     contract_version: 'zto-webmcp-v1',
     app: 'daisyui-theme-generator',
-    modules: MODULES,
+    modules: MODULES.map((module) => module.id),
+    module_catalog: MODULES,
   });
 
-  window.webmcp_list_tools = () => TOOLS.map((t) => ({ name: t.name, description: t.description, inputSchema: t.inputSchema }));
+  window.webmcp_list_tools = () => TOOLS.map((tool) => ({
+    name: tool.name,
+    description: tool.description,
+    inputSchema: tool.inputSchema,
+    module: toolModule(tool.name),
+    ...(tool.annotations ? { annotations: tool.annotations } : {}),
+  }));
 
-  window.webmcp_invoke_tool = async (name, args = {}) => {
+  window.webmcp_invoke_tool = async (request, suppliedArguments = {}) => {
+    const name = typeof request === 'string' ? request : request?.name;
+    const args = typeof request === 'string' ? suppliedArguments : request?.arguments || suppliedArguments;
     const handler = handlers[name];
     if (!handler) return { ok: false, error: `Unknown tool '${name}'` };
     try {
-      return await handler(args || {});
+      return afterRender(await handler(args || {}));
     } catch (e) {
       return { ok: false, error: `Tool '${name}' failed: ${e?.message || e}` };
     }

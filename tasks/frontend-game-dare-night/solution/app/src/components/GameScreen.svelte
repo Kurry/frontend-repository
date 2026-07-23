@@ -69,7 +69,7 @@
 
 <svelte:window onkeydown={(e: KeyboardEvent) => { if (e.key === 'Escape' && showScoreboard) showScoreboard = false; }} />
 
-<div class="min-h-screen p-5 flex flex-col gap-5" style="background-color: var(--color-bg);">
+<main class="min-h-screen p-5 flex flex-col gap-5" style="background-color: var(--color-bg);">
   <!-- Header -->
   <header class="flex items-center justify-between gap-2.5 max-w-lg mx-auto w-full">
     <button class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white text-sm font-semibold border-2 border-black hover:bg-gray-50 transition-colors" onclick={onNewGame}>
@@ -118,7 +118,7 @@
               {#if entry.name === winner}<Trophy size={14} weight="fill" class="inline -mt-0.5" aria-hidden="true" /> Winner{/if}
               {#if entry.name === currentPlayer && !winner}<span class="ml-1 text-xs text-cyan-700">(turn)</span>{/if}
             </span>
-            <span class="text-sm tabular-nums"><strong class="text-green-600">{entry.points}</strong><span class="text-gray-400">/10</span> · <span class="text-red-500">{entry.forfeits}</span> skip</span>
+            <span class="text-sm tabular-nums"><strong class="text-green-600">{entry.points}</strong><span class="text-gray-400">/10</span> · <span class="text-red-500">{entry.forfeits}</span> forfeits</span>
           </div>
           <div class="h-2.5 rounded-full bg-gray-200 overflow-hidden" role="progressbar" aria-valuenow={entry.points} aria-valuemin={0} aria-valuemax={10} aria-label={`${entry.name} points`}>
             <div class="h-full rounded-full transition-[width] duration-300" style="width: {Math.min(100, entry.points * 10)}%; background-color: {entry.name === winner ? '#F59E0B' : 'var(--color-accent)'};"></div>
@@ -192,16 +192,16 @@
   {/if}
 
   <!-- Live event feed -->
-  <div class="max-w-lg mx-auto w-full">
+  <aside class="max-w-lg mx-auto w-full" aria-label="Live event feed">
     <LiveEventPanel status={streamStatus} {appliedEvents} {bonuses} {offeredEvent} {deliveredCount} {totalEvents} {duplicatesIgnored} onStart={onStreamStart} onPause={onStreamPause} onReconnect={onStreamReconnect} onDeliverOutOfOrder={onStreamDeliverOutOfOrder} />
-  </div>
+  </aside>
 
   <!-- Scoreboard slide-over -->
   {#if showScoreboard}
     <div class="fixed inset-0 z-40 flex justify-end" role="dialog" aria-modal="true" aria-labelledby="scoreboard-title" transition:scale={{ start: 0.98, duration: motionMs(180) }}>
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <button class="absolute inset-0 dialog-backdrop" style="background-color: rgba(0,0,0,0.35);" onclick={() => (showScoreboard = false)} aria-label="Close scoreboard"></button>
-      <div class="relative w-full max-w-sm bg-white rounded-l-[10px] shadow-2xl p-5 overflow-y-auto z-50">
+      <div class="relative w-full max-w-sm bg-white rounded-l-[10px] shadow-2xl p-5 overflow-y-auto z-50" transition:scale={{ start: 0.95, duration: motionMs(180) }}>
         <div class="flex items-center justify-between mb-5">
           <h2 id="scoreboard-title" class="text-xl font-semibold" style="color: var(--color-accent);">Scoreboard</h2>
           <button class="p-2.5 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors" onclick={() => (showScoreboard = false)} aria-label="Close scoreboard"><X size={18} weight="bold" /></button>
@@ -210,4 +210,4 @@
       </div>
     </div>
   {/if}
-</div>
+</main>

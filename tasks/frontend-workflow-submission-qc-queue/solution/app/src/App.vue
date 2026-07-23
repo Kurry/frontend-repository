@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { NConfigProvider, darkTheme, lightTheme } from 'naive-ui'
 import IconArchive from '~icons/lucide/archive'
 import IconCommand from '~icons/lucide/command'
@@ -12,12 +12,18 @@ import IconSun from '~icons/lucide/sun'
 import IconUndo from '~icons/lucide/undo-2'
 import IconX from '~icons/lucide/x'
 import QueueView from './components/QueueView.vue'
-import DetailView from './components/DetailView.vue'
-import ExportView from './components/ExportView.vue'
 import ContributorDrawer from './components/ContributorDrawer.vue'
 import CommandPalette from './components/CommandPalette.vue'
 import { useQcStore } from './store'
 import { registerWebMcp } from './webmcp'
+
+// DetailView (with its review dialogs + vee-validate/zod schemas) and
+// ExportView are mutually exclusive with the default 'queue' view and are
+// only ever needed after a user navigates away from the queue — split them
+// out of the initial chunk so cold load has less JS to parse before the
+// queue is interactive.
+const DetailView = defineAsyncComponent(() => import('./components/DetailView.vue'))
+const ExportView = defineAsyncComponent(() => import('./components/ExportView.vue'))
 
 const store = useQcStore()
 const title = computed(() => store.activeView === 'export' ? 'Export center' : store.activeView === 'detail' ? 'Submission detail' : 'Quality queue')
@@ -58,22 +64,20 @@ function openPalette() {
 
 function onKeydown(event) {
   const command = event.ctrlKey || event.metaKey
+  if (event.key === 'Escape') {
+    if (store.palette.open) { store.palette.open = false; return }
+    if (store.drawerContributor) { store.drawerContributor = null; return }
+    if (store.dialogs.add || store.dialogs.revision || store.dialogs.override || store.dialogs.approve) {
+      store.closeDialogs(); return
+    }
+  }
   if (command && event.key.toLowerCase() === 'k') {
     event.preventDefault()
     if (!store.palette.open) store.paletteOpener = document.activeElement
     store.palette.open = !store.palette.open
     return
   }
-  if (store.palette.open) return
-  if (store.dialogs.add || store.dialogs.revision || store.dialogs.override || store.dialogs.approve) {
-    if (event.key === 'Escape') {
-      event.preventDefault()
-      store.closeDialogs()
-    }
-    return
-  }
   if (command && event.key.toLowerCase() === 'z') { event.preventDefault(); event.shiftKey ? store.redo() : store.undo() }
-  if (event.key === 'Escape' && store.drawerContributor) store.drawerContributor = null
 }
 
 function toggleTheme() {

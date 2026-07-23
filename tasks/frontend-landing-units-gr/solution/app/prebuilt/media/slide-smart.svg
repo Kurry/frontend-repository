@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 683" preserveAspectRatio="xMidYMid slice">
+  <rect width="1024" height="683" fill="#00aa3c"/>
+  <path d="M583.8720061552065 524.0827661777762 q-22 -34 -10 -64 q16 12 10 64" fill="#00aa3c" opacity="0.8"/><path d="M677.7026631193182 639.1883735424963 q-22 -34 -10 -64 q16 12 10 64" fill="#1be349" opacity="0.8"/><path d="M409.60093986013436 117.73937728439428 q-22 -34 -10 -64 q16 12 10 64" fill="#00aa3c" opacity="0.8"/><path d="M938.1090441795092 279.74495902069316 q-22 -34 -10 -64 q16 12 10 64" fill="#1be349" opacity="0.8"/><path d="M818.3552654299251 160.91060325389338 q-22 -34 -10 -64 q16 12 10 64" fill="#00aa3c" opacity="0.8"/><path d="M757.789220396814 250.3332664618142 q-22 -34 -10 -64 q16 12 10 64" fill="#1be349" opacity="0.8"/><path d="M179.6169488747575 323.8043769216524 q-22 -34 -10 -64 q16 12 10 64" fill="#00aa3c" opacity="0.8"/><path d="M921.3341211285888 95.075288872682 q-22 -34 -10 -64 q16 12 10 64" fill="#1be349" opacity="0.8"/><path d="M662.8393047766517 522.9828224843798 q-22 -34 -10 -64 q16 12 10 64" fill="#00aa3c" opacity="0.8"/><path d="M432.7088841289882 58.21952754595458 q-22 -34 -10 -64 q16 12 10 64" fill="#1be349" opacity="0.8"/><path d="M594.9115619726247 254.9617898278692 q-22 -34 -10 -64 q16 12 10 64" fill="#00aa3c" opacity="0.8"/><path d="M858.6762803750261 317.76262164550525 q-22 -34 -10 -64 q16 12 10 64" fill="#1be349" opacity="0.8"/><path d="M140.43097169242358 213.3566910523508 q-22 -34 -10 -64 q16 12 10 64" fill="#00aa3c" opacity="0.8"/><path d="M435.8351249028806 444.02025080957776 q-22 -34 -10 -64 q16 12 10 64" fill="#1be349" opacity="0.8"/>
+  <g transform="translate(532.48,341.5) rotate(-8)">
+  <rect x="-90" y="-150" width="180" height="320" rx="26" fill="#000"/>
+  <rect x="-78" y="-132" width="156" height="284" rx="14" fill="#ab54f7"/>
+  <rect x="-58" y="-100" width="116" height="60" rx="10" fill="#fff"/>
+  <circle cx="0" cy="-20" r="34" fill="#ffb200"/><path d="M-12 -32 v24 h24 M0 -8 v22" stroke="#000" stroke-width="7" fill="none"/>
+  <rect x="-58" y="40" width="116" height="20" rx="10" fill="#fff" opacity="0.8"/>
+  <rect x="-58" y="74" width="80" height="20" rx="10" fill="#fff" opacity="0.6"/>
+  </g>
+  <path d="M307.2 683 q40 -120 120 -150 l60 30 q-30 90 -40 150 z" fill="#f4e9e1" opacity="0.9"/>
+  </svg>

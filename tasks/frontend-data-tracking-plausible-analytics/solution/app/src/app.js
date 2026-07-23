@@ -244,6 +244,7 @@ function toggleCompare() {
 }
 function setCeiling(val) {
   if (!Number.isInteger(val) || val < 0 || val > 100) return false;
+  if (state.ceiling === val) return true;
   pushUndo();
   state.ceiling = val;
   commit();
@@ -251,6 +252,7 @@ function setCeiling(val) {
 }
 function setFloor(val) {
   if (!Number.isInteger(val) || val < 0 || val > 1000000) return false;
+  if (state.floor === val) return true;
   pushUndo();
   state.floor = val;
   commit();
@@ -396,6 +398,8 @@ document.addEventListener('keydown', (e) => {
     const openModalKey = Object.keys(modals).find((k) => modals[k].overlay.classList.contains('active'));
     if (openModalKey) { closeModal(openModalKey); e.preventDefault(); return; }
     if (segmentsMenuOpen) { closeSegmentsMenu(); e.preventDefault(); return; }
+    const openListbox = [C.siteBox, C.periodBox, C.sortBox].find((box) => box?.isOpen());
+    if (openListbox) { openListbox.close(true); e.preventDefault(); }
   }
 });
 document.addEventListener('keydown', (e) => {
@@ -537,7 +541,7 @@ function makeListbox({ label, options, getSelectedId, onSelect }) {
       if (open) renderOptions();
     },
     isOpen: () => open,
-    close: () => closePopup(false),
+    close: (returnFocus = false) => closePopup(returnFocus),
   };
 }
 
@@ -591,34 +595,44 @@ function buildChrome() {
 
   C.ceilingErr = el('div', { class: 'err-msg', id: 'err-bounce-rate-ceiling', role: 'alert' });
   C.ceilingHint = el('div', { class: 'thresh-hint', id: 'ceiling-hint' });
+  let ceilingCommitTimer = null;
+  const handleCeilingEntry = (e, immediate = false) => {
+    clearTimeout(ceilingCommitTimer);
+    const raw = e.target.value.trim();
+    const num = Number(raw);
+    if (raw === '' || !Number.isInteger(num) || num < 0 || num > 100) {
+      txt(C.ceilingErr, 'Bounce-rate ceiling must be an integer from 0 to 100');
+      return;
+    }
+    txt(C.ceilingErr, '');
+    if (immediate) setCeiling(num);
+    else ceilingCommitTimer = setTimeout(() => setCeiling(num), 250);
+  };
   C.ceilingInput = el('input', {
     type: 'number', class: 'thresh-input', id: 'bounce-rate-ceiling', min: 0, max: 100, step: 1,
     'aria-describedby': 'err-bounce-rate-ceiling ceiling-hint',
-    onchange: (e) => {
-      const raw = e.target.value.trim();
-      const num = Number(raw);
-      if (raw === '' || !Number.isInteger(num) || num < 0 || num > 100) {
-        txt(C.ceilingErr, 'Bounce-rate ceiling must be an integer from 0 to 100');
-        return;
-      }
-      txt(C.ceilingErr, '');
-      setCeiling(num);
-    },
+    oninput: (e) => handleCeilingEntry(e),
+    onchange: (e) => handleCeilingEntry(e, true),
   });
   C.floorErr = el('div', { class: 'err-msg', id: 'err-visitor-floor', role: 'alert' });
+  let floorCommitTimer = null;
+  const handleFloorEntry = (e, immediate = false) => {
+    clearTimeout(floorCommitTimer);
+    const raw = e.target.value.trim();
+    const num = Number(raw);
+    if (raw === '' || !Number.isInteger(num) || num < 0 || num > 1000000) {
+      txt(C.floorErr, 'Visitor floor must be an integer from 0 to 1,000,000');
+      return;
+    }
+    txt(C.floorErr, '');
+    if (immediate) setFloor(num);
+    else floorCommitTimer = setTimeout(() => setFloor(num), 250);
+  };
   C.floorInput = el('input', {
     type: 'number', class: 'thresh-input', id: 'visitor-floor', min: 0, max: 1000000, step: 1,
     'aria-describedby': 'err-visitor-floor',
-    onchange: (e) => {
-      const raw = e.target.value.trim();
-      const num = Number(raw);
-      if (raw === '' || !Number.isInteger(num) || num < 0 || num > 1000000) {
-        txt(C.floorErr, 'Visitor floor must be an integer from 0 to 1,000,000');
-        return;
-      }
-      txt(C.floorErr, '');
-      setFloor(num);
-    },
+    oninput: (e) => handleFloorEntry(e),
+    onchange: (e) => handleFloorEntry(e, true),
   });
 
   C.segBtn = el('button', {
@@ -927,7 +941,7 @@ function buildSiteModal() {
   const overlay = el('div', { class: 'modal', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Add site' }, [content]);
   installTrap(overlay, () => content, () => closeModal('site'));
   document.body.appendChild(overlay);
-  return { overlay, content, reset() { nameInput.value = ''; domainInput.value = ''; tzSelect.value = ''; txt(nameErr, ''); txt(domainErr, ''); txt(tzErr, ''); submitBtn.disabled = true; } };
+  return { overlay, content, reset() { nameInput.value = ''; domainInput.value = ''; tzSelect.value = ''; validate(); } };
 }
 
 function buildGoalModal() {
@@ -983,7 +997,7 @@ function buildGoalModal() {
   const overlay = el('div', { class: 'modal', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Add goal' }, [content]);
   installTrap(overlay, () => content, () => closeModal('goal'));
   document.body.appendChild(overlay);
-  return { overlay, content, reset() { nameInput.value = ''; typeSelect.value = ''; matchInput.value = ''; txt(nameErr, ''); txt(typeErr, ''); txt(matchErr, ''); submitBtn.disabled = true; } };
+  return { overlay, content, reset() { nameInput.value = ''; typeSelect.value = ''; matchInput.value = ''; validate(); } };
 }
 
 function buildSaveModal() {
@@ -999,7 +1013,7 @@ function buildSaveModal() {
     if (n.length < 1 || n.length > 40) { if (showNameError) txt(nameErr, 'Segment name must be 1 to 40 characters'); ok = false; }
     else if (state.savedSegments.some((s) => s.name === n)) { if (showNameError) txt(nameErr, 'A segment with this name already exists'); ok = false; }
     else if (showNameError) txt(nameErr, '');
-    if (state.filters.length === 0) { txt(filterErr, 'Cannot save a segment with no active filters'); ok = false; }
+    if (state.filters.length === 0) { txt(filterErr, 'The filters field requires at least one active filter'); ok = false; }
     else txt(filterErr, '');
     submitBtn.disabled = !ok;
     return ok;
@@ -1020,7 +1034,7 @@ function buildSaveModal() {
   document.body.appendChild(overlay);
   return {
     overlay, content,
-    onOpen() { nameInput.value = ''; txt(nameErr, ''); validate(false); },
+    onOpen() { nameInput.value = ''; validate(true); },
   };
 }
 
@@ -1358,8 +1372,8 @@ function update() {
   txt(C.brandSub, `${state.site} · ${tz} · ${model.period.label}`);
   C.themeBtn.textContent = state.theme === 'light' ? 'Dark' : 'Light';
   C.themeBtn.setAttribute('aria-label', state.theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
-  C.undoBtn.disabled = undoStack.length === 0;
-  C.redoBtn.disabled = redoStack.length === 0;
+  C.undoBtn.setAttribute('aria-disabled', undoStack.length === 0 ? 'true' : 'false');
+  C.redoBtn.setAttribute('aria-disabled', redoStack.length === 0 ? 'true' : 'false');
   C.compareBtn.classList.toggle('active', state.compare);
   C.compareBtn.setAttribute('aria-pressed', state.compare ? 'true' : 'false');
   if (document.activeElement !== C.ceilingInput) C.ceilingInput.value = state.ceiling;
@@ -1367,8 +1381,14 @@ function update() {
   txt(C.ceilingHint, `now ${model.kpi.bounceRate}%`);
   C.customRangeControl.style.display = state.period === 'custom' ? '' : 'none';
   if (state.customRange) {
-    if (document.activeElement !== C.customFrom) C.customFrom.value = state.customRange.from;
-    if (document.activeElement !== C.customTo) C.customTo.value = state.customRange.to;
+    if (document.activeElement !== C.customFrom) {
+      C.customFrom.value = state.customRange.from;
+      txt(C.customFromErr, '');
+    }
+    if (document.activeElement !== C.customTo) {
+      C.customTo.value = state.customRange.to;
+      txt(C.customToErr, '');
+    }
   }
   C.siteBox.refresh();
   C.periodBox.refresh();
@@ -1546,6 +1566,7 @@ function updatePanel(dim, entries, model) {
   if (!showEmpty && p.empty.isConnected) p.empty.remove();
 
   // reconcile values + active + compare chip, and reorder to desired order (FLIP)
+  let nextPosition = list.firstElementChild;
   entries.forEach((entry) => {
     const node = p.rowMap.get(entry.name);
     const active = state.filters.some((f) => f.dimension === dim && f.value === entry.name);
@@ -1566,7 +1587,11 @@ function updatePanel(dim, entries, model) {
     } else {
       node.chip.classList.add('hidden');
     }
-    list.appendChild(node.btn); // reorders to desired order; preserves identity
+    // Only move a row when its position actually changes. Re-appending every
+    // row on a filter commit preserves node identity but Chromium drops focus
+    // when the focused button is detached/reinserted into the same list.
+    if (node.btn !== nextPosition) list.insertBefore(node.btn, nextPosition);
+    nextPosition = node.btn.nextElementSibling;
   });
 
   // FLIP: animate rows that existed before to their new position
@@ -1670,9 +1695,17 @@ const TOOLS = [
   },
   {
     name: 'browse_search', operation: 'search',
-    description: 'No-op search: this dashboard has no free-text search surface; returns an honest empty result.',
+    description: 'Query the active site breakdowns without changing visible filters or navigation.',
     parameters: { query: { type: 'string' } },
-    handler: () => ({ ok: true, results: [], note: 'No search surface on this dashboard.' }),
+    handler: (a) => {
+      const query = String(a && a.query || '').trim().toLowerCase();
+      if (!query) return { ok: false, error: 'query is required' };
+      const site = SITES[state.site];
+      const results = DIMENSIONS.flatMap((dimension) => site[dimension === 'country' ? 'countries' : `${dimension}s`]
+        .filter((entry) => entry.name.toLowerCase().includes(query))
+        .map((entry) => ({ dimension, name: entry.name, visitors: entry.visitors })));
+      return { ok: true, query, count: results.length, results };
+    },
   },
   {
     name: 'browse_apply_filter', operation: 'apply_filter',
@@ -1808,7 +1841,24 @@ window.webmcp_session_info = () => ({
   modules: ['browse-query-v1', 'form-workflow-v1', 'artifact-transfer-v1'],
   state: { site: state.site, period: state.period, sort: state.sort, theme: state.theme, filters: state.filters, compare: state.compare, ceiling: state.ceiling, floor: state.floor },
 });
-window.webmcp_list_tools = () => TOOLS.map((t) => ({ name: t.name, operation: t.operation, description: t.description, parameters: t.parameters }));
+const REQUIRED_TOOL_ARGUMENTS = {
+  browse_open: ['destination'],
+  browse_search: ['query'],
+  browse_apply_filter: ['filter', 'value'],
+  browse_sort: ['sort'],
+  browse_set_theme: ['theme'],
+  form_validate: ['fields'],
+  form_submit: ['form', 'fields'],
+  artifact_export: ['format'],
+  artifact_import: ['mode'],
+  artifact_copy: ['format'],
+};
+window.webmcp_list_tools = () => TOOLS.map((t) => ({
+  name: t.name,
+  operation: t.operation,
+  description: t.description,
+  inputSchema: { type: 'object', properties: t.parameters, required: REQUIRED_TOOL_ARGUMENTS[t.name] || [], additionalProperties: false },
+}));
 window.webmcp_invoke_tool = (name, args) => {
   const tool = TOOLS.find((t) => t.name === name);
   if (!tool) return { ok: false, error: `Unknown tool: ${name}` };

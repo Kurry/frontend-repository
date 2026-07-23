@@ -71,10 +71,17 @@ const tools = [
   },
   {
     name: 'form_validate', description: 'Validate a declared visible form without mutating state.',
-    inputSchema: { type: 'object', properties: { form: { enum: ['new-dataset', 'add-row', 'edit-row', 'threshold-rule', 'split-percentages', 'snapshot-name', 'attach-suite-select', 'formula-input'] }, values: { type: 'object' } }, required: ['form', 'values'], additionalProperties: false },
+    inputSchema: { type: 'object', properties: { form: { enum: ['new-dataset', 'add-row', 'edit-row', 'threshold-rule', 'split-percentages', 'snapshot-name', 'attach-suite-select', 'formula-input'] }, values: { type: 'object' } }, additionalProperties: false }, annotations: { readOnlyHint: true },
     execute: async ({ form, values }) => {
       let checked
-      if (form === 'new-dataset') checked = datasetCreateSchema.safeParse(values)
+      if (!form) {
+        if (store.getState().modal) return failure('form and values are required while a visible form is open')
+        const ds = current()
+        if (!ds) return failure('No dataset is selected')
+        checked = datasetCreateSchema.safeParse({ name: ds.name, description: ds.description || '', schema: ds.schema })
+        return checked.success ? result('Selected dataset contract is valid', { rowCount: ds.rows.length }) : failure(checked.error.issues[0].message)
+      }
+      else if (form === 'new-dataset') checked = datasetCreateSchema.safeParse(values)
       else if (form === 'add-row' || form === 'edit-row') checked = dynamicRowSchema(current().schema).safeParse(values)
       else if (form === 'threshold-rule') checked = thresholdSchema.safeParse(values)
       else if (form === 'split-percentages') checked = splitSchema.safeParse(values)
@@ -158,10 +165,10 @@ const tools = [
     name: 'artifact_copy', description: 'Activate the visible export Copy control. Clipboard contents are intentionally not returned.',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
     execute: async () => {
-      const button = [...document.querySelectorAll('button')].find((b) => /^(Copy|Copied)$/.test(b.textContent.trim()))
+      const button = [...document.querySelectorAll('button')].find((b) => /^(Copy artifact|Copied artifact)$/.test(b.textContent.trim()))
       if (!button) return failure('Open the export drawer before copying')
       button.click()
-      return result('Visible Copy control activated; verify clipboard through browser interaction')
+      return result('Visible Copy artifact control activated; a named confirmation toast is shown')
     },
   },
 ]
@@ -174,7 +181,7 @@ function sessionInfo() {
     app: 'dataset-workbench',
     contract_version: 'zto-webmcp-v1',
     selectedDatasetId: store.getState().selectedId,
-    modules: MODULES.map((m) => ({ ...m, tools: listableTools.filter((t) => t.name.startsWith(m.tool_name_prefix + '_')).map((t) => t.name) })),
+    modules: MODULES.map((m) => m.id),
     tool_count: listableTools.length,
     mechanics_exclusions: ['file picker and drag-and-drop dropzone', 'virtualized-grid scroll smoothness', 'pivot chip drag gesture fidelity', 'undo/redo and inline-cell keyboard mechanics', 'animation and toast transients', 'clipboard contents of export Copy'],
   }

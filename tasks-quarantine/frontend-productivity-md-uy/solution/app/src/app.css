@@ -1,0 +1,298 @@
+@import '@fontsource/ibm-plex-serif/400.css';
+@import '@fontsource/ibm-plex-serif/600.css';
+@import '@fontsource/fira-code/400.css';
+@import 'tailwindcss';
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+	--background: oklch(0.99 0.01 81.8);
+	--foreground: oklch(0.33 0.03 258.35);
+	--card: oklch(1 0 0);
+	--card-foreground: oklch(0.33 0.03 258.35);
+	--popover: oklch(1 0 0);
+	--popover-foreground: oklch(0.33 0.03 258.35);
+	--primary: oklch(0.68 0.12 247.11);
+	--primary-foreground: oklch(1 0 0);
+	--secondary: oklch(0.91 0.03 7.14);
+	--secondary-foreground: oklch(0.33 0.03 258.35);
+	--muted: oklch(0.96 0.02 74.66);
+	--muted-foreground: oklch(0.41 0.03 246.76);
+	--accent: oklch(0.93 0.02 118.95);
+	--accent-foreground: oklch(0.33 0.03 258.35);
+	--destructive: oklch(0.74 0.15 20.88);
+	--destructive-foreground: oklch(1 0 0);
+	--border: oklch(0.86 0.01 67.69);
+	--input: oklch(0.41 0.03 246.76);
+	--ring: oklch(0.68 0.12 247.11);
+	--font-sans: 'IBM Plex Serif', Georgia, serif;
+	--font-serif: 'IBM Plex Serif', Georgia, serif;
+	--font-mono: 'Fira Code', ui-monospace, monospace;
+	--radius: 0.3rem;
+	--chrome-ease: 80ms ease;
+	--pane-ms: 200ms;
+	--ambient-shift: 0px;
+}
+
+.dark {
+	--background: oklch(0.27 0.02 254.83);
+	--foreground: oklch(0.93 0.02 84.59);
+	--card: oklch(0.31 0.02 257.27);
+	--card-foreground: oklch(0.93 0.02 84.59);
+	--popover: oklch(0.31 0.02 257.27);
+	--popover-foreground: oklch(0.93 0.02 84.59);
+	--primary: oklch(0.68 0.12 247.11);
+	--primary-foreground: oklch(1 0 0);
+	--secondary: oklch(0.91 0.03 7.14);
+	--secondary-foreground: oklch(0.27 0.02 254.83);
+	--muted: oklch(0.33 0.03 258.35);
+	--muted-foreground: oklch(0.82 0 0);
+	--accent: oklch(0.93 0.02 118.95);
+	--accent-foreground: oklch(0.27 0.02 254.83);
+	--destructive: oklch(0.74 0.15 21.38);
+	--destructive-foreground: oklch(1 0 0);
+	--border: oklch(0.41 0.03 246.76);
+	--input: oklch(0.41 0.03 246.76);
+	--ring: oklch(0.59 0.09 246.73);
+	--font-sans: 'IBM Plex Serif', Georgia, serif;
+	--font-serif: 'IBM Plex Serif', Georgia, serif;
+	--font-mono: 'Fira Code', ui-monospace, monospace;
+	--radius: 0.3rem;
+}
+
+@theme inline {
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--font-sans: var(--font-sans);
+	--font-mono: var(--font-mono);
+	--font-serif: var(--font-serif);
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+	* {
+		@apply border-border;
+	}
+	body {
+		@apply bg-background text-foreground font-serif;
+		background-image:
+			radial-gradient(1200px 600px at calc(20% + var(--ambient-shift)) -10%, oklch(0.92 0.04 247 / 0.45), transparent 60%),
+			radial-gradient(900px 500px at calc(90% - var(--ambient-shift)) 110%, oklch(0.94 0.03 118 / 0.35), transparent 55%);
+		background-attachment: fixed;
+	}
+}
+
+.dark body {
+	background-image:
+		radial-gradient(1200px 600px at calc(20% + var(--ambient-shift)) -10%, oklch(0.35 0.05 247 / 0.45), transparent 60%),
+		radial-gradient(900px 500px at calc(90% - var(--ambient-shift)) 110%, oklch(0.32 0.04 118 / 0.35), transparent 55%);
+}
+
+/* Chrome hover/focus: keep transitions under 100ms for performance criteria */
+.chrome-btn,
+.mode-btn,
+button,
+[role='button'],
+a {
+	transition:
+		background-color var(--chrome-ease),
+		border-color var(--chrome-ease),
+		color var(--chrome-ease),
+		opacity var(--chrome-ease),
+		box-shadow var(--chrome-ease);
+}
+
+.chrome-btn:focus-visible,
+.mode-btn:focus-visible,
+button:focus-visible,
+[role='button']:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+	outline: 2px solid var(--ring);
+	outline-offset: 2px;
+	box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 35%, transparent);
+}
+
+.skip-link {
+	position: absolute;
+	left: -9999px;
+	top: 0;
+	z-index: 100;
+	padding: 0.5rem 1rem;
+	background: var(--primary);
+	color: var(--primary-foreground);
+	border-radius: var(--radius);
+}
+.skip-link:focus {
+	left: 0.75rem;
+	top: 0.75rem;
+}
+
+.pane-shell {
+	animation: pane-in var(--pane-ms) ease both;
+}
+
+@keyframes pane-in {
+	from {
+		opacity: 0;
+		transform: translateY(6px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes dialog-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+@keyframes dialog-out {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+@keyframes dialog-pop-in {
+	from {
+		opacity: 0;
+		transform: translate(-50%, -48%) scale(0.96);
+	}
+	to {
+		opacity: 1;
+		transform: translate(-50%, -50%) scale(1);
+	}
+}
+@keyframes dialog-pop-out {
+	from {
+		opacity: 1;
+		transform: translate(-50%, -50%) scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: translate(-50%, -48%) scale(0.96);
+	}
+}
+
+.animate-dialog-in {
+	animation: dialog-in 200ms ease both;
+}
+.animate-dialog-out {
+	animation: dialog-out 160ms ease both;
+}
+.animate-dialog-pop-in {
+	animation: dialog-pop-in 200ms ease both;
+}
+.animate-dialog-pop-out {
+	animation: dialog-pop-out 160ms ease both;
+}
+
+.dialog-overlay {
+	transition: opacity 200ms ease;
+}
+.dialog-content {
+	transition:
+		opacity 200ms ease,
+		transform 200ms ease;
+}
+
+.brand-mark {
+	font-size: clamp(1.15rem, 2.2vw, 1.55rem);
+	font-weight: 600;
+	letter-spacing: -0.02em;
+}
+
+.toolbar-label {
+	font-size: clamp(0.8125rem, 1.6vw, 0.9375rem);
+}
+
+.onboarding-card {
+	animation: pane-in 220ms ease both;
+}
+
+.ink-burst {
+	animation: ink 700ms ease-out both;
+}
+@keyframes ink {
+	0% {
+		transform: scale(0.4);
+		opacity: 0.7;
+	}
+	100% {
+		transform: scale(1.8);
+		opacity: 0;
+	}
+}
+
+@media (max-width: 640px) {
+	.brand-mark {
+		font-size: 1.25rem;
+	}
+	.toolbar-label {
+		font-size: 0.875rem;
+	}
+}
+
+@media (min-width: 1440px) {
+	.brand-mark {
+		font-size: 1.6rem;
+	}
+	.toolbar-label {
+		font-size: 1rem;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--chrome-ease: 0ms linear;
+		--pane-ms: 0ms;
+	}
+	.pane-shell,
+	.animate-dialog-in,
+	.animate-dialog-out,
+	.animate-dialog-pop-in,
+	.animate-dialog-pop-out,
+	.onboarding-card,
+	.ink-burst,
+	.slide-pane {
+		animation: none !important;
+		transition: none !important;
+	}
+	.dialog-overlay,
+	.dialog-content,
+	.chrome-btn,
+	.mode-btn,
+	button,
+	[role='button'],
+	a {
+		transition: none !important;
+	}
+}

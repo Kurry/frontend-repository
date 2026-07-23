@@ -5,7 +5,7 @@ import {
   BORDER_VALUES, FONT_FAMILIES, FIELD_HEIGHT, SELECTOR_SIZE,
 } from './data.js';
 
-export const NAME_RE = /^[A-Za-z][A-Za-z0-9 _-]*$/;
+export const NAME_RE = /^[a-z][a-z0-9_-]*$/;
 
 export function slugOf(name) {
   return String(name).trim().toLowerCase().replace(/\s+/g, '-');
@@ -14,6 +14,10 @@ export function slugOf(name) {
 function fontCss(id) {
   const f = FONT_FAMILIES.find((x) => x.id === id) || FONT_FAMILIES[0];
   return f.css;
+}
+
+function fontContractValue(id) {
+  return (FONT_FAMILIES.find((x) => x.id === id) || FONT_FAMILIES[0]).contract;
 }
 
 export function toCSS(theme) {
@@ -41,13 +45,16 @@ export function toJSON(theme) {
     size: { field: theme.size.field, selector: theme.size.selector },
     border: theme.border,
     effects: { depth: theme.depth === 1, noise: theme.noise === 1 },
-    fontFamily: theme.fontFamily,
+    fontFamily: fontContractValue(theme.fontFamily),
     options: {
       defaultTheme: !!theme.options.defaultTheme,
       defaultDarkTheme: !!theme.options.defaultDarkTheme,
       darkColorScheme: !!theme.options.darkColorScheme,
     },
-    generatedAt: new Date().toISOString(),
+    // Keep every export surface byte-for-byte coherent for the active record.
+    // Merely opening, copying, or downloading an artifact must not manufacture
+    // a different payload timestamp.
+    generatedAt: theme.generatedAt || new Date().toISOString(),
   };
 }
 
@@ -89,11 +96,11 @@ export function validateDeclaredTheme(text) {
     if (!known.has(key)) errors.push(`Unexpected key '${key}' is not part of the declared-theme contract`);
   }
   if (typeof doc.name !== 'string' || !doc.name.trim()) {
-    errors.push("name is required (a trimmed string of 2-30 characters)");
+    errors.push("name is required (a trimmed slug of 2-30 characters)");
   } else {
     const t = doc.name.trim();
     if (t.length < 2 || t.length > 30) errors.push(`name must be 2-30 characters (got ${t.length})`);
-    else if (!NAME_RE.test(t)) errors.push('name must use letters, numbers, spaces, hyphens, or underscores only');
+    else if (!NAME_RE.test(t)) errors.push('name must start with a lowercase letter and use only lowercase letters, numbers, hyphens, or underscores');
   }
   const colors = {};
   if (typeof doc.colors !== 'object' || doc.colors === null || Array.isArray(doc.colors)) {
@@ -138,9 +145,10 @@ export function validateDeclaredTheme(text) {
     else noise = doc.effects.noise ? 1 : 0;
   }
   let fontFamily = 'outfit';
-  if (!FONT_FAMILIES.some((f) => f.id === doc.fontFamily)) {
-    errors.push(`fontFamily must be one of ${FONT_FAMILIES.map((f) => f.id).join(', ')}`);
-  } else fontFamily = doc.fontFamily;
+  const declaredFont = FONT_FAMILIES.find((f) => f.contract === doc.fontFamily);
+  if (!declaredFont) {
+    errors.push(`fontFamily must be one of ${FONT_FAMILIES.map((f) => f.contract).join(', ')}`);
+  } else fontFamily = declaredFont.id;
   const options = { defaultTheme: false, defaultDarkTheme: false, darkColorScheme: false };
   if (typeof doc.options !== 'object' || doc.options === null) {
     errors.push('options is required (object with defaultTheme, defaultDarkTheme, darkColorScheme)');
@@ -159,7 +167,10 @@ export function validateDeclaredTheme(text) {
   if (errors.length) return { ok: false, errors };
   return {
     ok: true,
-    theme: { name: doc.name.trim(), colors, radius, size, border, depth, noise, fontFamily, options },
+    theme: {
+      name: doc.name.trim(), colors, radius, size, border, depth, noise,
+      fontFamily, options, generatedAt: doc.generatedAt,
+    },
   };
 }
 

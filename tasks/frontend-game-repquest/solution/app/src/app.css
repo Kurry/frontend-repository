@@ -77,6 +77,11 @@ h1, h2, h3, .font-display {
 ::-webkit-scrollbar-thumb { background: var(--color-surface-light); border-radius: 8px; }
 
 button, [role="button"] { transition: background-color .15s ease, color .15s ease, border-color .15s ease, transform .12s ease, box-shadow .15s ease; }
+button:hover:not(:disabled), [role="button"]:hover:not([aria-disabled="true"]) {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 16px rgba(2, 6, 23, 0.24);
+}
 button:active:not(:disabled) { transform: translateY(1px); }
 
 canvas { display: block; max-width: 100%; }
@@ -103,4 +108,13 @@ canvas { display: block; max-width: 100%; }
 @keyframes rq-pulse {
   0%, 100% { opacity: 1; }
   50%      { opacity: 0.72; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

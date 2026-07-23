@@ -1,17 +1,16 @@
-import React from 'react'
 import { createRoot } from 'react-dom/client'
 import '@carbon/styles/css/styles.css'
 import './styles.css'
 import App from './App'
 
 createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <App />,
 )
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {})
+    window.setTimeout(() => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {})
+    }, 0)
   })
 }

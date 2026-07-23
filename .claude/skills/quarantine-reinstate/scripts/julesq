@@ -1,0 +1,142 @@
+#!/usr/bin/env python3
+"""julesq — the bundled jules CLI with two-account daily-quota failover.
+
+Accounts:
+  primary  -> JULES_API_KEY          (the usual account)
+  backup   -> JULES_BACKUP_API_KEY   (second account; used when primary is
+                                      out of daily quota)
+
+Behavior:
+  create           tries primary; on a daily-quota error (HTTP 429 /
+                   RESOURCE_EXHAUSTED / "quota") retries once on backup.
+                   Whichever account created the session is recorded in the
+                   session->account map so follow-ups hit the right account.
+  everything else  if the first non-flag argument after the subcommand looks
+                   like a session id (or sessions/<id>), the map picks the
+                   account; unknown ids default to primary.
+  JULES_ACCOUNT=primary|backup   force one account, no failover.
+
+Map file: ~/.mercor/jules-session-accounts.jsonl (override with
+JULES_ACCOUNT_MAP). Sessions are account-scoped in the Jules API — `list`,
+`activities`, `message`, `approve`, `wait`, `merge` on the wrong account
+return 404/empty, which is why the map exists. `list` only shows the chosen
+account's sessions; pass JULES_ACCOUNT=backup to list the backup fleet.
+
+Never prints either key.
+"""
+from __future__ import annotations
+
+import datetime
+import json
+import os
+import pathlib
+import re
+import subprocess
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+JULES = HERE.parents[1] / "jules" / "scripts" / "jules"
+MAP = pathlib.Path(
+    os.environ.get(
+        "JULES_ACCOUNT_MAP",
+        pathlib.Path.home() / ".mercor" / "jules-session-accounts.jsonl",
+    )
+)
+QUOTA_RE = re.compile(r"\b429\b|RESOURCE_EXHAUSTED|quota", re.IGNORECASE)
+SESSION_RE = re.compile(r"sessions/([A-Za-z0-9_-]+)")
+KEY_VAR = {"primary": "JULES_API_KEY", "backup": "JULES_BACKUP_API_KEY"}
+
+
+def key_for(account: str) -> str:
+    var = KEY_VAR[account]
+    value = os.environ.get(var)
+    if not value:
+        sys.exit(f"error: {var} not set (source ~/.zshrc or export it)")
+    return value
+
+
+def run(account: str, argv: list[str]) -> subprocess.CompletedProcess[str]:
+    env = dict(os.environ, JULES_API_KEY=key_for(account))
+    env.pop("JULES_BACKUP_API_KEY", None)
+    return subprocess.run(
+        [sys.executable, str(JULES), *argv],
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+
+
+def map_rows() -> dict[str, str]:
+    rows: dict[str, str] = {}
+    if MAP.exists():
+        for line in MAP.read_text().splitlines():
+            try:
+                row = json.loads(line)
+            except ValueError:
+                continue
+            if row.get("session_id"):
+                rows[row["session_id"]] = row.get("account", "primary")
+    return rows
+
+
+def record(session_id: str, account: str) -> None:
+    MAP.parent.mkdir(parents=True, exist_ok=True)
+    stamp = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    with MAP.open("a") as handle:
+        handle.write(
+            json.dumps(
+                {"session_id": session_id, "account": account, "at": stamp}
+            )
+            + "\n"
+        )
+
+
+def emit(proc: subprocess.CompletedProcess[str]) -> int:
+    sys.stdout.write(proc.stdout)
+    sys.stderr.write(proc.stderr)
+    return proc.returncode
+
+
+def main(argv: list[str]) -> int:
+    if not argv:
+        return emit(run("primary", argv))
+    forced = os.environ.get("JULES_ACCOUNT")
+    if forced and forced not in KEY_VAR:
+        sys.exit("error: JULES_ACCOUNT must be 'primary' or 'backup'")
+    subcommand = next((a for a in argv if not a.startswith("-")), None)
+
+    if subcommand == "create":
+        order = [forced] if forced else ["primary", "backup"]
+        proc = None
+        account = order[0]
+        for account in order:
+            proc = run(account, argv)
+            blob = proc.stdout + proc.stderr
+            if proc.returncode == 0 or not QUOTA_RE.search(blob):
+                break
+            if account != order[-1]:
+                print(
+                    f"julesq: {account} account looks out of daily quota; "
+                    "failing over to backup",
+                    file=sys.stderr,
+                )
+        match = SESSION_RE.search(proc.stdout)
+        if proc.returncode == 0 and match:
+            record(match.group(1), account)
+        return emit(proc)
+
+    # Non-create: route by the session id argument when one is present.
+    account = forced
+    if account is None:
+        rows = map_rows()
+        account = "primary"
+        for arg in argv:
+            candidate = arg.split("/")[-1]
+            if candidate in rows:
+                account = rows[candidate]
+                break
+    return emit(run(account, argv))
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

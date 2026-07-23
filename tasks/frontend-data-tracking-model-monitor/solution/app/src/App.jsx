@@ -141,7 +141,7 @@ function Field({ id, label, hint, error, children }) {
   const describedBy = error ? `${id}-error` : hint ? `${id}-hint` : undefined
   return (
     <div className={`field ${error ? 'has-error' : ''}`}>
-      <label className="field-label" htmlFor={id}>{label}</label>
+      <label className="field-label" id={`${id}-label`} htmlFor={id}>{label}</label>
       {children}
       {error
         ? <p className="field-error" id={`${id}-error`}>{error}</p>
@@ -151,6 +151,7 @@ function Field({ id, label, hint, error, children }) {
 }
 
 const a11yProps = (id, error, hint) => ({
+  'aria-labelledby': `${id}-label`,
   'aria-invalid': error ? true : undefined,
   'aria-describedby': error ? `${id}-error` : hint ? `${id}-hint` : undefined,
 })
@@ -882,7 +883,7 @@ function Catalog({ models, visibleModels, providers }) {
   const toggleCompare = useAppStore((state) => state.toggleCompare)
   const setCompareSelected = useAppStore((state) => state.setCompareSelected)
   const togglePin = useAppStore((state) => state.togglePin)
-  const suggestions = ['OpenAI', 'Anthropic', 'Google', 'Meta', 'Mistral', 'Free']
+  const suggestions = ['Nimbus AI', 'Vertexa', 'Google', 'Meta', 'Mistral', 'Free']
   const hasActiveFilter = Boolean(searchQuery) || providerFilter !== 'All providers' || pinnedOnly || freeOnly
   const emptyReason = searchQuery
     ? `“${searchQuery}”`

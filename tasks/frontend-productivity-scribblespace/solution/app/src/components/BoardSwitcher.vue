@@ -14,6 +14,18 @@ const store = useAppStore()
 const renameState = ref<{ id: string; name: string; error?: string } | null>(null)
 
 const boardToDelete = computed(() => store.boards.find(b => b.id === store.boardDeleteId) || null)
+const renameIsValid = computed(() => {
+  const name = renameState.value?.name.trim() ?? ''
+  return name.length >= 1 && name.length <= 60
+})
+
+const validateRename = () => {
+  if (!renameState.value) return false
+  renameState.value.error = renameIsValid.value
+    ? ''
+    : 'board-name field must be 1 to 60 characters'
+  return renameIsValid.value
+}
 
 const startRename = (board: any) => {
   renameState.value = { id: board.id, name: board.name, error: '' }
@@ -24,11 +36,8 @@ const confirmRename = () => {
   const { id, name } = renameState.value
   const trimmed = name.trim()
 
-  if (trimmed.length === 0 || trimmed.length > 60) {
-    renameState.value.error = 'board-name field must be 1 to 60 characters'
+  if (!validateRename()) {
     store.announce('board-name field must be 1 to 60 characters')
-    const b = store.boards.find(b => b.id === id)
-    if (b) renameState.value.name = b.name
     return
   }
 
@@ -40,6 +49,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
   if (e.key === 'Escape') {
     renameState.value = null
   } else if (e.key === 'Enter') {
+    e.preventDefault()
     confirmRename()
   }
 }
@@ -53,7 +63,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
       role="tab"
       :aria-selected="board.id === store.activeBoardId"
       class="flex items-center min-w-[120px] max-w-[200px] bg-white border border-gray-200 rounded-t-lg overflow-hidden shrink-0"
-      :class="{'border-b-0 border-[#6D5BD0] shadow-sm z-10': board.id === store.activeBoardId}"
+      :class="{'border-b-0 border-[#6D5BD0] shadow-sm z-10 bg-[#6D5BD0] text-white': board.id === store.activeBoardId}"
     >
       <div v-if="renameState?.id === board.id" class="flex flex-col w-full px-2 py-1">
         <input
@@ -63,16 +73,33 @@ const handleKeyDown = (e: KeyboardEvent) => {
           aria-describedby="board-name-error"
           class="w-full text-sm border-b border-[#6D5BD0] outline-none"
           @keydown="handleKeyDown"
-          @blur="confirmRename"
+          @input="validateRename"
           autofocus
         />
         <span v-if="renameState.error" id="board-name-error" role="alert" class="text-xs text-red-600 mt-1">{{ renameState.error }}</span>
+        <div class="flex justify-end gap-1 mt-1">
+          <button
+            type="button"
+            class="px-2 py-1 text-xs rounded text-gray-600 hover:bg-gray-100 outline-none focus:ring-2 focus:ring-[#6D5BD0]"
+            @click="renameState = null"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="px-2 py-1 text-xs rounded bg-[#6D5BD0] text-white disabled:opacity-50 disabled:cursor-not-allowed outline-none focus:ring-2 focus:ring-[#6D5BD0] focus:ring-offset-1"
+            :disabled="!renameIsValid"
+            @click="confirmRename"
+          >
+            Confirm
+          </button>
+        </div>
       </div>
       <button
         v-else
         type="button"
-        class="flex-1 truncate px-3 py-1.5 text-sm text-left hover:bg-gray-50 outline-none focus:ring-2 focus:ring-inset focus:ring-[#6D5BD0]"
-        :class="board.id === store.activeBoardId ? 'font-semibold text-gray-900' : 'text-gray-600'"
+        class="flex-1 truncate px-3 py-1.5 text-sm text-left outline-none focus:ring-2 focus:ring-inset focus:ring-[#6D5BD0]"
+        :class="board.id === store.activeBoardId ? 'font-semibold text-white hover:bg-[#5A4AB8]' : 'text-gray-600 hover:bg-gray-50'"
         @click="store.setActiveBoard(board.id)"
       >
         {{ board.name }}

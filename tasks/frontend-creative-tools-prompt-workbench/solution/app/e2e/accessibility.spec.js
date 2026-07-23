@@ -1,0 +1,2 @@
+import { criterionSuite } from './helpers.js'
+criterionSuite('accessibility', ['keyboard_operable_workbench_controls','save_modal_focus_trap_and_return','toolbar_and_badge_icons_named','run_status_announced_via_live_region','forms_have_explicit_labels','reasoning_disclosure_exposes_expanded_state','workbench_landmarks_present','workbench_contrast_sufficient','semantic_roles_on_interactive_chrome','reduced_motion_respected','export_modal_and_palette_focus_management'])

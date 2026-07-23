@@ -89,6 +89,8 @@ export function registerWebMcp() {
     inputSchema
   }));
 
+  const settleVisibleUi = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
   window.webmcp_invoke_tool = async (nameOrRequest, args = {}) => {
     const name = typeof nameOrRequest === 'object' ? nameOrRequest.name : nameOrRequest;
     const input = typeof nameOrRequest === 'object' ? (nameOrRequest.arguments || {}) : args;
@@ -96,6 +98,7 @@ export function registerWebMcp() {
     if (!tool) throw new Error(`Unknown WebMCP tool: ${name}`);
     const result = await tool.handler(input);
     store.syncUiAfterMutation();
+    await settleVisibleUi();
     return result;
   };
 

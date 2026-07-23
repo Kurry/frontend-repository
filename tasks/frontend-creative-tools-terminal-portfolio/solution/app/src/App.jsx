@@ -1,52 +1,64 @@
 import { useState } from 'preact/hooks';
 import { useSignalEffect } from '@preact/signals';
-import { mode, theme, cookieConsent } from './store.js';
+import { mode, theme, cookieConsent, easterEgg } from './store.js';
 import Terminal from './Terminal.jsx';
-import Board from './Board.jsx';
+import EasterCanvas from './EasterCanvas.jsx';
 import wallpaperUrl from '../dark-theme-blur.webp';
+
+// Map our four themes onto daisyUI built-in themes so component chrome
+// (buttons, badges, cards) recolors coherently alongside our design tokens.
+const DAISY_THEME = { dark: 'dark', light: 'light', retro: 'retro', glass: 'dim' };
 
 export default function App() {
   const [terminalClosed, setTerminalClosed] = useState(false);
+  const [minimized, setMinimized] = useState(false);
+  const [maximized, setMaximized] = useState(false);
 
   useSignalEffect(() => {
-    document.documentElement.className = theme.value;
+    const t = theme.value;
+    const root = document.documentElement;
+    root.className = `theme-${t}`;
+    root.dataset.theme = DAISY_THEME[t] || t;
   });
 
-  const handleAccept = () => cookieConsent.value = 'accepted';
-  const handleDecline = () => cookieConsent.value = 'declined';
-
-  const handleReopen = () => {
-    setTerminalClosed(false);
-  };
+  const accept = () => { cookieConsent.value = 'accepted'; };
+  const decline = () => { cookieConsent.value = 'declined'; };
+  const reopen = () => { setTerminalClosed(false); setMinimized(false); };
 
   return (
-    <div className="min-h-screen flex flex-col p-2 md:p-8 bg-cover bg-center overflow-x-hidden" style={{ backgroundImage: `url(${wallpaperUrl})` }}>
+    <main className="app-shell" aria-label="Terminal portfolio workspace" style={{ backgroundImage: `url(${wallpaperUrl})` }}>
+      <EasterCanvas kind={easterEgg.value} onDone={() => { easterEgg.value = null; }} />
+
       {cookieConsent.value === 'not_set' && (
-        <div className="fixed bottom-0 sm:bottom-4 left-0 sm:left-auto right-0 sm:right-4 bg-base-200 p-4 rounded-t-lg sm:rounded-lg shadow-lg z-50 flex flex-col gap-2 border-t sm:border border-border">
-          <p className="text-sm">We use cookies for analytics.</p>
-          <div className="flex gap-2">
-            <button onClick={handleAccept} className="btn btn-primary btn-sm flex-1 sm:flex-none" aria-label="Accept cookies">Accept</button>
-            <button onClick={handleDecline} className="btn btn-ghost btn-sm flex-1 sm:flex-none" aria-label="Decline cookies">Decline</button>
+        <div className="consent-banner" role="dialog" aria-label="Cookie consent">
+          <p className="consent-text">This portfolio uses no cookies or tracking. Dismiss this notice to record your choice for the session.</p>
+          <div className="consent-actions">
+            <button type="button" className="btn btn-primary consent-btn" onClick={accept}>Accept</button>
+            <button type="button" className="btn btn-ghost consent-btn" onClick={decline}>Decline</button>
           </div>
         </div>
       )}
 
       {terminalClosed ? (
-        <div className="flex-1 flex items-center justify-center">
-          <button onClick={handleReopen} className="btn btn-primary" aria-label="Reopen terminal">Reopen</button>
+        <div className="exit-overlay" role="dialog" aria-label="Terminal closed">
+          <div className="exit-card">
+            <span className="icon-[tabler--terminal-2] size-8 exit-icon" aria-hidden="true" />
+            <h2 className="exit-h">Session paused</h2>
+            <p className="exit-p">The terminal window is closed. Your output history and theme are preserved in memory for this tab.</p>
+            <button type="button" className="btn btn-primary exit-reopen" onClick={reopen} autoFocus>Reopen Terminal</button>
+          </div>
         </div>
       ) : (
-        <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 w-full max-w-7xl mx-auto h-[95vh] md:h-[90vh]">
-          <div className={`w-full ${mode.value === 'cli' ? 'lg:w-full' : 'lg:w-1/2'} flex flex-col transition-all duration-300 min-h-[400px]`}>
-             <Terminal onClose={() => setTerminalClosed(true)} />
-          </div>
-          {mode.value !== 'cli' && (
-            <div className="w-full lg:w-1/2 flex flex-col bg-panel-bg rounded-lg border border-border p-2 sm:p-4 overflow-y-auto min-h-[400px]">
-               <Board />
-            </div>
-          )}
+        <div className={`terminal-wrap ${maximized ? 'is-max' : ''}`}>
+          <Terminal
+            onClose={() => setTerminalClosed(true)}
+            minimized={minimized}
+            setMinimized={setMinimized}
+            maximized={maximized}
+            setMaximized={setMaximized}
+          />
         </div>
       )}
-    </div>
+    </main>
   );
 }

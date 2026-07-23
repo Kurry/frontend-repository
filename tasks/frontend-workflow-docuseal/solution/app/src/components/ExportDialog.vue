@@ -21,7 +21,7 @@ async function copyArtifact() {
   try {
     await navigator.clipboard.writeText(activeText.value)
     confirmation.value = 'Copied'
-    store.notify(`${tab.value === 'json' ? 'Template JSON' : 'Signing summary'} copied`)
+    store.notify(`${tab.value === 'json' ? 'Template JSON' : 'Signing Summary'} copied`)
   } catch {
     confirmation.value = 'Copy unavailable'
   }
@@ -39,8 +39,14 @@ function downloadArtifact() {
   anchor.click()
   URL.revokeObjectURL(url)
   confirmation.value = 'Downloaded'
-  store.notify(`${tab.value === 'json' ? 'Template JSON' : 'Signing summary'} downloaded`)
+  store.notify(`${tab.value === 'json' ? 'Template JSON' : 'Signing Summary'} downloaded`)
   window.setTimeout(() => { confirmation.value = '' }, 1800)
+}
+
+function handleKeyDown(e) {
+  if (e.key === 'Escape' && open.value) {
+    open.value = false
+  }
 }
 
 function handleExternalOpen(event) {
@@ -48,8 +54,14 @@ function handleExternalOpen(event) {
   open.value = true
 }
 
-onMounted(() => window.addEventListener('docuseal:open-export', handleExternalOpen))
-onBeforeUnmount(() => window.removeEventListener('docuseal:open-export', handleExternalOpen))
+onMounted(() => {
+  window.addEventListener('docuseal:open-export', handleExternalOpen)
+  window.addEventListener('keydown', handleKeyDown)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('docuseal:open-export', handleExternalOpen)
+  window.removeEventListener('keydown', handleKeyDown)
+})
 </script>
 
 <template>
@@ -76,13 +88,13 @@ onBeforeUnmount(() => window.removeEventListener('docuseal:open-export', handleE
         <TabsRoot v-model="tab" class="artifact-tabs">
           <TabsList class="tabs-list" aria-label="Export formats">
             <TabsTrigger value="json" class="tab-trigger">Template JSON</TabsTrigger>
-            <TabsTrigger value="summary" class="tab-trigger">Signing summary</TabsTrigger>
+            <TabsTrigger value="summary" class="tab-trigger">Signing Summary</TabsTrigger>
           </TabsList>
           <TabsContent value="json" class="artifact-panel">
             <pre aria-label="Template JSON preview">{{ store.templateJson }}</pre>
           </TabsContent>
           <TabsContent value="summary" class="artifact-panel">
-            <pre aria-label="Signing summary preview">{{ store.signingSummary }}</pre>
+            <pre aria-label="Signing Summary preview">{{ store.signingSummary }}</pre>
           </TabsContent>
         </TabsRoot>
 

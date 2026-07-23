@@ -20,7 +20,7 @@ const timelineImportFormSchema = z.object({
     try {
       return JSON.parse(text);
     } catch {
-      context.addIssue({ code: 'custom', message: 'Import document: malformed JSON' });
+      context.addIssue({ code: 'custom', message: 'Import document: malformed JSON. Check commas, quotes, and braces, then try again.' });
       return z.NEVER;
     }
   }).pipe(timelinePackSchema),
@@ -56,7 +56,7 @@ export function FiltersDrawer() {
   };
 
   return (
-    <Drawer opened={open} onClose={() => setOpen(false)} title="Filters" position="right" zIndex={100} size="sm">
+    <Drawer opened={open} onClose={() => setOpen(false)} title="Filters" position="right" zIndex={100} size="sm" closeOnEscape closeOnClickOutside returnFocus trapFocus>
       <div className="space-y-6 pb-6">
         <TextInput
           label="Search"
@@ -315,7 +315,7 @@ export function ExportDrawer() {
   };
 
   return (
-    <Drawer opened={open} onClose={() => setOpen(false)} title={activeTab === 'import' ? 'Import timeline' : 'Export timeline'} position="right" zIndex={100} size="xl">
+    <Drawer opened={open} onClose={() => setOpen(false)} title={activeTab === 'import' ? 'Import timeline' : 'Export timeline'} position="right" zIndex={100} size="xl" closeOnEscape closeOnClickOutside returnFocus trapFocus>
       <Tabs value={activeTab} onChange={(value) => setActiveTab(value || 'json')}>
         <Tabs.List>
           <Tabs.Tab value="json">Timeline JSON</Tabs.Tab>
@@ -327,21 +327,8 @@ export function ExportDrawer() {
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-gray-500">{events.length} events · {formatYear(Math.round(yearWindow.from))} to {formatYear(Math.round(yearWindow.to))}</span>
             <div className="flex gap-2">
-              <span className="text-sm font-medium self-center min-h-[1.25rem]" aria-live="polite">
-                <AnimatePresence>
-                  {copyStatus && (
-                    <motion.span
-                      key={copyStatus}
-                      initial={{ opacity: 0, y: -4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -4 }}
-                      transition={{ duration: 0.18 }}
-                      className={copyStatus === 'copied' ? 'text-green-600' : 'text-red-600'}
-                    >
-                      {copyStatus === 'copied' ? 'Copied' : 'Copy failed'}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
+              <span className={`text-sm font-medium self-center min-h-[1.25rem] ${copyStatus === 'copied' ? 'text-green-700' : 'text-red-700'}`} role="status" aria-live="polite" aria-atomic="true">
+                {copyStatus === 'copied' ? 'Timeline JSON copied' : copyStatus === 'failed' ? 'Timeline JSON copy failed' : ''}
               </span>
               <Button size="xs" variant="default" leftSection={copyStatus === 'copied' ? <IconCheck size={14} aria-hidden /> : <IconCopy size={14} aria-hidden />} onClick={() => copyToClipboard(jsonString)}>{copyStatus === 'copied' ? 'Copied' : 'Copy'}</Button>
               <Button size="xs" color="cyan" component="a" href={`data:text/json;charset=utf-8,${encodeURIComponent(jsonString)}`} download="timeline-pack.json">Download JSON</Button>
@@ -354,21 +341,8 @@ export function ExportDrawer() {
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-gray-500">Events CSV format</span>
             <div className="flex gap-2">
-              <span className="text-sm font-medium self-center min-h-[1.25rem]" aria-live="polite">
-                <AnimatePresence>
-                  {copyStatus && (
-                    <motion.span
-                      key={copyStatus}
-                      initial={{ opacity: 0, y: -4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -4 }}
-                      transition={{ duration: 0.18 }}
-                      className={copyStatus === 'copied' ? 'text-green-600' : 'text-red-600'}
-                    >
-                      {copyStatus === 'copied' ? 'Copied' : 'Copy failed'}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
+              <span className={`text-sm font-medium self-center min-h-[1.25rem] ${copyStatus === 'copied' ? 'text-green-700' : 'text-red-700'}`} role="status" aria-live="polite" aria-atomic="true">
+                {copyStatus === 'copied' ? 'Events CSV copied' : copyStatus === 'failed' ? 'Events CSV copy failed' : ''}
               </span>
               <Button size="xs" variant="default" leftSection={copyStatus === 'copied' ? <IconCheck size={14} aria-hidden /> : <IconCopy size={14} aria-hidden />} onClick={() => copyToClipboard(csvString)}>{copyStatus === 'copied' ? 'Copied' : 'Copy'}</Button>
               <Button size="xs" color="cyan" component="a" href={`data:text/csv;charset=utf-8,${encodeURIComponent(csvString)}`} download="timeline-events.csv">Download CSV</Button>

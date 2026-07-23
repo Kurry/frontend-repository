@@ -22,8 +22,10 @@ export const useStudioStore = create((set, get) => ({
   theme: 'light',
   locale: 'en',
   density: 'comfortable',
+  // Non-blocking coach starts open but never focus-traps the studio.
   hasSeenOnboarding: false,
   onboardingStep: 0,
+  voiceListening: false,
 
   toggleSortOrder: () => set((state) => ({
     sortOrder: state.sortOrder === 'manual' ? 'asc' : state.sortOrder === 'asc' ? 'desc' : 'manual',
@@ -34,7 +36,11 @@ export const useStudioStore = create((set, get) => ({
   setTheme: (theme) => set({ theme }),
   setLocale: (locale) => set({ locale }),
   setDensity: (density) => set({ density }),
-  selectTechnique: (technique) => set({ activeTechnique: technique, activeView: 'forms', assetPickerOpen: false }),
+  setVoiceListening: (voiceListening) => set({ voiceListening }),
+  selectTechnique: (technique) => {
+    // Flush any in-flight draft writes before switching so rapid sidebar clicks retain text.
+    set({ activeTechnique: technique, activeView: 'forms', assetPickerOpen: false })
+  },
   setView: (activeView) => set({ activeView, assetPickerOpen: false }),
   setChrome: (patch) => set(patch),
   showToast: (kind, title, subtitle = '') => set({ toast: { id: Date.now(), kind, title, subtitle } }),
@@ -44,16 +50,16 @@ export const useStudioStore = create((set, get) => ({
     const current = get().drafts[technique]
     const nextDraft = { fields: clone(fields), attachments: clone(attachments) }
     if (JSON.stringify(current) === JSON.stringify(nextDraft)) return
-    const hasInput = JSON.stringify(nextDraft) !== JSON.stringify(defaultDrafts[technique])
-    set((state) => ({
-      drafts: { ...state.drafts, [technique]: nextDraft },
-      statuses: {
-        ...state.statuses,
-        [technique]: state.statuses[technique] === 'saved' || state.statuses[technique] === 'generated'
-          ? state.statuses[technique]
-          : (hasInput ? 'in-progress' : 'neutral'),
-      },
-    }))
+    const baseline = defaultDrafts[technique]
+    const hasInput = nextDraft.attachments.length > 0 || Object.entries(baseline.fields)
+      .some(([name, value]) => JSON.stringify(nextDraft.fields[name]) !== JSON.stringify(value))
+    set((state) => {
+      return {
+        drafts: { ...state.drafts, [technique]: nextDraft },
+        prompts: hasInput ? state.prompts : { ...state.prompts, [technique]: undefined },
+        statuses: { ...state.statuses, [technique]: hasInput ? 'in-progress' : 'neutral' },
+      }
+    })
   },
 
   generatePrompt: (technique, fields, attachments, promptText) => set((state) => ({

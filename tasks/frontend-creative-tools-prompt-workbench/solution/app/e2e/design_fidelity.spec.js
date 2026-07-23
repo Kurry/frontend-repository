@@ -1,0 +1,2 @@
+import { criterionSuite } from './helpers.js'
+criterionSuite('design_fidelity', ['spacing_matches_two_thirds_one_third','editor_monospace_and_panel_hierarchy','desktop_composition_matches_spec','specified_state_changes_have_motion','responsive_behavior_matches_spec','controls_styled_not_browser_default','clear_hierarchy_panels_vs_metadata','component_states_match_spec','placeholder_and_status_color_language','microinteraction_timing_matches_spec'])

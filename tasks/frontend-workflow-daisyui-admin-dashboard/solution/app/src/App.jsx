@@ -87,7 +87,7 @@ function Sidebar() {
   const current = store.activeView.value;
   const setGroup = (name) => store.sidebarGroup.value = open === name ? null : name;
   return <>
-    {store.sidebarOpen.value && <button className="mobile-overlay" aria-label="Close navigation" onClick={() => store.sidebarOpen.value = false} />}
+    <button className={`mobile-overlay ${store.sidebarOpen.value ? 'open' : ''}`} aria-label="Close navigation" onClick={() => store.sidebarOpen.value = false} />
     <aside className={`sidebar ${store.sidebarOpen.value ? 'open' : ''}`} aria-label="Primary navigation">
       <div className="brand"><span className="brand-mark"><GlobeAltIcon className="icon" /></span>Pineapple Tech</div>
       <nav className="sidebar-nav">
@@ -229,7 +229,7 @@ function OperationsOverview() {
         <MetricLine a="Net revenue retention" b="112%"/><MetricLine a="Refund pressure" b="3.8%"/><MetricLine a="VIP escalations" b="14"/><MetricLine a="Stock on hand" b="42,800"/>
       </OverviewCard>
       <OverviewCard span="4" title="Inventory pressure" icon={ArchiveBoxIcon} action="Inventory board"><Progress label="Low stock · 42 SKUs" value={42}/><Progress label="Oversold · 7 SKUs" value={7}/><Progress label="Healthy stock · 1,284 SKUs" value={91}/></OverviewCard>
-      <OverviewCard span="6" title="Plugin and tool status" icon={PuzzlePieceIcon} action="Plugins"><table className="activity-table"><thead><tr><th>Component</th><th>Status</th><th>Signal</th></tr></thead><tbody>{[['Fraud Shield','Active','426 coupon blocks'],['Media Optimizer','Update','Backlog impact'],['Backup Vault','Active','Last snapshot 18m ago'],['Import queue','Ready','3 validated files']].map(r=><tr key={r[0]}><td>{r[0]}</td><td><span className="pill">{r[1]}</span></td><td>{r[2]}</td></tr>)}</tbody></table></OverviewCard>
+      <OverviewCard span="6" title="Plugin and tool status" icon={PuzzlePieceIcon} action="Plugins"><div className="table-scroll"><table className="activity-table"><thead><tr><th>Component</th><th>Status</th><th>Signal</th></tr></thead><tbody>{[['Fraud Shield','Active','426 coupon blocks'],['Media Optimizer','Update','Backlog impact'],['Backup Vault','Active','Last snapshot 18m ago'],['Import queue','Ready','3 validated files']].map(r=><tr key={r[0]}><td>{r[0]}</td><td><span className="pill">{r[1]}</span></td><td>{r[2]}</td></tr>)}</tbody></table></div></OverviewCard>
       <OverviewCard span="6" title="Fulfillment throughput" subtitle="Packed, shipped, returned, and delayed order movement" icon={TruckIcon}>
         <div className="chart-wrap small"><ChartCanvas data={lineData([16,22,31,28,42,53,61,55,67,78,88,81,94,103,109])}/></div><div className="metric-row"><div><strong>9,482</strong><span className="muted">Packed</span></div><div><strong>624</strong><span className="muted">Queued</span></div><div><strong>118</strong><span className="muted">Returns</span></div></div>
       </OverviewCard>
@@ -247,9 +247,11 @@ function Progress({label,value}) { return <div className="progress-item"><div cl
 function Uptime({label,value,alert}) { return <div style={{marginTop:50}}><div className="progress-label"><span>{label}</span><span>{value}</span></div><div className="uptime-bars">{Array.from({length:12},(_,i)=><i key={i} className={alert&&i===2?'alert':''}/>)}</div></div>; }
 function MetricLine({a,b}) { return <div style={{display:'flex',justifyContent:'space-between',fontSize:12,marginTop:12}}><span>{a}</span><strong>{b}</strong></div>; }
 
-function KpiCard({ label, value, color, index }) {
+function KpiCard({ label, value, color }) {
   const seed = [6,7,6,9,10,9,12,value];
-  return <article className="card kpi-card"><div><small>{label}</small><strong>{value}</strong></div><div className="spark"><ChartCanvas data={{labels:seed.map((_,i)=>i),datasets:[{data:seed,borderColor:color,backgroundColor:`${color}22`,borderWidth:2,tension:.35,pointRadius:0,fill:true}]}} options={{animation:{duration:380+index*50}}}/></div></article>;
+  const max = Math.max(...seed, 1);
+  const points = seed.map((point, pointIndex) => `${pointIndex * 14.25},${38 - (point / max) * 32}`).join(' ');
+  return <article className="card kpi-card"><div><small>{label}</small><strong>{value}</strong></div><svg className="spark" viewBox="0 0 100 42" preserveAspectRatio="none" role="img" aria-label={`${label} trend chart ending at ${value}`}><polyline points={points} fill="none" stroke={color} strokeWidth="3" vectorEffect="non-scaling-stroke"/><circle cx="99.75" cy={38 - (value / max) * 32} r="3" fill={color}/></svg></article>;
 }
 
 function UsersShell({ children, title, subtitle, actions = true }) {
@@ -266,7 +268,7 @@ function AllUsers() {
   const bulkDisabled = selected.size === 0;
   return <UsersShell title="All users" subtitle="Manage access, lifecycle status, and customer value from one live directory.">
     <section className="users-kpis" aria-label="User KPIs">
-      <KpiCard label="Total" value={store.kpis.value.total} color="#25b8ef" index={0}/><KpiCard label="Active" value={store.kpis.value.active} color="#09c8b8" index={1}/><KpiCard label="Paying" value={store.kpis.value.paying} color="#f5b941" index={2}/><KpiCard label="Suspended" value={store.kpis.value.suspended} color="#f15d79" index={3}/>
+      <KpiCard label="Total" value={store.kpis.value.total} color="#25b8ef"/><KpiCard label="Active" value={store.kpis.value.active} color="#09c8b8"/><KpiCard label="Paying" value={store.kpis.value.paying} color="#f5b941"/><KpiCard label="Suspended" value={store.kpis.value.suspended} color="#f15d79"/>
     </section>
     <div className="card filterbar">
       <FunnelIcon className="icon-sm muted"/>
@@ -304,36 +306,38 @@ function UserForm() {
   const editing = store.editUserId.value ? store.users.value.find(u=>u.id===store.editUserId.value) : null;
   const source = store.duplicateSourceId.value ? store.users.value.find(u=>u.id===store.duplicateSourceId.value) : null;
   const mode = editing ? 'edit' : source ? 'duplicate' : 'add';
-  const draft = store.formDraft.value;
+  // Restore the saved draft when this view mounts without subscribing the
+  // entire form component to every draft write; react-hook-form owns live edits.
+  const draft = store.formDraft.peek();
   const draftValues = draft && draft.mode === mode && draft.editId === (editing?.id ?? null) && draft.sourceId === (source?.id ?? null)
     ? draft.values
     : null;
   const defaults = draftValues || (editing ? {...editing,temporaryPassword:''} : source ? {...source,id:undefined,email:'',temporaryPassword:'',status:'Invited',sendInvitation:true} : defaultUser);
   const schema = editing ? store.userEditSchema : store.userCreateSchema;
-  const {register,handleSubmit,formState:{errors,isSubmitting},watch,reset} = useForm({resolver:zodResolver(schema),mode:'onSubmit',defaultValues:defaults});
+  const {register,handleSubmit,formState:{errors,isSubmitting,isValid,dirtyFields},watch} = useForm({resolver:zodResolver(schema),mode:'onChange',defaultValues:defaults});
   const lock = useRef(false);
+  const statusExplicit = useRef(Boolean(draftValues && draft?.statusExplicit));
   useEffect(() => {
-    reset(defaults);
-  }, [store.editUserId.value, store.duplicateSourceId.value, draftValues]);
-  useEffect(() => {
-    const sub = watch((values) => {
+    const sub = watch((values, info) => {
+      if (info.name === 'status') statusExplicit.current = true;
       store.formDraft.value = {
         mode,
         editId: editing?.id ?? null,
         sourceId: source?.id ?? null,
-        values
+        values,
+        statusExplicit: statusExplicit.current
       };
     });
     return () => sub.unsubscribe();
   }, [watch, mode, editing?.id, source?.id]);
   const submit = (data) => {
     if(lock.current)return; lock.current=true;
-    try { editing ? store.updateUser(editing.id,data) : store.createUser(data); store.formDraft.value = null; store.setView('all-users'); }
+    try { const payload=!editing&&data.sendInvitation&&!dirtyFields.status&&!statusExplicit.current?{...data,status:'Invited'}:data; editing ? store.updateUser(editing.id,payload) : store.createUser(payload); store.formDraft.value = null; store.setView('all-users'); }
     catch(error){ store.toast.value=error.message; }
     finally { setTimeout(()=>lock.current=false,400); }
   };
-  const onInvalid = () => {
-    store.toast.value = Object.values(errors).map(e=>e?.message).filter(Boolean).join('. ') || 'Fix the highlighted fields before submitting.';
+  const onInvalid = (invalidFields) => {
+    store.toast.value = Object.values(invalidFields).map(e=>e?.message).filter(Boolean).join('. ') || 'Fix the highlighted fields before submitting.';
   };
   const title = editing ? 'Edit user' : source ? 'Duplicate user' : 'Add user';
   return <UsersShell title={title} subtitle={editing?'Update this API-shaped directory record.':source?'Create an invited user from an existing profile.':'Create an API-shaped directory record with validated access settings.'} actions={false}>
@@ -359,7 +363,7 @@ function UserForm() {
       <div className="form-section"><h3>Permissions</h3><p>Only declared permission IDs can be included in the payload.</p><div className="check-grid">
         {store.PERMISSIONS.map(p=><label className="check-row" key={p}><input className="checkbox" type="checkbox" value={p} {...register('permissions')}/>{p}</label>)}
       </div><div className="field-error" role="status">{errors.permissions?.message}</div></div>
-      <div className="form-actions"><button className="btn" type="button" onClick={()=>{store.formDraft.value=null;store.setView('all-users')}}>Cancel</button><button className="btn btn-primary" type="submit" disabled={isSubmitting}>{editing?'Save changes':'Create user'}</button></div>
+      <div className="form-actions"><button className="btn" type="button" onClick={()=>{store.formDraft.value=null;store.setView('all-users')}}>Cancel</button><button className="btn btn-primary" type="submit" disabled={!isValid||isSubmitting}>{editing?'Save changes':'Create user'}</button></div>
       <div className="sr-only" aria-live="polite">{Object.values(errors).map(e=>e?.message).filter(Boolean).join('. ')}</div>
     </form>
   </UsersShell>;
@@ -434,8 +438,7 @@ function ExportDrawer({triggerRef}) {
   return <><div className="drawer-backdrop" onClick={close}/><aside ref={ref} className="export-drawer" role="dialog" aria-modal="true" aria-label="Export directory"><div className="drawer-head"><div><h2>Export directory</h2><p>Live artifacts compiled from this session’s shared store.</p></div><button className="icon-btn" aria-label="Close export drawer" onClick={close}><XMarkIcon className="icon"/></button></div><div className="export-summary"><div className="summary-chip"><small>Active users</small><strong>{store.users.value.length}</strong></div><div className="summary-chip"><small>Archived</small><strong>{store.archive.value.length}</strong></div><div className="summary-chip"><small>Log entries</small><strong>{store.activityLog.value.length}</strong></div></div><div className="tabs" role="tablist"><button className={`tab ${store.exportTab.value==='json'?'active':''}`} onClick={()=>store.exportTab.value='json'} role="tab">Directory JSON</button><button className={`tab ${store.exportTab.value==='csv'?'active':''}`} onClick={()=>store.exportTab.value='csv'} role="tab">Users CSV</button></div><pre className="preview" tabIndex="0">{text}</pre><div className="drawer-actions"><button className="btn" onClick={copy}><ClipboardDocumentIcon className="icon-sm"/>Copy</button><button className="btn btn-primary" onClick={download}><ArrowDownTrayIcon className="icon-sm"/>Download</button></div></aside></>;
 }
 
-function CurrentView() {
-  const view=store.activeView.value;
+function CurrentView({view}) {
   if(view==='operations-overview')return <OperationsOverview/>;
   if(view==='all-users')return <AllUsers/>;
   if(view==='add-user')return <UserForm/>;
@@ -447,11 +450,12 @@ function CurrentView() {
 
 export default function App() {
   store.uiEpoch.value;
+  const activeView=store.activeView.value;
   const commandTriggerRef=useRef(null),exportTriggerRef=useRef(null);
   useEffect(()=>{document.documentElement.dataset.theme=store.theme.value},[store.theme.value]);
-  useEffect(()=>{const key=(e)=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();store.commandOpen.value=true}if(e.key==='Escape'){store.resetTransientMenus();if(store.importOpen.value)store.importOpen.value=false;if(store.bulkDialog.value)store.bulkDialog.value=null}};document.addEventListener('keydown',key);return()=>document.removeEventListener('keydown',key)},[]);
+  useEffect(()=>{const key=(e)=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();store.commandOpen.value=true}if(e.key==='Escape'){const menuTrigger=document.querySelector('.account-btn[aria-expanded="true"], .utility-header button[aria-expanded="true"]');store.resetTransientMenus();if(store.exportOpen.value){store.exportOpen.value=false;setTimeout(()=>(window.__lastExportTrigger||exportTriggerRef.current)?.focus(),0)}if(store.importOpen.value)store.importOpen.value=false;if(store.bulkDialog.value)store.bulkDialog.value=null;if(menuTrigger)setTimeout(()=>menuTrigger.focus(),0)}};document.addEventListener('keydown',key);return()=>document.removeEventListener('keydown',key)},[]);
   useEffect(()=>{if(!store.toast.value)return;const timer=setTimeout(()=>store.toast.value='',2600);return()=>clearTimeout(timer)},[store.toast.value]);
   useEffect(()=>registerWebMcp(),[]);
   const rememberExportTrigger=(event)=>{const button=event.target.closest?.('button');if(!button)return;const label=`${button.textContent} ${button.getAttribute('aria-label')||''}`;if(/export/i.test(label))window.__lastExportTrigger=button.closest('.command-card')?commandTriggerRef.current:button;};
-  return <div className="app-shell" onClickCapture={rememberExportTrigger}><Sidebar/><div className="main"><Header commandTriggerRef={commandTriggerRef} exportTriggerRef={exportTriggerRef}/><CurrentView/></div>{store.commandOpen.value&&<CommandPalette triggerRef={commandTriggerRef}/>} {store.exportOpen.value&&<ExportDrawer triggerRef={exportTriggerRef}/>} {store.importOpen.value&&<ImportModal/>}<BulkDialog/>{store.toast.value&&<div className="toast-live" role="status" aria-live="polite"><CheckCircleIcon className="icon-sm" style={{display:'inline',marginRight:7}}/>{store.toast.value}</div>}<div className="sr-only" aria-live="polite">{store.toast.value}</div></div>;
+  return <div className="app-shell" onClickCapture={rememberExportTrigger}><Sidebar/><div className="main"><Header commandTriggerRef={commandTriggerRef} exportTriggerRef={exportTriggerRef}/><CurrentView key={activeView} view={activeView}/></div>{store.commandOpen.value&&<CommandPalette triggerRef={commandTriggerRef}/>} {store.exportOpen.value&&<ExportDrawer triggerRef={exportTriggerRef}/>} {store.importOpen.value&&<ImportModal/>}<BulkDialog/>{store.toast.value&&<div className="toast-live" role="status" aria-live="polite"><CheckCircleIcon className="icon-sm" style={{display:'inline',marginRight:7}}/>{store.toast.value}</div>}<div className="sr-only" aria-live="polite">{store.toast.value}</div></div>;
 }

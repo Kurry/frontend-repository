@@ -10,7 +10,7 @@ export default function Progress(props: { current: number }) {
   return (
     <ol
       class="flex items-center gap-2 overflow-hidden rounded-lg bg-scope-bg2/50 p-2.5"
-      aria-label="Patching wizard progress"
+      aria-label={`Patching wizard progress — step ${props.current + 1} of ${STEPS.length}: ${STEPS[props.current]}`}
     >
       <For each={STEPS}>
         {(stage, index) => {

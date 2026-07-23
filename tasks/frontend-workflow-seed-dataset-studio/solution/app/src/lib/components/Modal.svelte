@@ -15,13 +15,14 @@
   let mounted = $state(false);
   let visible = $state(false);
   let leaving = $state(false);
+  const modalId = `modal-${crypto.randomUUID()}`;
 
   $effect(() => {
     let enterFrame = 0;
     if (open) {
+      if (!mounted) opener = document.activeElement;
       mounted = true;
       leaving = false;
-      opener = document.activeElement;
       enterFrame = requestAnimationFrame(() => {
         visible = true;
         tick().then(() => (panel?.querySelector<HTMLElement>('input, textarea, select, button') ?? panel)?.focus());
@@ -72,14 +73,14 @@
       class:modal-panel-leave={leaving}
       role="dialog"
       aria-modal="true"
-      aria-labelledby="modal-title"
-      aria-describedby={description ? 'modal-description' : undefined}
+      aria-labelledby={`${modalId}-title`}
+      aria-describedby={description ? `${modalId}-description` : undefined}
       tabindex="-1"
     >
       <header class="modal-header">
         <div>
-          <h2 id="modal-title">{title}</h2>
-          {#if description}<p id="modal-description">{description}</p>{/if}
+          <h2 id={`${modalId}-title`}>{title}</h2>
+          {#if description}<p id={`${modalId}-description`}>{description}</p>{/if}
         </div>
         <button class="icon-button" aria-label="Close dialog" onclick={onclose}><X size={18} aria-hidden="true" /></button>
       </header>

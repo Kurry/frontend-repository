@@ -92,7 +92,7 @@ export const seededCards = [
   }),
   makeCard({
     id: 'card-support-triage', title: 'Harden support triage agent against ambiguous requests',
-    description: 'Exercise routing behavior when product area and customer impact are unclear. The routing check intentionally retries twice.',
+    description: 'Exercise routing behavior when product area and customer impact are unclear. The routing check is flaky by design: it fails on its first two attempts and recovers on the third.',
     column: 'in-progress', assignee: 'maya', attached_prompt: 'prompt-triage',
     taskTitles: ['Normalize ticket samples', 'Infer product routing', 'Validate urgency labels', 'Check escalation notes', 'Compile findings'],
   }),
@@ -145,7 +145,10 @@ export const seededOrder = columns.reduce((acc, column) => {
   return acc
 }, {})
 
+// Exactly one seeded In Progress card carries a failure plan: its planned
+// sub-item fails on attempts 1 and 2 (with visible backoff countdowns), the
+// run then reaches a failed state, and Retry resumes from that sub-item —
+// the third attempt succeeds and the run completes.
 export const failurePlans = {
   'card-support-triage': { taskId: 'card-support-triage-task-2', failAttempts: 2, maxAttempts: 3 },
-  'card-sql-eval': { taskId: 'card-sql-eval-task-3', failAttempts: 3, maxAttempts: 3 },
 }

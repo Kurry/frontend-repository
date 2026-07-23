@@ -1,0 +1,328 @@
+name: Judge oracle with Codex OAuth
+
+# Luna availability was probed successfully on 2026-07-21 with Codex CLI
+# 0.145.0 and ChatGPT-plan OAuth while OPENAI_API_KEY was unset. This workflow
+# is intentionally maintainer-triggered and global-serial: one oracle at a time protects the owner's
+# plan quota. The full 13-dimension probe took 29m26s with no auth or rate-limit
+# errors. Do not turn this into a matrix or a broad per-push sweep.
+on:
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: "One task slug under tasks/"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: judge-oracle-codex-oauth
+  cancel-in-progress: false
+
+jobs:
+  judge:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.issue.pull_request &&
+       github.event.comment.body == '/judge' &&
+       contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association))
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      JUDGE_MODEL: gpt-5.6-luna
+    steps:
+      - name: Resolve exactly one task
+        id: target
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          DISPATCH_SLUG: ${{ inputs.slug }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$EVENT_NAME" == "issue_comment" ]]; then
+            pr="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER")"
+            [[ "$(jq -r .state <<<"$pr")" == "open" ]] || {
+              echo "PR #$PR_NUMBER is not open." >&2
+              exit 1
+            }
+            repository="$GITHUB_REPOSITORY"
+            sha="$(jq -r .head.sha <<<"$pr")"
+            ref="refs/pull/$PR_NUMBER/head"
+            mapfile -t changed_files < <(
+              gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" --jq '.[].filename'
+            )
+            mapfile -t slugs < <(
+              printf '%s\n' "${changed_files[@]}" |
+                sed -nE 's#^tasks/([^/]+)/solution/app/.*#\1#p' | sort -u
+            )
+          else
+            [[ "$DISPATCH_SLUG" =~ ^frontend-[a-z0-9-]+$ ]] || {
+              echo "Invalid task slug: $DISPATCH_SLUG" >&2
+              exit 1
+            }
+            repository="$GITHUB_REPOSITORY"
+            sha="$GITHUB_SHA"
+            ref="$GITHUB_SHA"
+            slugs=("$DISPATCH_SLUG")
+            PR_NUMBER=""
+          fi
+
+          [[ "${#slugs[@]}" -eq 1 ]] || {
+            echo "Judge runs require exactly one changed solution app; found ${#slugs[@]}: ${slugs[*]-}" >&2
+            exit 1
+          }
+
+          if [[ "$EVENT_NAME" == "issue_comment" ]]; then
+            allowed_prefix="tasks/${slugs[0]}/solution/app/"
+            mapfile -t disallowed_files < <(
+              printf '%s\n' "${changed_files[@]}" | grep -v "^${allowed_prefix}" || true
+            )
+            [[ "${#disallowed_files[@]}" -eq 0 ]] || {
+              echo "OAuth judging rejects changes outside $allowed_prefix:" >&2
+              printf '  %s\n' "${disallowed_files[@]}" >&2
+              exit 1
+            }
+          fi
+
+          {
+            echo "slug=${slugs[0]}"
+            echo "repository=$repository"
+            echo "ref=$ref"
+            echo "sha=$sha"
+            echo "pr_number=$PR_NUMBER"
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ steps.target.outputs.repository }}
+          ref: ${{ steps.target.outputs.ref }}
+          path: source
+          persist-credentials: false
+
+      - name: Hash oracle solution
+        id: fingerprint
+        working-directory: source
+        env:
+          SLUG: ${{ steps.target.outputs.slug }}
+          EXPECTED_SHA: ${{ steps.target.outputs.sha }}
+        run: |
+          set -euo pipefail
+          actual_sha="$(git rev-parse HEAD)"
+          [[ "$actual_sha" == "$EXPECTED_SHA" ]] || {
+            echo "Authorized SHA $EXPECTED_SHA moved to $actual_sha before checkout; rerun /judge." >&2
+            exit 1
+          }
+          hash="$(git rev-parse "HEAD:tasks/$SLUG/solution/app")"
+          echo "hash=$hash" >> "$GITHUB_OUTPUT"
+
+      - name: Validate target and secret
+        working-directory: source
+        env:
+          SLUG: ${{ steps.target.outputs.slug }}
+          CODEX_AUTH_JSON: ${{ secrets.CODEX_AUTH_JSON }}
+        run: |
+          set -euo pipefail
+          [[ -f "tasks/$SLUG/task.toml" && -x "tasks/$SLUG/solution/solve.sh" ]]
+          jq -e 'type == "object"' <<<"$CODEX_AUTH_JSON" >/dev/null
+          docker info >/dev/null
+
+      - uses: astral-sh/setup-uv@v8.3.2
+        with:
+          enable-cache: true
+
+      - name: Install locked workspace
+        working-directory: source
+        run: uv sync --locked
+
+      - name: Run the oracle and Codex judge
+        id: harbor
+        continue-on-error: true
+        working-directory: source
+        env:
+          SLUG: ${{ steps.target.outputs.slug }}
+          JOBS_DIR: ${{ runner.temp }}/judge-jobs
+          JOB_NAME: judge-${{ github.run_id }}-${{ github.run_attempt }}
+          CODEX_AUTH_JSON: ${{ secrets.CODEX_AUTH_JSON }}
+        run: |
+          set -o pipefail
+          compact_auth="$(jq -c . <<<"$CODEX_AUTH_JSON")"
+          echo "::add-mask::$compact_auth"
+          uv run harbor run \
+            --path tasks \
+            --include-task-name "$SLUG" \
+            --n-tasks 1 \
+            --agent oracle \
+            --jobs-dir "$JOBS_DIR" \
+            --job-name "$JOB_NAME" \
+            --n-concurrent 1 \
+            --yes \
+            --verifier-env "CODEX_AUTH_JSON=$compact_auth" \
+            --verifier-env "REWARDKIT_MODEL=$JUDGE_MODEL" \
+            --verifier-env "REWARDKIT_JUDGE=codex"
+
+      - name: Build score report
+        id: report
+        if: always() && steps.target.outcome == 'success'
+        env:
+          SLUG: ${{ steps.target.outputs.slug }}
+          SHA: ${{ steps.target.outputs.sha }}
+          HARBOR_OUTCOME: ${{ steps.harbor.outcome }}
+          ORACLE_HASH: ${{ steps.fingerprint.outputs.hash }}
+          JOBS_DIR: ${{ runner.temp }}/judge-jobs
+          REPORT_JSON: ${{ runner.temp }}/judge-result.json
+          REPORT_MD: ${{ runner.temp }}/judge-comment.md
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          jobs_dir = Path(os.environ["JOBS_DIR"])
+          rewards = list(jobs_dir.glob("**/verifier/reward.json"))
+          success = os.environ["HARBOR_OUTCOME"] == "success" and len(rewards) == 1
+          data = json.loads(rewards[0].read_text()) if success else {}
+          numeric = {
+              key: float(value)
+              for key, value in data.items()
+              if isinstance(value, (int, float)) and not isinstance(value, bool)
+          }
+          total = numeric.get("reward")
+          success = success and total is not None
+          dimensions = {
+              key: value
+              for key, value in numeric.items()
+              if key not in {"reward", "pass"}
+          }
+          result = {
+              "slug": os.environ["SLUG"],
+              "sha": os.environ["SHA"],
+              "oracleHash": os.environ["ORACLE_HASH"],
+              "model": os.environ["JUDGE_MODEL"],
+              "total": total,
+              "per-dim": dimensions,
+              "run": f"{os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+          }
+          Path(os.environ["REPORT_JSON"]).write_text(json.dumps(result, separators=(",", ":")) + "\n")
+
+          marker = "<!-- judge-oracle-codex-oauth -->"
+          lines = [marker, f"### Oracle judge: `{os.environ['SLUG']}`"]
+          if success:
+              lines += [
+                  "",
+                  f"**Total: {total:.4f}** · Model: `{os.environ['JUDGE_MODEL']}` · Commit: `{os.environ['SHA'][:12]}`",
+                  "",
+                  "| Dimension | Score |",
+                  "| --- | ---: |",
+                  *[f"| `{name}` | {score:.4f} |" for name, score in sorted(dimensions.items())],
+              ]
+          else:
+              lines += [
+                  "",
+                  "**Judge run failed before producing one valid reward file.**",
+                  "Inspect the linked Actions run; no ledger entry was written.",
+              ]
+          lines += ["", f"[Actions run]({result['run']})"]
+          Path(os.environ["REPORT_MD"]).write_text("\n".join(lines) + "\n")
+
+          output = Path(os.environ["GITHUB_OUTPUT"])
+          with output.open("a") as stream:
+              stream.write(f"success={'true' if success else 'false'}\n")
+          PY
+
+      # Always upload, success or failure: the jobs dir (including reward.json)
+      # is otherwise discarded with the runner, and a downstream step (PR
+      # comment, ledger commit) can still fail after a valid score - the
+      # artifact is then the only surviving copy of that score, or of the
+      # per-trial exception traceback when harbor produced 0 valid trials.
+      - name: Upload jobs dir
+        if: always() && steps.target.outcome == 'success'
+        uses: actions/upload-artifact@v7
+        with:
+          name: judge-jobs-${{ github.run_id }}
+          path: ${{ runner.temp }}/judge-jobs
+          retention-days: 14
+          if-no-files-found: warn
+
+      # PR-comment failures (e.g. HTTP 403 Resource not accessible by
+      # integration) must not fail a run whose judge score is otherwise
+      # valid - "Enforce successful judge result" below is the real gate.
+      - name: Post or update PR score comment
+        if: always() && github.event_name != 'workflow_dispatch' && steps.report.outcome == 'success'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.target.outputs.pr_number }}
+          REPORT_MD: ${{ runner.temp }}/judge-comment.md
+        run: |
+          set -euo pipefail
+          marker='<!-- judge-oracle-codex-oauth -->'
+          comment_id="$(
+            gh api --paginate "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" \
+              --jq ".[] | select(.user.login == \"github-actions[bot]\" and (.body | startswith(\"$marker\"))) | .id" |
+              head -n 1
+          )"
+          payload="$(jq -n --rawfile body "$REPORT_MD" '{body: $body}')"
+          if [[ -n "$comment_id" ]]; then
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$comment_id" --input - <<<"$payload"
+          else
+            gh api --method POST "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --input - <<<"$payload"
+          fi
+
+      # main's "approved_pr_to_merge" ruleset requires 1 approving review with
+      # no bypass actors (not even admins), so a direct Contents-API commit to
+      # main can never land - it isn't a race, it fails identically every
+      # retry. Open a PR instead: commits still go through the Contents API
+      # (GitHub-authored and signed, satisfying the all-branches
+      # "verify_commits" ruleset) but target a fresh branch, then a maintainer
+      # reviews and merges. The ledger is therefore NOT auto-current on main -
+      # see docs/judge-ledger.jsonl's staleness until that merge happens.
+      - name: Open judge ledger PR
+        id: ledger
+        if: always() && steps.report.outputs.success == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPORT_JSON: ${{ runner.temp }}/judge-result.json
+          SLUG: ${{ steps.target.outputs.slug }}
+          PR_NUMBER: ${{ steps.target.outputs.pr_number }}
+        run: |
+          set -euo pipefail
+          line="$(jq -c . "$REPORT_JSON")"
+          branch="ci/judge-ledger-$SLUG-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+
+          main_sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
+          gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" \
+            -f "ref=refs/heads/$branch" -f "sha=$main_sha" >/dev/null
+
+          path="repos/$GITHUB_REPOSITORY/contents/docs/judge-ledger.jsonl"
+          current="$(gh api "$path?ref=$branch")"
+          existing="$(jq -r .content <<<"$current" | base64 --decode)"
+          new_content="$(printf '%s%s\n' "$existing" "$line" | base64 -w0)"
+          payload="$(jq -n \
+            --arg msg "ci: record OAuth oracle score for $SLUG" \
+            --arg content "$new_content" \
+            --arg branch "$branch" \
+            --arg sha "$(jq -r .sha <<<"$current")" \
+            '{message: $msg, content: $content, branch: $branch, sha: $sha}')"
+          gh api --method PUT "$path" --input - <<<"$payload" >/dev/null
+
+          body="Automated ledger entry from the OAuth oracle judge."
+          if [[ -n "$PR_NUMBER" ]]; then
+            body="$body"$'\n\n'"Triggered by /judge on #$PR_NUMBER."
+          fi
+          gh pr create --base main --head "$branch" \
+            --title "ci: record OAuth oracle score for $SLUG" \
+            --body "$body"
+
+      - name: Enforce successful judge result
+        if: always() && steps.target.outcome == 'success'
+        env:
+          SUCCESS: ${{ steps.report.outputs.success }}
+          LEDGER_OUTCOME: ${{ steps.ledger.outcome }}
+        run: test "$SUCCESS" = "true" && test "$LEDGER_OUTCOME" = "success"

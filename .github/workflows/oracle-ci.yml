@@ -1,0 +1,80 @@
+name: Oracle contract CI
+
+on:
+  pull_request:
+    paths:
+      - "tasks/**/solution/**"
+      - "packages/corpuscheck/**"
+      - ".github/workflows/oracle-ci.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: oracle-ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  oracle-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@v8.3.2
+        with:
+          enable-cache: true
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Detect relevant changes
+        id: changes
+        env:
+          BASE_REF: origin/${{ github.base_ref }}
+        run: |
+          changed="$(git diff --name-only "$BASE_REF"...HEAD)"
+          if grep -qE '^tasks/[^/]+/solution/' <<<"$changed"; then
+            echo "oracles=true" >> "$GITHUB_OUTPUT"
+          fi
+          if grep -qE '^(packages/corpuscheck/|\.github/workflows/oracle-ci\.yml$)' <<<"$changed"; then
+            echo "corpuscheck=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install Python workspace
+        run: uv sync --locked
+
+      - name: Install Node workspace
+        # corpuscheck's e2e-stage pytest fixtures resolve @playwright/test from
+        # the root workspace, so both paths need the install.
+        if: steps.changes.outputs.oracles == 'true' || steps.changes.outputs.corpuscheck == 'true'
+        run: npm ci
+
+      - name: Cache Playwright Chromium
+        if: steps.changes.outputs.oracles == 'true'
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Chromium system dependencies
+        if: steps.changes.outputs.oracles == 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Check changed oracles
+        if: steps.changes.outputs.oracles == 'true'
+        env:
+          BASE_REF: origin/${{ github.base_ref }}
+        run: uv run corpuscheck oracle-ci --changed --base-ref "$BASE_REF" --skip-e2e
+
+      - name: Test corpuscheck
+        if: steps.changes.outputs.corpuscheck == 'true'
+        run: uv run pytest packages/corpuscheck/tests

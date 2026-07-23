@@ -333,10 +333,10 @@ function uniqueName(base) {
   const names = new Set(allThemes().map((t) => t.name));
   if (!names.has(trimmed)) return trimmed;
   for (let i = 2; i < 999; i++) {
-    const candidate = `${trimmed} ${i}`;
+    const candidate = `${trimmed}-${i}`;
     if (!names.has(candidate)) return candidate;
   }
-  return `${trimmed} ${Date.now().toString(36)}`;
+  return `${trimmed}-${Date.now().toString(36)}`;
 }
 
 function syncCustomsEntry() {
@@ -390,7 +390,7 @@ function forkActive() {
   const fork = cloneTheme(src);
   fork.id = uid();
   fork.type = "custom";
-  fork.name = uniqueName(`${src.name} copy`);
+  fork.name = uniqueName(`${src.name}-copy`);
   fork.default = false;
   fork.prefersdark = false;
   fork.baseline = serializeTheme(src);
@@ -517,7 +517,7 @@ function duplicateActive() {
     ...cloneTheme(source),
     id: uid(),
     type: "custom",
-    name: uniqueName(`${source.name} copy`),
+    name: uniqueName(`${source.name}-copy`),
     default: false,
     prefersdark: false,
   });
@@ -626,8 +626,17 @@ function randomizeTheme() {
 
 /* ------------------------------ snapshots ------------------------------ */
 
+function validateSnapshotName(rawName) {
+  const name = String(rawName ?? "").trim();
+  if (!name) return "Snapshot name is required — enter a name before saving.";
+  if (name.length > 64) {
+    return `Snapshot name must be 64 characters or fewer (currently ${name.length}) — shorten it.`;
+  }
+  return null;
+}
+
 function saveSnapshot(rawName) {
-  const nameError = validateThemeName(rawName);
+  const nameError = validateSnapshotName(rawName);
   if (nameError) return nameError;
   const snap = {
     id: uid(),
@@ -746,12 +755,16 @@ function openCssModal() {
   modalLastFocus = document.activeElement;
   renderExportOutput();
   const modal = document.getElementById("css-modal");
+  modal.inert = false;
+  modal.setAttribute("aria-hidden", "false");
   modal.classList.add("open");
   modal.querySelector("#css-close")?.focus();
 }
 
 function closeModal(modal) {
   modal.classList.remove("open");
+  modal.inert = true;
+  modal.setAttribute("aria-hidden", "true");
   if (modalLastFocus && typeof modalLastFocus.focus === "function") {
     modalLastFocus.focus();
   }
@@ -843,8 +856,13 @@ function downloadExport() {
   a.download = `${fileSlug(state.active?.name)}.${ext}`;
   document.body.appendChild(a);
   a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  // Keep the activated anchor alive until Chromium has consumed the blob URL.
+  // Removing it synchronously can cancel the download even though the UI then
+  // reports success.
+  setTimeout(() => {
+    a.remove();
+    URL.revokeObjectURL(url);
+  }, 1000);
   toast(`Downloaded ${fileSlug(state.active?.name)}.${ext}`);
 }
 
@@ -858,6 +876,8 @@ function openImportModal() {
   const err = document.getElementById("import-error");
   err.textContent = "";
   const modal = document.getElementById("import-modal");
+  modal.inert = false;
+  modal.setAttribute("aria-hidden", "false");
   modal.classList.add("open");
   input.focus();
 }
@@ -936,10 +956,10 @@ function resetToSeed() {
 function onHashChange() {
   const hasPayload = hashHasThemePayload();
   const decoded = readThemeHash();
-  if (hasPayload && !decoded) {
+  if (!hasPayload || (hasPayload && !decoded)) {
     resetToSeed();
     selectTheme(cloneTheme(defaultBuiltin()), { syncHash: false });
-    clearThemeHash();
+    if (hasPayload) clearThemeHash();
     return;
   }
   if (!decoded) return;
@@ -1793,6 +1813,9 @@ function maybeStartTour() {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && !tour.hidden) close();
   });
+  document.addEventListener("pointerdown", (e) => {
+    if (!tour.hidden && !card.contains(e.target)) close();
+  });
   window.addEventListener("resize", position);
 
   setTimeout(() => {
@@ -1816,10 +1839,10 @@ function boot() {
 
     const hasPayload = hashHasThemePayload();
     const decoded = readThemeHash();
-    if (hasPayload && !decoded) {
+    if (!hasPayload || (hasPayload && !decoded)) {
       resetToSeed();
       selectTheme(cloneTheme(defaultBuiltin()), { syncHash: false });
-      clearThemeHash();
+      if (hasPayload) clearThemeHash();
     } else if (decoded) {
       try {
         const theme = seedFromPayload(decoded);

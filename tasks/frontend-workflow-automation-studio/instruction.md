@@ -2,6 +2,16 @@
 Build a browser automation studio for the Ternwave platform using React, Zustand, Tailwind CSS 4.3.2, and IBM Carbon Design System.
 </summary>
 
+<reference_screenshots>
+Screenshots of the reference application are provided in-container at
+/reference-screenshots/: overview.png is a full-page desktop-layout
+overview (downscaled); overview-tablet.png and overview-mobile.png are full-page responsive
+reflows at 1024x768 (tablet) and 390x844 (mobile) viewports; segment-NN.png are full-resolution 1440x900 sections
+in top-to-bottom order with slight overlap. They are part of this instruction:
+recreate what they show. Where a screenshot and the text conflict, the text
+wins. Do not copy the images into /app or ship them as app assets.
+</reference_screenshots>
+
 <core_features>
 Core features (each line is an observable behavior the finished app must exhibit):
 
@@ -62,7 +72,7 @@ Feature: Undo and redo timeline —
 - Performing a new action after an undo clears the redo stack and disables Redo
 
 Feature: Export center —
-- An Export view shows a live-compiled preview in a monospaced block with two tabs: Definition JSON (the selected script's name, target URL, steps with parameters, disabled flags, version number, and schedule) and Run report (the latest run's per-step results, retry counts, extracted values, timeline summary, and rollup totals)
+- An Export view shows a live-compiled preview in a monospaced block with two tabs: Definition JSON (the selected script's name, target URL, steps with parameters, disabled flags, version number, and schedule) and Run report (the latest run's per-step results, retry counts, extracted values, and rollup totals)
 - The Definition JSON is API-shaped like a real automation-service payload: a script object with id, name, target_url, version, a schedule object (enabled flag, time, and an interval that is exactly one of hourly, daily, or weekly), and a steps array where each step carries id, order, a type that is exactly one of navigate, click, type, extract, wait, screenshot, or assert_text, a params object holding only that type's typed fields (for example wait carries a positive integer ms, extract carries selector and variable), and a disabled flag — these field names and enum values are visible in the preview text
 - The Run report is likewise API-shaped: a run object with run id, trigger (manual or schedule), start time, duration, totals (passed, failed, skipped, retries), and a steps array of per-step outcomes each carrying order, type, a status that is exactly one of pass, fail, or skipped, an attempts count, an error reason on failures, and the extracted name and value where the step extracted one
 - The record each form creates is exactly the object that appears in the Definition JSON — same field names, bounds, and enums — and form validation enforces the same contracts the export shape declares, always naming the offending field inline

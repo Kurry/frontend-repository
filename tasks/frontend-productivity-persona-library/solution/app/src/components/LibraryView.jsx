@@ -20,12 +20,13 @@ function FacetRail() {
     return acc
   }, {})
   const entries = Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+  const visibleCount = filters.tag ? candidates.filter((persona) => persona.tags.includes(filters.tag)).length : candidates.length
 
   return (
     <aside className={`facet-rail ${filtersOpen ? 'open' : ''}`} aria-label="Tag facets">
       <div className="facet-title"><div><span>DISCOVER</span><p className="facet-heading" id="facet-tags-heading">Tags</p></div><Button className="facet-close" kind="ghost" size="sm" hasIconOnly renderIcon={Close} iconDescription="Close filters" onClick={() => useAppStore.getState().setUI({ filtersOpen: false })} /></div>
       <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-      <li><button className={!filters.tag ? 'facet-entry active' : 'facet-entry'} onClick={() => setFilters({ tag: null })}><span>All tags</span><b>{candidates.length}</b></button></li>
+      <li><button className={!filters.tag ? 'facet-entry active' : 'facet-entry'} onClick={() => setFilters({ tag: null })}><span>All tags</span><b>{visibleCount}</b></button></li>
       {entries.map(([tag, count]) => (
         <li key={tag}><button className={filters.tag === tag ? 'facet-entry active' : 'facet-entry'} aria-pressed={filters.tag === tag} onClick={() => setFilters({ tag: filters.tag === tag ? null : tag })}><span>{tag}</span><b>{count}</b></button></li>
       ))}

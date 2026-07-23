@@ -17,7 +17,7 @@ export const createTaskSchema = z.object({
     (value) => (value === undefined || value === null ? '' : String(value)),
     z.string()
       .min(1, 'Pull-request number is required')
-      .regex(/^\d{1,6}$/, 'Pull-request number must be a positive integer of 1–6 digits')
+      .regex(/^[1-9]\d{0,5}$/, 'Pull-request number must be a positive integer of 1–6 digits')
       .refine((value) => Number(value) > 0, 'Pull-request number must be positive'),
   ),
   minFiles: intField('Minimum file bound'),
@@ -45,7 +45,10 @@ export const taskManifestSchema = z.object({
   maxFiles: z.number().int().min(1).max(500),
   checks: z.object({ skeleton: z.literal(true), validate: z.literal(true) }),
   stages: z.array(stageSchema).length(5),
-  generatedAt: z.string().datetime({ offset: false }),
+  generatedAt: z.string().regex(
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/,
+    'generatedAt must be an ISO-8601 datetime ending in Z',
+  ),
 }).refine((data) => data.minFiles <= data.maxFiles, {
   message: 'minFiles must not exceed maxFiles',
   path: ['maxFiles'],

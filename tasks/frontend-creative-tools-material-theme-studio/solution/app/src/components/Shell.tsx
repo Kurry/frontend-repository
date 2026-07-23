@@ -140,20 +140,20 @@ export default function Shell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-gray-100 font-sans">
-      <header className="flex items-center justify-between px-4 py-2 border-b border-gray-700">
-        <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold">Material-UI Theme Creator</h1>
-          <div className="flex items-center text-sm text-gray-400">
+      <header className="studio-header flex flex-wrap items-center justify-between gap-2 px-4 py-2 border-b border-gray-700">
+        <div className="flex min-w-0 basis-full items-center gap-2 sm:basis-auto sm:gap-4">
+          <h1 className="min-w-0 text-lg font-bold sm:text-xl">Material-UI Theme Creator</h1>
+          <div className="flex min-w-0 items-center text-sm text-gray-400">
             <span className="mr-2" aria-hidden="true">└─</span>
             <span
-              className="px-2 py-1 bg-gray-800 rounded border border-gray-700 cursor-not-allowed select-none"
+              className="min-w-0 break-all px-2 py-1 bg-gray-800 rounded border border-gray-700 cursor-not-allowed select-none"
               title="Inert version chip"
             >
               @material-ui/core@^4.11.0
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-2">
           <button
             type="button"
             className="px-3 py-1.5 text-sm text-gray-300 border border-gray-700 rounded hover:bg-gray-800 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-blue-400 min-h-11"
@@ -164,7 +164,7 @@ export default function Shell({ children }: { children: ReactNode }) {
           </button>
           <button
             type="button"
-            className="px-3 py-1.5 text-sm font-medium text-blue-400 hover:bg-blue-400/10 rounded transition-colors outline-none focus-visible:ring-2 focus-visible:ring-blue-400 min-h-11"
+            className="px-3 py-1.5 text-sm font-medium text-blue-400 hover:bg-blue-400/10 hover:underline rounded transition-colors outline-none focus-visible:ring-2 focus-visible:ring-blue-400 min-h-11"
             id="btn-tutorial"
             onClick={() => setTutorialOpen(true)}
           >
@@ -186,7 +186,7 @@ export default function Shell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <nav className="relative flex px-4 border-b border-gray-700 bg-gray-900" role="tablist" aria-label="Main">
+      <nav className="studio-nav relative flex px-4 border-b border-gray-700 bg-gray-900" role="tablist" aria-label="Main">
         <div className="flex items-center mr-6">
           <svg viewBox="0 0 24 24" width="28" height="28" role="img" aria-label="Material logo mark">
             <path
@@ -219,13 +219,16 @@ export default function Shell({ children }: { children: ReactNode }) {
         />
       </nav>
 
-      <main className="flex-1 overflow-hidden relative">{children}</main>
+      {/* Below lg the main region itself scrolls (Saved Themes / Export content
+          taller than the viewport stays reachable at 768px); at lg+ each tab
+          manages its own internal scrolling. */}
+      <main className="flex-1 overflow-y-auto lg:overflow-hidden relative">{children}</main>
 
       {/* Polite live region for validation + status announcements. The span is
           re-keyed on every announce dispatch so identical consecutive messages
           still mutate the DOM and re-fire for assistive tech. */}
       <div className="sr-only" role="status" aria-live="polite" data-announcer>
-        <span key={announceSeq}>{announcement}</span>
+        <span className="block h-px w-px overflow-hidden" key={announceSeq}>{announcement}</span>
       </div>
 
       <TutorialDialog open={tutorialOpen} onClose={() => setTutorialOpen(false)} />

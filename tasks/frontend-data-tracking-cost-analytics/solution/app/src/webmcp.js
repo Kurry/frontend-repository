@@ -182,6 +182,26 @@ const descriptions = {
   artifact_export: 'Download the live cost report as cost-report-json or cost-report-csv.',
 };
 
+const toolMetadata = {
+  browse_open: {
+    inputSchema: {
+      type: 'object',
+      properties: { destination: { enum: DESTINATIONS } },
+      required: ['destination'],
+      additionalProperties: false,
+    },
+    annotations: { readOnlyHint: true },
+  },
+  browse_sort: {
+    inputSchema: {
+      type: 'object',
+      properties: { sort: { enum: ['model', ...Object.keys(SORTS).filter((key) => key !== 'model')] } },
+      required: ['sort'],
+      additionalProperties: false,
+    },
+  },
+};
+
 function toolArgs(value) {
   if (value && typeof value === 'object' && value.arguments && typeof value.arguments === 'object') return value.arguments;
   if (value && typeof value === 'object' && value.args && typeof value.args === 'object') return value.args;
@@ -192,7 +212,7 @@ let registered = false;
 export function registerWebMCP() {
   if (registered) return;
   registered = true;
-  window.webmcp_list_tools = () => Object.keys(tools).map((name) => ({ name, description: descriptions[name] || `${name.replaceAll('_', ' ')} operation` }));
+  window.webmcp_list_tools = () => Object.keys(tools).map((name) => ({ name, description: descriptions[name] || `${name.replaceAll('_', ' ')} operation`, ...toolMetadata[name] }));
   window.webmcp_invoke_tool = async (name, args = {}) => tools[name] ? tools[name](toolArgs(args)) : fail('Unknown WebMCP tool');
   window.webmcp_session_info = () => ({
     contractVersion: 'zto-webmcp-v1',
@@ -210,7 +230,7 @@ export function registerWebMCP() {
   if (modelContext?.registerTool) {
     Object.entries(tools).forEach(([name, handler]) => {
       try {
-        modelContext.registerTool({ name, description: descriptions[name] || `${name.replaceAll('_', ' ')} operation`, inputSchema: { type: 'object', additionalProperties: true }, execute: (args) => handler(toolArgs(args)) });
+        modelContext.registerTool({ name, description: descriptions[name] || `${name.replaceAll('_', ' ')} operation`, inputSchema: { type: 'object', additionalProperties: true }, ...toolMetadata[name], execute: (args) => handler(toolArgs(args)) });
       } catch { /* The compatibility globals above remain available. */ }
     });
   }

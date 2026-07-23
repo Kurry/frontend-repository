@@ -170,7 +170,9 @@ export const installWebMCP = () => {
       name: t.name,
       module: t.module,
       description: t.description,
-      parameters: t.parameters
+      parameters: t.parameters,
+      inputSchema: t.parameters,
+      annotations: t.name === 'editor_preview' ? { readOnlyHint: true } : undefined
     }));
 
   window.webmcp_session_info = () => ({ ...SESSION, tools: TOOLS.map((t) => t.name) });

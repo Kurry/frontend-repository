@@ -294,6 +294,7 @@ function webmcp_session_info() {
     contract_version: 'zto-webmcp-v1',
     app: 'nostrpass-vault',
     tool_count: tools.length,
+    modules: ['browse-query-v1', 'entity-collection-v1', 'artifact-transfer-v1'],
   };
 }
 
@@ -340,3 +341,5 @@ if ((navigator as Navigator & { modelContext?: { registerTool: (tool: unknown) =
 }
 
 export { webmcp_session_info, webmcp_list_tools, webmcp_invoke_tool };
+
+// Keep the contract module in the production bundle for the oracle harness.

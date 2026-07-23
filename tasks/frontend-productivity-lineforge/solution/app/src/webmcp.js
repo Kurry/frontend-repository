@@ -80,7 +80,7 @@ export function initWebmcp() {
       handler(args) {
         const q = (args || {}).query;
         if (typeof q !== 'string') return { ok: false, error: 'query must be a string' };
-        if (q.length > 60) return { ok: false, error: 'query too long (max 60 chars)' };
+        if (q.length > 200) return { ok: false, error: 'query too long (max 200 chars)' };
         searchQuery.value = q;
         return { ok: true, query: q };
       }
@@ -315,6 +315,54 @@ export function initWebmcp() {
     }
   };
 
+  const objectSchema = (properties = {}, required = []) => ({ type: 'object', additionalProperties: false, ...(required.length ? { required } : {}), properties });
+  const fieldsSchema = { type: 'object', additionalProperties: { type: 'string', maxLength: 200 } };
+  const emptySchema = objectSchema();
+  const entityFields = ['name', 'opening-code', 'moves', 'ply', 'tags', 'notes', 'side-to-move'];
+  const tagList = value => value === undefined ? undefined : String(value).split(',').map(tag => tag.trim()).filter(Boolean);
+  const registry = {
+    'browse.open': { description: 'Open a declared destination (route, tab, section, or item).', inputSchema: objectSchema({ destination: { type: 'string', enum: DESTINATIONS, description: 'Declared destination' } }, ['destination']), handler: tools.browse_open.handler },
+    'browse.search': { description: 'Search within the browsable surface.', inputSchema: objectSchema({ query: { type: 'string', maxLength: 200 } }, ['query']), handler: tools.browse_search.handler },
+    'browse.apply_filter': { description: 'Apply a declared filter.', inputSchema: objectSchema({ filter: { type: 'string', enum: FILTERS }, value: { type: 'string', maxLength: 200 } }, ['filter']), handler: tools.browse_apply_filter.handler },
+    'browse.clear_filter': { description: 'Clear one or all declared filters.', inputSchema: objectSchema({ filter: { type: 'string', enum: FILTERS } }), handler: args => { if (!args.filter) { showFavoritesOnly.value = false; searchQuery.value = ''; return { ok: true, filter: 'all' }; } return tools.browse_clear_filter.handler(args); } },
+    'browse.set_theme': { description: 'Switch to a declared theme.', inputSchema: objectSchema({ theme: { type: 'string', enum: THEMES } }, ['theme']), handler: tools.browse_set_theme.handler },
+    'entity.create': { description: 'Create an entity using declared fields.', inputSchema: objectSchema({ fields: fieldsSchema }), handler: ({ fields = {} }) => tools.entity_create.handler({ entity: 'saved-line', name: fields.name, tags: tagList(fields.tags), notes: fields.notes }) },
+    'entity.select': { description: 'Select an entity by public id.', inputSchema: objectSchema({ id: { type: 'string', maxLength: 128 } }, ['id']), handler: ({ id }) => tools.entity_select.handler({ entity: findSaved(id) ? 'saved-line' : 'opening', id }) },
+    'entity.update': { description: 'Update declared fields on an entity.', inputSchema: objectSchema({ id: { type: 'string', maxLength: 128 }, fields: fieldsSchema }, ['id', 'fields']), handler: ({ id, fields }) => tools.entity_update.handler({ entity: 'saved-line', id, name: fields.name, tags: tagList(fields.tags), notes: fields.notes }) },
+    'entity.delete': { description: 'Delete an entity with explicit confirmation.', inputSchema: objectSchema({ id: { type: 'string', maxLength: 128 }, confirm: { type: 'boolean', const: true } }, ['id', 'confirm']), handler: ({ id, confirm }) => tools.entity_delete.handler({ entity: 'saved-line', id, confirm }) },
+    'entity.toggle': { description: 'Toggle a boolean field on an entity.', inputSchema: objectSchema({ id: { type: 'string', maxLength: 128 }, field: { type: 'string', enum: entityFields } }, ['id']), handler: ({ id }) => tools.entity_toggle.handler({ entity: 'favorite', id }) },
+    'session.start': { description: 'Invoke session operation: start.', inputSchema: emptySchema, handler: tools.session_start.handler },
+    'session.pause': { description: 'Invoke session operation: pause.', inputSchema: emptySchema, handler: tools.session_pause.handler },
+    'session.resume': { description: 'Invoke session operation: resume.', inputSchema: emptySchema, handler: tools.session_resume.handler },
+    'session.disconnect': { description: 'Invoke session operation: disconnect.', inputSchema: emptySchema, handler: tools.session_disconnect.handler },
+    'session.restart': { description: 'Invoke session operation: restart.', inputSchema: emptySchema, handler: tools.session_restart.handler },
+    'session.advance': { description: 'Invoke session operation: advance.', inputSchema: emptySchema, handler: tools.session_advance.handler },
+    'session.trigger_demo': { description: 'Trigger a declared demo.', inputSchema: objectSchema({ demo: { type: 'string', enum: DEMOS } }, ['demo']), handler: tools.session_trigger_demo.handler },
+    'artifact.import': { description: 'Start a declared import mode (no file bytes in WebMCP).', inputSchema: objectSchema({ mode: { type: 'string', enum: IMPORT_MODES } }, ['mode']), handler: tools.artifact_import.handler },
+    'artifact.export': { description: 'Export using a declared format (no blob/base64 in results).', inputSchema: objectSchema({ format: { type: 'string', enum: EXPORT_FORMATS } }, ['format']), handler: tools.artifact_export.handler },
+    'artifact.copy': { description: 'Trigger copy via the visible control (clipboard verified in Playwright).', inputSchema: emptySchema, handler: async () => { showExportCenter.value = true; await new Promise(resolve => setTimeout(resolve, 0)); const button = document.querySelector('[data-export-copy="study-pack"]'); if (!button) return { ok: false, error: 'Visible copy control not found' }; button.click(); for (let i = 0; i < 100; i++) { await new Promise(resolve => setTimeout(resolve, 20)); const label = button.textContent || ''; if (label.includes('Copied!')) return { ok: true, copy_triggered: true }; if (label.includes('Copy failed')) return { ok: false, error: 'Visible copy control reported failure' }; } return { ok: false, error: 'Visible copy control did not settle' }; } },
+  };
+  const validateInput = (schema, input) => {
+    if (!input || typeof input !== 'object' || Array.isArray(input)) return 'arguments must be an object';
+    const properties = schema.properties || {};
+    const unknown = Object.keys(input).find(key => !(key in properties)); if (unknown) return `unknown argument: ${unknown}`;
+    const missing = (schema.required || []).find(key => input[key] === undefined); if (missing) return `missing required argument: ${missing}`;
+    for (const [key, rule] of Object.entries(properties)) {
+      const value = input[key]; if (value === undefined) continue;
+      if (rule.type === 'string' && typeof value !== 'string') return `${key} must be a string`;
+      if (rule.type === 'boolean' && typeof value !== 'boolean') return `${key} must be a boolean`;
+      if (rule.enum && !rule.enum.includes(value)) return `${key} is outside the declared enum`;
+      if (rule.const !== undefined && value !== rule.const) return `${key} must equal ${rule.const}`;
+      if (rule.maxLength && value.length > rule.maxLength) return `${key} is too long`;
+      if (rule.type === 'object') {
+        if (!value || typeof value !== 'object' || Array.isArray(value)) return `${key} must be an object`;
+        const badField = Object.keys(value).find(field => !entityFields.includes(field)); if (badField) return `Unknown field: ${badField}`;
+        const badValue = Object.entries(value).find(([, fieldValue]) => typeof fieldValue !== 'string' || fieldValue.length > 200); if (badValue) return `${key}.${badValue[0]} must be a string of at most 200 characters`;
+      }
+    }
+    return '';
+  };
+
   window.webmcp_session_info = function () {
     return {
       contract_version: 'zto-webmcp-v1',
@@ -332,14 +380,18 @@ export function initWebmcp() {
       artifact_operations: ['export', 'import', 'copy'],
       export_formats: EXPORT_FORMATS.slice(),
       import_modes: IMPORT_MODES.slice(),
-      tool_count: Object.keys(tools).length
+      tool_names: Object.keys(registry),
+      tool_count: Object.keys(registry).length
     };
   };
   window.webmcp_list_tools = function () {
-    return Object.keys(tools).map(name => ({ name, description: tools[name].description }));
+    return Object.entries(registry).map(([name, tool]) => ({ name, description: tool.description, inputSchema: tool.inputSchema }));
   };
-  window.webmcp_invoke_tool = function (name, args) {
-    if (!tools[name]) throw new Error('Unknown WebMCP tool: ' + name);
-    return tools[name].handler(args || {});
+  window.webmcp_invoke_tool = async function (name, args = {}) {
+    const tool = registry[name];
+    if (!tool) return { ok: false, error: 'unknown_tool: ' + name };
+    const error = validateInput(tool.inputSchema, args); if (error) return { ok: false, error };
+    try { return await tool.handler(args); } catch (cause) { return { ok: false, error: String(cause?.message || cause) }; }
   };
+  try { if (navigator.modelContext?.registerTool) Object.entries(registry).forEach(([name, tool]) => navigator.modelContext.registerTool({ name, description: tool.description, inputSchema: tool.inputSchema, invoke: args => window.webmcp_invoke_tool(name, args || {}) })); } catch {}
 }

@@ -14,6 +14,11 @@ export interface User {
   email: string;
   phone?: string;
   notes?: string;
+  accountSegment?: (typeof SEGMENTS)[number];
+  sendInvitation?: boolean;
+  enable2FA?: boolean;
+  productAccess?: boolean;
+  permissions?: string[];
   role: Role;
   status: Status;
   payments: number;
@@ -23,15 +28,17 @@ export interface User {
 }
 
 export type SortKey = 'last-active' | 'newest' | 'highest-spend' | 'name-az';
+const SORT_KEYS: SortKey[] = ['last-active', 'newest', 'highest-spend', 'name-az'];
+const ACTIVE_VIEWS = ['operations-overview', 'all-users', 'add-user', 'roles', 'permissions', 'user-logs', 'user-stats', 'user-payments', 'user-products'];
 
 const av = (i: number) => ((i - 1) % 6) + 1;
 const daysAgo = (d: number) => new Date(Date.now() - d * 86400000).toISOString();
 
 export const SEED_USERS: User[] = [
-  { id: 'u1', firstName: 'Ada', lastName: 'Lovelace', email: 'ada.lovelace@pineapple.io', phone: '4155550101', notes: 'Founding analyst', role: 'Admin', status: 'Active', payments: 18400, products: 9, lastActive: daysAgo(0), avatar: av(1) },
+  { id: 'u1', firstName: 'Ada', lastName: 'Lovelace', email: 'ada.lovelace@pineapple.io', phone: '4155550101', notes: 'Founding analyst', role: 'Admin', status: 'Active', payments: 18400, products: 9, lastActive: daysAgo(50), avatar: av(1) },
   { id: 'u2', firstName: 'Grace', lastName: 'Hopper', email: 'grace.hopper@pineapple.io', phone: '4155550102', role: 'Manager', status: 'Active', payments: 12250, products: 6, lastActive: daysAgo(1), avatar: av(2) },
   { id: 'u3', firstName: 'Alan', lastName: 'Turing', email: 'alan.turing@pineapple.io', role: 'Member', status: 'Suspended', payments: 0, products: 0, lastActive: daysAgo(40), avatar: av(3) },
-  { id: 'u4', firstName: 'Katherine', lastName: 'Johnson', email: 'katherine.johnson@pineapple.io', phone: '4155550104', role: 'Manager', status: 'Active', payments: 9620, products: 5, lastActive: daysAgo(2), avatar: av(4) },
+  { id: 'u4', firstName: 'Katherine', lastName: 'Johnson', email: 'katherine.johnson@pineapple.io', phone: '4155550104', role: 'Manager', status: 'Active', payments: 9620, products: 5, lastActive: daysAgo(0), avatar: av(4) },
   { id: 'u5', firstName: 'Linus', lastName: 'Torvalds', email: 'linus.torvalds@pineapple.io', role: 'Member', status: 'Invited', payments: 0, products: 0, lastActive: daysAgo(8), avatar: av(5) },
   { id: 'u6', firstName: 'Margaret', lastName: 'Hamilton', email: 'margaret.hamilton@pineapple.io', phone: '4155550106', role: 'Admin', status: 'Active', payments: 15300, products: 7, lastActive: daysAgo(3), avatar: av(6) },
   { id: 'u7', firstName: 'Barbara', lastName: 'Liskov', email: 'barbara.liskov@pineapple.io', role: 'Viewer', status: 'Active', payments: 210, products: 1, lastActive: daysAgo(5), avatar: av(1) },
@@ -89,8 +96,9 @@ export function sortUsers(users: User[], key: SortKey): User[] {
   const a = [...users];
   if (key === 'name-az') return a.sort((x, y) => x.firstName.localeCompare(y.firstName) || x.lastName.localeCompare(y.lastName));
   if (key === 'highest-spend') return a.sort((x, y) => y.payments - x.payments);
-  if (key === 'newest') return a.sort((x, y) => +new Date(y.lastActive) - +new Date(x.lastActive));
-  return a.sort((x, y) => +new Date(y.lastActive) - +new Date(x.lastActive));
+  if (key === 'newest') return a.reverse();
+  if (key === 'last-active') return a.sort((x, y) => +new Date(y.lastActive) - +new Date(x.lastActive));
+  return a;
 }
 
 const csvField = (v: unknown): string => {
@@ -186,12 +194,21 @@ function validUserRow(r: any, idx: number, requirePassword: boolean): string | n
 export function importSessionJson(text: string): ImportErr {
   let doc: any;
   try { doc = JSON.parse(text); } catch { return { ok: false, message: 'payload is not valid JSON' }; }
-  if (!doc || typeof doc !== 'object') return { ok: false, message: 'payload must be a JSON object' };
+  if (!doc || typeof doc !== 'object' || Array.isArray(doc)) return { ok: false, message: 'payload must be a JSON object' };
   if (doc.schemaVersion !== SCHEMA_VERSION) return { ok: false, message: `schemaVersion must be exactly ${SCHEMA_VERSION}` };
+  if (typeof doc.exportedAt !== 'string' || !/^\d{4}-\d{2}-\d{2}T/.test(doc.exportedAt) || !Number.isFinite(Date.parse(doc.exportedAt)))
+    return { ok: false, message: 'exportedAt is required and must be an ISO-8601 timestamp' };
   if (!Array.isArray(doc.users)) return { ok: false, message: 'users must be an array' };
   const k = doc.kpis;
-  if (k && ['total', 'active', 'paying', 'suspended'].some((x) => k[x] != null && (Number(k[x]) < 0 || !Number.isFinite(Number(k[x])))))
-    return { ok: false, message: 'kpis contain a negative or non-numeric figure' };
+  if (!k || typeof k !== 'object' || ['total', 'active', 'paying', 'suspended'].some((x) => !Number.isInteger(k[x]) || k[x] < 0))
+    return { ok: false, message: 'kpis must require non-negative integer total, active, paying, and suspended values' };
+  if (!doc.filters || typeof doc.filters !== 'object' || !Object.hasOwn(doc.filters, 'role') || !Object.hasOwn(doc.filters, 'status'))
+    return { ok: false, message: 'filters must require role and status' };
+  if (doc.filters.role !== null && !ROLES.includes(doc.filters.role)) return { ok: false, message: `filters.role must be null or one of ${ROLES.join(', ')}` };
+  if (doc.filters.status !== null && !STATUSES.includes(doc.filters.status)) return { ok: false, message: `filters.status must be null or one of ${STATUSES.join(', ')}` };
+  if (!SORT_KEYS.includes(doc.sort)) return { ok: false, message: `sort must be one of ${SORT_KEYS.join(', ')}` };
+  if (doc.theme !== 'light' && doc.theme !== 'dark') return { ok: false, message: 'theme must be light or dark' };
+  if (typeof doc.activeView !== 'string' || !ACTIVE_VIEWS.includes(doc.activeView)) return { ok: false, message: `activeView must be one of ${ACTIVE_VIEWS.join(', ')}` };
   const out: User[] = [];
   for (let i = 0; i < doc.users.length; i++) {
     const err = validUserRow(doc.users[i], i + 1, false);
@@ -205,10 +222,12 @@ export function importSessionJson(text: string): ImportErr {
       lastActive: String(r.lastActive), avatar: av(i + 1),
     });
   }
+  const expectedKpis = computeKpis(filterUsersForKpis(out, doc.filters.role || '', doc.filters.status || ''));
+  if (['total', 'active', 'paying', 'suspended'].some((key) => k[key] !== expectedKpis[key as keyof Kpis]))
+    return { ok: false, message: 'kpis must match the imported users and active filters' };
   return { ok: true, users: out, applied: {
     role: doc.filters?.role ?? '', status: doc.filters?.status ?? '',
-    sort: (['last-active', 'newest', 'highest-spend', 'name-az'].includes(doc.sort) ? doc.sort : 'newest') as SortKey,
-    theme: doc.theme === 'light' ? 'light' : 'dark', activeView: doc.activeView || 'operations-overview',
+    sort: doc.sort, theme: doc.theme, activeView: doc.activeView,
   } };
 }
 
@@ -216,9 +235,8 @@ export function importUsersCsv(text: string): ImportErr {
   const lines = text.replace(/\r/g, '').split('\n').filter((l) => l.trim() !== '');
   if (lines.length === 0) return { ok: false, message: 'CSV is empty' };
   const header = splitCsvLine(lines[0]).map((h) => h.trim());
-  const need = ['firstName', 'lastName', 'email', 'role', 'status'];
-  const missing = need.find((n) => !header.includes(n));
-  if (missing) return { ok: false, message: `CSV header missing required column: ${missing}` };
+  if (header.length !== CSV_COLS.length || header.some((column, index) => column !== CSV_COLS[index]))
+    return { ok: false, message: `CSV header must be exactly ${CSV_HEADER}` };
   const out: User[] = [];
   for (let i = 1; i < lines.length; i++) {
     const vals = splitCsvLine(lines[i]).map(parseCsvField);
@@ -238,7 +256,8 @@ export function importUsersCsv(text: string): ImportErr {
   return { ok: true, users: out };
 }
 
-export function nextId(): string { return `u-${Date.now()}-${Math.floor(Math.random() * 1e4)}`; }
+let _uid = 100;
+export function nextId(): string { return `u-${Date.now()}-${_uid++}`; }
 
 export function makeUserFromCreate(v: UserCreateValues): User {
   return {
@@ -246,6 +265,11 @@ export function makeUserFromCreate(v: UserCreateValues): User {
     firstName: v.firstName.trim(), lastName: v.lastName.trim(), email: v.email.trim(),
     phone: v.phone && v.phone.trim() ? v.phone.trim() : undefined,
     notes: v.notes && v.notes.trim() ? v.notes.trim() : undefined,
+    accountSegment: v.accountSegment,
+    sendInvitation: v.sendInvitation,
+    enable2FA: v.enable2FA,
+    productAccess: v.productAccess,
+    permissions: v.permissions,
     role: v.role, status: v.status, payments: 0, products: 0,
     lastActive: new Date().toISOString(), avatar: av(Math.floor(Math.random() * 6) + 1),
   };

@@ -164,6 +164,12 @@ function applyHarmony() {
   const set = harmonyHues(store.wheelHue, store.harmonyMode).map((h) =>
     hslToHex(h, ANCHOR_SAT, ANCHOR_LIGHT),
   );
+  // A complementary wheel has two hue positions, while every palette must
+  // contain at least three unique swatches. Keep the true 180° companion and
+  // add a lighter anchor tone so applying the harmony preserves that contract.
+  if (store.harmonyMode === 'Complementary') {
+    set.push(hslToHex(store.wheelHue, ANCHOR_SAT - 18, ANCHOR_LIGHT + 24));
+  }
   const result = store.applyHarmonySet(palette.value.id, set);
   if (!result.ok) {
     harmonyError.value = result.error;
@@ -174,14 +180,6 @@ function applyHarmony() {
 }
 
 function onDeleteClick() {
-  if (!confirmingDelete.value) {
-    confirmingDelete.value = true;
-    if (confirmTimer) clearTimeout(confirmTimer);
-    confirmTimer = setTimeout(() => {
-      confirmingDelete.value = false;
-    }, 4000);
-    return;
-  }
   const name = palette.value.name;
   store.deletePalette(palette.value.id);
   store.closeDetail();

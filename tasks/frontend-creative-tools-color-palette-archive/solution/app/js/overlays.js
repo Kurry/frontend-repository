@@ -54,8 +54,9 @@ export function closeExport(silent = false) {
   const entry = exportEntry;
   exportEntry = null;
   ui.exportOpen = false;
+  if (exportInvoker && document.contains(exportInvoker)) exportInvoker.focus();
   closePanel($('#export-drawer'), entry, () => {
-    if (exportInvoker && document.contains(exportInvoker)) exportInvoker.focus();
+    exportInvoker = null;
   });
   if (!silent) announce('Export drawer closed.');
 }
@@ -238,6 +239,7 @@ let confirmEntry = null;
 
 export function confirmDialog({ title, body, confirmLabel, onConfirm }) {
   const el = $('#confirm-dialog');
+  const returnFocus = document.activeElement;
   $('#confirm-title').textContent = title;
   $('#confirm-body').textContent = body;
   const confirmBtn = $('#confirm-ok');
@@ -249,8 +251,9 @@ export function confirmDialog({ title, body, confirmLabel, onConfirm }) {
     el.classList.remove('is-open');
     confirmBtn.onclick = null;
     cancelBtn.onclick = null;
+    if (returnFocus instanceof HTMLElement && document.contains(returnFocus)) returnFocus.focus();
   };
-  cancelBtn.onclick = () => { cleanup(); cancelBtn.focus?.(); };
+  cancelBtn.onclick = cleanup;
   confirmBtn.onclick = () => { cleanup(); onConfirm?.(); };
   el.hidden = false;
   requestAnimationFrame(() => el.classList.add('is-open'));
@@ -300,10 +303,12 @@ export function applyBatchTag() {
 // ================= Subscribe popup ================================================
 
 let popupEntry = null;
+let popupInvoker = null;
 let idleTimer = null;
 const IDLE_MS = 45000;
 
 export function initPopup() {
+  try { if (sessionStorage.getItem('popupDismissed')) ui.popupDismissed = true; } catch (e) {}
   const reset = () => {
     if (ui.popupDismissed || ui.popupOpen) return;
     clearTimeout(idleTimer);
@@ -341,11 +346,14 @@ function throttle(fn, ms) {
   };
 }
 
-export function showPopup() {
-  if (ui.popupDismissed || ui.popupOpen) return;
+export function showPopup(force = false) {
+  if (ui.popupOpen || (ui.popupDismissed && !force)) return;
+  if (force) ui.popupDismissed = false;
   const el = $('#subscribe-popup');
+  popupInvoker = document.activeElement;
   ui.popupOpen = true;
-  el.hidden = false;
+  if (el.hasAttribute('popover') && typeof el.showPopover === 'function' && !el.matches(':popover-open')) el.showPopover();
+  else el.hidden = false;
   requestAnimationFrame(() => el.classList.add('is-visible'));
   popupEntry = { el, onEscape: () => dismissPopup() };
   openOverlay(popupEntry);
@@ -357,10 +365,16 @@ export function dismissPopup(viaSubmit = false) {
   if (!ui.popupOpen) return;
   ui.popupOpen = false;
   ui.popupDismissed = true; // stays dismissed for the rest of the session
+  try { sessionStorage.setItem('popupDismissed', 'true'); } catch (e) {}
   const el = $('#subscribe-popup');
   el.classList.remove('is-visible');
   if (popupEntry) { closeOverlay(popupEntry); popupEntry = null; }
-  setTimeout(() => { el.hidden = true; }, prefersReducedMotion() ? 0 : 380);
+  if (popupInvoker instanceof HTMLElement && document.contains(popupInvoker)) popupInvoker.focus();
+  popupInvoker = null;
+  setTimeout(() => {
+    if (el.hasAttribute('popover') && typeof el.hidePopover === 'function' && el.matches(':popover-open')) el.hidePopover();
+    else el.hidden = true;
+  }, prefersReducedMotion() ? 0 : 380);
   announce(viaSubmit ? 'Subscribed — the popup is dismissed for this session.' : 'Popup dismissed for this session.');
 }
 

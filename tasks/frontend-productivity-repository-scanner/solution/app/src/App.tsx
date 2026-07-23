@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AnimatePresence, motion, MotionConfig } from 'motion/react'
+import { AnimatePresence, motion, MotionConfig, useReducedMotion } from 'motion/react'
 import {
   Button,
   Checkbox,
@@ -92,7 +92,11 @@ const patternLabels: Record<PatternKey, { label: string; description: string }> 
 
 function formatDate(value: string | null) {
   if (!value) return 'Not scanned yet'
-  return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value))
+  return new Intl.DateTimeFormat('en-CA', {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false, timeZone: 'UTC', timeZoneName: 'short',
+  }).format(new Date(value))
 }
 
 function fileName(path: string) {
@@ -113,8 +117,15 @@ function useEscape(handler: () => void, active: boolean) {
 function useModalFocusTrap(open: boolean, onClose: () => void, selector = '.cds--modal.is-visible .cds--modal-container') {
   const openerRef = useRef<HTMLElement | null>(null)
   useEffect(() => {
+    if (open) return undefined
+    const rememberOpener = () => { openerRef.current = document.activeElement as HTMLElement }
+    document.addEventListener('focusin', rememberOpener)
+    return () => document.removeEventListener('focusin', rememberOpener)
+  }, [open])
+  useEffect(() => {
     if (!open) return undefined
-    openerRef.current = document.activeElement as HTMLElement
+    const active = document.activeElement as HTMLElement | null
+    if (active && !active.closest('.cds--modal, [role="dialog"]')) openerRef.current = active
     let container: Element | null = null
     let attempts = 0
     const focusModal = () => {
@@ -196,6 +207,7 @@ function AddRepositoryModal() {
   }
 
   useModalFocusTrap(open, close)
+  useEscape(close, open)
 
   const submit = handleSubmit((values) => {
     if (submitting.current) return
@@ -292,6 +304,7 @@ function RenameEditor({ repository, onClose }: { repository: Repository; onClose
 }
 
 function RepositoryRow({ repository, onRemove }: { repository: Repository; onRemove: (repository: Repository) => void }) {
+  const shouldReduceMotion = useReducedMotion()
   const selected = useAppStore((state) => state.selectedRepositoryIds.includes(repository.id))
   const toggleSelection = useAppStore((state) => state.toggleRepositorySelection)
   const run = useAppStore((state) => state.scanRuns[repository.id])
@@ -308,7 +321,7 @@ function RepositoryRow({ repository, onRemove }: { repository: Repository; onRem
       id={`repository-${repository.id}`}
       tabIndex={-1}
       layout
-      initial={{ opacity: 0, y: 8 }}
+      initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: -18, height: 0 }}
       transition={{ duration: 0.2 }}
@@ -332,9 +345,9 @@ function RepositoryRow({ repository, onRemove }: { repository: Repository; onRem
             <div className="repository-title-line">
               <Folder size={18} />
               <h3>{repositoryLabel(repository)}</h3>
-              {repository.id === 'repo-2' && failed && <Tag size="sm" type="red">Failed</Tag>}
-              {repository.id === 'repo-2' && !failed && scanning && <Tag size="sm" type="blue">Running</Tag>}
-              {repository.id === 'repo-2' && !failed && !scanning && run?.status === 'complete' && <Tag size="sm" type="green">Complete</Tag>}
+              {failed && <Tag size="sm" type="red">Failed</Tag>}
+              {!failed && scanning && <Tag size="sm" type="blue">Running</Tag>}
+              {!failed && !scanning && run?.status === 'complete' && <Tag size="sm" type="green">Complete</Tag>}
             </div>
             <p className="repository-path" title={repository.path}>{repository.path}</p>
             <div className="repository-meta">
@@ -370,7 +383,7 @@ function RepositoryList() {
     <section className="panel repository-panel" aria-labelledby="repositories-heading">
       <div className="panel-heading split-heading">
         <div>
-          <p className="eyebrow">Tracked sources</p>
+          <p className="eyebrow">Repository collection</p>
           <h2 id="repositories-heading">Repositories</h2>
         </div>
         <span className="count-pill">{repositories.length}</span>
@@ -391,7 +404,13 @@ function RepositoryList() {
         </ul>
       ) : (
         <div className="empty-state">
-          <Folder size={32} />
+          <div className="empty-state-illustration" aria-hidden="true">
+            <span className="empty-orbit orbit-one" />
+            <span className="empty-orbit orbit-two" />
+            <Folder size={36} />
+            <Document size={18} className="empty-document" />
+            <Search size={16} className="empty-search" />
+          </div>
           <h3>No repositories tracked</h3>
           <p>Add a local repository path to begin scanning prompt-engineering guidance.</p>
           <Button size="sm" renderIcon={Add} onClick={() => setUi('addOpen', true)}>Add repository</Button>
@@ -521,10 +540,10 @@ function ScanPanel() {
   const events = timelineFilters.length ? run.timeline.filter((event) => timelineFilters.includes(event.status)) : run.timeline
 
   return (
-    <section className="panel scan-panel" aria-labelledby="scan-heading">
+    <section id="scan-panel" className="panel scan-panel" aria-labelledby="scan-heading">
       <div className="panel-heading scan-heading">
         <div>
-          <p className="eyebrow">Durable workflow</p>
+          <p className="eyebrow">Scan workflow</p>
           <h2 id="scan-heading">Scan run · {repositoryLabel(repository)}</h2>
         </div>
         <div className="scan-actions">
@@ -534,7 +553,7 @@ function ScanPanel() {
         </div>
       </div>
       <ProgressBar
-        label={`${complete} / ${run.steps.length} files scanned`}
+        label={`${complete}/${run.steps.length} documents scanned`}
         helperText={`${percent}% complete`}
         value={percent}
         max={100}
@@ -601,7 +620,7 @@ function ScanPanel() {
           <ol className="timeline-list" aria-live="polite">
             <AnimatePresence initial={false}>
               {events.map((event) => (
-                <motion.li key={event.id} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
+                <motion.li key={event.id} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: 12 }} transition={{ duration: 0.2 }}>
                   <button className={selectedStep === event.stepId ? 'is-highlighted' : ''} onClick={() => selectStep(event.stepId)}>
                     <StatusTag status={event.status} />
                     <span>{event.message}</span>
@@ -703,7 +722,7 @@ function DocumentTree() {
       <div className="panel-heading split-heading">
         <div>
           <p className="eyebrow">Shared document index</p>
-          <h2 id="tree-heading">Detected files</h2>
+          <h2 id="tree-heading">Documents</h2>
         </div>
         <span className="count-pill">{visibleDocuments.length}</span>
       </div>
@@ -764,9 +783,13 @@ function FileViewer() {
   if (!document) return <DocumentTree />
 
   const copy = async () => {
-    await navigator.clipboard.writeText(document.content)
-    setCopied(true)
-    window.setTimeout(() => setCopied(false), 1600)
+    try {
+      await navigator.clipboard.writeText(document.content)
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 1600)
+    } catch {
+      setCopied(false)
+    }
   }
 
   return (
@@ -774,7 +797,9 @@ function FileViewer() {
       <div className="viewer-toolbar">
         <Button size="sm" kind="ghost" renderIcon={ArrowLeft} onClick={showTree}>Back to document tree</Button>
         <Button size="sm" kind="tertiary" renderIcon={copied ? CheckmarkFilled : Copy} onClick={() => void copy()}>{copied ? 'Copied' : 'Copy'}</Button>
+        <span className="sr-only" role="status" aria-live="polite">{copied ? 'File content copied' : ''}</span>
       </div>
+      <ActiveScanContext />
       <div className="panel-heading">
         <p className="eyebrow">Read-only file viewer · {document.type}</p>
         <h2 id="viewer-heading">{fileName(document.path)}</h2>
@@ -793,6 +818,30 @@ function FileViewer() {
         <Findings document={document} />
       </div>
     </section>
+  )
+}
+
+function ActiveScanContext() {
+  const activeScanId = useAppStore((state) => state.activeScanId)
+  const run = useAppStore((state) => activeScanId ? state.scanRuns[activeScanId] : undefined)
+  const repository = useAppStore((state) => state.repositories.find((item) => item.id === activeScanId))
+  const pause = useAppStore((state) => state.pauseScan)
+  const resume = useAppStore((state) => state.resumeScan)
+  if (!activeScanId || !run || !repository) return null
+  const complete = run.steps.filter((step) => step.status === 'complete').length
+  return (
+    <div className="active-scan-context">
+      <span className="sr-only" role="status" aria-live="polite">Active scan {repositoryLabel(repository)}, {complete} of {run.steps.length} files, {run.status}</span>
+      <div>
+        <strong>Active scan · {repositoryLabel(repository)}</strong>
+        <span>{complete}/{run.steps.length} files · {run.status}</span>
+      </div>
+      <div>
+        {run.status === 'running' && <Button size="sm" kind="secondary" renderIcon={Pause} onClick={() => pause(repository.id)}>Pause scan</Button>}
+        {run.status === 'paused' && <Button size="sm" renderIcon={Play} onClick={() => resume(repository.id)}>Resume scan</Button>}
+        <Button size="sm" kind="ghost" onClick={() => document.getElementById('scan-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>View scan panel</Button>
+      </div>
+    </div>
   )
 }
 
@@ -815,8 +864,12 @@ function ExportModal() {
     window.setTimeout(() => setConfirmation(''), 1600)
   }
   const copy = async () => {
-    await navigator.clipboard.writeText(activeText)
-    confirm(`${format} copied`)
+    try {
+      await navigator.clipboard.writeText(activeText)
+      confirm(`${format} copied`)
+    } catch {
+      confirm(`${format} copy failed`)
+    }
   }
   const download = () => {
     const blob = new Blob([activeText], { type: tab === 0 ? 'application/json' : 'text/markdown' })
@@ -848,7 +901,9 @@ function ExportModal() {
           <Button size="sm" renderIcon={Download} onClick={download}>Download</Button>
         </div>
       </div>
-      {confirmation && <InlineNotification kind="success" lowContrast hideCloseButton title={confirmation} />}
+      <div className="export-live" role="status" aria-live="polite">
+        {confirmation && <InlineNotification kind="success" lowContrast hideCloseButton title={confirmation} />}
+      </div>
       <Tabs selectedIndex={tab} onChange={({ selectedIndex }) => setTab(selectedIndex)}>
         <TabList aria-label="Export formats" contained>
           <Tab>Scan Index JSON</Tab>
@@ -881,12 +936,13 @@ function ImportModal() {
     setFeedback('')
   }
   useModalFocusTrap(open, close)
+  useEscape(close, open)
   const submit = handleSubmit(({ payload: source }) => {
     let parsed: unknown
     try { parsed = JSON.parse(source) } catch { setFeedback('payload: Scan Index JSON contains malformed JSON.'); return }
     const result = importIndex(parsed)
     if (!result.ok) { setFeedback(result.error || 'Scan Index JSON is invalid.'); return }
-    setFeedback('Import successful.')
+    setFeedback('Scan index imported; repositories, documents, and patterns restored.')
     setTimeout(close, 1500)
   })
   return (
@@ -949,6 +1005,13 @@ function CommandPalette() {
   const inputRef = useRef<HTMLInputElement>(null)
   const openerRef = useRef<HTMLElement | null>(null)
 
+  useEffect(() => {
+    if (open) return undefined
+    const rememberOpener = () => { openerRef.current = document.activeElement as HTMLElement }
+    document.addEventListener('focusin', rememberOpener)
+    return () => document.removeEventListener('focusin', rememberOpener)
+  }, [open])
+
   const close = () => {
     setUi('paletteOpen', false)
     window.setTimeout(() => openerRef.current?.focus(), 0)
@@ -957,7 +1020,8 @@ function CommandPalette() {
 
   useEffect(() => {
     if (open) {
-      openerRef.current = document.activeElement as HTMLElement
+      const active = document.activeElement as HTMLElement | null
+      if (active && !active.closest('.palette-backdrop, [role="dialog"]')) openerRef.current = active
       setQuery('')
       setHighlight(0)
       window.setTimeout(() => inputRef.current?.focus(), 0)
@@ -1004,6 +1068,8 @@ function CommandPalette() {
         className="command-palette"
         initial={{ opacity: 0, scale: 0.97, y: -10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.97, y: -10 }}
+        transition={{ duration: 0.2 }}
         onKeyDown={(event) => {
           if (event.key === 'ArrowDown') { event.preventDefault(); setHighlight((value) => Math.min(value + 1, filtered.length - 1)) }
           if (event.key === 'ArrowUp') { event.preventDefault(); setHighlight((value) => Math.max(value - 1, 0)) }
@@ -1053,6 +1119,7 @@ function CommandPalette() {
 }
 
 function FirstScanCoachmark() {
+  const shouldReduceMotion = useReducedMotion()
   const repositories = useAppStore((state) => state.repositories)
   const scanRuns = useAppStore((state) => state.scanRuns)
   const [dismissed, setDismissed] = useState(false)
@@ -1061,7 +1128,7 @@ function FirstScanCoachmark() {
   return (
     <motion.div
       className="coachmark"
-      initial={{ opacity: 0, y: -6 }}
+      initial={shouldReduceMotion ? false : { opacity: 0, y: -6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
       role="status"
@@ -1076,6 +1143,75 @@ function FirstScanCoachmark() {
   )
 }
 
+function GuidanceTopology() {
+  const repositories = useAppStore((state) => state.repositories)
+  const documents = useAppStore((state) => state.documents)
+  const [activeRepositoryId, setActiveRepositoryId] = useState(repositories[0]?.id || '')
+
+  useEffect(() => {
+    if (!repositories.some((repository) => repository.id === activeRepositoryId)) {
+      setActiveRepositoryId(repositories[0]?.id || '')
+    }
+  }, [activeRepositoryId, repositories])
+
+  if (!repositories.length) return null
+  const repository = repositories.find((item) => item.id === activeRepositoryId) || repositories[0]
+  const repositoryDocuments = documents[repository.id] || []
+  const coveredTypes = new Set(repositoryDocuments.map((document) => document.type))
+  const findings = repositoryDocuments.flatMap((document) => document.findings)
+  const weightedFindings = findings.reduce((total, finding) => total + (finding.severity === 'error' ? 3 : finding.severity === 'warning' ? 2 : 1), 0)
+  const riskIndex = repositoryDocuments.length ? Math.min(100, Math.round((weightedFindings / repositoryDocuments.length) * 18)) : 0
+  const coverage = coveredTypes.size
+  const missingTypes = DOCUMENT_TYPES.filter((type) => !coveredTypes.has(type))
+  const nextAction = !repositoryDocuments.length
+    ? 'Run the first scan to generate a guidance fingerprint.'
+    : missingTypes.length
+      ? `Restore ${typeLabels[missingTypes[0]]} coverage to close the largest guidance gap.`
+      : riskIndex >= 45
+        ? 'Review high-signal findings before sharing this scan index.'
+        : 'Coverage is balanced; export this repository as a review baseline.'
+
+  return (
+    <section className="guidance-topology" aria-labelledby="guidance-topology-heading">
+      <div className="topology-intro">
+        <p className="eyebrow">Live intelligence layer</p>
+        <h2 id="guidance-topology-heading">Guidance topology</h2>
+        <p>Compare instruction coverage and finding pressure across the current in-memory repository index.</p>
+        <div className="topology-repository-tabs" role="list" aria-label="Compare repository guidance topology">
+          {repositories.map((item) => (
+            <button key={item.id} type="button" className={item.id === repository.id ? 'is-active' : ''} aria-pressed={item.id === repository.id} onClick={() => setActiveRepositoryId(item.id)}>
+              {repositoryLabel(item)}
+            </button>
+          ))}
+        </div>
+      </div>
+      <motion.div className="topology-score-card" layout aria-live="polite">
+        <div className="topology-orbit" style={{ '--coverage': `${coverage * 25}%` } as React.CSSProperties}>
+          <div><strong>{coverage}/4</strong><span>types covered</span></div>
+        </div>
+        <div className="topology-score-copy">
+          <span>Active fingerprint</span>
+          <h3>{repositoryLabel(repository)}</h3>
+          <p>{repositoryDocuments.length} documents · {findings.length} findings · risk index {riskIndex}</p>
+        </div>
+      </motion.div>
+      <div className="topology-coverage" aria-label={`${repositoryLabel(repository)} guidance coverage`}>
+        {DOCUMENT_TYPES.map((type, index) => {
+          const count = repositoryDocuments.filter((document) => document.type === type).length
+          return (
+            <motion.div key={type} className={count ? 'is-covered' : 'is-missing'} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}>
+              <span>{typeLabels[type]}</span>
+              <strong>{count ? `${count} indexed` : 'Coverage gap'}</strong>
+              <i style={{ width: `${Math.min(100, count * 50)}%` }} />
+            </motion.div>
+          )
+        })}
+      </div>
+      <div className="topology-recommendation"><span>Next best action</span><strong>{nextAction}</strong></div>
+    </section>
+  )
+}
+
 function Toolbar() {
   const setUi = useAppStore((state) => state.setUi)
   const selectedCount = useAppStore((state) => state.selectedRepositoryIds.length)
@@ -1083,6 +1219,8 @@ function Toolbar() {
   const redo = useAppStore((state) => state.redo)
   const canUndo = useAppStore((state) => state.undoStack.length > 0)
   const canRedo = useAppStore((state) => state.redoStack.length > 0)
+  const failureDemoRun = useAppStore((state) => state.scanRuns['repo-2'])
+  const failureDemoRunning = failureDemoRun?.status === 'running' || failureDemoRun?.status === 'paused'
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -1101,6 +1239,9 @@ function Toolbar() {
         <Button size="sm" renderIcon={Add} onClick={() => setUi('addOpen', true)}>Add repository</Button>
         <Button size="sm" kind="secondary" renderIcon={Play} disabled={!selectedCount} onClick={() => void scanSelected()}>
           Scan selected{selectedCount ? ` (${selectedCount})` : ''}
+        </Button>
+        <Button size="sm" kind="danger--tertiary" renderIcon={WarningFilled} disabled={failureDemoRunning} onClick={() => void startScan('repo-2', { simulateFailure: true })}>
+          Run failure demo
         </Button>
       </div>
       <div className="toolbar-secondary">
@@ -1132,15 +1273,27 @@ function AppContent() {
   const overlayOpen = ui.addOpen || ui.exportOpen || ui.importOpen || ui.paletteOpen
   const totalDocuments = repositories.reduce((total, repository) => total + (documents[repository.id]?.length || 0), 0)
   const totalFindings = repositories.reduce((total, repository) => total + (documents[repository.id] || []).reduce((sum, document) => sum + document.findings.length, 0), 0)
+  const scanRuns = useAppStore((state) => state.scanRuns)
+  const [density, setDensity] = useState<'comfortable' | 'compact'>('comfortable')
+  const [highContrast, setHighContrast] = useState(false)
+  const scanActivity = repositories.map((repository) => ({ repository, run: scanRuns[repository.id] }))
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell density-${density}${highContrast ? ' is-high-contrast' : ''}`}>
       <header className="app-header" aria-hidden={overlayOpen}>
         <div className="brand-lockup">
           <div className="brand-mark" aria-hidden="true"><Search size={20} /></div>
           <div><span>Prompt Engineering Platform</span><strong>RepoScan Studio</strong></div>
         </div>
-        <div className="session-indicator"><span className="status-dot" />In-memory session</div>
+        <div className="header-preferences" aria-label="Display preferences">
+          <Button size="sm" kind="ghost" aria-pressed={density === 'compact'} onClick={() => setDensity((value) => value === 'compact' ? 'comfortable' : 'compact')}>
+            {density === 'compact' ? 'Comfortable density' : 'Compact density'}
+          </Button>
+          <Button size="sm" kind="ghost" aria-pressed={highContrast} onClick={() => setHighContrast((value) => !value)}>
+            {highContrast ? 'Standard contrast' : 'High contrast'}
+          </Button>
+          <div className="session-indicator"><span className="status-dot" />In-memory session</div>
+        </div>
       </header>
       <main aria-hidden={overlayOpen}>
         <section className="hero">
@@ -1154,7 +1307,21 @@ function AppContent() {
             <div><strong>{totalDocuments}</strong><span>documents</span></div>
             <div><strong>{totalFindings}</strong><span>findings</span></div>
           </div>
+          <div className="workflow-constellation" aria-label="Live repository scan activity">
+            {scanActivity.map(({ repository, run }, index) => (
+              <motion.div
+                key={repository.id}
+                className={`constellation-node ${run?.status || 'idle'}`}
+                animate={run?.status === 'running' ? { scale: [1, 1.18, 1] } : { scale: 1 }}
+                transition={{ duration: 1.1, repeat: run?.status === 'running' ? Infinity : 0, delay: index * 0.08 }}
+                title={`${repositoryLabel(repository)}: ${run?.status || 'idle'}`}
+              >
+                <span />
+              </motion.div>
+            ))}
+          </div>
         </section>
+        <GuidanceTopology />
         <FirstScanCoachmark />
         <Toolbar />
         <div className="workspace-grid">

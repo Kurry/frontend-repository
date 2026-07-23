@@ -1,9 +1,10 @@
 import { h } from 'preact';
 import {
   currentOpening, selectedNodeId, userLine, practiceActive,
-  saveFormOpen, saveName, saveTags, saveNotes, saveError,
+  saveFormOpen, saveName, saveTags, saveNotes, saveError, savingInProgress,
   getNodeMoves, selectNode, addSavedLine, showToast, validateTagsNotes, TAG_SET
 } from '../store';
+import { Icon } from '../icons';
 
 function moveLabel(index, san) {
   const num = Math.floor(index / 2) + 1;
@@ -33,12 +34,16 @@ export function MoveTree() {
   const ul = userLine.value;
   const practicing = practiceActive.value;
   const playedCount = practicing ? getNodeMoves().length : 0;
+  const nameOk = saveName.value.trim().length >= 1 && saveName.value.trim().length <= 80;
+  const fieldError = validateTagsNotes(saveTags.value, saveNotes.value);
+  const canSubmit = nameOk && !fieldError && !savingInProgress.value;
 
   const openSaveForm = () => {
     saveName.value = `${opening.name} line`;
     saveTags.value = [];
     saveNotes.value = '';
     saveError.value = '';
+    savingInProgress.value = false;
     saveFormOpen.value = true;
   };
 
@@ -50,6 +55,7 @@ export function MoveTree() {
   };
 
   const submitSave = () => {
+    if (savingInProgress.value) return;
     const name = saveName.value.trim();
     if (!name) {
       saveError.value = 'Name is required — type a name for this line, then select Save';
@@ -67,6 +73,7 @@ export function MoveTree() {
         : 'Tags — select up to 8 tags from the allowed set, then select Save';
       return;
     }
+    savingInProgress.value = true;
     const path = getNodeMoves();
     const moves = path.length > 0 ? path : [...opening.moves];
     const nid = selectedNodeId.value;
@@ -78,20 +85,21 @@ export function MoveTree() {
     addSavedLine(name, opening.id, moves, snapshot, { tags: saveTags.value, notes });
     saveFormOpen.value = false;
     saveError.value = '';
+    savingInProgress.value = false;
     showToast('Line saved');
   };
 
   return (
-    <section class="card mb-4">
+    <section class="card mb-4" aria-labelledby="move-tree-heading">
       <div class="flex items-center justify-between gap-2 mb-3 flex-wrap">
-        <h3>Move tree</h3>
-        <button type="button" class="btn-primary" onClick={openSaveForm}>
-          Save this line
+        <h3 id="move-tree-heading">Move tree</h3>
+        <button type="button" id="coach-save" class="btn-primary" onClick={openSaveForm}>
+          <Icon name="save" size={16} /> Save this line
         </button>
       </div>
       {saveFormOpen.value && (
         <form
-          class="mb-3 p-3 rounded-[10px] bg-neutral-50 border border-neutral-400"
+          class="mb-3 p-3 rounded-[10px] bg-neutral-50 border border-neutral-400 save-form"
           onSubmit={e => { e.preventDefault(); submitSave(); }}
         >
           <label class="block text-sm font-medium mb-1" for="line-name">Line name</label>
@@ -105,6 +113,7 @@ export function MoveTree() {
             onKeyDown={e => { if (e.key === 'Escape') { e.stopPropagation(); saveFormOpen.value = false; } }}
             aria-describedby={saveError.value ? 'line-name-help line-name-error' : 'line-name-help'}
             aria-invalid={saveError.value ? 'true' : undefined}
+            autoFocus
           />
           <fieldset class="mt-2 border-0 p-0 m-0">
             <legend class="block text-sm font-medium mb-1">Tags (optional, up to 8)</legend>
@@ -131,13 +140,11 @@ export function MoveTree() {
             onInput={e => { saveNotes.value = e.target.value; if (saveError.value) saveError.value = ''; }}
             aria-describedby="line-notes-help"
           />
-          {saveError.value && (
-            <p id="line-name-error" class="mt-1 text-sm font-medium" style="color: var(--color-danger);">
-              {saveError.value}
-            </p>
-          )}
+          <p id="line-name-error" aria-live="polite" class="mt-1 text-sm font-medium field-error" style="min-height: 1.25rem; color: var(--color-danger);">
+            {saveError.value || (saveName.value.trim() === '' ? 'Line name field is required — type a name for this line, then choose Save' : !nameOk ? 'Name is required — type a name for this line, then choose Save' : fieldError || '')}
+          </p>
           <div class="flex gap-2 mt-2">
-            <button type="submit" class="btn-primary">Save</button>
+            <button type="submit" class="btn-primary" disabled={!canSubmit}>Save</button>
             <button type="button" class="btn-secondary" onClick={() => { saveFormOpen.value = false; }}>Cancel</button>
           </div>
         </form>
@@ -183,9 +190,10 @@ export function MoveTree() {
           </div>
         ))}
         {!practicing && ul && ul.moves.length > 0 && (
-          <div class="ml-4 mt-2">
+          <div class="ml-4 mt-2 your-line-branch">
             <div class="flex items-center gap-2 mb-1 flex-wrap">
-              <span class="your-line-label">Your Line</span>
+              <span class="your-line-label font-bold text-[var(--color-primary)]">Your Line</span>
+              <span class="new-line-badge bg-[var(--color-primary)] text-white text-xs px-2 py-0.5 rounded font-semibold">New Line</span>
               <span class="text-sm text-neutral-600">Session only — not part of the bundled tree</span>
             </div>
             <ul class="list-none m-0 p-0">

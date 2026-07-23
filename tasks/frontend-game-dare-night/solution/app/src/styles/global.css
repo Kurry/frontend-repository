@@ -197,6 +197,9 @@ div.bg-white.rounded-2xl {
 
 .dialog-panel {
   animation: dialogIn 0.22s ease-out;
+  max-height: calc(100dvh - 2.5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .dialog-backdrop {
@@ -219,4 +222,10 @@ div.bg-white.rounded-2xl {
   button:not(:disabled):active {
     transform: none;
   }
+}
+
+button[style*="background-color: var(--color-accent)"],
+button[style*="background-color: #1a202c"],
+button.bg-black {
+  box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.25);
 }

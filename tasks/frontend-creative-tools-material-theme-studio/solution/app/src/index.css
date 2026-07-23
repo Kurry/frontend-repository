@@ -1,5 +1,30 @@
 @import "tailwindcss";
 
+/* Studio chrome uses the bundled Roboto (Material typeface) — Tailwind's
+   `font-sans` utility resolves to this stack instead of the system-ui default. */
+@theme {
+  --font-sans: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+}
+
+@media (max-width: 720px) {
+  .studio-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .studio-header > div {
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+
+  .studio-nav {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}
+
 :root {
   color-scheme: dark;
 }
@@ -50,7 +75,7 @@ body {
 }
 
 @keyframes toast-in {
-  from { opacity: 0; transform: translate(-50%, 18px); }
+  from { opacity: 0; transform: translate(-50%, 100%); }
   to   { opacity: 1; transform: translate(-50%, 0); }
 }
 
@@ -61,10 +86,15 @@ body {
 
 /* ---------- animation utilities ---------- */
 
-.animate-card-in { animation: card-in 0.3s ease both; }
-.card-exiting { animation: card-out 0.26s ease both; pointer-events: none; }
+.animate-card-in { animation: card-in 0.3s ease both; transition: opacity 250ms ease-in, transform 250ms ease-in; }
+.animate-card-out { animation: card-out 0.26s ease both; pointer-events: none; transition: opacity 250ms ease-in, transform 250ms ease-in; }
 .animate-fade-in { animation: fade-in 0.3s ease both; }
 .animate-swatch-pulse { animation: swatch-pulse 0.6s ease-out; }
+/* Brief Harmonics highlight ring held on the target swatch while it pulses. */
+.swatch-highlight {
+  outline: 3px solid rgba(147, 197, 253, 0.95);
+  outline-offset: 2px;
+}
 .animate-preview-flash { animation: preview-flash 0.85s ease-out both; }
 .animate-wcag-settle { animation: wcag-settle 0.3s ease both; }
 
@@ -109,6 +139,13 @@ body {
   opacity: 0.45;
 }
 
+/* Visible keyboard focus indicator for every MUI ButtonBase control
+   (Load / Rename / Delete / Save version / Restore / accordion summaries…). */
+.MuiButtonBase-root:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
+
 /* Inert link-like controls underline on hover */
 .link-inert {
   transition: color 0.18s ease;
@@ -126,5 +163,22 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  /* The MUI microinteraction rules above use !important with higher
+     specificity than the `*` reset, so they must be zeroed explicitly —
+     otherwise accordion collapse / button transitions keep their 0.18–0.28s
+     durations under prefers-reduced-motion. */
+  .MuiAccordionSummary-root,
+  .MuiAccordion-root .MuiCollapse-root,
+  .MuiAccordionSummary-root .MuiAccordionSummary-expandIconWrapper,
+  .MuiButton-root,
+  .animate-card-in,
+  .animate-card-out,
+  .sample-swap,
+  .sample-swap > *,
+  .sample-swap > * > * {
+    transition: none !important;
+    animation: none !important;
   }
 }

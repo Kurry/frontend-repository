@@ -90,6 +90,9 @@ export function Timeline() {
 
   const onKeyDown = (e) => {
     if (width <= 0 || span <= 0) return;
+    // With a detail panel open, App owns horizontal arrows so they step the
+    // filtered event selection instead of panning the stage underneath it.
+    if (selectedId && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) return;
     if (e.key === 'ArrowLeft') { e.preventDefault(); panBy(-span * 0.05); }
     else if (e.key === 'ArrowRight') { e.preventDefault(); panBy(span * 0.05); }
     else if (e.key === 'ArrowUp' || e.key === '+' || e.key === '=') { e.preventDefault(); zoomAboutMidpoint(0.85); }
@@ -215,7 +218,7 @@ export function Timeline() {
               ></div>
               <button
                 type="button"
-                className={`w-6 h-6 rounded-full border-2 bg-white flex items-center justify-center -translate-x-1/2 -translate-y-1/2 transition-all duration-150 ${isActive
+                className={`timeline-pin w-6 h-6 rounded-full border-2 bg-white flex items-center justify-center -translate-x-1/2 -translate-y-1/2 transition-all duration-150 ${isActive
                   ? 'scale-125 shadow-lg border-[var(--c-brand)]'
                   : 'border-gray-300 shadow-sm hover:scale-125 hover:border-[var(--c-brand)] hover:shadow-lg hover:ring-4 hover:ring-cyan-600/20 active:scale-95'}`}
                 onClick={(e) => { e.stopPropagation(); setSelectedId(ev.id); }}
@@ -243,7 +246,7 @@ export function Timeline() {
       {events.length === 0 && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none" aria-live="polite">
           <div className="bg-white/80 px-4 py-3 rounded shadow-sm flex flex-col items-center gap-2">
-            <p className="text-gray-600 font-medium">No events match this range and filters.</p>
+            <p className="text-gray-600 font-medium">No events match this range and filters. Try resetting filters or create a new event.</p>
             <button
               type="button"
               className="text-sm text-cyan-600 font-semibold pointer-events-auto hover:underline"

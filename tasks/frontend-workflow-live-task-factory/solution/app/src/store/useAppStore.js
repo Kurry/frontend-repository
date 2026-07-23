@@ -13,7 +13,14 @@ import {
   sourceCount,
   sourceFiles,
 } from '../lib/fixtures'
-import { addRepositorySchema, batchReportSchema, chatCompletionsRequestSchema, taskPackageSchema } from '../lib/schemas'
+import {
+  addRepositorySchema,
+  aiConnectionSchema,
+  batchReportSchema,
+  chatCompletionsRequestSchema,
+  githubConnectionSchema,
+  taskPackageSchema,
+} from '../lib/schemas'
 
 export const cardId = (repo, prNumber) => `${repo}#${prNumber}`
 const initialPlacements = Object.fromEntries(allFixturePrs.map(({ repo, pr }) => [cardId(repo, pr.number), { column: 'inbox', reason: null }]))
@@ -30,8 +37,8 @@ const deterministicCreatedAt = (repo, prNumber) => `2026-06-${String((prNumber %
 function stripCredentialMaterial(value) {
   if (typeof value !== 'string') return value
   return value
-    .replace(/ghp_[A-Za-z0-9_]+/g, '[redacted-github-token]')
-    .replace(/sk-[A-Za-z0-9_]+/g, '[redacted-ai-key]')
+    .replace(/\bghp_[A-Za-z0-9]{20,}\b/g, '[redacted-github-token]')
+    .replace(/\bsk-[A-Za-z0-9_-]{20,}\b/g, '[redacted-ai-key]')
 }
 
 const stageTemplate = () => [
@@ -260,7 +267,7 @@ export const useAppStore = create(persist((set, get) => ({
   batch: null,
   batchReport: null,
   coachmarks: { connections: false, triage: false, pipeline: false },
-  aiBaseUrl: 'https://api.openai.com',
+  aiBaseUrl: 'https://api.nimbus-ai.com',
   ...initialConnections,
   connectionsOpen: false,
   commandOpen: false,
@@ -271,7 +278,11 @@ export const useAppStore = create(persist((set, get) => ({
   announcement: '',
   focusReturnEl: null,
 
-  setView: (activeView) => set({ activeView, mobileNavOpen: false }),
+  setView: (activeView) => set({
+    activeView,
+    mobileNavOpen: false,
+    ...(activeView === 'library' ? { selectedPackage: null } : {}),
+  }),
   selectRepo: (selectedRepo) => set({ selectedRepo, selectedPr: null, activeView: 'candidates' }),
   selectPr: (repo, prNumber) => set({ selectedRepo: repo, selectedPr: Number(prNumber), activeView: 'candidates' }),
   selectPackage: (bundle) => set({ selectedPackage: bundle, activeView: 'library' }),

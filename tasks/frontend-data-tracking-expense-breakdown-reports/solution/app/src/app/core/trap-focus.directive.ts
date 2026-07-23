@@ -39,14 +39,54 @@ export class TrapFocusDirective implements AfterViewInit, OnDestroy {
     setTimeout(() => (target ?? root).focus(), 0);
   }
 
+  // Escape is bound at the document level (capture phase) rather than relying
+  // on bubbling from the host, because focus is moved into the overlay
+  // asynchronously (setTimeout below, to let *ngIf-rendered content settle
+  // first). If Escape is pressed in that window — before focus has actually
+  // landed inside the overlay — a host-scoped listener never sees the event:
+  // it bubbles from whatever was focused *before* the overlay opened, which
+  // lives outside the overlay's DOM subtree. A document-level listener closes
+  // the overlay correctly regardless of exactly where focus currently sits.
+  @HostListener('document:keydown', ['$event'])
+  onDocumentKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'Escape' || !this.isTopmostTrap()) return;
+    event.stopPropagation();
+    event.preventDefault();
+    this.escapePressed.emit();
+  }
+
+  /**
+   * A document-level Escape listener is shared by every mounted overlay.
+   * Only the visually foremost trap may consume it; otherwise an open
+   * confirmation dialog would also dismiss the drawer or palette behind it.
+   */
+  private isTopmostTrap(): boolean {
+    const current = this.host.nativeElement;
+    const traps = Array.from(document.querySelectorAll<HTMLElement>('[appTrapFocus]')).filter(
+      (element) => element.offsetParent !== null,
+    );
+    const topmost = traps.reduce<HTMLElement | null>((winner, candidate) => {
+      if (winner === null) return candidate;
+      const zIndex = this.overlayZIndex(candidate);
+      const winnerZIndex = this.overlayZIndex(winner);
+      if (zIndex !== winnerZIndex) return zIndex > winnerZIndex ? candidate : winner;
+      return winner.compareDocumentPosition(candidate) & Node.DOCUMENT_POSITION_FOLLOWING
+        ? candidate
+        : winner;
+    }, null);
+    return topmost === current;
+  }
+
+  private overlayZIndex(element: HTMLElement): number {
+    for (let node: HTMLElement | null = element; node; node = node.parentElement) {
+      const zIndex = Number.parseInt(getComputedStyle(node).zIndex, 10);
+      if (Number.isFinite(zIndex)) return zIndex;
+    }
+    return 0;
+  }
+
   @HostListener('keydown', ['$event'])
   onKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Escape') {
-      event.stopPropagation();
-      event.preventDefault();
-      this.escapePressed.emit();
-      return;
-    }
     if (event.key !== 'Tab') return;
     const root = this.host.nativeElement;
     const focusables = Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(

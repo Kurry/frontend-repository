@@ -1,10 +1,17 @@
-# Story Docs — 1. Getting Started (oracle)
+# Story Docs — Oracle
 
-Reference oracle for the `frontend-creative-tools-story-docs` eval task: a storyboard
-getting-started tutorial built with Astro + React islands, Nanostores, Tailwind, and
-DaisyUI. All state is in-memory (no browser storage); the portable end state is the
-StoryboardPackage JSON produced by the Export drawer and consumed by Import.
+Reference solution (oracle) for the `frontend-creative-tools-story-docs` task. Serves the app
+described in `../../instruction.md`; used by `solve.sh`, the reference
+screenshot capture harness, and oracle validation runs. Must serve with
+zero console/page errors.
 
-- `npm run build` — static build into `dist/` (committed alongside source)
-- `npm run verify:build` — build + assert the dist entry exists
-- `npm start` — serve the built app on port 3000
+## Run
+
+    npm install
+    npm run verify:build
+    npm start          # serves on port 3000
+
+## WebMCP
+
+Registers the task's contract modules: browse-query-v1, form-workflow-v1, entity-collection-v1, artifact-transfer-v1. Tools are exposed via
+window.webmcp_session_info / webmcp_list_tools / webmcp_invoke_tool.

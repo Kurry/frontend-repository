@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Container entrypoint (baked by environment/Dockerfile as /opt/verifier/entrypoint.sh).
 # Starts the shared headless CDP Chrome that the judge's MCP servers (contract in
-# scripts/canonical/mcp/reward_mcp_servers.toml) and builder self-tests attach to,
+# corpuscheck canonical/mcp/reward_mcp_servers.toml) and builder self-tests attach to,
 # then execs the container command. Paired with the Dockerfile HEALTHCHECK so
 # `harbor run --install-only` exposes a broken judge env before any agent trial.
 set -u

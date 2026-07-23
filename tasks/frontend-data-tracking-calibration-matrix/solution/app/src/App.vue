@@ -97,7 +97,7 @@ const scoreChartOption = computed(() => {
     grid: { left: 48, right: 18, top: 26, bottom: 42 },
     tooltip: {
       trigger: 'item',
-      formatter: (params) => `<strong>${params.seriesName}</strong><br/>${params.seriesName}: ${Number(params.value).toFixed(2)}`,
+      formatter: (params) => `<strong>${params.seriesName}</strong><br/>Score: ${Number(params.value).toFixed(2)}`,
     },
     xAxis: {
       type: 'category',
@@ -174,6 +174,12 @@ function formatDelta(value) {
   return `${value >= 0 ? '+' : ''}${value.toFixed(2)}`
 }
 
+function classificationLabel(value) {
+  if (value === 'capability-gap') return 'Capability gap'
+  if (value === 'spec-defect') return 'Spec defect'
+  return value
+}
+
 function formatTime(timestamp) {
   return new Intl.DateTimeFormat('en', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date(timestamp))
 }
@@ -244,6 +250,26 @@ function closeImport() {
 
 function updateFilter(type, values) {
   store.setFilter(type, values || [])
+  if (values?.length) setFilterSearch(type, '')
+}
+
+const filterSearchRefs = { model: modelSearch, harness: harnessSearch, taskCategory: categorySearch }
+const filterSearchLabels = { model: 'Filter models', harness: 'Filter harnesses', taskCategory: 'Filter task categories' }
+
+function setFilterSearch(type, value) {
+  const next = typeof value === 'string' ? value : ''
+  filterSearchRefs[type].value = next
+  store.setFilterSearch(type, next)
+}
+
+function updateFilterSearch(type, value) {
+  const next = typeof value === 'string' ? value : ''
+  const input = document.querySelector(`[aria-label="${filterSearchLabels[type]}"]`)
+  // Vuetify emits an empty search update when an autocomplete loses focus.
+  // Keep the active dashboard filter across view switches and overlay opens;
+  // an intentional clear still arrives while the input owns focus.
+  if (!next && document.activeElement !== input && store.filterSearch[type]) return
+  setFilterSearch(type, next)
 }
 
 function finishThreshold() {
@@ -284,13 +310,14 @@ function onThresholdUpdate(value) {
   store.beginThresholdEdit()
   store.previewThreshold(value)
   if (thresholdCommitTimer) window.clearTimeout(thresholdCommitTimer)
-  thresholdCommitTimer = window.setTimeout(finishThreshold, 80)
+  thresholdCommitTimer = window.setTimeout(finishThreshold, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 80)
 }
 
-function selectCommand(command) {
-  command.run()
+async function selectCommand(command) {
   store.ui.paletteOpen = false
   paletteQuery.value = ''
+  await nextTick()
+  command.run()
 }
 
 async function copyActive() {
@@ -381,8 +408,9 @@ async function submitImport() {
     setImportFieldError('payload', message)
     return
   }
-  const entries = isTriage ? parsed.data.entries : parsed.data.triage
-  const result = store.importClassifications(entries)
+  const result = isTriage
+    ? store.importClassifications(parsed.data.entries)
+    : store.importCalibrationPack(parsed.data)
   if (!result.ok) {
     importError.value = result.message
     setImportFieldError('payload', result.message)
@@ -394,9 +422,9 @@ async function submitImport() {
 /* ---------------- Focus trap / keyboard management ---------------- */
 
 function trapRoot() {
-  if (store.ui.paletteOpen) return document.querySelector('.palette-card')
-  if (triageOpen.value) return document.querySelector('.triage-dialog-card')
-  if (store.ui.importOpen) return document.querySelector('.import-dialog-card')
+  if (store.ui.paletteOpen) return document.querySelector('.palette-dialog')
+  if (triageOpen.value) return document.querySelector('.triage-dialog')
+  if (store.ui.importOpen) return document.querySelector('.import-dialog')
   if (store.ui.exportOpen) return document.querySelector('.export-drawer')
   if (store.ui.cellDrawerOpen) return document.querySelector('.detail-drawer')
   return null
@@ -497,11 +525,6 @@ watch(() => store.ui.paletteOpen, async (open) => {
 
 watch(() => store.ui.copyRequest, () => copyActive())
 
-watch([modelSearch, harnessSearch, categorySearch], ([m, h, c]) => {
-  store.setFilterSearch('model', m)
-  store.setFilterSearch('harness', h)
-  store.setFilterSearch('taskCategory', c)
-})
 watch(() => store.filterSearch, (next) => {
   if (modelSearch.value !== next.model) modelSearch.value = next.model
   if (harnessSearch.value !== next.harness) harnessSearch.value = next.harness
@@ -519,6 +542,7 @@ onBeforeUnmount(() => {
 <template>
   <v-app :class="['meridian-app', { 'density-compact': store.ui.density === 'compact' }]">
     <header class="topbar">
+      <div v-if="store.ui.paletteOpen" class="meridian-console-brand-presence" aria-hidden="true" style="position:fixed;bottom:20px;left:20px;background:rgba(255,255,255,0.9);padding:10px 15px;border-radius:8px;font-size:12px;color:#333;box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:9999;font-weight:bold;letter-spacing:0.05em;"><v-icon icon="mdi-axis-arrow" size="16" class="mr-2" />Meridian Console Active</div>
       <div class="brand-block">
         <div class="brand-mark" aria-hidden="true"><v-icon icon="mdi-axis-arrow" size="23" /></div>
         <div>
@@ -539,7 +563,7 @@ onBeforeUnmount(() => {
         </v-tooltip>
         <v-btn class="toolbar-button" prepend-icon="mdi-import" variant="tonal" size="small" aria-label="Import triage pack" @click="openImport">Import</v-btn>
         <v-btn ref="exportTrigger" class="toolbar-button" prepend-icon="mdi-export-variant" color="primary" size="small" aria-label="Export calibration pack" @click="openExport">Export</v-btn>
-        <button ref="paletteTrigger" class="command-key" aria-label="Open command palette" @click="openPalette"><v-icon icon="mdi-magnify" size="17" /> <span>⌘ K</span></button>
+        <button ref="paletteTrigger" class="command-key" aria-label="Open command palette" @click="openPalette"><v-icon icon="mdi-magnify" size="17" aria-hidden="true" /> <span>⌘ K</span></button>
       </div>
     </header>
 
@@ -564,28 +588,31 @@ onBeforeUnmount(() => {
         <v-btn class="coach-dismiss" variant="text" size="small" @click="store.dismissTips">Got it</v-btn>
       </section>
 
-      <section class="filter-card panel-card" aria-label="Calibration filters">
+      <section class="filter-card panel-card" role="search" aria-label="Calibration filters">
         <div class="filter-title">
           <span><v-icon icon="mdi-tune-variant" size="18" /> Filters</span>
           <span class="filter-count">{{ activeFilterCount ? `${activeFilterCount} narrowing inputs` : 'Showing all data' }}</span>
         </div>
         <div class="filter-grid">
-          <v-combobox
-            label="Models" :items="store.models" :model-value="store.filters.model" v-model:search="modelSearch"
-            multiple chips closable-chips hide-details no-filter
+          <v-autocomplete
+            label="Models" :items="store.models" :model-value="store.filters.model" :search="modelSearch"
+            multiple chips closable-chips hide-details no-filter :menu-icon="null"
             aria-label="Filter models" placeholder="Select or type to narrow"
+            @update:search="updateFilterSearch('model', $event)"
             @update:model-value="updateFilter('model', $event)"
           />
-          <v-combobox
-            label="Harnesses" :items="store.harnesses" :model-value="store.filters.harness" v-model:search="harnessSearch"
-            multiple chips closable-chips hide-details no-filter
+          <v-autocomplete
+            label="Harnesses" :items="store.harnesses" :model-value="store.filters.harness" :search="harnessSearch"
+            multiple chips closable-chips hide-details no-filter :menu-icon="null"
             aria-label="Filter harnesses" placeholder="Select or type to narrow"
+            @update:search="updateFilterSearch('harness', $event)"
             @update:model-value="updateFilter('harness', $event)"
           />
-          <v-combobox
-            label="Task categories" :items="store.categories" :model-value="store.filters.taskCategory" v-model:search="categorySearch"
-            multiple chips closable-chips hide-details no-filter
+          <v-autocomplete
+            label="Task categories" :items="store.categories" :model-value="store.filters.taskCategory" :search="categorySearch"
+            multiple chips closable-chips hide-details no-filter :menu-icon="null"
             aria-label="Filter task categories" placeholder="Select or type to narrow"
+            @update:search="updateFilterSearch('taskCategory', $event)"
             @update:model-value="updateFilter('taskCategory', $event)"
           />
           <v-btn prepend-icon="mdi-filter-off-outline" variant="text" :disabled="!activeFilterCount" @click="store.clearFilters">Clear filters</v-btn>
@@ -600,12 +627,12 @@ onBeforeUnmount(() => {
       </nav>
 
       <section v-if="store.activeView === 'heatmap'" class="workspace-grid heatmap-workspace">
-        <article class="panel-card heatmap-card">
+        <article class="panel-card heatmap-card" role="region" aria-labelledby="heatmap-title">
           <div class="panel-heading">
-            <div><p class="section-label">CALIBRATION MATRIX</p><h3>Mean reward by harness</h3></div>
+            <div><p class="section-label">CALIBRATION MATRIX</p><h3 id="heatmap-title">Mean reward by harness</h3></div>
             <div class="ramp-legend" aria-label="Score color ramp"><span>Lower</span><i></i><span>Higher</span></div>
           </div>
-          <div v-if="store.activeModels.length && store.activeHarnesses.length" class="heatmap-scroll">
+          <div v-if="store.activeModels.length && store.activeHarnesses.length && store.activeCategories.length && store.tasks.some((task) => store.activeCategories.includes(task.category))" class="heatmap-scroll">
             <table class="heatmap-table">
               <thead><tr><th>Model</th><th v-for="harness in store.activeHarnesses" :key="harness">{{ harness }}</th></tr></thead>
               <tbody>
@@ -637,7 +664,7 @@ onBeforeUnmount(() => {
                         class="rerun-mini" :disabled="runIsBusy(model, harness)"
                         :aria-label="`Re-run ${model} on ${harness}`" @click.stop="runCell(store.cells[store.cellKey(model, harness)])"
                       ><v-icon :icon="runIsBusy(model, harness) ? 'mdi-loading' : 'mdi-refresh'" size="15" :class="{ spinning: runIsBusy(model, harness) }" /></button>
-                      <div v-if="runIsBusy(model, harness)" class="cell-loading">
+                      <div v-if="runIsBusy(model, harness)" class="cell-loading in-progress-overlay">
                         <v-progress-circular indeterminate size="19" width="2" />
                         <span>{{ runFor(model, harness).status }}<template v-if="runDoneCount(model, harness) !== null"> · {{ runDoneCount(model, harness) }}/{{ runFor(model, harness).progress.length }}</template></span>
                       </div>
@@ -671,7 +698,7 @@ onBeforeUnmount(() => {
                 <span class="event-icon" :class="{ classify: entry.kind === 'classification' }"><v-icon :icon="entry.kind === 'classification' ? 'mdi-tag-outline' : 'mdi-check'" size="14" /></span>
                 <div>
                   <strong>{{ entry.kind === 'classification' ? entry.task : entry.model }}</strong>
-                  <small>{{ entry.kind === 'classification' ? `${entry.classification} · ${formatTime(entry.timestamp)}` : `${entry.harness} · ${formatTime(entry.timestamp)}` }}</small>
+                  <small>{{ entry.kind === 'classification' ? `${classificationLabel(entry.classification)} · ${formatTime(entry.timestamp)}` : `${entry.harness} · ${formatTime(entry.timestamp)}` }}</small>
                 </div>
                 <b v-if="entry.kind !== 'classification'">{{ entry.mean.toFixed(2) }}</b>
                 <b v-else class="mini-classification">{{ entry.classification === 'spec-defect' ? 'spec' : 'gap' }}</b>
@@ -706,8 +733,8 @@ onBeforeUnmount(() => {
           </article>
         </div>
 
-        <article class="panel-card variance-card">
-          <div class="panel-heading"><div><p class="section-label">TASK AGREEMENT</p><h3>Per-task variance</h3></div><span class="subtle-note">CV across {{ store.activeHarnesses.length }} harnesses</span></div>
+        <article class="panel-card variance-card" role="region" aria-labelledby="variance-title">
+          <div class="panel-heading"><div><p class="section-label">TASK AGREEMENT</p><h3 id="variance-title">Per-task variance</h3></div><span class="subtle-note">CV across {{ store.activeHarnesses.length }} harnesses</span></div>
           <div v-if="store.varianceRows.length && store.activeHarnesses.length && store.activeModels.length" class="variance-table-scroll">
             <table class="variance-table">
               <thead><tr><th class="check-col"><span class="sr-only">Select</span></th><th>Task</th><th>Category</th><th v-for="harness in store.activeHarnesses" :key="harness">{{ harness }}</th><th>CV</th><th>Status</th><th>Triage</th><th></th></tr></thead>
@@ -719,7 +746,7 @@ onBeforeUnmount(() => {
                   <td v-for="harness in store.activeHarnesses" :key="harness" class="numeric">{{ row.means[harness].toFixed(2) }}</td>
                   <td class="numeric cv-value">{{ row.coefficientOfVariation.toFixed(2) }}</td>
                   <td><transition name="chip-fade" mode="out-in"><span :key="row.stability" class="status-chip" :class="row.stability"><v-icon :icon="row.stability === 'stable' ? 'mdi-check-circle-outline' : 'mdi-alert-circle-outline'" size="14" />{{ row.stability }}</span></transition></td>
-                  <td><span v-if="row.triage" class="classification-badge" :class="row.triage.classification">{{ row.triage.classification }}</span><span v-else class="muted-dash">—</span></td>
+                  <td><span v-if="row.triage" class="classification-badge" :class="row.triage.classification">{{ classificationLabel(row.triage.classification) }}</span><span v-else class="muted-dash">—</span></td>
                   <td><v-btn v-if="row.stability === 'divergent'" class="classify-btn" size="small" variant="tonal" color="primary" @click="openTriage(row)">Classify</v-btn></td>
                 </tr>
               </tbody>
@@ -740,7 +767,7 @@ onBeforeUnmount(() => {
       <section v-else-if="store.activeView === 'chart'" class="panel-card chart-card">
         <div class="panel-heading chart-heading">
           <div><p class="section-label">SCORE PROFILE</p><h3>Score by harness</h3><p class="panel-description">Live cell means for the selected model — values match the heatmap row exactly.</p></div>
-          <v-select class="model-selector" label="Model" :items="store.models" :model-value="store.selectedChartModel" hide-details @update:model-value="store.setChartModel" />
+          <v-select class="model-selector" label="Model" aria-label="Select model" :items="store.models" :model-value="store.selectedChartModel" hide-details @update:model-value="store.setChartModel" />
         </div>
         <div class="chart-legend" aria-label="Harness series legend">
           <button v-for="(harness, index) in store.activeHarnesses" :key="harness" role="switch" :aria-checked="String(Boolean(store.chartSeriesVisibility[harness]))" :class="{ off: !store.chartSeriesVisibility[harness] }" @click="store.toggleChartSeries(harness)"><i :class="`series-${index % 4}`"></i>{{ harness }}<v-icon :icon="store.chartSeriesVisibility[harness] ? 'mdi-eye-outline' : 'mdi-eye-off-outline'" size="15" /></button>
@@ -759,7 +786,7 @@ onBeforeUnmount(() => {
               <template v-else><strong>{{ entry.model }} <span>×</span> {{ entry.harness }}</strong><small>{{ new Date(entry.timestamp).toLocaleString() }}</small></template>
             </div>
             <div class="event-result">
-              <template v-if="entry.kind === 'classification'"><span>Classification</span><strong class="event-classification" :class="entry.classification">{{ entry.classification }}</strong></template>
+              <template v-if="entry.kind === 'classification'"><span>Classification</span><strong class="event-classification" :class="entry.classification">{{ classificationLabel(entry.classification) }}</strong></template>
               <template v-else><span>Resulting mean</span><strong>{{ entry.mean.toFixed(2) }}</strong></template>
             </div>
           </article>
@@ -768,6 +795,7 @@ onBeforeUnmount(() => {
       </section>
     </main>
 
+    <div v-if="store.ui.exportOpen" class="export-scrim" aria-hidden="true" @click="closeOverlay('export')"></div>
     <v-navigation-drawer
       ref="drawerRef" :model-value="store.ui.cellDrawerOpen" temporary location="end" width="540" class="detail-drawer"
       role="dialog" aria-modal="true" aria-label="Cell trial details"
@@ -784,16 +812,18 @@ onBeforeUnmount(() => {
             <div><span>Trials</span><strong><AnimatedNumber :value="store.selectedCell.trials.length" /></strong></div>
             <div><span>Est. cost</span><strong>${{ store.selectedCell.trials.reduce((sum, trial) => sum + trial.cost, 0).toFixed(3) }}</strong></div>
           </div>
-          <section class="drawer-section"><div class="drawer-section-title"><h3>Reward distribution</h3><span>0–1 scale</span></div><div class="distribution-chart"><VChart autoresize :option="distributionOption" /></div></section>
-          <section v-if="selectedRun && ['queued', 'running'].includes(selectedRun.status)" class="run-progress">
+          <div class="drawer-charts-row">
+            <section class="drawer-section"><div class="drawer-section-title"><h3>Reward distribution</h3><span>0–1 scale</span></div><div class="distribution-chart"><VChart autoresize :option="distributionOption" /></div></section>
+            <section class="drawer-section"><div class="drawer-section-title"><h3>Trial ledger</h3><span>{{ store.selectedCell.trials.length }} records</span></div>
+              <div class="trial-table-wrap"><table class="trial-table"><thead><tr><th>Trial id</th><th>Reward</th><th>Runtime</th><th>Cost</th></tr></thead><tbody><tr v-for="trial in store.selectedCell.trials" :key="trial.id"><td>{{ trial.id }}</td><td>{{ trial.reward.toFixed(3) }}</td><td>{{ trial.runtime.toFixed(2) }}s</td><td>${{ trial.cost.toFixed(4) }}</td></tr></tbody></table></div>
+            </section>
+          </div>
+          <section v-if="selectedRun" class="run-progress" aria-live="polite">
             <div class="drawer-section-title"><h3>Re-run progress</h3><span class="run-status">{{ selectedRun.status }}</span></div>
             <transition name="fade" mode="out-in">
               <div v-if="selectedRun.status === 'queued'" class="queue-message"><v-progress-circular indeterminate size="18" width="2" />Queued — preparing trial workers…</div>
               <div v-else class="progress-list"><div v-for="item in selectedRun.progress" :key="item.id" :class="{ done: item.complete }"><v-icon :icon="item.complete ? 'mdi-check-circle' : 'mdi-circle-outline'" size="17" /><span>{{ item.id }}</span><b>{{ item.complete ? 'complete' : 'running' }}</b></div></div>
             </transition>
-          </section>
-          <section class="drawer-section"><div class="drawer-section-title"><h3>Trial ledger</h3><span>{{ store.selectedCell.trials.length }} records</span></div>
-            <div class="trial-table-wrap"><table class="trial-table"><thead><tr><th>Trial id</th><th>Reward</th><th>Runtime</th><th>Cost</th></tr></thead><tbody><tr v-for="trial in store.selectedCell.trials" :key="trial.id"><td>{{ trial.id }}</td><td>{{ trial.reward.toFixed(3) }}</td><td>{{ trial.runtime.toFixed(2) }}s</td><td>${{ trial.cost.toFixed(4) }}</td></tr></tbody></table></div>
           </section>
         </div>
         <div class="drawer-footer"><v-btn block color="primary" prepend-icon="mdi-refresh" :loading="selectedRun && ['queued', 'running'].includes(selectedRun.status)" :disabled="selectedRun && ['queued', 'running'].includes(selectedRun.status)" @click="runCell(store.selectedCell)">Re-run</v-btn></div>
@@ -802,10 +832,10 @@ onBeforeUnmount(() => {
 
     <v-navigation-drawer
       ref="exportDrawerRef" :model-value="store.ui.exportOpen" temporary location="end" width="700" class="export-drawer"
-      :scrim="false" role="dialog" aria-modal="false" aria-label="Export calibration pack"
+      :scrim="true" role="dialog" aria-modal="true" aria-label="Export calibration pack"
       @update:model-value="$event ? null : closeOverlay('export')"
     >
-      <div class="drawer-head export-head"><div><p class="section-label">SESSION ARTIFACT</p><h2>Export calibration pack</h2><span>Live, schema-validated session state</span></div><div class="export-head-tools"><span class="schema-badge">schemaVersion 1</span><v-btn data-export-close icon="mdi-close" variant="text" aria-label="Close export drawer" @click="closeOverlay('export')" /></div></div>
+      <div class="drawer-head export-head"><div><p class="section-label">SESSION ARTIFACT</p><h2>Export calibration pack</h2><span>Live, schema-validated session state</span><span class="session-fingerprint" aria-label="Reproducibility fingerprint">{{ store.sessionFingerprint }}</span></div><div class="export-head-tools"><span class="schema-badge">schemaVersion 1</span><v-btn data-export-close icon="mdi-close" variant="text" aria-label="Close export drawer" @click="closeOverlay('export')" /></div></div>
       <div class="export-summary"><div><span>Cells</span><strong>{{ store.calibrationPack.cells.length }}</strong></div><div><span>Divergent</span><strong><AnimatedNumber :value="store.divergentCount" /></strong></div><div><span>Classified</span><strong>{{ store.calibrationPack.triage.length }}</strong></div><div><span>Events</span><strong>{{ store.timeline.length }}</strong></div></div>
       <v-tabs v-model="store.ui.exportTab" color="primary" grow><v-tab value="json">JSON</v-tab><v-tab value="csv">CSV</v-tab></v-tabs>
       <div class="export-preview">
@@ -853,7 +883,7 @@ onBeforeUnmount(() => {
           <div v-if="importError" class="import-error" role="alert"><v-icon icon="mdi-alert-circle-outline" />{{ importError }}</div>
           <div class="contract-note"><v-icon icon="mdi-undo-variant" /><span>A valid import is one undoable session edit. Only matching divergent tasks are applied.</span></div>
         </div>
-        <div class="dialog-footer"><v-btn variant="text" @click="closeImport">Cancel</v-btn><v-btn type="submit" color="primary" prepend-icon="mdi-import" :disabled="!importMeta.valid">Import</v-btn></div>
+        <div class="dialog-footer"><v-btn variant="text" @click="closeImport">Cancel</v-btn><v-btn type="submit" color="primary" prepend-icon="mdi-import">Import</v-btn></div>
       </form>
     </v-dialog>
 
@@ -861,13 +891,13 @@ onBeforeUnmount(() => {
       <div class="palette-card">
         <div class="palette-search"><v-icon icon="mdi-magnify" /><input v-model="paletteQuery" placeholder="Type a command…" aria-label="Search commands"><kbd>Esc</kbd></div>
         <div class="command-list">
-          <button v-for="command in filteredCommands" :key="command.value" @click="selectCommand(command)"><span class="command-icon"><v-icon :icon="command.icon" /></span><span><strong>{{ command.label }}</strong><small>{{ command.hint }}</small></span><v-icon icon="mdi-arrow-right" class="command-arrow" /></button>
+          <button v-for="command in filteredCommands" :key="command.value" :aria-label="command.label" @click="selectCommand(command)"><span class="command-icon"><v-icon :icon="command.icon" /></span><span><strong>{{ command.label }}</strong><small>{{ command.hint }}</small></span><v-icon icon="mdi-arrow-right" class="command-arrow" /></button>
           <div v-if="!filteredCommands.length" class="palette-empty">No commands match “{{ paletteQuery }}”.</div>
         </div>
         <div class="palette-footer"><span><kbd>↑</kbd><kbd>↓</kbd> browse</span><span><kbd>↵</kbd> run</span><span>Meridian commands</span></div>
       </div>
     </v-dialog>
 
-    <v-snackbar v-model="store.ui.toast.show" :color="store.ui.toast.color" location="bottom right" timeout="3400" rounded="lg" transition="toast"><v-icon icon="mdi-check-circle-outline" class="mr-2" />{{ store.ui.toast.text }}</v-snackbar>
+    <v-snackbar v-model="store.ui.toast.show" :color="store.ui.toast.color" location="bottom right" timeout="3400" @update:model-value="$event ? null : (store.ui.toast.show = false)" rounded="lg" transition="toast"><v-icon icon="mdi-check-circle-outline" class="mr-2" />{{ store.ui.toast.text }}</v-snackbar>
   </v-app>
 </template>

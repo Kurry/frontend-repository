@@ -34,6 +34,7 @@
       <nav id="day-nav" aria-label="Itinerary days"></nav>
       <button class="nav-item" data-toast="Budget summary is coming soon"><span>◫</span> Budget</button>
       <div class="sidebar-spacer"></div>
+      <label class="accent-control nav-item">🎨 Accent <select id="accent-select" aria-label="Coastal accent pack"><option value="teal">Teal</option><option value="coral">Coral</option><option value="gold">Gold</option></select></label>
       <button class="nav-item" data-toast="Support is available in the full product"><span>?</span> Support</button>
       <button id="hide-sidebar" class="nav-item"><span>⇤</span> Hide sidebar</button>
     </aside>
@@ -54,12 +55,14 @@
           <button id="add-stop" class="btn primary mutating">＋ Add stop</button>
         </div>
       </section>
+      <div id="density" class="density" aria-hidden="true" title="Stops per day, Sunday to Saturday"></div>
 
       <section class="filter-ribbon" aria-label="Filters">
         <label class="search-wrap">⌕ <input id="search" type="search" placeholder="Search places (try anitbes)" aria-label="Search stops"></label>
         <select id="filter-category" aria-label="Filter by category"><option value="">All categories</option><option>lodging</option><option>food</option><option>transit</option><option>activity</option><option>idea</option></select>
         <select id="filter-cost" aria-label="Filter by cost tier"><option value="">All cost tiers</option><option value="1">$</option><option value="2">$$</option><option value="3">$$$</option><option value="4">$$$$</option></select>
         <select id="filter-status" aria-label="Filter by status"><option value="">All statuses</option><option value="to-visit">To Visit</option><option value="reserved">Reserved</option><option value="completed">Completed</option></select>
+        <select id="filter-tag" aria-label="Filter by tag"><option value="">All tags</option><option value="walk">walk</option><option value="food">food</option><option value="museum">museum</option><option value="coast">coast</option><option value="views">views</option><option value="market">market</option><option value="hotel">hotel</option><option value="favorite">favorite</option></select>
         <select id="timezone" aria-label="Time zone"><option value="CET">CET · Destination</option><option value="ET">ET · Home</option><option value="UTC">UTC</option></select>
         <button id="clear-filters" class="text-btn">Clear filters</button>
       </section>
@@ -76,10 +79,13 @@
         <select id="map-layer" class="map-btn" aria-label="Map layer"><option value="coastal">Coastal</option><option value="terrain">Terrain</option><option value="night">Night</option></select>
         <button id="zoom-out" class="map-btn" aria-label="Zoom out">−</button><button id="zoom-in" class="map-btn" aria-label="Zoom in">＋</button>
       </div>
-      <div class="map-sea" aria-hidden="true"></div><div class="map-land" aria-hidden="true"></div><div class="map-roads" aria-hidden="true"></div>
-      <svg id="routes" class="routes" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
-      <div id="map-pins" class="map-pins"></div>
-      <div class="map-label label-nice">NICE</div><div class="map-label label-cannes">CANNES</div><div class="map-label label-monaco">MONACO</div><div class="map-label label-sea">MEDITERRANEAN SEA</div>
+      <div id="map-world" class="map-world">
+        <div class="map-sea" aria-hidden="true"></div><div class="map-land" aria-hidden="true"></div><div class="map-roads" aria-hidden="true"></div>
+        <svg id="routes" class="routes" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <div id="map-pins" class="map-pins"></div>
+        <div class="map-label label-nice">NICE</div><div class="map-label label-cannes">CANNES</div><div class="map-label label-monaco">MONACO</div><div class="map-label label-sea">MEDITERRANEAN SEA</div>
+        <div id="isochrone-ring" class="isochrone-ring hidden" aria-label="1.25 km isochrone around Hotel Le Negresco"></div>
+      </div>
       <div id="map-empty" class="map-empty hidden">No numbered pins to show</div>
       <div id="detail-card" class="detail-card hidden" role="region" aria-label="Place detail">
         <button id="detail-close" class="detail-close icon-btn" aria-label="Close place detail">×</button>
@@ -88,7 +94,6 @@
         <div id="detail-panel" class="detail-panel" tabindex="0"></div>
         <div class="detail-actions"><button id="edit-selected" class="btn ghost mutating">Edit stop</button><button id="isochrone" class="btn ghost hidden">Show 1.25 km isochrone</button><button id="conflict-open" class="btn ghost mutating">Simulate peer edit</button><button id="delete-selected" class="btn danger mutating owner-only">Delete</button></div>
       </div>
-      <div id="isochrone-ring" class="isochrone-ring hidden" aria-label="1.25 km isochrone around Hotel Le Negresco"></div>
       <div class="presence" aria-label="Simulated collaborators"><span class="peer sarah">Sarah</span><span class="peer john">John</span><span class="peer marco">Marco</span></div>
     </section>
   </div>
@@ -96,13 +101,13 @@
   <button id="sidebar-reopen" class="sidebar-reopen hidden" aria-label="Show sidebar">☰</button>
   <div id="scrim" class="scrim hidden"></div>
 
-  <aside id="ideas-drawer" class="drawer hidden" aria-label="Ideas bucket"><div class="drawer-head"><div><small>UNASSIGNED</small><h2>Ideas bucket</h2></div><button class="icon-btn drawer-close" aria-label="Close ideas bucket">×</button></div><p>Vote together. An idea with 3 of 4 votes joins Day 5.</p><div id="ideas-list"></div></aside>
-  <aside id="activity-drawer" class="drawer hidden" aria-label="Activity log"><div class="drawer-head"><div><small>LIVE SESSION</small><h2>Activity log</h2></div><button class="icon-btn drawer-close" aria-label="Close activity log">×</button></div><div id="activity-list"></div></aside>
+  <aside id="ideas-drawer" class="drawer hidden" aria-label="Ideas bucket"><div class="drawer-head"><div><small>UNASSIGNED</small><h2>Ideas bucket</h2></div><button class="icon-btn drawer-close" aria-label="Close ideas bucket">×</button></div><p>Vote together. An idea with 3 of 4 votes joins Day 5.</p><label class="latency-control">Peer latency <select id="peer-latency" aria-label="Simulated peer latency"><option value="50">50 ms</option><option value="320" selected>Realtime</option><option value="500">500 ms</option><option value="2000">2000 ms</option></select></label><div id="ideas-list"></div></aside>
+  <aside id="activity-drawer" class="drawer hidden" aria-label="Activity log"><div class="drawer-head"><div><small>LIVE SESSION</small><h2>Activity log</h2></div><button class="icon-btn drawer-close" aria-label="Close activity log">×</button></div><div id="activity-list"></div><button id="sim-error" class="btn ghost sim-error-btn" type="button">Simulate sync failure</button></aside>
 
   <dialog id="stop-dialog" role="dialog" aria-modal="true" aria-labelledby="stop-dialog-title">
     <form id="stop-form" method="dialog" novalidate>
       <div class="modal-head"><div><small>ITINERARY ACTIVITY</small><h2 id="stop-dialog-title">Add stop</h2></div><button type="button" class="icon-btn modal-close" aria-label="Close stop form">×</button></div>
-      <div id="form-errors" class="form-errors" aria-live="polite"></div>
+      <div id="form-errors" class="form-errors" role="alert" aria-live="assertive" aria-atomic="true"></div>
       <div class="form-grid">
         <label class="span-2">Title <input name="title" maxlength="121" required><span class="field-error" data-error="title"></span></label>
         <label class="span-2">Location <input name="location" maxlength="201" required><span class="field-error" data-error="location"></span></label>

@@ -1,11 +1,13 @@
-import { formSchemas, makeLibraryDocument, markdownForPrompt, savePayloadSchema, techniqueIds } from './domain'
+import { formSchemas, makeLibraryDocument, markdownForPrompt, savePayloadSchema, techniqueIds, assemblePrompt } from './domain'
 import { studioActions } from './store'
 import { copyText, downloadText } from './components/PreviewPanel'
 
-const destinationSchema = { type: 'string', enum: [...techniqueIds, 'library'] }
+// Put a destination outside the seeded studio view first so schema-driven
+// WebMCP clients can exercise an observable navigation mutation.
+const destinationSchema = { type: 'string', enum: ['library', ...techniqueIds] }
 const emptySchema = { type: 'object', properties: {}, additionalProperties: false }
 
-const tools = [
+const legacyTools = [
   ...['validate', 'submit', 'cancel', 'reset', 'advance', 'return'].map((operation) => ({
     name: `form_${operation}`,
     description: `${operation[0].toUpperCase()}${operation.slice(1)} the visible active technique workflow.`,
@@ -133,6 +135,67 @@ const tools = [
   },
 ]
 
+const formFields = ['task-description', 'output-format', 'tone', 'example-input', 'expected-output', 'goal', 'reasoning-step', 'scratchpad', 'success-criterion', 'measurement', 'role', 'audience', 'constraint-type', 'constraint-text', 'reference-documents', 'title']
+const entityFields = ['title', 'technique', 'field-values', 'attachments']
+const objectSchema = (properties = {}, required = []) => ({ type: 'object', additionalProperties: false, properties, ...(required.length ? { required } : {}) })
+const fieldsSchema = { type: 'object', additionalProperties: { type: 'string', maxLength: 200 } }
+
+const tools = [
+  { name: 'browse.open', description: 'Open a declared destination (route, tab, section, or item).', inputSchema: objectSchema({ destination: destinationSchema }, ['destination']), invokeAs: 'browse_open' },
+  { name: 'browse.search', description: 'Search within the browsable surface.', inputSchema: objectSchema({ query: { type: 'string', maxLength: 200 } }, ['query']), invokeAs: 'browse_search' },
+  { name: 'entity.create', description: 'Create an entity using declared fields.', inputSchema: objectSchema({ fields: fieldsSchema }), allowedFields: entityFields, invokeAs: 'entity_create' },
+  { name: 'entity.select', description: 'Select an entity by public id.', inputSchema: objectSchema({ id: { type: 'string', maxLength: 128 } }, ['id']), invokeAs: 'entity_select' },
+  { name: 'entity.delete', description: 'Delete an entity with explicit confirmation.', inputSchema: objectSchema({ id: { type: 'string', maxLength: 128 }, confirm: { type: 'boolean', const: true } }, ['id', 'confirm']), invokeAs: 'entity_delete' },
+  { name: 'form.validate', description: 'Run declared form validation.', inputSchema: objectSchema({ fields: fieldsSchema }), allowedFields: formFields, invokeAs: 'form_validate' },
+  { name: 'form.submit', description: 'Submit the form through the visible handler.', inputSchema: objectSchema({ fields: fieldsSchema }), allowedFields: formFields, invokeAs: 'form_submit' },
+  { name: 'form.cancel', description: 'Cancel the active form workflow.', inputSchema: emptySchema, invokeAs: 'form_cancel' },
+  { name: 'form.reset', description: 'Reset the form to its initial state.', inputSchema: emptySchema, invokeAs: 'form_reset' },
+  { name: 'artifact.copy', description: 'Trigger copy via the visible control (clipboard verified in Playwright).', inputSchema: emptySchema },
+]
+
+function validateInput(tool, input) {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return 'arguments must be an object'
+  const properties = tool.inputSchema.properties || {}
+  const unknown = Object.keys(input).find((key) => !(key in properties)); if (unknown) return `unknown argument: ${unknown}`
+  const missing = (tool.inputSchema.required || []).find((key) => input[key] === undefined); if (missing) return `missing required argument: ${missing}`
+  for (const [key, rule] of Object.entries(properties)) {
+    const value = input[key]; if (value === undefined) continue
+    if (rule.type === 'string' && typeof value !== 'string') return `${key} must be a string`
+    if (rule.type === 'boolean' && typeof value !== 'boolean') return `${key} must be a boolean`
+    if (rule.enum && !rule.enum.includes(value)) return `${key} is outside the declared enum`
+    if (rule.const !== undefined && value !== rule.const) return `${key} must equal ${rule.const}`
+    if (rule.type === 'object') {
+      if (!value || typeof value !== 'object' || Array.isArray(value)) return `${key} must be an object`
+      const badField = tool.allowedFields && Object.keys(value).find((field) => !tool.allowedFields.includes(field)); if (badField) return `Unknown field: ${badField}`
+      const badValue = Object.entries(value).find(([, fieldValue]) => typeof fieldValue !== 'string' || fieldValue.length > 200); if (badValue) return `${key}.${badValue[0]} must be a string of at most 200 characters`
+    }
+  }
+  return ''
+}
+
+async function invokeExact(tool, args) {
+  if (tool.name === 'artifact.copy') {
+    const button = document.querySelector('[data-copy-prompt]')
+    if (!button) return { ok: false, error: 'Generate a visible prompt preview first' }
+    delete button.dataset.copyStatus
+    button.click()
+    for (let attempt = 0; attempt < 100; attempt += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 20))
+      if (button.dataset.copyStatus === 'success') return { ok: true, copy_triggered: true }
+      if (button.dataset.copyStatus === 'error') return { ok: false, error: 'Visible copy control reported failure' }
+    }
+    return { ok: false, error: 'Visible copy control did not settle' }
+  }
+  if (tool.name.startsWith('form.') && Object.keys(args.fields || {}).length) {
+    const applied = window.__templateFormApplyFields?.(args.fields)
+    if (!applied?.ok) return applied || { ok: false, error: 'Active form is not ready' }
+  }
+  if (tool.name === 'entity.create') return invoke('entity_create', { title: args.fields?.title })
+  if (tool.name === 'entity.select') return invoke('entity_select', { index: Number(args.id) })
+  if (tool.name === 'entity.delete') return invoke('entity_delete', { index: Number(args.id), confirm: args.confirm })
+  return invoke(tool.invokeAs, args)
+}
+
 function unavailable(operation) {
   return { ok: false, unavailable: `${operation} is not available in this product workflow.` }
 }
@@ -176,6 +239,20 @@ async function invoke(name, args = {}) {
     if (operation === 'reset') {
       state.resetTechnique(state.activeTechnique)
       return { ok: true, reset: true }
+    }
+    if (operation === 'validate' || operation === 'submit' || operation === 'advance') {
+      // Fallback when the active form bridge has not mounted yet: report store-level readiness.
+      const technique = state.activeTechnique
+      const draft = state.drafts[technique]
+      const parsed = formSchemas[technique].safeParse({
+        ...draft.fields,
+        ...((technique === 'few-shot' || technique === 'role-based') ? { attachments: draft.attachments } : {}),
+      })
+      if (operation === 'validate') return { ok: true, valid: parsed.success }
+      if (!parsed.success) return { ok: true, valid: false, submitted: false }
+      const promptText = assemblePrompt(technique, draft.fields, draft.attachments || [])
+      state.generatePrompt(technique, draft.fields, draft.attachments || [], promptText)
+      return { ok: true, valid: true, submitted: true }
     }
     return unavailable(operation)
   }
@@ -336,16 +413,26 @@ async function invoke(name, args = {}) {
 
 export function registerWebMCP() {
   window.webmcp_session_info = () => ({
-    contractVersion: 'zto-webmcp-v1',
-    product: 'Template Forms',
+    contract_version: 'zto-webmcp-v1',
+    app: 'Template Forms',
     modules: ['form-workflow-v1', 'browse-query-v1', 'entity-collection-v1', 'artifact-transfer-v1'],
-    tools: tools.map((tool) => tool.name),
+    tool_names: tools.map((tool) => tool.name),
+    tool_count: tools.length,
   })
-  window.webmcp_list_tools = () => ({ tools })
-  window.webmcp_invoke_tool = invoke
+  window.webmcp_list_tools = () => tools.map(({ name, description, inputSchema }) => ({ name, description, inputSchema }))
+  window.webmcp_invoke_tool = async (name, args = {}) => {
+    if (name && typeof name === 'object') { args = name.arguments || {}; name = name.name }
+    const tool = tools.find((candidate) => candidate.name === name)
+    if (!tool) return { ok: false, error: `unknown_tool: ${name}` }
+    const error = validateInput(tool, args); if (error) return { ok: false, error }
+    try { return await invokeExact(tool, args) } catch (cause) { return { ok: false, error: String(cause?.message || cause) } }
+  }
   window.webmcp = {
     sessionInfo: window.webmcp_session_info,
     listTools: window.webmcp_list_tools,
     invokeTool: window.webmcp_invoke_tool,
   }
+  try {
+    if (navigator.modelContext?.registerTool) tools.forEach((tool) => navigator.modelContext.registerTool({ name: tool.name, description: tool.description, inputSchema: tool.inputSchema, invoke: (args) => window.webmcp_invoke_tool(tool.name, args || {}) }))
+  } catch { /* Window bridge remains available when native registration is unsupported. */ }
 }

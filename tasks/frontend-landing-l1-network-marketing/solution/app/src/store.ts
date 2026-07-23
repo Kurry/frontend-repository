@@ -30,6 +30,19 @@ export interface Lead {
   payload: LeadPayload;
 }
 
+export const EVENT_STATUSES: EventStatus[] = ['upcoming', 'featured', 'past'];
+export const EVENT_CATEGORIES: EventCategory[] = ['Summit', 'Meetup', 'Workshop', 'Hackathon', 'Webinar'];
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+export function isIsoCalendarDate(value: string): boolean {
+  if (!DATE_RE.test(value)) return false;
+  const [year, month, day] = value.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year
+    && date.getUTCMonth() === month - 1
+    && date.getUTCDate() === day;
+}
+
 // Initial seed
 const SEED_EVENTS: RidgeEvent[] = [
   { id: '1', title: 'Ridge Summit 2026', date: '2026-10-15', city: 'Denver', category: 'Summit', status: 'featured', featured: true },
@@ -52,6 +65,19 @@ export const $megaMenuOpen = atom(false);
 export const $eventsManagerOpen = atom(false);
 export const $commandPaletteOpen = atom(false);
 export const $exportCatalogOpen = atom(false);
+
+// Persistent polite status region (mounted once in AppClient) for cross-component
+// announcements: copy confirmations, import results, validation summaries.
+export const $a11yStatus = atom('');
+let a11ySeq = 0;
+export function announce(message: string) {
+  if (!message) return;
+  a11ySeq += 1;
+  $a11yStatus.set(`${message} `);
+  // Clear after a few seconds so the region does not stay permanently populated.
+  const seq = a11ySeq;
+  setTimeout(() => { if (seq === a11ySeq) $a11yStatus.set(''); }, 4000);
+}
 
 // Undo / Redo stacks for events
 interface HistoryState {
@@ -102,6 +128,7 @@ export function updateEvent(updated: RidgeEvent) {
 }
 
 export function deleteEvents(ids: string[]) {
+  if (ids.length === 0) return;
   saveHistoryState();
   const current = $events.get();
   $events.set(current.filter(e => !ids.includes(e.id)));
@@ -136,29 +163,136 @@ export function resetSessionToSeed() {
   $historyRedo.set([]);
 }
 
-export function loadCatalog(jsonStr: string): boolean {
+// Consistent display format used by Events Manager rows AND the Global Events
+// listings / featured slots so date formatting matches across surfaces.
+export function formatEventDate(iso: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+  if (!m) return iso || '';
+  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+export interface LoadCatalogResult { ok: boolean; error?: string; }
+
+export function loadCatalog(jsonStr: string, catalogName = 'catalog'): LoadCatalogResult {
+  let data: any;
   try {
-    const data = JSON.parse(jsonStr);
-    if (!data.version || !data.events || !data.leads || !data.counts) {
-      throw new Error("Missing keys");
-    }
-
-    // Cross-field validation (featured == true <-> status == 'featured')
-    for (const e of data.events) {
-       if (e.featured && e.status !== 'featured') throw new Error("Invalid cross-field: featured but status not featured");
-       if (e.status === 'featured' && !e.featured) throw new Error("Invalid cross-field: status featured but not featured");
-       // Basic enum check
-       if (!['upcoming', 'featured', 'past'].includes(e.status)) throw new Error("Invalid status enum");
-       if (!['Summit', 'Meetup', 'Workshop', 'Hackathon', 'Webinar'].includes(e.category)) throw new Error("Invalid category enum");
-    }
-
-    $events.set(data.events);
-    if (Array.isArray(data.leads)) {
-      $leads.set(data.leads);
-    }
-    return true;
-  } catch (e) {
-    console.error(e);
-    return false;
+    data = JSON.parse(jsonStr);
+  } catch {
+    return { ok: false, error: `Import failed: ${catalogName} is not valid JSON.` };
   }
+  if (!data || typeof data !== 'object') {
+    return { ok: false, error: `Import failed: ${catalogName} is not a catalog object.` };
+  }
+  for (const key of ['version', 'theme', 'events', 'leads', 'counts']) {
+    if (!(key in data)) {
+      return { ok: false, error: `Import failed: ${catalogName} is missing the required "${key}" key.` };
+    }
+  }
+  if (!Array.isArray(data.events)) {
+    return { ok: false, error: `Import failed: ${catalogName} "events" must be an array.` };
+  }
+  if (!Array.isArray(data.leads)) {
+    return { ok: false, error: `Import failed: ${catalogName} "leads" must be an array.` };
+  }
+  if (data.version !== 1 || (data.theme !== 'light' && data.theme !== 'dark')) {
+    return { ok: false, error: `Import failed: ${catalogName} has an invalid version or theme.` };
+  }
+  if (!data.counts || typeof data.counts !== 'object') {
+    return { ok: false, error: `Import failed: ${catalogName} "counts" must be an object.` };
+  }
+  for (const e of data.events) {
+    if (!e || typeof e.id !== 'string' || e.id.length === 0) {
+      return { ok: false, error: `Import failed: ${catalogName} has an event with an invalid id.` };
+    }
+    if (typeof e.title !== 'string' || e.title.length < 2) {
+      return { ok: false, error: `Import failed: ${catalogName} has an event with an invalid title.` };
+    }
+    if (typeof e.date !== 'string' || !isIsoCalendarDate(e.date)) {
+      return { ok: false, error: `Import failed: ${catalogName} has an event with an invalid date.` };
+    }
+    if (typeof e.city !== 'string' || e.city.length < 2) {
+      return { ok: false, error: `Import failed: ${catalogName} has an event with an invalid city.` };
+    }
+    if (!EVENT_CATEGORIES.includes(e.category)) {
+      return { ok: false, error: `Import failed: ${catalogName} has an event with an invalid category.` };
+    }
+    if (!EVENT_STATUSES.includes(e.status)) {
+      return { ok: false, error: `Import failed: ${catalogName} has an event with an invalid status.` };
+    }
+    if (typeof e.featured !== 'boolean') {
+      return { ok: false, error: `Import failed: ${catalogName} has an event with an invalid featured flag.` };
+    }
+    if (e.featured && e.status !== 'featured') {
+      return { ok: false, error: `Import failed: ${catalogName} breaks the featured/status rule (featured true requires status featured).` };
+    }
+    if (e.status === 'featured' && e.featured !== true) {
+      return { ok: false, error: `Import failed: ${catalogName} breaks the featured/status rule (status featured requires featured true).` };
+    }
+  }
+  for (const lead of data.leads) {
+    if (!lead || typeof lead !== 'object' || typeof lead.id !== 'string' || lead.id.length === 0) {
+      return { ok: false, error: `Import failed: ${catalogName} has a lead with an invalid id.` };
+    }
+    if (lead.kind !== 'contact' || typeof lead.submittedAt !== 'string' || Number.isNaN(Date.parse(lead.submittedAt))) {
+      return { ok: false, error: `Import failed: ${catalogName} has an invalid contact lead envelope.` };
+    }
+    const payload = lead.payload;
+    if (!payload || typeof payload !== 'object' || typeof payload.name !== 'string' || payload.name.length < 2) {
+      return { ok: false, error: `Import failed: ${catalogName} has a lead with an invalid name.` };
+    }
+    if (typeof payload.email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
+      return { ok: false, error: `Import failed: ${catalogName} has a lead with an invalid email.` };
+    }
+    if (!['Build', 'Solutions', 'Community', 'Enterprise'].includes(payload.interest) || payload.privacy_consent !== true) {
+      return { ok: false, error: `Import failed: ${catalogName} has a lead with invalid interest or privacy consent.` };
+    }
+    if (payload.company !== undefined && typeof payload.company !== 'string') {
+      return { ok: false, error: `Import failed: ${catalogName} has a lead with an invalid company.` };
+    }
+    if (payload.message !== undefined && (typeof payload.message !== 'string' || (payload.message.length > 0 && payload.message.length < 10))) {
+      return { ok: false, error: `Import failed: ${catalogName} has a lead with an invalid message.` };
+    }
+  }
+  const expectedCounts = {
+    events: data.events.length,
+    leads: data.leads.length,
+    upcoming: data.events.filter((event: any) => event.status === 'upcoming').length,
+    featured: data.events.filter((event: any) => event.status === 'featured').length,
+    past: data.events.filter((event: any) => event.status === 'past').length,
+  };
+  for (const [key, expected] of Object.entries(expectedCounts)) {
+    if (!Number.isInteger(data.counts[key]) || data.counts[key] < 0 || data.counts[key] !== expected) {
+      return { ok: false, error: `Import failed: ${catalogName} has an invalid "counts.${key}" value.` };
+    }
+  }
+
+  $events.set(data.events.map((e: any) => ({
+    id: String(e.id ?? Math.random().toString(36).slice(2, 9)),
+    title: e.title,
+    date: e.date,
+    city: e.city,
+    category: e.category,
+    status: e.status,
+    featured: Boolean(e.featured),
+  })));
+  $leads.set(data.leads.map((lead: any) => ({
+    id: lead.id,
+    kind: 'contact' as const,
+    submittedAt: lead.submittedAt,
+    payload: {
+      name: lead.payload.name,
+      email: lead.payload.email,
+      company: lead.payload.company,
+      interest: lead.payload.interest,
+      privacy_consent: true,
+      message: lead.payload.message,
+    },
+  })));
+  $theme.set(data.theme);
+  $eventsFilter.set({ status: '', category: '' });
+  $historyUndo.set([]);
+  $historyRedo.set([]);
+  $selectedEventIds.set([]);
+  return { ok: true };
 }

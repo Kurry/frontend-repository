@@ -7,7 +7,6 @@ const stamp = () => new Date().toISOString();
 const phaseOrder = ['data', 'fineTune', 'evaluation'];
 let sequence = 1050;
 let lastSubmissionAt = 0;
-let tickCounter = 0;
 
 const event = (runId, phase, status, message) => ({
   id: `${runId}-e-${Date.now()}-${Math.random().toString(16).slice(2, 6)}`,
@@ -89,7 +88,9 @@ export const usePipelineStore = create((set, get) => ({
   drilldown: null,
   alerts: [],
   importError: null,
-  setView: (activeView) => set({ activeView, mobileNavOpen: false, selectedRunId: null, drilldown: null }),
+  // Keep the selected run and its timeline filters while visiting catalog and
+  // results views so returning to the board restores the same detail context.
+  setView: (activeView) => set({ activeView, mobileNavOpen: false, drilldown: null }),
   setMobileNav: (mobileNavOpen) => set({ mobileNavOpen }),
   setDensity: (density) => set({ density }),
   openSubmission: () => set({ submissionOpen: true, selectedRunId: null, drilldown: null, importError: null }),
@@ -106,21 +107,36 @@ export const usePipelineStore = create((set, get) => ({
   dismissAlert: (id) => set((s) => ({ alerts: s.alerts.filter((a) => a.id !== id) })),
   pushAlert: (message, color = 'indigo') => set((s) => ({ alerts: [...s.alerts, { id: `${Date.now()}-${Math.random()}`, message, color }] })),
   clearImportError: () => set({ importError: null }),
+  // Clears the "just submitted" entrance-animation flag on a fixed real-time
+  // delay so it reliably outlasts the .45s run-in CSS animation regardless of
+  // when the background simulation tick next happens to touch this run (tying
+  // it to tick cadence made the highlight vanish inconsistently, sometimes
+  // before the animation even finished). The delay is generous (5s, well
+  // past the .45s animation) rather than tight: the CSS animation uses
+  // fill-mode `both`, so it only ever plays once on mount and holding the
+  // class longer never replays or extends it visually — there's no downside
+  // to a wide margin, and it needs to comfortably survive Playwright/CDP
+  // round-trip latency on a loaded CI runner between "run created" and
+  // whatever the next assertion happens to be.
+  clearIsNew: (runId) => set((s) => ({ runs: s.runs.map((r) => r.id === runId ? { ...r, isNew: false } : r) })),
   submitJob: (raw, opts = {}) => {
     const state = get();
     const submittedAt = Date.now();
     if (!opts.force && (state.submitting || submittedAt - lastSubmissionAt < 600)) return null;
     lastSubmissionAt = submittedAt;
+    set({ submitting: true });
     const config = sanitizeJobConfig(raw, getEligibleDatasets(state.runs), getEligibleCheckpoints(state.runs));
     const run = buildRun(config);
     set((s) => ({
       runs: [run, ...s.runs],
       submissionOpen: false,
       activeView: 'pipeline',
+      datasetFilter: null,
       selectedRunId: null,
       submitting: false,
       alerts: [...s.alerts, { id: `submit-${run.id}`, message: `${run.id} submitted to ${config.cluster}`, color: 'indigo' }],
     }));
+    setTimeout(() => get().clearIsNew(run.id), 5000);
     return run;
   },
   pausePhase: (runId, phaseKey) => set((s) => ({
@@ -201,8 +217,10 @@ export const usePipelineStore = create((set, get) => ({
         runs: [...runs, ...s.runs],
         importError: null,
         activeView: 'pipeline',
+        datasetFilter: null,
         alerts: [...s.alerts, { id: `import-${Date.now()}`, message: `Imported ${runs.length} job config(s)`, color: 'green' }],
       }));
+      runs.forEach((run) => setTimeout(() => get().clearIsNew(run.id), 5000));
       return true;
     }
     const eligibleDatasets = getEligibleDatasets(get().runs);
@@ -218,8 +236,10 @@ export const usePipelineStore = create((set, get) => ({
       runs: [run, ...s.runs],
       importError: null,
       activeView: 'pipeline',
+      datasetFilter: null,
       alerts: [...s.alerts, { id: `import-${run.id}`, message: `Imported ${run.id} from job-config`, color: 'green' }],
     }));
+    setTimeout(() => get().clearIsNew(run.id), 5000);
     return true;
   },
   exportRuns: () => {
@@ -235,7 +255,6 @@ export const usePipelineStore = create((set, get) => ({
     return exportSchema.parse(payload);
   },
   tick: () => set((state) => {
-    tickCounter += 1;
     let trialData = state.trialData;
     const alerts = [...state.alerts];
     const runs = state.runs.map((run) => {
@@ -250,14 +269,14 @@ export const usePipelineStore = create((set, get) => ({
           return { ...p, retryRemaining: remaining, autoRetry: remaining > 0 };
         }
         if (p.status !== 'Running' || p.paused) return p;
-        // Slow cadence so pause/resume and countdowns stay observable.
-        if (p.key === 'fineTune' && tickCounter % 2 !== 0) return p;
-        if (p.key === 'evaluation' && tickCounter % 2 !== 0) return p;
+        // Advance each running phase once per simulation tick. Keeping this
+        // branch counter-free avoids stale module-level cadence state across
+        // independent browser sessions and ensures every tick can settle.
         changed = true;
         nextCost += p.key === 'data' ? .07 : p.key === 'fineTune' ? .22 : .11;
         if (p.key === 'data') {
           const target = p.count * 100;
-          const current = Math.min(target, p.current + 8);
+          const current = Math.min(target, p.current + 100);
           if (current >= target) {
             nextEvents = [...nextEvents, event(run.id, p.key, 'Complete', `${current.toLocaleString()} tasks generated`)];
             alerts.push({ id: `done-${run.id}-${p.key}`, message: `${run.id} data generation completed`, color: 'green' });
@@ -296,7 +315,7 @@ export const usePipelineStore = create((set, get) => ({
         alerts.push({ id: `auto-${run.id}`, message: `${run.id} automatic evaluation started`, color: 'indigo' });
         changed = true;
       }
-      return changed ? { ...run, phases, events: nextEvents, cost: Number(nextCost.toFixed(2)), isNew: false } : run;
+      return changed ? { ...run, phases, events: nextEvents, cost: Number(nextCost.toFixed(2)) } : run;
     });
     return { runs, trialData, alerts };
   }),

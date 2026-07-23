@@ -13,6 +13,7 @@ import ImportDialog from './ImportDialog.vue'
 
 const store = useWorkspaceStore()
 const sendError = ref('')
+const compact = ref(false)
 
 function handleTemplateName(event, handleChange) {
   handleChange(event, true)
@@ -68,14 +69,17 @@ function advance() {
 
     <div class="top-controls">
       <div class="history-controls" aria-label="History controls">
-        <button type="button" class="top-action compact" :disabled="!store.canUndo" aria-label="Undo" @click="store.undo()">
+        <button type="button" class="top-action compact" :disabled="!store.canUndo" aria-label="Undo" title="Undo (Ctrl+Z)" @click="store.undo()">
           <PhArrowUUpLeft :size="17" /><span>Undo</span>
         </button>
-        <button type="button" class="top-action compact" :disabled="!store.canRedo" aria-label="Redo" @click="store.redo()">
+        <button type="button" class="top-action compact" :disabled="!store.canRedo" aria-label="Redo" title="Redo (Ctrl+Shift+Z)" @click="store.redo()">
           <PhArrowUUpRight :size="17" /><span>Redo</span>
         </button>
       </div>
 
+      <button type="button" class="top-action compact" :aria-label="compact ? 'Comfortable density' : 'Compact density'" @click="compact = !compact; store.notify(compact ? 'Compact density active' : 'Comfortable density active')">
+        <span>{{ compact ? 'Compact' : 'Comfortable' }}</span>
+      </button>
       <ExportDialog />
       <ImportDialog />
 

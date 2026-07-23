@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "start": "vite preview --host 0.0.0.0 --port 3000 --strictPort",
-    "verify:build": "vite build"
+    "verify:build": "vite build",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "4.3.2",
@@ -14,6 +15,7 @@
     "tailwindcss": "4.3.2"
   },
   "devDependencies": {
+    "@playwright/test": "1.61.0",
     "@sveltejs/vite-plugin-svelte": "7.2.0",
     "typescript": "6.0.3",
     "vite": "8.1.4"

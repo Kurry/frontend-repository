@@ -1,12 +1,17 @@
-# LoopDaily
+# Loopdaily — Oracle
 
-A frontend-only habit-tracking app built with React, Jotai, Tailwind CSS 4.3.2, and shadcn/ui.
-
-![App Screenshot](./screenshot.png)
-
-## Overview
-LoopDaily allows you to track habits, complete them, view stats, and import/export your data seamlessly without requiring any backend.
+Reference solution (oracle) for the `frontend-productivity-loopdaily` task. Serves the app
+described in `../../instruction.md`; used by `solve.sh`, the reference
+screenshot capture harness, and oracle validation runs. Must serve with
+zero console/page errors.
 
 ## Run
-1. Run `npm install`
-2. Run `npm start`
+
+    npm install
+    npm run verify:build
+    npm start          # serves on port 3000
+
+## WebMCP
+
+Registers the task's contract modules: browse-query-v1, entity-collection-v1, form-workflow-v1, artifact-transfer-v1. Tools are exposed via
+window.webmcp_session_info / webmcp_list_tools / webmcp_invoke_tool.

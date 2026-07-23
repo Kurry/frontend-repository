@@ -340,11 +340,11 @@
       currentCard = null;
       canUndo = false;
       stopStream();
-      if (!prefersReducedMotion()) confetti({ particleCount: 140, spread: 90, origin: { y: 0.55 } });
+      if (!prefersReducedMotion()) { try { (typeof confetti === 'function' ? confetti : (confetti as any)?.default)({ particleCount: 140, spread: 90, origin: { y: 0.55 } }); } catch (e) {} }
       return;
     }
     if (setNewRecord && !prefersReducedMotion()) {
-      confetti({ particleCount: 90, spread: 65, origin: { y: 0.6 } });
+      try { (typeof confetti === 'function' ? confetti : (confetti as any)?.default)({ particleCount: 90, spread: 65, origin: { y: 0.6 } }); } catch (e) {} 
     }
     advanceTurn();
   }
@@ -379,7 +379,10 @@
     canUndo = false;
     undoData = null;
     stopTimer();
-    if (currentCard && timerEnabled) startTimer(snapshot.timeLeft);
+    // A timer forfeit snapshots at 0 seconds. Restarting from that value used
+    // to forfeit the restored card again one second after Undo, making Undo
+    // appear reusable and hiding the exact card the player asked to restore.
+    if (currentCard && timerEnabled) startTimer(snapshot.timeLeft > 0 ? snapshot.timeLeft : 15);
     showToast('Last turn undone', 'info');
   }
 
@@ -612,8 +615,11 @@
       a.download = `dare-night-session-${Date.now()}.json`;
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      setTimeout(() => {
+        a.remove();
+        URL.revokeObjectURL(url);
+      }, 1000);
+      showToast('Session JSON downloaded', 'success');
     } catch { showToast('Download failed', 'error'); }
   }
 
@@ -681,7 +687,7 @@
       if (!OUTCOMES.includes(entry.outcome as typeof OUTCOMES[number])) return 'each turnLog outcome must be done, skip, or timeout';
       if (typeof entry.cardPrompt !== 'string' || !CATEGORIES.includes(entry.category as Category) || !INTENSITIES.includes(entry.intensity as Intensity)) return 'each turnLog entry must include a cardPrompt, category, and intensity';
     }
-    if (typeof payload.exportedAt !== 'string' || Number.isNaN(Date.parse(payload.exportedAt)) || new Date(payload.exportedAt).toISOString() !== payload.exportedAt) return 'exportedAt must be an ISO-8601 timestamp';
+    if (typeof payload.exportedAt !== 'string' || Number.isNaN(Date.parse(payload.exportedAt))) return 'exportedAt must be an ISO-8601 timestamp';
     const winningPlayer = payload.players.find((p: any) => p.points >= WIN_TARGET);
     if (payload.status === 'finished' && (!winningPlayer || payload.winner !== winningPlayer.name)) return 'a finished session must name a winner at the win target';
     if (payload.status !== 'finished' && (winningPlayer || payload.winner !== null)) return 'an unfinished session cannot include a winner';
@@ -951,6 +957,18 @@
         return { ok: true, message: 'No open dialog to cancel' };
       },
       formReset: () => { newGame(); return { ok: true, message: 'Returned to setup screen' }; },
+      artifactExport: () => {
+        showExportPreview = true;
+        return { ok: true, message: 'Opened session export preview' };
+      },
+      artifactImport: () => {
+        showImportDialog = true;
+        return { ok: true, message: 'Opened session import workflow' };
+      },
+      artifactCopy: () => {
+        showExportPreview = true;
+        return { ok: true, message: 'Opened export preview for copy' };
+      },
     };
     registerWebmcp(actions);
     webmcpReady = true;
@@ -1037,7 +1055,7 @@
 
   {#if showNewGameConfirm}
     <Dialog labelId="dlg-newgame" onClose={() => { showNewGameConfirm = false; }}>
-      <h2 id="dlg-newgame" class="text-xl font-semibold mb-2.5" style="color: var(--color-accent);">Start new game?</h2>
+      <h2 id="dlg-newgame" class="text-xl font-semibold mb-2.5" style="color: var(--color-accent);">Start New Game?</h2>
       <p class="text-gray-700 mb-5">Start over to clear all players and scores. Your Dare Night record and saved session stay available.</p>
       <div class="flex gap-2.5">
         <button class="flex-1 px-5 py-2.5 rounded-full bg-white border-2 border-black text-black font-semibold hover:bg-gray-50 transition-colors" onclick={() => { showNewGameConfirm = false; }}>Cancel</button>
@@ -1048,7 +1066,7 @@
 
   {#if showDeleteConfirm}
     <Dialog labelId="dlg-delete" onClose={() => { showDeleteConfirm = null; }}>
-      <h2 id="dlg-delete" class="text-xl font-semibold mb-2.5" style="color: var(--color-accent);">Delete custom card?</h2>
+      <h2 id="dlg-delete" class="text-xl font-semibold mb-2.5" style="color: var(--color-accent);">Delete Custom Card?</h2>
       <p class="text-gray-700 mb-5">This removes the card from your deck and from every saved session. This cannot be undone.</p>
       <div class="flex gap-2.5">
         <button class="flex-1 px-5 py-2.5 rounded-full bg-white border-2 border-black text-black font-semibold hover:bg-gray-50 transition-colors" onclick={() => { showDeleteConfirm = null; }}>Cancel</button>

@@ -16,7 +16,7 @@
         :class="{ 'field-error': errors.name }"
         :aria-invalid="errors.name ? 'true' : 'false'"
         :aria-describedby="errors.name ? `${idPrefix}-name-error` : undefined"
-        placeholder="e.g. Harbor Coastal"
+        placeholder="e.g. Cove Coastal"
       />
       <p v-if="errors.name" :id="`${idPrefix}-name-error`" class="error-note" role="alert">{{ errors.name }}</p>
     </div>
@@ -170,8 +170,8 @@
     <div class="flex flex-wrap items-center gap-3 pt-2 border-t border-rule">
       <button
         type="submit"
-        :disabled="!meta.valid || submitting"
-        :aria-disabled="!meta.valid || submitting"
+        :disabled="submitting"
+        :aria-disabled="submitting"
         class="min-h-11 px-6 bg-oxblood text-cream font-mono text-xs tracking-[0.18em] uppercase transition-colors hover:bg-ink disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {{ mode === 'create' ? 'Create Palette' : 'Apply Changes' }}

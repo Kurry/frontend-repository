@@ -1,0 +1,28 @@
+{
+  "name": "apparel-sample-review-pipeline",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "vite --host 0.0.0.0 --port 3000",
+    "verify:build": "vite build",
+    "test:e2e": "playwright test e2e.spec.mjs",
+    "test:e2e:canonical": "playwright test -c e2e.playwright.config.mjs"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwindcss": "4.3.3",
+    "@tailwindcss/vite": "4.3.3",
+    "framer-motion": "^10.16.4",
+    "zustand": "^4.4.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@vitejs/plugin-react": "6.0.3",
+    "vite": "^8.1.5"
+  },
+  "overrides": {
+    "baseline-browser-mapping": "2.10.42",
+    "browserslist": "4.28.5",
+    "electron-to-chromium": "1.5.389"
+  }
+}

@@ -530,6 +530,7 @@ select { height: 38px; margin-top: 6px; padding: 0 33px 0 10px; font-size: 11px;
 }
 
 @media (max-width: 1023px) {
+  .topbar { z-index: 70; }
   .mobile-menu { display: inline-grid; }
   .workspace { display: block; }
   .release-sidebar { position: fixed; z-index: 60; left: 0; top: 0; bottom: 0; width: 278px; padding-top: 92px; transform: translateX(-102%); box-shadow: 20px 0 50px rgba(10,22,17,.24); transition: transform .2s ease; }
@@ -562,7 +563,7 @@ select { height: 38px; margin-top: 6px; padding: 0 33px 0 10px; font-size: 11px;
   .diff-controls select { height: 44px; }
   .swap-button { width: 100%; }
   .summary-strip { grid-template-columns: 1fr 1fr; }
-  .diff-row { min-width: 610px; }
+  .diff-row { min-width: 0; width: 100%; grid-template-columns: 24px 60px 1fr; }
   .diff-list { overflow-x: auto; }
   .unchanged-disclosure { min-width: 610px; }
   .split-grid { grid-template-columns: 1fr; }
@@ -584,9 +585,10 @@ select { height: 38px; margin-top: 6px; padding: 0 33px 0 10px; font-size: 11px;
 @media (max-width: 560px) {
   /* Manifest table fits its container without horizontal clipping: the flexible
      title column wraps while short mono/kebab cells stay intact. */
-  .data-table.manifest-table { min-width: 0; }
+  .data-table.manifest-table { width: 100%; min-width: 0; table-layout: fixed; }
   .data-table.manifest-table th, .data-table.manifest-table td { padding: 8px 9px; }
-  .data-table.manifest-table td { white-space: normal; font-size: 11px; }
+  .data-table.manifest-table th, .data-table.manifest-table td { min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+  .data-table.manifest-table code { white-space: normal; overflow-wrap: anywhere; }
   .manifest-table-wrap { overflow-x: hidden; }
 }
 

@@ -146,6 +146,15 @@ or programmatic jump — browse_open-style scrollIntoView jumps fire every
 intersection observer en route and permanently mark content as revealed, after
 which "elements below the viewport start unrevealed" can only false-fail. If you
 have already jumped around the page, reload it before grading reveal criteria.
+Reduced-motion discipline: criteria about prefers-reduced-motion behavior must be
+verified on the `playwright_reduced_motion` browser, where prefers-reduced-motion
+is forced — the primary browser's media query never matches, so grading them there
+can only false-block. Fresh-load http://localhost:3000 in that browser, confirm via
+`browser_evaluate` that `matchMedia('(prefers-reduced-motion: reduce)').matches` is
+true, then grade; never grade a reduced-motion criterion on the primary browser.
+That browser is a separate app instance: set up any state a reduced-motion
+criterion needs through its own UI — the webmcp bridge attaches to the primary
+page only and cannot drive it.
 Viewport discipline: before judging ANY layout, composition, or density criterion,
 resize to a desktop viewport (at least 1280x800) and confirm the size with
 `browser_evaluate` (window.innerWidth) — a narrow default viewport legitimately
@@ -186,6 +195,9 @@ Use the first criterion ID plus `-shared` as the filename (e.g. `TASK-FUNC-001-s
 Each applicable reasoning entry cites the same exact filename. Do not share a screenshot
 across different viewport sizes, materially different states, or criteria whose decisive
 evidence is not represented in the image.
+Only cite an evidence filename after you have verified the screenshot was actually saved
+to /logs/verifier (e.g. it appears in your screenshot tool output); never cite a filename
+you did not persist.
 
 5. Image read-back policy
 Taking a screenshot and reading its pixels back into context are separate decisions.
@@ -209,6 +221,16 @@ Do not retry or route around: an application-level crash; a dead documented cont
 validation failure produced by the app; a genuinely missing feature; or a path that only
 works after reload when the criterion does not ask for reload. When evidence remains
 ambiguous after the allowed observation, score the criterion "no".
+Session-death recovery: browser tool timeouts or a wedged session mid-run are
+infrastructure faults, not app verdicts — never mark the remaining criteria
+"BLOCKED:" wholesale because tooling stopped responding. Recover first: close any
+stuck tab state, re-navigate (`browser_navigate`) to http://localhost:3000, take a
+fresh snapshot, and retry the failed observation at least twice; when both tool
+surfaces are connected, re-check the other one too (webmcp_session_info /
+Playwright) before concluding the session is dead. Only after repeated recovery
+attempts still fail may a criterion be scored "BLOCKED:", and its reasoning must
+state that recovery was attempted and how. A single tool timeout is never
+sufficient grounds to BLOCK the rest of the rubric.
 
 7. Render-gate procedure
 For a globally unusable app:

@@ -6,7 +6,8 @@ import {
   deleteTheme,
   updateActiveOptions,
   importTheme,
-  setTab
+  setTab,
+  closeThemeForm
 } from './store/themeSlice';
 import { parseImportedTheme } from './utils/importTheme';
 import { copyThemeArtifact, ThemeArtifactFormat } from './utils/themeArtifacts';
@@ -46,16 +47,146 @@ export function initializeWebMCP() {
   });
 
   w.webmcp_list_tools = () => [
-    { name: 'editor_select', description: 'Select an editor object' },
-    { name: 'editor_update_property', description: 'Update an editor property' },
-    { name: 'editor_preview', description: 'Preview an editor object' },
-    { name: 'entity_create', description: 'Create an entity' },
-    { name: 'entity_select', description: 'Select an entity' },
-    { name: 'entity_update', description: 'Update an entity' },
-    { name: 'entity_delete', description: 'Delete an entity' },
-    { name: 'artifact_export', description: 'Export an artifact' },
-    { name: 'artifact_import', description: 'Import an artifact' },
-    { name: 'artifact_copy', description: 'Copy an artifact' },
+    {
+      name: 'editor_select',
+      module: 'structured-editor-v1',
+      operation: 'select',
+      description: 'Select a saved material theme for editing',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          object_type: { const: 'material-theme' },
+          id: { type: 'string', default: 'default' },
+        },
+        required: ['object_type', 'id'],
+        additionalProperties: false,
+      },
+    },
+    {
+      name: 'editor_update_property',
+      module: 'structured-editor-v1',
+      operation: 'update_property',
+      description: 'Update a palette, typography, or shape property group',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          object_type: { const: 'material-theme' },
+          property: { type: 'string', enum: ['palette', 'typography', 'shape'] },
+          value: { type: 'object', default: { primary: { main: '#1565c0' } } },
+        },
+        required: ['object_type', 'property', 'value'],
+        additionalProperties: false,
+      },
+    },
+    {
+      name: 'editor_preview',
+      module: 'structured-editor-v1',
+      operation: 'preview',
+      description: 'Open the framed preview for the active material theme',
+      inputSchema: {
+        type: 'object',
+        properties: { object_type: { const: 'material-theme' } },
+        additionalProperties: false,
+      },
+    },
+    {
+      name: 'entity_create',
+      module: 'entity-collection-v1',
+      operation: 'create',
+      description: 'Create and select a saved theme',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          name: { type: 'string', minLength: 1, maxLength: 64 },
+          palette: { type: 'object' },
+        },
+        required: ['name'],
+        additionalProperties: false,
+      },
+    },
+    {
+      name: 'entity_select',
+      module: 'entity-collection-v1',
+      operation: 'select',
+      description: 'Select a saved theme',
+      inputSchema: {
+        type: 'object',
+        properties: { id: { type: 'string', default: 'default' } },
+        required: ['id'],
+        additionalProperties: false,
+      },
+    },
+    {
+      name: 'entity_update',
+      module: 'entity-collection-v1',
+      operation: 'update',
+      description: 'Rename or update a saved theme',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', default: 'default' },
+          name: { type: 'string', minLength: 1, maxLength: 64 },
+          palette: { type: 'object' },
+          options: { type: 'object' },
+        },
+        required: ['id'],
+        additionalProperties: false,
+      },
+    },
+    {
+      name: 'entity_delete',
+      module: 'entity-collection-v1',
+      operation: 'delete',
+      description: 'Delete a saved theme after explicit confirmation',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', default: 'green' },
+          confirm: { const: true },
+        },
+        required: ['id', 'confirm'],
+        additionalProperties: false,
+      },
+    },
+    {
+      name: 'artifact_export',
+      module: 'artifact-transfer-v1',
+      operation: 'export',
+      description: 'Open the export workspace for JSON or CSS',
+      inputSchema: {
+        type: 'object',
+        properties: { format: { type: 'string', enum: ['json', 'css'] } },
+        required: ['format'],
+        additionalProperties: false,
+      },
+    },
+    {
+      name: 'artifact_import',
+      module: 'artifact-transfer-v1',
+      operation: 'import',
+      description: 'Import a declared ThemeOptions JSON payload',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          mode: { const: 'declared-theme' },
+          payload: { type: 'object' },
+        },
+        required: ['mode', 'payload'],
+        additionalProperties: false,
+      },
+    },
+    {
+      name: 'artifact_copy',
+      module: 'artifact-transfer-v1',
+      operation: 'copy',
+      description: 'Copy the active JSON or CSS artifact',
+      inputSchema: {
+        type: 'object',
+        properties: { format: { type: 'string', enum: ['json', 'css'], default: 'json' } },
+        additionalProperties: false,
+      },
+    },
   ];
 
   w.webmcp_invoke_tool = async (name: string, args: any) => {
@@ -74,6 +205,8 @@ export function initializeWebMCP() {
         const current = store.getState().theme.activeOptions;
         const options = args.palette ? { ...current, palette: mergePalette(current.palette, args.palette) } : current;
         store.dispatch(createTheme({ id, name: themeName, options }));
+        store.dispatch(setTab('saved'));
+        store.dispatch(closeThemeForm());
         return { success: true };
       }
       case 'entity_select': {

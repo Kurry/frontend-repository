@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Controller, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import {
   Button, Checkbox, ComposedModal, InlineNotification, ModalBody, ModalFooter, ModalHeader,
-  Select, SelectItem, SelectItemGroup, Tag, TextArea, TextInput, Tile,
+  Select, SelectItem, SelectItemGroup, Tag, TextInput, Tile,
 } from '@carbon/react'
 import {
   Add, ArrowDown, Attachment, Checkmark, CheckmarkOutline, ChevronDown, ChevronLeft, ChevronRight,
@@ -13,39 +13,18 @@ import {
 import { PromptEditor } from './PromptEditor'
 import { useDialogFocus } from './useDialogFocus'
 import { ASSETS, MODELS, PERSONAS, SUGGESTIONS, TECHNIQUES, detectVariables, estimateCost, estimateTokens, modelById } from './data'
-import { compileMarkdown, compilePackage, useWorkbench } from './store'
-import { importPasteSchema, libraryPromptInputSchema, variableInsertSchema } from './schemas'
+import { useWorkbench } from './store'
+import { variableInsertSchema } from './schemas'
+import { MOD_KEY, copyText, displayText, iconOnly, useModalEscapeReturn } from './uiUtils'
 
-const IS_MAC = typeof navigator !== 'undefined' && /Mac|iP(hone|ad|od)/.test(navigator.platform)
-const MOD_KEY = IS_MAC ? '⌘' : 'Ctrl'
-
-function iconOnly(label) { return { hasIconOnly: true, iconDescription: label, tooltipPosition: 'bottom' } }
-
-// Strip double-brace tokens for display-only surfaces so template syntax never
-// leaks into chrome that is not actively being edited.
-const displayText = (text) => text.replace(/\{\{([A-Za-z0-9_]+)\}\}/g, '$1')
-
-function useModalEscapeReturn(open, close) {
-  const closeRef = useRef(close)
-  const priorFocusRef = useRef(null)
-  closeRef.current = close
-  useEffect(() => {
-    if (!open) return
-    priorFocusRef.current = document.activeElement
-    const escape = (event) => {
-      if (event.key !== 'Escape') return
-      event.preventDefault()
-      event.stopImmediatePropagation()
-      closeRef.current()
-    }
-    document.addEventListener('keydown', escape, true)
-    return () => {
-      document.removeEventListener('keydown', escape, true)
-      window.setTimeout(() => priorFocusRef.current?.focus?.(), 0)
-    }
-  }, [open])
-}
-
+// Lazy: none of these render anything until their own `open` flag flips true
+// (see the mount gate in App() below), so the chunk — and the react-hook-form
+// + zod resolver wiring it pulls in — never loads on the cold-load path that
+// the technical/cold_load_interactive_2s criterion measures.
+const SaveModal = lazy(() => import('./Overlays').then((module) => ({ default: module.SaveModal })))
+const ExportModal = lazy(() => import('./Overlays').then((module) => ({ default: module.ExportModal })))
+const ImportModal = lazy(() => import('./Overlays').then((module) => ({ default: module.ImportModal })))
+const CommandPalette = lazy(() => import('./Overlays').then((module) => ({ default: module.CommandPalette })))
 function useMotionPreference() {
   const [reduced, setReduced] = useState(() => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   useEffect(() => {
@@ -284,12 +263,12 @@ function StepPanel({ run }) {
   )
 }
 
-function RichResponse({ text }) {
+function RichResponse({ text, isStreaming }) {
   const [copied, setCopied] = useState('')
   const addToast = useWorkbench((state) => state.addToast)
   const parts = text.split(/```([A-Za-z0-9_+-]*)\n([\s\S]*?)```/g)
   const copyCode = async (code) => {
-    await navigator.clipboard.writeText(code)
+    await copyText(code)
     setCopied(code)
     addToast('Code copied to clipboard')
     window.setTimeout(() => setCopied(''), 1800)
@@ -297,7 +276,7 @@ function RichResponse({ text }) {
   return (
     <div className="response-prose">
       {parts.map((part, index) => {
-        if (index % 3 === 0) return <span key={index} className="response-text">{part}</span>
+        if (index % 3 === 0) return <span key={index} className="response-text">{part}{isStreaming && index === parts.length - 1 && <span className="stream-cursor" aria-hidden="true" />}</span>
         if (index % 3 === 1) return null
         const language = parts[index - 1] || 'text'
         return <div className="code-block" key={index}><div className="code-header"><span>{language}</span><button onClick={() => copyCode(part)}>{copied === part ? <CheckmarkOutline size={16} /> : <Copy size={16} />}{copied === part ? 'Copied' : 'Copy'}</button></div><pre><code>{part}</code></pre></div>
@@ -311,11 +290,11 @@ function Reasoning({ run }) {
   const reasoning = run.variants[run.variantIndex]?.reasoning || ''
   return (
     <section className={`reasoning ${run.reasoningExpanded ? 'open' : ''}`}>
-      <button className="reasoning-header" onClick={() => toggle(run.id)} aria-expanded={run.reasoningExpanded}>
+      <button className="reasoning-header" onClick={() => toggle(run.id)} aria-expanded={run.reasoningExpanded} aria-controls={`reasoning-${run.id}`}>
         <span className="reasoning-icon"><ChevronDown size={18} /></span>
         <span><strong>Reasoning</strong><small>{run.status === 'streaming' ? <><i className="active-pulse" /> Active while generating</> : `Completed in ${run.reasoningDuration || 1}s`}</small></span>
       </button>
-      <div className="reasoning-region"><p>{reasoning}</p></div>
+      <div id={`reasoning-${run.id}`} className="reasoning-region" aria-hidden={!run.reasoningExpanded}><p>{reasoning}</p></div>
     </section>
   )
 }
@@ -392,12 +371,19 @@ function ResponsePanel() {
           <StepPanel run={run} />
           <Reasoning run={run} />
           <div className="variant-row">
-            <span>{run.status === 'complete' ? run.variants[run.variantIndex].label : 'Live draft'}</span>
+            {run.status === 'complete' ? (
+              <div role="tablist" aria-label="Response variants" style={{ display: 'flex', gap: '4px' }}>
+                {run.variants.map((v, idx) => (
+                  <button key={v.label} type="button" role="tab" aria-selected={idx === run.variantIndex} className={`variant-chip ${idx === run.variantIndex ? 'active' : ''}`} style={{ border: '1px solid #dce3ed', borderRadius: '4px', padding: '2px 6px', background: idx === run.variantIndex ? '#eaf0ff' : 'white', cursor: 'pointer', fontSize: '10px' }} onClick={() => setVariant(run.id, idx)}>
+                    {v.label}
+                  </button>
+                ))}
+              </div>
+            ) : <span>Live draft</span>}
             {run.status === 'complete' && <div><Button size="sm" kind="ghost" renderIcon={ChevronLeft} onClick={() => setVariant(run.id, run.variantIndex - 1)} disabled={run.variantIndex === 0} {...iconOnly('Previous variant')} /><strong>{run.variantIndex + 1} of {run.variants.length}</strong><Button size="sm" kind="ghost" renderIcon={ChevronRight} onClick={() => setVariant(run.id, run.variantIndex + 1)} disabled={run.variantIndex === run.variants.length - 1} {...iconOnly('Next variant')} /></div>}
           </div>
           <div key={`${run.id}-${run.variantIndex}`} className={`response-body variant-${run.variantIndex} variant-in${settled ? ' settled' : ''}`} ref={bodyRef} onScroll={handleScroll}>
-            <RichResponse text={displayed} />
-            {isStreaming && <span className="stream-cursor" aria-hidden="true" />}
+            <RichResponse text={displayed} isStreaming={isStreaming} />
           </div>
           {!followScroll && isStreaming && <Button className="jump-latest" size="sm" kind="secondary" renderIcon={ArrowDown} onClick={jump}>Jump to Latest</Button>}
         </div>
@@ -422,7 +408,7 @@ function Workbench() {
   }, [streamingRunId, advanceRun])
 
   const handlePastePlaceholders = useCallback((names) => {
-    addToast(`Detected ${names.length} pasted placeholder${names.length > 1 ? 's' : ''}: ${names.join(', ')} — bind ${names.length > 1 ? 'their values' : 'its value'} in the panel`, 'info')
+    addToast(`Detected ${names.length} pasted variable${names.length > 1 ? 's' : ''}: ${names.join(', ')} — bind ${names.length > 1 ? 'their values' : 'its value'} in the panel`, 'info')
   }, [addToast])
 
   return (
@@ -464,7 +450,7 @@ function VariablePopover({ editorRef, variableSelectionRef }) {
   return (
     <div className="popover variable-popover" role="dialog" aria-modal="true" aria-labelledby="variable-popover-title" ref={dialogRef}>
       <div className="popover-arrow" />
-      <div className="popover-head"><div><p className="eyebrow">Placeholder</p><h2 id="variable-popover-title">Insert Variable</h2></div><Button size="sm" kind="ghost" renderIcon={Close} onClick={close} {...iconOnly('Close variable popover')} /></div>
+      <div className="popover-head"><div><p className="eyebrow">Variable</p><h2 id="variable-popover-title">Insert Variable</h2></div><Button size="sm" kind="ghost" renderIcon={Close} onClick={close} {...iconOnly('Close variable popover')} /></div>
       <form onSubmit={handleSubmit(confirm)} noValidate>
         <TextInput id="variable-name" labelText="Name" placeholder="customer_name" invalid={!!errors.name} invalidText={errors.name?.message} aria-describedby={errors.name ? 'variable-name-error-msg variable-name-error' : undefined} {...register('name')} /><div id="variable-name-error" className="sr-only" aria-live="polite">{errors.name?.message}</div>
         <p className="helper">Letters, digits, and underscores; 1–64 characters.</p>
@@ -561,7 +547,7 @@ function LibraryView() {
           </button>
           <Tag type="blue" size="sm">{item.technique}</Tag>
           <span className="attachment-count"><Attachment size={15} />{item.attachments.length}</span>
-          <Button size="sm" kind="ghost" renderIcon={TrashCan} onClick={() => removeWithExit(item.id)} {...iconOnly(`Delete ${item.title}`)} />
+          <Button size="sm" kind="ghost" renderIcon={TrashCan} disabled={leaving.includes(item.id)} onClick={() => removeWithExit(item.id)} {...iconOnly(`Delete ${item.title}`)} />
         </Tile>
       ))}</div> : library.length === 0 ? (
         <div className="empty-state library-empty"><FolderOpen size={42} /><h2>Your Library Is Empty</h2><p>Saved prompt records will appear here with their techniques and attachments.</p><Button onClick={() => switchView('workbench')}>Return to Workbench</Button></div>
@@ -570,189 +556,6 @@ function LibraryView() {
       )}
     </main>
   )
-}
-
-function SaveModal() {
-  const open = useWorkbench((state) => state.saveOpen)
-  const draft = useWorkbench((state) => state.draft)
-  const bindings = useWorkbench((state) => state.bindings)
-  const attachments = useWorkbench((state) => state.attachmentIds)
-  const persona = useWorkbench((state) => state.activePersona)
-  const library = useWorkbench((state) => state.library)
-  const save = useWorkbench((state) => state.saveLibrary)
-  const setChrome = useWorkbench((state) => state.setChrome)
-  const [allowEmpty, setAllowEmpty] = useState(false)
-  const savingRef = useRef(false)
-  const { register, handleSubmit, reset, setError, watch, formState: { errors, isValid } } = useForm({ resolver: zodResolver(libraryPromptInputSchema), mode: 'onChange', defaultValues: { title: '', technique: '' } })
-  useEffect(() => { if (open) { reset({ title: '', technique: '' }); setAllowEmpty(false); savingRef.current = false } }, [open, reset])
-  const close = () => setChrome('saveOpen', false)
-  useModalEscapeReturn(open, close)
-  const techniqueValue = watch('technique')
-  const techniqueMessage = errors.technique?.message || (!techniqueValue ? `Technique is required. Choose exactly one of: ${TECHNIQUES.join(', ')}.` : '')
-  const submit = (values) => {
-    if (savingRef.current) return
-    if (library.some((item) => item.title.toLowerCase() === values.title.toLowerCase())) {
-      setError('title', { message: 'Title must be unique among existing library prompts.' })
-      return
-    }
-    savingRef.current = true
-    save({ ...values, promptText: draft, bindings: { ...bindings }, attachments: [...attachments], personaId: persona?.id || null })
-  }
-  return (
-    <ComposedModal open={open} onClose={close} onKeyDown={(event) => { if (event.key === 'Escape') close() }} size="sm" preventCloseOnClickOutside>
-      <ModalHeader title="Save to Library" label="LibraryPrompt create" closeModal={close} />
-      <ModalBody>
-        <p className="modal-copy">Create a reusable prompt record from the current workbench state.</p>
-        <form id="save-library-form" onSubmit={handleSubmit(submit)} className="modal-form" noValidate>
-          <TextInput id="save-title" labelText="Title" placeholder="Quarterly launch brief" invalid={!!errors.title} invalidText={errors.title?.message} aria-describedby={errors.title ? 'save-title-error-msg save-title-error' : undefined} {...register('title')} /><div id="save-title-error" className="sr-only" aria-live="polite">{errors.title?.message}</div>
-          <Select id="save-technique" labelText="Technique" invalid={!!techniqueMessage} invalidText={techniqueMessage} aria-describedby={techniqueMessage ? 'save-technique-error-msg save-technique-error' : undefined} {...register('technique')}>
-            <SelectItem value="" text="Choose a technique" />
-            {TECHNIQUES.map((technique) => <SelectItem key={technique} value={technique} text={technique} />)}
-          </Select>
-          <div id="save-technique-error" className="sr-only" aria-live="polite">{techniqueMessage}</div>
-          {!draft && <Checkbox id="allow-empty" labelText="Save this intentionally empty draft" checked={allowEmpty} onChange={(_, data) => setAllowEmpty(data.checked)} />}
-          <div className="payload-summary"><span><strong>{detectVariables(draft).length}</strong> variables</span><span><strong>{attachments.length}</strong> attachments</span><span><strong>{persona ? 1 : 0}</strong> persona</span></div>
-        </form>
-      </ModalBody>
-      <ModalFooter><Button kind="secondary" onClick={close}>Cancel</Button><Button type="submit" form="save-library-form" disabled={!isValid || (!draft && !allowEmpty)}>Save</Button></ModalFooter>
-    </ComposedModal>
-  )
-}
-
-function ExportModal() {
-  const open = useWorkbench((state) => state.exportOpen)
-  const format = useWorkbench((state) => state.exportFormat)
-  const setChrome = useWorkbench((state) => state.setChrome)
-  const addToast = useWorkbench((state) => state.addToast)
-  useWorkbench()
-  useModalEscapeReturn(open, () => setChrome('exportOpen', false))
-  const [copied, setCopied] = useState(false)
-  useEffect(() => { if (open) setCopied(false) }, [open])
-  const pkg = compilePackage()
-  const preview = format === 'markdown' ? compileMarkdown() : JSON.stringify(pkg, null, 2)
-  const tokens = estimateTokens(pkg.promptText, pkg.model)
-  const summaryLine = `prompt-package-v1 · ${modelById(pkg.model).name} · ${tokens} tokens · ${detectVariables(pkg.promptText).length} variables · ${pkg.attachments.length} attachments`
-  const copy = async () => {
-    await navigator.clipboard.writeText(preview)
-    setCopied(true)
-    window.setTimeout(() => setCopied(false), 1800)
-    addToast(`${format === 'markdown' ? 'Markdown' : 'JSON'} copied to clipboard`)
-  }
-  const copySummary = async () => {
-    await navigator.clipboard.writeText(summaryLine)
-    addToast('Package summary copied to clipboard')
-  }
-  const download = () => {
-    const blob = new Blob([preview], { type: format === 'markdown' ? 'text/markdown' : 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const anchor = document.createElement('a')
-    anchor.href = url
-    anchor.download = `prompt-package.${format === 'markdown' ? 'md' : 'json'}`
-    anchor.click()
-    URL.revokeObjectURL(url)
-    addToast(`${format === 'markdown' ? 'Markdown' : 'JSON'} downloaded`)
-  }
-  return (
-    <ComposedModal open={open} onClose={() => setChrome('exportOpen', false)} onKeyDown={(event) => { if (event.key === 'Escape') setChrome('exportOpen', false) }} size="lg" preventCloseOnClickOutside>
-      <ModalHeader title="Export Prompt Package" label="Live-compiled session" closeModal={() => setChrome('exportOpen', false)} />
-      <ModalBody className="export-body">
-        <div className="package-summary">
-          <button className="sum-chip" onClick={copySummary} title="Copy this one-line package summary"><strong>{summaryLine.split('·')[0].trim()}</strong>{summaryLine.split('·').slice(1).map((piece) => <span key={piece}>{piece.trim()}</span>)}</button>
-          <span className="sum-chip"><strong>{estimateCost(pkg.promptText, pkg.model).toFixed(5)}</strong>&nbsp;est. cost</span>
-        </div>
-        <div className="format-tabs" role="tablist" aria-label="Export format">
-          <button role="tab" aria-selected={format === 'markdown'} onClick={() => setChrome('exportFormat', 'markdown')}>Markdown document</button>
-          <button role="tab" aria-selected={format === 'json'} onClick={() => setChrome('exportFormat', 'json')}>JSON package</button>
-        </div>
-        <pre className="export-preview" tabIndex={0} aria-label={`${format} preview`}><code>{preview}</code></pre>
-      </ModalBody>
-      <ModalFooter><Button kind="secondary" renderIcon={copied ? CheckmarkOutline : Copy} onClick={copy}>{copied ? 'Copied' : 'Copy'}</Button><Button renderIcon={ArrowDown} onClick={download}>Download {format === 'markdown' ? 'Markdown' : 'JSON'}</Button></ModalFooter>
-    </ComposedModal>
-  )
-}
-
-function ImportModal() {
-  const open = useWorkbench((state) => state.importOpen)
-  const setChrome = useWorkbench((state) => state.setChrome)
-  const hydrate = useWorkbench((state) => state.importPackage)
-  const addToast = useWorkbench((state) => state.addToast)
-  const { control, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm({ resolver: zodResolver(importPasteSchema), mode: 'onChange', defaultValues: { json: '' } })
-  const text = watch('json')
-  useEffect(() => { if (open) reset({ json: '' }) }, [open, reset])
-  const close = () => setChrome('importOpen', false)
-  useModalEscapeReturn(open, close)
-  const submit = ({ json }) => {
-    hydrate(JSON.parse(json))
-    addToast('Prompt package imported successfully')
-  }
-  const loadFile = async (event) => {
-    const file = event.target.files?.[0]
-    if (file) setValue('json', await file.text(), { shouldValidate: true, shouldDirty: true })
-  }
-  return (
-    <ComposedModal open={open} onClose={close} onKeyDown={(event) => { if (event.key === 'Escape') close() }} size="sm" preventCloseOnClickOutside>
-      <ModalHeader title="Import JSON Package" label="PromptPackage v1" closeModal={close} />
-      <ModalBody>
-        <form id="import-form" onSubmit={handleSubmit(submit)} className="modal-form" noValidate>
-          <Controller name="json" control={control} render={({ field }) => <><TextArea {...field} id="import-json" labelText="JSON package" rows={12} invalid={!!errors.json} invalidText={errors.json?.message} aria-describedby={errors.json ? 'import-json-error-msg import-json-error' : undefined} placeholder={'{\n  "schemaVersion": "prompt-package-v1",\n  ...\n}'} /><div id="import-json-error" className="sr-only" aria-live="polite">{errors.json?.message}</div></>} />
-          <label className="file-input"><Upload size={16} /><span>Load JSON file</span><input type="file" accept="application/json,.json" onChange={loadFile} /></label>
-          <p className="helper">Import validates schemaVersion, messages, model, bindings, attachments, persona, and technique before changing the workbench.</p>
-        </form>
-      </ModalBody>
-      <ModalFooter><Button kind="secondary" onClick={close}>Cancel</Button><Button type="submit" form="import-form" disabled={!text.trim()}>Import</Button></ModalFooter>
-    </ComposedModal>
-  )
-}
-
-function CommandPalette() {
-  const open = useWorkbench((state) => state.commandOpen)
-  const query = useWorkbench((state) => state.commandQuery)
-  const library = useWorkbench((state) => state.library)
-  const setModel = useWorkbench((state) => state.setModel)
-  const load = useWorkbench((state) => state.loadLibrary)
-  const attach = useWorkbench((state) => state.attachPersona)
-  const switchView = useWorkbench((state) => state.switchView)
-  const setChrome = useWorkbench((state) => state.setChrome)
-  const paletteRef = useRef(null)
-  const [index, setIndex] = useState(0)
-  const close = useCallback(() => { setChrome('commandOpen', false); setChrome('commandQuery', '') }, [setChrome])
-  useDialogFocus(open, paletteRef, close)
-  useEffect(() => {
-    const key = (event) => {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); setChrome('commandOpen', true) }
-    }
-    document.addEventListener('keydown', key)
-    return () => document.removeEventListener('keydown', key)
-  }, [setChrome])
-  const actions = useMemo(() => [
-    { id: 'export', type: 'Action', label: 'Export Package', run: () => setChrome('exportOpen', true) },
-    { id: 'save', type: 'Action', label: 'Save to Library', run: () => setChrome('saveOpen', true) },
-    { id: 'library', type: 'Action', label: 'Switch to Library', run: () => switchView('library') },
-    { id: 'workbench', type: 'Action', label: 'Switch to Workbench', run: () => switchView('workbench') },
-  ], [setChrome, switchView])
-  const all = useMemo(() => [
-    ...actions,
-    ...MODELS.map((model) => ({ id: model.id, type: 'Model', label: model.name, meta: model.provider, run: () => setModel(model.id) })),
-    ...library.map((item) => ({ id: item.id, type: 'Library', label: item.title, meta: item.technique, run: () => load(item.id) })),
-    ...PERSONAS.map((persona) => ({ id: persona.id, type: 'Persona', label: persona.name, meta: persona.role, run: () => attach(persona) })),
-  ], [actions, attach, library, load, setModel])
-  const score = (item, value) => {
-    const needle = value.toLowerCase().replace(/\s/g, '')
-    const haystack = `${item.label}${item.type}${item.meta || ''}`.toLowerCase().replace(/\s/g, '')
-    let cursor = 0
-    for (const char of needle) { cursor = haystack.indexOf(char, cursor); if (cursor < 0) return false; cursor += 1 }
-    return true
-  }
-  const results = query.trim() ? all.filter((item) => score(item, query)).slice(0, 12) : actions
-  useEffect(() => setIndex(0), [query])
-  if (!open) return null
-  const choose = (item) => { item.run(); close() }
-  const keyDown = (event) => {
-    if (event.key === 'ArrowDown') { event.preventDefault(); setIndex((value) => Math.min(results.length - 1, value + 1)) }
-    if (event.key === 'ArrowUp') { event.preventDefault(); setIndex((value) => Math.max(0, value - 1)) }
-    if (event.key === 'Enter' && results[index]) { event.preventDefault(); choose(results[index]) }
-  }
-  return <div className="palette-layer"><button className="backdrop" aria-label="Close command palette" onClick={close} /><section className="command-palette" role="dialog" aria-modal="true" aria-labelledby="palette-title" ref={paletteRef} onKeyDown={keyDown}><h2 id="palette-title" className="sr-only">Command palette</h2><div className="palette-search"><Search size={20} /><input aria-label="Search models, prompts, personas, and actions" value={query} onChange={(event) => setChrome('commandQuery', event.target.value)} placeholder="Search models, prompts, personas, and actions…" /><kbd>Esc</kbd></div><div className="palette-results" role="listbox">{results.length ? results.map((item, itemIndex) => <button key={`${item.type}-${item.id}`} role="option" aria-selected={index === itemIndex} className={index === itemIndex ? 'selected' : ''} onMouseEnter={() => setIndex(itemIndex)} onClick={() => choose(item)}><span className={`result-icon type-${item.type.toLowerCase()}`}>{item.type === 'Model' ? 'M' : item.type === 'Library' ? 'L' : item.type === 'Persona' ? 'P' : '⌘'}</span><span><strong>{item.label}</strong><small>{item.meta || item.type}</small></span><em>{item.type}</em></button>) : <div className="palette-empty"><Search size={28} /><strong>Nothing matched “{query}”</strong><span>Try a model, prompt title, persona, or action.</span></div>}</div><footer><span>↑↓ Navigate</span><span>↵ Select</span><span>{MOD_KEY} I Insert Variable</span><span>Esc Close</span></footer></section></div>
 }
 
 function Toasts() {
@@ -764,6 +567,17 @@ function Toasts() {
 
 export function App() {
   const activeView = useWorkbench((state) => state.activeView)
+  const saveOpen = useWorkbench((state) => state.saveOpen)
+  const exportOpen = useWorkbench((state) => state.exportOpen)
+  const importOpen = useWorkbench((state) => state.importOpen)
+  const commandOpen = useWorkbench((state) => state.commandOpen)
+  // The save/export/import modals and command palette live in a separate,
+  // lazy-loaded chunk (./Overlays) — mount it the first time any of them is
+  // opened, not on initial render, so cold load never pays for it.
+  const [overlaysMounted, setOverlaysMounted] = useState(false)
+  useEffect(() => {
+    if (saveOpen || exportOpen || importOpen || commandOpen) setOverlaysMounted(true)
+  }, [saveOpen, exportOpen, importOpen, commandOpen])
   useEffect(() => {
     const closeTransactionalModal = (event) => {
       if (event.key !== 'Escape') return
@@ -777,14 +591,32 @@ export function App() {
     document.addEventListener('keydown', closeTransactionalModal, true)
     return () => document.removeEventListener('keydown', closeTransactionalModal, true)
   }, [])
+  useEffect(() => {
+    // Cmd/Ctrl+K opens the command palette even before its lazy chunk has
+    // ever mounted (the in-component listener in Overlays.jsx only exists
+    // once mounted); this always-on listener just flips the store flag,
+    // which triggers the mount effect above.
+    const openPalette = (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        useWorkbench.getState().setChrome('commandOpen', true)
+      }
+    }
+    document.addEventListener('keydown', openPalette)
+    return () => document.removeEventListener('keydown', openPalette)
+  }, [])
   return (
     <div className="app-shell">
       <AppHeader />
       {activeView === 'workbench' ? <Workbench /> : <LibraryView />}
-      <SaveModal />
-      <ExportModal />
-      <ImportModal />
-      <CommandPalette />
+      {overlaysMounted && (
+        <Suspense fallback={null}>
+          <SaveModal />
+          <ExportModal />
+          <ImportModal />
+          <CommandPalette />
+        </Suspense>
+      )}
       <Toasts />
     </div>
   )

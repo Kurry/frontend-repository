@@ -14,6 +14,8 @@ export function ImportModal() {
   const panelRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const currentValidation = jsonInput.trim() ? parseStoryboardPackage(jsonInput) : null;
+  const canImport = currentValidation?.ok === true;
 
   const close = () => {
     isImportModalOpenStore.set(false);
@@ -26,8 +28,10 @@ export function ImportModal() {
   const handleFile = (file: File) => {
     const reader = new FileReader();
     reader.onload = () => {
-      setJsonInput(String(reader.result ?? ''));
-      setError(null);
+      const contents = String(reader.result ?? '');
+      const parsed = contents.trim() ? parseStoryboardPackage(contents) : null;
+      setJsonInput(contents);
+      setError(parsed && !parsed.ok ? parsed.error : null);
     };
     reader.readAsText(file);
   };
@@ -98,6 +102,15 @@ export function ImportModal() {
                 setJsonInput(e.target.value);
                 setError(null);
               }}
+              onBlur={(event) => {
+                const value = event.currentTarget.value;
+                if (!value.trim()) {
+                  setError(null);
+                  return;
+                }
+                const validation = parseStoryboardPackage(value);
+                setError(!validation.ok ? validation.error : null);
+              }}
               aria-invalid={error ? true : undefined}
               aria-describedby={error ? 'import-error' : undefined}
               className={clsx(
@@ -146,7 +159,8 @@ export function ImportModal() {
               <button
                 type="button"
                 onClick={handleImport}
-                className="inline-flex h-11 items-center gap-2 rounded-xl bg-yellow-400 px-5 text-sm font-bold text-yellow-950 shadow-sm shadow-yellow-400/40 transition-all hover:bg-yellow-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2"
+                disabled={!canImport}
+                className="inline-flex h-11 items-center gap-2 rounded-xl bg-yellow-400 px-5 text-sm font-bold text-yellow-950 shadow-sm shadow-yellow-400/40 transition-all hover:bg-yellow-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
               >
                 <Ri name="upload-2-line" size={16} />
                 Import

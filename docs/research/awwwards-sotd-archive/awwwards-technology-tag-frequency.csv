@@ -1,0 +1,127 @@
+technology_tag,site_count,percent_of_live_sites
+HTML5,1006,22.052
+GSAP,928,20.342
+CSS,919,20.145
+WebGL,743,16.287
+jQuery,608,13.327
+Three.js,422,9.25
+WordPress,386,8.461
+PHP,265,5.809
+SVG,238,5.217
+React,192,4.209
+Figma,181,3.968
+Nginx,176,3.858
+Vue.js,173,3.792
+Modernizr,163,3.573
+GLSL,149,3.266
+Nuxt.js,146,3.2
+Webpack,139,3.047
+Webflow,123,2.696
+PixiJS,121,2.652
+Next.js,106,2.324
+JavaScript,95,2.082
+Shopify,91,1.995
+BARBA.js,81,1.776
+Contentful,79,1.732
+Node.js,74,1.622
+Google Font API,70,1.534
+Hammer.JS,66,1.447
+Cloudflare,63,1.381
+Typekit,58,1.271
+Craft CMS,54,1.184
+Lodash,53,1.162
+Web Fonts,52,1.14
+Locomotive Scroll,49,1.074
+Lottie,47,1.03
+Underscore.js,47,1.03
+After Effects,46,1.008
+Blender,42,0.921
+WooCommerce,42,0.921
+Sanity,41,0.899
+Backbone.js,36,0.789
+Cinema 4D,34,0.745
+Bootstrap,34,0.745
+Prismic,33,0.723
+Vercel,33,0.723
+CSS Framework,31,0.68
+Express,30,0.658
+Varnish,30,0.658
+Angular,28,0.614
+CreateJS,28,0.614
+Debian,27,0.592
+Netlify,25,0.548
+Laravel,23,0.504
+Highway.js,23,0.504
+Yepnope,23,0.504
+jQuery UI,22,0.482
+Google App Engine,20,0.438
+RequireJS,19,0.416
+Drupal,18,0.395
+Tailwind,17,0.373
+Anime.js,17,0.373
+Sass,17,0.373
+IIS,17,0.373
+Adobe Illustrator,16,0.351
+Gatsby,16,0.351
+tween.js,16,0.351
+FastClick,16,0.351
+Zepto,15,0.329
+Snap.svg,15,0.329
+TypeScript,14,0.307
+Adobe Photoshop,14,0.307
+GraphQL,13,0.285
+Canvas API,13,0.285
+Firebase,13,0.285
+Framer,12,0.263
+Swiper.js,12,0.263
+Ruby,11,0.241
+Adobe XD,11,0.241
+Handlebars,11,0.241
+Vanilla JS,10,0.219
+WebVR,10,0.219
+DatoCMS,10,0.219
+Matter.js,10,0.219
+VideoJS,10,0.219
+VR,10,0.219
+Astro,9,0.197
+WebSockets,9,0.197
+SEO,9,0.197
+YouTube API,9,0.197
+Font Awesome,9,0.197
+Velocity.js,8,0.175
+11ty,7,0.153
+Curtains.js,7,0.153
+AWS,6,0.132
+Svelte,5,0.11
+PWA,5,0.11
+Readymag,5,0.11
+Ink,5,0.11
+jQuery Mobile,4,0.088
+Vite,3,0.066
+P5.js,3,0.066
+OWL Carousel,3,0.066
+MediaElement.js,3,0.066
+Unity,2,0.044
+Editor X,2,0.044
+Flickity,2,0.044
+Python,2,0.044
+Sketch,2,0.044
+Prestashop,2,0.044
+Knockout,2,0.044
+Raphael.js,2,0.044
+Skrollr.js,2,0.044
+D3,2,0.044
+Socket.io,2,0.044
+Spin.js,2,0.044
+SoundManager,2,0.044
+Facebook API,2,0.044
+Cables,1,0.022
+Redux,1,0.022
+Tilda,1,0.022
+Hugo,1,0.022
+Elementor,1,0.022
+Neos CMS,1,0.022
+Docker,1,0.022
+Directus,1,0.022
+Magento,1,0.022
+Optimizely,1,0.022

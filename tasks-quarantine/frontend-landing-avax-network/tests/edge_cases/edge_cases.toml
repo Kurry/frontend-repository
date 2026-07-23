@@ -1,0 +1,212 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "contact_empty_submit_names_missing_fields"
+description = "Submitting the contact form with required fields empty shows inline messages naming each missing field, shows no success message, clears nothing, and does not append a session lead or change the Session leads total."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "newsletter_confirmation_only_on_step_5"
+description = "The newsletter submit/confirmation action exists only on step 5; steps 1 through 4 offer Next (and Back from step 2 onward) and never show Thank you for subscribing."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "community_feed_arrows_permanently_disabled"
+description = "The community feed track is empty by design: its previous and next arrows are disabled on load and remain disabled after clicking, hovering, and scrolling."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "news_carousel_end_arrows_disabled_no_wrap"
+description = "At the news carousel's first slide the previous arrow is disabled; at the last slide the next arrow is disabled; neither click wraps around."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "contact_errors_are_field_specific"
+description = "Contact and newsletter final-submit validation errors name the specific missing/invalid field (including otherDetail when project_type is Other) with actionable text rather than a generic Invalid rejection alone."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "form_success_messages_appear_after_delay"
+description = "Valid contact and newsletter submits show their success copy (Success! We'll be in touch. / Thank you for subscribing) after the brief simulated delay rather than instantly with no feedback."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "newsletter_progress_surfaces_reflect_step"
+description = "The five-step newsletter long flow keeps a visible step counter and progress bar that update with Next/Back."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "form_controls_use_semantic_labels"
+description = "Newsletter and contact form fields use semantic inputs with visible labels (or accessible name equivalents) rather than unlabeled div shells."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "mobile_drawer_dismissible"
+description = "Below 1025px the open mobile drawer can be dismissed via its close control (and keyboard where focusable), restoring the page."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "newsletter_next_never_blocks_on_validity"
+description = "On newsletter steps 1–4, Next advances even when the current step's fields are incomplete (navigation never blocks on per-step validity)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "empty_log_export_valid_schema"
+description = "With zero leads, Download JSON still produces astra-session-leads.json with version 1, the current theme, counts all zero, and an empty leads array; Copy JSON copies that same empty-log JSON and still shows Copied confirmation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "undo_on_empty_log_noop"
+description = "With zero leads, Undo last lead leaves the empty state unchanged (total stays 0, no phantom row)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "invalid_then_valid_contact_one_lead"
+description = "A failed empty contact submit followed immediately by a valid contact submit appends exactly one lead — the invalid attempt never appears in the Session leads list or export."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "newsletter_invalid_final_submit_named_errors"
+description = "On newsletter step 5, submitting with firstname shorter than 2 characters, a malformed email, empty or out-of-enum country, missing or out-of-enum vertical, isDeveloper unset, or gdpr unchecked shows inline errors naming each offending field, never shows Thank you for subscribing, and appends no lead."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "contact_otherDetail_required_when_other"
+description = "Submitting the contact form with project_type Other and otherDetail empty or shorter than 2 characters shows a named otherDetail error, shows no Success! We'll be in touch. message, clears nothing, and appends no lead."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "contact_message_min_length_and_email_format"
+description = "Submitting the contact form with astra_contact_message shorter than 10 characters or a malformed email shows a named error on that field, shows no success message, clears nothing, and appends no lead."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "contact_gdpr_unchecked_blocks_lead"
+description = "Submitting the contact form with otherwise-valid fields but gdpr unchecked shows a named gdpr error, shows no Success! We'll be in touch. message, clears nothing, and appends no lead."
+type = "binary"
+weight = 1.0
+

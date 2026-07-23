@@ -2,6 +2,16 @@
 Build an A/B experimentation studio for a prompt-engineering platform using React, Zustand, Tailwind CSS 4.3.2, IBM Carbon Design System, and Recharts. The app PRODUCES the operator's experiment report: a downloadable and copyable Experiment Report JSON document compiled live from the selected experiment's design, sample counts, statistics (excluding flagged outliers), and decision, conforming to the same API-shaped field contracts as the designer, criterion, and decision forms, with Import that round-trips a contract-valid report.
 </summary>
 
+<reference_screenshots>
+Screenshots of the reference application are provided in-container at
+/reference-screenshots/: overview.png is a full-page desktop-layout
+overview (downscaled); overview-tablet.png and overview-mobile.png are full-page responsive
+reflows at 1024x768 (tablet) and 390x844 (mobile) viewports; segment-NN.png are full-resolution 1440x900 sections
+in top-to-bottom order with slight overlap. They are part of this instruction:
+recreate what they show. Where a screenshot and the text conflict, the text
+wins. Do not copy the images into /app or ship them as app assets.
+</reference_screenshots>
+
 <core_features>
 Core features (each line is an observable behavior the finished app must exhibit):
 

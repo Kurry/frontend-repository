@@ -1,0 +1,33 @@
+{
+  "name": "media-timeline",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "verify:build": "vite build && node -e \"require('fs').accessSync('dist/index.html')\"",
+    "start": "vite preview --port 3000 --host 0.0.0.0",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/fraunces": "5.2.8",
+    "@fontsource-variable/manrope": "5.2.8",
+    "@kobalte/core": "0.13.12",
+    "@tabler/icons-solidjs": "3.45.0",
+    "motion": "11.18.2",
+    "solid-js": "1.9.14",
+    "virtua": "0.38.5",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.3.2",
+    "tailwindcss": "4.3.2",
+    "vite": "8.1.5",
+    "vite-plugin-solid": "2.11.13",
+    "@playwright/test": "1.61.0"
+  },
+  "overrides": {
+    "baseline-browser-mapping": "2.10.43",
+    "electron-to-chromium": "1.5.393"
+  }
+}

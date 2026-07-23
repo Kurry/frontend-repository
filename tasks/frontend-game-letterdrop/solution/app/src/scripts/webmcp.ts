@@ -154,46 +154,73 @@ async function artifactOperate(args: Record<string, unknown>) {
 // ---- registry --------------------------------------------------------------
 type Handler = (args: Record<string, unknown>) => unknown | Promise<unknown>;
 
-const TOOLS: { name: string; description: string; handler: Handler }[] = [
+type Tool = {
+  name: string;
+  description: string;
+  module: string;
+  handler: Handler;
+  inputSchema?: Record<string, unknown>;
+  annotations?: Record<string, unknown>;
+};
+
+const EMPTY_INPUT_SCHEMA = { type: "object", properties: {}, additionalProperties: false };
+
+const TOOLS: Tool[] = [
   {
     name: "session.start",
     description: "Start a run through the visible Start game control.",
+    module: "command-session-v1",
     handler: () => sessionOperate({ operation: "start" }),
   },
   {
     name: "session.pause",
     description: "Pause the active run through the visible Pause control.",
+    module: "command-session-v1",
     handler: () => sessionOperate({ operation: "pause" }),
   },
   {
     name: "session.resume",
     description: "Resume the paused run through the visible Resume control.",
+    module: "command-session-v1",
     handler: () => sessionOperate({ operation: "resume" }),
   },
   {
     name: "session.restart",
     description: "Restart after Game Over through the visible Play again control.",
+    module: "command-session-v1",
     handler: () => sessionOperate({ operation: "restart" }),
   },
   {
     name: "browse.open",
     description:
       "Switch the visible view via the real tab control. args.destination is one of game-board | match-history | achievements. Returns a fresh visibleState.",
+    module: "browse-query-v1",
     handler: browseOpen,
+  },
+  {
+    name: "browse.inspect",
+    description: "Read the current visible game and navigation state without changing the app.",
+    module: "browse-query-v1",
+    inputSchema: EMPTY_INPUT_SCHEMA,
+    annotations: { readOnlyHint: true },
+    handler: () => ({ ok: true, visibleState: visibleState() }),
   },
   {
     name: "artifact.export",
     description: "Open the visible export preview for args.format run-json or history-json; no JSON is returned.",
+    module: "artifact-transfer-v1",
     handler: (args) => artifactOperate({ ...args, operation: "export" }),
   },
   {
     name: "artifact.import",
     description: "Reveal and focus the visible Import control for args.mode run-json or history-json; raw bytes remain Playwright-only.",
+    module: "artifact-transfer-v1",
     handler: (args) => artifactOperate({ ...args, operation: "import" }),
   },
   {
     name: "artifact.copy",
     description: "Copy from the currently visible export preview and report the settled clipboard result without returning its contents.",
+    module: "artifact-transfer-v1",
     handler: (args) => artifactOperate({ ...args, operation: "copy" }),
   },
 ];
@@ -206,7 +233,15 @@ export function initWebMcp() {
     tools: TOOLS.map((t) => t.name),
     visibleState: visibleState(),
   });
-  w.webmcp_list_tools = () => TOOLS.map((t) => ({ name: t.name, description: t.description }));
+  w.webmcp_list_tools = () =>
+    TOOLS.map((t) => ({
+      name: t.name,
+      description: t.description,
+      module: t.module,
+      inputSchema: t.inputSchema ?? EMPTY_INPUT_SCHEMA,
+      parameters: t.inputSchema ?? EMPTY_INPUT_SCHEMA,
+      annotations: t.annotations ?? {},
+    }));
   w.webmcp_invoke_tool = async (name: string, args: Record<string, unknown> = {}) => {
     const tool = TOOLS.find((t) => t.name === name);
     if (!tool) return { ok: false, error: `unknown tool: ${name}` };

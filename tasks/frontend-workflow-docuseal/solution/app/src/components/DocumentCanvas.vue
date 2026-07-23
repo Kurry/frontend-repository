@@ -32,8 +32,9 @@ function fieldStyle(field) {
 
 function handlePointerDown(event, field) {
   if (store.mode !== 'build' || event.button !== 0) return
-  store.selectField(field.id, event.shiftKey)
-  if (event.shiftKey) return
+  const additive = event.shiftKey || event.ctrlKey || event.metaKey
+  store.selectField(field.id, additive)
+  if (additive) return
   const page = event.currentTarget.closest('.document-page')
   const rect = page.getBoundingClientRect()
   const startX = event.clientX
@@ -67,7 +68,7 @@ function handlePointerDown(event, field) {
 function keySelect(event, field) {
   if (event.key === 'Enter' || event.key === ' ') {
     event.preventDefault()
-    store.selectField(field.id, event.shiftKey)
+    store.selectField(field.id, event.shiftKey || event.ctrlKey || event.metaKey)
   }
 }
 </script>
@@ -76,7 +77,7 @@ function keySelect(event, field) {
   <main class="canvas-shell" :class="{ previewing: store.mode === 'preview' }" aria-label="Document canvas">
     <div class="canvas-toolbar-mobile">
       <span>{{ store.activeTemplate.name }}</span>
-      <span>{{ store.activeTemplate.fields.length }} fields · {{ store.activeTemplate.pages }} pages</span>
+      <span>{{ store.activeTemplate.fields.length }} {{ store.activeTemplate.fields.length === 1 ? 'field' : 'fields' }} · {{ store.activeTemplate.pages }} {{ store.activeTemplate.pages === 1 ? 'page' : 'pages' }}</span>
     </div>
 
     <div class="pages-stack">
@@ -123,7 +124,7 @@ function keySelect(event, field) {
             @keydown.delete.stop.prevent="store.deleteFields([field.id])"
           >
             <template v-if="store.mode === 'build'">
-              <component :is="icons[field.type]" class="field-icon" :size="15" weight="bold" />
+              <component :is="icons[field.type]" class="field-icon" :size="15" weight="bold" aria-hidden="true" />
               <span class="field-name">{{ field.name }}</span>
               <span v-if="field.required" class="required-mark" aria-label="required">*</span>
               <span class="field-owner">{{ field.submitter }}</span>

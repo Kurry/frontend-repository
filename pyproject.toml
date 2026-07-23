@@ -5,10 +5,20 @@ description = "Frontend Harbor eval tasks — pins harbor to the Kurry/harbor fo
 requires-python = ">=3.12"
 dependencies = [
     "harbor[modal]",
+    "corpuscheck",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
 ]
 
 [tool.uv]
 package = false
 
+[tool.uv.workspace]
+members = ["packages/corpuscheck"]
+
 [tool.uv.sources]
 harbor = { git = "https://github.com/Kurry/harbor.git", rev = "49ac88859e31cd5561f98249aaf4b9ca03c90f7e" }
+corpuscheck = { workspace = true }

@@ -41,6 +41,7 @@ function issue(id: string, type: TimelineType, summary: string): TimelineEntry {
 }
 
 export class ConsoleStore {
+  private rerunStarting = false;
   runs = $state<RunRecord[]>(seedRuns());
   selectedRunId = $state('RUN-2407-A91');
   selectedStageName = $state<StageName>('Test Generation');
@@ -329,15 +330,20 @@ export class ConsoleStore {
   }
 
   async startRerun(stageName: StageName = this.selectedStage.name): Promise<boolean> {
-    if (this.rerun.active) return false;
+    if (this.rerun.active || this.rerunStarting) return false;
+    this.rerunStarting = true;
     const run = this.selectedRun;
     const stage = run.stages.find((candidate) => candidate.name === stageName);
-    if (!stage) return false;
+    if (!stage) {
+      this.rerunStarting = false;
+      return false;
+    }
     this.revertWhatIf();
     this.closeNoteForm();
     const gateStatuses: Record<string, RerunGateStatus> = {};
     stage.gates.forEach((gate) => { gateStatuses[gate.id] = 'pending'; });
     this.rerun = { active: true, runId: run.id, stageName, progress: 0, gateStatuses: { ...gateStatuses } };
+    this.rerunStarting = false;
     stage.status = 'running';
     stage.certificate = null;
     this.appendTimeline(run, issue(run.id, 're-run', `${stageName} re-run started`));
@@ -465,17 +471,20 @@ export class ConsoleStore {
         })),
         certificate: stage.certificate ? { ...stage.certificate } : null
       })),
-      timeline: payload.timeline.map((entry, index) => ({ ...entry, id: `import-${index}-${Date.now()}` }))
+      timeline: payload.timeline.map((entry, index) => ({
+        ...entry,
+        id: `import-${index}-${entry.timestamp}`
+      }))
     };
     const nextRuns = [...this.runs];
     nextRuns[targetIndex] = nextRun;
-    this.runs = nextRuns;
+    this.runs = [...nextRuns];
     this.selectedRunId = nextRun.id;
     this.selectedStageName = nextRun.stages[0].name;
     this.importDraft = text;
     this.importError = '';
+    this.exportedAt = payload.exportedAt;
     this.resetTransientStageState();
-    this.touchExport();
     this.closeModal();
     this.showToast(`Acceptance package imported for ${nextRun.id}`);
     return { ok: true };

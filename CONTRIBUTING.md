@@ -26,17 +26,16 @@ separate "rebuild" bucket.
 
 ## Task quality tracking
 
-Every task's readiness lives in `tools/corpuscheck`, not in this file — the
+Every task's readiness lives in `packages/corpuscheck`, not in this file — the
 corpus changes too often for a hand-edited table to stay honest. See
-`tools/corpuscheck/README.md` for the full command surface; the everyday loop
-is:
+`packages/corpuscheck/README.md` for the full command surface; the everyday loop
+(from the repo root) is:
 
 ```bash
-cd tools/corpuscheck
-corpuscheck discover --root ../../tasks   # register new/renamed tasks
-corpuscheck validate --all --incremental  # run static tiers, refresh fingerprints
-corpuscheck status --all                  # print every task's current stage
-corpuscheck advance <slug>                # recompute static stages after a fix
+uv run corpuscheck discover                   # register new/renamed tasks
+uv run corpuscheck validate --all --incremental  # run static tiers, refresh fingerprints
+uv run corpuscheck status --all               # print every task's current stage
+uv run corpuscheck advance <slug>             # recompute static stages after a fix
 ```
 
 Readiness is a lifecycle, monotonic only while a task's content is unchanged:
@@ -66,6 +65,28 @@ Use `corpuscheck baseline accept <slug> <tier> --reason "..."` for deliberate,
 reasoned exceptions only — never to silently skip a real failure.
 `corpuscheck baseline list` / `remove` manage existing waivers.
 
+## Playwright test authoring
+
+Every pull request runs the root Playwright ESLint scaffold against added lines
+in canonical `packages/corpuscheck/.../canonical/e2e/` tests and task-owned
+`solution/app/e2e.spec.mjs` or `solution/app/e2e/**/*.spec.*` suites. Existing
+lint debt outside the changed lines does not block a PR, but newly introduced
+focused or skipped tests, missing Playwright `await`s, hard timeout sleeps,
+conditional assertions, invalid expectations, and the other recommended
+`eslint-plugin-playwright` defects do.
+
+Run the same gate locally from the repository root:
+
+```bash
+npm ci
+npm run lint:playwright:changed -- --base origin/main --head HEAD
+```
+
+The root `package.json`, `eslint.config.mjs`, and
+`packages/corpuscheck/src/corpuscheck/assets/lint_changed_playwright.mjs` are
+the shared tooling source. Do not add divergent ESLint copies to individual
+task apps.
+
 ## Where task quality is actually defined
 
 `corpuscheck` tells you *whether* a task is valid; it doesn't define what
@@ -76,4 +97,4 @@ reasoned exceptions only — never to silently skip a real failure.
 - `CLAUDE.md` / `AGENTS.md` — the non-negotiable invariants: judge integrity
   (observer never repairer), polarity discipline (negatives state the defect
   as present), the WebMCP contract mandate, and scripted consistency
-  (`scripts/propagate_canonical.py`) for anything shared across tasks.
+  (`uv run corpuscheck propagate`) for anything shared across tasks.

@@ -5,7 +5,8 @@
   "scripts": {
     "verify:build": "npm run build && node --input-type=module -e \"import fs from 'fs'; fs.accessSync('dist/index.html');\"",
     "start": "npx --yes serve -l 3000 -n dist",
-    "build": "vite build"
+    "build": "vite build",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
   },
   "dependencies": {
     "html2canvas": "^1.4.1",
@@ -14,6 +15,7 @@
   },
   "devDependencies": {
     "@felte/validator-zod": "^1.0.18",
+    "@playwright/test": "^1.61.1",
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@tailwindcss/vite": "4.3.2",
     "bits-ui": "^1.0.0",

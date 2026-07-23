@@ -71,6 +71,17 @@ export default function StepBitmaps() {
             class="h-[46px] w-[210px] cursor-pointer appearance-none rounded-md border-2 border-scope-bg2 bg-scope-bg2 pl-3 pr-9 text-sm font-medium text-scope-fg1 transition-[border-color,box-shadow] duration-150 hover:border-scope-bg3 hover:shadow-sm focus:border-scope-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-scope-accent focus-visible:ring-offset-1"
             value={state.iconSet}
             onChange={(e) => selectIconSet(e.currentTarget.value as IconSet)}
+            onKeyDown={(e) => {
+              if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+              e.preventDefault();
+              const options: IconSet[] = ["none", "vector"];
+              const current = options.indexOf(state.iconSet);
+              const next = Math.max(
+                0,
+                Math.min(options.length - 1, current + (e.key === "ArrowDown" ? 1 : -1)),
+              );
+              if (next !== current) selectIconSet(options[next]);
+            }}
           >
             <option value="none">{ICON_SET_LABELS.none}</option>
             <option value="vector">{ICON_SET_LABELS.vector}</option>
@@ -80,12 +91,8 @@ export default function StepBitmaps() {
           </span>
         </span>
         <p class="text-sm text-scope-fg2" aria-live="polite">
-          <Show
-            when={state.iconSet === "vector"}
-            fallback={<>Keeping the original embedded bitmaps.</>}
-          >
-            {replacedCount()} of {BITMAPS.length} bitmaps set to Vector.
-          </Show>
+          {replacedCount()} of {BITMAPS.length} bitmaps set to Vector.
+          <Show when={state.iconSet === "none"}> Keeping the original embedded bitmaps.</Show>
         </p>
       </div>
 

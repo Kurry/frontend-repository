@@ -18,8 +18,9 @@
 
 :root { font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; color: #f4f7fb; background: #070b12; font-synthesis: none; }
 * { box-sizing: border-box; }
-html { min-width: 320px; background: #070b12; scroll-behavior: smooth; }
+html { min-width: 320px; background: #070b12; scroll-behavior: smooth; overflow-x: clip; }
 body { margin: 0; min-width: 320px; min-height: 100vh; overflow-x: hidden; background: radial-gradient(circle at 85% -10%, rgba(69,137,255,.13), transparent 32rem), #070b12; }
+.app-shell { min-width: 0; max-width: 100%; overflow-x: clip; }
 button, input, textarea, select { font: inherit; }
 button { -webkit-tap-highlight-color: transparent; }
 :focus-visible { outline: 2px solid #a6c8ff !important; outline-offset: 2px; }

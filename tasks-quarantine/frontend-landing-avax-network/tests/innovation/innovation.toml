@@ -1,0 +1,142 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+weight = 0.25
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "11.1"
+name = "execution_quality_of_signature_interactions"
+description = "Score execution quality of the reference experience (not invention beyond it): theme cross-fade, mega-menu hover panels, and marquee pause-on-hover feel polished and coherent rather than unfinished stubs."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.2"
+name = "scroll_storytelling_execution"
+description = "On a fresh load, scroll-triggered section storytelling (split-line rises and heading glyph flashes) executes smoothly as a choreographed sequence rather than a janky or missing recreation of the reference motion."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.3"
+name = "hero_layered_intro_execution"
+description = "The hero clipped-panel entrance and layered placeholder video cycle (nine desktop / five below 1025px) plus HUD fade-ins execute as a finished sequence matching the reference ambition."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.7"
+name = "astra_brand_narrative_arc"
+description = "The long-form page reads as one Astra Network narrative arc from hero through Why Astra, Network In Action, News, Solutions, Community, and builder CTAs rather than disconnected template blocks."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.a1"
+name = "designed_experience_narrative_arc"
+description = "The page reads as a designed experience with a narrative arc — sections build on each other visually and the signature scroll interaction is memorable as faithful reference execution, not a template with effects sprinkled on."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.a2"
+name = "showcase_rechoreographed_at_narrow_widths"
+description = "Impeccable execution across breakpoints: at 390 the showcase composition is re-choreographed (stacked hero, drawer nav, mobile spacing) rather than a broken shrink of the desktop layout."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "innovation.catchall"
+name = "innovation_catchall"
+description = "The app demonstrates a noteworthy, browser-observable execution-quality enhancement of the reference experience that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick, and must not invent design beyond the reference. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0

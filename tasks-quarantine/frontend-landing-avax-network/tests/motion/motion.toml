@@ -1,0 +1,205 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "theme_toggle_crossfade"
+description = "Clicking the theme toggle cross-fades the sun/moon icons and transitions surface, text, border, and accent colors together rather than snapping instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "shared_hover_language"
+description = "Hovering navigation labels and mega-menu link rows produces an accent shift and hover wash, and hovering buttons eases their fill and cut-corner frame with non-linear easing as one coherent hover language"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "hero_intro_and_video_layer_cycle"
+description = "On a fresh load the hero panels enter with a clipped-panel reveal and the center cycles through stacked placeholder video layers (nine on desktop, five below 1025px), starting after about 1.5s and advancing when each layer ends, wrapping past layer one after the first pass"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "hero_hud_overlays_fade_in"
+description = "Both looping HUD overlays fade in over the hero after about four seconds"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.5"
+name = "section_split_line_reveal_on_scroll"
+description = "On a fresh load, really scrolling a lower section such as Network or Contact into view (no state shortcut) triggers its reveal, its split paragraphs rising line by line"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "heading_glyph_flash_on_reveal"
+description = "On a fresh load, when a split heading really scrolls into view its characters flash through random glyphs before settling to the final uppercase letters"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "smooth_scroll_scrub_and_anchors"
+description = "Above 1024px, smooth native scrolling stays active alongside scroll-driven section motion and the desktop quick-link card scrub, hash/anchor navigation eases over about two seconds, and sticky Why Astra headings still stick; below 1025px native scrolling is used with the smooth-scroll engine off"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "marquees_loop_and_pause_on_hover"
+description = "The trusted-business logo marquee loops continuously and the footer wordmark marquee repeats on a fast loop, and both pause on hover"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.9"
+name = "blog_carousel_paging_and_reset"
+description = "Paging the blog carousel with its previous/next arrows moves the slides, arrow enabled state follows the start and end of the track, and scrolling back above it resets it to the first slide"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "newsletter_step_and_field_animation"
+description = "Moving through the newsletter steps animates the progress bar and step counter as the step wrapper slides between the five steps, and the form chips, floating labels, and custom selects animate their open/selected states"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.13"
+name = "marquee_cycle_durations"
+description = "The running trusted-logo marquee reports a cycle duration near 31500ms and the footer wordmark marquee near 5000ms, both linear and infinite (readable via getAnimations on the loaded page)"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.14"
+name = "inertial_reveal_easing_timings"
+description = "On a fresh load, when a section is scrolled into view its split-line reveal runs about 2000ms with an ease-out-cubic (non-linear) curve, and the hero clipped-panel entrance runs about 2000ms with ease-in-out-quart rather than linear start/stop tweens"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.16"
+name = "reduced_motion_suppresses_effects"
+description = "With a reduced-motion preference emulated and the page freshly loaded, the smooth scrolling, split-line reveals, heading glyph flashes, and marquees are suppressed while section visibility triggers and the hero sequence still run"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.17"
+name = "section_reveal_replays_on_reentry"
+description = "After a section has revealed, really scrolling back above it and then back into view replays its entrance animation rather than showing it pre-settled"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.18"
+name = "signature_scroll_storytelling"
+description = "On a fresh load, really scrolling through major sections drives a sequential storytelling reveal — sections enter in scroll order with split-line rises and heading glyph flashes — rather than all content appearing pre-settled or only animating via a state shortcut"
+type = "binary"
+weight = 1.0
+

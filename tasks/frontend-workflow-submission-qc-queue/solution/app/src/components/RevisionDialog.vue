@@ -9,9 +9,30 @@ import { useQcStore } from '../store'
 const store = useQcStore()
 const submission = computed(() => store.activeSubmission)
 const schema = z.object({ summary: z.string({ message: 'Summary is required.' }).trim().min(20, 'Summary must be at least 20 characters.') })
-const { handleSubmit, meta, isSubmitting, resetForm, validate } = useForm({ validationSchema: toTypedSchema(schema), validateOnMount: true, initialValues: { summary: '' } })
-const submit = handleSubmit(async (values) => { if (store.requestRevision(submission.value.id, values)) await nextTick(() => resetForm()) })
-watch(() => store.dialogs.revision, async (open) => { if (open) { await nextTick(); await validate() } })
+const draft = computed(() => {
+  if (!submission.value) return { summary: '' }
+  return store.draftRevisions[submission.value.id] || { summary: '' }
+})
+
+const { handleSubmit, meta, isSubmitting, resetForm, validate, values } = useForm({ validationSchema: toTypedSchema(schema), validateOnMount: true, initialValues: draft.value })
+
+watch(values, (newVals) => {
+  if (submission.value) {
+    store.draftRevisions[submission.value.id] = JSON.parse(JSON.stringify(newVals))
+  }
+}, { deep: true })
+
+const submit = handleSubmit(async (values) => { 
+  if (store.requestRevision(submission.value.id, values)) {
+    delete store.draftRevisions[submission.value.id]
+    await nextTick(() => resetForm()) 
+  }
+})
+// The dialog's <Field> input unmounts when the modal closes (display-directive="if"),
+// and vee-validate drops its value on unmount — so every open must re-hydrate the
+// form from the per-submission draft rather than relying on the one-time initialValues
+// this component captured at its own (submission-independent) mount.
+watch(() => store.dialogs.revision, async (open) => { if (open) { resetForm({ values: draft.value }); await nextTick(); await validate() } })
 </script>
 <template>
   <NModal v-if="store.dialogs.revision" :show="true" :mask-closable="true" :close-on-esc="true" display-directive="if" class="review-modal" transform-origin="center" @update:show="(v) => { if (!v) store.dialogs.revision = false }" @esc="store.dialogs.revision = false">

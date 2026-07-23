@@ -141,8 +141,14 @@ export const savePayloadSchema = z.object({
     context.addIssue({ code: 'custom', path: ['fields'], message: `Fields do not match the ${techniqueById[record.technique].name} schema.` })
     return
   }
+  const normalizePromptText = (value) => String(value)
+    .replace(/\r\n?/g, '\n')
+    .split('\n')
+    .map((line) => line.trimEnd())
+    .join('\n')
+    .trim()
   const expectedPrompt = assemblePrompt(record.technique, parsed.data, record.attachments || [])
-  if (record.promptText !== expectedPrompt) {
+  if (normalizePromptText(record.promptText) !== normalizePromptText(expectedPrompt)) {
     context.addIssue({ code: 'custom', path: ['promptText'], message: 'Prompt text must match the assembled preview.' })
   }
 })

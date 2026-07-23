@@ -7,7 +7,8 @@
     "build": "astro build",
     "start": "astro preview --host 0.0.0.0 --port 3000",
     "dev": "astro dev --host 0.0.0.0 --port 3000",
-    "verify:build": "astro build"
+    "verify:build": "astro build",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
   },
   "dependencies": {
     "@astrojs/svelte": "9.0.0",
@@ -27,6 +28,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "typescript": "6.0.3"
   }
 }

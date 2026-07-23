@@ -257,6 +257,22 @@ function formCancel(args: Args): Result {
   return { ok: true, field, cancelled: true }
 }
 
+function artifactExport(): Result {
+  const store = useSparkStore()
+  return {
+    ok: true,
+    format: 'workspace-json',
+    artifact: store.buildWorkspaceExport(),
+  }
+}
+
+function moduleForTool(name: string): string {
+  if (name.startsWith('browse-')) return 'browse-query-v1'
+  if (name.startsWith('entity-')) return 'entity-collection-v1'
+  if (name.startsWith('form-')) return 'form-workflow-v1'
+  return 'artifact-transfer-v1'
+}
+
 // ---- registry --------------------------------------------------------------
 
 interface Tool {
@@ -419,6 +435,12 @@ const TOOLS: Tool[] = [
     },
     handler: formCancel,
   },
+  {
+    name: 'artifact-export',
+    description: 'Return the same Workspace JSON derived from the current visible workspace that the Export drawer downloads.',
+    input_schema: { type: 'object', properties: {} },
+    handler: artifactExport,
+  },
 ]
 
 export function initWebMcp() {
@@ -429,7 +451,14 @@ export function initWebMcp() {
     tools: TOOLS.map(t => t.name),
   })
   w.webmcp_list_tools = () =>
-    TOOLS.map(t => ({ name: t.name, description: t.description, input_schema: t.input_schema }))
+    TOOLS.map(t => ({
+      name: t.name,
+      module: moduleForTool(t.name),
+      description: t.description,
+      input_schema: t.input_schema,
+      inputSchema: t.input_schema,
+      annotations: t.name === 'artifact-export' ? { readOnlyHint: true } : undefined,
+    }))
   w.webmcp_invoke_tool = (name: string, args: Args = {}) => {
     const tool = TOOLS.find(t => t.name === name)
     if (!tool) return { ok: false, error: `unknown tool: ${name}` }

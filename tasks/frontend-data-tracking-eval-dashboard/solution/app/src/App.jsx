@@ -119,7 +119,7 @@ const STATUS_ICON = {
 
 function StatusPill({ status }) {
   const Icon = STATUS_ICON[status] || Time;
-  return <span className={`status-pill status-${status}`}><Icon size={14} aria-hidden="true" />{status}</span>;
+  return <span className={`status-pill status-${status}`}><Icon size={14} role="img" aria-label={`${status} status`} />{status}</span>;
 }
 
 // The control that opened a dialog; Carbon modals refocus it on close.
@@ -199,6 +199,13 @@ function useDrawerBehavior(open, close, panelRef) {
     if (!open) return undefined;
     const trigger = document.activeElement;
     const frame = requestAnimationFrame(() => panelRef.current?.focus());
+    const focusableNodes = () => panelRef.current
+      ? [...panelRef.current.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')].filter((node) => !node.disabled && node.offsetParent !== null)
+      : [];
+    const onFocus = (event) => {
+      if (!panelRef.current || panelRef.current.contains(event.target)) return;
+      (focusableNodes()[0] || panelRef.current).focus();
+    };
     const onKey = (event) => {
       if (event.key === 'Escape') {
         event.preventDefault();
@@ -206,18 +213,24 @@ function useDrawerBehavior(open, close, panelRef) {
         return;
       }
       if (event.key === 'Tab' && panelRef.current) {
-        const nodes = [...panelRef.current.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')].filter((node) => !node.disabled && node.offsetParent !== null);
+        const nodes = focusableNodes();
         if (!nodes.length) return;
         const first = nodes[0];
         const last = nodes.at(-1);
-        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        const focusIsInside = panelRef.current.contains(document.activeElement);
+        if (!focusIsInside || document.activeElement === panelRef.current) {
+          event.preventDefault();
+          (event.shiftKey ? last : first).focus();
+        } else if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
         else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
       }
     };
     document.addEventListener('keydown', onKey, true);
+    document.addEventListener('focusin', onFocus, true);
     return () => {
       cancelAnimationFrame(frame);
       document.removeEventListener('keydown', onKey, true);
+      document.removeEventListener('focusin', onFocus, true);
       trigger?.focus?.();
     };
   }, [open, close, panelRef]);
@@ -856,7 +869,7 @@ function DetailPanel({ row, open }) {
       <div className={`disclosure ${openDisclosure ? 'open' : ''}`}>
         <button onClick={() => state.toggleDisclosure(row.rowId)} aria-expanded={openDisclosure}><span><span className="eyebrow">Rubric</span><strong>Scoring breakdown</strong></span><ChevronDown className="disclosure-chevron" /></button>
         <div className="disclosure-content" aria-hidden={!openDisclosure}>
-          <div>{row.scoringBreakdown.map((item) => <div className="rubric-row" key={item.dimension}><span>{item.dimension}</span><div><i style={{ width: `${item.score}%` }} /></div><strong>{item.score}</strong></div>)}</div>
+          {openDisclosure && <div>{row.scoringBreakdown.map((item) => <div className="rubric-row" key={item.dimension}><span>{item.dimension}</span><div><i style={{ width: `${item.score}%` }} /></div><strong>{item.score}</strong></div>)}</div>}
         </div>
       </div>
     </aside>

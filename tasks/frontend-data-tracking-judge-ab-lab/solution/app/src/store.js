@@ -24,11 +24,14 @@ export function visibleTrials(state) {
   const direction = state.sort.direction === 'asc' ? 1 : -1
   rows = [...rows].sort((a, b) => {
     if (state.sort.type === 'task-name') return direction * (a.taskName.localeCompare(b.taskName) || a.id.localeCompare(b.id))
-    if (state.sort.type === 'label-reward') return direction * ((a.results[state.sort.label]?.totalReward ?? -1) - (b.results[state.sort.label]?.totalReward ?? -1))
+    if (state.sort.type === 'label-reward') {
+      const rewardDelta = (a.results[state.sort.label]?.totalReward ?? -1) - (b.results[state.sort.label]?.totalReward ?? -1)
+      return direction * (rewardDelta || a.id.localeCompare(b.id))
+    }
     const [la, lb] = state.deltaPair
     const da = Math.abs((a.results[lb]?.totalReward ?? 0) - (a.results[la]?.totalReward ?? 0))
     const db = Math.abs((b.results[lb]?.totalReward ?? 0) - (b.results[la]?.totalReward ?? 0))
-    return direction * (da - db)
+    return direction * ((da - db) || a.id.localeCompare(b.id))
   })
   return rows
 }
@@ -298,7 +301,13 @@ export const useLabStore = create((set, get) => ({
   },
 
   importDocument: (document) => {
-    const parsed = labResultsSchema.parse(document)
+    const parsedResult = labResultsSchema.safeParse(document)
+    if (!parsedResult.success) {
+      const issue = parsedResult.error.issues?.[0]
+      const err = issue ? (issue.message.includes(':') ? issue.message : `${issue.path.join('.')}: ${issue.message}`) : 'document: validation failed'
+      return { imported: false, error: err }
+    }
+    const parsed = parsedResult.data
     const importedLabels = parsed.labels.map(({ name, scorerModel, configNote }) => ({ name, scorerModel, configNote }))
     const modelByLabel = Object.fromEntries(importedLabels.map((label) => [label.name, label.scorerModel]))
     const originalById = Object.fromEntries(get().trials.map((trial) => [trial.id, trial]))

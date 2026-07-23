@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 771 1024" preserveAspectRatio="xMidYMid slice">
+  <rect width="771" height="1024" fill="#f4e9e1"/>
+  <rect x="40" y="0" width="691" height="1024" fill="#fff" opacity="0.5"/>
+  <rect x="323.82" y="60" width="262.14000000000004" height="904" rx="20" fill="#2a2a2e"/>
+  <rect x="354.66" y="120" width="200.46" height="200.46" rx="14" fill="#111114"/>
+  <circle cx="385.5" cy="170" r="9" fill="#1be349"/><circle cx="451.035" cy="170" r="9" fill="#1be349"/><circle cx="516.57" cy="170" r="9" fill="#1be349"/><circle cx="385.5" cy="216" r="9" fill="#1be349"/><circle cx="451.035" cy="216" r="9" fill="#1be349"/><circle cx="516.57" cy="216" r="9" fill="#1be349"/><circle cx="385.5" cy="262" r="9" fill="#1be349"/><circle cx="451.035" cy="262" r="9" fill="#1be349"/><circle cx="516.57" cy="262" r="9" fill="#1be349"/>
+  <rect x="385.5" y="563.2" width="123.36" height="120" rx="10" fill="#3a3a40"/>
+  <rect x="385.5" y="563.2" width="20" height="120" rx="8" fill="#ffb200"/>
+  <g transform="translate(92.52,870.4) scale(2.4)"><path d="M0 0 q-14 -22 -6 -40 q10 8 6 40" fill="#00aa3c"/><path d="M0 0 q14 -22 6 -40 q-10 8 -6 40" fill="#1be349"/><path d="M0 2 q-2 -30 0 -46 q2 16 0 46" stroke="#00aa3c" stroke-width="2" fill="none"/><rect x="-7" y="0" width="14" height="12" rx="2" fill="#ff5c38"/></g>
+  <circle cx="616.8000000000001" cy="184.32" r="40" fill="#ffdb08" opacity="0.8"/>
+  </svg>

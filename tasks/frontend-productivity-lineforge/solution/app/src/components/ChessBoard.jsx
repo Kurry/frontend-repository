@@ -1,15 +1,16 @@
 import { h } from 'preact';
+import { useRef, useEffect } from 'preact/hooks';
 import {
-  currentOpening, selectedNodeId, boardFlipped,
-  practiceActive, practiceStreak, practiceCorrect, practiceTotal,
-  practicePrompt, practiceMessage,
-  userLine, activeGame, boardSelection, legalTargets, boardFlash, previewMoves,
-  getNodeMoves, nodeIdForPath, recordExploredMove, showToast
+  currentOpening, boardFlipped,
+  activeGame, boardSelection, legalTargets, boardFlash, previewMoves,
+  blindfoldActive, blindfoldPeek,
+  getNodeMoves, showToast
 } from '../store';
 import {
-  applyMoves, generateLegalMoves, moveToString, sanEq,
-  PIECE_UNICODE, INITIAL_FEN, findKing, isInCheck, squareLabel
+  applyMoves, generateLegalMoves, moveToString, PIECE_UNICODE, INITIAL_FEN,
+  findKing, isInCheck, squareLabel
 } from '../chess';
+import { playMoveObject, clearInteraction, currentPath, positionForPath } from '../boardPlay';
 
 function ownPiece(piece, turn) {
   if (!piece) return false;
@@ -18,22 +19,19 @@ function ownPiece(piece, turn) {
 
 export function ChessBoard() {
   const opening = currentOpening.value;
-  if (!opening) return null;
+  const prevCaptured = useRef({ w: 0, b: 0 });
 
-  const game = activeGame.value;
-  const preview = previewMoves.value;
-  const path = game ? game.moves.slice(0, game.index + 1) : (preview || getNodeMoves());
-
-  const states = applyMoves(INITIAL_FEN, path);
-  const currentPos = states[states.length - 1].state;
-  const legalMoves = generateLegalMoves(currentPos);
+  const path = opening ? currentPath() : [];
+  const states = opening ? applyMoves(INITIAL_FEN, path) : [];
+  const currentPos = opening ? states[states.length - 1].state : null;
+  const legalMoves = currentPos ? generateLegalMoves(currentPos) : [];
 
   // Captured-piece tally from the position diff
   const initialCounts = { P: 8, N: 2, B: 2, R: 2, Q: 1, K: 1, p: 8, n: 2, b: 2, r: 2, q: 1, k: 1 };
   const currentCounts = {};
   for (let r = 0; r < 8; r++) {
     for (let c = 0; c < 8; c++) {
-      const p = currentPos.board[r][c];
+      const p = currentPos?.board[r][c];
       if (p) currentCounts[p] = (currentCounts[p] || 0) + 1;
     }
   }
@@ -47,6 +45,13 @@ export function ChessBoard() {
       else capturedByWhite.push(PIECE_UNICODE[piece]);
     }
   }
+  const newW = Math.max(0, capturedByWhite.length - prevCaptured.current.w);
+  const newB = Math.max(0, capturedByBlack.length - prevCaptured.current.b);
+  useEffect(() => {
+    prevCaptured.current = { w: capturedByWhite.length, b: capturedByBlack.length };
+  });
+
+  if (!opening || !currentPos) return null;
 
   const select = (r, c) => {
     const targets = legalMoves.filter(m => m.from.r === r && m.from.c === c);
@@ -56,74 +61,26 @@ export function ChessBoard() {
     }
   };
 
-  const clearSelection = () => {
-    boardSelection.value = null;
-    legalTargets.value = [];
-  };
-
-  const practiceAttempt = (move, notation) => {
-    const exp = opening.moves[path.length];
-    if (!exp) {
-      practicePrompt.value = 'Line complete';
-      clearSelection();
-      return;
-    }
-    practiceTotal.value += 1;
-    if (sanEq(notation, exp)) {
-      practiceCorrect.value += 1;
-      practiceStreak.value += 1;
-      practiceMessage.value = '';
-      boardFlash.value = 'success';
-      setTimeout(() => { if (boardFlash.value === 'success') boardFlash.value = null; }, 650);
-      showToast('Correct!');
-      const nid = nodeIdForPath([...path, exp]);
-      if (nid) selectedNodeId.value = nid;
-      practicePrompt.value = path.length + 1 >= opening.moves.length ? 'Line complete' : 'Your move';
-    } else {
-      practiceStreak.value = 0;
-      practiceMessage.value = 'Try again';
-      boardFlash.value = 'danger';
-      showToast('Try again');
-      previewMoves.value = [...path, notation];
-      setTimeout(() => {
-        previewMoves.value = null;
-        if (boardFlash.value === 'danger') boardFlash.value = null;
-      }, 700);
-    }
-    clearSelection();
-  };
-
-  const executeMove = (move) => {
-    const notation = moveToString(currentPos, move);
-    if (practiceActive.value) {
-      practiceAttempt(move, notation);
-      return;
-    }
-    recordExploredMove(path, notation);
-    clearSelection();
-  };
-
-  // Unified activation used by mouse-up and keyboard: attempt a move to
-  // (r, c) when a piece is picked up, otherwise pick up an own piece.
   const activate = (r, c) => {
-    if (game) {
+    if (activeGame.value) {
       showToast('Board is replaying a game — use Previous move and Next move, or select Close');
       return;
     }
-    if (preview) return;
+    if (previewMoves.value) {
+      showToast('Board is previewing a line — wait for the preview to finish');
+      return;
+    }
     const sel = boardSelection.value;
     const piece = currentPos.board[r][c];
     const own = ownPiece(piece, currentPos.turn);
     if (sel && !(sel.r === r && sel.c === c)) {
       const move = legalMoves.find(m => m.from.r === sel.r && m.from.c === sel.c && m.to.r === r && m.to.c === c);
       if (move) {
-        executeMove(move);
+        const notation = moveToString(currentPos, move);
+        playMoveObject(move, notation, currentPos);
         return;
       }
-      if (own) {
-        select(r, c);
-        return;
-      }
+      if (own) { select(r, c); return; }
       showToast('Illegal move — choose one of the highlighted squares');
       return;
     }
@@ -131,26 +88,26 @@ export function ChessBoard() {
   };
 
   const onSquareMouseDown = (r, c) => {
-    if (game || preview) return;
+    if (activeGame.value) {
+      showToast('Board is replaying a game — use Previous move and Next move, or select Close');
+      return;
+    }
+    if (previewMoves.value) {
+      showToast('Board is previewing a line — wait for the preview to finish');
+      return;
+    }
     const piece = currentPos.board[r][c];
     if (ownPiece(piece, currentPos.turn)) select(r, c);
   };
 
   const onSquareMouseUp = (r, c) => {
     const sel = boardSelection.value;
-    if (game) {
-      showToast('Board is replaying a game — use Previous move and Next move, or select Close');
-      return;
-    }
-    if (preview) return;
+    if (activeGame.value || previewMoves.value) return;
     if (sel && !(sel.r === r && sel.c === c)) activate(r, c);
   };
 
   const onSquareKeyDown = (e, r, c) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      activate(r, c);
-    }
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(r, c); }
   };
 
   const flipped = boardFlipped.value;
@@ -163,9 +120,14 @@ export function ChessBoard() {
   const last = states[states.length - 1];
   const lastMove = path.length > 0 && last.move ? last.move : null;
 
+  const blind = blindfoldActive.value && !blindfoldPeek.value;
+
   return (
     <div class="flex flex-col sm:flex-row gap-4 items-start">
       <div class={`board-wrapper w-full sm:w-auto ${boardFlash.value ? `flash-${boardFlash.value}` : ''}`}>
+        {boardFlash.value && (
+          <div class={`board-flash-overlay flash-overlay-${boardFlash.value}`} aria-hidden="true" />
+        )}
         <div class="grid grid-cols-8 rounded-[10px] overflow-hidden shadow-lg board-frame" style="width: min(368px, 100%); aspect-ratio: 1;">
           {Array.from({ length: 64 }, (_, i) => {
             const row = Math.floor(i / 8);
@@ -185,7 +147,7 @@ export function ChessBoard() {
             return (
               <div
                 key={i}
-                class={`relative flex items-center justify-center cursor-pointer select-none
+                class={`relative flex items-center justify-center cursor-pointer select-none board-square
                   ${isLight ? 'board-light' : 'board-dark'}
                   ${isSel ? 'square-selected' : ''}
                   ${isLastMove ? 'square-last-move' : ''}
@@ -202,7 +164,7 @@ export function ChessBoard() {
               >
                 {piece && (
                   <span
-                    class={`select-none ${isSel ? 'piece-lifted' : ''} ${
+                    class={`select-none piece-glyph ${isSel ? 'piece-lifted' : ''} ${blind ? 'piece-blind' : ''} ${
                       piece === piece.toUpperCase() ? 'piece-white' : 'piece-black'
                     }`}
                     aria-hidden="true"
@@ -232,21 +194,32 @@ export function ChessBoard() {
         </div>
       </div>
       <div class="flex flex-col gap-2 self-stretch justify-start min-w-[96px]">
-        <h3 class="side-heading">Captured pieces</h3>
+        <h3 class="side-heading">Captured Pieces</h3>
         <div class="space-y-2 text-base">
           <div>
             <div class="text-sm text-neutral-600">By white</div>
-            <div class="text-xl leading-tight">{capturedByWhite.join(' ') || 'None'}</div>
+            <div class="text-xl leading-tight capture-row" aria-live="polite">
+              {capturedByWhite.length === 0 ? 'None' : capturedByWhite.map((g, idx) => (
+                <span key={idx} class={idx >= capturedByWhite.length - newW ? 'capture-pop' : ''}>{g} </span>
+              ))}
+            </div>
           </div>
           <div>
             <div class="text-sm text-neutral-600">By black</div>
-            <div class="text-xl leading-tight">{capturedByBlack.join(' ') || 'None'}</div>
+            <div class="text-xl leading-tight capture-row" aria-live="polite">
+              {capturedByBlack.length === 0 ? 'None' : capturedByBlack.map((g, idx) => (
+                <span key={idx} class={idx >= capturedByBlack.length - newB ? 'capture-pop' : ''}>{g} </span>
+              ))}
+            </div>
           </div>
         </div>
         <div class="mt-1 text-base text-neutral-700">
           {currentPos.turn === 'w' ? 'White to move' : 'Black to move'}
           {inCheck ? ' — check' : ''}
         </div>
+        {blind && (
+          <p class="text-sm text-neutral-600 mt-1">Blindfold mode hides the pieces to train visualization. Use Peek or toggle Blindfold off.</p>
+        )}
       </div>
     </div>
   );

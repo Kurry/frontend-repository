@@ -1,22 +1,9 @@
 /**
- * WebMCP surface for the Razorpay Sprint 26 microsite (contract zto-webmcp-v1).
- *
- * Every tool drives the SAME visible control the human UI uses — it locates the
- * real DOM element (segment nav anchor, play button, hamburger toggle, modal
- * close) and dispatches the identical click/handler path. There is no success
- * path here that the UI itself lacks.
- *
- *   window.webmcp_session_info()
- *   window.webmcp_list_tools()
- *   window.webmcp_invoke_tool(name, args)
- *
- * Modules:
- *   browse-query-v1   (prefix "browse")   — operation: open
- *   command-session-v1 (prefix "session") — operations: start, stop, trigger_demo
+ * WebMCP surface for the Novapay Sprint 26 microsite.
+ * Tool names and input schemas mirror packages/webmcp-contracts exactly; every
+ * handler drives the same visible control path as a person using the page.
  */
 
-
-// destination key -> in-page hash of the matching segment nav anchor
 const DESTINATIONS = {
   hero: "#Hero",
   "agentic-stack": "#agentic-stack",
@@ -27,183 +14,260 @@ const DESTINATIONS = {
   "business-banking": "#finance",
   shortlist: "shortlist",
   compare: "compare",
-  "sprint-brief": "sprint-brief"
+  "sprint-brief": "sprint-brief",
+};
+const FILTERS = ["all", "agentic-stack", "international", "payment-gateway", "d2c", "marketing", "business-banking"];
+const DEMOS = ["mobile-menu", "command-palette"];
+const ENTITY_FIELDS = ["feature_name", "pinned"];
+const SLUG_TO_THEME = {
+  all: "All",
+  "agentic-stack": "Agentic Stack",
+  international: "International Payments",
+  "payment-gateway": "Payment Gateway",
+  d2c: "D2C",
+  marketing: "Marketing",
+  "business-banking": "Business Banking",
 };
 
-const DEMOS = ["mobile-menu", "command-palette"];
+function objectSchema(properties, required = []) {
+  const schema = { type: "object", additionalProperties: false, properties };
+  if (required.length) schema.required = required;
+  return schema;
+}
+
+function validateInput(schema, args) {
+  if (!args || typeof args !== "object" || Array.isArray(args)) return "arguments must be an object";
+  const properties = schema.properties || {};
+  const unknown = Object.keys(args).find((key) => !(key in properties));
+  if (unknown) return `unknown argument: ${unknown}`;
+  const missing = (schema.required || []).find((key) => args[key] === undefined);
+  if (missing) return `missing required argument: ${missing}`;
+  for (const [key, rule] of Object.entries(properties)) {
+    const value = args[key];
+    if (value === undefined) continue;
+    if (rule.type === "string" && typeof value !== "string") return `${key} must be a string`;
+    if (rule.type === "boolean" && typeof value !== "boolean") return `${key} must be a boolean`;
+    if (rule.type === "object" && (!value || typeof value !== "object" || Array.isArray(value))) return `${key} must be an object`;
+    if (rule.maxLength && typeof value === "string" && value.length > rule.maxLength) return `${key} is too long`;
+    if (rule.enum && !rule.enum.includes(value)) return `${key} is outside the declared enum`;
+    if (rule.const !== undefined && value !== rule.const) return `${key} must equal ${rule.const}`;
+    if (rule.type === "object" && rule.additionalProperties && typeof rule.additionalProperties === "object") {
+      for (const [nestedKey, nested] of Object.entries(value)) {
+        const nestedRule = rule.additionalProperties;
+        if (nestedRule.type === "string" && typeof nested !== "string") return `${key}.${nestedKey} must be a string`;
+        if (nestedRule.maxLength && typeof nested === "string" && nested.length > nestedRule.maxLength) return `${key}.${nestedKey} is too long`;
+      }
+    }
+  }
+  return "";
+}
+
+function openTray() {
+  if (typeof window.openSessionTray !== "function") return false;
+  window.openSessionTray();
+  return true;
+}
+
+function openBrief() {
+  const panel = document.getElementById("brief-panel");
+  if (panel && getComputedStyle(panel).display !== "none") return true;
+  const button = document.getElementById("btn-export-brief");
+  if (!button) return false;
+  button.click();
+  return true;
+}
+
+function featureButton(className, name) {
+  return Array.from(document.querySelectorAll(`button.${className}[data-feature]`))
+    .find((button) => button.getAttribute("data-feature") === name);
+}
+
+function hasFeature(name) {
+  return Array.from(document.querySelectorAll(".shortlist-item[data-feature]"))
+    .some((card) => card.getAttribute("data-feature") === name);
+}
+
+function setSearch(query) {
+  if (query.length > 120) return { ok: false, error: "query must be 120 characters or fewer" };
+  openTray();
+  const input = document.getElementById("search-query");
+  if (!input) return { ok: false, error: "Launch search control not found" };
+  input.value = query;
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+  return { ok: true, query };
+}
+
+function setFilter(slug) {
+  const theme = SLUG_TO_THEME[slug];
+  if (!theme) return { ok: false, error: "Unknown filter" };
+  openTray();
+  const select = document.getElementById("theme-filter");
+  if (!select) return { ok: false, error: "Theme filter control not found" };
+  select.value = theme;
+  select.dispatchEvent(new Event("change", { bubbles: true }));
+  return { ok: true, filter: slug };
+}
 
 export function initWebmcp() {
   const tools = {
-    // ---- browse-query-v1 -------------------------------------------------
-    browse_open: {
-      description: "Open (scroll to) a page section or panel.",
+    "browse.open": {
+      description: "Open a declared destination (route, tab, section, or item).",
+      inputSchema: objectSchema({
+        destination: { type: "string", enum: Object.keys(DESTINATIONS), description: "Declared destination" },
+      }, ["destination"]),
       handler(args) {
-        args = args || {};
-        const dest = args.destination;
-        if (dest === "sprint-brief") {
-          const exportBtn = document.getElementById("btn-export-brief");
-          if (exportBtn) exportBtn.click();
-          return { ok: true, destination: dest, active: true };
-        } else if (dest === "shortlist" || dest === "compare") {
-          // just scroll to the trays UI
-          const trays = document.getElementById("trays-ui");
-          if (trays) trays.scrollIntoView({ behavior: 'smooth' });
-          return { ok: true, destination: dest, active: true };
+        const destination = args.destination;
+        if (destination === "sprint-brief") return { ok: openBrief(), destination };
+        if (destination === "shortlist" || destination === "compare") {
+          const ok = openTray();
+          const dock = document.getElementById("session-dock");
+          if (dock) dock.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          return { ok, destination };
         }
-
-        const hash = DESTINATIONS[dest];
-        if (!hash) return { ok: false, error: "Unknown destination: " + dest };
-        const cell = document.querySelector('a.seg-cell[href="' + hash + '"]');
-        if (!cell) return { ok: false, error: "Nav control not found for " + dest };
-        cell.click();
-        return {
-          ok: true,
-          destination: dest,
-          hash,
-          active: cell.classList.contains("is-active"),
-        };
+        const hash = DESTINATIONS[destination];
+        const control = document.querySelector(`a.seg-cell[href="${hash}"]`);
+        if (!control) return { ok: false, error: `Navigation control not found for ${destination}` };
+        control.click();
+        return { ok: true, destination };
       },
     },
-    browse_apply_filter: {
-      description: "Apply a theme filter.",
-      handler(args) {
-        args = args || {};
-        if (args.themes && args.themes.length > 0) {
-           const themeSelect = document.getElementById("theme-filter");
-           if (themeSelect) {
-              themeSelect.value = args.themes[0];
-              themeSelect.dispatchEvent(new Event('change'));
-              return { ok: true, filter: args.themes[0] };
-           }
-        }
-        return { ok: false, error: "Missing themes argument" };
-      }
+    "browse.search": {
+      description: "Search within the browsable surface.",
+      inputSchema: objectSchema({ query: { type: "string", maxLength: 200 } }, ["query"]),
+      handler(args) { return setSearch(args.query); },
     },
-
-    // ---- command-session-v1 ---------------------------------------------
-    session_start: {
-      description: "Start the executive video session.",
+    "browse.apply_filter": {
+      description: "Apply a declared filter.",
+      inputSchema: objectSchema({
+        filter: { type: "string", enum: FILTERS },
+        value: { type: "string", maxLength: 200 },
+      }, ["filter"]),
+      handler(args) { return setFilter(args.filter); },
+    },
+    "browse.clear_filter": {
+      description: "Clear one or all declared filters.",
+      inputSchema: objectSchema({ filter: { type: "string", enum: FILTERS } }),
+      handler() { return setFilter("all"); },
+    },
+    "session.start": {
+      description: "Invoke session operation: start.",
+      inputSchema: objectSchema({}),
       handler() {
         const play = document.querySelector("[data-video]");
         if (!play) return { ok: false, error: "No play control found" };
         play.click();
-        const modal = document.querySelector(".video-modal");
-        return {
-          ok: true,
-          session: "video",
-          open: !!(modal && modal.style.opacity === "1"),
-          scrollLocked: document.body.style.overflow === "hidden",
-        };
+        return { ok: true, session: "video", started: true };
       },
     },
-    session_stop: {
-      description: "Stop the video session.",
+    "session.stop": {
+      description: "Invoke session operation: stop.",
+      inputSchema: objectSchema({}),
       handler() {
         const close = document.querySelector(".video-close-button");
         if (!close) return { ok: false, error: "No close control found" };
         close.click();
-        const modal = document.querySelector(".video-modal");
-        return {
-          ok: true,
-          session: "video",
-          open: !!(modal && modal.style.opacity === "1"),
-        };
+        return { ok: true, session: "video", stopped: true };
       },
     },
-    session_trigger_demo: {
-      description: "Trigger a page demo.",
+    "session.trigger_demo": {
+      description: "Trigger a declared demo.",
+      inputSchema: objectSchema({ demo: { type: "string", enum: DEMOS } }, ["demo"]),
       handler(args) {
-        args = args || {};
-        const demo = args.demo;
-        if (demo === "mobile-menu") {
+        if (args.demo === "mobile-menu") {
           const toggle = document.getElementById("menu-toggle");
           if (!toggle) return { ok: false, error: "Mobile menu toggle not found" };
           toggle.click();
-          const menu = document.getElementById("mobile-menu");
-          return { ok: true, demo, menuOpen: !!(menu && menu.classList.contains("is-open")) };
-        } else if (demo === "command-palette") {
-           const ev = new KeyboardEvent('keydown', { key: 'k', ctrlKey: true });
-           document.dispatchEvent(ev);
-           return { ok: true, demo };
+          return { ok: true, demo: args.demo, triggered: true };
         }
-        return { ok: false, error: "Unknown demo; use one of " + DEMOS.join(", ") };
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true, bubbles: true }));
+        return { ok: true, demo: args.demo, triggered: true };
       },
     },
-
-    // ---- entity-collection-v1 -------------------------------------------
-    entity_create: {
-      description: "Create (pin) a shortlist item.",
+    "entity.create": {
+      description: "Create an entity using declared fields.",
+      inputSchema: objectSchema({
+        fields: { type: "object", additionalProperties: { type: "string", maxLength: 200 } },
+      }),
       handler(args) {
-        args = args || {};
-        const name = args.entity_fields?.feature_name;
-        if (!name) return { ok: false, error: "Missing feature_name" };
-        const pinBtn = document.querySelector(`button.btn-pin[data-feature="${name}"]`);
-        if (pinBtn) pinBtn.click();
-        else if (window.appMutations) window.appMutations.pinFeature(name);
-        return { ok: true, entity: "shortlist-item", feature_name: name, pinned: true };
-      }
+        const fields = args.fields || {};
+        const unknown = Object.keys(fields).find((key) => !ENTITY_FIELDS.includes(key));
+        if (unknown) return { ok: false, error: `Unknown field: ${unknown}` };
+        const name = fields.feature_name;
+        if (!name || !hasFeature(name)) return { ok: false, error: "feature_name must identify a catalog feature" };
+        const button = featureButton("btn-pin", name);
+        if (!button) return { ok: false, error: "Pin control not found" };
+        button.click();
+        return { ok: true, id: name, pinned: true };
+      },
     },
-    entity_delete: {
-      description: "Delete (unpin) a shortlist item.",
+    "entity.delete": {
+      description: "Delete an entity with explicit confirmation.",
+      inputSchema: objectSchema({
+        id: { type: "string", maxLength: 128 },
+        confirm: { type: "boolean", const: true },
+      }, ["id", "confirm"]),
       handler(args) {
-        args = args || {};
-        const name = args.entity_fields?.feature_name;
-        if (!name) return { ok: false, error: "Missing feature_name" };
-        const unpinBtn = document.querySelector(`button.btn-unpin[data-feature="${name}"]`);
-        if (unpinBtn) unpinBtn.click();
-        else if (window.appMutations) window.appMutations.unpinFeature(name);
-        return { ok: true, entity: "shortlist-item", feature_name: name, pinned: false };
-      }
+        if (!hasFeature(args.id)) return { ok: false, error: "id must identify a catalog feature" };
+        const button = featureButton("btn-unpin", args.id);
+        if (!button) return { ok: false, error: "Unpin control not found" };
+        button.click();
+        return { ok: true, id: args.id, pinned: false };
+      },
     },
-    entity_toggle: {
-      description: "Toggle a shortlist item pin state.",
+    "entity.toggle": {
+      description: "Toggle a boolean field on an entity.",
+      inputSchema: objectSchema({
+        id: { type: "string", maxLength: 128 },
+        field: { type: "string", enum: ENTITY_FIELDS },
+      }, ["id"]),
       handler(args) {
-        args = args || {};
-        const name = args.entity_fields?.feature_name;
-        if (!name) return { ok: false, error: "Missing feature_name" };
-        if (window.appState && window.appState.shortlist.includes(name)) {
-            const unpinBtn = document.querySelector(`button.btn-unpin[data-feature="${name}"]`);
-            if (unpinBtn) unpinBtn.click();
-            else window.appMutations.unpinFeature(name);
-            return { ok: true, entity: "shortlist-item", feature_name: name, pinned: false };
-        } else {
-            const pinBtn = document.querySelector(`button.btn-pin[data-feature="${name}"]`);
-            if (pinBtn) pinBtn.click();
-            else if (window.appMutations) window.appMutations.pinFeature(name);
-            return { ok: true, entity: "shortlist-item", feature_name: name, pinned: true };
+        if (!hasFeature(args.id)) return { ok: false, error: "id must identify a catalog feature" };
+        if (args.field !== undefined && args.field !== "pinned") return { ok: false, error: "only pinned is toggleable" };
+        const pinned = !!(window.appState && window.appState.shortlist.includes(args.id));
+        const button = featureButton(pinned ? "btn-unpin" : "btn-pin", args.id);
+        if (!button) return { ok: false, error: "Pin toggle control not found" };
+        button.click();
+        return { ok: true, id: args.id, pinned: !pinned };
+      },
+    },
+    "artifact.import": {
+      description: "Start a declared import mode (no file bytes in WebMCP).",
+      inputSchema: objectSchema({ mode: { type: "string", enum: ["file", "sample"] } }, ["mode"]),
+      handler(args) {
+        if (!openBrief()) return { ok: false, error: "Sprint brief panel not found" };
+        const button = document.getElementById(args.mode === "sample" ? "btn-load-sample" : "btn-import");
+        if (!button) return { ok: false, error: "Import control not found" };
+        if (args.mode === "sample") button.click();
+        else button.focus();
+        return { ok: true, mode: args.mode, import_started: true };
+      },
+    },
+    "artifact.export": {
+      description: "Export using a declared format (no blob/base64 in results).",
+      inputSchema: objectSchema({ format: { type: "string", enum: ["json", "markdown"] } }, ["format"]),
+      handler(args) {
+        if (!openBrief()) return { ok: false, error: "Sprint brief panel not found" };
+        const tab = document.getElementById(args.format === "markdown" ? "tab-markdown" : "tab-json");
+        if (tab) tab.click();
+        if (args.format === "json") {
+          const download = document.getElementById("btn-download");
+          if (!download) return { ok: false, error: "Download control not found" };
+          download.click();
         }
-      }
+        return { ok: true, format: args.format, export_started: true };
+      },
     },
-
-    // ---- artifact-transfer-v1 -------------------------------------------
-    artifact_export: {
-      description: "Export the sprint brief.",
+    "artifact.copy": {
+      description: "Trigger copy via the visible control (clipboard verified in Playwright).",
+      inputSchema: objectSchema({}),
       handler() {
-        const btn = document.getElementById("btn-download");
-        if (btn) btn.click();
-        return { ok: true, artifact: "sprint-brief" };
-      }
+        if (!openBrief()) return { ok: false, error: "Sprint brief panel not found" };
+        const button = document.getElementById("btn-copy");
+        if (!button) return { ok: false, error: "Copy control not found" };
+        button.click();
+        return { ok: true, copy_triggered: true };
+      },
     },
-    artifact_copy: {
-      description: "Copy the sprint brief.",
-      handler() {
-        const btn = document.getElementById("btn-copy");
-        if (btn) btn.click();
-        return { ok: true, artifact: "sprint-brief" };
-      }
-    },
-    artifact_import: {
-      description: "Import the sprint brief.",
-      handler(args) {
-        args = args || {};
-        if (args.import_modes && args.import_modes.includes("sample")) {
-          const btn = document.getElementById("btn-load-sample");
-          if (btn) btn.click();
-          return { ok: true, artifact: "sprint-brief", mode: "sample" };
-        }
-        return { ok: true, artifact: "sprint-brief" }; // WebMCP only tests Load sample brief
-      }
-    }
   };
 
   window.webmcp_session_info = function () {
@@ -218,12 +282,15 @@ export function initWebmcp() {
     };
   };
   window.webmcp_list_tools = function () {
-    return Object.keys(tools).map(function (name) {
-      return { name: name, description: tools[name].description };
-    });
+    return Object.entries(tools).map(([name, tool]) => ({ name, description: tool.description, inputSchema: tool.inputSchema }));
   };
   window.webmcp_invoke_tool = function (name, args) {
-    if (!tools[name]) throw new Error("Unknown WebMCP tool: " + name);
-    return tools[name].handler(args || {});
+    const tool = tools[name];
+    if (!tool) return { ok: false, error: `unknown_tool: ${name}` };
+    const input = args || {};
+    const inputError = validateInput(tool.inputSchema, input);
+    if (inputError) return { ok: false, error: inputError };
+    try { return tool.handler(input); }
+    catch (error) { return { ok: false, error: String(error && error.message ? error.message : error) }; }
   };
 }

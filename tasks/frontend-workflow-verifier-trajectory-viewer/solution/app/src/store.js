@@ -243,7 +243,11 @@ export const useReviewStore = create((set, get) => ({
       terminalComplete: { ...state.terminalComplete, [key]: true },
     })),
 
-  recordAdjudications: (records, label = "Recorded adjudication") => {
+  recordAdjudications: (
+    records,
+    label = "Recorded adjudication",
+    { preserveSelection = false } = {},
+  ) => {
     const state = get();
     const trialId = state.activeTrialId;
     if (!trialId || !records.length) return;
@@ -259,7 +263,7 @@ export const useReviewStore = create((set, get) => ({
       adjudications: next,
       undo: history,
       redo: [],
-      selectedFlips: [],
+      ...(preserveSelection ? {} : { selectedFlips: [] }),
     });
     pushActivity(set, get, {
       label,

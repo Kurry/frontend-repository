@@ -80,7 +80,7 @@ onBeforeUnmount(() => window.removeEventListener('docuseal:open-import', handleE
             <input type="file" accept="application/json,.json" @change="onFile($event, setFieldValue)" />
           </label>
 
-          <Field v-slot="{ field, errorMessage }" name="document">
+          <Field v-slot="{ field, errorMessage }" name="document" :validate-on-input="true">
             <label class="form-label" for="import-document">Template JSON</label>
             <textarea
               id="import-document"

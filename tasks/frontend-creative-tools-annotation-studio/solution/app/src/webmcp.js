@@ -202,10 +202,17 @@ const handlers = {
   },
 
   editor_preview: ({ mode }) => {
-    store().setView('export');
-    if (mode === 'stats') store().setExportTab('stats');
-    else store().setExportTab('labels');
-    return ok({ mode: mode || 'export', visiblePostcondition: 'Live artifact preview is visible' });
+    const state = store();
+    const items = Object.values(state.items);
+    return ok({
+      mode: mode || 'export',
+      summary: {
+        suiteId: state.activeSuiteId,
+        itemCount: items.length,
+        labeledCount: items.filter((item) => item.review_state !== 'unlabeled').length,
+        selectedCount: state.selected.length,
+      },
+    });
   },
 
   // ---- command-session-v1 (assist-run demo) ----
@@ -265,7 +272,7 @@ const TOOL_DEFS = [
   ['editor_delete', 'Delete a taxonomy class, metadata field, or region. Requires explicit confirm=true.', schema({ objectType: enumOf(['taxonomy-class', 'metadata-field', 'region']), id: str(), itemId: str(), confirm: { type: 'boolean' } }, ['objectType', 'id', 'confirm'])],
   ['editor_update_property', 'Update one bounded editor property (region geometry, region attribute values, or a taxonomy class field).', schema({ objectType: enumOf(['taxonomy-class', 'metadata-field', 'region']), itemId: str(), id: str(), property: enumOf(['name', 'color', 'icon', 'shortcut', 'attributes', 'attribute-values', 'class-id', 'x', 'y', 'w', 'h']), value: {} }, ['objectType', 'id', 'property', 'value'])],
   ['editor_switch_mode', 'Switch the editor among annotate, taxonomy, review-queue, agreement, history, and export modes.', schema({ mode: enumOf(['annotate', 'taxonomy', 'review-queue', 'agreement', 'history', 'export']) }, ['mode'])],
-  ['editor_preview', 'Open the live artifact preview (export center) without returning artifact contents.', schema({ mode: enumOf(['export', 'stats']) }, [])],
+  ['editor_preview', 'Read a bounded summary of the live annotation workspace without changing the visible view or returning artifact contents.', schema({ mode: enumOf(['export', 'stats']) }, []), { readOnlyHint: true }],
   ['session_start', 'Start the simulated assist-run pass for a suite (one visible step per unannotated item).', schema({ suiteId: str() }, ['suiteId'])],
   ['session_pause', 'Pause a running assist pass; completed steps keep their outputs and timestamps.', schema({ suiteId: str() }, ['suiteId'])],
   ['session_resume', 'Resume a paused assist pass from exactly the frozen step.', schema({ suiteId: str() }, ['suiteId'])],
@@ -278,7 +285,10 @@ export function registerWebMCP() {
   if (window.__corvidWebMCPRegistered) return;
   window.__corvidWebMCPRegistered = true;
 
-  const tools = TOOL_DEFS.map(([name, description, inputSchema]) => ({ name, description, inputSchema }));
+  const tools = TOOL_DEFS.map(([name, description, inputSchema, annotations]) => ({ name, description, inputSchema, ...(annotations ? { annotations } : {}) }));
+  const entitySelect = tools.find((tool) => tool.name === 'entity_select');
+  const firstItemId = Object.keys(store().items)[0];
+  if (entitySelect && firstItemId) entitySelect.inputSchema.properties.id.default = firstItemId;
 
   window.webmcp_session_info = () => ({
     contract_version: 'zto-webmcp-v1',

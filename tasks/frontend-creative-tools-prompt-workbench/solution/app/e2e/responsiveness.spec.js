@@ -1,0 +1,2 @@
+import { criterionSuite } from './helpers.js'
+criterionSuite('responsiveness', ['layout_adapts_1440_to_375','mobile_tap_targets_adequate','typography_readable_both_widths','no_clip_or_overflow_at_375','bindings_stack_below_1024','narrow_stack_order_stays_usable','mobile_controls_tappable','no_horizontal_scroll_at_375','toolbar_wraps_instead_of_overflow','overlays_remain_operable_at_small_widths','palette_and_export_modal_operable_mobile'])

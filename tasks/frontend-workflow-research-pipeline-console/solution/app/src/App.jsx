@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Accordion, ActionIcon, Badge, Button, Drawer, Modal, NumberInput,
+  Accordion, ActionIcon, Badge, Button, Drawer, Modal, NumberInput, Tooltip,
   SegmentedControl, Select, Switch, Table, TextInput,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
@@ -59,7 +59,7 @@ function Sidebar({ mobile = false }) {
         <p className="eyebrow nav-label">Workspace</p>
         {nav.map(({ id, label, icon: NavIcon }) => (
           <button key={id} type="button" className={`nav-item ${activeView === id ? 'active' : ''}`} onClick={() => setView(id)} aria-current={activeView === id ? 'page' : undefined}>
-            <Icon icon={NavIcon} label={label} size={18} /><span>{label}</span>{activeView === id && <span className="nav-indicator" aria-hidden="true" />}
+            <Icon icon={NavIcon} label={label} size={18} decorative /><span>{label}</span>{activeView === id && <span className="nav-indicator" aria-hidden="true" />}
           </button>
         ))}
       </nav>
@@ -173,10 +173,12 @@ function Board() {
   return (
     <div className="view board-view">
       <div className="view-heading"><div><p className="eyebrow">Live workspace</p><h1>Pipeline board</h1><p>Watch datasets become checkpoints, then benchmark results.</p></div><div className="heading-actions"><Button variant="default" leftSection={<Icon icon={IconDownload} label="Export" size={16} decorative />} onClick={downloadExport}>Export runs</Button><Button leftSection={<Icon icon={IconFlask} label="Submit job" size={16} decorative />} onClick={openSubmission}>Submit job</Button></div></div>
-      <div className="board-toolbar"><div><span className="section-count" data-testid="run-count">{visible.length} runs</span><span className="updated"><span className="sim-dot" aria-hidden="true"/>advancing live</span></div>{datasetFilter && <button type="button" className="active-filter" onClick={() => setDatasetFilter(null)} aria-label={`Clear dataset filter ${datasetFilter}`}><Icon icon={IconFilter} label="Active filter" size={14} /><span className="filter-chip-label">{datasetFilter}</span><Icon icon={IconX} label="Clear" size={13} /></button>}</div>
-      <div className="run-list" ref={parent}>
+      <div className="board-toolbar"><div><span className="section-count" data-testid="run-count">{visible.length} runs</span><span className="updated"><span className="sim-dot" aria-hidden="true"/>advancing live</span></div>{datasetFilter && <Tooltip label="Clear filter"><button type="button" className="active-filter" onClick={() => setDatasetFilter(null)} aria-label={`Clear dataset filter ${datasetFilter}`}><Icon icon={IconFilter} label="Active filter" size={14} /><span className="filter-chip-label">{datasetFilter}</span><Icon icon={IconX} label="Clear" size={13} /></button></Tooltip>}</div>
+      <div className="run-list" ref={parent} aria-busy={visible.some((run) => run.phases.some((phase) => phase.status === 'Running' && !phase.paused))}>
         {visible.map((run) => <RunStrip key={run.id} run={run}/>) }
-        {!visible.length && <EmptyState title={`No runs use ${datasetFilter}`} body={`The dataset filter “${datasetFilter}” matches zero runs. Clear the filter to restore the full board.`} action="Clear dataset filter" onAction={() => setDatasetFilter(null)} />}
+        {!visible.length && (datasetFilter
+          ? <EmptyState title={`No runs use ${datasetFilter}`} body={`The dataset filter “${datasetFilter}” matches zero runs. Clear the filter to restore the full board.`} action="Clear dataset filter" onAction={() => setDatasetFilter(null)} />
+          : <EmptyState title="No pipeline runs yet" body="Submit a research job to add the first run to this board." action="Submit job" onAction={openSubmission} />)}
       </div>
     </div>
   );
@@ -203,16 +205,27 @@ function DatasetCard({ dataset }) {
 
 function DatasetsView() {
   const datasets = usePipelineStore((s) => s.datasets);
+  const openSubmission = usePipelineStore((s) => s.openSubmission);
   const [query, setQuery] = useState('');
+  const [catalogReady, setCatalogReady] = useState(false);
   const reducedMotion = useReducedMotion();
   const [datasetGridRef, enableAnimations] = useAutoAnimate({ duration: 220 });
   useEffect(() => enableAnimations(!reducedMotion), [enableAnimations, reducedMotion]);
+  // Commit the navigation chrome first, then mount the chart-heavy catalog on
+  // the next frame. This keeps view changes responsive under constrained CI
+  // CPUs without changing the resulting catalog or its interaction model.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setCatalogReady(true));
+    return () => cancelAnimationFrame(frame);
+  }, []);
   const filtered = datasets.filter((d) => d.name.toLowerCase().includes(query.toLowerCase()));
   return (
     <div className="view"><div className="view-heading"><div><p className="eyebrow">Training inventory</p><h1>Datasets</h1><p>Trace generated task sets back to the run and recipe that produced them.</p></div><TextInput value={query} onChange={(e) => setQuery(e.currentTarget.value)} leftSection={<Icon icon={IconSearch} label="Search" size={16} />} placeholder="Search datasets" aria-label="Search datasets" className="search-input"/></div>
       <div className="catalog-summary"><strong>{datasets.reduce((s,d)=>s+d.tasks,0).toLocaleString()}</strong><span>curated tasks across {datasets.length} datasets</span><div>{['Plan','Tool','Verify'].map((x,i)=><span key={x}><i style={{background:['#6d5dfc','#15a8a0','#e49744'][i]}}/>{x}</span>)}</div></div>
-      <div className="dataset-grid" ref={datasetGridRef}>{filtered.map((d)=><DatasetCard dataset={d} key={d.id}/>)}</div>
-      {!filtered.length && <EmptyState title={`No datasets match “${query}”`} body="Try a different dataset name." action="Clear search" onAction={() => setQuery('')}/>} 
+      <div className="dataset-grid" ref={datasetGridRef}>{catalogReady && filtered.map((d)=><DatasetCard dataset={d} key={d.id}/>)}</div>
+      {catalogReady && !filtered.length && (datasets.length === 0
+        ? <EmptyState title="No datasets available" body="Complete a Data generation job to add the first dataset." action="Submit job" onAction={openSubmission}/>
+        : <EmptyState title={`No datasets match “${query}”`} body="Try a different dataset name or clear the search." action="Clear search" onAction={() => setQuery('')}/>)}
     </div>
   );
 }
@@ -263,7 +276,7 @@ function ResultsView() {
     raw.sort((a, b) => {
       const delta = (a[sort.key] - b[sort.key]) * dir;
       if (delta !== 0) return delta;
-      return a.model.localeCompare(b.model);
+      return a.model.localeCompare(b.model) * dir;
     });
     return raw;
   }, [trialData, sort]);
@@ -304,12 +317,13 @@ function TrialDrilldown() {
   const [completedTraces,setCompletedTraces] = useState(()=>new Set());
   const entry = drilldown ? trialData.find((x)=>x.model===drilldown.model&&x.benchmark===drilldown.benchmark) : null;
   useEffect(()=>{setExpandedTrial(null);setCompletedTraces(new Set())},[drilldown?.model,drilldown?.benchmark]);
-  return <Drawer opened={Boolean(drilldown)} onClose={()=>setDrilldown(null)} position="right" size="md" withinPortal keepMounted={false} title={<div className="drawer-title"><span className="eyebrow">Trial drill-down</span><strong>{drilldown?.benchmark}</strong><small>{drilldown?.model}</small></div>} overlayProps={{backgroundOpacity:.25,blur:2}} closeOnEscape closeOnClickOutside closeButtonProps={{'aria-label':'Close trial drill-down'}}>
+  return <Drawer opened={Boolean(drilldown)} onClose={()=>setDrilldown(null)} position="right" size="md" withinPortal keepMounted={false} title={<div className="drawer-title"><span className="eyebrow">Trial drill-down</span><strong>{drilldown?.benchmark}</strong><small>{drilldown?.model}</small></div>} overlayProps={{backgroundOpacity:.25,blur:2}} closeOnEscape closeOnClickOutside={true} closeButtonProps={{'aria-label':'Close trial drill-down'}}>
     {entry && <><div className="drill-summary"><div><span>Mean score</span><strong>{mean(entry.trials.map(t=>t.score)).toFixed(3)}</strong></div><div><span>Spread</span><strong>± {spread(entry.trials.map(t=>t.score)).toFixed(2)}</strong></div><div><span>Trials</span><strong>{entry.trials.length}</strong></div></div><Accordion value={expandedTrial} onChange={setExpandedTrial} variant="separated" className="trial-list">{entry.trials.map((trial)=><Accordion.Item value={trial.id} key={trial.id}><Accordion.Control><div className="trial-row"><strong>{trial.id}</strong><span>score <b>{trial.score.toFixed(3)}</b></span><span>{trial.duration}s</span></div></Accordion.Control><Accordion.Panel>{expandedTrial===trial.id&&<TraceExcerpt trial={trial} instant={completedTraces.has(trial.id)} onComplete={()=>setCompletedTraces((seen)=>{if(seen.has(trial.id))return seen;const next=new Set(seen);next.add(trial.id);return next})}/>}</Accordion.Panel></Accordion.Item>)}</Accordion></>}
   </Drawer>;
 }
 
 function RunDetail() {
+  const activeView = usePipelineStore((s)=>s.activeView);
   const selectedRunId = usePipelineStore((s)=>s.selectedRunId);
   const selectRun = usePipelineStore((s)=>s.selectRun);
   const runs = usePipelineStore((s)=>s.runs);
@@ -319,13 +333,15 @@ function RunDetail() {
   const setTimelinePhase = usePipelineStore((s)=>s.setTimelinePhase);
   const setTimelineStatus = usePipelineStore((s)=>s.setTimelineStatus);
   const setHighlightedPhase = usePipelineStore((s)=>s.setHighlightedPhase);
-  const [timelineListRef] = useAutoAnimate({duration:220});
+  const reducedMotion = useReducedMotion();
+  const [timelineListRef, enableTimelineAnimations] = useAutoAnimate({duration:220});
+  useEffect(() => enableTimelineAnimations(!reducedMotion), [enableTimelineAnimations, reducedMotion]);
   const run = runs.find((r)=>r.id===selectedRunId);
   const filtered = run?.events.filter((e)=>(timelinePhase==='all'||e.phase===timelinePhase)&&(timelineStatus==='all'||e.status===timelineStatus)) ?? [];
-  return <Drawer opened={Boolean(run)} onClose={()=>selectRun(null)} position="right" size="xl" withinPortal keepMounted={false} title={run ? <div className="drawer-title"><span className="eyebrow">Run detail</span><strong>{run.id} · {run.label}</strong><small>Submitted {fmtTime(run.createdAt)}</small></div> : ''} overlayProps={{backgroundOpacity:.2,blur:2}} classNames={{body:'run-drawer-body', content:'run-drawer-content'}} closeOnEscape closeOnClickOutside closeButtonProps={{'aria-label':'Close run detail'}}>
+  return <Drawer opened={activeView === 'pipeline' && Boolean(run)} onClose={()=>selectRun(null)} position="right" size="xl" withinPortal keepMounted={false} title={run ? <div className="drawer-title"><span className="eyebrow">Run detail</span><strong>{run.id} · {run.label}</strong><small>Submitted {fmtTime(run.createdAt)}</small></div> : ''} overlayProps={{backgroundOpacity:.2,blur:2,className:'run-drawer-overlay'}} classNames={{body:'run-drawer-body', content:'run-drawer-content'}} closeOnEscape closeOnClickOutside closeButtonProps={{'aria-label':'Close run detail'}}>
     {run && <div className="run-detail"><section><div className="detail-section-title"><h2>Phase outputs</h2><span>Click a timeline event to locate its phase</span></div><div className="detail-phases">{run.phases.map((p)=><div key={p.key}><PhaseCard runId={run.id} phase={p} detailed highlighted={highlightedPhase===p.key}/><dl className="output-meta"><div><dt>Started</dt><dd>{fmtTime(p.startedAt)}</dd></div><div><dt>Completed</dt><dd>{fmtTime(p.completedAt)}</dd></div><div><dt>Output</dt><dd>{p.output ?? 'Not available yet'}</dd></div></dl></div>)}</div></section>
-      <section className="timeline-section"><div className="detail-section-title"><h2>Event timeline</h2><span>{run.events.length} recorded transitions</span></div><div className="timeline-filters"><Select aria-label="Filter timeline by phase" value={timelinePhase} onChange={setTimelinePhase} data={[{value:'all',label:'All phases'},...Object.entries(phaseLabel).map(([value,label])=>({value,label}))]}/><Select aria-label="Filter timeline by status" value={timelineStatus} onChange={setTimelineStatus} data={['all','Pending','Running','Complete','Failed','Skipped'].map((x)=>({value:x,label:x==='all'?'All statuses':x}))}/>{(timelinePhase!=='all'||timelineStatus!=='all')&&<Button variant="subtle" leftSection={<Icon icon={IconX} label="Clear" size={14} />} onClick={()=>{setTimelinePhase('all');setTimelineStatus('all')}}>Clear</Button>}</div>
-        <div className="timeline-list" ref={timelineListRef}>{filtered.map((e)=><button type="button" key={e.id} className={`timeline-entry ${highlightedPhase===e.phase?'selected':''}`} onClick={()=>setHighlightedPhase(e.phase)}><span className="timeline-marker" style={{background:statusDot[e.status]}} aria-hidden="true"/><div><span>{phaseLabel[e.phase]}</span><strong>{e.message}</strong><time>{fmtTime(e.timestamp)}</time></div><StatusChip status={e.status}/></button>)}{!filtered.length&&<EmptyState title="No timeline events match" body={`No events match the selected ${timelinePhase} / ${timelineStatus} filters. Clear filters to restore the full timeline.`} action="Clear timeline filters" onAction={()=>{setTimelinePhase('all');setTimelineStatus('all')}}/>}</div>
+      <section className="timeline-section"><div className="detail-section-title"><h2>Event timeline</h2><span>{run.events.length} recorded transitions</span></div><div className="timeline-filters"><Select aria-label="Filter timeline by phase" value={timelinePhase} onChange={setTimelinePhase} data={[{value:'all',label:'All phases'},...Object.entries(phaseLabel).map(([value,label])=>({value,label}))]}/><Select aria-label="Filter timeline by status" value={timelineStatus} onChange={setTimelineStatus} data={['all','Pending','Running','Complete','Failed','Skipped'].map((x)=>({value:x,label:x==='all'?'All statuses':x}))}/>{(timelinePhase!=='all'||timelineStatus!=='all')&&<Button variant="subtle" leftSection={<Icon icon={IconX} label="Clear" size={14} />} onClick={()=>{setTimelinePhase('all');setTimelineStatus('all')}}>Clear timeline filters</Button>}</div>
+        <div className="timeline-list" ref={timelineListRef}>{filtered.map((e)=><button type="button" key={e.id} className={`timeline-entry ${highlightedPhase===e.phase?'selected':''}`} onClick={()=>setHighlightedPhase(e.phase)}><span className="timeline-marker" style={{background:statusDot[e.status]}} aria-hidden="true"/><div><span>{phaseLabel[e.phase]}</span><strong>{e.message}</strong><time>{fmtTime(e.timestamp)}</time></div><StatusChip status={e.status}/></button>)}{!filtered.length&&<EmptyState title="No timeline events match" body={`No events match the selected ${timelinePhase} / ${timelineStatus} filters. Clear filters to restore the full timeline or wait for new events to occur.`} action="Clear timeline filters" onAction={()=>{setTimelinePhase('all');setTimelineStatus('all')}}/>}</div>
       </section></div>}
   </Drawer>;
 }
@@ -333,8 +349,8 @@ function RunDetail() {
 function downloadText(text, filename) {
   const blob = new Blob([text], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
-  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  const a = document.createElement('a'); a.href = url; a.download = filename; a.style.display = 'none'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 1500);
 }
 
 const suggestions = [
@@ -342,11 +358,6 @@ const suggestions = [
   { label:'Nova data forge', values:{jobType:'Data generation',dataset:'Nova-Synth',model:'lumen-2b',count:12,cluster:'cinder'} },
   { label:'Switchboard eval', values:{jobType:'Evaluate',dataset:'Helix-12K',model:'quill-2b-ft-1027',count:3,cluster:'basalt',benchmark:'Switchboard',repetitions:3} },
 ];
-
-function FieldError({ message }) {
-  if (!message) return null;
-  return <p className="field-error" role="alert" aria-live="polite">{message}</p>;
-}
 
 function SubmissionDrawer() {
   const opened = usePipelineStore((s)=>s.submissionOpen);
@@ -360,12 +371,16 @@ function SubmissionDrawer() {
   const clearImportError = usePipelineStore((s)=>s.clearImportError);
   const importRef = useRef(null);
   const submitLock = useRef(false);
-  const eligibleDatasets = useMemo(()=>getEligibleDatasets(runs),[runs]);
-  const eligibleCheckpoints = useMemo(()=>getEligibleCheckpoints(runs),[runs]);
+  const eligibleDatasetsRaw = getEligibleDatasets(runs);
+  const eligibleDatasetsStr = eligibleDatasetsRaw.join(',');
+  const eligibleDatasets = useMemo(()=>eligibleDatasetsRaw,[eligibleDatasetsStr]);
+  const eligibleCheckpointsRaw = getEligibleCheckpoints(runs);
+  const eligibleCheckpointsStr = eligibleCheckpointsRaw.join(',');
+  const eligibleCheckpoints = useMemo(()=>eligibleCheckpointsRaw,[eligibleCheckpointsStr]);
   const schema = useMemo(()=>makeJobConfigSchema(eligibleDatasets,eligibleCheckpoints),[eligibleDatasets,eligibleCheckpoints]);
   const { control, watch, reset, handleSubmit, trigger, formState:{errors,isValid,isSubmitting} } = useForm({
     resolver:zodResolver(schema), mode:'onChange', reValidateMode:'onChange',
-    defaultValues:{jobType:'Fine-tune',dataset:'',model:'',count:5,cluster:'aurora',benchmark:undefined,repetitions:3,autoEvaluate:true},
+    defaultValues:{jobType:'Fine-tune',dataset:'',model:'',count:5,cluster:'aurora',benchmark:undefined,repetitions:undefined,autoEvaluate:true},
   });
   const values = watch();
   useEffect(()=>{ if(opened) setTimeout(()=>trigger(),0); },[opened,trigger]);
@@ -378,9 +393,9 @@ function SubmissionDrawer() {
   if(jobType==='Evaluate'){previewObject.benchmark=values.benchmark||'';previewObject.repetitions=Number(values.repetitions)||0}
   if(jobType==='Fine-tune') previewObject.autoEvaluate=Boolean(values.autoEvaluate);
   const preview = JSON.stringify(previewObject,null,2);
-  const applySuggestion = (item) => reset({...item.values,repetitions:item.values.repetitions??3,benchmark:item.values.benchmark,autoEvaluate:item.values.autoEvaluate??false});
+  const applySuggestion = (item) => reset({...item.values, repetitions: item.values.jobType==='Evaluate'?(item.values.repetitions??3):undefined, benchmark: item.values.jobType==='Evaluate'?item.values.benchmark:undefined, autoEvaluate: item.values.jobType==='Fine-tune'?(item.values.autoEvaluate??false):undefined});
   useEffect(()=>{
-    const fill = (e) => { reset({...e.detail,repetitions:e.detail.repetitions??3,autoEvaluate:e.detail.autoEvaluate??false}); setTimeout(()=>trigger(),0); };
+    const fill = (e) => { reset({...e.detail, repetitions: e.detail.jobType==='Evaluate'?(e.detail.repetitions??3):undefined, benchmark: e.detail.jobType==='Evaluate'?e.detail.benchmark:undefined, autoEvaluate: e.detail.jobType==='Fine-tune'?(e.detail.autoEvaluate??false):undefined}); setTimeout(()=>trigger(),0); };
     window.addEventListener('relay:form-fill',fill);
     return ()=>window.removeEventListener('relay:form-fill',fill);
   },[reset,trigger]);
@@ -398,60 +413,59 @@ function SubmissionDrawer() {
     const ok = importJobConfig(text);
     if (ok) close();
   };
-  return <Modal opened={opened} onClose={close} size="min(960px, 96vw)" centered withinPortal keepMounted={false} title={<div className="drawer-title"><span className="eyebrow">New pipeline work</span><strong>Submit a research job</strong><small>Configure one phase; Relay preserves the downstream chain.</small></div>} overlayProps={{backgroundOpacity:.28,blur:3}} transitionProps={{transition:'fade',duration:220}} closeButtonProps={{'aria-label':'Close submission panel'}} closeOnEscape closeOnClickOutside trapFocus returnFocus>
+  return <Modal opened={opened} onClose={close} size="min(960px, 96vw)" centered withinPortal keepMounted={false} title={<div className="drawer-title"><span className="eyebrow">New pipeline work</span><strong>Submit a research job</strong><small>Configure one phase; Relay preserves the downstream chain.</small></div>} overlayProps={{backgroundOpacity:.28,blur:3}} transitionProps={{transition:'slide-up',duration:240}} closeButtonProps={{'aria-label':'Close submission panel'}} closeOnEscape closeOnClickOutside trapFocus returnFocus>
     <div className="suggestions"><span><Icon icon={IconSparkles} label="Quick configurations" size={14} />Quick configurations</span><div>{suggestions.map((s)=><button type="button" key={s.label} onClick={()=>applySuggestion(s)}>{s.label}</button>)}</div></div>
     <form className="submission-layout" onSubmit={handleSubmit(onSubmit)} noValidate>
       <div className="job-form">
         <div className="form-section"><span className="form-step">01</span><div><h2>Job shape</h2><p>Choose the phase this job should execute.</p></div></div>
         <Controller name="jobType" control={control} render={({field})=>(
           <div>
-            <Select {...field} value={field.value??null} onChange={(v)=>reset({jobType:v,dataset:'',model:'',count:5,cluster:values.cluster||'aurora',benchmark:undefined,repetitions:3,autoEvaluate:false})} label="Job type" data={JOB_TYPES} error={errors.jobType?.message} allowDeselect={false} required/>
-            <FieldError message={errors.jobType?.message} />
+            <Select {...field} value={field.value??null} onChange={(v)=>reset({jobType:v,dataset:'',model:'',count:5,cluster:values.cluster||'aurora',benchmark:undefined,repetitions:v==='Evaluate'?3:undefined,autoEvaluate:v==='Fine-tune'?false:undefined})} label="Job type" data={JOB_TYPES} error={errors.jobType?.message} allowDeselect={false} required/>
+
           </div>
         )}/>
-        <div className="form-section compact"><span className="form-step">02</span><div><h2>Inputs & compute</h2><p>Eligible inputs are gated by completed upstream phases.</p></div></div>
+        <div className="form-section compact"><span className="form-step">02</span><div><h2>Inputs and compute</h2><p>Eligible inputs are gated by completed upstream phases.</p></div></div>
         <Controller name="dataset" control={control} render={({field})=>(
           <div>
-            <Select {...field} value={field.value||null} onChange={field.onChange} searchable label="Dataset" placeholder="Select an eligible dataset" data={datasetOptions} error={errors.dataset?.message} required description={jobType==='Fine-tune'?'Only datasets from completed generation runs can be selected.':undefined} nothingFoundMessage="No completed datasets available"/>
-            <FieldError message={errors.dataset?.message} />
+            <Select {...field} value={field.value||null} onChange={field.onChange} searchable label="Dataset" placeholder="Select an eligible dataset" data={datasetOptions} error={errors.dataset?.message} required description={jobType==='Fine-tune'?'Only datasets from completed generation runs can be selected.':undefined} nothingFoundMessage="No completed datasets available. Run a Data generation job to create one."/>
+
           </div>
         )}/>
         <Controller name="model" control={control} render={({field})=>(
           <div>
-            <Select {...field} value={field.value||null} onChange={field.onChange} searchable label="Model" placeholder="Select a model" data={modelOptions} error={errors.model?.message} required description={jobType==='Evaluate'?'Only checkpoints produced by a completed fine-tune can be selected.':undefined} nothingFoundMessage="No completed checkpoints available"/>
-            <FieldError message={errors.model?.message} />
+            <Select {...field} value={field.value||null} onChange={field.onChange} searchable label="Model" placeholder="Select a model" data={modelOptions} error={errors.model?.message} required description={jobType==='Evaluate'?'Only checkpoints produced by a completed fine-tune can be selected.':undefined} nothingFoundMessage="No completed checkpoints available. Run a Fine-tune job to create one."/>
+
           </div>
         )}/>
         <div className="form-row"><Controller name="count" control={control} render={({field})=>(
           <div>
-            <NumberInput {...field} value={field.value??''} onChange={field.onChange} label={jobType==='Fine-tune'?'Epoch count':jobType==='Data generation'?'Trial count':'Trial budget'} min={1} max={50} clampBehavior="none" error={errors.count?.message} required/>
-            <FieldError message={errors.count?.message} />
+            <NumberInput {...field} value={field.value??''} onChange={field.onChange} label={jobType==='Fine-tune'?'Epoch count':jobType==='Data generation'?'Trial count':'Trial budget'} min={1} max={50} clampBehavior="none" error={errors.count?.message} required />
           </div>
         )}/><Controller name="cluster" control={control} render={({field})=>(
           <div>
             <Select {...field} value={field.value??null} onChange={field.onChange} label="Cluster" data={CLUSTERS} error={errors.cluster?.message} allowDeselect={false} required/>
-            <FieldError message={errors.cluster?.message} />
+
           </div>
         )}/></div>
         {jobType==='Evaluate'&&<div className="conditional-fields"><span className="conditional-label">Evaluation settings</span><div className="form-row"><Controller name="benchmark" control={control} render={({field})=>(
           <div>
             <Select {...field} value={field.value||null} onChange={field.onChange} label="Benchmark" placeholder="Select benchmark" data={BENCHMARKS} error={errors.benchmark?.message} required/>
-            <FieldError message={errors.benchmark?.message} />
+
           </div>
         )}/><Controller name="repetitions" control={control} render={({field})=>(
           <div>
-            <NumberInput {...field} value={field.value??''} onChange={field.onChange} label="Repetition count" min={1} max={10} clampBehavior="none" error={errors.repetitions?.message} required/>
-            <FieldError message={errors.repetitions?.message} />
+            <NumberInput {...field} value={field.value??''} onChange={field.onChange} label="Repetition count" min={1} max={10} clampBehavior="none" error={errors.repetitions?.message} required />
           </div>
         )}/></div></div>}
         {jobType==='Fine-tune'&&<Controller name="autoEvaluate" control={control} render={({field})=><Switch checked={field.value} onChange={(e)=>field.onChange(e.currentTarget.checked)} label="Start evaluation automatically when training completes" description="Adds a timeline trigger and starts the evaluation phase from the saved checkpoint."/>}/>}
         <div className="import-block">
-          <input ref={importRef} type="file" accept="application/json,.json" className="sr-only" aria-label="Import job-config JSON file" onChange={(e)=>{ const f=e.target.files?.[0]; e.target.value=''; onImportFile(f); }} />
+          <label className="sr-only" htmlFor="job-config-file">Import job-config JSON file</label>
+          <input id="job-config-file" ref={importRef} type="file" accept="application/json,.json" className="sr-only" onChange={(e)=>{ const f=e.target.files?.[0]; e.target.value=''; onImportFile(f); }} />
           <Button type="button" variant="default" leftSection={<Icon icon={IconClipboard} label="Import" size={15} />} onClick={()=>{ clearImportError(); importRef.current?.click(); }}>Import job-config</Button>
           {importError && <p className="field-error" role="alert" aria-live="assertive">{importError}</p>}
         </div>
       </div>
-      <aside className="preview-panel"><div className="preview-heading"><div><span className="eyebrow">Request body</span><h2>Config preview</h2></div><span className={isValid?'valid-config':'invalid-config'}>{isValid?<><Icon icon={IconCheck} label="Valid" size={13} />Valid</>:<><Icon icon={IconAlertTriangle} label="Incomplete" size={13} />Incomplete</>}</span></div><pre aria-label="Live job configuration preview">{preview}</pre><div className="preview-actions"><Button type="button" variant="default" leftSection={<Icon icon={IconCopy} label="Copy" size={15} />} onClick={copy}>Copy</Button><Button type="button" variant="default" leftSection={<Icon icon={IconDownload} label="Download" size={15} />} onClick={()=>downloadText(preview,'job-config.json')}>Download job-config.json</Button></div><div className="preview-note"><Icon icon={IconCheck} label="Schema note" size={15} /><p>Copy, download, and successful submission use this exact request-body schema.</p></div><Button type="submit" size="md" fullWidth disabled={!isValid||isSubmitting||submitLock.current} loading={isSubmitting} leftSection={<Icon icon={IconBolt} label="Submit" size={16} />}>Submit job</Button><Button type="button" variant="subtle" color="gray" fullWidth onClick={close}>Cancel</Button></aside>
+      <aside className="preview-panel"><div className="preview-heading"><div><span className="eyebrow">Request body</span><h2>Config preview</h2></div><span className={isValid?'valid-config':'invalid-config'}>{isValid?<><Icon icon={IconCheck} label="Valid" size={13} />Valid</>:<><Icon icon={IconAlertTriangle} label="Incomplete" size={13} />Incomplete</>}</span></div><pre aria-label="Live job configuration preview">{preview}</pre><div className="preview-actions"><Button type="button" variant="default" leftSection={<Icon icon={IconCopy} label="Copy" size={15} />} onClick={copy}>Copy</Button><Button type="button" variant="default" leftSection={<Icon icon={IconDownload} label="Download" size={15} />} onClick={()=>downloadText(preview,'job-config.json')}>Download job-config.json</Button></div><div className="preview-note"><Icon icon={IconCheck} label="Schema note" size={15} /><p>Copy, download, and successful submission use this exact request-body schema.</p></div><Button type="submit" size="md" fullWidth disabled={!isValid||isSubmitting||submitLock.current} loading={isSubmitting} leftSection={<Icon icon={IconBolt} label="Submit" size={16} decorative />}>Submit job</Button><Button type="button" variant="subtle" color="gray" fullWidth onClick={close}>Cancel submission</Button></aside>
     </form>
   </Modal>;
 }
@@ -491,12 +505,12 @@ function App() {
       <Rollups/>
       <div className="prefs-bar" aria-label="Display preferences">
         <span>Density</span>
-        <SegmentedControl size="xs" value={density} onChange={setDensity} data={[{value:'comfortable',label:'Comfortable'},{value:'compact',label:'Compact'}]} aria-label="Board density preference"/>
+        <Tooltip label="Change board density"><SegmentedControl size="xs" value={density} onChange={setDensity} data={[{value:'comfortable',label:'Comfortable'},{value:'compact',label:'Compact'}]} aria-label="Board density preference"/></Tooltip>
         <small className="shortcut-hint"><Icon icon={IconSparkles} label="Shortcut" size={12} /> ⌘K submit job</small>
       </div>
       <div className="canvas">{activeView==='pipeline'?<Board/>:activeView==='datasets'?<DatasetsView/>:<ResultsView/>}</div>
     </main>
-    <Drawer opened={mobileNavOpen} onClose={()=>setMobileNav(false)} position="left" size="280px" withinPortal withCloseButton closeButtonProps={{'aria-label':'Close navigation'}} classNames={{body:'mobile-nav-body'}} closeOnEscape closeOnClickOutside><Sidebar mobile/></Drawer>
+    <Drawer opened={mobileNavOpen} onClose={()=>setMobileNav(false)} position="left" size="280px" withinPortal withCloseButton closeButtonProps={{'aria-label':'Close navigation'}} classNames={{body:'mobile-nav-body'}} closeOnEscape closeOnClickOutside={true}><Sidebar mobile/></Drawer>
     <SubmissionDrawer/><RunDetail/><TrialDrilldown/>
     <div className="sr-only" aria-live="polite" aria-atomic="true">{latestAlert}</div>
     <div className="sr-only" aria-live="polite" aria-atomic="true">{autoTrigger}</div>

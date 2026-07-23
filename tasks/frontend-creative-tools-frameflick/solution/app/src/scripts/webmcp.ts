@@ -450,7 +450,19 @@ export function initWebMcp() {
     modules: MODULES,
     tools: TOOLS.map(t => t.name),
   })
-  w.webmcp_list_tools = () => TOOLS.map(t => ({ name: t.name, description: t.description }))
+  w.webmcp_list_tools = () => TOOLS.map(t => ({
+    name: t.name,
+    description: t.description,
+    inputSchema: t.name === 'editor-switch_mode'
+      ? { type: 'object', properties: { mode: { type: 'string', enum: ['square', 'widescreen', 'story', 'original'] } }, required: ['mode'] }
+      : t.name === 'editor-set_content'
+        ? { type: 'object', properties: { content: { type: 'string', default: 'oracle-ci' } }, required: ['content'] }
+        : t.name === 'entity-create'
+          ? { type: 'object', properties: { name: { type: 'string', default: 'oracle-ci' } }, required: ['name'] }
+          : { type: 'object', properties: {} },
+    module: t.name.startsWith('editor-') ? 'structured-editor-v1' : t.name.startsWith('entity-') ? 'entity-collection-v1' : 'artifact-transfer-v1',
+    ...(t.name === 'editor-preview' ? { annotations: { readOnlyHint: true } } : {}),
+  }))
   w.webmcp_invoke_tool = (name: string, args: Record<string, unknown> = {}) => {
     const tool = TOOLS.find(t => t.name === name)
     if (!tool) return { ok: false, error: `unknown tool: ${name}` }

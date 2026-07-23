@@ -89,11 +89,11 @@ const ISO = /^\d{4}-\d{2}-\d{2}$/;
         <div class="flex items-center gap-1.5 rounded-lg border border-mint-200 bg-mint-50/60 px-2.5 py-1.5">
           <i class="pi pi-calendar text-xs text-mint-600" aria-hidden="true"></i>
           <label class="sr-only" for="date-start">Date range start</label>
-          <input id="date-start" type="text" inputmode="numeric" [value]="dateStartDraft" (change)="onDateChange()"
+          <input id="date-start" type="text" inputmode="numeric" [value]="dateStartDraft" (input)="onDateChange()"
             aria-describedby="date-range-hint" class="range-input" [class.field-invalid]="dateError" />
           <span class="text-xs text-ink-soft">→</span>
           <label class="sr-only" for="date-end">Date range end</label>
-          <input id="date-end" type="text" inputmode="numeric" [value]="dateEndDraft" (change)="onDateChange()"
+          <input id="date-end" type="text" inputmode="numeric" [value]="dateEndDraft" (input)="onDateChange()"
             class="range-input" [class.field-invalid]="dateError" />
         </div>
 
@@ -217,7 +217,7 @@ const ISO = /^\d{4}-\d{2}-\d{2}$/;
                     <td data-label="Account" class="hidden text-ink-soft md:table-cell">{{ tx.account }}</td>
                     <td data-label="Amount" class="whitespace-nowrap font-display font-bold tabular-nums"
                       [class.text-positive]="tx.amount > 0">
-                      {{ tx.amount > 0 ? '+' + money(tx.amount) : money(tx.amount) }}
+                      {{ signedMoney(tx.amount) }}
                     </td>
                     <td data-label="Status" class="hidden sm:table-cell">
                       @if (tx.status) {
@@ -405,6 +405,14 @@ export class TransactionsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     if (start && end && start > end) {
       this.dateError = 'End date must be on or after start date; the range was not applied.';
+      // A change event from the first field may already have applied an
+      // open-ended half of the draft range. Roll that transient half back so
+      // an invalid completed range never leaves the table partially filtered.
+      if ((this.filters.dateStart === start && this.filters.dateEnd === null) ||
+          (this.filters.dateEnd === end && this.filters.dateStart === null)) {
+        this.store.dispatch(A.applyFilter({ key: 'dateStart', value: null }));
+        this.store.dispatch(A.applyFilter({ key: 'dateEnd', value: null }));
+      }
       return;
     }
     this.dateError = null;

@@ -52,8 +52,6 @@ export default function App() {
         setSelectedId(null);
       }
       if (mode === 'explore' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight') && selectedId && !aboutOpen && !filterOpen && !exportOpen) {
-        const timelineStage = document.querySelector('#timeline-main [role="application"]');
-        if (timelineStage && (timelineStage === document.activeElement || timelineStage.contains(document.activeElement))) return;
         const target = e.target;
         const isTyping = target instanceof HTMLElement && (
           target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)

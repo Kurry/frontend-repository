@@ -1,0 +1,191 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "9.1"
+name = "cold_start_interactive_under_2s"
+description = "The page is interactive within 2 seconds of a local cold load."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.2"
+name = "console_clean_on_load_and_exercise"
+description = "No console errors, hydration mismatch warnings, or unhandled rejections appear on load or during a full scroll-through, theme toggle, form completion, session-lead export/copy, and carousel exercise."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.3"
+name = "theme_and_chrome_remain_responsive"
+description = "Theme toggle and primary nav chrome respond without multi-second lag after first paint (UI transitions feel under ~100ms for chrome interactions)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.4"
+name = "form_submit_shows_brief_async_feedback"
+description = "Valid newsletter and contact submits show their success messages after the brief simulated delay rather than hanging the UI with no feedback."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.5"
+name = "long_page_scroll_without_lag"
+description = "Scrolling the full long-form homepage (all sections) remains usable without perceived multi-second freezes between sections."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.6"
+name = "interactive_during_theme_and_carousel"
+description = "The UI remains interactive during theme toggles and news carousel paging (controls stay clickable)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.7"
+name = "scroll_reveals_hold_smooth_frame_rate"
+description = "Continuous scrolling from top to bottom holds a smooth frame rate through every reveal, scrub, and marquee."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.8"
+name = "rapid_theme_toggle_never_freezes"
+description = "Rapidly toggling the theme several times never freezes the page."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.9"
+name = "extended_scroll_session_stable"
+description = "After an extended scroll-through with theme toggles and carousel paging, the page remains responsive without runaway resource use that freezes interaction."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "9.10"
+name = "above_fold_settles_and_media_strategy"
+description = "Largest above-the-fold content settles within about 2.5 seconds; hero imagery is eager-loaded and editorial imagery is lazy-loaded."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a1"
+name = "scroll_linked_animation_frame_rate"
+description = "Scroll-linked section reveals and desktop quick-link scrub hold a smooth frame rate through the full page length on a 1440-wide viewport with no visible hitching during continuous scroll."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a2"
+name = "smooth_scroll_feels_continuous_above_1024"
+description = "Above 1024px, the native-scroll smooth engine feels continuous and settles naturally without lag between input and motion, while sticky Why Astra headings still work."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a4"
+name = "layout_stable_cls_under_0_1"
+description = "Layout is stable after load: cumulative layout shift stays under about 0.1 as fonts, images, or video panels finish loading — media regions reserve their space from first paint."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a6"
+name = "motion_scripts_hydrate_after_first_paint"
+description = "Client motion scripts hydrate after first paint without blocking navigation or theme chrome; heavy scroll and hero sequencing attach when needed rather than freezing the first interaction."
+type = "binary"
+weight = 1.0
+

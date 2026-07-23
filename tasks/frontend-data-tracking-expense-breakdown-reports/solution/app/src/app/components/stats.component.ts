@@ -46,7 +46,7 @@ function sparkOption(data: number[], color: string): EChartsOption {
       @for (card of cards; track card.label) {
         <article class="stat-card rounded-2xl border border-mint-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
           <div class="flex items-center justify-between gap-2">
-            <h3 class="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-soft">{{ card.label }}</h3>
+            <div class="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-soft">{{ card.label }}</div>
             <span class="h-2 w-2 rounded-full" [style.background]="card.accent" aria-hidden="true"></span>
           </div>
           <p class="font-display mt-1.5 text-[26px] font-bold leading-none tracking-tight tabular-nums text-teal-950"

@@ -1,22 +1,17 @@
-# Ridge L1 Network Marketing Landing Page
+# L1 Network Marketing — Oracle
 
-This is a complete React + Astro + Nano Stores application representing the Ridge Layer-1 network marketing site.
+Reference solution (oracle) for the `frontend-landing-l1-network-marketing` task. Serves the app
+described in `../../instruction.md`; used by `solve.sh`, the reference
+screenshot capture harness, and oracle validation runs. Must serve with
+zero console/page errors.
 
-## Stack
-- Astro (static delivery)
-- React Islands
-- Nano Stores (in-memory state management)
-- Tailwind CSS 4.3.2 + DaisyUI
-- GSAP + Lenis for animations
+## Run
 
-## Features
-- Fully functional Events Manager with sorting, filtering, and bulk actions.
-- Zod + React Hook Form validation for Event Create/Edit and Contact Lead forms.
-- Export Catalog functionality (JSON, ICS) + Import capability.
-- Session Leads log.
-- Smooth scroll, sticky chapters, entrance animations.
-- Dark/Light mode theme toggle.
-- WebMCP Integration binding UI actions to exposed tools.
+    npm install
+    npm run verify:build
+    npm start          # serves on port 3000
 
-## Screenshot
-![Finished App Overview](./public/images/full_page_overview.png)
+## WebMCP
+
+Registers the task's contract modules: browse-query-v1, form-workflow-v1, entity-collection-v1, artifact-transfer-v1. Tools are exposed via
+window.webmcp_session_info / webmcp_list_tools / webmcp_invoke_tool.

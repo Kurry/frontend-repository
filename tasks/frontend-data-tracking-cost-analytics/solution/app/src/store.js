@@ -195,7 +195,12 @@ export const useCostStore = create((set, get) => ({
     pinnedTeams: state.pinnedTeams.includes(team) ? state.pinnedTeams.filter((t) => t !== team) : [...state.pinnedTeams, team],
   })),
   dismissTour: () => set({ tourDismissed: true }),
-  setBudgetCap: ({ capUsd, note }) => set({ budgetCap: capUsd, budgetNote: note || '', announce: `Monthly budget cap set to $${Number(capUsd).toFixed(2)}` }),
+  setBudgetCap: ({ capUsd, note }) => set({
+    budgetCap: capUsd,
+    budgetNote: note || '',
+    toast: { kind: 'success', title: 'Monthly cap saved', subtitle: `The workspace cap is now $${Number(capUsd).toFixed(2)}.` },
+    announce: `Monthly budget cap set to $${Number(capUsd).toFixed(2)}`,
+  }),
   applyRange: (range) => set({ range, selectedIds: [], activeViewId: null }),
   setCompare: (compare) => set({ compare }),
   setDimension: (dimension) => set({ dimension, hiddenSeries: {}, activeViewId: null }),
@@ -214,10 +219,19 @@ export const useCostStore = create((set, get) => ({
     selectedIds: [],
     announce: `${state.selectedIds.length} events recategorized`,
   })),
-  setTeamCeiling: ({ team, ceilingUsd }) => set((state) => withHistory(state, { teamCeilings: { ...state.teamCeilings, [team]: ceilingUsd }, announce: `${team} ceiling updated to $${Number(ceilingUsd).toFixed(2)}` })),
+  setTeamCeiling: ({ team, ceilingUsd }) => set((state) => withHistory(state, {
+    teamCeilings: { ...state.teamCeilings, [team]: ceilingUsd },
+    toast: { kind: 'success', title: `${team} ceiling saved`, subtitle: `The new ceiling is $${Number(ceilingUsd).toFixed(2)} and can be undone.` },
+    announce: `${team} ceiling updated to $${Number(ceilingUsd).toFixed(2)}`,
+  })),
   setRate: (model, rate) => set((state) => {
     const { min, max } = rateBounds(model);
-    return { rateOverrides: { ...state.rateOverrides, [model]: Math.min(max, Math.max(min, Number(rate))) } };
+    const nextRate = Math.min(max, Math.max(min, Number(rate)));
+    if (Math.abs(nextRate - ORIGINAL_RATES[model]) < Number.EPSILON) {
+      const { [model]: _removed, ...rateOverrides } = state.rateOverrides;
+      return { rateOverrides };
+    }
+    return { rateOverrides: { ...state.rateOverrides, [model]: nextRate } };
   }),
   revertRates: () => set({ rateOverrides: {}, announce: 'What-if rates reverted to the originals' }),
   setFormula: (formula) => set({ formula }),

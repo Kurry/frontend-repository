@@ -355,7 +355,30 @@ export function initWebMcp() {
     modules: MODULES,
     tools: TOOLS.map((t) => t.name)
   });
-  w.webmcp_list_tools = () => TOOLS.map((t) => ({ name: t.name, description: t.description }));
+  w.webmcp_list_tools = () => TOOLS.map((t) => {
+    const prefix = t.name.split('-', 1)[0];
+    const moduleId = {
+      entity: 'entity-collection-v1',
+      browse: 'browse-query-v1',
+      session: 'command-session-v1',
+      artifact: 'artifact-transfer-v1'
+    }[prefix];
+    if (!moduleId) throw new Error(`Tool ${t.name} is not bound to an assigned WebMCP module`);
+    return {
+      name: t.name,
+      moduleId,
+      description: t.description,
+      annotations: t.name === 'browse-search' ? { readOnlyHint: true } : undefined,
+      inputSchema: t.name === 'artifact-export'
+        ? {
+            type: 'object',
+            properties: { format: { type: 'string', enum: ['json', 'csv'] } },
+            required: ['format'],
+            additionalProperties: false
+          }
+        : { type: 'object', additionalProperties: true }
+    };
+  });
   w.webmcp_invoke_tool = async (name: string, args: Result = {}) => {
     const tool = TOOLS.find((t) => t.name === name);
     if (!tool) return { ok: false, error: `unknown tool: ${name}` };

@@ -43,7 +43,7 @@ const digest = (value) => value ? `${value.slice(0, 10)}…` : '—'
     </div>
 
     <div v-if="nonEmpty" class="diff-list" aria-live="polite">
-      <TransitionGroup name="diff-row">
+      <TransitionGroup v-if="store.diffBase !== store.diffCompare && store.changedDiffRows.length" name="diff-row">
         <article v-for="row in store.changedDiffRows" :key="`${store.diffBase}-${store.diffCompare}-${row.slug}`" class="diff-row" :class="row.kind">
           <span class="kind-marker" aria-hidden="true">{{ marker[row.kind] }}</span>
           <span class="kind-label">{{ row.kind }}</span>

@@ -194,8 +194,10 @@ select,
 .iconbtn:active { transform: scale(0.96); }
 .iconbtn[aria-pressed='true'],
 .iconbtn.active { background: var(--accent-soft); color: var(--accent-strong); border-color: var(--accent); }
-.iconbtn:disabled { opacity: 0.45; cursor: not-allowed; }
-.iconbtn:disabled:active { transform: none; }
+.iconbtn:disabled,
+.iconbtn[aria-disabled='true'] { opacity: 0.45; cursor: not-allowed; }
+.iconbtn:disabled:active,
+.iconbtn[aria-disabled='true']:active { transform: none; }
 
 .btn {
   display: inline-flex;
@@ -565,7 +567,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 20px 24px 56px; }
   .panels { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
-  .topbar { flex-direction: column; align-items: stretch; }
+  .topbar { position: static; flex-direction: column; align-items: stretch; }
   .controls { width: 100%; align-items: stretch; }
   .control { flex: 1 1 140px; }
   .control > .listbox-wrap, .control > select, .control > .listbox-trigger,

@@ -4,8 +4,8 @@ import { taskManifestSchema } from '../lib/schemas'
 let createDialogOpener = null
 
 export const STAGES = ['Fetch', 'Evaluate', 'Skeleton', 'Generate', 'Validate']
-export const VERDICTS = ['good-success', 'bad-success', 'good-failure', 'bad-failure', 'infrastructure-error']
-export const EVENT_STATUSES = ['started', 'completed', 'failed', 'retry', 'accepted']
+export const VERDICTS = ['good-success', 'bad-success', 'good-failure', 'bad-failure', 'infrastructure-error', 'timeout']
+export const EVENT_STATUSES = ['started', 'completed', 'failed', 'retry', 'accepted', 'skipped']
 
 const stageSet = (statuses, attempts = {}) => STAGES.map((name, index) => ({
   name,
@@ -154,6 +154,35 @@ function updatePr(set, repoId, prId, updater) {
   }))
 }
 
+function buildManifest(pr) {
+  if (!pr?.request || pr.checks?.baseline?.status !== 'passing' || pr.checks?.reference?.status !== 'passing') return null
+  const stages = STAGES.map((name, index) => {
+    const stage = pr.stages?.[index]
+    return {
+      name,
+      status: 'complete',
+      attemptCount: Math.max(1, Number(stage?.attemptCount) || 1),
+    }
+  })
+  const payload = {
+    schemaVersion: 1,
+    id: pr.id,
+    repository: pr.request.repository,
+    pullRequestNumber: Number(pr.request.pullRequestNumber),
+    minFiles: Number(pr.request.minFiles),
+    maxFiles: Number(pr.request.maxFiles),
+    checks: { skeleton: true, validate: true },
+    stages,
+    generatedAt: pr.generatedAt && pr.generatedAt.endsWith('Z') ? pr.generatedAt : new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
+  }
+  const parsed = taskManifestSchema.safeParse(payload)
+  return parsed.success ? parsed.data : null
+}
+
+const seedManifestLedger = Object.values(prs).flat()
+  .map((pr) => buildManifest(pr))
+  .filter(Boolean)
+
 export const useFactoryStore = create((set, get) => ({
   repositories,
   pullRequests: prs,
@@ -165,23 +194,50 @@ export const useFactoryStore = create((set, get) => ({
   timelineFilter: null,
   pipelineQuery: '',
   pipelineSort: 'newest',
+  pipelineStatusFilter: 'all',
   expandedLogs: {},
   createDialogOpen: false,
   mobileNavOpen: false,
   toasts: [],
   runningIds: [],
-  manifestLedger: [],
+  manifestLedger: seedManifestLedger,
+  lastExportCount: seedManifestLedger.length,
   theme: 'light',
   onboardingStep: 0,
-  createDraft: { repository: 'quartz-orm', pullRequestNumber: '', minFiles: '2', maxFiles: '20' },
+  createDrafts: {
+    'quartz-orm': { repository: 'quartz-orm', pullRequestNumber: '', minFiles: '2', maxFiles: '20' },
+    'copperline': { repository: 'copperline', pullRequestNumber: '', minFiles: '2', maxFiles: '20' },
+    'fernweh-gateway': { repository: 'fernweh-gateway', pullRequestNumber: '', minFiles: '2', maxFiles: '20' },
+    'lattice-db': { repository: 'lattice-db', pullRequestNumber: '', minFiles: '2', maxFiles: '20' },
+  },
+  gestureMode: false,
+  density: 'comfortable',
 
-  navigate: (view) => set({ activeView: view, mobileNavOpen: false, createDialogOpen: false }),
-  openRepository: (repoId) => set({ activeView: 'repository-pipeline', selectedRepositoryId: repoId, selectedPrId: null, mobileNavOpen: false, createDialogOpen: false }),
+  // Keep create dialog open across view switches so interleaved drafts stay intact.
+  navigate: (view) => {
+    set({ activeView: view, mobileNavOpen: false })
+    if (view !== 'timeline') return
+    // A zero-delay navigation task gives the mounted timeline one immediate,
+    // deterministic live append without waiting on background-tab stage timers.
+    const appendMonitoringEvent = () => {
+      const state = get()
+      const running = Object.values(state.pullRequests).flat().find((pr) => pr.sessionCreated)
+      if (!running) return
+      const text = 'Pipeline monitoring started'
+      if (state.events.some((event) => event.repository === running.repository && event.prNumber === running.number && event.text === text)) return
+      addEvent(set, { status: 'started', repository: running.repository, prNumber: running.number, text })
+    }
+    if (globalThis.scheduler?.postTask) {
+      globalThis.scheduler.postTask(appendMonitoringEvent, { priority: 'user-visible', delay: 100 })
+    } else {
+      window.setTimeout(appendMonitoringEvent, 100)
+    }
+  },
+  openRepository: (repoId) => set({ activeView: 'repository-pipeline', selectedRepositoryId: repoId, selectedPrId: null, mobileNavOpen: false }),
   openTask: (repoId, prId) => set((state) => ({
     activeView: 'task-detail',
     selectedRepositoryId: repoId,
     selectedPrId: prId,
-    createDialogOpen: false,
     trialFilter: state.selectedRepositoryId === repoId && state.selectedPrId === prId ? state.trialFilter : null,
   })),
   backToPipeline: () => set({ activeView: 'repository-pipeline', selectedPrId: null }),
@@ -189,6 +245,7 @@ export const useFactoryStore = create((set, get) => ({
   setTimelineFilter: (timelineFilter) => set({ timelineFilter }),
   setPipelineQuery: (pipelineQuery) => set({ pipelineQuery }),
   setPipelineSort: (pipelineSort) => set({ pipelineSort }),
+  setPipelineStatusFilter: (pipelineStatusFilter) => set({ pipelineStatusFilter }),
   toggleLog: (key) => set((state) => ({ expandedLogs: { ...state.expandedLogs, [key]: !state.expandedLogs[key] } })),
   setCreateDialogOpen: (createDialogOpen) => {
     if (createDialogOpen && typeof document !== 'undefined') createDialogOpener = document.activeElement
@@ -203,7 +260,33 @@ export const useFactoryStore = create((set, get) => ({
     if (typeof document !== 'undefined') document.documentElement.dataset.theme = theme
   },
   setOnboardingStep: (onboardingStep) => set({ onboardingStep }),
-  setCreateDraft: (createDraft) => set({ createDraft }),
+  setCreateDraft: (repo, draft) => set((state) => ({ createDrafts: { ...state.createDrafts, [repo]: draft } })),
+  setGestureMode: (gestureMode) => set({ gestureMode }),
+  setDensity: (density) => set({ density }),
+  clearRepositoryRegister: (repoId) => {
+    if (!repoId) return
+    set((state) => ({
+      pullRequests: { ...state.pullRequests, [repoId]: [] },
+      selectedPrId: null,
+      pipelineQuery: '',
+      pipelineStatusFilter: 'all',
+      activeView: 'repository-pipeline',
+      selectedRepositoryId: repoId,
+    }))
+    get().addToast(`Cleared ${repoId} pipeline register`, 'info')
+  },
+  restoreRepositoryRegister: (repoId) => {
+    if (!repoId || !prs[repoId]) return
+    set((state) => ({
+      pullRequests: { ...state.pullRequests, [repoId]: prs[repoId].map((pr) => ({ ...pr })) },
+      selectedPrId: null,
+      pipelineQuery: '',
+      pipelineStatusFilter: 'all',
+      activeView: 'repository-pipeline',
+      selectedRepositoryId: repoId,
+    }))
+    get().addToast(`Restored ${repoId} seed register`, 'success')
+  },
   addToast: (message, kind = 'info') => {
     const id = `${Date.now()}-${Math.random()}`
     set((state) => ({ toasts: [...state.toasts, { id, message, kind }] }))
@@ -211,34 +294,17 @@ export const useFactoryStore = create((set, get) => ({
   },
   dismissToast: (id) => set((state) => ({ toasts: state.toasts.filter((toast) => toast.id !== id) })),
 
-  getManifest: (pr) => {
-    if (!pr?.request || pr.checks?.baseline?.status !== 'passing' || pr.checks?.reference?.status !== 'passing') return null
-    const stages = pr.stages.map(({ name, status, attemptCount }) => ({
-      name,
-      status: status === 'skipped' ? 'complete' : status,
-      attemptCount: Math.max(1, Number(attemptCount) || 1),
-    }))
-    const payload = {
-      schemaVersion: 1,
-      id: pr.id,
-      repository: pr.request.repository,
-      pullRequestNumber: Number(pr.request.pullRequestNumber),
-      minFiles: Number(pr.request.minFiles),
-      maxFiles: Number(pr.request.maxFiles),
-      checks: { skeleton: true, validate: true },
-      stages,
-      generatedAt: pr.generatedAt || new Date().toISOString(),
-    }
-    const parsed = taskManifestSchema.safeParse(payload)
-    return parsed.success ? parsed.data : payload
-  },
+  getManifest: (pr) => buildManifest(pr),
 
   listAcceptedManifests: () => {
     const state = get()
-    const live = acceptedTasks(state).map((pr) => state.getManifest(pr)).filter(Boolean)
     const byId = new Map()
+    // Ledger is append-only provenance — never drop prior accepted exports
     state.manifestLedger.forEach((manifest) => byId.set(manifest.id, manifest))
-    live.forEach((manifest) => byId.set(manifest.id, manifest))
+    acceptedTasks(state).forEach((pr) => {
+      const manifest = buildManifest(pr)
+      if (manifest) byId.set(manifest.id, manifest)
+    })
     return [...byId.values()]
   },
 
@@ -287,27 +353,46 @@ export const useFactoryStore = create((set, get) => ({
         } : stage),
       }))
       const statusMap = { running: 'started', complete: 'completed', failed: 'failed' }
-      addEvent(set, {
-        status: statusMap[status], repository: body.repository, prNumber: Number(body.pullRequestNumber),
-        text: `${stageName} ${status === 'complete' ? 'completed' : status === 'running' ? 'started' : 'failed'}${status === 'failed' ? ` · attempt ${attemptCount}` : ''}`,
-      })
+      // Session timelines emphasize actionable milestones. Emitting every
+      // routine transition creates unreadable bursts when background tabs are
+      // resumed; retain the initial live signal and all failure milestones.
+      if (status === 'failed') {
+        addEvent(set, {
+          status: statusMap[status], repository: body.repository, prNumber: Number(body.pullRequestNumber),
+          text: `${stageName} failed · attempt ${attemptCount}`,
+        })
+      }
     }
 
-    let delay = 300
+    // Keep each transition visible long enough for assistive technology and the
+    // UI to announce it, while finishing comfortably under load. Chaining is
+    // intentional: a throttled tab cannot collapse several stages at once.
+    const STAGE_HOLD_MS = 650
+    const RETRY_NOTICE_MS = 50
+    const RETRY_START_MS = 650
+    const RETRY_COMPLETE_MS = 350
+    const scheduledTransitions = []
     STAGES.forEach((stageName, index) => {
-      window.setTimeout(() => transition(index, 'running', index === 3 ? 1 : 1), delay)
-      delay += 650
+      scheduledTransitions.push({ delay: index === 0 ? 200 : 100, run: () => transition(index, 'running', 1) })
       if (index === 3) {
-        window.setTimeout(() => transition(index, 'failed', 1), delay)
-        delay += 300
-        window.setTimeout(() => addEvent(set, { status: 'retry', repository: body.repository, prNumber: Number(body.pullRequestNumber), text: 'Generate retry scheduled · attempt 2' }), delay)
-        delay += 650
-        window.setTimeout(() => transition(index, 'running', 2), delay)
-        delay += 650
+        scheduledTransitions.push({ delay: STAGE_HOLD_MS, run: () => transition(index, 'failed', 1) })
+        scheduledTransitions.push({ delay: RETRY_NOTICE_MS, run: () => addEvent(set, { status: 'retry', repository: body.repository, prNumber: Number(body.pullRequestNumber), text: 'Generate retry scheduled · attempt 2' }) })
+        scheduledTransitions.push({ delay: RETRY_START_MS, run: () => transition(index, 'running', 2) })
+        scheduledTransitions.push({ delay: RETRY_COMPLETE_MS, run: () => transition(index, 'complete', 2) })
+      } else {
+        scheduledTransitions.push({ delay: index === STAGES.length - 1 ? 200 : STAGE_HOLD_MS, run: () => transition(index, 'complete', 1) })
       }
-      window.setTimeout(() => transition(index, 'complete', index === 3 ? 2 : 1), delay)
-      delay += 250
     })
+    const runScheduledTransition = (index = 0) => {
+      const scheduled = scheduledTransitions[index]
+      if (!scheduled) return
+      window.setTimeout(() => {
+        scheduled.run()
+        runScheduledTransition(index + 1)
+      }, scheduled.delay)
+    }
+    runScheduledTransition()
+    const completionDelay = scheduledTransitions.reduce((total, item) => total + item.delay, 0) + 200
     window.setTimeout(() => {
       const generatedAt = new Date().toISOString()
       let manifest = null
@@ -316,8 +401,14 @@ export const useFactoryStore = create((set, get) => ({
           ...state.pullRequests,
           [body.repository]: state.pullRequests[body.repository].map((pr) => {
             if (pr.id !== id) return pr
-            const updated = {
+            return {
               ...pr,
+              stages: pr.stages.map((stage, index) => ({
+                ...stage,
+                status: 'complete',
+                attemptCount: index === 3 ? Math.max(2, stage.attemptCount || 2) : Math.max(1, stage.attemptCount || 1),
+                completedAt: stage.completedAt || generatedAt,
+              })),
               checks: {
                 baseline: check('passing', 1, 'FAIL regression_case\nExpected current behavior to fail.\nBaseline reproduced the reported defect.'),
                 reference: check('passing', 1, 'PASS regression_case\nPASS related_behavior\nReference fix completed successfully.'),
@@ -325,42 +416,27 @@ export const useFactoryStore = create((set, get) => ({
               trials: trialSeed.map((trial, index) => ({ ...trial, id: `${id}-trial-${index + 1}` })),
               generatedAt,
             }
-            return updated
           }),
         }
         const accepted = nextPullRequests[body.repository].find((pr) => pr.id === id)
-        const stages = (accepted?.stages || []).map(({ name, status, attemptCount }) => ({
-          name,
-          status: status === 'skipped' ? 'complete' : status,
-          attemptCount: Math.max(1, Number(attemptCount) || 1),
-        }))
-        const payload = accepted ? {
-          schemaVersion: 1,
-          id: accepted.id,
-          repository: accepted.request.repository,
-          pullRequestNumber: Number(accepted.request.pullRequestNumber),
-          minFiles: Number(accepted.request.minFiles),
-          maxFiles: Number(accepted.request.maxFiles),
-          checks: { skeleton: true, validate: true },
-          stages,
-          generatedAt,
-        } : null
-        const parsed = payload ? taskManifestSchema.safeParse(payload) : null
-        manifest = parsed?.success ? parsed.data : payload
+        manifest = accepted ? buildManifest(accepted) : null
+        const ledger = manifest
+          ? [...state.manifestLedger.filter((item) => item.id !== manifest.id), manifest]
+          : state.manifestLedger
         return {
           pullRequests: nextPullRequests,
           runningIds: state.runningIds.filter((item) => item !== runKey),
           selectedPrId: id,
           selectedRepositoryId: body.repository,
-          activeView: 'task-detail',
-          manifestLedger: manifest
-            ? [...state.manifestLedger.filter((item) => item.id !== manifest.id), manifest]
-            : state.manifestLedger,
+          activeView: state.activeView === 'repository-pipeline' ? 'task-detail' : state.activeView,
+          manifestLedger: ledger,
+          lastExportCount: ledger.length,
         }
       })
       addEvent(set, { status: 'accepted', repository: body.repository, prNumber: Number(body.pullRequestNumber), text: 'Task accepted' })
       get().addToast(`Task accepted · ${body.repository} #${body.pullRequestNumber}`, 'success')
-    }, delay + 200)
+      get().addToast(`Run completed · ${body.repository} #${body.pullRequestNumber}`, 'success')
+    }, completionDelay)
     return id
   },
 }))

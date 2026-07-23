@@ -1,0 +1,2 @@
+import { criterionSuite } from './helpers.js'
+criterionSuite('behavioral', ['multi_facet_reload_resets_to_seed','variant_reversal_proves_live_run_state','binding_and_model_derived_sensitivity','editor_placeholder_echoes_in_bindings_and_preview','save_library_count_delta_exact','different_prompts_different_run_outcomes','interleaved_save_and_run_flows','empty_then_repopulate_library','export_import_pipeline_preserves_session_contract'])

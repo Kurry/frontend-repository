@@ -7,7 +7,7 @@ import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { BarChart } from 'echarts/charts'
 import { GridComponent, TooltipComponent } from 'echarts/components'
-import { PhListChecks as ListChecks, PhUsersThree as UsersThree, PhFileText as FileText, PhMagnifyingGlass as MagnifyingGlass, PhX as X, PhArrowLeft as ArrowLeft, PhPlay as Play, PhPause as Pause, PhArrowCounterClockwise as ArrowCounterClockwise, PhClock as Clock, PhCheckCircle as CheckCircle, PhXCircle as XCircle, PhCircle as Circle, PhCopy as Copy, PhDownloadSimple as DownloadSimple, PhUploadSimple as UploadSimple, PhChartBar as ChartBar, PhFunnel as Funnel, PhGitBranch as GitBranch, PhChatCircleText as ChatCircleText, PhSidebarSimple as SidebarSimple, PhDatabase as Database, PhSparkle as Sparkle } from '@phosphor-icons/vue'
+import { PhListChecks as ListChecks, PhUsersThree as UsersThree, PhFileText as FileText, PhMagnifyingGlass as MagnifyingGlass, PhX as X, PhArrowLeft as ArrowLeft, PhPlay as Play, PhPause as Pause, PhArrowCounterClockwise as ArrowCounterClockwise, PhClock as Clock, PhCheckCircle as CheckCircle, PhXCircle as XCircle, PhCircle as Circle, PhCopy as Copy, PhDownloadSimple as DownloadSimple, PhUploadSimple as UploadSimple, PhChartBar as ChartBar, PhFunnel as Funnel, PhGitBranch as GitBranch, PhChatCircleText as ChatCircleText, PhSidebarSimple as SidebarSimple, PhDatabase as Database, PhSparkle as Sparkle, PhMoon as Moon, PhSun as Sun, PhPrinter as Printer, PhQuestion as Question } from '@phosphor-icons/vue'
 import { useAuditStore, title } from './store'
 import { CHECKS, CRITERIA, REVIEWERS, FEEDBACK_VERDICTS, STAGES, REPOSITORIES, FeedbackEntrySchema, CriterionFailVerdictSchema, EscalationSchema, ResolutionSchema, firstZodError } from './contracts'
 import CriterionRow from './components/CriterionRow.vue'
@@ -17,16 +17,25 @@ import ImportModal from './components/ImportModal.vue'
 
 use([CanvasRenderer,BarChart,GridComponent,TooltipComponent])
 const store=useAuditStore()
-const { records, activeView, selectedTask, selectedReviewer, visibleRecords, checkRates, criterionRanking, reviewerActivity, datasetSummary, activeFilterChips, touchedRecords }=storeToRefs(store)
+const { records, activeView, selectedTask, selectedReviewer, visibleRecords, checkRates, criterionRanking, reviewerActivity, datasetSummary, activeFilterChips, touchedRecords, repositorySummaries, sessionDensity }=storeToRefs(store)
 const evidenceFilter=ref('all')
 const activeViolation=ref(null)
 const nowTick=ref(Date.now())
 const timer=setInterval(()=>nowTick.value=Date.now(),250)
 const themeOverrides={common:{primaryColor:'#4f6f52',primaryColorHover:'#3f6044',primaryColorPressed:'#345239',borderRadius:'10px',fontFamily:'Inter, Avenir Next, system-ui, sans-serif'},Button:{borderRadiusMedium:'10px'},Input:{borderRadius:'10px'}}
 
-const checkChartOption=computed(()=>({animation:true,animationDuration:400,animationDurationUpdate:400,color:['#58795c'],grid:{left:46,right:18,top:18,bottom:78},tooltip:{trigger:'item',confine:true,formatter:p=>`${p.name}<br/><strong>${p.value}% pass</strong>`},xAxis:{type:'category',data:checkRates.value.map(x=>x.check),axisLabel:{rotate:42,fontSize:10}},yAxis:{type:'value',max:100,axisLabel:{formatter:'{value}%'}},series:[{type:'bar',data:checkRates.value.map(x=>x.passRate),barMaxWidth:26,itemStyle:{borderRadius:[5,5,0,0]},animationDelay:i=>i*18}]}))
-const criterionChartOption=computed(()=>({animation:true,animationDuration:400,animationDurationUpdate:400,color:['#58795c'],grid:{left:46,right:18,top:18,bottom:92},tooltip:{trigger:'item',confine:true,formatter:p=>`${p.name}<br/><strong>${p.value} ${p.value===1?'failure':'failures'}</strong>`},xAxis:{type:'category',data:criterionRanking.value.map(x=>x.criterion),axisLabel:{rotate:48,fontSize:9}},yAxis:{type:'value',minInterval:1},series:[{type:'bar',data:criterionRanking.value.map(x=>x.failures),barMaxWidth:24,itemStyle:{borderRadius:[5,5,0,0]},animationDelay:i=>i*18}]}))
+const checkChartOption=computed(()=>({animation:true,animationDuration:400,animationDurationUpdate:400,animationEasing:'cubicOut',color:['#58795c'],grid:{left:46,right:18,top:18,bottom:78,containLabel:false},tooltip:{trigger:'item',confine:true,formatter:p=>`${p.name}<br/><strong>${p.value}% pass</strong>`},xAxis:{type:'category',data:checkRates.value.map(x=>x.check),axisLabel:{rotate:42,fontSize:10}},yAxis:{type:'value',max:100,axisLabel:{formatter:'{value}%'}},series:[{type:'bar',data:checkRates.value.map(x=>x.passRate),barMaxWidth:26,itemStyle:{borderRadius:[5,5,0,0]},animationDelay:i=>i*18}]}))
+const criterionChartOption=computed(()=>({animation:true,animationDuration:400,animationDurationUpdate:400,animationEasing:'cubicOut',color:['#58795c'],grid:{left:46,right:18,top:18,bottom:92,containLabel:false},tooltip:{trigger:'item',confine:true,formatter:p=>`${p.name}<br/><strong>${p.value} ${p.value===1?'failure':'failures'}</strong>`},xAxis:{type:'category',data:criterionRanking.value.map(x=>x.criterion),axisLabel:{rotate:48,fontSize:9}},yAxis:{type:'value',minInterval:1},series:[{type:'bar',data:criterionRanking.value.map(x=>x.failures),barMaxWidth:24,itemStyle:{borderRadius:[5,5,0,0]},animationDelay:i=>i*18}]}))
 const reviewerChartOption=computed(()=>{const r=reviewerActivity.value.find(x=>x.reviewer===selectedReviewer.value);return {animation:true,animationDuration:400,animationDurationUpdate:400,color:['#58795c'],grid:{left:45,right:15,top:15,bottom:60},tooltip:{trigger:'item',confine:true},xAxis:{type:'category',data:FEEDBACK_VERDICTS,axisLabel:{rotate:18}},yAxis:{type:'value',minInterval:1},series:[{type:'bar',data:FEEDBACK_VERDICTS.map(v=>r?.verdictMix[v]||0),barMaxWidth:42,itemStyle:{borderRadius:[5,5,0,0]}}]}})
+const onboardingCopy=[
+  {title:'Welcome to the Benchwise audit desk',body:'Queue holds every seeded task. Live rollup cells filter the table; charts share one moss accent and grow on first paint.'},
+  {title:'Reviewers and coverage',body:'Nine seeded reviewers leave Approve / caveats / Needs edit / Reject feedback. Open Reviewers to inspect verdict mix charts.'},
+  {title:'Task lifecycle',body:'Open a row to run the nine deterministic checks, pause mid-step, set admission criteria, escalate held work, or apply simulated fixes.'},
+  {title:'Portable Audit Package',body:'Report compiles Audit Package JSON and Markdown live. Copy, download, or import a contract-valid package to reconstruct the desk.'}
+]
+function onCheckChart(params){if(params?.name)store.applyFilter('check',params.name,'pass')}
+function onCriterionChart(params){if(params?.name)store.applyFilter('criterion',params.name,'fail')}
+function printReport(){store.setView('report');store.notify('Printable audit summary ready');window.print()}
 const paletteOpen=ref(false)
 const paletteQuery=ref('')
 const paletteItems=computed(()=>{
@@ -57,6 +66,13 @@ const passCount=t=>CHECKS.filter(c=>t.checkResults[c].status==='pass').length
 const criteriaCount=t=>CRITERIA.filter(c=>t.criteria[c].verdict==='pass').length
 const failedCriteria=t=>CRITERIA.filter(c=>t.criteria[c].verdict==='fail')
 const admissionText=t=>failedCriteria(t).length?`Held · ${failedCriteria(t).join(', ')}`:(passCount(t)===9&&criteriaCount(t)===10?(t.stage==='resolved'?'Resolved':'Admitted'):'Review in progress')
+const whatIfPreview=computed(()=>{
+  const task=selectedTask.value; if(!task)return null
+  const hyp=store.whatIfCriterion
+  if(!hyp)return {label:'Pick a criterion to preview a fail outcome',banner:admissionText(task)}
+  const fails=new Set(failedCriteria(task)); fails.add(hyp)
+  return {label:`If ${hyp} fails`,banner:`Held · ${[...fails].join(', ')}`}
+})
 const stageClass=s=>`stage-${s}`
 const checkClass=s=>`check-${s}`
 const verdictClass=v=>`verdict-${v.toLowerCase().replaceAll(' ','-')}`
@@ -66,38 +82,87 @@ const reachedAt=(task,stage)=>task.stageHistory.findLast?.(x=>x.stage===stage)?.
 const currentStepIcon=s=>s.status==='complete'?CheckCircle:s.status==='failed'?XCircle:s.status==='running'||s.status==='retrying'?ArrowCounterClockwise:Circle
 function checkClicked(task,check){const result=task.checkResults[check];activeViolation.value=result.status==='fail'?{check,text:result.violation}:null;if(activeRun.value){activeRun.value.highlighted=check;setTimeout(()=>document.querySelector(`[data-step="${check}"]`)?.scrollIntoView({behavior:'smooth',block:'center'}),20)}}
 function chooseEvidence(entry){if(!activeRun.value)return;const check=CHECKS.find(c=>entry.detail.startsWith(c));if(check){activeRun.value.highlighted=check;document.querySelector(`[data-step="${check}"]`)?.scrollIntoView({behavior:'smooth',block:'center'})}}
-async function copyExport(){const text=store.recordExport(store.exportFormat);try{if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(text);else{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}store.notify('Exact preview copied to clipboard')}catch(e){store.notify('Clipboard unavailable — export still recorded')}}
-function downloadExport(){const text=store.recordExport(store.exportFormat);const ext=store.exportFormat==='json'?'json':'md';const url=URL.createObjectURL(new Blob([text],{type:store.exportFormat==='json'?'application/json':'text/markdown'}));const a=document.createElement('a');a.href=url;a.download=`quality-audit-${new Date().toISOString().slice(0,10)}.${ext}`;a.click();URL.revokeObjectURL(url)}
+async function copyExport(){const text=store.recordExport(store.exportFormat);try{let copied=false;if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(text);copied=true}else{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();copied=document.execCommand('copy')===true;ta.remove()}if(!copied)throw new Error('clipboard rejected copy');store.notify('Exact preview copied to clipboard');return true}catch(e){store.notify('Clipboard unavailable — export still recorded');return false}}
+function downloadExport(){const text=store.recordExport(store.exportFormat);const ext=store.exportFormat==='json'?'json':'md';const url=URL.createObjectURL(new Blob([text],{type:store.exportFormat==='json'?'application/json':'text/markdown'}));const a=document.createElement('a');a.href=url;a.download=`quality-audit-${new Date().toISOString().slice(0,10)}.${ext}`;a.style.display='none';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);return true}
 
 function registerWebMcp(){
-  const tools=[]; const add=(name,description,inputSchema,handler)=>tools.push({name,description,inputSchema,handler})
-  add('browse_open','Open a bounded audit desk destination.',{type:'object',properties:{destination:{enum:['queue','task-detail','reviewers','reviewer-detail','report']},slug:{type:'string'},reviewer:{enum:REVIEWERS}},required:['destination']},a=>{if(a.destination==='task-detail')store.openTask(a.slug);else if(a.destination==='reviewer-detail')store.openReviewer(a.reviewer);else store.setView(a.destination);return {visibleView:store.activeView}})
-  add('browse_apply_filter','Apply a bounded queue filter.',{type:'object',properties:{filter:{enum:['check-outcome','criterion-outcome','lifecycle-stage','reviewer']},value:{type:'string'},outcome:{enum:['pass','fail']}},required:['filter','value']},a=>{const k={'check-outcome':'check','criterion-outcome':'criterion','lifecycle-stage':'stage',reviewer:'reviewer'}[a.filter];store.applyFilter(k,a.value,a.outcome);return {visibleCount:store.visibleRecords.length}})
-  add('browse_clear_filter','Clear all queue filters.',{type:'object',properties:{}},()=>{store.clearFilters();return {visibleCount:store.visibleRecords.length}})
-  add('browse_sort','Sort the task queue.',{type:'object',properties:{column:{enum:['slug','repository','stage','checks','criteria','feedback','lastActivity']},direction:{enum:['column-ascending','column-descending']}},required:['column','direction']},a=>{store.sort={key:a.column,direction:a.direction==='column-ascending'?'asc':'desc'};return {sort:store.sort}})
-  add('form_validate','Validate a declared workflow payload without saving.',{type:'object',properties:{workflow:{enum:['add-feedback-entry','set-criterion-verdict','escalate-task','resolve-task']},slug:{type:'string'},payload:{type:'object'}},required:['workflow','payload']},a=>({valid:validateWorkflow(a.workflow,a.payload).ok,error:validateWorkflow(a.workflow,a.payload).error||null}))
-  add('form_submit','Submit a declared workflow through product handlers.',{type:'object',properties:{workflow:{enum:['add-feedback-entry','set-criterion-verdict','escalate-task','apply-simulated-fixes','resolve-task']},slug:{type:'string'},payload:{type:'object'}},required:['workflow','slug']},a=>submitWorkflow(a))
-  add('form_cancel','Cancel the visible form workflow.',{type:'object',properties:{}},()=>{store.importOpen=false;return {visible:true,operation:'cancel'}})
-  add('session_start','Start a check-run or filtered batch run.',{type:'object',properties:{demo:{enum:['check-run','batch-run-filtered','re-audit-run']},slug:{type:'string'}},required:['demo']},a=>{if(a.demo==='batch-run-filtered')store.startBatch();else store.runChecks(a.slug||store.selectedSlug);return {started:true}})
-  add('session_pause','Pause the current check or batch run.',{type:'object',properties:{slug:{type:'string'}}},a=>{if(store.batch.active)store.pauseBatch();else store.pauseRun(a.slug||store.selectedSlug);return {paused:true}})
-  add('session_resume','Resume the current check or batch run.',{type:'object',properties:{slug:{type:'string'}}},a=>{if(store.batch.active)store.resumeBatch();else store.resumeRun(a.slug||store.selectedSlug);return {resumed:true}})
-  add('artifact_copy','Copy the active export through the visible product handler.',{type:'object',properties:{format:{enum:['audit-package-json','audit-report-markdown']}},required:['format']},a=>{store.exportFormat=a.format==='audit-package-json'?'json':'markdown';copyExport();return {format:a.format,confirmation:'Visible copy confirmation shown'}})
-  add('artifact_export','Download the active export through the visible product handler.',{type:'object',properties:{format:{enum:['audit-package-json','audit-report-markdown']}},required:['format']},a=>{store.exportFormat=a.format==='audit-package-json'?'json':'markdown';downloadExport();return {format:a.format,confirmation:'Visible download confirmation shown'}})
-  add('artifact_import','Open the visible Audit Package JSON import surface.',{type:'object',properties:{mode:{enum:['paste','file-picker']}},required:['mode']},a=>{store.setView('report');store.importOpen=true;return {visible:true,mode:a.mode}})
-  window.webmcp_session_info=()=>({contract_version:'zto-webmcp-v1',modules:['browse-query-v1','form-workflow-v1','command-session-v1','artifact-transfer-v1'],app:'Benchwise Audit Desk',tool_names:tools.map(t=>t.name)})
-  window.webmcp_list_tools=()=>tools.map(({handler,...x})=>x)
-  window.webmcp_invoke_tool=async(nameOrObj,maybeArgs={})=>{
-    let name,args
-    if(typeof nameOrObj==='string'){name=nameOrObj;args=maybeArgs||{}}
-    else if(nameOrObj&&typeof nameOrObj==='object'){name=nameOrObj.name??nameOrObj.tool??nameOrObj.toolName;args=nameOrObj.arguments??nameOrObj.args??maybeArgs??{}}
-    else{name=undefined;args={}}
-    const tool=tools.find(t=>t.name===name)
-    if(!tool)throw new Error(`Unknown tool: ${name}`)
-    return tool.handler(args||{})
+  const destinations=['queue','task-detail','reviewers','reviewer-detail','report']
+  const filters=['check-outcome','criterion-outcome','lifecycle-stage','reviewer']
+  const sorts=['column-ascending','column-descending']
+  const formFields=['reviewer','feedback-verdict','findings','criterion-verdict','fail-rationale','escalation-category','escalation-summary','resolution-note']
+  const exportFormats=['audit-package-json','audit-report-markdown']
+  const objectSchema=(properties={},required=[])=>({type:'object',additionalProperties:false,...(required.length?{required}:{}),properties})
+  const fieldsSchema={type:'object',additionalProperties:{type:'string',maxLength:200}}
+  const tools=[]
+  const add=(name,description,inputSchema,handler)=>tools.push({name,description,inputSchema,handler})
+  const validateInput=(schema,input)=>{
+    if(!input||typeof input!=='object'||Array.isArray(input))return 'arguments must be an object'
+    const properties=schema.properties||{}
+    const unknown=Object.keys(input).find(key=>!(key in properties));if(unknown)return `unknown argument: ${unknown}`
+    const missing=(schema.required||[]).find(key=>input[key]===undefined);if(missing)return `missing required argument: ${missing}`
+    for(const [key,rule] of Object.entries(properties)){
+      const value=input[key];if(value===undefined)continue
+      if(rule.type==='string'&&typeof value!=='string')return `${key} must be a string`
+      if(rule.type==='object'&&(!value||typeof value!=='object'||Array.isArray(value)))return `${key} must be an object`
+      if(rule.maxLength&&value.length>rule.maxLength)return `${key} is too long`
+      if(rule.enum&&!rule.enum.includes(value))return `${key} is outside the declared enum`
+      if(rule.type==='object'){
+        const badField=Object.keys(value).find(field=>!formFields.includes(field));if(badField)return `Unknown field: ${badField}`
+        const badValue=Object.entries(value).find(([,fieldValue])=>typeof fieldValue!=='string'||fieldValue.length>200);if(badValue)return `${key}.${badValue[0]} must be a string of at most 200 characters`
+      }
+    }
+    return ''
+  }
+  const currentSlug=()=>store.selectedSlug||store.visibleRecords[0]?.slug
+  const currentCriterion=()=>store.selectedTask?(CRITERIA.find(c=>store.selectedTask.criteria[c]?.verdict===null)||null):null
+  const inferWorkflow=fields=>{
+    if('resolution-note' in fields)return ['resolve-task',{'resolution-note':fields['resolution-note']}]
+    if('escalation-category' in fields||'escalation-summary' in fields)return ['escalate-task',{'escalation-category':fields['escalation-category'],'escalation-summary':fields['escalation-summary']}]
+    if('criterion-verdict' in fields||'fail-rationale' in fields)return ['set-criterion-verdict',{criterion:currentCriterion(),'criterion-verdict':fields['criterion-verdict'],'fail-rationale':fields['fail-rationale']}]
+    if('reviewer' in fields||'feedback-verdict' in fields||'findings' in fields)return ['add-feedback-entry',{reviewer:fields.reviewer,'feedback-verdict':fields['feedback-verdict'],findings:fields.findings}]
+    return [null,{}]
+  }
+  add('browse.open','Open a declared destination (route, tab, section, or item).',objectSchema({destination:{type:'string',enum:destinations,description:'Declared destination'}},['destination']),({destination})=>{if(destination==='task-detail'){const slug=currentSlug();if(!slug)return {ok:false,error:'No visible task'};store.openTask(slug)}else if(destination==='reviewer-detail')store.openReviewer(store.selectedReviewer||REVIEWERS[0]);else store.setView(destination);return {ok:true,destination,visibleView:store.activeView}})
+  add('browse.search','Search within the browsable surface.',objectSchema({query:{type:'string',maxLength:200}},['query']),({query})=>{store.search=query;store.setView('queue');return {ok:true,query,visibleCount:store.visibleRecords.length}})
+  add('browse.apply_filter','Apply a declared filter.',objectSchema({filter:{type:'string',enum:filters},value:{type:'string',maxLength:200}},['filter']),({filter,value=''})=>{
+    if(filter==='lifecycle-stage'){if(value&&!STAGES.includes(value))return {ok:false,error:'lifecycle-stage value is outside the declared bounds'};store.applyFilter('stage',value||null)}
+    else if(filter==='reviewer'){if(value&&!REVIEWERS.includes(value))return {ok:false,error:'reviewer value is outside the declared bounds'};store.applyFilter('reviewer',value||null)}
+    else {const [item,outcome='fail']=value.split(':');const allowed=filter==='check-outcome'?CHECKS:CRITERIA;if(item&&!allowed.includes(item))return {ok:false,error:`${filter} value is outside the declared bounds`};if(!['pass','fail'].includes(outcome))return {ok:false,error:'outcome must be pass or fail'};store.applyFilter(filter==='check-outcome'?'check':'criterion',item||null,outcome)}
+    return {ok:true,filter,value,visibleCount:store.visibleRecords.length}
+  })
+  add('browse.clear_filter','Clear one or all declared filters.',objectSchema({filter:{type:'string',enum:filters}}),({filter})=>{if(!filter)store.clearFilters();else store.removeFilter({'check-outcome':'check','criterion-outcome':'criterion','lifecycle-stage':'stage',reviewer:'reviewer'}[filter]);return {ok:true,filter:filter||'all',visibleCount:store.visibleRecords.length}})
+  add('browse.sort','Apply a declared sort order.',objectSchema({sort:{type:'string',enum:sorts}},['sort']),({sort})=>{store.sort={key:store.sort.key||'lastActivity',direction:sort==='column-ascending'?'asc':'desc'};return {ok:true,sort}})
+  add('form.validate','Run declared form validation.',objectSchema({fields:fieldsSchema}),({fields={}})=>{const [workflow,payload]=inferWorkflow(fields);if(!workflow)return {ok:false,error:'At least one declared workflow field is required'};const result=validateWorkflow(workflow,payload);return {ok:result.ok,workflow,error:result.error||null}})
+  add('form.submit','Submit the form through the visible handler.',objectSchema({fields:fieldsSchema}),({fields={}})=>{const slug=currentSlug();if(!slug)return {ok:false,error:'No visible task'};const [workflow,payload]=inferWorkflow(fields);if(!workflow)return {ok:false,error:'At least one declared workflow field is required'};const validation=validateWorkflow(workflow,payload);if(!validation.ok)return validation;return submitWorkflow({workflow,slug,payload})})
+  add('form.cancel','Cancel the active form workflow.',objectSchema({}),()=>{store.importOpen=false;return {ok:true,cancelled:true}})
+  add('session.start','Invoke session operation: start.',objectSchema({}),()=>{const slug=currentSlug();if(!slug)return {ok:false,error:'No visible task'};store.openTask(slug);store.runChecks(slug);return {ok:true,started:true,slug}})
+  add('session.pause','Invoke session operation: pause.',objectSchema({}),()=>{
+    if(store.batch.active){store.pauseBatch();return {ok:true,paused:true,scope:'batch'}}
+    const slug=store.selectedSlug||store.lastSelectedSlug;const run=slug?store.runs[slug]:null
+    if(!run||run.status!=='running')return {ok:false,error:'No running audit session to pause'}
+    store.pauseRun(slug);return {ok:run.status==='paused',paused:run.status==='paused',slug}
+  })
+  add('session.resume','Invoke session operation: resume.',objectSchema({}),()=>{
+    if(store.batch.active){if(!store.batch.paused)return {ok:false,error:'Batch session is not paused'};store.resumeBatch();return {ok:true,resumed:true,scope:'batch'}}
+    const slug=store.selectedSlug||store.lastSelectedSlug;const run=slug?store.runs[slug]:null
+    if(!run||run.status!=='paused')return {ok:false,error:'No paused audit session to resume'}
+    store.resumeRun(slug);return {ok:run.status==='running',resumed:run.status==='running',slug}
+  })
+  add('artifact.import','Start a declared import mode (no file bytes in WebMCP).',objectSchema({mode:{type:'string',maxLength:64}},['mode']),({mode})=>{if(!['paste','file-picker'].includes(mode))return {ok:false,error:'mode must be paste or file-picker'};store.setView('report');store.importOpen=true;return {ok:true,visible:true,mode}})
+  add('artifact.export','Export using a declared format (no blob/base64 in results).',objectSchema({format:{type:'string',enum:exportFormats}},['format']),({format})=>{store.setView('report');store.exportFormat=format==='audit-package-json'?'json':'markdown';downloadExport();return {ok:true,format,export_started:true}})
+  add('artifact.copy','Trigger copy via the visible control (clipboard verified in Playwright).',objectSchema({}),async()=>{store.setView('report');const copied=await copyExport();return {ok:copied,copy_triggered:copied}})
+  window.webmcp_session_info=()=>({contract_version:'zto-webmcp-v1',modules:['browse-query-v1','form-workflow-v1','command-session-v1','artifact-transfer-v1'],app:'Benchwise Audit Desk',tool_names:tools.map(t=>t.name),tool_count:tools.length})
+  window.webmcp_list_tools=()=>tools.map(({handler,...tool})=>tool)
+  window.webmcp_invoke_tool=async(name,args={})=>{if(name&&typeof name==='object'){args=name.arguments||{};name=name.name}const tool=tools.find(t=>t.name===name);if(!tool)return {ok:false,error:`unknown_tool: ${name}`};const error=validateInput(tool.inputSchema,args);if(error)return {ok:false,error};try{return await tool.handler(args)}catch(cause){return {ok:false,error:String(cause?.message||cause)}}}
+  try{if(navigator.modelContext?.registerTool)tools.forEach(tool=>navigator.modelContext.registerTool({name:tool.name,description:tool.description,inputSchema:tool.inputSchema,invoke:args=>window.webmcp_invoke_tool(tool.name,args||{})}))}catch{}
+  window.webmcp={
+    sessionInfo:window.webmcp_session_info,
+    listTools:window.webmcp_list_tools,
+    invokeTool:window.webmcp_invoke_tool
   }
 }
 function parseResult(schema,payload){const r=schema.safeParse(payload);return r.success?{ok:true}:{ok:false,error:firstZodError(r.error)}}
-function validateWorkflow(workflow,payload){if(workflow==='add-feedback-entry')return parseResult(FeedbackEntrySchema,{reviewer:payload.reviewer,verdict:payload['feedback-verdict'],findings:payload.findings});if(workflow==='set-criterion-verdict')return payload['criterion-verdict']==='pass'?{ok:true}:parseResult(CriterionFailVerdictSchema,{criterion:payload.criterion,verdict:'fail',rationale:payload['fail-rationale']});if(workflow==='escalate-task')return parseResult(EscalationSchema,{category:payload['escalation-category'],summary:payload['escalation-summary']});if(workflow==='resolve-task')return parseResult(ResolutionSchema,{note:payload['resolution-note']});return {ok:false,error:'Unknown workflow'}}
+function validateWorkflow(workflow,payload){if(workflow==='add-feedback-entry')return parseResult(FeedbackEntrySchema,{reviewer:payload.reviewer,verdict:payload['feedback-verdict'],findings:payload.findings});if(workflow==='set-criterion-verdict'){if(!payload.criterion||!CRITERIA.includes(payload.criterion))return {ok:false,error:'Open a task and select an unresolved criterion first'};return payload['criterion-verdict']==='pass'?{ok:true}:parseResult(CriterionFailVerdictSchema,{criterion:payload.criterion,verdict:'fail',rationale:payload['fail-rationale']})}if(workflow==='escalate-task')return parseResult(EscalationSchema,{category:payload['escalation-category'],summary:payload['escalation-summary']});if(workflow==='resolve-task')return parseResult(ResolutionSchema,{note:payload['resolution-note']});return {ok:false,error:'Unknown workflow'}}
 function submitWorkflow(a){const p=a.payload||{};if(a.workflow==='add-feedback-entry')return store.addFeedback(a.slug,{reviewer:p.reviewer,verdict:p['feedback-verdict'],findings:p.findings});if(a.workflow==='set-criterion-verdict')return store.saveCriterion(a.slug,p.criterion,p['criterion-verdict'],p['fail-rationale']);if(a.workflow==='escalate-task')return store.escalate(a.slug,{category:p['escalation-category'],summary:p['escalation-summary']});if(a.workflow==='apply-simulated-fixes')return {ok:store.applyFixes(a.slug)};if(a.workflow==='resolve-task')return store.resolve(a.slug,{note:p['resolution-note']});return {ok:false,error:'Unknown workflow'}}
 // Decorative Phosphor icons render bare <svg>; mark those without their own
 // accessible name as aria-hidden so screen readers announce the labelled control,
@@ -112,6 +177,7 @@ function hideDecorativeIcons(root=document.body){
 }
 onMounted(()=>{
   registerWebMcp()
+  store.setTheme(store.theme)
   hideDecorativeIcons()
   iconObserver=new MutationObserver(()=>hideDecorativeIcons())
   iconObserver.observe(document.body,{childList:true,subtree:true})
@@ -122,15 +188,29 @@ onBeforeUnmount(()=>{iconObserver&&iconObserver.disconnect();window.removeEventL
 
 <template>
 <NConfigProvider :theme-overrides="themeOverrides">
-  <div class="min-h-screen bg-paper text-ink">
+  <div class="min-h-screen bg-paper text-ink" :data-theme="store.theme">
     <aside class="desktop-rail fixed inset-y-0 left-0 z-30 flex w-[224px] flex-col border-r border-line bg-[#fbfcf8] p-4">
-      <div class="mb-8 flex items-center gap-3 px-2 pt-2"><div class="grid size-9 place-items-center rounded-xl bg-moss text-white"><ListChecks :size="20" weight="bold"/></div><div><div class="text-lg font-black tracking-tight">Benchwise</div><div class="eyebrow">Audit desk</div></div></div>
+      <div class="mb-8 flex items-center gap-3 px-2 pt-2"><div class="grid size-9 place-items-center rounded-xl bg-moss text-white"><ListChecks :size="20" weight="bold" aria-hidden="true"/></div><div><div class="text-lg font-black tracking-tight">Benchwise</div><div class="eyebrow">Audit desk</div></div></div>
       <nav class="space-y-1" aria-label="Primary navigation">
-        <button :class="['nav-btn',activeView==='queue'&&'active']" @click="store.setView('queue')"><ListChecks :size="20"/> Queue <span class="ml-auto text-xs">{{ records.length }}</span></button>
-        <button :class="['nav-btn',['reviewers','reviewer-detail'].includes(activeView)&&'active']" @click="store.setView('reviewers')"><UsersThree :size="20"/> Reviewers</button>
-        <button :class="['nav-btn',activeView==='report'&&'active']" @click="store.setView('report')"><FileText :size="20"/> Report <span v-if="touchedRecords.length" class="ml-auto size-2 rounded-full bg-coral"></span></button>
+        <button type="button" :class="['nav-btn',activeView==='queue'&&'active']" @click="store.setView('queue')"><ListChecks :size="20" aria-hidden="true"/> Queue <span class="ml-auto text-xs">{{ records.length }}</span></button>
+        <button type="button" :class="['nav-btn',['reviewers','reviewer-detail'].includes(activeView)&&'active']" @click="store.setView('reviewers')"><UsersThree :size="20" aria-hidden="true"/> Reviewers</button>
+        <button type="button" :class="['nav-btn',activeView==='report'&&'active']" @click="store.setView('report')"><FileText :size="20" aria-hidden="true"/> Report <span v-if="touchedRecords.length" class="ml-auto size-2 rounded-full bg-coral"></span></button>
       </nav>
-      <div class="mt-auto rounded-xl border border-line bg-white p-3"><div class="flex items-center gap-2 text-xs font-extrabold"><Database :size="16"/> In-memory session</div><p class="mt-1 text-[11px] leading-4 text-muted">Reload restores the seeded benchmark desk.</p></div>
+      <div class="mt-4 space-y-2">
+        <button type="button" class="nav-btn" :aria-pressed="store.theme==='dark'" @click="store.toggleTheme()">
+          <Moon v-if="store.theme==='light'" :size="18" aria-hidden="true"/><Sun v-else :size="18" aria-hidden="true"/>
+          {{ store.theme==='light'?'Dark mode':'Light mode' }}
+        </button>
+        <button type="button" class="nav-btn" @click="store.onboardingOpen=true;store.onboardingStep=0"><Question :size="18" aria-hidden="true"/> Desk tour</button>
+      </div>
+      <div class="mt-auto space-y-3">
+        <div class="rounded-xl border border-line bg-white p-3" aria-label="Session density meter">
+          <div class="flex items-center justify-between text-xs font-extrabold"><span>Session density</span><span>{{ sessionDensity.percent }}%</span></div>
+          <div class="mt-2 h-2 overflow-hidden rounded-full bg-[#e7ebe2]"><div class="h-full rounded-full bg-moss transition-all duration-500" :style="{width:`${sessionDensity.percent}%`}"></div></div>
+          <p class="mt-1 text-[11px] text-muted">{{ sessionDensity.touched }} of {{ sessionDensity.total }} tasks touched</p>
+        </div>
+        <div class="rounded-xl border border-line bg-white p-3"><div class="flex items-center gap-2 text-xs font-extrabold"><Database :size="16" aria-hidden="true"/> In-memory session</div><p class="mt-1 text-[11px] leading-4 text-muted">Reload restores the seeded benchmark desk.</p></div>
+      </div>
     </aside>
 
     <div class="mobile-top sticky top-0 z-20 hidden items-center justify-between border-b border-line bg-[#fbfcf8]/95 px-4 py-3 backdrop-blur"><div class="flex items-center gap-2 font-black"><ListChecks :size="20" aria-hidden="true"/> Benchwise</div><button class="soft-btn !p-2" aria-label="Open navigation" @click="store.mobileNav=true"><SidebarSimple :size="20" aria-hidden="true"/></button></div>
@@ -139,14 +219,16 @@ onBeforeUnmount(()=>{iconObserver&&iconObserver.disconnect();window.removeEventL
     <main class="main-shell ml-[224px] min-h-screen p-6 lg:p-8">
       <Transition name="detail" mode="out-in">
       <section v-if="activeView==='queue'" key="queue" class="mx-auto max-w-[1600px]">
-        <header class="mb-6 flex flex-wrap items-end justify-between gap-4"><div><p class="eyebrow">Benchmark authoring pipeline</p><h1 class="mt-1 text-3xl font-black tracking-tight">Audit queue</h1><p class="mt-1 text-sm text-muted">Deterministic checks and admission evidence across {{ REPOSITORIES.length }} repositories.</p></div><div class="flex gap-2"><NButton :disabled="!visibleRecords.length||store.batch.active" type="primary" @click="store.startBatch"><Play class="mr-1"/>Run checks on all filtered</NButton></div></header>
+        <header class="mb-6 flex flex-wrap items-end justify-between gap-4"><div><p class="eyebrow">Benchmark authoring pipeline</p><h1 class="mt-1 text-3xl font-black tracking-tight">Audit queue</h1><p class="mt-1 text-sm text-muted">Deterministic checks and admission evidence across {{ REPOSITORIES.length }} repositories.</p></div><div class="flex gap-2"><NButton :disabled="!visibleRecords.length||store.batch.active" type="primary" @click="store.startBatch"><Play class="mr-1" aria-hidden="true"/>Run checks on all filtered</NButton></div></header>
+
+        <section class="mb-4 overflow-x-auto" aria-label="Per-repository mini summaries"><div class="flex min-w-max gap-2"><button v-for="repo in repositorySummaries" :key="repo.repository" type="button" class="roll-cell !min-w-[150px]" @click="store.applyFilter('repository',repo.repository)"><span class="block text-[11px] font-bold text-muted">{{ repo.repository }}</span><strong class="mt-1 block text-lg">{{ repo.total }}</strong><span class="text-[11px] text-muted">{{ repo.held }} held · {{ repo.admitted }} admitted · {{ repo.pending }} pending</span></button></div></section>
 
         <section class="panel mb-5 overflow-hidden" aria-labelledby="rollup-heading">
           <div class="flex items-center justify-between border-b border-line px-5 py-4"><div><h2 id="rollup-heading" class="text-base font-extrabold">Live rollup</h2><p class="mt-0.5 text-xs text-muted">Cells filter the queue. Charts reflect the shared session.</p></div><ChartBar :size="20" class="text-moss"/></div>
-          <div class="overflow-x-auto p-4"><p class="eyebrow mb-2">Deterministic checks</p><div class="flex min-w-max gap-2"><button v-for="x in checkRates" :key="x.check" :class="['roll-cell',store.rollupPulse&&'pulse']" @click="store.applyFilter('check',x.check,'pass')"><span class="block text-[11px] font-bold text-muted">{{ x.check }}</span><strong class="mt-1 block text-xl">{{ x.passRate }}%</strong><span class="text-[11px] text-muted">{{ x.passes }} pass · {{ x.fails }} fail</span></button></div>
-            <p class="eyebrow mb-2 mt-4">Admission criteria</p><div class="flex min-w-max gap-2"><button v-for="x in criterionRanking" :key="x.criterion" class="roll-cell" @click="store.applyFilter('criterion',x.criterion,'fail')"><span class="block max-w-[120px] truncate text-[11px] font-bold text-muted" :title="x.criterion">{{ x.criterion }}</span><strong class="mt-1 block text-xl">{{ x.failures }}</strong><span class="text-[11px] text-muted">{{ x.failures===1?'failure':'failures' }}</span></button></div>
-            <p class="eyebrow mb-2 mt-4">Reviewer entries</p><div class="flex min-w-max gap-2"><button v-for="x in reviewerActivity" :key="x.reviewer" class="roll-cell" @click="store.applyFilter('reviewer',x.reviewer)"><span class="block text-[11px] font-bold text-muted">{{ x.reviewer }}</span><strong class="mt-1 block text-xl">{{ x.entryCount }}</strong><span class="text-[11px] text-muted">entries</span></button></div></div>
-          <div class="grid gap-4 border-t border-line p-4 lg:grid-cols-2"><div class="min-w-0"><h3 class="mb-1 text-sm font-extrabold">Pass rate per check</h3><div class="chart-frame w-full max-w-full" style="height:280px"><VChart style="width:100%;height:280px;max-width:100%" class="w-full" :option="checkChartOption" autoresize/></div></div><div class="min-w-0"><h3 class="mb-1 text-sm font-extrabold">Criteria ranked by failure count</h3><div class="chart-frame w-full max-w-full" style="height:280px"><VChart style="width:100%;height:280px;max-width:100%" class="w-full" :option="criterionChartOption" autoresize/></div></div></div>
+          <div class="overflow-x-auto p-4"><p class="eyebrow mb-2">Deterministic checks</p><div class="flex min-w-max gap-2"><button type="button" v-for="x in checkRates" :key="x.check" :class="['roll-cell',store.rollupPulse&&'pulse']" @click="store.applyFilter('check',x.check,'pass')"><span class="block text-[11px] font-bold text-muted">{{ x.check }}</span><strong class="mt-1 block text-xl">{{ x.passRate }}%</strong><span class="text-[11px] text-muted">{{ x.passes }} pass · {{ x.fails }} fail</span></button></div>
+            <p class="eyebrow mb-2 mt-4">Admission criteria</p><div class="flex min-w-max gap-2"><button type="button" v-for="x in criterionRanking" :key="x.criterion" class="roll-cell" @click="store.applyFilter('criterion',x.criterion,'fail')"><span class="block max-w-[120px] truncate text-[11px] font-bold text-muted" :title="x.criterion">{{ x.criterion }}</span><strong class="mt-1 block text-xl">{{ x.failures }}</strong><span class="text-[11px] text-muted">{{ x.failures===1?'failure':'failures' }}</span></button></div>
+            <p class="eyebrow mb-2 mt-4">Reviewer entries</p><div class="flex min-w-max gap-2"><button type="button" v-for="x in reviewerActivity" :key="x.reviewer" class="roll-cell" @click="store.applyFilter('reviewer',x.reviewer)"><span class="block text-[11px] font-bold text-muted">{{ x.reviewer }}</span><strong class="mt-1 block text-xl">{{ x.entryCount }}</strong><span class="text-[11px] text-muted">entries</span></button></div></div>
+          <div class="grid gap-4 border-t border-line p-4 lg:grid-cols-2"><div class="min-w-0"><h3 class="mb-1 text-sm font-extrabold">Pass rate per check</h3><div class="chart-frame"><VChart class="chart-canvas" :option="checkChartOption" autoresize @click="onCheckChart"/></div></div><div class="min-w-0"><h3 class="mb-1 text-sm font-extrabold">Criteria ranked by failure count</h3><div class="chart-frame"><VChart class="chart-canvas" :option="criterionChartOption" autoresize @click="onCriterionChart"/></div></div></div>
         </section>
 
         <section class="panel overflow-hidden">
@@ -188,7 +270,17 @@ onBeforeUnmount(()=>{iconObserver&&iconObserver.disconnect();window.removeEventL
               <div v-if="activeRun" class="mt-5 border-t border-line pt-4"><div class="mb-3 flex flex-wrap items-center justify-between gap-2"><h3 class="text-sm font-extrabold">Run evidence log</h3><label class="filter-field w-[150px]"><span class="sr-only">Filter evidence by status</span><select class="native-select" :value="evidenceFilter" @change="evidenceFilter=$event.target.value"><option value="all">all</option><option value="running">running</option><option value="retrying">retrying</option><option value="complete">complete</option><option value="failed">failed</option></select></label></div><div class="max-h-[220px] space-y-1 overflow-y-auto"><button v-for="entry in filteredEvidence" :key="entry.id" class="row-hover flex w-full items-start gap-3 rounded-lg p-2 text-left text-xs" @click="chooseEvidence(entry)"><Clock class="mt-0.5 shrink-0" aria-hidden="true"/><span class="flex-1">{{ entry.detail }}</span><span class="shrink-0 text-[10px] text-muted">{{ fmt(entry.at) }}</span></button></div></div>
             </section>
 
-            <section class="panel p-5"><div class="mb-3 flex items-center justify-between"><div><h2 class="font-extrabold">Admission rubric</h2><p class="mt-0.5 text-xs text-muted">Ten operator judgments with saved rationale evidence.</p></div><span class="text-sm font-black">{{ criteriaCount(selectedTask) }} / 10</span></div><div v-if="!selectedTask.firstRunCompleted" class="mb-3 rounded-xl bg-[#eef2ec] p-3 text-sm font-bold text-muted">Checks must run first. Verdict toggles are disabled until a completed run.</div><div :class="['mb-3 rounded-xl p-3 text-sm font-extrabold',failedCriteria(selectedTask).length?'bg-[#fff1d5] text-[#795817]':passCount(selectedTask)===9&&criteriaCount(selectedTask)===10?'bg-[#e5f3e7] text-[#2e6737]':'bg-[#eef2ec] text-muted']">{{ admissionText(selectedTask) }}</div><CriterionRow v-for="criterion in CRITERIA" :key="criterion" :task="selectedTask" :criterion="criterion"/></section>
+            <section class="panel p-5"><div class="mb-3 flex items-center justify-between"><div><h2 class="font-extrabold">Admission rubric</h2><p class="mt-0.5 text-xs text-muted">Ten operator judgments with saved rationale evidence.</p></div><span class="text-sm font-black">{{ criteriaCount(selectedTask) }} / 10</span></div><div v-if="!selectedTask.firstRunCompleted" class="mb-3 rounded-xl bg-[#eef2ec] p-3 text-sm font-bold text-muted">Checks must run first. Verdict toggles are disabled until a completed run.</div><div :class="['mb-3 rounded-xl p-3 text-sm font-extrabold',failedCriteria(selectedTask).length?'bg-[#fff1d5] text-[#795817]':passCount(selectedTask)===9&&criteriaCount(selectedTask)===10?'bg-[#e5f3e7] text-[#2e6737]':'bg-[#eef2ec] text-muted']">{{ admissionText(selectedTask) }}</div>
+              <div class="mb-4 rounded-xl border border-dashed border-line p-3" aria-label="What-if admission preview">
+                <div class="mb-2 flex flex-wrap items-center justify-between gap-2"><h3 class="text-sm font-extrabold">What-if admission preview</h3>
+                  <label class="filter-field max-w-[260px]"><span class="sr-only">Preview fail criterion</span>
+                    <select class="native-select" :value="store.whatIfCriterion||''" @change="store.whatIfCriterion=$event.target.value||null"><option value="">Choose criterion</option><option v-for="c in CRITERIA" :key="c" :value="c">{{ c }}</option></select>
+                  </label>
+                </div>
+                <p class="text-xs text-muted">{{ whatIfPreview?.label }}</p>
+                <p class="mt-1 text-sm font-extrabold">{{ whatIfPreview?.banner }}</p>
+              </div>
+              <CriterionRow v-for="criterion in CRITERIA" :key="criterion" :task="selectedTask" :criterion="criterion"/></section>
           </div>
 
           <div class="space-y-5">
@@ -202,9 +294,9 @@ onBeforeUnmount(()=>{iconObserver&&iconObserver.disconnect();window.removeEventL
 
       <section v-else-if="activeView==='reviewers'" key="reviewers" class="mx-auto max-w-[1120px]"><header class="mb-6"><p class="eyebrow">Feedback coverage</p><h1 class="mt-1 text-3xl font-black">Reviewers</h1><p class="mt-1 text-sm text-muted">Activity from the nine seeded benchmark reviewers.</p></header><div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3"><button v-for="r in reviewerActivity" :key="r.reviewer" class="panel row-hover p-5 text-left" @click="store.openReviewer(r.reviewer)"><div class="mb-4 flex items-center justify-between"><div class="grid size-10 place-items-center rounded-full bg-moss-soft font-black text-moss">{{ r.reviewer.split(' ').map(x=>x[0]).join('') }}</div><span class="text-2xl font-black">{{ r.entryCount }}</span></div><h2 class="font-extrabold">{{ r.reviewer }}</h2><p class="mt-1 text-xs text-muted">{{ r.entryCount }} feedback entries · {{ r.verdictMix.Approve }} approvals</p></button></div></section>
 
-      <section v-else-if="activeView==='reviewer-detail'&&selectedReviewer" key="reviewer-detail" class="mx-auto max-w-[1050px]"><button class="mb-5 flex items-center gap-2 text-sm font-extrabold text-moss" @click="store.setView('reviewers')"><ArrowLeft/>Back to reviewers</button><header class="mb-6"><p class="eyebrow">Reviewer activity</p><h1 class="mt-1 text-3xl font-black">{{ selectedReviewer }}</h1><p class="mt-1 text-sm text-muted">{{ reviewerEntries.length }} feedback entries across the audit queue.</p></header><div class="grid gap-5 lg:grid-cols-[.85fr_1.15fr]"><section class="panel p-5"><h2 class="mb-2 font-extrabold">Verdict distribution</h2><div class="w-full" style="height:320px"><VChart style="height:320px" class="w-full" :option="reviewerChartOption" autoresize/></div></section><section class="panel p-5"><h2 class="mb-4 font-extrabold">Feedback entries</h2><div class="space-y-3"><button v-for="entry in reviewerEntries" :key="entry.slug+entry.at" class="row-hover w-full rounded-xl border border-line p-4 text-left" @click="store.openTask(entry.slug)"><div class="flex flex-wrap items-center gap-2"><span class="break-all font-mono text-xs font-bold">{{ entry.slug }}</span><span :class="['stage-badge',verdictClass(entry.verdict)]">{{ entry.verdict }}</span><time class="ml-auto text-[10px] text-muted">{{ fmt(entry.at) }}</time></div><p class="mt-2 text-sm">{{ entry.findings }}</p></button></div></section></div></section>
+      <section v-else-if="activeView==='reviewer-detail'&&selectedReviewer" key="reviewer-detail" class="mx-auto max-w-[1050px]"><button class="mb-5 flex items-center gap-2 text-sm font-extrabold text-moss" @click="store.setView('reviewers')"><ArrowLeft/>Back to reviewers</button><header class="mb-6"><p class="eyebrow">Reviewer activity</p><h1 class="mt-1 text-3xl font-black">{{ selectedReviewer }}</h1><p class="mt-1 text-sm text-muted">{{ reviewerEntries.length }} feedback entries across the audit queue.</p></header><div class="grid gap-5 lg:grid-cols-[.85fr_1.15fr]"><section class="panel p-5"><h2 class="mb-2 font-extrabold">Verdict distribution</h2><div class="chart-frame chart-frame-tall"><VChart class="chart-canvas" :option="reviewerChartOption" autoresize/></div></section><section class="panel p-5"><h2 class="mb-4 font-extrabold">Feedback entries</h2><div class="space-y-3"><button v-for="entry in reviewerEntries" :key="entry.slug+entry.at" class="row-hover w-full rounded-xl border border-line p-4 text-left" @click="store.openTask(entry.slug)"><div class="flex flex-wrap items-center gap-2"><span class="break-all font-mono text-xs font-bold">{{ entry.slug }}</span><span :class="['stage-badge',verdictClass(entry.verdict)]">{{ entry.verdict }}</span><time class="ml-auto text-[10px] text-muted">{{ fmt(entry.at) }}</time></div><p class="mt-2 text-sm">{{ entry.findings }}</p></button></div></section></div></section>
 
-      <section v-else-if="activeView==='report'" key="report" class="mx-auto max-w-[1380px]"><header class="mb-6 flex flex-wrap items-end justify-between gap-4"><div><p class="eyebrow">Portable session artifact</p><h1 class="mt-1 text-3xl font-black">Audit report</h1><p class="mt-1 text-sm text-muted">Compiled live from {{ touchedRecords.length }} session-touched tasks.</p></div><div class="flex flex-wrap gap-2"><NButton @click="store.importOpen=true"><UploadSimple aria-hidden="true"/>Import package</NButton><NButton @click="copyExport"><Copy aria-hidden="true"/>Copy export</NButton><NButton type="primary" @click="downloadExport"><DownloadSimple aria-hidden="true"/>Download export</NButton></div></header>
+      <section v-else-if="activeView==='report'" key="report" class="mx-auto max-w-[1380px]"><header class="mb-6 flex flex-wrap items-end justify-between gap-4"><div><p class="eyebrow">Portable session artifact</p><h1 class="mt-1 text-3xl font-black">Audit report</h1><p class="mt-1 text-sm text-muted">Compiled live from {{ touchedRecords.length }} session-touched tasks.</p></div><div class="flex flex-wrap gap-2"><NButton @click="store.importOpen=true"><UploadSimple aria-hidden="true"/>Import package</NButton><NButton @click="copyExport"><Copy aria-hidden="true"/>Copy export</NButton><NButton type="primary" @click="downloadExport"><DownloadSimple aria-hidden="true"/>Download export</NButton><NButton @click="printReport"><Printer aria-hidden="true"/>Printable summary</NButton></div></header>
         <div class="mb-5 grid gap-3 sm:grid-cols-5"><div v-for="(value,key) in datasetSummary" :key="key" class="panel p-4"><span class="eyebrow">{{ key }}</span><strong class="mt-1 block text-2xl">{{ value }}</strong></div></div>
         <section v-if="touchedRecords.length" class="panel mb-5 overflow-hidden"><div class="border-b border-line px-4 py-3"><h2 class="font-extrabold">Session check table</h2><p class="text-xs text-muted">Pass/fail colors match the detail chips.</p></div><div class="overflow-x-auto p-3"><table class="report-check-table w-full min-w-[640px] text-left text-xs"><thead><tr><th class="p-2">Task</th><th v-for="c in CHECKS" :key="c" class="p-2 font-bold">{{ c }}</th></tr></thead><tbody><tr v-for="task in touchedRecords" :key="task.slug"><td class="p-2 font-mono font-bold">{{ task.slug }}</td><td v-for="c in CHECKS" :key="c" class="p-2"><span :class="['check-pill',checkClass(task.checkResults[c].status)]">{{ task.checkResults[c].status }}</span></td></tr></tbody></table></div></section>
         <div class="grid gap-5 xl:grid-cols-[1fr_300px]"><section class="panel overflow-hidden"><div class="flex flex-wrap items-center justify-between gap-3 border-b border-line p-4"><div><h2 class="font-extrabold">Live export preview</h2><p class="mt-0.5 text-xs text-muted">Field names and enum values match the API-shaped contract.</p></div><NRadioGroup v-model:value="store.exportFormat" size="small"><NRadioButton value="json">Audit Package JSON</NRadioButton><NRadioButton value="markdown">Audit Report Markdown</NRadioButton></NRadioGroup></div><div class="p-3"><pre class="mono-preview" tabindex="0">{{ reportPreview }}</pre></div></section><aside class="space-y-5"><section class="panel p-5"><div class="mb-3 flex items-center gap-2"><Sparkle class="text-moss" aria-hidden="true"/><h2 class="font-extrabold">Package contract</h2></div><p class="text-xs leading-5 text-muted">Exports use <strong>quality-audit-package-v1</strong>, a UTC timestamp, complete rollups, request-body-shaped evidence, and a session task appendix.</p></section><section class="panel p-5"><h2 class="mb-3 font-extrabold">Export history</h2><div v-if="store.exportHistory.length" class="space-y-2"><div v-for="item in [...store.exportHistory].reverse()" :key="item.exportedAt+item.format" class="rounded-lg bg-[#f3f5f0] p-3"><div class="text-xs font-extrabold uppercase">{{ item.format }}</div><time class="text-[10px] text-muted">{{ fmt(item.exportedAt) }}</time></div></div><p v-else class="text-xs leading-5 text-muted">Copy or download an export to add a timestamped history entry. Untouched records stay out of the appendix until a run, verdict, feedback entry, fix, escalation, or resolution.</p></section></aside></div>
@@ -214,7 +306,19 @@ onBeforeUnmount(()=>{iconObserver&&iconObserver.disconnect();window.removeEventL
 
     <Transition name="fade"><div v-if="store.batch.active" class="fixed bottom-4 left-4 right-4 z-40 rounded-2xl border border-line bg-white p-4 shadow-2xl sm:left-auto sm:w-[430px]"><div class="mb-3 flex items-start justify-between"><div><p class="eyebrow">Batch run</p><h3 class="font-black">Task {{ store.batch.index+1 }} of {{ store.batch.slugs.length }}</h3><p class="mt-0.5 max-w-[310px] truncate text-xs text-muted">{{ store.batch.slugs[store.batch.index] }}</p></div><NButton v-if="!store.batch.paused" size="small" @click="store.pauseBatch"><Pause aria-hidden="true"/>Pause</NButton><NButton v-else size="small" type="primary" @click="store.resumeBatch"><Play aria-hidden="true"/>Resume</NButton></div><div class="grid grid-cols-9 gap-1"><div v-for="step in currentBatchRun?.steps" :key="step.check" :title="`${step.check}: ${step.status}`" :class="['h-2 rounded-full',step.status==='complete'?'bg-[#5c8a63]':step.status==='failed'?'bg-[#c85b47]':step.status==='running'?'animate-pulse bg-blue':step.status==='retrying'?'bg-sun':'bg-[#e0e3dc]']"></div></div></div></Transition>
     <Transition name="toast"><div v-if="store.toast" role="status" aria-live="polite" class="toast-banner fixed right-4 top-4 z-[80] flex max-w-[360px] items-center gap-2 rounded-xl bg-[#253128] px-4 py-3 text-sm font-bold text-white shadow-xl"><CheckCircle :size="19" aria-hidden="true"/>{{ store.toast }}</div></Transition>
+    <Transition name="toast"><div v-if="store.celebrate" role="status" class="celebrate-banner fixed bottom-6 left-1/2 z-[85] -translate-x-1/2 rounded-2xl border border-[#c9e0cc] bg-[#e8f6ea] px-5 py-3 text-sm font-black text-[#2f6a39] shadow-xl">{{ store.celebrate }}</div></Transition>
     <div class="sr-only" aria-live="polite">{{ store.liveMessage }}</div>
+    <NModal v-model:show="store.onboardingOpen" :close-on-esc="true" :mask-closable="true" class="desk-modal">
+      <div class="mx-auto mt-[14vh] w-[min(520px,calc(100vw-24px))] rounded-2xl border border-line bg-white p-5 shadow-2xl" role="dialog" aria-label="Audit desk onboarding">
+        <p class="eyebrow">Guided tour · step {{ store.onboardingStep+1 }} of 4</p>
+        <h2 class="mt-2 text-xl font-black">{{ onboardingCopy[store.onboardingStep].title }}</h2>
+        <p class="mt-2 text-sm leading-6 text-muted">{{ onboardingCopy[store.onboardingStep].body }}</p>
+        <div class="mt-5 flex justify-between gap-2">
+          <NButton @click="store.skipOnboarding()">Skip</NButton>
+          <NButton type="primary" @click="store.advanceOnboarding()">{{ store.onboardingStep>=3?'Start auditing':'Next' }}</NButton>
+        </div>
+      </div>
+    </NModal>
     <NModal v-model:show="paletteOpen" :close-on-esc="true" class="desk-modal" :mask-closable="true">
       <div class="mx-auto mt-[12vh] w-[min(520px,calc(100vw-24px))] rounded-2xl border border-line bg-white p-4 shadow-2xl" role="dialog" aria-label="Command palette">
         <label class="field-label" for="command-palette">Jump to a view or task</label>

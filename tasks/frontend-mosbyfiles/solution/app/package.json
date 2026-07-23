@@ -2,12 +2,16 @@
   "name": "fieldnotesarchive-oracle",
   "version": "1.0.0",
   "private": true,
-  "description": "Field Notes Archive \u2014 offline static oracle reconstruction (10 routes, WebMCP surface).",
+  "description": "Field Notes Archive — offline static oracle reconstruction (10 routes, WebMCP surface).",
   "scripts": {
     "start": "npx --yes serve@14 -l 3000 -s .",
-    "verify:build": "node -e \"var f=require('fs');['index.html','app.js','app.css','assets/manifest.json'].forEach(function(p){if(!f.existsSync(p)){throw new Error('missing '+p)}});console.log('verify:build ok')\""
+    "verify:build": "node -e \"var f=require('fs');['index.html','app.js','app.css','assets/manifest.json'].forEach(function(p){if(!f.existsSync(p)){throw new Error('missing '+p)}});console.log('verify:build ok')\"",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
   },
   "dependencies": {
-    "serve": "14.2.4"
+    "serve": "14.2.6"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.0"
   }
 }

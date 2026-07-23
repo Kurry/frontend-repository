@@ -1,0 +1,2 @@
+import { criterionSuite } from './helpers.js'
+criterionSuite('performance', ['cold_start_under_two_seconds','console_clean_during_full_exercise','preview_updates_under_100ms','streaming_status_visible_while_running','large_editor_text_stays_responsive','ui_interactive_during_stream','streaming_and_variant_motion_stable','rapid_typing_never_hangs','extended_run_session_stable','no_layout_jumps_after_first_paint','command_palette_filtering_responsive'])

@@ -23,7 +23,7 @@ export function NotableGames() {
 
   return (
     <section class="card mb-4">
-      <h3 class="mb-3">Notable games</h3>
+      <h3 class="mb-3">Notable Games</h3>
       <ul class="space-y-2 list-none m-0 p-0">
         {opening.notableGames.map((g, i) => (
           <li key={i} class="border border-neutral-400 rounded-[10px] p-3 text-base">

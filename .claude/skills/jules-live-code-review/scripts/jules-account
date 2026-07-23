@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  echo "usage: jules-account <primary|backup> [jules arguments...]" >&2
+  exit 2
+}
+
+[[ $# -ge 2 ]] || usage
+account=$1
+shift
+
+script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+jules_cli=$(cd -- "$script_dir/../../jules/scripts" && pwd)/jules
+
+case "$account" in
+  primary)
+    # Let the bundled CLI resolve JULES_API_KEY from the environment or its
+    # supported .env search path.
+    ;;
+  backup)
+    backup_key=${JULES_BACKUP_API_KEY:-}
+    if [[ -z "$backup_key" ]] && command -v zsh >/dev/null 2>&1; then
+      # Keep startup output on /dev/null and return only the key over fd 3.
+      backup_key=$(zsh -ic 'printf %s "${JULES_BACKUP_API_KEY:-}" >&3' \
+        3>&1 >/dev/null 2>&1)
+    fi
+    [[ -n "$backup_key" ]] || {
+      echo "error: JULES_BACKUP_API_KEY is not available" >&2
+      exit 1
+    }
+    export JULES_API_KEY=$backup_key
+    unset backup_key
+    ;;
+  *)
+    usage
+    ;;
+esac
+
+exec "$jules_cli" "$@"

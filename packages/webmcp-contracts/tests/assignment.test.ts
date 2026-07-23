@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
@@ -6,7 +6,6 @@ import {
   CONTRACT_VERSION,
   MODULE_IDS,
   validateAssignmentEntry,
-  validateAssignmentMap,
   BindingValidationError,
 } from "../src/index.js";
 
@@ -41,15 +40,48 @@ describe("assignment map", () => {
     ).toThrow(BindingValidationError);
   });
 
-  it("loads the seeded 23-task assignment map", () => {
-    const path = join(root, "schemas/webmcp-assignment-map.json");
-    const raw = JSON.parse(readFileSync(path, "utf8")) as unknown;
-    const entries = validateAssignmentMap(raw);
-    expect(entries).toHaveLength(23);
-    expect(new Set(entries.map((e) => e.task)).size).toBe(23);
+  it("matches the canonical task assignment inventory", () => {
+    const path = join(
+      root,
+      "packages/corpuscheck/src/corpuscheck/schemas/webmcp-assignments.json",
+    );
+    const raw = JSON.parse(readFileSync(path, "utf8")) as {
+      contract_version?: unknown;
+      module_catalog?: unknown;
+      assignments?: unknown;
+    };
+    expect(raw.contract_version).toBe(CONTRACT_VERSION);
+    expect(Array.isArray(raw.module_catalog)).toBe(true);
+    expect([...(raw.module_catalog as string[])].sort()).toEqual(
+      [...MODULE_IDS].sort(),
+    );
+    expect(Array.isArray(raw.assignments)).toBe(true);
+
+    const entries = raw.assignments as Array<{
+      task: string;
+      modules: string[];
+    }>;
+    const assignmentTasks = entries.map((entry) => entry.task);
+    const repositoryTasks = new Set(
+      ["tasks", "tasks-quarantine"].flatMap((directory) =>
+        readdirSync(join(root, directory), { withFileTypes: true })
+          .filter(
+            (entry) =>
+              entry.isDirectory() && entry.name.startsWith("frontend-"),
+          )
+          .map((entry) => entry.name),
+      ),
+    );
+    expect(new Set(assignmentTasks).size).toBe(entries.length);
+    expect([...new Set(assignmentTasks)].sort()).toEqual(
+      [...repositoryTasks].sort(),
+    );
     for (const e of entries) {
+      expect(e.task).toMatch(/^frontend-[a-z0-9-]+$/);
       expect(e.modules.length).toBeGreaterThanOrEqual(1);
       expect(e.modules.length).toBeLessThanOrEqual(4);
+      expect(new Set(e.modules).size).toBe(e.modules.length);
+      for (const module of e.modules) expect(MODULE_IDS).toContain(module);
     }
   });
 });

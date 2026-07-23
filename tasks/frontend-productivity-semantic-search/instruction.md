@@ -2,6 +2,16 @@
 Build a semantic search workspace for a prompt-and-document knowledge library using React, Zustand, Tailwind CSS 4.3.2, and IBM Carbon Design System. The app produces the operator's portable artifacts: a downloadable and copyable search-report JSON compiled live from the current query ranking, and a library-package JSON of the document corpus that round-trips through Import — both conforming to the same API-shaped field contracts as the create and save forms.
 </summary>
 
+<reference_screenshots>
+Screenshots of the reference application are provided in-container at
+/reference-screenshots/: overview.png is a full-page desktop-layout
+overview (downscaled); overview-tablet.png and overview-mobile.png are full-page responsive
+reflows at 1024x768 (tablet) and 390x844 (mobile) viewports; segment-NN.png are full-resolution 1440x900 sections
+in top-to-bottom order with slight overlap. They are part of this instruction:
+recreate what they show. Where a screenshot and the text conflict, the text
+wins. Do not copy the images into /app or ship them as app assets.
+</reference_screenshots>
+
 <core_features>
 Core features (each line is an observable behavior the finished app must exhibit):
 

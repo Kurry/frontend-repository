@@ -23,20 +23,20 @@ export const useStudio = create((set, get) => ({
   experiments: clone(seedExperiments),
   criteria: clone(seedCriteria),
   prompts: clone(seedPrompts),
-  search: '', filters: [], showArchived: false, selectedIds: [], activeExperimentId: null,
+  search: '', filters: [], showArchived: false, selectedIds: [], activeExperimentId: null, lastExperimentId: null,
   view: 'experiments', activeTab: 'results', timelineFilter: 'all', inspectorVariant: 'A', flaggedOnly: false,
   designer: null, decisionFor: null, criterionOpen: false, reportFor: null, confirm: null,
   previewOpen: false, previewInput: 'Explain the key idea clearly and concisely.', previewResponses: [],
   toast: null, announcement: '', past: [], future: [], sampleSort: 'desc', copied: false,
 
   setField: (field, value) => set({ [field]: value }),
-  notify: (title, kind = 'success', announcement = title) => {
+  notify: (title, kind = 'success', announcementText = title) => {
     clearTimeout(notifyTimer)
     const id = Date.now()
-    set({ toast: { id, title, kind }, announcement })
+    set({ toast: { id, title, kind }, announcement: announcementText })
     notifyTimer = setTimeout(() => set(state => ({
       toast: state.toast?.id === id ? null : state.toast,
-      announcement: state.announcement === announcement ? '' : state.announcement,
+      announcement: state.announcement === announcementText ? '' : state.announcement,
     })), 3800)
   },
   setSearch: search => set({ search }),
@@ -44,7 +44,12 @@ export const useStudio = create((set, get) => ({
   clearFilters: () => set({ search: '', filters: [], showArchived: false }),
   toggleSelected: id => set(state => ({ selectedIds: state.selectedIds.includes(id) ? state.selectedIds.filter(item => item !== id) : [...state.selectedIds, id] })),
   selectAll: ids => set(state => ({ selectedIds: state.selectedIds.length === ids.length ? [] : ids })),
-  selectExperiment: id => set({ activeExperimentId: id, activeTab: 'results', inspectorVariant: 'A' }),
+  selectExperiment: id => set(state => ({
+    activeExperimentId: id,
+    activeTab: state.lastExperimentId === id ? state.activeTab : 'results',
+    inspectorVariant: state.lastExperimentId === id ? state.inspectorVariant : 'A',
+    lastExperimentId: id
+  })),
   closePanel: () => set({ activeExperimentId: null }),
   openDesigner: id => set({ designer: id || 'new', previewOpen: false }),
   closeDesigner: () => set({ designer: null, previewOpen: false }),
@@ -105,6 +110,12 @@ export const useStudio = create((set, get) => ({
     if (!ids.length) return
     set(state => ({ ...addHistory(state), experiments: state.experiments.filter(experiment => !ids.includes(experiment.id)), selectedIds: [], activeExperimentId: ids.includes(state.activeExperimentId) ? null : state.activeExperimentId }))
     get().notify(`${ids.length} experiment${ids.length === 1 ? '' : 's'} deleted`)
+  },
+  deleteOneDirect: id => {
+    if (!get().experiments.some(experiment => experiment.id === id)) return false
+    set(state => ({ ...addHistory(state), experiments: state.experiments.filter(experiment => experiment.id !== id), selectedIds: state.selectedIds.filter(selectedId => selectedId !== id), activeExperimentId: state.activeExperimentId === id ? null : state.activeExperimentId }))
+    get().notify('1 experiment deleted')
+    return true
   },
   archiveOne: id => set({ confirm: { type: 'archive-one', experimentId: id } }),
   archiveOneDirect: id => { set({ selectedIds: [id] }); get().archiveSelected() },

@@ -307,6 +307,7 @@ button.inert-nav {
 
 /* ── Bulk bar ── */
 .bulk-bar { display: flex; align-items: center; gap: 12px; margin: 0 4px 16px; padding: 10px 16px; background: #fff7df; border: 1px solid var(--accent); border-radius: var(--br2); box-shadow: 0 6px 18px rgba(245, 197, 66, 0.18); animation: slideDown 220ms ease; }
+.bulk-bar[hidden], .back-to-top[hidden] { display: none !important; }
 .bulk-count { font-weight: 700; color: #6b5400; }
 .bulk-btn { height: 36px; padding: 0 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--c8); font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: background-color 140ms ease, transform 120ms ease; }
 .bulk-btn:hover { background: var(--surface-2); }
@@ -340,7 +341,9 @@ button.inert-nav {
 }
 .scene-item.is-entering { opacity: 0; transform: translateY(10px) scale(0.985); }
 .scene-item.is-entered { opacity: 1; transform: none; transition: opacity 360ms ease, transform 360ms cubic-bezier(0.2, 0.8, 0.2, 1); }
-.scene-item:hover { transform: translateY(-4px); }
+.scene-item:hover { transform: translateY(-4px); box-shadow: 0 18px 36px rgba(33, 28, 12, 0.18); }
+.scene-item.is-initial-enter { animation: initialCardIn 520ms cubic-bezier(0.2,0.8,0.2,1) both; animation-delay: var(--enter-delay, 0ms); }
+@keyframes initialCardIn { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: none; } }
 .scene-item.is-selected .scene-image { box-shadow: 0 0 0 3px var(--accent-strong), var(--shad); }
 .scene-item.is-lastedit .scene-card-wrap { box-shadow: 0 0 0 2px var(--accent-wash); border-radius: var(--br2); }
 
@@ -568,6 +571,7 @@ body.image-corners-v2 .scene-image { border-radius: var(--br2); }
 @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
 @keyframes cardOut { to { opacity: 0; transform: scale(0.9); } }
 .scene-item.is-removing { animation: cardOut 220ms ease forwards; pointer-events: none; }
+.removal-ghost { z-index: 140; pointer-events: none; }
 
 /* ── Print (outline) ── */
 @media print {

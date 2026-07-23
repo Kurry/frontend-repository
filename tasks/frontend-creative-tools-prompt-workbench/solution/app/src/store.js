@@ -4,7 +4,10 @@ import { ASSETS, MODELS, PERSONAS, SEEDED_LIBRARY, detectVariables, modelById, r
 const makeBindings = (text, current = {}) => Object.fromEntries(detectVariables(text).map((name) => [name, current[name] ?? '']))
 
 const snapshotKeys = ['draft', 'bindings', 'selectedModelId', 'activePersona', 'attachmentIds', 'library']
-const snapshot = (state) => Object.fromEntries(snapshotKeys.map((key) => [key, structuredClone(state[key])]))
+// Workbench mutations replace arrays/objects instead of mutating them in place,
+// so history can retain their immutable references. Deep-cloning the seeded
+// library on every editor keystroke made large drafts needlessly expensive.
+const snapshot = (state) => Object.fromEntries(snapshotKeys.map((key) => [key, state[key]]))
 
 const withHistory = (set, get, changes) => {
   const before = snapshot(get())
@@ -16,6 +19,7 @@ const withHistory = (set, get, changes) => {
 }
 
 const toastId = () => `toast-${Date.now()}-${Math.random().toString(36).slice(2)}`
+const normalizedTitle = (title) => title.trim().toLocaleLowerCase()
 
 function makeRequest(state) {
   return {
@@ -115,10 +119,11 @@ export const useWorkbench = create((set, get) => ({
   }),
   switchView: (activeView) => set({ activeView, commandOpen: false }),
   saveLibrary: (payload) => {
-    if (get().library.some((item) => item.title.toLowerCase() === payload.title.toLowerCase())) return false
-    const record = { id: `lib-${Date.now()}`, ...structuredClone(payload) }
-    withHistory(set, get, () => ({ library: [...get().library, record], saveOpen: false }))
-    get().addToast(`“${payload.title}” saved to library`, 'success')
+    const title = payload.title.trim()
+    if (get().library.some((item) => normalizedTitle(item.title) === normalizedTitle(title))) return false
+    const record = { id: `lib-${Date.now()}`, ...structuredClone(payload), title }
+    withHistory(set, get, () => ({ library: [...get().library, record], saveOpen: false, techniqueFilter: '' }))
+    get().addToast(`“${record.title}” saved to library`, 'success')
     return record
   },
   deleteLibrary: (id) => {
@@ -273,4 +278,3 @@ export function compileMarkdown(state = useWorkbench.getState()) {
   const attachments = pkg.attachments.map((item) => item.name).join(', ') || 'None'
   return `# Prompt package\n\n## Model\n${model.name}\n\n${pkg.persona ? `## Persona: ${pkg.persona.name}\n${pkg.persona.preface}\n\n` : ''}## Prompt\n\n${pkg.promptText}\n\n## Bindings\n\n| Variable | Value |\n| --- | --- |\n${bindingRows}\n\n## Attachments\n${attachments}${pkg.latestRun ? `\n\n## Latest response summary\n${pkg.latestRun.summary}` : ''}\n`
 }
-

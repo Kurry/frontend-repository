@@ -263,10 +263,6 @@ function Canvas() {
   const onEdgesChange = useWorkflowStore((state) => state.onEdgesChange);
   const addConnection = useWorkflowStore((state) => state.addConnection);
   const addNode = useWorkflowStore((state) => state.addNode);
-  const selectNode = useWorkflowStore((state) => state.selectNode);
-  const setSelection = useWorkflowStore((state) => state.setSelection);
-  const selectEdge = useWorkflowStore((state) => state.selectEdge);
-  const clearSelection = useWorkflowStore((state) => state.clearSelection);
   const openModal = useWorkflowStore((state) => state.openModal);
   const showToast = useWorkflowStore((state) => state.showToast);
   const { screenToFlowPosition } = useReactFlow();
@@ -328,16 +324,7 @@ function Canvas() {
         onConnectEnd={onConnectEnd}
         isValidConnection={isValidConnection}
         connectionMode={ConnectionMode.Strict}
-        onNodeClick={(event, node) => {
-          if (event.shiftKey) return;
-          selectNode(node.id);
-        }}
         onNodeDoubleClick={(_, node) => openModal('configure', { nodeId: node.id })}
-        onEdgeClick={(_, edge) => selectEdge(edge.id)}
-        onPaneClick={clearSelection}
-        onSelectionChange={({ nodes: selectedNodes, edges: selectedEdges }) => {
-          setSelection(selectedNodes.map((node) => node.id), selectedEdges.map((edge) => edge.id));
-        }}
         selectionOnDrag
         selectionMode={SelectionMode.Partial}
         panOnDrag={[1, 2]}
@@ -642,7 +629,7 @@ function ImportModal() {
     }
   });
   return (
-    <Modal open={open} modalHeading="Import workflow definition" modalLabel="JSON · schema version 1" primaryButtonText="Review import" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || !value.trim()} onRequestSubmit={submit} onRequestClose={close} size="lg">
+    <Modal open={open} modalHeading="Import workflow definition" modalLabel="JSON · schema version 1" primaryButtonText="Review import" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || !value.trim()} onRequestSubmit={submit} onRequestClose={close} selectorPrimaryFocus="#import-definition" size="lg">
       <form onSubmit={submit} className="modal-form" aria-live="polite">
         <TextArea id="import-definition" rows={12} labelText="Workflow definition JSON" placeholder={'{\n  "schemaVersion": 1,\n  ...\n}'} invalid={!!errors.definition || !!parseError} invalidText={parseError || errors.definition?.message || 'Workflow definition is required'} aria-describedby={errors.definition || parseError ? 'import-definition-error-msg' : undefined} {...register('definition')} />
         <p className="form-footnote">The canvas changes only after validation and confirmation.</p>

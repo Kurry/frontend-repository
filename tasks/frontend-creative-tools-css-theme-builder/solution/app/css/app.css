@@ -338,13 +338,17 @@ button.inert-nav {
   border-color: var(--chrome-accent);
 }
 
-.hold-btn::before {
-  content: "";
+.hold-btn .hold-progress {
   position: absolute;
   inset: 0 auto 0 0;
   width: var(--hold-progress, 0%);
-  background: color-mix(in srgb, var(--chrome-accent) 30%, transparent);
+  z-index: 0;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--chrome-accent) 36%, transparent),
+    color-mix(in srgb, var(--chrome-accent) 58%, transparent));
+  box-shadow: inset -2px 0 0 color-mix(in srgb, var(--chrome-accent) 82%, white 18%);
   transition: width 40ms linear;
+  pointer-events: none;
 }
 
 .hold-btn.hold-done::after {
@@ -367,7 +371,7 @@ button.inert-nav {
   }
 }
 
-.hold-btn span {
+.hold-btn .hold-label {
   position: relative;
   z-index: 1;
   font-size: 0.85rem;
@@ -1169,12 +1173,14 @@ input[aria-invalid="true"] ~ .validation-error {
   padding: 1rem;
   opacity: 0;
   visibility: hidden;
+  pointer-events: none;
   transition: opacity 0.18s ease, visibility 0s linear 0.18s;
 }
 
 .modal-backdrop.open {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
   transition: opacity 0.18s ease;
 }
 
@@ -1390,6 +1396,10 @@ input[aria-invalid="true"] ~ .validation-error {
 @media (max-width: 900px) {
   body {
     overflow: auto;
+  }
+
+  .app-shell {
+    height: auto;
   }
 
   .workspace {

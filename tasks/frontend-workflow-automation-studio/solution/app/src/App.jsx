@@ -15,7 +15,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { AnimatePresence, motion } from 'motion/react'
 import { getSelectedScript, statusLabel, useStudio } from './store'
-import { newScriptSchema, paramSchemas, scheduleSchema, stepTypes, typeLabels, validateStep } from './schemas'
+import { newScriptSchema, paramSchemas, runReportSchema, scheduleSchema, stepTypes, typeLabels, validateStep } from './schemas'
 import './webmcp'
 
 const viewItems = [
@@ -111,13 +111,15 @@ function Toolbar() {
   const script = useStudio(getSelectedScript)
   const cursor = useStudio(s => s.historyCursor)
   const actionCount = useStudio(s => s.editActions.length)
-  const { setView, undo, redo, setUi, toggleSidebar } = useStudio()
+  const density = useStudio(s => s.density)
+  const { setView, undo, redo, setUi, toggleSidebar, setDensity } = useStudio()
   return <header className="topbar">
     <div className="topbar-main">
       <Button className="mobile-menu" kind="ghost" size="sm" hasIconOnly renderIcon={Menu} iconDescription="Open script library" onClick={toggleSidebar} />
       <div className="topbar-title min-w-0 flex-1"><div className="eyebrow">Current script</div><div className="truncate text-sm font-semibold">{script?.name || 'No script selected'}</div></div>
       <Button kind="ghost" size="sm" hasIconOnly renderIcon={Undo} iconDescription="Undo" disabled={!cursor} onClick={undo} />
       <Button kind="ghost" size="sm" hasIconOnly renderIcon={Redo} iconDescription="Redo" disabled={cursor >= actionCount} onClick={redo} />
+      <Button kind="ghost" size="sm" aria-pressed={density === 'compact'} onClick={() => setDensity(density === 'compact' ? 'comfortable' : 'compact')}>{density === 'compact' ? 'Comfortable view' : 'Compact view'}</Button>
       <Button kind="ghost" size="sm" renderIcon={Time} onClick={() => setUi({ historyOpen: !useStudio.getState().historyOpen })}>History</Button>
       <Button kind="tertiary" size="sm" renderIcon={Search} onClick={() => setUi({ paletteOpen: true, paletteQuery: '', paletteIndex: 0 })}>Commands <span className="ml-2 opacity-60">⌘K</span></Button>
     </div>
@@ -316,37 +318,68 @@ function VersionsPanel({ script }) {
 
 function RunRollup({ script }) {
   const live = useStudio(s => s.liveRun)
-  const results = Object.values(live?.stepResults || {})
-  const rollup = { passed: results.filter(r => r.status === 'pass').length, failed: results.filter(r => r.status === 'fail').length, skipped: results.filter(r => r.status === 'skipped').length, retries: live?.retryCount || 0 }
   const [, tick] = useState(0)
   useEffect(() => { if (!live || ['complete','failed'].includes(live.status)) return; const id = setInterval(() => tick(v => v + 1), 250); return () => clearInterval(id) }, [live?.status])
+  if (live && live.scriptId !== script.id) return null
+  const results = Object.values(live?.stepResults || {})
+  const rollup = { passed: results.filter(r => r.status === 'pass').length, failed: results.filter(r => r.status === 'fail').length, skipped: results.filter(r => r.status === 'skipped').length, retries: live?.retryCount || 0 }
   const elapsed = live ? Date.now() - Date.parse(live.start_time) : 0
-  return <div className="rollup-grid">
-    <div className="metric"><span className="metric-label">Pass</span><strong>{rollup.passed} of {script.steps.length}</strong></div>
-    <div className="metric"><span className="metric-label">Elapsed</span><strong>{formatDuration(elapsed)}</strong></div>
-    <div className="metric"><span className="metric-label">Retrying</span><strong>{rollup.retries}</strong></div>
-    <div className="metric"><span className="metric-label">Fail</span><strong>{rollup.failed}</strong></div>
-  </div>
+  return <>
+    <div className="rollup-grid">
+      <div className="metric"><span className="metric-label">Pass</span><strong>{rollup.passed} of {script.steps.length}</strong></div>
+      <div className="metric"><span className="metric-label">Fail</span><strong>{rollup.failed}</strong></div>
+      <div className="metric"><span className="metric-label">Skipped</span><strong>{rollup.skipped}</strong></div>
+      <div className="metric"><span className="metric-label">Retries</span><strong>{rollup.retries}</strong></div>
+      <div className="metric"><span className="metric-label">Elapsed</span><strong>{formatDuration(elapsed)}</strong></div>
+    </div>
+    {live?.checkpointLabel && <div className="checkpoint-note" role="status">{live.checkpointLabel}</div>}
+  </>
 }
 
 function RunConsole() {
   const lines = useStudio(s => s.consoleLines)
+  const selectedScriptId = useStudio(s => s.selectedScriptId)
   const theme = useStudio(s => s.consoleTheme)
   const following = useStudio(s => s.consoleFollowing)
+  const jumpDismissed = useStudio(s => s.consoleJumpDismissed)
   const setTheme = useStudio(s => s.setConsoleTheme)
   const setFollowing = useStudio(s => s.setConsoleFollowing)
+  const dismissJump = useStudio(s => s.dismissConsoleJump)
   const setUi = useStudio(s => s.setUi)
   const scrollRef = useRef(null)
-  useEffect(() => { if (following && scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight }, [lines.length, following])
+  const jumpLockRef = useRef(false)
+  const [jumpVisible, setJumpVisible] = useState(false)
+  const visibleLines = lines.filter(line => line.scriptId === selectedScriptId)
+  useEffect(() => { if (following && scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight }, [visibleLines.length, following])
   const className = theme === 'Ocean' ? 'console-ocean' : theme === 'Solar' ? 'console-solar' : 'console-midnight'
   return <section className={`panel console ${className}`} aria-label="Run console">
-    <div className="console-toolbar"><div className="flex items-center gap-2"><Terminal size={17} /><strong className="text-sm">Run console</strong><span className="text-xs opacity-60">{lines.length} events</span></div>
+    <div className="console-toolbar"><div className="flex items-center gap-2"><Terminal size={17} /><strong className="text-sm">Run console</strong><span className="text-xs opacity-60">{visibleLines.length} events</span></div>
       <Select id="console-theme" hideLabel labelText="Console theme" size="sm" value={theme} onChange={e => setTheme(e.target.value)}><SelectItem value="Midnight" text="Midnight" /><SelectItem value="Ocean" text="Ocean" /><SelectItem value="Solar" text="Solar" /></Select>
     </div>
-    <div ref={scrollRef} className="console-body" onScroll={e => { const el = e.currentTarget; const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 8; setFollowing(atBottom) }}>
-      {!lines.length && <div className="opacity-70">Ready. Run a script to stream step events.</div>}
-      {lines.map(line => <div key={line.id}><div className={`console-line ${line.level}`}><span className="opacity-60">{timeOnly(line.timestamp)}</span><span>{line.text}</span></div>{line.screenshot && <button className="screenshot-thumb" onClick={() => setUi({ screenshotModal: { label: line.screenshotLabel } })}><DataView size={30} /><strong>Screenshot captured</strong><span>Open full-size preview</span></button>}</div>)}
-      {!following && <button className="jump-latest" onClick={() => { setFollowing(true); if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight }}><ArrowDown size={13} className="mr-1 inline" />Jump to latest</button>}
+    <div ref={scrollRef} className="console-body"
+      onScroll={e => {
+        if (jumpLockRef.current) return
+        const el = e.currentTarget
+        const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 8
+        setFollowing(atBottom)
+        setJumpVisible(!atBottom)
+      }}>
+      {!visibleLines.length && <div className="opacity-70">Ready. Run a script to stream step events.</div>}
+      {visibleLines.map(line => <div key={line.id}><div className={`console-line ${line.level}`}><span className="opacity-60">{timeOnly(line.timestamp)}</span><span>{line.text}</span></div>{line.screenshot && <button className="screenshot-thumb" onClick={() => setUi({ screenshotModal: { label: line.screenshotLabel } })}><DataView size={30} /><strong>Screenshot captured</strong><span>Open full-size preview</span></button>}</div>)}
+      {jumpVisible && !jumpDismissed && <button className="jump-latest" onClick={event => {
+        event.currentTarget.hidden = true
+        jumpLockRef.current = true
+        dismissJump()
+        setJumpVisible(false)
+        setFollowing(true)
+        requestAnimationFrame(() => {
+          if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+        })
+        setTimeout(() => {
+          if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+          jumpLockRef.current = false
+        }, 3_000)
+      }}><ArrowDown size={13} className="mr-1 inline" />Jump to latest</button>}
     </div>
   </section>
 }
@@ -375,7 +408,7 @@ function EditorView() {
   const [stepMenu, setStepMenu] = useState(false)
   if (!script) return <div className="panel empty-state"><h1 className="page-title text-slate-900">No script selected</h1><p className="mt-3">Choose a script from the library or create a new script to open the editor.</p><Button className="mt-6" renderIcon={Add} onClick={() => setUi({ newScriptModal: true })}>New Script</Button></div>
   const running = live?.scriptId === script.id && ['running','retrying','paused'].includes(live.status)
-  const canRun = script.steps.some(step => !step.disabled)
+  const canRun = script.steps.length > 0 && script.steps.every(step => Object.keys(validateStep(step)).length === 0)
   return <>
     <div className="editor-grid">
       <section className="panel min-w-0">
@@ -410,19 +443,31 @@ function PlaygroundView() {
   const html = useStudio(s => s.playgroundHtml)
   const selector = useStudio(s => s.playgroundSelector)
   const matches = useStudio(s => s.playgroundMatches)
+  const playgroundError = useStudio(s => s.playgroundError)
   const target = useStudio(s => s.playgroundTargetStep)
   const { setPlayground, sendSelectorToStep } = useStudio()
   const schema = z.object({ mock_html: z.string().min(1, 'Mock HTML is required'), selector: z.string().min(1, 'Selector is required').superRefine((value, ctx) => { try { document.createElement('div').querySelector(value) } catch (error) { ctx.addIssue({ code: 'custom', message: `Selector is invalid: ${error.message}` }) } }) })
   const { register, formState: { errors }, setValue, trigger } = useForm({ resolver: zodResolver(schema), mode: 'onChange', defaultValues: { mock_html: html, selector } })
   const preview = useMemo(() => {
     try {
-      const doc = new DOMParser().parseFromString(html, 'text/html'); const found = selector ? [...doc.querySelectorAll(selector)] : []
+      const doc = new DOMParser().parseFromString(html, 'text/html')
+      doc.querySelectorAll('script').forEach(node => node.remove())
+      doc.querySelectorAll('*').forEach(node => [...node.attributes].forEach(attribute => {
+        if (attribute.name.toLowerCase().startsWith('on') || /^(href|src|srcset|action|formaction)$/i.test(attribute.name)) node.removeAttribute(attribute.name)
+      }))
+      let found = []
+      let matchingFailed = false
+      try { found = selector ? [...doc.querySelectorAll(selector)] : [] }
+      catch (error) {
+        matchingFailed = true
+        if (matches !== 0 || playgroundError !== error.message) setTimeout(() => setPlayground({ playgroundMatches: 0, playgroundError: error.message }), 0)
+      }
       found.forEach(el => el.setAttribute('data-ternwave-match', 'true'))
       const style = doc.createElement('style'); style.textContent = `body{font-family:IBM Plex Sans,Arial;padding:24px;color:#172033} [data-ternwave-match]{outline:3px solid #0f62fe!important;background:#dceaff!important;animation:tw .25s ease}@keyframes tw{from{transform:scale(.98)}to{transform:none}} article{border:1px solid #d8dee8;padding:14px;margin:10px 0;border-radius:6px}`; doc.head.appendChild(style)
-      if (found.length !== matches) setTimeout(() => setPlayground({ playgroundMatches: found.length, playgroundError: '' }), 0)
+      if (!matchingFailed && (found.length !== matches || playgroundError)) setTimeout(() => setPlayground({ playgroundMatches: found.length, playgroundError: '' }), 0)
       return '<!doctype html>' + doc.documentElement.outerHTML
-    } catch (error) { setTimeout(() => setPlayground({ playgroundError: error.message }), 0); return html }
-  }, [html, selector])
+    } catch (error) { setTimeout(() => setPlayground({ playgroundError: error.message }), 0); return '<!doctype html><html><body></body></html>' }
+  }, [html, selector, matches, playgroundError])
   const selectorError = errors.selector?.message || useStudio.getState().playgroundError
   const eligible = script?.steps.filter(s => ['click','type','extract','assert_text'].includes(s.type)) || []
   const eligibleIds = eligible.map(s => s.id).join(',')
@@ -442,7 +487,7 @@ function PlaygroundView() {
         {!selectorError && <div className={`mt-3 text-sm font-semibold ${matches ? 'text-green-700' : 'text-amber-700'}`}>{matches ? `${matches} match${matches === 1 ? '' : 'es'}` : 'Zero matches for this selector'}</div>}
         <div className="mt-5 grid gap-3 sm:grid-cols-[1fr_auto]"><Select id="target-step" labelText="Send to step" value={target} onChange={e => setPlayground({ playgroundTargetStep: e.target.value })}><SelectItem value="" text="Choose a selector step" />{eligible.map(step => <SelectItem key={step.id} value={step.id} text={`${step.order}. ${step.label}`} />)}</Select><Button className="self-end" size="sm" renderIcon={SendAlt} disabled={!target || !!selectorError || !selector} onClick={() => sendSelectorToStep(target)}>Send to step</Button></div>
       </div>
-      <div className="panel overflow-hidden"><div className="panel-header"><div><div className="eyebrow">Rendered safely</div><h2 className="panel-title">Preview</h2></div><Tag size="sm" type={matches ? 'blue' : 'gray'}>{matches} matches</Tag></div><iframe title="Mock HTML preview" sandbox="" srcDoc={preview} className="preview-frame" /></div>
+      <div className="panel overflow-hidden"><div className="panel-header"><div><div className="eyebrow">Rendered safely</div><h2 className="panel-title">Preview</h2></div><Tag size="sm" type={matches ? 'blue' : 'gray'}>{matches} matches</Tag></div><iframe title="Mock HTML preview" sandbox="allow-scripts" srcDoc={preview} className="preview-frame" /></div>
     </div>
   </section>
 }
@@ -510,9 +555,9 @@ function definitionFor(script) {
 function reportFor(script) {
   const run = script?.runs.at(-1)
   if (!run) return { run: null }
-  return { run: { id: run.id, trigger: run.trigger, start_time: run.start_time, duration: run.duration, totals: run.totals,
+  return runReportSchema.parse({ run: { id: run.id, trigger: run.trigger, start_time: run.start_time, duration: run.duration, totals: run.totals,
     steps: run.steps.map(step => ({ order: step.order, type: step.type, status: step.status, attempts: step.attempts, ...(step.error_reason ? { error_reason: step.error_reason } : {}), ...(step.extracted_name ? { extracted_name: step.extracted_name, extracted_value: step.extracted_value } : {}) })),
-    timeline_summary: run.timeline.map(event => ({ step: event.step, status: event.status, timestamp: event.timestamp })) } }
+  } })
 }
 
 function ExportView() {
@@ -521,8 +566,14 @@ function ExportView() {
   const copied = useStudio(s => s.copied)
   const setUi = useStudio(s => s.setUi)
   const value = JSON.stringify(tab === 'definition' ? definitionFor(script) : reportFor(script), null, 2)
-  const copy = async () => { await navigator.clipboard.writeText(value); setUi({ copied: true }); setTimeout(() => setUi({ copied: false }), 1800) }
-  return <section><div className="mb-5 flex flex-wrap items-end justify-between gap-3"><div><div className="eyebrow">API-shaped artifacts</div><h1 className="page-title">Export center</h1><p className="muted mt-2 text-sm">The visible payload compiles live from the current Zustand session.</p></div><Button className={`copy-export-btn${copied ? ' copied' : ''}`} onClick={copy}><span className="copy-icon inline-flex items-center gap-2">{copied ? <Checkmark size={16} /> : <Copy size={16} />}{copied ? 'Copied' : 'Copy export'}</span></Button></div>
+  const copy = async () => {
+    await navigator.clipboard.writeText(value)
+    const label = tab === 'definition' ? 'Definition JSON' : 'Run report'
+    setUi({ copied: true, announcement: `${label} copied to the clipboard.` })
+    useStudio.getState().toastMessage(`${label} copied`)
+    setTimeout(() => setUi({ copied: false }), 1800)
+  }
+  return <section><div className="mb-5 flex flex-wrap items-end justify-between gap-3"><div><div className="eyebrow">API-shaped artifacts</div><h1 className="page-title">Export center</h1><p className="muted mt-2 text-sm">The visible payload compiles live from the current Zustand session.</p></div><Button className={`copy-export-btn${copied ? ' copied' : ''}`} onClick={copy}><span className="copy-icon inline-flex items-center gap-2">{copied ? <Checkmark size={16} /> : <Copy size={16} />}{copied ? `${tab === 'definition' ? 'Definition JSON' : 'Run report'} copied` : 'Copy export'}</span></Button></div>
     <div className="panel overflow-hidden"><div className="panel-header"><div className="flex gap-1"><button className={`view-tab ${tab === 'definition' ? 'active' : ''}`} onClick={() => setUi({ exportTab: 'definition' })}>Definition JSON</button><button className={`view-tab ${tab === 'report' ? 'active' : ''}`} onClick={() => setUi({ exportTab: 'report' })}>Run report</button></div><div className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-green-500" /><span className="text-xs font-semibold text-green-700">Compiled from session state</span></div></div><pre className="export-code" aria-label="Export preview">{value}</pre></div>
   </section>
 }
@@ -540,13 +591,17 @@ function App() {
   const setUi = useStudio(s => s.setUi)
   const undo = useStudio(s => s.undo)
   const redo = useStudio(s => s.redo)
+  const density = useStudio(s => s.density)
+  const onboardingOpen = useStudio(s => s.onboardingOpen)
+  const dismissOnboarding = useStudio(s => s.dismissOnboarding)
   const newScriptRef = useRef(null)
   useEffect(() => {
     const onKey = event => {
       const meta = event.ctrlKey || event.metaKey
+      const editable = event.target instanceof HTMLElement && (event.target.matches('input, textarea, select') || event.target.isContentEditable)
       if (meta && event.key.toLowerCase() === 'k') { event.preventDefault(); setUi({ paletteOpen: true, paletteQuery: '', paletteIndex: 0 }) }
-      if (meta && event.key.toLowerCase() === 'z' && !event.shiftKey) { event.preventDefault(); undo() }
-      if (meta && event.key.toLowerCase() === 'z' && event.shiftKey) { event.preventDefault(); redo() }
+      if (!editable && meta && event.key.toLowerCase() === 'z' && !event.shiftKey) { event.preventDefault(); undo() }
+      if (!editable && meta && event.key.toLowerCase() === 'z' && event.shiftKey) { event.preventDefault(); redo() }
       if (event.key === 'Escape') {
         const state = useStudio.getState()
         if (state.paletteOpen) { setUi({ paletteOpen: false }); return }
@@ -556,10 +611,10 @@ function App() {
         if (state.historyOpen) { setUi({ historyOpen: false }) }
       }
     }
-    window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey)
+    window.addEventListener('keydown', onKey, true); return () => window.removeEventListener('keydown', onKey, true)
   }, [])
   const page = { 'step-editor': <EditorView />, playground: <PlaygroundView />, runs: <RunsView />, 'scheduled-queue': <ScheduledView />, export: <ExportView /> }[view]
-  return <div className="app-shell"><Sidebar newScriptRef={newScriptRef} /><div className="workspace"><Toolbar /><main className="content">{page}</main></div>
+  return <div className="app-shell" data-density={density}><Sidebar newScriptRef={newScriptRef} /><div className="workspace"><Toolbar /><main className="content">{onboardingOpen && <section className="onboarding-card" aria-label="Automation studio quick start"><div><strong>Build, run, and export your first automation</strong><p>Choose a seeded script, edit its ordered steps, then run it to watch the console and report update together.</p></div><Button size="sm" kind="ghost" onClick={dismissOnboarding}>Dismiss tips</Button></section>}{page}</main></div>
     <HistoryDrawer /><NewScriptModal launcherRef={newScriptRef} /><ScheduleModal /><ScreenshotModal /><AnimatePresence><CommandPalette /></AnimatePresence>
     <AnimatePresence>{toast && <motion.div className="toast-stack" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}><InlineNotification lowContrast kind="success" title={toast.message} /></motion.div>}</AnimatePresence>
     <div className="sr-only" aria-live="assertive" aria-atomic="true">{announcement}</div>

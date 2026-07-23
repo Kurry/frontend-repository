@@ -1,4 +1,3 @@
-import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { useMemo, useState, useRef } from 'react'
 import { Button, Tag, Modal, Search, Select, SelectItem } from '@carbon/react'
 import {
@@ -38,7 +37,6 @@ export default function LibraryView({ importLauncherRef }) {
   const setLibraryTechniqueFilter = useStudioStore((state) => state.setLibraryTechniqueFilter)
   const document = useMemo(() => makeLibraryDocument(library), [library])
   const jsonText = useMemo(() => JSON.stringify(document, null, 2), [document])
-  const [parent] = useAutoAnimate()
   const [confirmDelete, setConfirmDelete] = useState(null)
   const deleteLauncher = useRef(null)
   const deleteInFlight = useRef(false)
@@ -178,7 +176,7 @@ export default function LibraryView({ importLauncherRef }) {
       )}
 
       {sortedLibrary.length > 0 ? (
-        <section className="library-list" aria-label="Saved prompts" ref={parent}>
+        <section className="library-list" aria-label="Saved prompts">
           <div className="list-head"><span>Prompt</span><span>Technique</span><span>Saved</span><span>Actions</span></div>
           {sortedLibrary.map((record) => {
             const index = record.originalIndex
@@ -242,22 +240,35 @@ export default function LibraryView({ importLauncherRef }) {
         </section>
       )}
 
-      <Modal
-        open={Boolean(confirmDelete)}
-        danger
-        modalHeading="Delete prompt"
-        primaryButtonText="Delete prompt"
-        secondaryButtonText="Cancel"
-        onRequestSubmit={commitRemove}
-        onRequestClose={() => {
-          deleteInFlight.current = false
-          setConfirmDelete(null)
-          requestAnimationFrame(() => deleteLauncher.current?.focus())
-        }}
-        focusTrap
-      >
-        <p className="modal-copy">Are you sure you want to delete this prompt? This action cannot be undone.</p>
-      </Modal>
+      {confirmDelete ? (
+        <Modal
+          open
+          danger
+          modalHeading="Delete prompt"
+          primaryButtonText="Delete prompt"
+          secondaryButtonText="Cancel"
+          onRequestSubmit={commitRemove}
+          onRequestClose={() => {
+            deleteInFlight.current = false
+            setConfirmDelete(null)
+            requestAnimationFrame(() => {
+              if (deleteLauncher.current?.isConnected) deleteLauncher.current.focus()
+              else libraryActionFallback.current?.focus()
+            })
+          }}
+          onSecondarySubmit={() => {
+            deleteInFlight.current = false
+            setConfirmDelete(null)
+            requestAnimationFrame(() => {
+              if (deleteLauncher.current?.isConnected) deleteLauncher.current.focus()
+              else libraryActionFallback.current?.focus()
+            })
+          }}
+          className="scale-modal"
+        >
+          <p className="modal-copy">Are you sure you want to delete this prompt? This action cannot be undone.</p>
+        </Modal>
+      ) : null}
     </main>
   )
 }

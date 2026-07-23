@@ -35,9 +35,9 @@ const motionConfigOverlay = computed(() => {
 const motionConfigContent = computed(() => {
   if (prefersReducedMotion.value) return undefined;
   return {
-    initial: { opacity: 0, scale: 0.95, y: '-50%', x: '-50%' },
-    enter: { opacity: 1, scale: 1, y: '-50%', x: '-50%', transition: { type: 'spring', stiffness: 300, damping: 25 } },
-    leave: { opacity: 0, scale: 0.95, y: '-50%', x: '-50%', transition: { duration: 150 } }
+    initial: { opacity: 0, scale: 0.95 },
+    enter: { opacity: 1, scale: 1, transition: { type: 'spring', stiffness: 300, damping: 25 } },
+    leave: { opacity: 0, scale: 0.95, transition: { duration: 150 } }
   }
 })
 
@@ -173,6 +173,7 @@ const VALID_TYPES = new Set(['note', 'flashcard', 'rectangle', 'circle', 'arrow'
 const validateWorkspace = (data: any): string | null => {
   if (!data || typeof data !== 'object') return 'Invalid JSON format'
   if (data.schemaVersion !== 'scribblespace-workspace-v1') return 'schemaVersion field must be scribblespace-workspace-v1'
+  if (typeof data.exportedAt !== 'string' || !data.exportedAt.trim() || Number.isNaN(Date.parse(data.exportedAt))) return 'exportedAt field must be a valid ISO-8601 timestamp'
   if (!Array.isArray(data.boards)) return 'boards field is required'
   if (!data.activeBoardId || typeof data.activeBoardId !== 'string') return 'activeBoardId field is required'
   if (!data.boards.some((b: any) => b.id === data.activeBoardId)) return 'activeBoardId must reference a board in boards'
@@ -184,21 +185,37 @@ const validateWorkspace = (data: any): string | null => {
     if (!Array.isArray(board.connectors)) return 'connectors field is required on each board'
     const ids = new Set(board.objects.map((o: any) => o.id))
     for (const obj of board.objects) {
+      if (typeof obj.id !== 'string' || !obj.id.trim()) return 'object id field is required'
       if (!VALID_TYPES.has(obj.type)) return 'type field must be note, flashcard, rectangle, circle, or arrow'
+      if (!Number.isFinite(obj.x) || !Number.isFinite(obj.y)) return 'x/y fields must be finite numbers'
+      if (!Number.isInteger(obj.zIndex) || obj.zIndex < 0) return 'zIndex field must be a non-negative integer'
       if (obj.type === 'note' || obj.type === 'flashcard') {
         if (!NOTE_COLOR_SET.has(String(obj.color || '').toUpperCase())) return 'color field must be a valid note/flashcard swatch'
-        if (obj.width < 120 || obj.height < 96) return 'width/height fields must meet note/flashcard minima (120 x 96)'
-        const textField = obj.type === 'note' ? obj.text : (obj.front ?? obj.back)
-        if (String(textField ?? '').length > 8000) return `${obj.type === 'note' ? 'text' : 'front/back'} field exceeds 8000 characters`
+        if (!Number.isFinite(obj.width) || !Number.isFinite(obj.height) || obj.width < 120 || obj.height < 96) return 'width/height fields must meet note/flashcard minima (120 x 96)'
+        if (obj.type === 'note') {
+          if (typeof obj.text !== 'string') return 'text field is required and must be a string'
+          if (obj.text.length > 8000) return 'text field exceeds 8000 characters'
+        } else {
+          if (typeof obj.front !== 'string') return 'front field is required and must be a string'
+          if (obj.front.length > 8000) return 'front field exceeds 8000 characters'
+          if (typeof obj.back !== 'string') return 'back field is required and must be a string'
+          if (obj.back.length > 8000) return 'back field exceeds 8000 characters'
+          if (typeof obj.flipped !== 'boolean') return 'flipped field must be a boolean'
+        }
       } else {
         if (!SHAPE_COLOR_SET.has(String(obj.color || '').toUpperCase())) return 'color field must be a valid shape swatch'
-        if (obj.width < 48 || obj.height < 48) return 'width/height fields must meet shape minima (48 x 48)'
+        if (!Number.isFinite(obj.width) || !Number.isFinite(obj.height) || obj.width < 48 || obj.height < 48) return 'width/height fields must meet shape minima (48 x 48)'
       }
     }
+    const connectorPairs = new Set<string>()
     for (const conn of board.connectors) {
+      if (typeof conn.id !== 'string' || !conn.id.trim()) return 'connector id field is required'
       if (!conn.fromId || !conn.toId) return 'connector fromId/toId fields are required'
       if (conn.fromId === conn.toId) return 'connector fromId and toId must be distinct'
       if (!ids.has(conn.fromId) || !ids.has(conn.toId)) return 'connector endpoints must resolve to objects on the same board'
+      const pair = [conn.fromId, conn.toId].sort().join('::')
+      if (connectorPairs.has(pair)) return 'duplicate connector pair is not allowed'
+      connectorPairs.add(pair)
     }
   }
   return null
@@ -227,10 +244,13 @@ const doImport = () => {
     <DialogPortal>
       <DialogOverlay v-motion="motionConfigOverlay" class="fixed inset-0 bg-black/40 z-50 transition-opacity duration-300" />
       <DialogContent
-        v-motion="motionConfigContent"
-        class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl p-6 w-[min(800px,calc(100vw-24px))] h-[min(600px,calc(100vh-48px))] flex flex-col z-50"
+        class="fixed inset-0 z-50 flex items-center justify-center p-3"
         :trap-focus="true"
       >
+        <div
+          v-motion="motionConfigContent"
+          class="bg-white rounded-xl shadow-xl p-6 w-[min(800px,calc(100vw-24px))] h-[min(600px,calc(100vh-48px))] flex flex-col"
+        >
         <div class="flex items-center justify-between mb-4 shrink-0">
            <DialogTitle class="text-xl font-bold text-gray-900 m-0">Workspace Options</DialogTitle>
            <DialogClose as-child>
@@ -241,10 +261,24 @@ const doImport = () => {
         </div>
 
         <TabsRoot v-model="activeTab" class="flex flex-col h-full min-h-0">
-           <TabsList class="flex gap-4 border-b border-gray-200 shrink-0">
-             <TabsTrigger value="export" class="px-2 py-2 text-sm font-medium text-gray-600 border-b-2 border-transparent hover:text-gray-900 data-[state=active]:border-[#6D5BD0] data-[state=active]:text-[#6D5BD0] outline-none">Export</TabsTrigger>
-             <TabsTrigger value="import" class="px-2 py-2 text-sm font-medium text-gray-600 border-b-2 border-transparent hover:text-gray-900 data-[state=active]:border-[#6D5BD0] data-[state=active]:text-[#6D5BD0] outline-none">Import</TabsTrigger>
-           </TabsList>
+           <div role="tablist" aria-label="Workspace operation" class="flex gap-4 border-b border-gray-200 shrink-0">
+             <button
+               type="button"
+               role="tab"
+               :aria-selected="activeTab === 'export'"
+               class="px-2 py-2 text-sm font-medium border-b-2 outline-none focus:ring-2 focus:ring-[#6D5BD0]"
+               :class="activeTab === 'export' ? 'border-[#6D5BD0] text-[#6D5BD0]' : 'border-transparent text-gray-600 hover:text-gray-900'"
+               @click="activeTab = 'export'"
+             >Export</button>
+             <button
+               type="button"
+               role="tab"
+               :aria-selected="activeTab === 'import'"
+               class="px-2 py-2 text-sm font-medium border-b-2 outline-none focus:ring-2 focus:ring-[#6D5BD0]"
+               :class="activeTab === 'import' ? 'border-[#6D5BD0] text-[#6D5BD0]' : 'border-transparent text-gray-600 hover:text-gray-900'"
+               @click="activeTab = 'import'"
+             >Import</button>
+           </div>
 
            <TabsContent value="export" class="flex-1 flex flex-col pt-4 min-h-0 outline-none">
               <TabsRoot v-model="exportFormatTab" class="flex flex-col h-full min-h-0">
@@ -256,13 +290,13 @@ const doImport = () => {
 
                  <div class="flex-1 border border-gray-200 rounded-lg overflow-hidden bg-gray-50 flex">
                     <TabsContent value="json" class="flex-1 w-full h-full outline-none">
-                       <textarea readonly class="w-full h-full p-4 font-mono text-sm resize-none bg-transparent outline-none text-gray-800" :value="jsonText"></textarea>
+                       <textarea readonly aria-label="Workspace JSON export preview" class="w-full h-full p-4 font-mono text-sm resize-none bg-transparent outline-none text-gray-800" :value="jsonText"></textarea>
                     </TabsContent>
                     <TabsContent value="md" class="flex-1 w-full h-full outline-none">
-                       <textarea readonly class="w-full h-full p-4 font-mono text-sm resize-none bg-transparent outline-none text-gray-800" :value="markdownText"></textarea>
+                       <textarea readonly aria-label="Markdown export preview" class="w-full h-full p-4 font-mono text-sm resize-none bg-transparent outline-none text-gray-800" :value="markdownText"></textarea>
                     </TabsContent>
                     <TabsContent value="text" class="flex-1 w-full h-full outline-none">
-                       <textarea readonly class="w-full h-full p-4 font-mono text-sm resize-none bg-transparent outline-none text-gray-800" :value="plainText"></textarea>
+                       <textarea readonly aria-label="Plain text export preview" class="w-full h-full p-4 font-mono text-sm resize-none bg-transparent outline-none text-gray-800" :value="plainText"></textarea>
                     </TabsContent>
                  </div>
 
@@ -276,7 +310,7 @@ const doImport = () => {
            <TabsContent value="import" class="flex-1 flex flex-col pt-4 min-h-0 outline-none">
               <p class="text-sm text-gray-600 mb-2">Paste a valid Workspace JSON package below to restore a previous session.</p>
               <label for="import-workspace-json" class="sr-only">Workspace JSON</label>
-              <textarea id="import-workspace-json" v-model="importText" aria-describedby="import-error" class="flex-1 w-full p-4 font-mono text-sm resize-none border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#6D5BD0] text-gray-800" placeholder='{"schemaVersion": "scribblespace-workspace-v1", ...}'></textarea>
+              <textarea id="import-workspace-json" v-model="importText" aria-label="Import Workspace JSON" aria-describedby="import-error" class="flex-1 w-full p-4 font-mono text-sm resize-none border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#6D5BD0] text-gray-800" placeholder='{"schemaVersion": "scribblespace-workspace-v1", ...}'></textarea>
               <div v-if="importError" id="import-error" role="alert" aria-live="polite" class="text-red-600 text-sm mt-2 font-medium">{{ importError }}</div>
 
               <div class="flex justify-end gap-3 mt-4 shrink-0">
@@ -284,7 +318,7 @@ const doImport = () => {
               </div>
            </TabsContent>
         </TabsRoot>
-
+        </div>
       </DialogContent>
     </DialogPortal>
   </DialogRoot>

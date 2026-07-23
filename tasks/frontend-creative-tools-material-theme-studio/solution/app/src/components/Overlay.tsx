@@ -41,9 +41,23 @@ export default function Overlay({
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
+  // Keep the most recent focus target outside a dialog. React may mount the
+  // portal before the opening effect runs, so reading activeElement only at
+  // that point can accidentally remember an element inside the new overlay.
+  useEffect(() => {
+    if (open) return;
+    const remember = (event: FocusEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target && !target.closest('[role="dialog"]')) restoreRef.current = target;
+    };
+    document.addEventListener('focusin', remember);
+    return () => document.removeEventListener('focusin', remember);
+  }, [open]);
+
   useEffect(() => {
     if (open) {
-      restoreRef.current = (document.activeElement as HTMLElement) ?? null;
+      const active = document.activeElement as HTMLElement | null;
+      if (active && !active.closest('[role="dialog"]')) restoreRef.current = active;
       // Reopening before the close animation's unmount timer fires cancels the
       // timer that would have removed the earlier entry — drop any stale entry
       // first so the stack holds exactly one id per mounted overlay (and the
@@ -75,13 +89,15 @@ export default function Overlay({
   useEffect(() => {
     if (!mounted) return;
     const handler = (event: KeyboardEvent) => {
-      if (overlayStack[overlayStack.length - 1] !== id) return;
       if (event.key === 'Escape') {
-        event.preventDefault();
-        event.stopPropagation();
-        onCloseRef.current();
+        if (overlayStack.includes(id)) {
+          event.preventDefault();
+          event.stopPropagation();
+          onCloseRef.current();
+        }
         return;
       }
+      if (overlayStack[overlayStack.length - 1] !== id) return;
       if (event.key !== 'Tab') return;
       const panel = panelRef.current;
       if (!panel) return;
@@ -139,7 +155,7 @@ export default function Overlay({
         <div
           ref={panelRef}
           role="dialog"
-          aria-modal="true"
+          aria-modal={backdrop ? "true" : "false"}
           aria-label={labelledBy ? undefined : label}
           aria-labelledby={labelledBy}
           className={`pointer-events-auto rounded-lg shadow-2xl transition-[opacity,transform] duration-[250ms] ease-out will-change-transform ${

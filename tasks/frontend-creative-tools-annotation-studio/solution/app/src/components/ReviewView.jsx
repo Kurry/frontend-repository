@@ -1,19 +1,21 @@
 import { useMemo, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, ComposedModal, ModalBody, ModalFooter, ModalHeader, Select, SelectItem, TextInput, Tag } from '@carbon/react';
+import { Button, ComposedModal, ModalBody, ModalFooter, ModalHeader, Select, SelectItem, TextArea, Tag } from '@carbon/react';
 import { Checkmark, Flag } from '@carbon/icons-react';
 import { DisputeCreateSchema, ResolveCreateSchema } from '../schemas';
 import { useStudioStore } from '../store';
 import { StateChip } from './Sidebar';
 import { useDialogDismiss } from './dialogs';
+import { RatingControls } from './AnnotationCard';
 
 function DisputeForm({ item, onClose, openerRef }) {
   const changeState = useStudioStore((s) => s.setReviewState);
   useDialogDismiss(Boolean(item), onClose, openerRef);
-  const { register, handleSubmit, formState: { errors, isValid } } = useForm({ resolver: zodResolver(DisputeCreateSchema), mode: 'onChange', reValidateMode: 'onChange', defaultValues: { reason: '' } });
+  const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm({ resolver: zodResolver(DisputeCreateSchema), mode: 'onChange', reValidateMode: 'onChange', defaultValues: { reason: '' } });
+  const reason = watch('reason');
   const submit = ({ reason }) => { changeState(item.id, 'disputed', { disputeReason: reason }); onClose(); };
-  return <ComposedModal open={Boolean(item)} onClose={onClose} size="sm" preventCloseOnClickOutside selectorPrimaryFocus="#dispute-reason" launcherButtonRef={openerRef}><ModalHeader title="Dispute annotation" label="Dispute reason" closeModal={onClose} /><ModalBody hasForm><form id="dispute-form" onSubmit={handleSubmit(submit)} className="modal-form"><TextInput id="dispute-reason" labelText="Reason" maxLength={201} invalid={Boolean(errors.reason)} invalidText={errors.reason?.message || 'Reason is required'} {...register('reason')} /><p className="form-hint">One line, 1–200 characters. The reason field is required.</p></form></ModalBody><ModalFooter><Button kind="secondary" onClick={onClose}>Cancel</Button><Button type="submit" form="dispute-form" disabled={!isValid}>Dispute</Button></ModalFooter></ComposedModal>;
+  return <ComposedModal open={Boolean(item)} onClose={onClose} size="sm" preventCloseOnClickOutside selectorPrimaryFocus="#dispute-reason" launcherButtonRef={openerRef} onKeyDown={(e) => { if (e.key === "Escape") onClose(); }}><ModalHeader title="Dispute annotation" label="Dispute reason" closeModal={onClose} /><ModalBody hasForm><form id="dispute-form" onSubmit={handleSubmit(submit)} className="modal-form"><TextArea id="dispute-reason" rows={3} labelText="Reason" invalid={Boolean(errors.reason) || !reason.trim()} invalidText={errors.reason?.message || 'Reason is required'} {...register('reason')} /><p className="form-hint">One line, 1–200 characters. The reason field is required and is preserved in History.</p></form></ModalBody><ModalFooter><Button kind="secondary" onClick={onClose}>Cancel</Button><Button type="submit" form="dispute-form" disabled={!isValid}>Dispute</Button></ModalFooter></ComposedModal>;
 }
 
 function ResolveForm({ item, onClose, openerRef }) {
@@ -21,7 +23,7 @@ function ResolveForm({ item, onClose, openerRef }) {
   useDialogDismiss(Boolean(item), onClose, openerRef);
   const { control, handleSubmit, formState: { errors, isValid } } = useForm({ resolver: zodResolver(ResolveCreateSchema), mode: 'onChange', defaultValues: { rating: '' } });
   const submit = ({ rating }) => { resolve(item.id, rating); onClose(); };
-  return <ComposedModal open={Boolean(item)} onClose={onClose} size="xs" preventCloseOnClickOutside selectorPrimaryFocus="#resolved-rating" launcherButtonRef={openerRef}><ModalHeader title="Resolve dispute" label="Corrected rating" closeModal={onClose} /><ModalBody hasForm><form id="resolve-form" onSubmit={handleSubmit(submit)} className="modal-form"><Controller name="rating" control={control} render={({ field }) => <Select id="resolved-rating" labelText="Corrected rating" value={field.value} onChange={(e) => field.onChange(e.target.value)} invalid={Boolean(errors.rating)} invalidText={errors.rating?.message}><SelectItem value="" text="Choose a rating" disabled /><SelectItem value="up" text="Up" /><SelectItem value="down" text="Down" /></Select>} /></form></ModalBody><ModalFooter><Button kind="secondary" onClick={onClose}>Cancel</Button><Button type="submit" form="resolve-form" disabled={!isValid}>Resolve</Button></ModalFooter></ComposedModal>;
+  return <ComposedModal open={Boolean(item)} onClose={onClose} size="xs" preventCloseOnClickOutside selectorPrimaryFocus=".rating-controls button" launcherButtonRef={openerRef} onKeyDown={(e) => { if (e.key === "Escape") onClose(); }}><ModalHeader title="Resolve dispute" label="Corrected rating" closeModal={onClose} /><ModalBody hasForm><form id="resolve-form" onSubmit={handleSubmit(submit)} className="modal-form"><Controller name="rating" control={control} render={({ field }) => <div className={errors.rating ? "has-error" : ""}><RatingControls rating={field.value} onChange={(v) => field.onChange(v)} />{errors.rating && <p className="field-error">{errors.rating.message}</p>}</div>} /></form></ModalBody><ModalFooter><Button kind="secondary" onClick={onClose}>Cancel</Button><Button type="submit" form="resolve-form" disabled={!isValid}>Resolve</Button></ModalFooter></ComposedModal>;
 }
 
 const tierEmptyCopy = {

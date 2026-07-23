@@ -11,6 +11,17 @@ const store = useAppStore()
 const showShapeMenu = ref(false)
 const shapeMenuRef = ref<HTMLElement | null>(null)
 const shapeButtonRef = ref<HTMLElement | null>(null)
+const shapeMenuPosition = ref({ top: 0, left: 0 })
+
+const toggleShapeMenu = () => {
+  showShapeMenu.value = !showShapeMenu.value
+  if (!showShapeMenu.value || !shapeButtonRef.value) return
+  const rect = shapeButtonRef.value.getBoundingClientRect()
+  shapeMenuPosition.value = {
+    top: rect.bottom + 4,
+    left: Math.max(12, Math.min(rect.left, window.innerWidth - 162)),
+  }
+}
 
 const onDocMouseDown = (e: MouseEvent) => {
   if (!shapeMenuRef.value?.contains(e.target as Node) && !shapeButtonRef.value?.contains(e.target as Node)) {
@@ -42,7 +53,7 @@ const objectCount = computed(() => store.activeBoard?.objects.length || 0)
 
 <template>
   <div
-    class="flex flex-nowrap items-center gap-2 px-3 py-2 bg-white/95 shadow-md w-full rounded-xl border border-gray-200 overflow-x-auto"
+    class="flex flex-nowrap items-center gap-2 px-3 py-2 bg-white/95 shadow-md w-full rounded-[12px] border border-gray-200 overflow-x-auto"
     role="toolbar"
     aria-label="Canvas tools"
   >
@@ -79,30 +90,33 @@ const objectCount = computed(() => store.activeBoard?.objects.length || 0)
         class="btn-primary"
         aria-haspopup="menu"
         :aria-expanded="showShapeMenu"
-        @click="showShapeMenu = !showShapeMenu"
+        @click="toggleShapeMenu"
         @keydown.esc="showShapeMenu = false"
       >
         New Shape
       </button>
-      <div
-        v-if="showShapeMenu"
-        ref="shapeMenuRef"
-        role="menu"
-        aria-label="Shape options"
-        class="absolute top-full left-0 mt-1 bg-white shadow-lg py-1 z-50 min-w-[150px] rounded-lg border-[1.5px] border-gray-500"
-        @keydown.esc="showShapeMenu = false; shapeButtonRef?.focus()"
-      >
-        <button
-          v-for="kind in ['rectangle', 'circle', 'arrow']"
-          :key="kind"
-          type="button"
-          role="menuitem"
-          class="w-full px-4 text-left hover:bg-[#EAE6F7] text-[14px] min-h-[44px] text-gray-900"
-          @click.stop.prevent="handleAddShape(kind as any, $event)"
+      <Teleport to="body">
+        <div
+          v-if="showShapeMenu"
+          ref="shapeMenuRef"
+          role="menu"
+          aria-label="Shape options"
+          class="fixed bg-white shadow-lg py-1 z-[100] min-w-[150px] rounded-lg border-[1.5px] border-gray-500"
+          :style="{ top: `${shapeMenuPosition.top}px`, left: `${shapeMenuPosition.left}px` }"
+          @keydown.esc="showShapeMenu = false; shapeButtonRef?.focus()"
         >
-          {{ kind === 'rectangle' ? 'Rectangle' : kind === 'circle' ? 'Circle' : 'Arrow' }}
-        </button>
-      </div>
+          <button
+            v-for="kind in ['rectangle', 'circle', 'arrow']"
+            :key="kind"
+            type="button"
+            role="menuitem"
+            class="w-full px-4 text-left hover:bg-[#EAE6F7] text-[14px] min-h-[44px] text-gray-900"
+            @click.stop.prevent="handleAddShape(kind as any, $event)"
+          >
+            {{ kind === 'rectangle' ? 'Rectangle' : kind === 'circle' ? 'Circle' : 'Arrow' }}
+          </button>
+        </div>
+      </Teleport>
     </div>
 
     <div aria-hidden="true" class="w-px h-8 self-center bg-gray-200"></div>
@@ -164,16 +178,3 @@ const objectCount = computed(() => store.activeBoard?.objects.length || 0)
     </button>
   </div>
 </template>
-
-<style scoped>
-@reference "../index.css";
-.btn-primary {
-  @apply bg-[#6D5BD0] hover:bg-[#5A4AB8] text-white font-medium rounded-lg px-4 min-h-[36px] text-sm;
-}
-.btn-secondary {
-  @apply bg-white hover:bg-gray-100 text-gray-800 border border-gray-300 font-medium rounded-lg px-3 min-h-[36px] text-sm;
-}
-.btn-tool {
-  @apply bg-white hover:bg-[#F3F0FF] text-gray-700 font-medium rounded-lg px-3 min-h-[36px] text-sm border-transparent border aria-pressed:border-[#6D5BD0] aria-pressed:bg-[#F3F0FF] aria-pressed:text-[#6D5BD0];
-}
-</style>

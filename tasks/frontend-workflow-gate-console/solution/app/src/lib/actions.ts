@@ -1,4 +1,8 @@
 export function focusTrap(node: HTMLElement) {
+  let previousFocus: HTMLElement | null = null;
+  if (typeof document !== 'undefined') {
+    previousFocus = document.activeElement as HTMLElement | null;
+  }
   const focusableSelector = [
     'a[href]',
     'button:not([disabled])',
@@ -63,6 +67,9 @@ export function focusTrap(node: HTMLElement) {
     destroy() {
       node.removeEventListener('keydown', handleKeydown);
       document.removeEventListener('focusin', handleFocusIn, true);
+      if (previousFocus) {
+        previousFocus.focus();
+      }
     }
   };
 }

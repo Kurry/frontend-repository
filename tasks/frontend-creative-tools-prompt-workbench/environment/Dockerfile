@@ -41,6 +41,4 @@ HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=5 \
 
 WORKDIR /app
 EXPOSE 3000
-
-# Reference screenshots for the builder (never shipped in /app)
 COPY reference-screenshots/ /reference-screenshots/

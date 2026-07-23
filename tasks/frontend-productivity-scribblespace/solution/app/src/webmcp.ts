@@ -1,4 +1,5 @@
 import { useAppStore } from './store'
+import { nextTick } from 'vue'
 import type { ObjectType, ToolType, CanvasObject } from './types'
 
 // Setup window interface for TypeScript
@@ -330,11 +331,25 @@ export function registerWebMCP() {
   };
 
   window.webmcp_list_tools = function () {
-    return Object.keys(tools).map(name => ({ name, description: tools[name].description }));
+    const moduleForTool = (name: string) => {
+      if (name.startsWith('editor_')) return 'structured-editor-v1';
+      if (name.startsWith('board_')) return 'entity-collection-v1';
+      if (name.startsWith('session_')) return 'command-session-v1';
+      if (name.startsWith('artifact_')) return 'artifact-transfer-v1';
+      throw new Error(`Tool ${name} is not bound to an assigned WebMCP module`);
+    };
+    return Object.keys(tools).map(name => ({
+      name,
+      moduleId: moduleForTool(name),
+      description: tools[name].description,
+    }));
   };
 
-  window.webmcp_invoke_tool = function (name: string, args?: Record<string, unknown>) {
+  window.webmcp_invoke_tool = async function (name: string, args?: Record<string, unknown>) {
     if (!tools[name]) throw new Error('Unknown WebMCP tool: ' + name);
-    return tools[name].handler(args || {});
+    const result = await tools[name].handler(args || {});
+    await nextTick();
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    return result;
   };
 }

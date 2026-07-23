@@ -18,22 +18,22 @@ try {
     submitDisabled: await registerSubmit.isDisabled(),
     requiredMessages: await modal.getByText(/is required/).count(),
   }
-  await modal.getByLabel('Name').fill('Aster Harbor')
+  await modal.getByLabel('Name').fill('Aster Vale')
   await modal.getByRole('combobox', { name: 'Agent type' }).click()
   await page.getByRole('option', { name: 'Aster', exact: true }).click()
   await modal.getByRole('combobox', { name: 'Editor integration' }).click()
   await page.getByRole('option', { name: 'Vector', exact: true }).click()
-  await modal.getByLabel('Access key').fill('harbor_access_key_2026')
+  await modal.getByLabel('Access key').fill('aster_access_key_2026')
   await registerSubmit.waitFor({ state: 'visible' })
   await registerSubmit.click()
-  await page.getByText('Aster Harbor', { exact: true }).waitFor()
+  await page.getByText('Aster Vale', { exact: true }).waitFor()
   const afterRegister = {
     rows: await page.locator('.agent-row').count(),
     totalText: await page.locator('.rollup-total').innerText(),
-    registeredVisible: await page.getByText('Aster Harbor', { exact: true }).isVisible(),
+    registeredVisible: await page.getByText('Aster Vale', { exact: true }).isVisible(),
   }
 
-  const newRow = page.locator('.agent-row').filter({ hasText: 'Aster Harbor' })
+  const newRow = page.locator('.agent-row').filter({ hasText: 'Aster Vale' })
   await newRow.getByRole('button', { name: 'Start run' }).click()
   await page.waitForTimeout(1200)
   const started = await newRow.innerText()
@@ -47,8 +47,8 @@ try {
   const exported = JSON.parse(preview)
   const exportChecks = {
     total: exported.rollup.total,
-    containsNewAgent: exported.agents.some((agent) => agent.name === 'Aster Harbor' && agent.agentType === 'aster' && agent.editorIntegration === 'vector'),
-    newAgentRunStatus: exported.agents.find((agent) => agent.name === 'Aster Harbor')?.run?.status,
+    containsNewAgent: exported.agents.some((agent) => agent.name === 'Aster Vale' && agent.agentType === 'aster' && agent.editorIntegration === 'vector'),
+    newAgentRunStatus: exported.agents.find((agent) => agent.name === 'Aster Vale')?.run?.status,
   }
   await page.keyboard.press('Escape')
 
@@ -60,7 +60,7 @@ try {
   const roundTrip = {
     rows: await page.locator('.agent-row').count(),
     totalText: await page.locator('.rollup-total').innerText(),
-    importedAgentVisible: await page.getByText('Aster Harbor', { exact: true }).isVisible(),
+    importedAgentVisible: await page.getByText('Aster Vale', { exact: true }).isVisible(),
   }
 
   await page.keyboard.press('Control+K')

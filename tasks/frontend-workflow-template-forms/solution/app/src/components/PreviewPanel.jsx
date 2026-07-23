@@ -6,9 +6,13 @@ import { markdownForPrompt, techniqueById } from '../domain'
 import { useStudioStore } from '../store'
 
 export async function copyText(text) {
-  if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(text)
-    return
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text)
+      return true
+    }
+  } catch {
+    // fall through to execCommand
   }
   const node = document.createElement('textarea')
   node.value = text
@@ -16,8 +20,9 @@ export async function copyText(text) {
   node.style.opacity = '0'
   document.body.appendChild(node)
   node.select()
-  document.execCommand('copy')
+  const ok = document.execCommand('copy')
   node.remove()
+  return ok
 }
 
 export function downloadText(filename, text, type) {
@@ -50,8 +55,16 @@ export default function PreviewPanel({ saveButtonRef }) {
     )
   }
 
-  async function handleCopy() {
-    await copyText(promptText)
+  async function handleCopy(event) {
+    const control = event.currentTarget
+    control.dataset.copyStatus = 'pending'
+    const copiedSuccessfully = await copyText(promptText)
+    if (!copiedSuccessfully) {
+      control.dataset.copyStatus = 'error'
+      showToast('error', 'Copy failed', 'Clipboard access was unavailable. Select the preview text and copy it manually.')
+      return
+    }
+    control.dataset.copyStatus = 'success'
     setCopied(true)
     showToast('success', 'Prompt copied', 'The exact preview text is on your clipboard.')
     clearTimeout(timer.current)
@@ -80,6 +93,7 @@ export default function PreviewPanel({ saveButtonRef }) {
             kind="ghost"
             size="sm"
             onClick={handleCopy}
+            data-copy-prompt
             aria-label={copied ? 'Prompt copied' : 'Copy assembled prompt'}
           >
             <AnimatePresence mode="wait" initial={false}>
