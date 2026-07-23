@@ -10,6 +10,23 @@
   ],
   "assignments": [
     {
+      "task": "frontend-data-tracking-reading-velocity-backlog-observatory",
+      "modules": ["browse-query-v1", "entity-collection-v1", "form-workflow-v1", "artifact-transfer-v1"],
+      "bindings": {
+        "filters": ["all", "ready", "blocked", "done"],
+        "entity": "backlog-item",
+        "entity_operations": ["select", "update", "toggle"],
+        "entity_fields": ["title", "points", "status", "lane"],
+        "form_operations": ["submit"],
+        "form_fields": ["title", "points"],
+        "artifact_operations": ["export", "import"],
+        "export_formats": ["reading-velocity-json"],
+        "import_modes": ["reading-velocity-json"],
+        "visible_postconditions": ["selected-item", "filtered-queue", "phase-advanced", "artifact-ready"]
+      },
+      "mechanics_exclusions": ["Backlog drag ordering remains Playwright-driven when gesture mechanics matter"]
+    },
+    {
       "task": "frontend-creative-tools-annotation-studio",
       "modules": [
         "entity-collection-v1",
@@ -820,64 +837,6 @@
       ]
     },
     {
-      "task": "frontend-creative-tools-icon-family-optical-studio",
-      "modules": [
-        "structured-editor-v1",
-        "artifact-transfer-v1"
-      ],
-      "bindings": {
-        "editor_object_types": [
-          "anchor",
-          "path",
-          "constraint",
-          "variant",
-          "hint",
-          "branch"
-        ],
-        "editor_operations": [
-          "select",
-          "add",
-          "delete",
-          "update_property",
-          "set_content",
-          "switch_mode",
-          "preview"
-        ],
-        "editor_properties": [
-          "x",
-          "y",
-          "type",
-          "value"
-        ],
-        "editor_modes": [
-          "edit",
-          "preview"
-        ],
-        "artifact_operations": [
-          "export",
-          "import"
-        ],
-        "export_formats": [
-          "json",
-          "svg",
-          "css",
-          "md"
-        ],
-        "import_modes": [
-          "json"
-        ],
-        "visible_postconditions": [
-          "selected-anchor",
-          "updated-geometry",
-          "preview-size",
-          "export-ready"
-        ]
-      },
-      "mechanics_exclusions": [
-        "Drag anchor geometry remains Playwright-driven when gesture mechanics matter"
-      ]
-    },
-    {
       "task": "frontend-creative-tools-markupflow",
       "modules": [
         "structured-editor-v1",
@@ -1536,59 +1495,16 @@
         "artifact-transfer-v1"
       ],
       "bindings": {
-        "editor_object_types": [
-          "piece",
-          "seam",
-          "nest"
-        ],
-        "editor_properties": [
-          "transform",
-          "orientation"
-        ],
-        "editor_operations": [
-          "select",
-          "update_property",
-          "switch_mode",
-          "preview",
-          "set_content"
-        ],
-        "editor_modes": [
-          "geometry",
-          "fabric",
-          "topology",
-          "assembly",
-          "proof"
-        ],
+        "editor_object_types": ["piece", "seam", "nest"],
+        "editor_properties": ["transform", "orientation"],
+        "editor_operations": ["select", "update_property", "switch_mode", "preview", "set_content"],
+        "editor_modes": ["geometry", "fabric", "topology", "assembly", "proof"],
         "entity": "quilt-entity",
-        "entity_operations": [
-          "create",
-          "select",
-          "update",
-          "delete",
-          "toggle"
-        ],
-        "entity_fields": [
-          "entity-type",
-          "dimensions",
-          "material",
-          "order",
-          "revision"
-        ],
-        "artifact_operations": [
-          "export",
-          "import",
-          "copy"
-        ],
-        "export_formats": [
-          "quilt-project-json",
-          "piece-manifest-csv",
-          "templates-svg",
-          "assembly-plan-json",
-          "maker-notes-md"
-        ],
-        "import_modes": [
-          "quilt-project-json"
-        ]
+        "entity_operations": ["create", "select", "update", "delete", "toggle"],
+        "entity_fields": ["entity-type", "dimensions", "material", "order", "revision"],
+        "artifact_operations": ["export", "import", "copy"],
+        "export_formats": ["quilt-project-json", "piece-manifest-csv", "templates-svg", "assembly-plan-json", "maker-notes-md"],
+        "import_modes": ["quilt-project-json"]
       },
       "mechanics_exclusions": [
         "Canvas selection, panning, zooming, dragging, snapping, and keyboard movement stay Playwright-observed",
@@ -1808,39 +1724,6 @@
       ]
     },
     {
-      "task": "frontend-creative-tools-session-compression-loom",
-      "modules": [
-        "structured-editor-v1",
-        "artifact-transfer-v1"
-      ],
-      "bindings": {
-        "editor_entity": "capsule",
-        "editor_operations": [
-          "select",
-          "update",
-          "create",
-          "preview"
-        ],
-        "editor_fields": [
-          "title",
-          "variant"
-        ],
-        "artifact_formats": [
-          "compressed-session-pack-v1"
-        ],
-        "artifact_operations": [
-          "export",
-          "import"
-        ],
-        "import_modes": [
-          "compressed-session-pack-v1"
-        ]
-      },
-      "mechanics_exclusions": [
-        "Text selection, range highlighting, preview layout, and download bytes stay Playwright-observed"
-      ]
-    },
-    {
       "task": "frontend-creative-tools-shapeshift-grid",
       "modules": [
         "structured-editor-v1",
@@ -1903,6 +1786,21 @@
       ]
     },
     {
+      "task": "frontend-creative-tools-icon-family-optical-studio",
+      "modules": ["structured-editor-v1", "artifact-transfer-v1"],
+      "bindings": {
+        "editor_object_types": ["anchor", "path", "constraint", "variant", "hint", "branch"],
+        "editor_operations": ["select", "add", "delete", "update_property", "set_content", "switch_mode", "preview"],
+        "editor_properties": ["x", "y", "type", "value"],
+        "editor_modes": ["edit", "preview"],
+        "artifact_operations": ["export", "import"],
+        "export_formats": ["json", "svg", "css", "md"],
+        "import_modes": ["json"],
+        "visible_postconditions": ["selected-anchor", "updated-geometry", "preview-size", "export-ready"]
+      },
+      "mechanics_exclusions": ["Drag anchor geometry remains Playwright-driven when gesture mechanics matter"]
+    },
+    {
       "task": "frontend-creative-tools-stack-trace-path-finder",
       "modules": [
         "structured-editor-v1",
@@ -1910,54 +1808,17 @@
         "artifact-transfer-v1"
       ],
       "bindings": {
-        "editor_object_types": [
-          "frame",
-          "candidate",
-          "node"
-        ],
-        "editor_operations": [
-          "select",
-          "update_property",
-          "set_content",
-          "preview"
-        ],
-        "editor_properties": [
-          "weight",
-          "pinned-node",
-          "collapsed"
-        ],
-        "editor_modes": [
-          "normal",
-          "edit"
-        ],
+        "editor_object_types": ["frame", "candidate", "node"],
+        "editor_operations": ["select", "update_property", "set_content", "preview"],
+        "editor_properties": ["weight", "pinned-node", "collapsed"],
+        "editor_modes": ["normal", "edit"],
         "entity": "hypothesis",
-        "entity_operations": [
-          "create",
-          "select",
-          "delete"
-        ],
-        "entity_fields": [
-          "name",
-          "frame-count",
-          "path-status"
-        ],
-        "artifact_operations": [
-          "export",
-          "import",
-          "copy"
-        ],
-        "export_formats": [
-          "stack-path-hypothesis-json"
-        ],
-        "import_modes": [
-          "stack-path-hypothesis-json"
-        ],
-        "visible_postconditions": [
-          "selected-frame",
-          "mapped-node",
-          "path-validity",
-          "saved-hypothesis"
-        ]
+        "entity_operations": ["create", "select", "delete"],
+        "entity_fields": ["name", "frame-count", "path-status"],
+        "artifact_operations": ["export", "import", "copy"],
+        "export_formats": ["stack-path-hypothesis-json"],
+        "import_modes": ["stack-path-hypothesis-json"],
+        "visible_postconditions": ["selected-frame", "mapped-node", "path-validity", "saved-hypothesis"]
       },
       "mechanics_exclusions": [
         "Frame reordering and candidate drag mapping stay Playwright-driven when gesture mechanics matter",
@@ -2244,117 +2105,24 @@
     },
     {
       "task": "frontend-creative-tools-weaving-draft-constraint-studio",
-      "modules": [
-        "entity-collection-v1",
-        "structured-editor-v1",
-        "command-session-v1",
-        "artifact-transfer-v1"
-      ],
+      "modules": ["entity-collection-v1", "structured-editor-v1", "command-session-v1", "artifact-transfer-v1"],
       "bindings": {
         "entity": "draft-variant",
-        "entity_operations": [
-          "create",
-          "select",
-          "update",
-          "toggle"
-        ],
-        "entity_fields": [
-          "name",
-          "threading",
-          "tie-up",
-          "treadling",
-          "warp-colors",
-          "weft-colors",
-          "repeat",
-          "approval"
-        ],
-        "editor_object_types": [
-          "threading-cell",
-          "tie-up-cell",
-          "treadling-cell",
-          "color-cell",
-          "repeat-range",
-          "variant-range"
-        ],
-        "editor_operations": [
-          "select",
-          "update_property",
-          "set_content",
-          "switch_mode",
-          "preview"
-        ],
-        "editor_properties": [
-          "shaft",
-          "treadle",
-          "lifted",
-          "color-id",
-          "operation",
-          "offset",
-          "max-float",
-          "sequence"
-        ],
-        "editor_modes": [
-          "paint",
-          "erase",
-          "threading",
-          "tie-up",
-          "treadling",
-          "colors",
-          "repeat",
-          "analysis",
-          "variants",
-          "simulation",
-          "artifacts"
-        ],
-        "session_operations": [
-          "start",
-          "restart",
-          "advance",
-          "trigger_demo"
-        ],
-        "demos": [
-          "wrong-treadle",
-          "wrong-color",
-          "broken-yarn",
-          "branch-at-error"
-        ],
-        "artifact_operations": [
-          "export",
-          "import",
-          "copy"
-        ],
-        "export_formats": [
-          "canonical-json",
-          "wif-ini",
-          "draft-svg",
-          "drawdown-svg",
-          "yarn-pick-ledger-csv"
-        ],
-        "import_modes": [
-          "canonical-json",
-          "wif-ini"
-        ],
-        "value_bounds": [
-          "ends integer 1-64 and picks integer 1-96",
-          "shaft and treadle indices integer 1-4",
-          "repeat nesting depth at most 2",
-          "float threshold integer 3-7",
-          "yarn calculations use declared integer millimeter and gram rounding"
-        ],
-        "visible_postconditions": [
-          "editing threading, tie-up, treadling, or color cells immediately recomputes the derived drawdown and highlights bound inputs without permitting direct drawdown edits",
-          "repeat transforms preserve bounded source ranges and show the first expected-versus-actual break; incompatible overlaps block",
-          "float and structural analysis lists run type, length, and coordinates plus empty treadles, unused shafts, duplicate picks, and edge balance",
-          "forking and merging named variants updates cell/color/yarn comparisons while approved checksums remain frozen",
-          "simulation advance, pause, error, unweave, correction, resume, and branch-at-error update the visible pick and recovery history",
-          "canonical JSON or WIF import reconstructs the visible draft; export formats reflect current grid, color, yarn, repeat, variant, and simulation state"
-        ]
+        "entity_operations": ["create", "select", "update", "toggle"],
+        "entity_fields": ["name", "threading", "tie-up", "treadling", "warp-colors", "weft-colors", "repeat", "approval"],
+        "editor_object_types": ["threading-cell", "tie-up-cell", "treadling-cell", "color-cell", "repeat-range", "variant-range"],
+        "editor_operations": ["select", "update_property", "set_content", "switch_mode", "preview"],
+        "editor_properties": ["shaft", "treadle", "lifted", "color-id", "operation", "offset", "max-float", "sequence"],
+        "editor_modes": ["paint", "erase", "threading", "tie-up", "treadling", "colors", "repeat", "analysis", "variants", "simulation", "artifacts"],
+        "session_operations": ["start", "restart", "advance", "trigger_demo"],
+        "demos": ["wrong-treadle", "wrong-color", "broken-yarn", "branch-at-error"],
+        "artifact_operations": ["export", "import", "copy"],
+        "export_formats": ["canonical-json", "wif-ini", "draft-svg", "drawdown-svg", "yarn-pick-ledger-csv"],
+        "import_modes": ["canonical-json", "wif-ini"],
+        "value_bounds": ["ends integer 1-64 and picks integer 1-96", "shaft and treadle indices integer 1-4", "repeat nesting depth at most 2", "float threshold integer 3-7", "yarn calculations use declared integer millimeter and gram rounding"],
+        "visible_postconditions": ["editing threading, tie-up, treadling, or color cells immediately recomputes the derived drawdown and highlights bound inputs without permitting direct drawdown edits", "repeat transforms preserve bounded source ranges and show the first expected-versus-actual break; incompatible overlaps block", "float and structural analysis lists run type, length, and coordinates plus empty treadles, unused shafts, duplicate picks, and edge balance", "forking and merging named variants updates cell/color/yarn comparisons while approved checksums remain frozen", "simulation advance, pause, error, unweave, correction, resume, and branch-at-error update the visible pick and recovery history", "canonical JSON or WIF import reconstructs the visible draft; export formats reflect current grid, color, yarn, repeat, variant, and simulation state" ]
       },
-      "mechanics_exclusions": [
-        "Grid painting, erasing, range drag selection, direct keyboard navigation, mobile sequence sheets, palette reorder, and simulation control gestures are driven with Playwright; equivalent bounded state uses editor and session tools",
-        "Drawdown highlight causality, repeat overlays, responsive layout, focus indicators, hover states, and transitions remain Playwright-observed",
-        "File downloads, native file selection, and clipboard contents remain Playwright responsibilities"
-      ]
+      "mechanics_exclusions": ["Grid painting, erasing, range drag selection, direct keyboard navigation, mobile sequence sheets, palette reorder, and simulation control gestures are driven with Playwright; equivalent bounded state uses editor and session tools", "Drawdown highlight causality, repeat overlays, responsive layout, focus indicators, hover states, and transitions remain Playwright-observed", "File downloads, native file selection, and clipboard contents remain Playwright responsibilities"]
     },
     {
       "task": "frontend-data-tracking-admin-analytics-dashboard",
@@ -3130,12 +2898,6 @@
       ]
     },
     {
-      "task": "frontend-data-tracking-household-load-shift-planner",
-      "modules": [
-        "artifact-transfer-v1"
-      ]
-    },
-    {
       "task": "frontend-data-tracking-judge-ab-lab",
       "modules": [
         "browse-query-v1",
@@ -3348,6 +3110,28 @@
       ]
     },
     {
+      "task": "frontend-data-tracking-music-practice-loop-studio",
+      "modules": ["structured-editor-v1", "entity-collection-v1", "command-session-v1", "artifact-transfer-v1"],
+      "bindings": {
+        "editor_object_types": ["practice-loop", "tempo-point", "take-event"],
+        "editor_properties": ["name", "start", "end", "repetitions", "rules", "bpm", "measure", "beat", "event-type"],
+        "editor_operations": ["select", "add", "delete", "update_property", "set_content", "switch_mode", "preview"],
+        "editor_modes": ["score", "tempo", "takes", "schedule"],
+        "entity": "practice-item",
+        "entity_operations": ["create", "select", "update", "delete", "toggle"],
+        "entity_fields": ["entity-type", "name", "range", "repetitions", "rules", "day", "status"],
+        "session_operations": ["start", "pause", "resume", "stop", "restart"],
+        "artifact_operations": ["export", "import", "copy"],
+        "export_formats": ["practice-dossier-json", "practice-events-csv", "score-overlay-svg", "practice-schedule-ics", "practice-summary-md"],
+        "import_modes": ["practice-dossier-json"]
+      },
+      "mechanics_exclusions": [
+        "Score brushing, range resizing, curve dragging, scrubbing, and keyboard navigation stay Playwright-observed",
+        "Metronome timing, playback cadence, and animation endpoints stay Playwright-observed",
+        "Native downloads, file-picker import, and clipboard contents stay Playwright-observed; WebMCP returns no artifact contents"
+      ]
+    },
+    {
       "task": "frontend-data-tracking-model-monitor",
       "modules": [
         "browse-query-v1",
@@ -3441,92 +3225,6 @@
       ]
     },
     {
-      "task": "frontend-data-tracking-music-practice-loop-studio",
-      "modules": [
-        "structured-editor-v1",
-        "entity-collection-v1",
-        "command-session-v1",
-        "artifact-transfer-v1"
-      ],
-      "bindings": {
-        "editor_object_types": [
-          "practice-loop",
-          "tempo-point",
-          "take-event"
-        ],
-        "editor_properties": [
-          "name",
-          "start",
-          "end",
-          "repetitions",
-          "rules",
-          "bpm",
-          "measure",
-          "beat",
-          "event-type"
-        ],
-        "editor_operations": [
-          "select",
-          "add",
-          "delete",
-          "update_property",
-          "set_content",
-          "switch_mode",
-          "preview"
-        ],
-        "editor_modes": [
-          "score",
-          "tempo",
-          "takes",
-          "schedule"
-        ],
-        "entity": "practice-item",
-        "entity_operations": [
-          "create",
-          "select",
-          "update",
-          "delete",
-          "toggle"
-        ],
-        "entity_fields": [
-          "entity-type",
-          "name",
-          "range",
-          "repetitions",
-          "rules",
-          "day",
-          "status"
-        ],
-        "session_operations": [
-          "start",
-          "pause",
-          "resume",
-          "stop",
-          "restart"
-        ],
-        "artifact_operations": [
-          "export",
-          "import",
-          "copy"
-        ],
-        "export_formats": [
-          "practice-dossier-json",
-          "practice-events-csv",
-          "score-overlay-svg",
-          "practice-schedule-ics",
-          "practice-summary-md"
-        ],
-        "import_modes": [
-          "practice-dossier-json"
-        ]
-      },
-      "mechanics_exclusions": [
-        "Score brushing, range resizing, curve dragging, scrubbing, and keyboard navigation stay Playwright-observed",
-        "Metronome timing, playback cadence, and animation endpoints stay Playwright-observed",
-        "Native downloads, file-picker import, and clipboard contents stay Playwright-observed; WebMCP returns no artifact contents"
-      ]
-    },
-    {
       "task": "frontend-data-tracking-plausible-analytics",
       "modules": [
         "browse-query-v1",
@@ -3611,61 +3309,6 @@
         "Chart bar hover/tooltip stays Playwright-observed",
         "Export drawer slide and toast enter/exit timing stays Playwright-observed",
         "Compare chip ease-in/out timing stays Playwright-observed"
-      ]
-    },
-    {
-      "task": "frontend-data-tracking-reading-velocity-backlog-observatory",
-      "modules": [
-        "browse-query-v1",
-        "entity-collection-v1",
-        "form-workflow-v1",
-        "artifact-transfer-v1"
-      ],
-      "bindings": {
-        "filters": [
-          "all",
-          "ready",
-          "blocked",
-          "done"
-        ],
-        "entity": "backlog-item",
-        "entity_operations": [
-          "select",
-          "update",
-          "toggle"
-        ],
-        "entity_fields": [
-          "title",
-          "points",
-          "status",
-          "lane"
-        ],
-        "form_operations": [
-          "submit"
-        ],
-        "form_fields": [
-          "title",
-          "points"
-        ],
-        "artifact_operations": [
-          "export",
-          "import"
-        ],
-        "export_formats": [
-          "reading-velocity-json"
-        ],
-        "import_modes": [
-          "reading-velocity-json"
-        ],
-        "visible_postconditions": [
-          "selected-item",
-          "filtered-queue",
-          "phase-advanced",
-          "artifact-ready"
-        ]
-      },
-      "mechanics_exclusions": [
-        "Backlog drag ordering remains Playwright-driven when gesture mechanics matter"
       ]
     },
     {
@@ -5070,161 +4713,6 @@
         "Retry backoff countdown ticking and sub-item check animations are timed visuals, Playwright-observed live",
         "Toast and modal enter/exit transitions stay Playwright-observed",
         "Download file picker / clipboard contents stay Playwright responsibilities"
-      ]
-    },
-    {
-      "task": "frontend-planning-multilevel-accessible-route-lab",
-      "modules": [
-        "entity-collection-v1",
-        "artifact-transfer-v1"
-      ],
-      "bindings": {
-        "entity": "route-stop",
-        "entity_operations": [
-          "create",
-          "update",
-          "delete",
-          "reorder",
-          "select"
-        ],
-        "entity_fields": [
-          "nodeId",
-          "dwell"
-        ],
-        "artifact_operations": [
-          "export",
-          "import"
-        ],
-        "export_formats": [
-          "route-plan-json",
-          "route-geojson"
-        ],
-        "import_modes": [
-          "route-plan-json"
-        ]
-      },
-      "mechanics_exclusions": [
-        "Map route drawing, keyboard navigation, responsive layout, and native file transfer remain Playwright-observed"
-      ]
-    },
-    {
-      "task": "frontend-planning-potluck-contribution-orchestrator",
-      "modules": [
-        "entity-collection-v1",
-        "structured-editor-v1",
-        "artifact-transfer-v1"
-      ],
-      "bindings": {
-        "entity": "commitment",
-        "entity_operations": [
-          "create",
-          "select",
-          "update",
-          "delete"
-        ],
-        "entity_fields": [
-          "dish",
-          "portions",
-          "owner",
-          "state",
-          "targetId",
-          "dietary"
-        ],
-        "editor_operations": [
-          "select",
-          "update_property",
-          "set_content",
-          "preview"
-        ],
-        "artifact_operations": [
-          "export",
-          "import"
-        ],
-        "export_formats": [
-          "potluck-event-plan-v1"
-        ],
-        "import_modes": [
-          "potluck-event-plan-v1"
-        ]
-      },
-      "mechanics_exclusions": [
-        "Navigation, drag positioning, native downloads, and clipboard contents stay Playwright-observed"
-      ]
-    },
-    {
-      "task": "frontend-planning-stage-blocking-path-studio",
-      "modules": [
-        "structured-editor-v1",
-        "command-session-v1",
-        "artifact-transfer-v1"
-      ],
-      "bindings": {
-        "editor_object_types": [
-          "actor-waypoint",
-          "prop-waypoint",
-          "blocking-branch"
-        ],
-        "editor_operations": [
-          "select",
-          "add",
-          "delete",
-          "update_property",
-          "switch_mode",
-          "preview"
-        ],
-        "editor_properties": [
-          "beat",
-          "x",
-          "y",
-          "facing",
-          "movement-type",
-          "hold"
-        ],
-        "editor_modes": [
-          "stage",
-          "paths",
-          "sightlines",
-          "custody",
-          "rehearsal",
-          "artifacts"
-        ],
-        "session_operations": [
-          "start",
-          "pause",
-          "resume",
-          "stop",
-          "restart",
-          "advance"
-        ],
-        "artifact_operations": [
-          "export",
-          "import",
-          "copy"
-        ],
-        "export_formats": [
-          "canonical-json",
-          "stage-map-svg",
-          "path-atlas-svg",
-          "waypoint-csv",
-          "custody-csv",
-          "rehearsal-csv",
-          "script-markdown"
-        ],
-        "import_modes": [
-          "canonical-json"
-        ],
-        "visible_postconditions": [
-          "selected entity and waypoint",
-          "current beat and stage positions",
-          "active branch and rehearsal trace",
-          "artifact preview"
-        ]
-      },
-      "mechanics_exclusions": [
-        "Waypoint dragging, snapping, mirroring, and retiming gestures stay Playwright-driven; editor operations expose the resulting score state without bypassing gesture criteria",
-        "Collision, sightline, focus, entrance, and custody overlay geometry stays Playwright-observed",
-        "Rehearsal timing, smooth path interpolation, handoff animation, and reduced-motion behavior stay Playwright-observed",
-        "File picker, clipboard contents, downloaded artifact bytes, and SVG rendering fidelity remain Playwright responsibilities"
       ]
     },
     {
@@ -6831,123 +6319,24 @@
     },
     {
       "task": "frontend-workflow-apparel-sample-review-pipeline",
-      "modules": [
-        "entity-collection-v1",
-        "structured-editor-v1",
-        "command-session-v1",
-        "artifact-transfer-v1"
-      ],
+      "modules": ["entity-collection-v1", "structured-editor-v1", "command-session-v1", "artifact-transfer-v1"],
       "bindings": {
         "entity": "apparel-review-record",
-        "entity_operations": [
-          "create",
-          "select",
-          "update",
-          "toggle"
-        ],
-        "entity_fields": [
-          "record-type",
-          "label",
-          "status",
-          "severity",
-          "owner",
-          "measurement",
-          "material-lot",
-          "reason",
-          "evidence"
-        ],
-        "editor_object_types": [
-          "callout",
-          "measurement-point",
-          "construction-region",
-          "material-binding",
-          "sample-erratum",
-          "issue-revision"
-        ],
-        "editor_operations": [
-          "select",
-          "add",
-          "update_property",
-          "set_content",
-          "switch_mode",
-          "preview"
-        ],
-        "editor_properties": [
-          "x",
-          "y",
-          "type",
-          "label",
-          "method",
-          "anchor",
-          "note",
-          "base-target",
-          "tolerance",
-          "size-rule",
-          "material-id",
-          "measured-value",
-          "status"
-        ],
-        "editor_modes": [
-          "diagram",
-          "measurements",
-          "materials",
-          "samples",
-          "issues",
-          "compare",
-          "approvals",
-          "package"
-        ],
-        "session_operations": [
-          "start",
-          "restart",
-          "advance",
-          "trigger_demo"
-        ],
-        "demos": [
-          "package-run",
-          "retry-failed-package",
-          "comparison-lens",
-          "approval-check"
-        ],
-        "artifact_operations": [
-          "export",
-          "import",
-          "copy"
-        ],
-        "export_formats": [
-          "canonical-json",
-          "annotated-svg",
-          "measurements-csv",
-          "materials-csv",
-          "sample-history-csv",
-          "tech-pack-markdown",
-          "changelog-markdown"
-        ],
-        "import_modes": [
-          "canonical-json"
-        ],
-        "value_bounds": [
-          "callout normalized x and y each 0-100 and constrained to declared garment anchor zones",
-          "measurements use integer tenths of millimeters with non-negative tolerances and acyclic dependencies",
-          "material reservations conserve non-negative integer square centimeters or units per lot",
-          "issue status follows the declared lifecycle without skipping required states",
-          "sample snapshots are immutable and corrections append errata"
-        ],
-        "visible_postconditions": [
-          "moving or editing a callout updates the shared diagram/table selection and recalculates dependent size targets while invalid bounds or cycles leave state unchanged with field errors",
-          "changing a material binding adjusts derived targets and reservations and marks dependent samples and approvals stale",
-          "recording a sample measurement classifies pass, high, low, or not-measured against the frozen revision while corrections append an erratum",
-          "accepting and implementing an issue creates a revision branch and marks dependent conclusions stale",
-          "selecting a compare or heatmap cell highlights its diagram, evidence, revision, and tech-pack row while zero remains distinct from missing",
-          "the first package run preserves successful outputs while failing one colorway diagram and one checksum; retry-failed changes only those failed outputs",
-          "canonical import reconstructs the visible diagram, specifications, materials, samples, issues, revisions, approvals, and package history"
-        ]
+        "entity_operations": ["create", "select", "update", "toggle"],
+        "entity_fields": ["record-type", "label", "status", "severity", "owner", "measurement", "material-lot", "reason", "evidence"],
+        "editor_object_types": ["callout", "measurement-point", "construction-region", "material-binding", "sample-erratum", "issue-revision"],
+        "editor_operations": ["select", "add", "update_property", "set_content", "switch_mode", "preview"],
+        "editor_properties": ["x", "y", "type", "label", "method", "anchor", "note", "base-target", "tolerance", "size-rule", "material-id", "measured-value", "status"],
+        "editor_modes": ["diagram", "measurements", "materials", "samples", "issues", "compare", "approvals", "package"],
+        "session_operations": ["start", "restart", "advance", "trigger_demo"],
+        "demos": ["package-run", "retry-failed-package", "comparison-lens", "approval-check"],
+        "artifact_operations": ["export", "import", "copy"],
+        "export_formats": ["canonical-json", "annotated-svg", "measurements-csv", "materials-csv", "sample-history-csv", "tech-pack-markdown", "changelog-markdown"],
+        "import_modes": ["canonical-json"],
+        "value_bounds": ["callout normalized x and y each 0-100 and constrained to declared garment anchor zones", "measurements use integer tenths of millimeters with non-negative tolerances and acyclic dependencies", "material reservations conserve non-negative integer square centimeters or units per lot", "issue status follows the declared lifecycle without skipping required states", "sample snapshots are immutable and corrections append errata"],
+        "visible_postconditions": ["moving or editing a callout updates the shared diagram/table selection and recalculates dependent size targets while invalid bounds or cycles leave state unchanged with field errors", "changing a material binding adjusts derived targets and reservations and marks dependent samples and approvals stale", "recording a sample measurement classifies pass, high, low, or not-measured against the frozen revision while corrections append an erratum", "accepting and implementing an issue creates a revision branch and marks dependent conclusions stale", "selecting a compare or heatmap cell highlights its diagram, evidence, revision, and tech-pack row while zero remains distinct from missing", "the first package run preserves successful outputs while failing one colorway diagram and one checksum; retry-failed changes only those failed outputs", "canonical import reconstructs the visible diagram, specifications, materials, samples, issues, revisions, approvals, and package history" ]
       },
-      "mechanics_exclusions": [
-        "Callout and evidence-region dragging, diagram/heatmap selection, keyboard coordinate editing, mobile cards and drilldowns, and responsive navigation are driven with Playwright; equivalent bounded state uses editor/entity tools",
-        "Visual stale markers, tolerance bands, leader lines, collision avoidance, focus indicators, hover states, and transitions remain Playwright-observed",
-        "File downloads, native file selection, and clipboard contents remain Playwright responsibilities"
-      ]
+      "mechanics_exclusions": ["Callout and evidence-region dragging, diagram/heatmap selection, keyboard coordinate editing, mobile cards and drilldowns, and responsive navigation are driven with Playwright; equivalent bounded state uses editor/entity tools", "Visual stale markers, tolerance bands, leader lines, collision avoidance, focus indicators, hover states, and transitions remain Playwright-observed", "File downloads, native file selection, and clipboard contents remain Playwright responsibilities"]
     },
     {
       "task": "frontend-workflow-automation-studio",
@@ -7785,73 +7174,15 @@
       ],
       "bindings": {
         "entity": "fill-intent-allocation-record",
-        "entity_operations": [
-          "create",
-          "select",
-          "update",
-          "delete",
-          "toggle"
-        ],
-        "entity_fields": [
-          "fill-id",
-          "intent-id",
-          "source-id",
-          "account-id",
-          "symbol",
-          "side",
-          "quantity",
-          "price",
-          "occurred-at",
-          "exception-reason",
-          "override-reason"
-        ],
-        "editor_object_types": [
-          "mapping-cell",
-          "allocation-flow",
-          "lot-split",
-          "correction-link",
-          "variance-cell",
-          "checkpoint"
-        ],
-        "editor_operations": [
-          "select",
-          "update_property",
-          "set_content",
-          "switch_mode",
-          "preview"
-        ],
-        "editor_properties": [
-          "mapped-field",
-          "typed-value",
-          "excluded",
-          "allocation-quantity",
-          "ratio",
-          "exception-reason",
-          "override-reason",
-          "ledger-time",
-          "checkpoint-name"
-        ],
-        "editor_modes": [
-          "import-repair",
-          "allocation-floor",
-          "execution-ledger",
-          "variance-matrix",
-          "checkpoint-compare",
-          "export"
-        ],
-        "artifact_operations": [
-          "export",
-          "import",
-          "copy"
-        ],
-        "export_formats": [
-          "api-batch-json",
-          "reconciliation-csv",
-          "exception-csv"
-        ],
-        "import_modes": [
-          "api-batch-json"
-        ],
+        "entity_operations": ["create", "select", "update", "delete", "toggle"],
+        "entity_fields": ["fill-id", "intent-id", "source-id", "account-id", "symbol", "side", "quantity", "price", "occurred-at", "exception-reason", "override-reason"],
+        "editor_object_types": ["mapping-cell", "allocation-flow", "lot-split", "correction-link", "variance-cell", "checkpoint"],
+        "editor_operations": ["select", "update_property", "set_content", "switch_mode", "preview"],
+        "editor_properties": ["mapped-field", "typed-value", "excluded", "allocation-quantity", "ratio", "exception-reason", "override-reason", "ledger-time", "checkpoint-name"],
+        "editor_modes": ["import-repair", "allocation-floor", "execution-ledger", "variance-matrix", "checkpoint-compare", "export"],
+        "artifact_operations": ["export", "import", "copy"],
+        "export_formats": ["api-batch-json", "reconciliation-csv", "exception-csv"],
+        "import_modes": ["api-batch-json"],
         "value_bounds": [
           "intent and fill ids are unique non-empty strings and quantities are positive integers",
           "allocation quantities are positive integers bounded by both remaining fill quantity and remaining intent quantity",
@@ -7886,92 +7217,17 @@
       ],
       "bindings": {
         "entity": "source-clip-and-timeline-instance",
-        "entity_operations": [
-          "create",
-          "select",
-          "update",
-          "delete",
-          "reorder",
-          "toggle"
-        ],
-        "entity_fields": [
-          "source-range",
-          "lane",
-          "episode-time",
-          "transcript-inclusion",
-          "citation",
-          "rights-state",
-          "approval-state"
-        ],
-        "editor_object_types": [
-          "timeline-instance",
-          "transcript-token",
-          "citation",
-          "narrative-block",
-          "automation-point",
-          "branch-cut"
-        ],
-        "editor_operations": [
-          "select",
-          "add",
-          "delete",
-          "update_property",
-          "switch_mode",
-          "preview"
-        ],
-        "editor_properties": [
-          "source-in",
-          "source-out",
-          "start-ms",
-          "duration-ms",
-          "lane",
-          "gain",
-          "fade",
-          "included",
-          "title",
-          "summary",
-          "approval"
-        ],
-        "editor_modes": [
-          "sources",
-          "timeline",
-          "transcript",
-          "chapters",
-          "mix",
-          "rights",
-          "branches",
-          "render"
-        ],
-        "session_operations": [
-          "start",
-          "pause",
-          "resume",
-          "stop",
-          "restart",
-          "advance"
-        ],
-        "demos": [
-          "validation-run",
-          "render-run",
-          "retry-failed-render"
-        ],
-        "artifact_operations": [
-          "export",
-          "import",
-          "copy"
-        ],
-        "export_formats": [
-          "canonical-json",
-          "edl-csv",
-          "transcript-csv",
-          "webvtt",
-          "rss-xml",
-          "show-notes-markdown",
-          "timeline-svg"
-        ],
-        "import_modes": [
-          "canonical-json"
-        ],
+        "entity_operations": ["create", "select", "update", "delete", "reorder", "toggle"],
+        "entity_fields": ["source-range", "lane", "episode-time", "transcript-inclusion", "citation", "rights-state", "approval-state"],
+        "editor_object_types": ["timeline-instance", "transcript-token", "citation", "narrative-block", "automation-point", "branch-cut"],
+        "editor_operations": ["select", "add", "delete", "update_property", "switch_mode", "preview"],
+        "editor_properties": ["source-in", "source-out", "start-ms", "duration-ms", "lane", "gain", "fade", "included", "title", "summary", "approval"],
+        "editor_modes": ["sources", "timeline", "transcript", "chapters", "mix", "rights", "branches", "render"],
+        "session_operations": ["start", "pause", "resume", "stop", "restart", "advance"],
+        "demos": ["validation-run", "render-run", "retry-failed-render"],
+        "artifact_operations": ["export", "import", "copy"],
+        "export_formats": ["canonical-json", "edl-csv", "transcript-csv", "webvtt", "rss-xml", "show-notes-markdown", "timeline-svg"],
+        "import_modes": ["canonical-json"],
         "value_bounds": [
           "timeline time and source ranges are non-negative integer milliseconds and remain within source bounds",
           "chapters do not overlap and cover the approved timeline under declared intro and credit rules",
@@ -7994,6 +7250,19 @@
         "Waveform, loudness, peak, clipping, ducking, and fade-continuity visuals are observed through Playwright; validation session state uses command-session bindings",
         "File downloads, native file-picker interaction, and clipboard contents remain Playwright responsibilities"
       ]
+    },
+    {
+      "task": "frontend-planning-multilevel-accessible-route-lab",
+      "modules": ["entity-collection-v1", "artifact-transfer-v1"],
+      "bindings": {
+        "entity": "route-stop",
+        "entity_operations": ["create", "update", "delete", "reorder", "select"],
+        "entity_fields": ["nodeId", "dwell"],
+        "artifact_operations": ["export", "import"],
+        "export_formats": ["route-plan-json", "route-geojson"],
+        "import_modes": ["route-plan-json"]
+      },
+      "mechanics_exclusions": ["Map route drawing, keyboard navigation, responsive layout, and native file transfer remain Playwright-observed"]
     },
     {
       "task": "frontend-workflow-quality-audit-desk",
@@ -8807,6 +8076,31 @@
       ]
     },
     {
+      "task": "frontend-planning-stage-blocking-path-studio",
+      "modules": [
+        "structured-editor-v1",
+        "command-session-v1",
+        "artifact-transfer-v1"
+      ],
+      "bindings": {
+        "editor_object_types": ["actor-waypoint", "prop-waypoint", "blocking-branch"],
+        "editor_operations": ["select", "add", "delete", "update_property", "switch_mode", "preview"],
+        "editor_properties": ["beat", "x", "y", "facing", "movement-type", "hold"],
+        "editor_modes": ["stage", "paths", "sightlines", "custody", "rehearsal", "artifacts"],
+        "session_operations": ["start", "pause", "resume", "stop", "restart", "advance"],
+        "artifact_operations": ["export", "import", "copy"],
+        "export_formats": ["canonical-json", "stage-map-svg", "path-atlas-svg", "waypoint-csv", "custody-csv", "rehearsal-csv", "script-markdown"],
+        "import_modes": ["canonical-json"],
+        "visible_postconditions": ["selected entity and waypoint", "current beat and stage positions", "active branch and rehearsal trace", "artifact preview"]
+      },
+      "mechanics_exclusions": [
+        "Waypoint dragging, snapping, mirroring, and retiming gestures stay Playwright-driven; editor operations expose the resulting score state without bypassing gesture criteria",
+        "Collision, sightline, focus, entrance, and custody overlay geometry stays Playwright-observed",
+        "Rehearsal timing, smooth path interpolation, handoff animation, and reduced-motion behavior stay Playwright-observed",
+        "File picker, clipboard contents, downloaded artifact bytes, and SVG rendering fidelity remain Playwright responsibilities"
+      ]
+    },
+    {
       "task": "frontend-workflow-workflow-builder",
       "modules": [
         "structured-editor-v1",
@@ -8896,6 +8190,33 @@
         "Multi-select marquee geometry and Shift-click chord timing stay Playwright when mechanism matters",
         "Timeline status filter chips and Saved Workflows / Artifact panel open toggles stay Playwright-driven; no browse-query module is assigned"
       ]
+    },
+    {
+      "task": "frontend-planning-potluck-contribution-orchestrator",
+      "modules": ["entity-collection-v1", "structured-editor-v1", "artifact-transfer-v1"],
+      "bindings": {
+        "entity": "commitment",
+        "entity_operations": ["create", "select", "update", "delete"],
+        "entity_fields": ["dish", "portions", "owner", "state", "targetId", "dietary"],
+        "editor_operations": ["select", "update_property", "set_content", "preview"],
+        "artifact_operations": ["export", "import"],
+        "export_formats": ["potluck-event-plan-v1"],
+        "import_modes": ["potluck-event-plan-v1"]
+      },
+      "mechanics_exclusions": ["Navigation, drag positioning, native downloads, and clipboard contents stay Playwright-observed"]
+    },
+    {
+      "task": "frontend-creative-tools-session-compression-loom",
+      "modules": ["structured-editor-v1", "artifact-transfer-v1"],
+      "bindings": {
+        "editor_entity": "capsule",
+        "editor_operations": ["select", "update", "create", "preview"],
+        "editor_fields": ["title", "variant"],
+        "artifact_formats": ["compressed-session-pack-v1"],
+        "artifact_operations": ["export", "import"],
+        "import_modes": ["compressed-session-pack-v1"]
+      },
+      "mechanics_exclusions": ["Text selection, range highlighting, preview layout, and download bytes stay Playwright-observed"]
     }
   ]
 }
