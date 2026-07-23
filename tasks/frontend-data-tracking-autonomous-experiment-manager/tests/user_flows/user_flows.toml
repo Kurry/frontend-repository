@@ -1,0 +1,43 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "sse"
+url = "http://localhost:3000/sse"
+
+[[criterion]]
+id = "happy_path_loop"
+description = "Happy path complete loop: goal, baseline, proposal, (approval if needed), run, decision, and next incumbent completes successfully."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "pause_recover_campaign"
+description = "Pause and recover campaign: active checkpoint and budget state survives across pause and recover actions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "change_threshold_user_flow"
+description = "Change threshold: historical decisions remain immutable while the current counterfactual or readiness updates immediately."
+type = "binary"
+weight = 1.0

@@ -1,0 +1,49 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "sse"
+url = "http://localhost:3000/sse"
+
+[[criterion]]
+id = "stale_base_rejection"
+description = "Propose against stale base or immutable region: specific rejection is surfaced and no patch mutation occurs."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "boundary_conditions"
+description = "Boundary conditions: exact threshold equality, tie policies, or running one unit over budget produce their explicitly specified outcomes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cancel_before_completion"
+description = "Cancel before completion: no metric decision or incumbent change occurs if the run is canceled before finishing."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "import_nonlinear_ledger"
+description = "Import nonlinear or bad-hash ledger: atomic failure leaves the campaign completely unchanged."
+type = "binary"
+weight = 1.0

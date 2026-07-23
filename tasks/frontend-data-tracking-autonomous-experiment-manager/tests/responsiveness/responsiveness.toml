@@ -1,0 +1,43 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "sse"
+url = "http://localhost:3000/sse"
+
+[[criterion]]
+id = "cross_breakpoints"
+description = "Cross breakpoints: conveyor transforms to a staged mobile loop without losing hunk, sample, or run state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "adjust_threshold_mobile"
+description = "Adjust threshold on mobile: numeric stepper creates the same versioned policy as drag on desktop."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "review_risk_mobile"
+description = "Review risk approval at 360x800: diff, evidence, note, and actions remain reachable without horizontal page scroll."
+type = "binary"
+weight = 1.0

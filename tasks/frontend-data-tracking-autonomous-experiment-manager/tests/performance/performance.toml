@@ -1,0 +1,43 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "sse"
+url = "http://localhost:3000/sse"
+
+[[criterion]]
+id = "load_performance"
+description = "Load 30 experiments and patches: lineage, ledger, and diff remain responsive with bounded rendering overhead."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "stream_samples_performance"
+description = "Stream samples and tools: cancellation and inspector remain responsive without timer drift or layout thrashing."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "recompute_policy"
+description = "Recompute counterfactual policy: bounds and deterministic updates apply quickly without rewriting history."
+type = "binary"
+weight = 1.0

@@ -1,0 +1,49 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "sse"
+url = "http://localhost:3000/sse"
+
+[[criterion]]
+id = "interleave_actions"
+description = "Interleave actions: proposal stream, hunk edit, approval, threshold change, run completion, and reload actions properly converge on the hash-bound state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "retry_after_crash"
+description = "Retry after crash: old attempt evidence remains visible, and the semantics distinguishing a same-attempt recover vs. a new attempt retry are explicit."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "export_import_sequence"
+description = "Export, reset, import, export sequence: logical program, patches, samples, lineage, decisions, and ledger remain equivalent across the round trip."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "deny_risky_patch"
+description = "Deny risky patch or decision: no run or keep effect occurs, and the denial properly persists."
+type = "binary"
+weight = 1.0
