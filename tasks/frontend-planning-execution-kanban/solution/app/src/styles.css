@@ -178,6 +178,8 @@ button:focus-visible, [role="button"]:focus-visible, input:focus-visible, textar
 .board-stats .stat-warn { color: #684b00; }
 .board-stats .stat-warn strong { color: #4a3408; }
 .board-stats .stat-warn::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #b28600; }
+.flow-insight { margin-left: auto; padding: 3px 8px; border: 1px solid #a6c8ff; background: #edf5ff; color: #0043ce; }
+.flow-insight strong { color: #002d9c !important; }
 
 .board-scroller {
   width: 100%;
@@ -488,6 +490,7 @@ button:focus-visible, [role="button"]:focus-visible, input:focus-visible, textar
   .filter-group .cds--select, .filter-group .cds--search { width: 100%; }
   .toolbar-actions { justify-content: flex-end; }
   .board-stats { padding: 8px 16px; }
+  .flow-insight { width: 100%; margin-left: 0; }
   .board-scroller { padding: 14px 16px 22px; }
   .board-grid { height: calc(100vh - 274px); min-height: 470px; grid-template-columns: repeat(4, 312px); }
   .detail-grid { grid-template-columns: 1fr; }

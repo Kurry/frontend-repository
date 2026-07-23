@@ -300,7 +300,7 @@ function BoardCard({ card, prompt, people, selected, backoff, dropPosition, inde
             <DragVertical size={16} />
           </span>
           <div className="card-status"><StatusTag status={card.status} compact /></div>
-          <div className="move-menu-wrap" data-no-card-open="true" onClick={stop} onKeyDown={stop}>
+          <div className="move-menu-wrap" data-no-card-open="true" onPointerDown={stop} onClick={stop} onKeyDown={stop}>
             <OverflowMenu size="sm" flipped iconDescription={`Move ${card.title}`} aria-label={`Move ${card.title}`}>
               {columns.map((column) => (
                 <OverflowMenuItem
@@ -344,7 +344,7 @@ function BoardCard({ card, prompt, people, selected, backoff, dropPosition, inde
             <AssigneeAvatar assignee={card.assignee} people={people} />
             {card.comments.length > 0 && <span className="comment-count"><Chat size={14} />{card.comments.length}</span>}
           </div>
-          <span data-no-card-open="true" onClick={stop} onKeyDown={stop}>
+          <span data-no-card-open="true" onPointerDown={stop} onClick={stop} onKeyDown={stop}>
             <Button
               size="sm"
               kind={card.status === 'failed' ? 'danger--tertiary' : 'tertiary'}
@@ -785,14 +785,12 @@ function ExportDrawer({ shown }) {
     defaultValues: { import: state.importDraft },
   })
 
-  const exportData = useMemo(() => {
-//    if (!open) return { json: '', markdown: '' }
-    return {
-      json: compileJSON(state),
-      markdown: compileMarkdown(state),
-    }
+  const exportData = useMemo(() => ({
+    json: compileJSON(state),
+    markdown: compileMarkdown(state),
+  }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.board, state.cards, state.order, state.prompts, state.assignees, state.wipLimits])
+    [state.board, state.cards, state.order, state.prompts, state.assignees, state.wipLimits])
 
   const selectedIndex = state.exportFormat === 'json' ? 0 : 1
   const importReg = importForm.register('import')
@@ -1008,6 +1006,14 @@ function App() {
     return limit !== null && limit !== undefined && visibleByColumn[column.id].length > limit
   }).length, [visibleByColumn, state.wipLimits])
 
+  const flowInsight = useMemo(() => {
+    const activeColumns = columns.filter((column) => column.id !== 'done')
+    const bottleneck = activeColumns.reduce((largest, column) => (
+      state.order[column.id].length > state.order[largest.id].length ? column : largest
+    ), activeColumns[0])
+    return `${bottleneck.name} is carrying ${state.order[bottleneck.id].length} active cards`
+  }, [state.order])
+
   const calculateDrop = (event) => {
     const activeCard = state.cards[event.active.id]
     if (!activeCard) return null
@@ -1140,6 +1146,9 @@ function App() {
             {breachCount
               ? <><strong>{breachCount}</strong> {breachCount === 1 ? 'column' : 'columns'} over WIP limit</>
               : 'All columns within WIP limits'}
+          </span>
+          <span className="stat flow-insight" title="Live bottleneck insight derived from current board order">
+            <strong>Flow pulse</strong> {flowInsight}
           </span>
         </section>
 
