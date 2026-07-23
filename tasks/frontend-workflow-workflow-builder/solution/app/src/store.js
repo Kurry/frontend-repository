@@ -351,6 +351,7 @@ export const useWorkflowStore = create((set, get) => ({
     if (state.selectedNodeId) selectedNodeIds.add(state.selectedNodeId);
     if (state.selectedEdgeId) selectedEdgeIds.add(state.selectedEdgeId);
     if (selectedNodeIds.size === 0 && selectedEdgeIds.size === 0) return false;
+
     if (!get().pushHistory()) return false;
     set((current) => ({
       nodes: current.nodes.filter((node) => !selectedNodeIds.has(node.id)),

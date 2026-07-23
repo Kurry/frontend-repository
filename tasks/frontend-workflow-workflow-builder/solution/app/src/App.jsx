@@ -174,7 +174,7 @@ function Palette({ open, onToggle }) {
               key={type}
               className="palette-item"
               style={{ '--type-color': TYPE_META[type].color, '--type-soft': TYPE_META[type].soft }}
-              draggable
+              draggable={true}
               role="button"
               tabIndex={0}
               aria-label={`Add ${type} node. Drag to position or press Enter to add.`}

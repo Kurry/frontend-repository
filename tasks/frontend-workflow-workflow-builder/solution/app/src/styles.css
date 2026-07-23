@@ -335,3 +335,21 @@ kbd { min-width: 19px; padding: 2px 4px; color: #393939; background: #e8e8e8; bo
   .canvas-wrap { max-width: 100%; }
   .react-flow__minimap { display: none; }
 }
+
+/* 7.6 Mobile tap targets (ensure 44x44px minimum) */
+@media (max-width: 768px) {
+  .cds--btn--sm {
+    min-height: 44px;
+    min-width: 44px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  .react-flow__controls-button {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+  .node-settings {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+}
