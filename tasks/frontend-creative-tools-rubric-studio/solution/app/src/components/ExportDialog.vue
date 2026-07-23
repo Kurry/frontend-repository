@@ -57,9 +57,9 @@ function downloadPreview() {
       </div>
       <div class="export-actions">
         <Button :label="copied ? 'Copied' : 'Copy'" severity="secondary" outlined @click="copyPreview">
-          <template #icon><Check v-if="copied" :size="17" weight="bold" /><Copy v-else :size="17" /></template>
+          <template #icon><Check v-if="copied" :size="17" weight="bold" aria-hidden="true" /><Copy v-else :size="17" aria-hidden="true" /></template>
         </Button>
-        <Button label="Download" @click="downloadPreview"><template #icon><DownloadSimple :size="17" /></template></Button>
+        <Button label="Download" @click="downloadPreview"><template #icon><DownloadSimple :size="17" aria-hidden="true" /></template></Button>
       </div>
     </div>
     <div class="preview-meta">

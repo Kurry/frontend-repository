@@ -6,7 +6,7 @@ async function waitForStudio(page) {
   if (await skip.isVisible()) await skip.click();
 }
 
-test('criterion dialog blocks invalid submit, closes on Escape, and returns focus', async ({ page }) => {
+test('criterion dialog rejects invalid submit, closes on Escape, and returns focus', async ({ page }) => {
   await page.goto('/');
   await waitForStudio(page);
 
@@ -18,7 +18,11 @@ test('criterion dialog blocks invalid submit, closes on Escape, and returns focu
 
   const submit = dialog.getByRole('button', { name: 'Add criterion', exact: true });
   await expect(submit).toHaveAttribute('data-incomplete', 'true');
-  await expect(submit).toBeDisabled();
+  await expect(submit).toBeEnabled();
+  await submit.click();
+  await expect(page.locator('#criterion-id-error')).not.toBeEmpty();
+  await expect(page.locator('#criterion-name-error')).not.toBeEmpty();
+  await expect(page.locator('#criterion-description-error')).not.toBeEmpty();
   await expect(dialog.getByRole('status')).toContainText('Complete the required fields');
   await expect(page.locator('.criterion-panel')).toHaveCount(initialCount);
 
