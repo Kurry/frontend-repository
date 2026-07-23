@@ -240,14 +240,14 @@ test('oracle-fix invalid creation explains stage bounds', async ({ page }) => {
 
 test('oracle-fix sort reversal, filter, branch, and persisted mode stay coherent', async ({ page }) => {
     await page.goto(BASE);
-    await page.getByRole('button', { name: 'Path', exact: true }).click();
+    await page.getByRole('button', { name: /^Path/ }).click();
     await page.getByLabel('Filter waypoints').selectOption('actor');
     await page.getByRole('button', { name: 'Sort descending' }).click();
     await page.getByRole('button', { name: 'New branch' }).click();
     await page.getByLabel('Branch name').fill('rehearsal-b');
     await page.getByRole('button', { name: 'Create branch' }).click();
     await page.reload();
-    await expect(page.getByRole('button', { name: 'Path', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('button', { name: /^Path/ })).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByLabel('Filter waypoints')).toHaveValue('actor');
     await expect(page.getByLabel('Select branch')).toHaveValue('rehearsal-b');
     await expect(page.getByRole('button', { name: 'Sort ascending' })).toBeVisible();
@@ -256,20 +256,21 @@ test('oracle-fix sort reversal, filter, branch, and persisted mode stay coherent
 test('oracle-fix beat interpolation visibly changes derived stage position', async ({ page }) => {
     await page.goto(BASE);
     const actor = page.getByRole('button', { name: /Alice, actor/ });
-    const atOne = await actor.evaluate((element) => element.getAttribute('transform'));
+    const atOne = await actor.evaluate((element) => getComputedStyle(element).transform);
     await page.getByRole('button', { name: 'Add waypoint' }).click();
-    await page.getByLabel('Beat').fill('20'); await page.getByLabel('X position (m)').fill('10'); await page.getByLabel('Y position (m)').fill('7');
-    await page.getByRole('dialog').getByRole('button', { name: 'Add waypoint' }).click();
+    const waypointDialog = page.getByRole('dialog', { name: 'Add waypoint' });
+    await waypointDialog.getByRole('spinbutton', { name: 'Beat' }).fill('20'); await waypointDialog.getByLabel('X position (m)').fill('10'); await waypointDialog.getByLabel('Y position (m)').fill('7');
+    await waypointDialog.getByRole('button', { name: 'Add waypoint', exact: true }).click();
     await page.getByRole('button', { name: '20', exact: true }).click();
-    await expect(actor).not.toHaveAttribute('transform', atOne);
+    await expect.poll(() => actor.evaluate((element) => getComputedStyle(element).transform)).not.toBe(atOne);
 });
 
 test('oracle-fix analysis rehearsal approval and artifact flows provide feedback', async ({ page }) => {
     await page.goto(BASE);
-    await page.getByRole('button', { name: 'Analyze', exact: true }).click();
+    await page.getByRole('button', { name: /^Analyze/ }).click();
     await expect(page.getByText(/Sightlines and access clear|Collision risk/).first()).toBeVisible();
-    await page.getByRole('button', { name: 'Rehearse', exact: true }).click();
-    await page.getByTitle('start rehearsal').click();
+    await page.getByRole('button', { name: /^Rehearse/ }).click();
+    await page.getByTitle('start rehearsal', { exact: true }).click();
     await expect(page.getByText('Running', { exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Approve' }).click();
     await expect(page.getByText(/Branch .* approved/)).toBeVisible();
