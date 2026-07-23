@@ -336,6 +336,53 @@ kbd { min-width: 19px; padding: 2px 4px; color: #393939; background: #e8e8e8; bo
   .react-flow__minimap { display: none; }
 }
 
+/* Motion requirements */
+@keyframes scaleIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.workflow-node.just-dropped {
+  animation: scaleIn 0.15s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-10px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.timeline-row {
+  animation: slideIn 0.2s ease-out;
+}
+
+.status-tag {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.workflow-node.is-exiting {
+  animation: scaleIn 0.15s ease-in reverse;
+}
+
+/* Visual Design Requirements */
+.cds--btn:hover, .cds--text-input:hover, .cds--select-input:hover, .cds--text-area:hover {
+  filter: brightness(0.95);
+}
+
+.cds--btn:focus-visible, .cds--text-input:focus-visible, .cds--select-input:focus-visible, .cds--text-area:focus-visible, .workflow-node:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.cds--btn:disabled, .cds--text-input:disabled, .cds--select-input:disabled, .cds--text-area:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.validity-badge.is-incomplete {
+  background-color: #fff8d6;
+  color: #b28600;
+}
+
 /* 7.6 Mobile tap targets (ensure 44x44px minimum) */
 @media (max-width: 768px) {
   .cds--btn--sm {
@@ -353,3 +400,6 @@ kbd { min-width: 19px; padding: 2px 4px; color: #393939; background: #e8e8e8; bo
     min-width: 44px !important;
   }
 }
+.shortcuts-btn { margin-left: auto; }
+.shortcuts-list { padding-left: 1rem; list-style: disc; margin-top: 1rem; line-height: 2; }
+.shortcuts-list li strong { display: inline-block; width: 150px; }

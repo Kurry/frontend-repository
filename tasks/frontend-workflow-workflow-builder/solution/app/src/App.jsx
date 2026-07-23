@@ -118,7 +118,7 @@ function WorkflowNode({ id, type, data, selected }) {
     >
       {type !== 'Prompt' && <Handle id="in" type="target" position={Position.Left} className="typed-handle input-handle" aria-label={`${type} input`} />}
       <div className="node-heading">
-        <span className="node-icon" style={{ background: TYPE_META[type].soft, color: TYPE_META[type].color }}><Icon size={16} /></span>
+        <span className="node-icon" style={{ background: TYPE_META[type].soft, color: TYPE_META[type].color }}><Icon size={16} aria-hidden="true" /></span>
         <span className="node-type">{type}</span>
         <Button hasIconOnly iconDescription={`Configure ${data.title}`} renderIcon={Settings} kind="ghost" size="sm" onClick={() => openModal('configure', { nodeId: id })} className="node-settings" />
       </div>
@@ -174,7 +174,7 @@ function Palette({ open, onToggle }) {
               key={type}
               className="palette-item"
               style={{ '--type-color': TYPE_META[type].color, '--type-soft': TYPE_META[type].soft }}
-              draggable={true}
+              draggable
               role="button"
               tabIndex={0}
               aria-label={`Add ${type} node. Drag to position or press Enter to add.`}
@@ -189,7 +189,7 @@ function Palette({ open, onToggle }) {
                 }
               }}
             >
-              <span className="palette-icon"><Icon size={18} /></span>
+              <span className="palette-icon"><Icon size={18} aria-hidden="true" /></span>
               {open && <><span className="palette-label">{type}</span><Add size={16} className="palette-add" /></>}
             </div>
           );
@@ -240,10 +240,11 @@ function Toolbar() {
         <Button kind="ghost" size="sm" renderIcon={Upload} onClick={() => openModal('import')}>Import</Button>
         <Button kind="ghost" size="sm" renderIcon={TrashCan} onClick={deleteSelected} disabled={!hasSelection}>Delete selected</Button>
         <Button kind="ghost" size="sm" renderIcon={DataConnected} onClick={cycleNodeSelection}>Cycle</Button>
+        <KeyboardShortcuts />
         {selectedCount > 0 && <span className="selection-count" aria-live="polite">{selectedCount} selected</span>}
       </div>
       <div className={`validity-badge ${validity.valid ? 'is-valid' : 'is-incomplete'}`} title={validity.reason} aria-label={`Graph ${validity.label}: ${validity.reason}`}>
-        <span>{validity.label}</span>
+        <span>{validity.valid ? 'Valid' : `Incomplete: ${validity.reason}`}</span>
       </div>
       <div className="rollup" aria-label={`${rollup.complete} of ${rollup.total} nodes complete, ${rollup.failures} failures, ${elapsed} elapsed`}>
         <div className="rollup-stat"><strong>{rollup.complete}/{rollup.total}</strong><span>complete</span></div>
@@ -368,8 +369,8 @@ function SavedPanel() {
           <div className="saved-list">
             {saved.map((workflow) => (
               <div className="saved-row" key={workflow.savedId}>
-                <ClickableTile onClick={() => requestLoad(workflow.savedId)}>
-                  <span className="saved-row-icon"><Flow size={16} /></span>
+                <ClickableTile onClick={() => useWorkflowStore.getState().requestLoadWorkflow(workflow.savedId)}>
+                  <span className="saved-row-icon"><Flow size={16} aria-hidden="true" /></span>
                   <span><strong>{workflow.name}</strong><small>{workflow.nodes.length} nodes · {workflow.edges.length} edges</small></span>
                   <ChevronRight size={16} />
                 </ClickableTile>
@@ -438,7 +439,7 @@ function Timeline() {
               style={{ '--row-index': Math.min(index, 8) }}
               title={nodeExists ? `Select ${event.nodeTitle} on canvas` : 'This node has been deleted'}
             >
-              <span className="timeline-icon"><Icon size={15} /></span>
+              <span className="timeline-icon"><Icon size={15} aria-hidden="true" /></span>
               <span className="timeline-copy"><strong>{event.nodeTitle}</strong><span>{event.event} · {event.detail}</span></span>
               <Tag type={event.status === 'complete' ? 'green' : event.status === 'failed' ? 'red' : event.status === 'retrying' ? 'warm-gray' : 'cool-gray'} size="sm">{event.event}</Tag>
               <time dateTime={event.timestamp}>{new Date(event.timestamp).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}</time>
@@ -528,17 +529,6 @@ function SaveModal() {
   );
 }
 
-function ConfirmLoadModal() {
-  const ui = useWorkflowStore((state) => state.ui);
-  const saved = useWorkflowStore((state) => state.savedWorkflows.find((item) => item.savedId === state.ui.pendingWorkflowId));
-  const close = useWorkflowStore((state) => state.closeModal);
-  const confirm = useWorkflowStore((state) => state.confirmLoadWorkflow);
-  return (
-    <Modal danger open={ui.modal === 'confirm-load'} modalHeading="Replace the current canvas?" primaryButtonText="Load workflow" secondaryButtonText="Keep current canvas" onRequestSubmit={confirm} onRequestClose={close}>
-      <p>Loading <strong>{saved?.name}</strong> replaces the current nodes and edges. Its execution state starts fresh.</p>
-    </Modal>
-  );
-}
 
 function ArtifactPanel() {
   const open = useWorkflowStore((state) => state.ui.artifactOpen);
@@ -567,6 +557,7 @@ function ArtifactPanel() {
       await navigator.clipboard.writeText(content);
       setCopied(true);
       showToast('success', `${mode === 'json' ? 'JSON' : 'Mermaid'} copied to clipboard.`);
+      useWorkflowStore.getState().setAnnouncement(`${mode === 'json' ? 'JSON' : 'Mermaid'} copied to clipboard.`);
       setTimeout(() => setCopied(false), 1600);
     } catch {
       showToast('error', 'Clipboard access was unavailable. Select the preview text to copy it.');
@@ -613,6 +604,19 @@ function ArtifactPanel() {
   );
 }
 
+
+function ConfirmLoadModal() {
+  const ui = useWorkflowStore((state) => state.ui);
+  const saved = useWorkflowStore((state) => state.savedWorkflows.find((item) => item.savedId === state.ui.pendingWorkflowId));
+  const close = useWorkflowStore((state) => state.closeModal);
+  const confirm = useWorkflowStore((state) => state.confirmLoadWorkflow);
+  return (
+    <Modal danger open={ui.modal === 'confirm-load'} modalHeading="Replace the current canvas?" primaryButtonText="Load workflow" secondaryButtonText="Keep current canvas" onRequestSubmit={confirm} onRequestClose={close}>
+      <p><strong>{saved?.name}</strong> will replace the current canvas. Unsaved changes will be lost.</p>
+    </Modal>
+  );
+}
+
 function ImportModal() {
   const open = useWorkflowStore((state) => state.ui.modal === 'import');
   const close = useWorkflowStore((state) => state.closeModal);
@@ -625,7 +629,7 @@ function ImportModal() {
     try { prepareImport(JSON.parse(definition)); setParseError(''); }
     catch (error) {
       const issue = error?.issues?.[0];
-      setParseError(issue ? `Invalid workflow definition: ${issue.message}` : 'Invalid workflow definition: enter valid workflow JSON.');
+      setParseError(issue ? `Invalid workflow definition: ${issue.path?.join('.') || 'root'} - ${issue.message}` : 'Invalid workflow definition: enter valid workflow JSON.');
     }
   });
   return (
@@ -657,8 +661,31 @@ function ToastLayer() {
   return <div className="toast-layer"><ToastNotification lowContrast kind={toast.kind} title={toast.kind === 'error' ? 'Action unavailable' : 'Done'} subtitle={toast.message} timeout={0} onCloseButtonClick={dismiss} /></div>;
 }
 
+
+function KeyboardShortcuts() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button kind="ghost" size="sm" renderIcon={DataConnected} onClick={() => setOpen(true)} className="shortcuts-btn" title="Keyboard shortcuts">Shortcuts</Button>
+      <Modal open={open} modalHeading="Keyboard shortcuts" passiveModal onRequestClose={() => setOpen(false)}>
+        <ul className="shortcuts-list">
+          <li><strong>Ctrl/Cmd + Z</strong> Undo</li>
+          <li><strong>Ctrl/Cmd + Shift + Z</strong> Redo</li>
+          <li><strong>Ctrl/Cmd + S</strong> Save workflow</li>
+          <li><strong>Ctrl/Cmd + E</strong> Toggle Artifact panel</li>
+          <li><strong>Shift + Click</strong> Multi-select nodes</li>
+          <li><strong>Delete/Backspace</strong> Delete selected</li>
+          <li><strong>Alt + N</strong> Cycle node selection</li>
+          <li><strong>Space + Drag</strong> Pan canvas</li>
+          <li><strong>Scroll</strong> Zoom canvas</li>
+        </ul>
+      </Modal>
+    </>
+  );
+}
+
 function App() {
-  const [coachmarkVisible, setCoachmarkVisible] = useState(true);
+  const [coachmarkVisible, setCoachmarkVisible] = useState(() => localStorage.getItem('orchestrate_coachmark_dismissed') !== 'true');
   const paletteOpen = useWorkflowStore((state) => state.ui.paletteOpen);
   const togglePalette = useWorkflowStore((state) => state.togglePalette);
   const announcement = useWorkflowStore((state) => state.announcement);
@@ -743,7 +770,7 @@ function App() {
                 title="First-run tip"
                 subtitle="Drag a Prompt node from the palette onto the canvas, press Run to watch the seeded retries, then open Artifact to export JSON or Mermaid. Shortcuts: Alt+N cycle · Ctrl+Z undo · Ctrl+E Artifact."
                 hideCloseButton={false}
-                onCloseButtonClick={() => setCoachmarkVisible(false)}
+                onCloseButtonClick={() => { setCoachmarkVisible(false); localStorage.setItem('orchestrate_coachmark_dismissed', 'true'); }}
               />
             </div>
           )}
