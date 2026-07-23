@@ -1,0 +1,200 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "core.1"
+name = "bind_split_merge_cues"
+description = "Group/split/merge transcript tokens into ordered cue blocks without losing source-token provenance."
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "core.2"
+name = "drag_resize_cues"
+description = "Drag cue edges at 10-millisecond precision, with optional snapping to token, frame, or shot boundaries."
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "core.3"
+name = "overlap_semantics"
+description = "Simultaneous speech uses exactly two visible speaker lanes with aligned placement rules; ordinary cues cannot overlap in one lane."
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "core.4"
+name = "preview_collisions"
+description = "Moving one cue previews collisions, gaps, reading speed, and shot-crossing before commit."
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "core.5"
+name = "semantic_properties"
+description = "Speaker identity, off-screen status, position region, italics, music marker, and sound-description type dictate rendering (not arbitrary CSS)."
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "core.6"
+name = "safe_area_wrapping"
+description = "A preview safe-area shows line wrapping at the fixed output width (max two lines, 42 characters/line)."
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "core.7"
+name = "branching_provenance"
+description = "Branch wording variants retain token source ids, edits, timing, rationale, and reviewer decision."
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "core.8"
+name = "branch_compare_merge"
+description = "Compare highlights word/punctuation/timing/semantic deltas; merge resolves each conflict explicitly."
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "core.9"
+name = "synchronized_playback"
+description = "Playhead movement synchronizes video frame, waveform, current cue, transcript token, shot, reading-speed cursor, and mini-map."
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "core.10"
+name = "validation_workflow"
+description = "Validation runs tokenize, check intervals, render, reading speed, shot boundaries, and semantics; findings name exact cue/rule/value."
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "core.11"
+name = "validation_retry"
+description = "Validation runs pause/resume/retry, become stale after relevant edits, and retry-failed-only preserves successful results."
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "core.12"
+name = "review_master_approval"
+description = "Reviewers accept/reject variants, acknowledge bounded warnings, and approve a master only when all errors resolve and validation checksum is current."
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "core.13"
+name = "export_interoperability"
+description = "Export produces canonical JSON, WebVTT, SRT, and SVG cue map; import of canonical JSON or supported VTT reconstructs state."
+type = "binary"
+weight = 1.0
