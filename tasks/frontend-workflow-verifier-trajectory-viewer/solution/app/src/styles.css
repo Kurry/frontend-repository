@@ -44,7 +44,9 @@ button:disabled { cursor: not-allowed; }
 .mono { font-family: var(--font-mono); }
 .hover-wash { @apply transition-colors duration-150 hover:bg-accent/[0.055]; }
 .scroll-thin { scrollbar-width: thin; scrollbar-color: #b8beb9 transparent; }
-.rich-text h1, .rich-text h2, .rich-text h3 { @apply mt-4 mb-2 font-bold text-ink; }
+.rich-text h1, .rich-text h2, .rich-text h3, .rich-text h4, .rich-text h5 { @apply mt-4 mb-2 font-bold text-ink; }
+.rich-text h3 { font-size: 1.15em; }
+.rich-text h4 { font-size: 1.05em; }
 .rich-text p { @apply mb-3 leading-6 text-[#3f4943]; }
 .rich-text ul { @apply mb-3 list-disc pl-5 text-[#3f4943]; }
 .rich-text code { @apply rounded bg-black/[0.06] px-1 py-0.5 font-mono text-[0.9em]; }
@@ -55,8 +57,9 @@ button:disabled { cursor: not-allowed; }
 .stream-dot { animation: stream-pulse 1s ease-in-out infinite; }
 .linked-step { animation: linked-outline .38s ease-out; }
 @keyframes linked-outline { from { box-shadow: 0 0 0 6px rgb(20 111 100 / .08); } to { box-shadow: 0 0 0 1px rgb(20 111 100 / .45); } }
-.count-pop { animation: count-pop .28s ease-out; }
-@keyframes count-pop { 50% { transform: scale(1.14); } }
+.rollup-segment { transition: width 250ms ease-in-out, background-color 250ms ease-in-out; }
+.mark-emphasis { animation: pop-emphasis .3s cubic-bezier(.175, .885, .32, 1.275); }
+@keyframes pop-emphasis { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
 .trajectory-pane { animation: pane-in .2s ease-out; }
 .verdict-crossfade { animation: row-in .24s ease-out; }
 .verdict-crossfade tbody tr { animation: row-in .22s ease-out; }
@@ -94,35 +97,3 @@ button:disabled { cursor: not-allowed; }
   .app-command-button { display: none !important; }
 }
 
-/* Animations and motion */
-@media (prefers-reduced-motion: no-preference) {
-  .verdict-crossfade {
-    animation: crossfade 250ms ease-in-out;
-  }
-  @keyframes crossfade {
-    0% { opacity: 0.5; }
-    100% { opacity: 1; }
-  }
-
-  .rollup-segment {
-    transition: width 250ms ease-in-out, background-color 250ms ease-in-out;
-  }
-
-  .mark-emphasis {
-    animation: pop-emphasis 300ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  @keyframes pop-emphasis {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.15); }
-    100% { transform: scale(1); }
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}

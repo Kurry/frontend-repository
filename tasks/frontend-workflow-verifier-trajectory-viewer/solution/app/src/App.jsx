@@ -102,6 +102,15 @@ import { registerWebMCP } from "./webmcp";
 const cx = (...parts) => parts.filter(Boolean).join(" ");
 const iconSize = 17;
 
+// Demote markdown headings rendered inside the review workspace so embedded
+// documents (seed files, memo previews) never introduce an h1/h2 that breaks
+// the surrounding page heading hierarchy.
+const embeddedHeadings = {
+  h1: (props) => <h3 {...props} />,
+  h2: (props) => <h4 {...props} />,
+  h3: (props) => <h5 {...props} />,
+};
+
 class HighlightBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -907,7 +916,9 @@ function FileRenderer({ file }) {
   if (ext === "md")
     return (
       <div className="rich-text max-h-64 overflow-auto rounded-md border border-line bg-white p-4 text-xs">
-        <ReactMarkdown>{file.content}</ReactMarkdown>
+        <ReactMarkdown components={embeddedHeadings}>
+          {file.content}
+        </ReactMarkdown>
       </div>
     );
   if (ext === "csv") {
@@ -1212,7 +1223,7 @@ function Rollup({ trial, label }) {
           <div className="mx-3 my-2 h-1.5 overflow-hidden rounded-full bg-[#e1e4e1]">
             <div
               className={cx(
-                "h-full rounded-full transition-[width] duration-300",
+                "rollup-segment h-full rounded-full",
                 scores[dimension.id] >= 75
                   ? "bg-positive"
                   : scores[dimension.id] >= 50
@@ -1237,6 +1248,11 @@ function ComparisonStrip({ trial, ui }) {
     value: b.scores[d.id] - a.scores[d.id],
   }));
   const totalDelta = b.total - a.total;
+  const maxAbs = Math.max(
+    1,
+    ...deltas.map((d) => Math.abs(d.value)),
+    Math.abs(totalDelta),
+  );
   const Delta = ({ value }) => (
     <span
       className={cx(
@@ -1250,6 +1266,23 @@ function ComparisonStrip({ trial, ui }) {
     >
       {value > 0 ? "+" : ""}
       {value}
+    </span>
+  );
+  const DeltaBar = ({ value }) => (
+    <span
+      aria-hidden="true"
+      className="relative mt-1 block h-1 overflow-hidden rounded-full bg-black/[.07]"
+    >
+      <span className="absolute left-1/2 top-0 h-full w-px bg-black/20" />
+      <span
+        className={cx(
+          "absolute top-0 h-full rounded-full transition-[width] duration-300",
+          value > 0 ? "left-1/2 bg-positive" : "right-1/2 bg-negative",
+        )}
+        style={{
+          width: `${(Math.abs(value) / maxAbs) * 50}%`,
+        }}
+      />
     </span>
   );
   return (
@@ -1287,6 +1320,7 @@ function ComparisonStrip({ trial, ui }) {
                 {d.short}
               </span>
               <Delta value={d.value} />
+              <DeltaBar value={d.value} />
             </div>
           ))}
           <div className="flex flex-col justify-end rounded border border-accent/25 bg-accent-soft px-2 py-1.5">
@@ -1294,6 +1328,7 @@ function ComparisonStrip({ trial, ui }) {
               Total
             </span>
             <Delta value={totalDelta} />
+            <DeltaBar value={totalDelta} />
           </div>
         </div>
       </div>
@@ -1745,6 +1780,8 @@ function CriterionTable({ trial, ui }) {
                           {adjudication ? (
                             <div className="flex items-center justify-between gap-1">
                               <StatusPill
+                                key={`${adjudication.classification}-${adjudication.reviewedAt}`}
+                                className="mark-emphasis"
                                 tone={
                                   adjudication.classification === "agent-bug"
                                     ? "negative"
@@ -1793,6 +1830,7 @@ function CriterionTable({ trial, ui }) {
 function BulkBar({ trial, ui }) {
   const recordAdjudications = useReviewStore((s) => s.recordAdjudications);
   const clearSelection = useReviewStore((s) => s.clearFlipSelection);
+  const [appliedNotice, setAppliedNotice] = useState("");
   const {
     control,
     handleSubmit,
@@ -1811,7 +1849,12 @@ function BulkBar({ trial, ui }) {
       rationale: values.rationale.trim(),
       reviewedAt: now,
     }));
-    recordAdjudications(records, `Bulk applied ${values.classification}`);
+    recordAdjudications(records, `Bulk applied ${values.classification}`, {
+      preserveSelection: true,
+    });
+    setAppliedNotice(
+      `Applied ${values.classification} to ${records.length} selected criteria`,
+    );
     reset();
   });
   return (
@@ -1822,10 +1865,19 @@ function BulkBar({ trial, ui }) {
       <div className="mb-3 flex items-center justify-between gap-3">
         <div className="text-sm font-extrabold">
           {ui.selectedFlips.length} flipped criteria selected
+          {appliedNotice && (
+            <span className="ml-2 inline-flex items-center gap-1 text-xs font-bold text-positive">
+              <IconCheck size={13} />
+              {appliedNotice}
+            </span>
+          )}
         </div>
         <Button
           className="control control-quiet h-8 min-h-8 px-2 text-xs"
-          onPress={clearSelection}
+          onPress={() => {
+            setAppliedNotice("");
+            clearSelection();
+          }}
         >
           Clear selection
         </Button>
@@ -2205,7 +2257,7 @@ function ExportDrawer({ trial, ui }) {
     await copyText(activeText);
     const notice =
       tab === "json"
-        ? "Verdict JSON copied to clipboard"
+        ? "Review package JSON copied to clipboard"
         : "Review memo Markdown copied to clipboard";
     setCopied(true);
     setCopyNotice(notice);
@@ -2292,7 +2344,9 @@ function ExportDrawer({ trial, ui }) {
               className="scroll-thin min-h-0 flex-1 overflow-auto p-4 outline-none sm:p-5"
             >
               <div className="rich-text min-h-full rounded-lg border border-line bg-white p-5 text-sm">
-                <ReactMarkdown>{memoText}</ReactMarkdown>
+                <ReactMarkdown components={embeddedHeadings}>
+                  {memoText}
+                </ReactMarkdown>
               </div>
             </TabPanel>
           </Tabs>
@@ -2380,7 +2434,9 @@ function ImportSurface({ task, trial }) {
     replace(result.data.adjudications);
     setImportErrors([]);
     setAnnouncement(
-      `Successfully imported trajectory report`,
+      `Imported ${result.data.adjudications.length} adjudication${
+        result.data.adjudications.length === 1 ? "" : "s"
+      } successfully from Review Package JSON`,
     );
     close("import");
   });
@@ -2865,7 +2921,7 @@ export default function App() {
   useEffect(() => registerWebMCP(), []);
   useEffect(() => {
     if (!announcement) return undefined;
-    const timer = window.setTimeout(() => setAnnouncement(""), 2200);
+    const timer = window.setTimeout(() => setAnnouncement(""), 6000);
     return () => window.clearTimeout(timer);
   }, [announcement, setAnnouncement]);
   return (
