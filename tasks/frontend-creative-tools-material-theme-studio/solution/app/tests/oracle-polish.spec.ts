@@ -331,3 +331,124 @@ test('recorded 1.4/2.8/1.50 failure: field-path errors and save/import statuses 
   await expect(page.getByText(/shape\.borderRadius/)).toBeVisible();
   await expect(announcer).toContainText('shape.borderRadius');
 });
+
+test('recorded 1.24 failure: every required palette accordion exposes its complete field contract', async ({ page }) => {
+  for (const rowName of ['primary', 'secondary', 'error', 'warning', 'info', 'success']) {
+    const row = page.getByRole('button', { name: `${rowName} palette row` });
+    if ((await row.getAttribute('aria-expanded')) !== 'true') await row.click();
+    for (const channel of ['main', 'light', 'dark', 'contrastText']) {
+      await expect(page.getByLabel(new RegExp(`${rowName}\\.${channel} hex value`))).toHaveValue(/^#[0-9A-F]{6}$/i);
+    }
+  }
+  await expect(page.getByRole('radio', { name: 'Light' })).toBeVisible();
+  await expect(page.getByRole('radio', { name: 'Dark' })).toBeVisible();
+  for (const label of ['Background default color', 'Background paper color', 'Text primary color', 'Divider color']) {
+    await expect(page.getByLabel(label)).toBeVisible();
+  }
+});
+
+test('recorded 1.27 failure: real device controls measure 375/768/full and all six templates activate', async ({ page }) => {
+  const frame = page.locator('[data-preview-frame]');
+  await page.getByRole('button', { name: 'Phone frame' }).click();
+  expect(Math.round((await frame.boundingBox())!.width)).toBeGreaterThanOrEqual(375);
+  await page.getByRole('button', { name: 'Tablet frame' }).click();
+  expect(Math.round((await frame.boundingBox())!.width)).toBeGreaterThanOrEqual(768);
+  await page.getByRole('button', { name: 'Desktop frame' }).click();
+  expect((await frame.boundingBox())!.width).toBeGreaterThan(768);
+
+  for (const template of ['Instructions', 'Sign Up', 'Dashboard', 'Blog', 'Pricing', 'Checkout']) {
+    await page.getByRole('button', { name: template, exact: true }).click();
+    await expect(page.getByText(new RegExp(`Session memory.*${template}`))).toBeVisible();
+  }
+});
+
+test('recorded 1.34 failure: create card, swatches, load, editor, and preview recolor form one chain', async ({ page }) => {
+  const primary = page.getByLabel(/primary\.main hex value/);
+  await primary.fill('#314159');
+  await primary.press('Enter');
+  await page.getByRole('tab', { name: 'Saved Themes' }).click();
+  const before = await page.locator('[data-theme-card]').count();
+  await page.getByRole('button', { name: 'New Theme' }).first().click();
+  await page.getByLabel('Theme name').fill('Load Chain');
+  await page.getByRole('button', { name: 'Create Theme' }).click();
+  await expect(page.locator('[data-theme-card]')).toHaveCount(before + 1);
+  const created = page.locator('[data-theme-card]').filter({ hasText: 'Load Chain' });
+  await expect(created).toBeVisible();
+  await expect(created.locator('[aria-hidden="true"] span').first()).toHaveCSS('background-color', 'rgb(49, 65, 89)');
+  await page.locator('[data-theme-card="default"] [data-load="default"]').click();
+  await created.getByRole('button', { name: 'Load' }).click();
+  await page.getByRole('tab', { name: 'Preview' }).click();
+  await expect(page.locator('.monaco-editor')).toContainText('#314159');
+  expect(await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--preview-primary').trim())).toBe('#314159');
+});
+
+test('recorded 1.35 failure: dark then light returns preview and component surfaces without navigation', async ({ page }) => {
+  await page.getByRole('radio', { name: 'Dark' }).check();
+  expect(await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--preview-bg').trim())).toBe('#121212');
+  await page.getByRole('tab', { name: 'Components' }).click();
+  await expect(page.locator('[data-component-demo]').first()).toBeVisible();
+  await page.getByRole('tab', { name: 'Preview' }).click();
+  await page.getByRole('radio', { name: 'Light' }).check();
+  expect(await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--preview-bg').trim())).toBe('#fafafa');
+  await page.getByRole('tab', { name: 'Components' }).click();
+  await expect(page.locator('[data-component-demo]').first()).toBeVisible();
+});
+
+test('recorded 9.3/9.7/9.8 failure: repeated real palette input stays responsive and converges everywhere', async ({ page }) => {
+  const primary = page.getByLabel(/primary\.main hex value/);
+  const values = ['#102030', '#203040', '#304050', '#405060', '#506070', '#607080', '#708090', '#8090a0'];
+  const gaps = await page.evaluate(() => new Promise<number[]>(resolve => {
+    const samples: number[] = [];
+    let previous = performance.now();
+    const frame = (now: number) => {
+      samples.push(now - previous);
+      previous = now;
+      if (samples.length === 20) resolve(samples);
+      else requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  }));
+  for (const value of values) {
+    await primary.fill(value);
+    await primary.press('Enter');
+  }
+  expect(Math.max(...gaps)).toBeLessThan(100);
+  await expect(primary).toHaveValue('#8090A0');
+  await expect(page.locator('.monaco-editor')).toContainText('#8090a0');
+  expect(await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--preview-primary').trim())).toBe('#8090a0');
+  await page.getByRole('tab', { name: 'Export' }).click();
+  await expect(page.locator('[data-export-preview]')).toContainText('#8090a0');
+});
+
+test('recorded 1.1 failure: named studio controls are keyboard-focusable and operable', async ({ page }) => {
+  const controls = [
+    page.getByRole('tab', { name: 'Components' }),
+    page.getByRole('button', { name: 'Phone frame' }),
+    page.getByRole('button', { name: 'primary palette row' }),
+    page.getByRole('button', { name: 'Copy theme code' }),
+    page.getByRole('button', { name: 'Save', exact: true }),
+  ];
+  for (const control of controls) {
+    expect(await control.evaluate(element => (element as HTMLElement).tabIndex)).toBeGreaterThanOrEqual(0);
+    await control.focus();
+    await expect(control).toBeFocused();
+  }
+  const primary = page.getByLabel(/primary\.main hex value/);
+  await primary.fill('#102030');
+  await primary.press('Enter');
+  const undo = page.getByRole('button', { name: 'Undo' });
+  await undo.focus();
+  await expect(undo).toBeFocused();
+  await page.keyboard.press('Enter');
+  const redo = page.getByRole('button', { name: 'Redo' });
+  await redo.focus();
+  await expect(redo).toBeFocused();
+  await page.keyboard.press('Enter');
+  await page.getByRole('tab', { name: 'Export' }).focus();
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('tab', { name: 'Export' })).toHaveAttribute('aria-selected', 'true');
+  await page.getByRole('button', { name: 'Download JSON' }).focus();
+  await expect(page.getByRole('button', { name: 'Download JSON' })).toBeFocused();
+  await page.getByRole('button', { name: 'Copy export' }).focus();
+  await expect(page.getByRole('button', { name: 'Copy export' })).toBeFocused();
+});
