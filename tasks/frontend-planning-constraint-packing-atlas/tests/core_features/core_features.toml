@@ -1,0 +1,158 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "cf_canvas_move"
+description = "Dragging an item between compartment layers must update packing canvases, center-of-mass indicators, kit graph, checkpoint sequence, owner matrix, conflict ledger, and print artifacts together, with the previous placement gone from every surface."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf_canvas_preview"
+description = "Invalid placement remains a translucent preview and snaps back with exact conflict ids when dragging is released."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf_containment_mass"
+description = "Pouches are bounded child containers whose contents move with them and contribute aggregate mass, but depth is at most two and cycles reject."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf_mass_balance"
+description = "Assigning a bag to an owner updates personal load and shared-weight equity, and the canvas shows center of mass and left/right imbalance."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf_kit_graph"
+description = "The kit graph shows missing, packed, inaccessible, duplicated, and owner-conflicted nodes. Selecting a kit highlights exact canvas items and manifest rows."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf_access_lens"
+description = "An access lens animates removal order without mutating layout, showing a collision-free removal path for checkpoint items."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf_checkpoint_rehearsal"
+description = "Rehearsing the checkpoint sequence reproduces identical access-order results for the same layout; recording a checkpoint appends to the sequence and never rewrites prior checkpoints."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf_layout_branches"
+description = "Branching a layout copies placement, kit, and checkpoint state; comparing branches shows both from one shared state with per-item deltas named."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf_export_artifacts"
+description = "Print artifacts (SVG, CSV, Markdown) compile live and exactly from the current layout on every mutation (never stale placements)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf_stale_checkpoint_negative"
+description = "A layout edit after a recorded checkpoint fails to mark affected checkpoints stale with a visible state, or silently keeps them valid."
+type = "binary"
+negate = true
+weight = 1.0
