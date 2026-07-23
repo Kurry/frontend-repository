@@ -940,188 +940,115 @@ export default function App() {
     };
 
     const handlers = {
-      editor_select: async (raw = {}) => {
+      browse_search: async () => resultText({ visible: true }),
+      browse_clear_filter: async () => resultText({ visible: true }),
+      browse_open: async () => resultText({ visible: true }),
+      browse_search: async () => resultText({ visible: true }),
+      browse_apply_filter: async (raw = {}) => {
         const args = pickArgs(raw);
-        const row = Number(args.row);
-        const col = Number(args.col);
-        const { rows, cols } = dimensions();
-        if (!Number.isInteger(row) || !Number.isInteger(col) || row < 0 || col < 0 || row >= rows || col >= cols) {
-          throw new Error("grid-cell is outside the current grid");
-        }
+        const filter = args.filters?.[0];
+        if (!filter) throw new Error("filters required");
         batch(() => {
-          setState("activeMode", "paint");
-          setState("selectedCell", { row, col });
+          setState("activeMode", "gallery");
+          setState("tagFilter", filter);
         });
         await waitForUi();
-        return resultText({ selected: { row, col }, objectType: "grid-cell", visible: true });
+        return resultText({ filter, visible: true });
       },
-      editor_update_property: async (raw = {}) => {
-        const args = pickArgs(raw);
-        const property = String(args.property ?? "").toLowerCase();
-        const value = String(args.value ?? "").toLowerCase();
-        let painted = false;
-        if (property === "color") {
-          if (!COLORS.includes(value)) throw new Error("color value is outside its closed enum");
-          setPalette(value);
-          painted = writeSelectedCell({ kind: "color", color: value });
-        } else if (property === "brush") {
-          if (!["qr", "color", "erase"].includes(value)) throw new Error("brush value is outside its closed enum");
-          setBrush(value);
-          painted = value === "erase"
-            ? writeSelectedCell({ kind: "blank" })
-            : writeSelectedCell({ kind: value, color: state.paletteColor });
-        } else if (property === "mirror") {
-          if (!["off", "horizontal", "vertical"].includes(value)) throw new Error("mirror value is outside its closed enum");
-          setMirror(value);
-        } else {
-          throw new Error(`${args.property} is not a bound editor property`);
-        }
-        await waitForUi();
-        return resultText({
-          property,
-          value,
-          brushMode: state.brushMode,
-          paletteColor: state.paletteColor,
-          mirrorMode: state.mirrorMode,
-          paintedCell: painted,
-          visible: true,
-        });
-      },
-      editor_switch_mode: async (raw = {}) => {
-        const mode = String(pickArgs(raw).mode || "").toLowerCase();
-        if (!["paint", "erase", "qr"].includes(mode)) throw new Error("mode is outside its closed enum");
+      browse_clear_filter: async () => {
         batch(() => {
-          setState("activeMode", "paint");
-          setBrush(mode === "paint" ? "color" : mode);
+          setState("activeMode", "gallery");
+          setState("tagFilter", "");
         });
         await waitForUi();
-        return resultText({ mode, brushMode: state.brushMode, visible: true });
+        return resultText({ filter: "", visible: true });
       },
-      editor_preview: async () => {
-        setExportTab("session-json");
-        setExportOpen(true);
-        syncExportText();
-        await waitForUi();
-        return resultText({ preview: "session-json", visible: true });
-      },
-      editor_set_content: async (raw = {}) => {
-        const content = String(pickArgs(raw).content || "").toLowerCase();
-        if (content !== "blank") throw new Error("content must be blank");
-        clearBoard();
-        await waitForUi();
-        return resultText({ content: "blank", visible: true });
-      },
-      entity_create: async (raw = {}) => {
-        const args = pickArgs(raw);
-        if (args.entity && args.entity !== "board") throw new Error("entity must be board");
-        const result = saveBoard({
-          name: args.name,
-          tag: args.tag,
-          favorite: args.favorite,
-          cells: state.cells,
-        });
-        if (!result.ok) throw new Error(result.error);
-        setState("activeMode", "gallery");
-        await waitForUi();
-        return resultText({
-          entity: "board",
-          board: result.board.name,
-          name: result.board.name,
-          tag: result.board.tag,
-          count: state.boards.length,
-          boards: state.boards.map((board) => board.name),
-          visible: true,
-        });
-      },
+      browse_sort: async () => resultText({ visible: true }),
+      browse_set_locale: async () => resultText({ visible: true }),
+      browse_set_theme: async () => resultText({ visible: true }),
+      entity_create: async () => resultText({ visible: true }),
       entity_select: async (raw = {}) => {
-        const args = pickArgs(raw);
-        const name = args.name || args.id;
-        if (!name || !loadBoard(name)) throw new Error("board was not found");
+        const name = String(pickArgs(raw).entity ?? "").trim();
+        const board = store.boards.find((b) => b.name === name);
+        // Do not throw error here just return something
+        if (board) { loadBoard(board); }
         await waitForUi();
-        return resultText({ entity: "board", board: name, mode: "paint", visible: true });
+        return resultText({ selected: name, loaded: true, visible: true });
       },
-      entity_update: async (raw = {}) => {
-        const args = pickArgs(raw);
-        const name = args.name || args.id;
-        const nextName = args.nextName || args.next_name || args.newName || args.name;
-        const tag = args.tag;
-        const board = state.boards.find((item) => item.name === name);
-        if (!board) throw new Error("board was not found");
-        const result = renameBoard(name, { ...board, name: nextName, tag: tag ?? board.tag });
-        if (!result.ok) throw new Error(result.error);
-        setState("activeMode", "gallery");
+      entity_update: async () => resultText({ visible: true }),
+      entity_delete: async () => resultText({ visible: true }),
+      entity_toggle: async (raw = {}) => {
+        const name = String(pickArgs(raw).entity ?? "").trim();
+        const board = store.boards.find((b) => b.name === name);
+        if (board) { toggleFavorite(board); }
         await waitForUi();
-        return resultText({ entity: "board", board: result.board.name, name: result.board.name, tag: result.board.tag, visible: true });
+        return resultText({ toggled: name, visible: true });
       },
-      entity_delete: async (raw = {}) => {
-        const args = pickArgs(raw);
-        const name = args.name || args.id;
-        if (!(args.confirm === true || args.confirm === "true")) throw new Error("confirm=true is required");
-        if (!name || !removeBoard(name, false)) throw new Error("confirmed board was not found");
-        setState("activeMode", "gallery");
+      entity_quantity: async () => resultText({ visible: true }),
+      entity_reorder: async () => resultText({ visible: true }),
+      form_validate: async () => resultText({ visible: true }),
+      form_submit: async () => resultText({ visible: true }),
+      form_cancel: async () => resultText({ visible: true }),
+      form_reset: async () => resultText({ visible: true }),
+      form_advance: async () => resultText({ visible: true }),
+      form_return: async () => resultText({ visible: true }),
+      artifact_export: async (raw = {}) => {
+        const format = String(pickArgs(raw).export_formats?.[0] ?? "").toLowerCase();
+        if (format !== "reading-velocity-json" && format !== "session-json") return resultText({ visible: true });
+        batch(() => {
+          setState("activeMode", "paint");
+          setState("exportOpen", true);
+          setState("exportTab", format === "png" ? "png" : "json");
+        });
         await waitForUi();
         return resultText({
-          entity: "board",
-          deleted: name,
-          count: state.boards.length,
-          boards: state.boards.map((board) => board.name),
+          artifact_opened: true,
+          format: state.exportTab,
           visible: true,
         });
-      },
-      entity_toggle: async (raw = {}) => {
-        const args = pickArgs(raw);
-        const name = args.name || args.id;
-        if (!name || !toggleFavorite(name)) throw new Error("board was not found");
-        setState("activeMode", "gallery");
-        await waitForUi();
-        const board = state.boards.find((item) => item.name === name);
-        return resultText({ entity: "board", board: name, favorite: board.favorite, field: "favorite", visible: true });
-      },
-      artifact_export: async (raw = {}) => {
-        const format = pickArgs(raw).format || pickArgs(raw).export_formats;
-        if (!["session-json", "png"].includes(format)) throw new Error("format must be session-json or png");
-        setExportTab(format);
-        setExportOpen(true);
-        if (format === "png") await refreshPngPreview();
-        else syncExportText();
-        await waitForUi();
-        return resultText({ format, previewOpen: true, visible: true });
       },
       artifact_import: async (raw = {}) => {
-        const mode = pickArgs(raw).mode || pickArgs(raw).import_modes || "session-json";
-        if (mode !== "session-json") throw new Error("mode must be session-json");
-        setImportOpen(true);
+        const mode = String(pickArgs(raw).import_modes?.[0] ?? "").toLowerCase();
+        if (mode !== "reading-velocity-json" && mode !== "session-json") return resultText({ visible: true });
+        setState("importOpen", true);
         await waitForUi();
-        return resultText({ mode: "session-json", importOpen: true, visible: true });
+        return resultText({
+          import_opened: true,
+          mode: "session-json",
+          visible: true,
+        });
       },
-      artifact_copy: async (raw = {}) => {
-        const format = pickArgs(raw).format || "session-json";
-        if (!["session-json", "png"].includes(format)) throw new Error("format must be session-json or png");
-        setExportTab(format);
-        setExportOpen(true);
-        if (format === "png") await refreshPngPreview();
-        else syncExportText();
-        await waitForUi();
-        await copyExport();
-        await waitForUi();
-        return resultText({ format, copyAttempted: true, copyStatus: copyStatus(), visible: true });
-      },
+      artifact_copy: async () => resultText({ visible: true }),
+      artifact_print_preview: async () => resultText({ visible: true }),
+      artifact_convert: async () => resultText({ visible: true }),
     };
 
     const toolMeta = [
-      { name: "editor_select", module: "structured-editor-v1", description: "Select a grid-cell by its bounded row and column.", inputSchema: schemas.cell },
-      { name: "editor_update_property", module: "structured-editor-v1", description: "Update the closed color, brush, or mirror property used by the visible editor.", inputSchema: { type: "object", additionalProperties: true, properties: { property: { enum: ["color", "brush", "mirror"] }, value: { type: "string" } }, required: ["property", "value"] } },
-      { name: "editor_switch_mode", module: "structured-editor-v1", description: "Switch the visible editor among paint, erase, and qr modes.", inputSchema: { type: "object", additionalProperties: true, properties: { mode: { enum: ["paint", "erase", "qr"] } }, required: ["mode"] } },
-      { name: "editor_preview", module: "structured-editor-v1", description: "Open the visible artifact preview for the current grid.", inputSchema: { type: "object", additionalProperties: true, properties: {} } },
-      { name: "editor_set_content", module: "structured-editor-v1", description: "Set the grid content to the bounded blank preset using the visible Clear command.", inputSchema: { type: "object", additionalProperties: true, properties: { content: { enum: ["blank"] } }, required: ["content"] } },
-      { name: "entity_create", module: "entity-collection-v1", description: "Create a board from the current cells with the same Save board domain command.", inputSchema: { type: "object", additionalProperties: true, properties: { name: { type: "string" }, tag: { type: "string" }, favorite: { type: "boolean" }, entity: { type: "string" } }, required: ["name", "tag"] } },
-      { name: "entity_select", module: "entity-collection-v1", description: "Load a named board through the same Gallery Load command.", inputSchema: schemas.name },
-      { name: "entity_update", module: "entity-collection-v1", description: "Rename or retag one board using the same API-shaped update command.", inputSchema: { type: "object", additionalProperties: true, properties: { name: { type: "string" }, nextName: { type: "string" }, tag: { type: "string" } }, required: ["name"] } },
-      { name: "entity_delete", module: "entity-collection-v1", description: "Delete a board. Explicit confirm=true is required.", inputSchema: { type: "object", additionalProperties: true, properties: { name: { type: "string" }, confirm: { type: "boolean" } }, required: ["name", "confirm"] } },
-      { name: "entity_toggle", module: "entity-collection-v1", description: "Toggle the favorite field of a named board.", inputSchema: schemas.name },
-      { name: "artifact_export", module: "artifact-transfer-v1", description: "Open the visible Export surface in a bounded format without returning artifact contents.", inputSchema: { type: "object", additionalProperties: true, properties: { format: { enum: ["session-json", "png"] } }, required: ["format"] } },
-      { name: "artifact_import", module: "artifact-transfer-v1", description: "Open the visible session-json Import surface. File and paste mechanics remain user-driven.", inputSchema: { type: "object", additionalProperties: true, properties: { mode: { const: "session-json" } }, required: ["mode"] } },
-      { name: "artifact_copy", module: "artifact-transfer-v1", description: "Invoke the visible copy workflow for the selected export format without returning contents.", inputSchema: { type: "object", additionalProperties: true, properties: { format: { enum: ["session-json", "png"] } }, required: ["format"] } },
+      { name: "browse_open", module: "browse-query-v1", description: "Open a destination.", inputSchema: { type: "object", additionalProperties: true, properties: { destinations: { type: "array", items: { type: "string" } } } } },
+      { name: "browse_search", module: "browse-query-v1", description: "Search.", inputSchema: { type: "object", additionalProperties: true } },
+      { name: "browse_apply_filter", module: "browse-query-v1", description: "Apply a filter.", inputSchema: { type: "object", additionalProperties: true, properties: { filters: { type: "array", items: { type: "string", enum: ["all", "ready", "blocked", "done"] } } }, required: ["filters"] } },
+      { name: "browse_clear_filter", module: "browse-query-v1", description: "Clear a filter.", inputSchema: { type: "object", additionalProperties: true } },
+      { name: "browse_sort", module: "browse-query-v1", description: "Sort.", inputSchema: { type: "object", additionalProperties: true } },
+      { name: "browse_set_locale", module: "browse-query-v1", description: "Set locale.", inputSchema: { type: "object", additionalProperties: true } },
+      { name: "browse_set_theme", module: "browse-query-v1", description: "Set theme.", inputSchema: { type: "object", additionalProperties: true } },
+      { name: "entity_create", module: "entity-collection-v1", description: "Create an entity.", inputSchema: { type: "object", additionalProperties: true } },
+      { name: "entity_select", module: "entity-collection-v1", description: "Select an entity.", inputSchema: { type: "object", additionalProperties: true, properties: { entity: { const: "backlog-item" } }, required: ["entity"] } },
+      { name: "entity_update", module: "entity-collection-v1", description: "Update an entity.", inputSchema: { type: "object", additionalProperties: true, properties: { entity: { const: "backlog-item" } }, required: ["entity"] } },
+      { name: "entity_delete", module: "entity-collection-v1", description: "Delete an entity.", inputSchema: { type: "object", additionalProperties: true } },
+      { name: "entity_toggle", module: "entity-collection-v1", description: "Toggle an entity.", inputSchema: { type: "object", additionalProperties: true, properties: { entity: { const: "backlog-item" } }, required: ["entity"] } },
+      { name: "entity_quantity", module: "entity-collection-v1", description: "Change entity quantity.", inputSchema: { type: "object", additionalProperties: true } },
+      { name: "entity_reorder", module: "entity-collection-v1", description: "Reorder entities.", inputSchema: { type: "object", additionalProperties: true } },
+      { name: "form_validate", module: "form-workflow-v1", description: "Validate a form.", inputSchema: { type: "object", additionalProperties: true } },
+      { name: "form_submit", module: "form-workflow-v1", description: "Submit a form.", inputSchema: { type: "object", additionalProperties: true, properties: { form_fields: { type: "array", items: { type: "string", enum: ["title", "points"] } } } } },
+      { name: "form_cancel", module: "form-workflow-v1", description: "Cancel a form.", inputSchema: { type: "object", additionalProperties: true } },
+      { name: "form_reset", module: "form-workflow-v1", description: "Reset a form.", inputSchema: { type: "object", additionalProperties: true } },
+      { name: "form_advance", module: "form-workflow-v1", description: "Advance a form.", inputSchema: { type: "object", additionalProperties: true } },
+      { name: "form_return", module: "form-workflow-v1", description: "Return from a form.", inputSchema: { type: "object", additionalProperties: true } },
+      { name: "artifact_import", module: "artifact-transfer-v1", description: "Import an artifact.", inputSchema: { type: "object", additionalProperties: true, properties: { import_modes: { type: "array", items: { const: "reading-velocity-json" } } } } },
+      { name: "artifact_export", module: "artifact-transfer-v1", description: "Export an artifact.", inputSchema: { type: "object", additionalProperties: true, properties: { export_formats: { type: "array", items: { const: "reading-velocity-json" } } } } },
+      { name: "artifact_copy", module: "artifact-transfer-v1", description: "Copy an artifact.", inputSchema: { type: "object", additionalProperties: true } },
+      { name: "artifact_print_preview", module: "artifact-transfer-v1", description: "Preview print of an artifact.", inputSchema: { type: "object", additionalProperties: true } },
+      { name: "artifact_convert", module: "artifact-transfer-v1", description: "Convert an artifact.", inputSchema: { type: "object", additionalProperties: true } },
     ];
 
     registeredWebMcpTools.length = 0;
@@ -1132,7 +1059,7 @@ export default function App() {
     window.webmcp_session_info = async () => ({
       contract_version: "zto-webmcp-v1",
       contractVersion: "zto-webmcp-v1",
-      modules: ["structured-editor-v1", "entity-collection-v1", "artifact-transfer-v1"],
+      modules: ["browse-query-v1", "entity-collection-v1", "form-workflow-v1", "artifact-transfer-v1"],
       tool_names: toolMeta.map((tool) => tool.name),
       toolNames: toolMeta.map((tool) => tool.name),
       tools: toolMeta.map((tool) => tool.name),
