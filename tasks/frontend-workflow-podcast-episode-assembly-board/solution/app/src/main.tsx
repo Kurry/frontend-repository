@@ -68,7 +68,7 @@ if (typeof window !== 'undefined') {
           return { ok: true, operation: toolName, id: args.id };
         case 'entity.toggle':
           if (args.field === 'citation') store.fixCitation(String(args.id));
-          else if (args.field === 'approval') store.approve();
+          else if (args.field === 'approval') store.approveCategory(args.category || 'master');
           else return { ok: false, error: 'field must be citation or approval' };
           return { ok: true, operation: toolName, field: args.field };
         case 'editor.switch_mode':
@@ -76,7 +76,8 @@ if (typeof window !== 'undefined') {
         case 'editor.preview':
         case 'artifact.export':
         case 'artifact.copy':
-          return { ok: true, operation: toolName, format: args.format || 'canonical-json', artifact: store.exportData() };
+          store.generateExportOutputs();
+          return { ok: true, operation: toolName, format: args.format || 'canonical-json', artifact: useStore.getState().exportDataOutputs.json };
         case 'artifact.import':
           if (args.mode !== 'canonical-json' || typeof args.data !== 'string') return { ok: false, error: 'mode canonical-json and string data are required' };
           store.importData(args.data);
@@ -87,10 +88,14 @@ if (typeof window !== 'undefined') {
         case 'session.restart':
           store.branchCut('main');
           store.render();
-          return { ok: true, operation: toolName, branch: useStore.getState().branch, renderStatus: useStore.getState().renderStatus };
+          return { ok: true, operation: toolName, branch: useStore.getState().branch, renderStatus: useStore.getState().renderPipeline.status };
         case 'session.advance':
-          store.render();
-          return { ok: true, operation: toolName, renderStatus: useStore.getState().renderStatus };
+          if (store.renderPipeline.status === 'failed') {
+            store.retryRender();
+          } else {
+            store.render();
+          }
+          return { ok: true, operation: toolName, renderStatus: useStore.getState().renderPipeline.status };
         case 'session.pause':
         case 'session.resume':
         case 'session.stop':
