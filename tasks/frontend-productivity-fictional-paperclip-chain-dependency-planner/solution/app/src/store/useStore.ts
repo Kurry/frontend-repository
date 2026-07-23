@@ -81,9 +81,13 @@ export const useStore = create<AppState>((set, get) => ({
         if (isCyclic(t.id)) hasCycle = true;
       }
 
+
       if (hasCycle) {
-        return { plan: state.plan };
+        // Leave it as preview state so the cycle sheet can render
+        const clips = state.plan.clips.map(c => c.id === clipId ? { ...c, status: 'preview' as const, sourceTaskId: sourceId, targetTaskId: targetId } : c);
+        return { plan: { ...state.plan, clips } };
       }
+
 
       const clips = state.plan.clips.map(c => {
         if (c.id === clipId) {
@@ -113,8 +117,19 @@ export const useStore = create<AppState>((set, get) => ({
     });
   },
 
-  previewClip: (_clipId, _sourceId, _targetId) => set((state) => {
-    return { plan: state.plan };
+  previewClip: (clipId, sourceId, targetId) => set((state) => {
+    const clips = state.plan.clips.map(c => {
+      if (c.id === clipId) {
+        return {
+          ...c,
+          status: 'preview' as const,
+          sourceTaskId: sourceId,
+          targetTaskId: targetId
+        };
+      }
+      return c;
+    });
+    return { plan: { ...state.plan, clips } };
   }),
 
   cancelClip: (clipId) => set((state) => {

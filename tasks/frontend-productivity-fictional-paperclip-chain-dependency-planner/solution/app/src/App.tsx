@@ -7,6 +7,7 @@ import IssueGraph from './components/IssueGraph';
 import RehearsalController from './components/RehearsalController';
 import BranchCompare from './components/BranchCompare';
 import CompactMobileView from './components/CompactMobileView';
+import CyclePreviewSheet from './components/CyclePreviewSheet';
 import { initializeWebMCP } from './webmcp';
 
 function App() {
@@ -76,6 +77,7 @@ function App() {
 
       <div className="flex-1 md:hidden overflow-hidden">
          <CompactMobileView />
+         <CyclePreviewSheet />
       </div>
     </div>
   );
