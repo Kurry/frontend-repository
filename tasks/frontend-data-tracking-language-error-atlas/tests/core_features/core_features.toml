@@ -1,0 +1,217 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "span_aligned_correction_replace"
+description = "Users select an exact source range and create replace correction operation. Operations render an aligned diff."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "span_aligned_correction_insert"
+description = "Users select an exact source range and create insert correction operation. Operations render an aligned diff."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "span_aligned_correction_delete"
+description = "Users select an exact source range and create delete correction operation. Operations render an aligned diff."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "span_aligned_correction_move"
+description = "Users select an exact source range and create move correction operation. Operations render an aligned diff."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "span_aligned_correction_split_merge"
+description = "Users select an exact source range and create split/merge correction operation. Operations render an aligned diff."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "correction_review_accept"
+description = "Users accept a candidate correction, preserving author/source, rationale, confidence label, and before/after text."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "correction_review_edit"
+description = "Users edit a candidate correction, preserving author/source, rationale, confidence label, and before/after text."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "correction_review_reject"
+description = "Users reject a candidate correction, preserving author/source, rationale, confidence label, and before/after text."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "correction_review_branch"
+description = "Users branch a candidate correction, preserving author/source, rationale, confidence label, and before/after text."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "error_taxonomy_primary_type"
+description = "Accepted corrections bind exactly one primary error type."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "error_taxonomy_secondary_type"
+description = "Accepted corrections can optionally bind a secondary error type."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "error_taxonomy_concept_binding"
+description = "Accepted corrections bind one or more concepts."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "error_taxonomy_concept_edges"
+description = "Concepts connect by prerequisite, contrast, or often-confused edges."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "error_taxonomy_concept_selection"
+description = "Selecting any concept highlights exact spans, corrections, prompts, attempts, and scheduled exercises."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "pattern_clustering_create"
+description = "Users group accepted errors into named patterns based on learner rule, context signature, and concept set."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "pattern_clustering_matrix_counts"
+description = "The matrix crosses pattern/concept against attempt/date and distinguishes occurrence, opportunity-without-error, not-applicable, and unreviewed. Counts and rates use exact denominators."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "contrast_exercise_compose_identify"
+description = "Users assemble deterministic fixture sentence pairs into identify tasks binding target concept/pattern, prerequisite concepts, source error ids, acceptable operation set, and scoring rule."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "contrast_exercise_compose_choose"
+description = "Users assemble deterministic fixture sentence pairs into choose tasks binding target concept/pattern, prerequisite concepts, source error ids, acceptable operation set, and scoring rule."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "contrast_exercise_compose_rewrite"
+description = "Users assemble deterministic fixture sentence pairs into rewrite tasks binding target concept/pattern, prerequisite concepts, source error ids, acceptable operation set, and scoring rule."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "contrast_exercise_compose_explain"
+description = "Users assemble deterministic fixture sentence pairs into explain tasks binding target concept/pattern, prerequisite concepts, source error ids, acceptable operation set, and scoring rule."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "contrast_exercise_schedule"
+description = "Scheduling uses due date, spacing stage, and conflict with other tasks; edits create versioned exercise definitions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "attempt_and_review_workflow_submit"
+description = "An exercise run moves ready -> active -> submitted -> evaluated -> reviewed -> scheduled-next/complete."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "attempt_and_review_workflow_eval"
+description = "The deterministic evaluator returns exact operation alignment and partial-credit components."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "transfer_and_mastery_timeline"
+description = "A timeline shows intervention, opportunities, recurrence, and confidence bands using fixed fixture formulas, without claiming general language mastery."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "responsive_atlas_desktop"
+description = "Desktop shows text/diff, concept graph, recurrence matrix, and exercise/transfer rail."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "responsive_atlas_export"
+description = "Export produces canonical JSON, CSV span/correction/attempt ledger, Markdown contrast practice pack with answer key, and SVG concept/recurrence map; import reconstructs state exactly."
+type = "binary"
+weight = 1.0
