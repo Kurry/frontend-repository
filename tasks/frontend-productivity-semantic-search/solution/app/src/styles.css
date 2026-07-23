@@ -224,3 +224,7 @@ kbd { font-family: var(--font-mono); font-size: 11px; padding: 2px 6px; border: 
   button, .cds--btn, .cds--toggle__label { min-height: 44px; }
   .cds--slider-container { min-height: 44px; }
 }
+
+.cds--text-input[data-invalid] { border-bottom: 2px solid #da1e28 !important; }
+
+.cds--text-area[data-invalid], .cds--select-input[data-invalid] { border-bottom: 2px solid #da1e28 !important; outline: 2px solid transparent !important; }
