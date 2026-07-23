@@ -418,6 +418,7 @@ kbd {
 .fav-star { width: 19px; height: 19px; color: rgba(var(--ink), 0.55); transition: transform 0.25s var(--ease-out), color 0.25s ease; display: block; }
 .fav-star.is-filled { color: rgb(var(--ink)); }
 .palette-card__fav:hover .fav-star { transform: scale(1.18); color: rgb(var(--ink)); }
+.palette-card__fav[aria-pressed="true"] { animation: fav-pop 0.4s var(--ease-out); }
 .palette-card__fav[aria-pressed="true"] .fav-star { animation: fav-pop 0.4s var(--ease-out); }
 @keyframes fav-pop { 0% { transform: scale(0.6); } 55% { transform: scale(1.35); } 100% { transform: scale(1); } }
 
@@ -955,3 +956,8 @@ textarea.ed-input { border: 1px solid rgba(var(--ink), 0.4); resize: vertical; }
   }
   [data-reveal] { opacity: 1; transform: none; }
 }
+
+#catalog-preview { animation: veil-in 0.25s ease; }
+
+#btn-copy-export { transition: background-color 0.3s ease, color 0.3s ease; }
+#btn-copy-export.is-copied { background-color: rgb(var(--ink)); color: rgb(var(--bg)); }
