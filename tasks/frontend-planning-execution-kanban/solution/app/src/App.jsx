@@ -786,13 +786,13 @@ function ExportDrawer({ shown }) {
   })
 
   const exportData = useMemo(() => {
-    if (!open) return { json: '', markdown: '' }
+//    if (!open) return { json: '', markdown: '' }
     return {
       json: compileJSON(state),
       markdown: compileMarkdown(state),
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, state.board, state.cards, state.order, state.prompts, state.assignees, state.wipLimits])
+  }, [state.board, state.cards, state.order, state.prompts, state.assignees, state.wipLimits])
 
   const selectedIndex = state.exportFormat === 'json' ? 0 : 1
   const importReg = importForm.register('import')
