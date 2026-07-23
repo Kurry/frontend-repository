@@ -90,7 +90,7 @@ export default function Overlay({
     if (!mounted) return;
     const handler = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        if (overlayStack[overlayStack.length - 1] === id) {
+        if (overlayStack.includes(id)) {
           event.preventDefault();
           event.stopPropagation();
           onCloseRef.current();
@@ -155,7 +155,7 @@ export default function Overlay({
         <div
           ref={panelRef}
           role="dialog"
-          aria-modal="true"
+          aria-modal={backdrop ? "true" : "false"}
           aria-label={labelledBy ? undefined : label}
           aria-labelledby={labelledBy}
           className={`pointer-events-auto rounded-lg shadow-2xl transition-[opacity,transform] duration-[250ms] ease-out will-change-transform ${

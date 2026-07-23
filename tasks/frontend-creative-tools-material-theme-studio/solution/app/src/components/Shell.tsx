@@ -60,7 +60,7 @@ function TutorialDialog({ open, onClose }: { open: boolean; onClose: () => void 
       </div>
 
       <div className="px-5 py-5">
-        <p className="text-xs font-medium uppercase tracking-wide text-blue-600">
+        <p className="text-xs font-medium uppercase tracking-wide text-blue-600 hover:underline">
           Step {step + 1} of {TOUR_STEPS.length} — guided tour
         </p>
         <h3 className="mt-1 text-xl font-semibold text-gray-900">{current.title}</h3>
@@ -164,7 +164,7 @@ export default function Shell({ children }: { children: ReactNode }) {
           </button>
           <button
             type="button"
-            className="px-3 py-1.5 text-sm font-medium text-blue-400 hover:bg-blue-400/10 rounded transition-colors outline-none focus-visible:ring-2 focus-visible:ring-blue-400 min-h-11"
+            className="px-3 py-1.5 text-sm font-medium text-blue-400 hover:bg-blue-400/10 hover:underline rounded transition-colors outline-none focus-visible:ring-2 focus-visible:ring-blue-400 min-h-11"
             id="btn-tutorial"
             onClick={() => setTutorialOpen(true)}
           >
@@ -219,7 +219,7 @@ export default function Shell({ children }: { children: ReactNode }) {
         />
       </nav>
 
-      <main className="flex-1 overflow-hidden relative">{children}</main>
+      <main className="flex-1 overflow-hidden lg:overflow-hidden relative flex flex-col">{children}</main>
 
       {/* Polite live region for validation + status announcements. The span is
           re-keyed on every announce dispatch so identical consecutive messages

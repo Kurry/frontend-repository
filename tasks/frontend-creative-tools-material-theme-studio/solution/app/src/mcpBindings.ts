@@ -205,6 +205,7 @@ export function initializeWebMCP() {
         const options = args.palette ? { ...current, palette: mergePalette(current.palette, args.palette) } : current;
         store.dispatch(createTheme({ id, name: themeName, options }));
         store.dispatch(setTab('saved'));
+        store.dispatch(closeThemeForm());
         return { success: true };
       }
       case 'entity_select': {
