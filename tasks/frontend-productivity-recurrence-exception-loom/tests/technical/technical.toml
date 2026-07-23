@@ -1,0 +1,266 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "clean_state_begin"
+name = "clean_state_begin"
+description = "Begin from a genuinely clean state. No authored work, completion, approval, export, or success evidence may be preseeded."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "milestone_observable_after_action"
+name = "milestone_observable_after_action"
+description = "Each milestone must become observable only after its real UI action, with exact before and after entity and event count deltas."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "path_convergence"
+name = "path_convergence"
+description = "For every pointer or direct manipulation path, the keyboard or exact value path must converge to one canonical event with identical stable IDs, derived values, linked view selection, history, WebMCP state, persistence, and export bytes."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "no_extra_events"
+name = "no_extra_events"
+description = "No op, invalid, cancelled, and double activation paths must create zero extra events."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "adversarial_orderings"
+name = "adversarial_orderings"
+description = "Exercise adversarial orderings: canonical edit before and after merge/repair/reconciliation/approval; undo followed by branch; cancel after transient preview; import after divergent edits. Equivalent orders must converge."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "cancelled_actions_restore"
+name = "cancelled_actions_restore"
+description = "Cancelled actions restore the complete prior snapshot including selection, viewport, filters, focus, and history anchor."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "import_atomic_transaction"
+name = "import_atomic_transaction"
+description = "Treat every import mode as an atomic transaction over the same API shaped schema used by create, edit, and export."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "validate_records_fields"
+name = "validate_records_fields"
+description = "Validate all records and fields before commit. Report every file, record, and field diagnostic together."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "reject_invalid_import"
+name = "reject_invalid_import"
+description = "Reject unknown enums, exact boundary violations, duplicate or dangling IDs, cross field contradictions, stale derived values, and corrupted manifests with zero state mutation."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "interoperable_artifact"
+name = "interoperable_artifact"
+description = "The useful end state is an interoperable downloadable artifact of the session actual work with specified schemas, keys, units, and regenerated generatedAt and exportedAt."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "successful_import_restore"
+name = "successful_import_restore"
+description = "A successful import must restore authored and derived state, and re export must be semantically identical except for explicitly allowed regenerated metadata."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "reload_behavior"
+name = "reload_behavior"
+description = "State that the PRD promises to persist must survive reload exactly. Transient previews, dialogs, hover, drag, and invalid drafts must not leak into persistence."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "isolation"
+name = "isolation"
+description = "Separate sessions and import attempts must not silently share or overwrite state."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "bounded_fields_rules"
+name = "bounded_fields_rules"
+description = "Cover exact minimum, maximum, just inside, and just outside values for every bounded field, plus enum, format, uniqueness, and cross field rules."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "error_copy"
+name = "error_copy"
+description = "Error copy must identify the field, rejected value or rule, and recovery action. Correcting the value must clear only the corresponding error."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "real_browser_mechanics"
+name = "real_browser_mechanics"
+description = "Require real browser mechanics for evaluated interactions: normal pointer actionability, computed style while actually hovered, keyboard traversal, named shortcuts, modal focus trap, live announcements, non color evidence, reduced motion parity."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "performance_targets"
+name = "performance_targets"
+description = "At the maximum declared fixture, direct manipulation acknowledges within 100 ms, linked and derived views settle within 500 ms, and export/import complete within 2 s without dropped interactions, stale views, layout jumps, console errors, page errors, or non local network dependence."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "artifact_schema_version"
+name = "artifact_schema_version"
+description = "RecurrenceTaskPlan uses schemaVersion recurrence task plan v1 and stores all required data."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "artifact_series_identities"
+name = "artifact_series_identities"
+description = "Series ids and recurrence identities are stable; expansion follows declared local time, DST, holiday, inclusive end, and count semantics."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "artifact_parent_child"
+name = "artifact_parent_child"
+description = "Parent and child series intervals do not overlap; scope mutations preserve immutable past records and form an acyclic lineage."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "artifact_exceptions"
+name = "artifact_exceptions"
+description = "Exception events reference one valid occurrence; rejoin requires canonical field equality; skip and detach states are mutually exclusive."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "artifact_dependency_graph"
+name = "artifact_dependency_graph"
+description = "Dependency graph is acyclic and bound occurrences obey edge policy; split durations sum exactly."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "artifact_focus_event"
+name = "artifact_focus_event"
+description = "Focus event state machine is valid and append only; elapsed seconds derive from logical clock; completion gates use focused seconds."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "artifact_ics_csv"
+name = "artifact_ics_csv"
+description = "ICS masters use RRULE, EXDATE, RECURRENCE ID correctly with fixed UID mapping; CSV rows agree with occurrence and session ledger."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "artifact_import_rejects"
+name = "artifact_import_rejects"
+description = "Import rejects fixture or timezone mismatch, impossible recurrence, lineage or dependency cycle, overlapping generations, orphan exception or session, invalid timer event, forged derivation or checksum, or ICS or CSV disagreement atomically."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "artifact_canonical_reexport"
+name = "artifact_canonical_reexport"
+description = "Canonical re export changes only exportedAt; ICS and CSV remain byte identical."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "deterministic_outcomes"
+name = "deterministic_outcomes"
+description = "Stream replay, retry, and cancellation outcomes are deterministic and non duplicated."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "zero_partial_mutation"
+name = "zero_partial_mutation"
+description = "Zero partial mutation on validation or import failure."
+type = "binary"
+weight = 1.0
