@@ -78,7 +78,7 @@ export function seedEvents() {
 }
 
 export const DEFAULT_RANGE = {
-  from: formatISO(subDays(END_DATE, 29), { representation: 'date' }),
+  from: formatISO(subDays(END_DATE, 95), { representation: 'date' }),
   to: formatISO(END_DATE, { representation: 'date' }),
 };
 

@@ -193,6 +193,7 @@ html[data-theme="dark"] .segmented button.active { background: #f4f4f4; color: #
 .burn-track { height: 8px; background: color-mix(in srgb, var(--canvas) 75%, var(--line)); margin: .48rem 0 .4rem; overflow: hidden; }
 .burn-fill { height: 100%; background: var(--teal); transition: width 450ms cubic-bezier(.2, .8, .2, 1), background-color 300ms ease; }
 .team-row.over .burn-fill { background: repeating-linear-gradient(135deg, var(--error), var(--error) 5px, color-mix(in srgb, var(--error) 45%, white) 5px, color-mix(in srgb, var(--error) 45%, white) 9px); }
+.team-row.over { outline: 2px solid var(--error); outline-offset: -2px; padding: .85rem; }
 .overage-text { color: var(--error-text); font-size: .68rem; font-weight: 600; display: flex; align-items: center; gap: .3rem; }
 .ceiling-edit { margin-top: .5rem; display: flex; gap: .4rem; align-items: flex-end; }
 .ceiling-label { color: var(--muted); margin-bottom: .25rem; }
