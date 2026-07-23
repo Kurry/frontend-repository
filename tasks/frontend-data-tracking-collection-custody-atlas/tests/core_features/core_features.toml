@@ -1,0 +1,174 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "catalog_object_and_evidence"
+name = "catalog_object_and_evidence"
+description = "Users can catalog an object with title, creator, date range, medium, dimensions, identifiers, tags, and environmental class, and bind source evidence to assertions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "branch_provenance"
+name = "branch_provenance"
+description = "Users can place ownership, custody, and location events on a timeline, and branch a provenance interpretation for disputed intervals."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "annotate_condition_region"
+name = "annotate_condition_region"
+description = "Users can draw rectangular or polygonal regions on an object outline to mark conditions and resolve findings by appending evidence."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "place_and_rotate_exhibit"
+name = "place_and_rotate_exhibit"
+description = "Users can drag, rotate 90 degrees, and place objects into rectangular footprints on case shelves, adhering to spatial and compatibility rules."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "schedule_rotation_exposure"
+name = "schedule_rotation_exposure"
+description = "Users can schedule rotation intervals on object and case timelines that accumulate fixture light and exposure points under maximum threshold rules."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "execute_loan_custody"
+name = "execute_loan_custody"
+description = "A simulated loan progresses through checkpoints requiring an exact object set, actor, time, seal id, and attached evidence."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "reconcile_discrepancy"
+name = "reconcile_discrepancy"
+description = "Users can reconcile a discrepancy (like a mismatched seal or missing object) by correcting a manifest revision, returning an object, or rolling back a pending transfer."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "certify_collection"
+name = "certify_collection"
+description = "Users can certify the state of the catalog and collection."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "export_artifacts"
+name = "export_artifacts"
+description = "Users can export the collection state into JSON, CSV, SVG, and Markdown artifacts that agree with the current views."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "clean_state_start"
+name = "clean_state_start"
+description = "The app begins from a clean state with no authored work, preseeded completions, approvals, exports, or success evidence visible."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "transient_state_isolation"
+name = "transient_state_isolation"
+description = "Transient previews, dialogs, hover, drag, and invalid drafts do not leak into persistence, and reloading the page retains only exact intended state."
+type = "binary"
+weight = 1.0
