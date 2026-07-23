@@ -7,8 +7,8 @@ export const STEP_STATUSES = ['pending', 'running', 'complete', 'failed', 'retry
 
 export const createAgentSchema = z.object({
   name: z.string().trim().min(1, 'Name is required').min(2, 'Name must be 2 to 40 characters').max(40, 'Name must be 2 to 40 characters'),
-  agentType: z.enum(AGENT_TYPES, { error: 'Agent type is required' }),
-  editorIntegration: z.enum(EDITORS, { error: 'Editor integration is required' }),
+  agentType: z.enum(AGENT_TYPES, { message: 'Agent type is required' }),
+  editorIntegration: z.enum(EDITORS, { message: 'Editor integration is required' }),
   accessKey: z.string().min(1, 'Access key is required').min(16, 'Access key must be 16 to 64 characters').max(64, 'Access key must be 16 to 64 characters').regex(/^[A-Za-z0-9_-]+$/, 'Access key may use only letters, digits, hyphens, and underscores'),
 })
 

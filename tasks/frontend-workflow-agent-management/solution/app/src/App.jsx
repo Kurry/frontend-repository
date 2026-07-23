@@ -384,6 +384,17 @@ function ActivityTab({ agent }) {
 function DetailPanel() {
   const store = useFleetStore()
   const agent = store.agents.find((item) => item.id === store.detailAgentId)
+  useEffect(() => {
+    if (!agent) return undefined
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        event.stopPropagation()
+        store.closeDetail()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [agent, store.closeDetail])
   if (!agent) return null
   return (
     <>
@@ -456,7 +467,7 @@ function ImportModal() {
     if (result.success) importFleet(result.data)
   }
   return (
-    <Modal open modalHeading="Import fleet" modalLabel="Fleet snapshot" primaryButtonText="Import fleet" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || isSubmitting} onRequestClose={close} onSecondarySubmit={close} onRequestSubmit={handleSubmit(submit)} size="lg" preventCloseOnClickOutside selectorPrimaryFocus="#fleet-json-import">
+    <Modal open modalHeading="Import fleet" modalLabel="Fleet snapshot" primaryButtonText="Import fleet" secondaryButtonText="Cancel" primaryButtonDisabled={isSubmitting} onRequestClose={close} onSecondarySubmit={close} onRequestSubmit={handleSubmit(submit)} size="lg" preventCloseOnClickOutside selectorPrimaryFocus="#fleet-json-import">
       <div ref={containerRef}>
         <p className="modal-intro">Paste a complete fleet JSON document. A valid import replaces the current registry and can be undone.</p>
         <Controller name="jsonText" control={control} render={({ field }) => (

@@ -246,7 +246,7 @@ export const useFleetStore = create((set, get) => ({
         announcement: `${target.name} removed`,
       }))
       get().addToast(`${target.name} removed`)
-    }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 300)
+    }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 210)
     return true
   },
 
