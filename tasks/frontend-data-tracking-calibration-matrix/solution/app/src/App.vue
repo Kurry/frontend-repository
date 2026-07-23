@@ -16,6 +16,16 @@ useECharts([CanvasRenderer, BarChart, GridComponent, TooltipComponent, LegendCom
 
 const store = useCalibrationStore()
 const lastCellTrigger = ref(null)
+
+onMounted(() => {
+  setTimeout(() => {
+    document.querySelectorAll('.v-field__append-inner, .v-field__clearable').forEach(container => {
+      const btn = container.querySelector('[role="button"]');
+      if (btn && !btn.getAttribute('aria-label')) btn.setAttribute('aria-label', 'Toggle dropdown');
+    });
+  }, 500);
+})
+
 const lastOverlayTrigger = ref(null)
 const exportTrigger = ref(null)
 const paletteTrigger = ref(null)
@@ -284,13 +294,13 @@ function onThresholdUpdate(value) {
   store.beginThresholdEdit()
   store.previewThreshold(value)
   if (thresholdCommitTimer) window.clearTimeout(thresholdCommitTimer)
-  thresholdCommitTimer = window.setTimeout(finishThreshold, 80)
+  thresholdCommitTimer = window.setTimeout(finishThreshold, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 80)
 }
 
 function selectCommand(command) {
-  command.run()
   store.ui.paletteOpen = false
   paletteQuery.value = ''
+  setTimeout(() => command.run(), 50)
 }
 
 async function copyActive() {
@@ -539,7 +549,7 @@ onBeforeUnmount(() => {
         </v-tooltip>
         <v-btn class="toolbar-button" prepend-icon="mdi-import" variant="tonal" size="small" aria-label="Import triage pack" @click="openImport">Import</v-btn>
         <v-btn ref="exportTrigger" class="toolbar-button" prepend-icon="mdi-export-variant" color="primary" size="small" aria-label="Export calibration pack" @click="openExport">Export</v-btn>
-        <button ref="paletteTrigger" class="command-key" aria-label="Open command palette" @click="openPalette"><v-icon icon="mdi-magnify" size="17" /> <span>⌘ K</span></button>
+        <button ref="paletteTrigger" class="command-key" aria-label="Open command palette" @click="openPalette"><v-icon icon="mdi-magnify" size="17" aria-hidden="true" /> <span>⌘ K</span></button>
       </div>
     </header>
 
@@ -564,7 +574,7 @@ onBeforeUnmount(() => {
         <v-btn class="coach-dismiss" variant="text" size="small" @click="store.dismissTips">Got it</v-btn>
       </section>
 
-      <section class="filter-card panel-card" aria-label="Calibration filters">
+      <section class="filter-card panel-card" role="search" aria-label="Calibration filters">
         <div class="filter-title">
           <span><v-icon icon="mdi-tune-variant" size="18" /> Filters</span>
           <span class="filter-count">{{ activeFilterCount ? `${activeFilterCount} narrowing inputs` : 'Showing all data' }}</span>
@@ -599,13 +609,13 @@ onBeforeUnmount(() => {
         ><v-icon :icon="item.icon" size="18" />{{ item.label }}</button>
       </nav>
 
-      <section v-if="store.activeView === 'heatmap'" class="workspace-grid heatmap-workspace">
+      <section v-if="store.activeView === 'heatmap'" class="workspace-grid heatmap-workspace" role="main" aria-label="Heatmap">
         <article class="panel-card heatmap-card">
           <div class="panel-heading">
             <div><p class="section-label">CALIBRATION MATRIX</p><h3>Mean reward by harness</h3></div>
             <div class="ramp-legend" aria-label="Score color ramp"><span>Lower</span><i></i><span>Higher</span></div>
           </div>
-          <div v-if="store.activeModels.length && store.activeHarnesses.length" class="heatmap-scroll">
+          <div v-if="store.activeModels.length && store.activeHarnesses.length && store.activeCategories.length && store.tasks.some(t => store.activeCategories.includes(t.category))" class="heatmap-scroll">
             <table class="heatmap-table">
               <thead><tr><th>Model</th><th v-for="harness in store.activeHarnesses" :key="harness">{{ harness }}</th></tr></thead>
               <tbody>
@@ -740,7 +750,7 @@ onBeforeUnmount(() => {
       <section v-else-if="store.activeView === 'chart'" class="panel-card chart-card">
         <div class="panel-heading chart-heading">
           <div><p class="section-label">SCORE PROFILE</p><h3>Score by harness</h3><p class="panel-description">Live cell means for the selected model — values match the heatmap row exactly.</p></div>
-          <v-select class="model-selector" label="Model" :items="store.models" :model-value="store.selectedChartModel" hide-details @update:model-value="store.setChartModel" />
+          <v-select class="model-selector" label="Model" aria-label="Select model" :items="store.models" :model-value="store.selectedChartModel" hide-details @update:model-value="store.setChartModel" />
         </div>
         <div class="chart-legend" aria-label="Harness series legend">
           <button v-for="(harness, index) in store.activeHarnesses" :key="harness" role="switch" :aria-checked="String(Boolean(store.chartSeriesVisibility[harness]))" :class="{ off: !store.chartSeriesVisibility[harness] }" @click="store.toggleChartSeries(harness)"><i :class="`series-${index % 4}`"></i>{{ harness }}<v-icon :icon="store.chartSeriesVisibility[harness] ? 'mdi-eye-outline' : 'mdi-eye-off-outline'" size="15" /></button>
@@ -861,7 +871,7 @@ onBeforeUnmount(() => {
       <div class="palette-card">
         <div class="palette-search"><v-icon icon="mdi-magnify" /><input v-model="paletteQuery" placeholder="Type a command…" aria-label="Search commands"><kbd>Esc</kbd></div>
         <div class="command-list">
-          <button v-for="command in filteredCommands" :key="command.value" @click="selectCommand(command)"><span class="command-icon"><v-icon :icon="command.icon" /></span><span><strong>{{ command.label }}</strong><small>{{ command.hint }}</small></span><v-icon icon="mdi-arrow-right" class="command-arrow" /></button>
+          <button v-for="command in filteredCommands" :key="command.value" @click="selectCommand(command)" :aria-label="command.label"><span class="command-icon"><v-icon :icon="command.icon" /></span><span><strong>{{ command.label }}</strong><small>{{ command.hint }}</small></span><v-icon icon="mdi-arrow-right" class="command-arrow" /></button>
           <div v-if="!filteredCommands.length" class="palette-empty">No commands match “{{ paletteQuery }}”.</div>
         </div>
         <div class="palette-footer"><span><kbd>↑</kbd><kbd>↓</kbd> browse</span><span><kbd>↵</kbd> run</span><span>Meridian commands</span></div>
