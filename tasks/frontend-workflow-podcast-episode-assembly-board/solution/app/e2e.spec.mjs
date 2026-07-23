@@ -149,9 +149,10 @@ test('4.5 te_5 mobile reflow retains source, edit, lineage, approval, render, an
 
   await page.getByTitle(/Select Clip 1/).first().focus();
   await page.keyboard.press('Enter');
-  await expect(page.getByRole('region', { name: 'Selected clip editor' })).toBeVisible();
-  await expect(page.getByLabel('Episode start (ms)')).toBeVisible();
-  await expect(page.getByRole('region', { name: 'Approval and render stepper' })).toBeVisible();
+  const mobileInspector = page.getByRole('region', { name: 'Selected clip editor' }).last();
+  await expect(mobileInspector).toBeVisible();
+  await expect(mobileInspector.getByLabel('Episode start (ms)')).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Approval and render stepper' }).last()).toBeVisible();
 
   await page.getByRole('button', { name: 'Chapters' }).click();
   await expect(page.getByText(/Narrative Outline|Chapter Lineage/).first()).toBeVisible();
