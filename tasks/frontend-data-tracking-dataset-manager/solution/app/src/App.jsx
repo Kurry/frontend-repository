@@ -108,7 +108,7 @@ function FormulaBar() {
       <label htmlFor="formula" className="mono shrink-0 text-sm font-bold t-brand">ƒx</label>
       <input id="formula" list="formula-suggestions" className="input mono !min-h-8 !py-1 !text-xs flex-1" value={formulaInput}
         aria-invalid={Boolean(formulaResult?.error)} aria-describedby={formulaResult?.error ? 'formula-status' : 'formula-hint'}
-        onChange={(e) => setUi({ formulaInput: e.target.value, formulaResult: null })}
+        onChange={(e) => setUi({ formulaInput: e.target.value})}
         onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); evaluate() } }}
         placeholder="=AVERAGE(score) or =SUM(score, 1:100)" />
       <datalist id="formula-suggestions">
@@ -289,7 +289,7 @@ function VirtualGrid({ dataset, visibleRows }) {
                   className={cx('cell relative', field.type === 'number' && 'cell-num', flagged.includes(field.name) && 'flagged-cell')}
                   title={String(row.values[field.name])}
                   onDoubleClick={(e) => { e.stopPropagation(); openEditor(row, field.name) }}
-                  onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === 'F2') && e.target === e.currentTarget) { e.preventDefault(); openEditor(row, field.name) } }}
+                  onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === 'F2') && (!e.target.closest('input') && !e.target.closest('select'))) { e.preventDefault(); openEditor(row, field.name) } }}
                   role="gridcell" aria-label={`${field.name}: ${row.values[field.name]}${flagged.includes(field.name) ? ' (flagged)' : ''}`}>
                   {inline?.rowId === row.id && inline?.field === field.name
                     ? <InlineEditor row={row} field={field.name} schemaField={field} />
@@ -297,7 +297,7 @@ function VirtualGrid({ dataset, visibleRows }) {
                 </div>
               ))}
               <div tabIndex={0} className="cell relative" title={row.expectedOutput} onDoubleClick={(e) => { e.stopPropagation(); openEditor(row, 'expectedOutput') }}
-                onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === 'F2') && e.target === e.currentTarget) { e.preventDefault(); openEditor(row, 'expectedOutput') } }}
+                onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === 'F2') && (!e.target.closest('input') && !e.target.closest('select'))) { e.preventDefault(); openEditor(row, 'expectedOutput') } }}
                 role="gridcell" aria-label={`Expected output: ${row.expectedOutput}`}>
                 {inline?.rowId === row.id && inline?.field === 'expectedOutput' ? <InlineEditor row={row} field="expectedOutput" /> : <span className="cell-text">{row.expectedOutput}</span>}
               </div>
@@ -738,7 +738,7 @@ export default function App() {
           </div>
         )}
       </div>
-      <div className="sr-only" aria-live="assertive">{liveMessage}</div>
+      <div className="sr-only" aria-live="polite">{liveMessage}</div>
       <div className="sr-only" aria-live="assertive">{toast?.message}</div>
       <PrintSheet dataset={dataset} />
     </div>

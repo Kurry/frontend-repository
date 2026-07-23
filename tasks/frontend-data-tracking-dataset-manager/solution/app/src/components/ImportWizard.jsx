@@ -154,7 +154,7 @@ function WizardInner({ dataset }) {
               <h3 className="text-base font-bold t-primary">Map detected columns</h3>
               <p className="text-sm t-2">Matched schema headers arrive pre-assigned. Change any destination before continuing.</p>
             </div>
-            <div className="max-h-[52vh] overflow-auto rounded-lg hairline">
+            <div className="max-h-[52vh] overflow-auto overflow-x-auto rounded-lg hairline">
               <table className="w-full min-w-[620px] text-sm">
                 <thead className="sticky top-0 surface-3"><tr><th className="p-3 text-left text-xs font-bold uppercase t-2">CSV column</th><th className="p-3 text-left text-xs font-bold uppercase t-2">First values</th><th className="p-3 text-left text-xs font-bold uppercase t-2">Destination</th></tr></thead>
                 <tbody>
@@ -195,7 +195,7 @@ function WizardInner({ dataset }) {
                 <Tag tone="gray">{state.diagnostic.filter((r) => r.excluded).length} excluded</Tag>
               </div>
             </div>
-            <div className="mt-4 max-h-[50vh] overflow-auto rounded-lg hairline">
+            <div className="mt-4 max-h-[50vh] overflow-auto overflow-x-auto rounded-lg hairline">
               <table className="w-full min-w-[760px] text-xs">
                 <thead className="sticky top-0 z-10 surface-3"><tr><th className="p-2 text-left font-bold uppercase t-2">Exclude</th>{dataset.schema.map((f) => <th key={f.name} className="p-2 text-left font-bold uppercase t-2">{f.name}</th>)}<th className="p-2 text-left font-bold uppercase t-2">Expected output</th></tr></thead>
                 <tbody>

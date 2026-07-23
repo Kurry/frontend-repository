@@ -128,7 +128,7 @@ export function SnapshotPanel({ dataset }) {
           {chosen.length < 2 ? (
             <p className="mt-3 rounded-lg surface-2 p-5 text-sm t-3">Select two snapshots to compare. Added rows are green-tinted, removed rows red-tinted, and changed cells show old → new with the old value struck through.</p>
           ) : diff.length ? (
-            <div className="mt-3 space-y-3 overflow-x-auto pb-1" style={{ minWidth: 0 }}>
+            <div className="mt-3 space-y-3 overflow-x-auto pb-1" style={{ minWidth: 0, maxWidth: '100%' }}>
               <div className="min-w-[440px] space-y-3">
                 {diff.map((d, i) => (
                   <div key={d.id} className={cx('reveal-item rounded-lg hairline p-3', d.status === 'added' && 'diff-added', d.status === 'removed' && 'diff-removed', d.status === 'changed' && 'diff-changed')} style={{ animationDelay: `${Math.min(i, 12) * 55}ms` }}>
