@@ -1,0 +1,15 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+
+[[criterion]]
+id = "AC-03"
+title = "Causal and reduced motion parity"
+description = "Sample first/second jaw snaps, route detour, descendant interval push, issue resolution, rehearsal release, cycle cancel, and invalid return at early/settled frames; reduced motion exposes equivalent endpoints, route points, intervals, deltas, IDs, patterns, and phase status."
+weight = 1.0

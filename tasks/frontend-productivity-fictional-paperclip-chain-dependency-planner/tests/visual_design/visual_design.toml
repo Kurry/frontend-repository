@@ -1,0 +1,15 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+
+[[criterion]]
+id = "AC-02"
+title = "Desktop maker's planning desk"
+description = "At 1440x900, patterned task slips and clips dominate while matrix, schedule, slack, issues, rehearsal, and history form a deliberate maker's planning desk; loose, preview, invalid, committed, critical, selected, branched, rehearsed, and approved states remain legible without color alone."
+weight = 1.0

@@ -13,7 +13,6 @@ export function initializeWebMCP() {
       { name: "planner_get_critical_chain", description: "Read critical chain task IDs." },
       { name: "planner_get_issues", description: "List current unresolved issues." },
       { name: "planner_get_history", description: "Read the event and branch history." },
-      { name: "planner_get_artifact_preview", description: "Generate a preview of the ZIP payload data." },
       { name: "planner_set_selection", description: "Set active UI selection." },
       { name: "planner_set_viewport", description: "Set active viewport coordinates." },
       { name: "planner_set_timeline_brush", description: "Set active timeline brush window." },
@@ -37,9 +36,6 @@ export function initializeWebMCP() {
       { name: "planner_undo_actor_event", description: "Selectively undo an actor's event." },
       { name: "planner_redo_actor_event", description: "Selectively redo an actor's event." },
       { name: "planner_approve_plan", description: "Approve the entire plan." },
-      { name: "planner_validate_import", description: "Validate an import payload without mutating." },
-      { name: "planner_confirm_import", description: "Commit a validated import payload." },
-      { name: "planner_cancel_import", description: "Cancel an active import operation." },
       { name: "planner_export_packet", description: "Trigger the ZIP artifact export." }
     ];
   };
@@ -50,36 +46,37 @@ export function initializeWebMCP() {
 
     try {
       switch (toolName) {
-        case 'planner_get_plan_session':
-          return { success: true, result: { planId: plan.planId, revision: plan.revision } };
-        case 'planner_get_plan':
-          return { success: true, result: plan };
-        case 'planner_list_tasks':
-          return { success: true, result: plan.tasks };
-        case 'planner_get_task':
-          return { success: true, result: plan.tasks.find((t: any) => t.id === args.id) };
-        case 'planner_list_clips':
-          return { success: true, result: plan.clips };
-        case 'planner_get_clip':
-          return { success: true, result: plan.clips.find((c: any) => c.id === args.id) };
-        case 'planner_get_schedule':
-          return { success: true, result: plan.schedule };
-        case 'planner_get_critical_chain':
-          return { success: true, result: plan.schedule.criticalTaskIds };
-        case 'planner_get_issues':
-          return { success: true, result: plan.issues };
-        case 'planner_get_history':
-          return { success: true, result: plan.history };
+        case 'planner_get_plan_session': return { success: true, result: { planId: plan.planId, revision: plan.revision } };
+        case 'planner_get_plan': return { success: true, result: plan };
+        case 'planner_list_tasks': return { success: true, result: plan.tasks };
+        case 'planner_get_task': return { success: true, result: plan.tasks.find((t: any) => t.id === args.id) };
+        case 'planner_list_clips': return { success: true, result: plan.clips };
+        case 'planner_get_clip': return { success: true, result: plan.clips.find((c: any) => c.id === args.id) };
+        case 'planner_get_schedule': return { success: true, result: plan.schedule };
+        case 'planner_get_critical_chain': return { success: true, result: plan.schedule.criticalTaskIds };
+        case 'planner_get_issues': return { success: true, result: plan.issues };
+        case 'planner_get_history': return { success: true, result: plan.history };
+
         case 'planner_set_selection':
           store.setSelection(args.kind || 'none', args.ids || [], args.primaryId || null);
+          return { success: true };
+        case 'planner_set_viewport':
+          store.setViewport(args.x, args.y, args.zoom);
           return { success: true };
         case 'planner_set_timeline_brush':
           store.setTimelineBrush(args.startMinute, args.endMinute);
           return { success: true };
+        case 'planner_set_compare_brush':
+          store.setCompareBrush(args.startMinute, args.endMinute);
+          return { success: true };
+
+        case 'planner_preview_clip':
+          store.previewClip(args.clipId, args.sourceId, args.targetId);
+          return { success: true };
         case 'planner_confirm_clip':
           if (args.clipId && args.sourceId && args.targetId) {
             store.updateClipStatus(args.clipId, args.sourceId, args.targetId);
-            return { success: true, result: useStore.getState().plan.schedule };
+            return { success: true };
           }
           return { success: false, error: 'Missing clipId, sourceId, or targetId' };
         case 'planner_cancel_clip':
@@ -88,9 +85,58 @@ export function initializeWebMCP() {
             return { success: true };
           }
           return { success: false, error: 'Missing clipId' };
+
+        case 'planner_remove_clip':
+          store.removeClip(args.clipId);
+          return { success: true };
+        case 'planner_restore_clip':
+          store.restoreClip(args.clipId);
+          return { success: true };
+        case 'planner_preview_route':
+          store.previewRoute(args.clipId, args.routeKind);
+          return { success: true };
+        case 'planner_confirm_route':
+          store.confirmRoute(args.clipId);
+          return { success: true };
+
+        case 'planner_start_rehearsal':
+          store.startRehearsal();
+          return { success: true };
+        case 'planner_step_rehearsal':
+          store.stepRehearsal();
+          return { success: true };
+        case 'planner_reset_rehearsal':
+          store.resetRehearsal();
+          return { success: true };
+        case 'planner_mark_rehearsal':
+          store.markRehearsal();
+          return { success: true };
+
+        case 'planner_fork_branch':
+          store.forkBranch(args.branchId);
+          return { success: true };
+        case 'planner_compare_branches':
+          store.compareBranches(args.targetBranchId);
+          return { success: true };
+
+        case 'planner_add_comment':
+          store.addComment(args.comment);
+          return { success: true };
+        case 'planner_resolve_comment':
+          store.resolveComment(args.commentId);
+          return { success: true };
+
+        case 'planner_review_plan':
+          store.reviewPlan(args.note);
+          return { success: true };
+        case 'planner_approve_plan':
+          store.approvePlan();
+          return { success: true };
+
         case 'planner_export_packet':
           import('./utils/export').then(m => m.createExportZip(plan));
           return { success: true };
+
         case 'planner_undo_actor_event':
           if (args.actorId) {
             store.undoActorEvent(args.actorId);
@@ -103,30 +149,6 @@ export function initializeWebMCP() {
             return { success: true };
           }
           return { success: false, error: 'Missing actorId' };
-
-        // Stubs for the remaining required operations that map to full store logic
-        case 'planner_get_artifact_preview':
-        case 'planner_set_viewport':
-        case 'planner_set_compare_brush':
-        case 'planner_preview_clip':
-        case 'planner_remove_clip':
-        case 'planner_restore_clip':
-        case 'planner_preview_route':
-        case 'planner_confirm_route':
-        case 'planner_start_rehearsal':
-        case 'planner_step_rehearsal':
-        case 'planner_reset_rehearsal':
-        case 'planner_mark_rehearsal':
-        case 'planner_fork_branch':
-        case 'planner_compare_branches':
-        case 'planner_add_comment':
-        case 'planner_resolve_comment':
-        case 'planner_review_plan':
-        case 'planner_approve_plan':
-        case 'planner_validate_import':
-        case 'planner_confirm_import':
-        case 'planner_cancel_import':
-          return { success: true, result: 'Operation simulated for WebMCP contract parity.' };
 
         default:
           return { success: false, error: `Tool ${toolName} not implemented.` };
