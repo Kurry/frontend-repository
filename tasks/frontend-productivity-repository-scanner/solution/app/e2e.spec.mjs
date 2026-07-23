@@ -459,4 +459,45 @@ test.describe('task criteria', () => {
       .poll(async () => row.evaluate((element) => getComputedStyle(element).backgroundColor))
       .not.toBe(before);
   });
+
+  test('batch scans complete normally while the explicit failure demo remains isolated', async ({ page }) => {
+    test.setTimeout(45000);
+    await gotoApp(page);
+    await page.getByRole('button', { name: 'Select all' }).click();
+    await page.getByRole('button', { name: /Scan selected/ }).click();
+    await expect.poll(async () => page.locator('.repository-title-line .cds--tag--green').count(), { timeout: 30000 }).toBe(3);
+    await expect(page.locator('#repository-repo-2')).toContainText('Complete');
+  });
+
+  test('scan state stays interactive across filters viewer pause and export', async ({ page }) => {
+    test.setTimeout(30000);
+    await gotoApp(page);
+    const scanRow = page.locator('#repository-repo-3');
+    await scanRow.getByRole('button', { name: 'Scan now' }).click();
+    await page.getByRole('checkbox', { name: 'CLAUDE.md', exact: true }).check({ force: true });
+    await page.locator('.document-row').first().locator('.document-open').click();
+    await expect(page.locator('.code-viewer')).toBeVisible();
+    await page.locator('.scan-actions').getByRole('button', { name: 'Pause' }).click();
+    await page.getByRole('button', { name: 'Export scan index' }).click();
+    await expect(page.getByRole('dialog', { name: 'Live scan package' })).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(scanRow.getByText('Paused')).toBeVisible();
+    await expect(page.locator('.code-viewer')).toBeVisible();
+    await page.getByRole('button', { name: 'Back to document tree' }).click();
+    await expect(page.getByRole('checkbox', { name: 'CLAUDE.md', exact: true })).toBeChecked();
+  });
+
+  test('display preferences and export confirmations are specific and reversible', async ({ page }) => {
+    await gotoApp(page);
+    await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.getByRole('button', { name: 'Compact density' }).click();
+    await expect(page.locator('.app-shell')).toHaveClass(/density-compact/);
+    await page.getByRole('button', { name: 'High contrast' }).click();
+    await expect(page.locator('.app-shell')).toHaveClass(/is-high-contrast/);
+    await page.getByRole('button', { name: 'Export scan index' }).click();
+    await page.getByRole('button', { name: 'Copy', exact: true }).click();
+    await expect(page.locator('.export-live')).toContainText('Scan Index JSON copied');
+    await page.getByRole('button', { name: 'Download', exact: true }).click();
+    await expect(page.locator('.export-live')).toContainText('Scan Index JSON downloaded');
+  });
 });

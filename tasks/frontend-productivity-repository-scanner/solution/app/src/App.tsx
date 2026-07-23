@@ -92,7 +92,11 @@ const patternLabels: Record<PatternKey, { label: string; description: string }> 
 
 function formatDate(value: string | null) {
   if (!value) return 'Not scanned yet'
-  return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value))
+  return new Intl.DateTimeFormat('en-CA', {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false, timeZone: 'UTC', timeZoneName: 'short',
+  }).format(new Date(value))
 }
 
 function fileName(path: string) {
@@ -341,9 +345,9 @@ function RepositoryRow({ repository, onRemove }: { repository: Repository; onRem
             <div className="repository-title-line">
               <Folder size={18} />
               <h3>{repositoryLabel(repository)}</h3>
-              {repository.id === 'repo-2' && failed && <Tag size="sm" type="red">Failed</Tag>}
-              {repository.id === 'repo-2' && !failed && scanning && <Tag size="sm" type="blue">Running</Tag>}
-              {repository.id === 'repo-2' && !failed && !scanning && run?.status === 'complete' && <Tag size="sm" type="green">Complete</Tag>}
+              {failed && <Tag size="sm" type="red">Failed</Tag>}
+              {!failed && scanning && <Tag size="sm" type="blue">Running</Tag>}
+              {!failed && !scanning && run?.status === 'complete' && <Tag size="sm" type="green">Complete</Tag>}
             </div>
             <p className="repository-path" title={repository.path}>{repository.path}</p>
             <div className="repository-meta">
@@ -379,7 +383,7 @@ function RepositoryList() {
     <section className="panel repository-panel" aria-labelledby="repositories-heading">
       <div className="panel-heading split-heading">
         <div>
-          <p className="eyebrow">Tracked sources</p>
+          <p className="eyebrow">Repository collection</p>
           <h2 id="repositories-heading">Repositories</h2>
         </div>
         <span className="count-pill">{repositories.length}</span>
@@ -400,7 +404,13 @@ function RepositoryList() {
         </ul>
       ) : (
         <div className="empty-state">
-          <Folder size={32} />
+          <div className="empty-state-illustration" aria-hidden="true">
+            <span className="empty-orbit orbit-one" />
+            <span className="empty-orbit orbit-two" />
+            <Folder size={36} />
+            <Document size={18} className="empty-document" />
+            <Search size={16} className="empty-search" />
+          </div>
           <h3>No repositories tracked</h3>
           <p>Add a local repository path to begin scanning prompt-engineering guidance.</p>
           <Button size="sm" renderIcon={Add} onClick={() => setUi('addOpen', true)}>Add repository</Button>
@@ -533,7 +543,7 @@ function ScanPanel() {
     <section id="scan-panel" className="panel scan-panel" aria-labelledby="scan-heading">
       <div className="panel-heading scan-heading">
         <div>
-          <p className="eyebrow">Durable workflow</p>
+          <p className="eyebrow">Scan workflow</p>
           <h2 id="scan-heading">Scan run · {repositoryLabel(repository)}</h2>
         </div>
         <div className="scan-actions">
@@ -543,7 +553,7 @@ function ScanPanel() {
         </div>
       </div>
       <ProgressBar
-        label={`${complete} / ${run.steps.length} files scanned`}
+        label={`${complete}/${run.steps.length} documents scanned`}
         helperText={`${percent}% complete`}
         value={percent}
         max={100}
@@ -610,7 +620,7 @@ function ScanPanel() {
           <ol className="timeline-list" aria-live="polite">
             <AnimatePresence initial={false}>
               {events.map((event) => (
-                <motion.li key={event.id} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
+                <motion.li key={event.id} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: 12 }} transition={{ duration: 0.2 }}>
                   <button className={selectedStep === event.stepId ? 'is-highlighted' : ''} onClick={() => selectStep(event.stepId)}>
                     <StatusTag status={event.status} />
                     <span>{event.message}</span>
@@ -712,7 +722,7 @@ function DocumentTree() {
       <div className="panel-heading split-heading">
         <div>
           <p className="eyebrow">Shared document index</p>
-          <h2 id="tree-heading">Detected files</h2>
+          <h2 id="tree-heading">Documents</h2>
         </div>
         <span className="count-pill">{visibleDocuments.length}</span>
       </div>
@@ -932,7 +942,7 @@ function ImportModal() {
     try { parsed = JSON.parse(source) } catch { setFeedback('payload: Scan Index JSON contains malformed JSON.'); return }
     const result = importIndex(parsed)
     if (!result.ok) { setFeedback(result.error || 'Scan Index JSON is invalid.'); return }
-    setFeedback('Import successful.')
+    setFeedback('Scan index imported; repositories, documents, and patterns restored.')
     setTimeout(close, 1500)
   })
   return (
@@ -1058,6 +1068,8 @@ function CommandPalette() {
         className="command-palette"
         initial={{ opacity: 0, scale: 0.97, y: -10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.97, y: -10 }}
+        transition={{ duration: 0.2 }}
         onKeyDown={(event) => {
           if (event.key === 'ArrowDown') { event.preventDefault(); setHighlight((value) => Math.min(value + 1, filtered.length - 1)) }
           if (event.key === 'ArrowUp') { event.preventDefault(); setHighlight((value) => Math.max(value - 1, 0)) }
@@ -1159,7 +1171,7 @@ function Toolbar() {
         <Button size="sm" kind="secondary" renderIcon={Play} disabled={!selectedCount} onClick={() => void scanSelected()}>
           Scan selected{selectedCount ? ` (${selectedCount})` : ''}
         </Button>
-        <Button size="sm" kind="danger--tertiary" renderIcon={WarningFilled} disabled={failureDemoRunning} onClick={() => void startScan('repo-2')}>
+        <Button size="sm" kind="danger--tertiary" renderIcon={WarningFilled} disabled={failureDemoRunning} onClick={() => void startScan('repo-2', { simulateFailure: true })}>
           Run failure demo
         </Button>
       </div>
@@ -1192,15 +1204,27 @@ function AppContent() {
   const overlayOpen = ui.addOpen || ui.exportOpen || ui.importOpen || ui.paletteOpen
   const totalDocuments = repositories.reduce((total, repository) => total + (documents[repository.id]?.length || 0), 0)
   const totalFindings = repositories.reduce((total, repository) => total + (documents[repository.id] || []).reduce((sum, document) => sum + document.findings.length, 0), 0)
+  const scanRuns = useAppStore((state) => state.scanRuns)
+  const [density, setDensity] = useState<'comfortable' | 'compact'>('comfortable')
+  const [highContrast, setHighContrast] = useState(false)
+  const scanActivity = repositories.map((repository) => ({ repository, run: scanRuns[repository.id] }))
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell density-${density}${highContrast ? ' is-high-contrast' : ''}`}>
       <header className="app-header" aria-hidden={overlayOpen}>
         <div className="brand-lockup">
           <div className="brand-mark" aria-hidden="true"><Search size={20} /></div>
           <div><span>Prompt Engineering Platform</span><strong>RepoScan Studio</strong></div>
         </div>
-        <div className="session-indicator"><span className="status-dot" />In-memory session</div>
+        <div className="header-preferences" aria-label="Display preferences">
+          <Button size="sm" kind="ghost" aria-pressed={density === 'compact'} onClick={() => setDensity((value) => value === 'compact' ? 'comfortable' : 'compact')}>
+            {density === 'compact' ? 'Comfortable density' : 'Compact density'}
+          </Button>
+          <Button size="sm" kind="ghost" aria-pressed={highContrast} onClick={() => setHighContrast((value) => !value)}>
+            {highContrast ? 'Standard contrast' : 'High contrast'}
+          </Button>
+          <div className="session-indicator"><span className="status-dot" />In-memory session</div>
+        </div>
       </header>
       <main aria-hidden={overlayOpen}>
         <section className="hero">
@@ -1213,6 +1237,19 @@ function AppContent() {
             <div><strong>{repositories.length}</strong><span>repositories</span></div>
             <div><strong>{totalDocuments}</strong><span>documents</span></div>
             <div><strong>{totalFindings}</strong><span>findings</span></div>
+          </div>
+          <div className="workflow-constellation" aria-label="Live repository scan activity">
+            {scanActivity.map(({ repository, run }, index) => (
+              <motion.div
+                key={repository.id}
+                className={`constellation-node ${run?.status || 'idle'}`}
+                animate={run?.status === 'running' ? { scale: [1, 1.18, 1] } : { scale: 1 }}
+                transition={{ duration: 1.1, repeat: run?.status === 'running' ? Infinity : 0, delay: index * 0.08 }}
+                title={`${repositoryLabel(repository)}: ${run?.status || 'idle'}`}
+              >
+                <span />
+              </motion.div>
+            ))}
           </div>
         </section>
         <FirstScanCoachmark />

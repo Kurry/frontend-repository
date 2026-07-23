@@ -67,6 +67,7 @@ export type ScanRun = {
   timeline: TimelineEvent[]
   startedAt: string
   completedAt?: string
+  simulateFailure?: boolean
 }
 
 type Snapshot = {
@@ -272,8 +273,16 @@ function compileJson(state: Pick<AppState, 'repositories' | 'documents' | 'patte
   return JSON.stringify(payload, null, 2)
 }
 
+function formatArtifactDate(value: string): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false, timeZone: 'UTC', timeZoneName: 'short',
+  }).format(new Date(value))
+}
+
 function compileMarkdown(state: Pick<AppState, 'repositories' | 'documents' | 'patterns'>): string {
-  const lines = ['# Repository scan inventory', '', `Generated ${new Date().toLocaleString()}`, '', '## Pattern configuration', '']
+  const lines = ['# Repository scan inventory', '', `Generated ${formatArtifactDate(now())}`, '', '## Pattern configuration', '']
   PATTERN_KEYS.forEach((key) => lines.push(`- ${key}: ${state.patterns[key] ? 'enabled' : 'disabled'}`))
   for (const repository of state.repositories) {
     const documents = state.documents[repository.id] || []
@@ -562,7 +571,7 @@ async function processScan(repositoryId: string, startIndex = 0): Promise<boolea
 
       const refreshed = useAppStore.getState().scanRuns[repositoryId]?.steps[index]
       if (!refreshed) return false
-      const deterministicFailure = repositoryId === 'repo-2'
+      const deterministicFailure = Boolean(useAppStore.getState().scanRuns[repositoryId]?.simulateFailure)
         && refreshed.document.type === '.cursorrules'
         && !refreshed.document.path.includes('/tools/')
         && !refreshed.manualRetry
@@ -626,7 +635,7 @@ async function processScan(repositoryId: string, startIndex = 0): Promise<boolea
   return true
 }
 
-export function startScan(repositoryId: string): Promise<boolean> {
+export function startScan(repositoryId: string, options: { simulateFailure?: boolean } = {}): Promise<boolean> {
   const existing = activeRunners.get(repositoryId)
   if (existing) return existing
   const state = useAppStore.getState()
@@ -641,6 +650,7 @@ export function startScan(repositoryId: string): Promise<boolean> {
     status: 'running',
     startedAt: now(),
     timeline: [],
+    simulateFailure: options.simulateFailure,
     steps: scanDocuments.map((document, index) => ({
       id: `${repositoryId}-step-${index}-${Date.now()}`,
       document,
