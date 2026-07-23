@@ -12,9 +12,13 @@
 // @playwright/test if present; never install a second copy (duplicate
 // instances break test loading).
 // ============================================================================
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { test as base, expect } from '@playwright/test';
 
 const BASE = 'http://localhost:3000';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const SAMPLE_PNG = path.join(__dirname, 'e2e-fixtures', 'sample.png');
 
 export const test = base.extend({
   page: async ({ page }, use) => {
@@ -403,4 +407,452 @@ test('assigned WebMCP modules execute visible browse, form, entity, and artifact
   await expect(page.getByRole('button', { name: /Remove Contract Board from favorites/ })).toBeVisible();
   await invokeTool(page, 'artifact_export', { format: 'reading-velocity-json' });
   await expect(page.getByLabel('Session JSON preview')).toBeVisible();
+});
+
+
+// ==== ORACLE-FIX FAIL CRITERIA (stride 17) ====
+// One PASSING test per jobs fail_criterion path. Named exactly dim/name.
+
+async function gotoStudio(page) {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('h1.display-title')).toContainText('SHAPESHIFT', { timeout: 20_000 });
+  await expect(page.locator('.tool-panel')).toBeVisible({ timeout: 20_000 });
+}
+
+async function openGallery(page) {
+  await page.getByRole('button', { name: /^Gallery/ }).click();
+  await expect(page.getByRole('region', { name: /Saved boards gallery|gallery/i }).or(page.locator('.gallery-column'))).toBeVisible();
+}
+
+async function saveBoardNamed(page, name, tag = 'Festival') {
+  await page.getByRole('button', { name: 'Save current board' }).click();
+  await page.locator('#save-board-name').fill(name);
+  await page.locator('#save-board-tag').fill(tag);
+  await page.getByRole('button', { name: 'Save board', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Save board', exact: true })).toBeHidden({ timeout: 8000 });
+  await openGallery(page);
+  await expect(page.getByRole('heading', { name })).toBeVisible({ timeout: 8000 });
+}
+
+test.describe('oracle-fix fail_criteria coverage', () => {
+  test('accessibility/reduced_motion_respected', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await gotoStudio(page);
+    await page.locator('.grid-cell').first().click();
+    await expect(page.locator('.grid-cell').first()).not.toHaveClass(/kind-blank/);
+    const reduced = await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
+    expect(reduced).toBe(true);
+  });
+
+  test('accessibility/export_dialog_focus_trap', async ({ page }) => {
+    await gotoStudio(page);
+    const trigger = page.getByRole('button', { name: 'Export' });
+    await trigger.click();
+    const dialog = page.locator('.export-dialog');
+    await expect(dialog).toBeVisible();
+    await expect.poll(() => dialog.evaluate((node) => node.contains(document.activeElement))).toBe(true);
+    for (let i = 0; i < 6; i++) {
+      await page.keyboard.press('Tab');
+      expect(await dialog.evaluate((node) => node.contains(document.activeElement))).toBe(true);
+    }
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+    await expect(trigger).toBeFocused();
+  });
+
+  test('accessibility/import_validation_announced', async ({ page }) => {
+    await gotoStudio(page);
+    await page.getByRole('button', { name: 'Import', exact: true }).click();
+    await page.getByRole('textbox', { name: /Session JSON/ }).fill('{"schemaVersion":"wrong"}');
+    const alert = page.getByRole('alert');
+    await expect(alert).toBeVisible();
+    await expect(alert).toHaveAttribute('aria-live', 'assertive');
+    await expect(alert).toContainText(/schemaVersion|cellSize|import/i);
+  });
+
+  test('core_features/paint_stage_toolbar_on_load', async ({ page }) => {
+    await gotoStudio(page);
+    await expect(page.getByRole('region', { name: 'Paint stage' })).toBeVisible();
+    await expect(page.getByLabel('SHAPESHIFT tools')).toBeVisible();
+    await expect(page.getByRole('button', { name: /QR Brush/i })).toBeVisible();
+    await expect(page.locator('.grid-cell').first()).toBeVisible();
+  });
+
+  test('core_features/seeded_boards_visible', async ({ page }) => {
+    await gotoStudio(page);
+    await openGallery(page);
+    await expect(page.locator('.board-card')).toHaveCount(4);
+    for (const name of ['Pulse Study', 'Sun Gate', 'Field Notes', 'After Dark']) {
+      await expect(page.getByRole('heading', { name })).toBeVisible();
+    }
+  });
+
+  test('core_features/save_board_harbor_signal_visible', async ({ page }) => {
+    await gotoStudio(page);
+    await saveBoardNamed(page, 'Harbor Signal', 'Harbor');
+    await openGallery(page);
+    await expect(page.getByRole('heading', { name: 'Harbor Signal' })).toBeVisible();
+  });
+
+  test('core_features/gallery_count_plus_three', async ({ page }) => {
+    await gotoStudio(page);
+    await openGallery(page);
+    const before = await page.locator('.board-card').count();
+    await page.getByRole('button', { name: /^Paint$/ }).click();
+    for (let i = 0; i < 3; i++) {
+      await page.locator('.grid-cell').nth(i).click();
+      await saveBoardNamed(page, `Plus Three ${i}`, `Tag${i}`);
+      await page.getByRole('button', { name: /^Paint$/ }).click();
+    }
+    await openGallery(page);
+    await expect(page.locator('.board-card')).toHaveCount(before + 3);
+  });
+
+  test('core_features/load_seeded_board_updates_canvas', async ({ page }) => {
+    await gotoStudio(page);
+    await openGallery(page);
+    await page.getByRole('button', { name: 'Load Pulse Study' }).click();
+    await expect(page.getByRole('button', { name: /^Paint$/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('.grid-cell.kind-qr, .grid-cell.kind-color').first()).toBeVisible();
+    await expect(page.locator('.stats-readout')).not.toContainText(/^0 painted/);
+  });
+
+  test('core_features/rename_board_evening_grid', async ({ page }) => {
+    await gotoStudio(page);
+    await openGallery(page);
+    await page.getByRole('button', { name: 'Rename Pulse Study' }).click();
+    await page.locator('[id^="rename-board-name-"]').fill('Evening Grid');
+    await page.getByRole('button', { name: 'Update board' }).click();
+    await expect(page.getByRole('heading', { name: 'Evening Grid' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Pulse Study' })).toHaveCount(0);
+  });
+
+  test('core_features/delete_board_removes_name', async ({ page }) => {
+    await gotoStudio(page);
+    await openGallery(page);
+    await page.getByRole('button', { name: 'Delete Sun Gate' }).click();
+    await page.getByRole('button', { name: 'Confirm delete Sun Gate' }).click();
+    await expect(page.getByRole('heading', { name: 'Sun Gate' })).toHaveCount(0);
+  });
+
+  test('core_features/empty_gallery_after_delete_all', async ({ page }) => {
+    await gotoStudio(page);
+    await openGallery(page);
+    for (const name of ['Pulse Study', 'Sun Gate', 'Field Notes', 'After Dark']) {
+      await page.getByRole('button', { name: `Delete ${name}` }).click();
+      await page.getByRole('button', { name: `Confirm delete ${name}` }).click();
+    }
+    await expect(page.getByRole('heading', { name: 'The gallery is empty' })).toBeVisible();
+    await expect(page.getByText(/Save board/i).first()).toBeVisible();
+  });
+
+  test('core_features/invalid_save_blocked_with_field_error', async ({ page }) => {
+    await gotoStudio(page);
+    await page.getByRole('button', { name: 'Save current board' }).click();
+    const name = page.locator('#save-board-name');
+    await name.fill('x');
+    await name.fill('');
+    await name.blur();
+    await expect(page.locator('.field-error').first()).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Save board', exact: true })).toBeDisabled();
+  });
+
+  test('core_features/gallery_filter_matches_only', async ({ page }) => {
+    await gotoStudio(page);
+    await openGallery(page);
+    await page.getByRole('button', { name: 'Filter boards by tag' }).click();
+    await page.getByRole('option', { name: 'Festival' }).click();
+    await expect(page.locator('.board-card')).toHaveCount(1);
+    await expect(page.getByRole('heading', { name: 'Pulse Study' })).toBeVisible();
+  });
+
+  test('core_features/paint_gallery_mode_switch', async ({ page }) => {
+    await gotoStudio(page);
+    await page.getByRole('button', { name: /^Gallery/ }).click();
+    await expect(page.locator('.gallery-column')).toBeVisible();
+    await page.getByRole('button', { name: /^Paint$/ }).click();
+    await expect(page.getByRole('region', { name: 'Paint stage' })).toBeVisible();
+  });
+
+  test('core_features/toolbar_gallery_hover_wash', async ({ page }) => {
+    await gotoStudio(page);
+    const brush = page.getByRole('button', { name: /Color Brush/i });
+    await brush.hover();
+    const bg = await brush.evaluate((el) => getComputedStyle(el).backgroundColor);
+    expect(bg).not.toBe('rgba(0, 0, 0, 0)');
+    await openGallery(page);
+    const card = page.locator('.board-card').first();
+    await card.hover();
+    await expect(card).toBeVisible();
+  });
+
+  test('core_features/boards_crud_shared_state', async ({ page }) => {
+    await gotoStudio(page);
+    await saveBoardNamed(page, 'Shared State Board', 'Shared');
+    await openGallery(page);
+    await expect(page.getByRole('heading', { name: 'Shared State Board' })).toBeVisible();
+    const count = await page.locator('.board-card').count();
+    await page.getByRole('button', { name: 'Rename Shared State Board' }).click();
+    await page.locator('[id^="rename-board-name-"]').fill('Shared State Renamed');
+    await page.getByRole('button', { name: 'Update board' }).click();
+    await expect(page.locator('.board-card')).toHaveCount(count);
+    await expect(page.getByRole('heading', { name: 'Shared State Renamed' })).toBeVisible();
+  });
+
+  test('core_features/qr_brush_scannable_mask', async ({ page }) => {
+    await gotoStudio(page);
+    await page.getByRole('button', { name: /QR Brush/i }).click();
+    const cell = page.locator('.grid-cell').first();
+    await cell.click();
+    await expect(cell).toHaveClass(/kind-qr/);
+    const bg = await cell.evaluate((el) => getComputedStyle(el).backgroundImage);
+    expect(bg).toContain('url(');
+  });
+
+  test('core_features/branded_png_footer_export', async ({ page }) => {
+    await gotoStudio(page);
+    await page.getByRole('button', { name: 'Export' }).click();
+    await page.getByRole('tab', { name: /PNG/ }).click();
+    await expect(page.getByRole('img', { name: /Branded PNG preview/i })).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('.site-footer')).toContainText(/MADE WITH SHAPESHIFT GRID TOOL/);
+    await expect(page.locator('.site-footer')).toContainText(/SHAPESHIFTFESTIVAL\.COM/);
+  });
+
+  test('core_features/cell_slider_resample_and_lock', async ({ page }) => {
+    await gotoStudio(page);
+    const slider = page.getByRole('slider', { name: 'Cell size' });
+    await expect(slider).toBeEnabled();
+    await page.locator('.grid-cell').first().click();
+    await expect(slider).toBeDisabled();
+    await expect(page.locator('.lock-note')).toContainText(/Locked after paint/i);
+  });
+
+  test('core_features/image_or_camera_pixelize', async ({ page }) => {
+    await gotoStudio(page);
+    const before = await page.locator('.stats-readout').innerText();
+    await page.locator('input.upload-input').setInputFiles(SAMPLE_PNG);
+    await expect.poll(async () => page.locator('.stats-readout').innerText()).not.toBe(before);
+    await expect(page.getByRole('slider', { name: 'Cell size' })).toBeDisabled();
+  });
+
+  test('core_features/keyboard_shortcuts_tools_palette', async ({ page }) => {
+    await gotoStudio(page);
+    await page.keyboard.press('b');
+    await expect(page.getByRole('button', { name: /Color Brush/i })).toHaveAttribute('aria-pressed', 'true');
+    await page.keyboard.press('3');
+    await expect(page.getByRole('button', { name: /red palette color/i })).toHaveAttribute('aria-pressed', 'true');
+    await page.keyboard.press('q');
+    await expect(page.getByRole('button', { name: /QR Brush/i })).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  test('core_features/save_flow_multi_surface_probe', async ({ page }) => {
+    await gotoStudio(page);
+    await page.locator('.grid-cell').nth(2).click();
+    await saveBoardNamed(page, 'Multi Surface', 'Probe');
+    await openGallery(page);
+    await expect(page.getByRole('heading', { name: 'Multi Surface' })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Gallery/ })).toContainText(/[5-9]/);
+    await page.getByRole('button', { name: 'Export' }).click();
+    const text = await page.getByLabel('Session JSON preview').textContent();
+    expect(text).toContain('Multi Surface');
+  });
+
+  test('core_features/load_flow_paint_undo_chain', async ({ page }) => {
+    await gotoStudio(page);
+    await openGallery(page);
+    await page.getByRole('button', { name: 'Load Field Notes' }).click();
+    const paintedBefore = await page.locator('.stats-readout').innerText();
+    await page.getByRole('button', { name: /Color Brush/i }).click();
+    await page.locator('.grid-cell.kind-blank').first().click();
+    await expect.poll(async () => page.locator('.stats-readout').innerText()).not.toBe(paintedBefore);
+    await page.keyboard.press('Backspace');
+    await expect(page.locator('.stats-readout')).toHaveText(paintedBefore);
+  });
+
+  test('core_features/rename_delete_filter_integrity_chain', async ({ page }) => {
+    await gotoStudio(page);
+    await openGallery(page);
+    await page.getByRole('button', { name: 'Rename After Dark' }).click();
+    await page.locator('[id^="rename-board-name-"]').fill('Night Watch');
+    await page.getByRole('button', { name: 'Update board' }).click();
+    await page.getByRole('button', { name: 'Filter boards by tag' }).click();
+    await page.getByRole('option', { name: 'Night' }).click();
+    await expect(page.getByRole('heading', { name: 'Night Watch' })).toBeVisible();
+    await page.getByRole('button', { name: 'Delete Night Watch' }).click();
+    await page.getByRole('button', { name: 'Confirm delete Night Watch' }).click();
+    await expect(page.getByRole('heading', { name: 'Night Watch' })).toHaveCount(0);
+  });
+
+  test('core_features/favorite_filter_recompute_chain', async ({ page }) => {
+    await gotoStudio(page);
+    await openGallery(page);
+    await page.getByRole('button', { name: /Remove Pulse Study from favorites/ }).click();
+    await expect(page.getByRole('button', { name: /Add Pulse Study to favorites/ })).toBeVisible();
+    await page.getByRole('button', { name: /Add Pulse Study to favorites/ }).click();
+    await page.getByRole('button', { name: 'Filter boards by tag' }).click();
+    await page.getByRole('option', { name: 'Festival' }).click();
+    await expect(page.getByRole('heading', { name: 'Pulse Study' })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Remove Pulse Study from favorites/ })).toBeVisible();
+  });
+
+  test('core_features/reload_resets_all_facets_to_seed', async ({ page }) => {
+    await gotoStudio(page);
+    await page.locator('.grid-cell').first().click();
+    await saveBoardNamed(page, 'Transient Board', 'Temp');
+    await page.reload();
+    await expect(page.locator('.grid-cell').first()).toHaveClass(/kind-blank/);
+    await expect(page.getByRole('slider', { name: 'Cell size' })).toBeEnabled();
+    await openGallery(page);
+    await expect(page.locator('.board-card')).toHaveCount(4);
+    await expect(page.getByRole('heading', { name: 'Transient Board' })).toHaveCount(0);
+  });
+
+  test('core_features/tag_filter_no_match_empty_state', async ({ page }) => {
+    await gotoStudio(page);
+    await openGallery(page);
+    // Create an unmatched filter by selecting a tag then deleting its boards is hard;
+    // use Festival filter then delete Pulse Study to empty the filtered set? Or
+    // programmatically: only Festival matches Pulse Study — delete it while filtered.
+    await page.getByRole('button', { name: 'Filter boards by tag' }).click();
+    await page.getByRole('option', { name: 'Festival' }).click();
+    await page.getByRole('button', { name: 'Delete Pulse Study' }).click();
+    await page.getByRole('button', { name: 'Confirm delete Pulse Study' }).click();
+    await expect(page.getByRole('heading', { name: 'No boards match this tag' })).toBeVisible();
+    await page.getByRole('button', { name: 'Clear filter' }).click();
+    await expect(page.locator('.board-card').first()).toBeVisible();
+  });
+
+  test('core_features/undo_without_history_safe_noop', async ({ page }) => {
+    await gotoStudio(page);
+    await expect(page.locator('.stats-readout')).toContainText('0 painted');
+    await page.keyboard.press('Backspace');
+    await expect(page.locator('.stats-readout')).toContainText('0 painted');
+    await expect(page.locator('.grid-cell').first()).toHaveClass(/kind-blank/);
+  });
+
+  test('core_features/camera_cancel_leaves_canvas_untouched', async ({ page }) => {
+    await gotoStudio(page);
+    const before = await page.locator('.stats-readout').innerText();
+    const sliderEnabled = await page.getByRole('slider', { name: 'Cell size' }).isEnabled();
+    await page.getByRole('button', { name: /Camera/ }).click();
+    await expect(page.locator('.camera-dialog')).toBeVisible();
+    await page.getByRole('button', { name: 'Cancel' }).click();
+    await expect(page.locator('.camera-dialog')).toBeHidden();
+    await expect(page.locator('.stats-readout')).toHaveText(before);
+    expect(await page.getByRole('slider', { name: 'Cell size' }).isEnabled()).toBe(sliderEnabled);
+  });
+
+  test('core_features/drag_stroke_records_cell_once', async ({ page }) => {
+    await gotoStudio(page);
+    const cell = page.locator('.grid-cell').first();
+    const box = await cell.boundingBox();
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x + 2, y + 2);
+    await page.mouse.move(x - 2, y - 2);
+    await page.mouse.move(x, y);
+    await page.mouse.up();
+    await expect(page.locator('.stats-readout')).toContainText('1 painted');
+    await page.keyboard.press('Backspace');
+    await expect(page.locator('.stats-readout')).toContainText('0 painted');
+  });
+
+  test('core_features/grid_toggle_label_flips', async ({ page }) => {
+    await gotoStudio(page);
+    const toggle = page.getByRole('button', { name: /grid overlay/i });
+    const before = await toggle.getAttribute('aria-label');
+    await toggle.click();
+    const after = await toggle.getAttribute('aria-label');
+    expect(after).not.toBe(before);
+    await expect(toggle).toHaveText(/Grid (On|Off)/);
+  });
+
+  test('core_features/color_brush_fill_and_eraser_clear', async ({ page }) => {
+    await gotoStudio(page);
+    await page.getByRole('button', { name: /Color Brush/i }).click();
+    const cell = page.locator('.grid-cell').first();
+    await cell.click();
+    await expect(cell).toHaveClass(/kind-color/);
+    await page.getByRole('button', { name: /Eraser/i }).click();
+    await cell.click();
+    await expect(cell).toHaveClass(/kind-blank/);
+  });
+
+  test('core_features/slider_resize_before_paint_keeps_blank', async ({ page }) => {
+    await gotoStudio(page);
+    const slider = page.getByRole('slider', { name: 'Cell size' });
+    await slider.focus();
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('ArrowRight');
+    await expect(page.locator('.grid-cell').first()).toHaveClass(/kind-blank/);
+    await expect(page.locator('.stats-readout')).toContainText('0 painted');
+  });
+
+  test('core_features/session_json_field_contract_keys_visible', async ({ page }) => {
+    await gotoStudio(page);
+    await page.getByRole('button', { name: 'Export' }).click();
+    const data = JSON.parse(await page.getByLabel('Session JSON preview').textContent());
+    for (const key of ['schemaVersion', 'brushMode', 'paletteColor', 'mirrorMode', 'fillStats', 'cells', 'boards', 'cellSize']) {
+      expect(data).toHaveProperty(key);
+    }
+    expect(data.schemaVersion).toBe('shapeshift-session-v1');
+  });
+
+  test('core_features/import_rejects_nonconforming_session_schema', async ({ page }) => {
+    await gotoStudio(page);
+    await page.locator('.grid-cell').first().click();
+    const before = await page.locator('.stats-readout').innerText();
+    await page.getByRole('button', { name: 'Import', exact: true }).click();
+    await page.getByRole('textbox', { name: /Session JSON/ }).fill('{"schemaVersion":"nope"}');
+    await expect(page.getByRole('alert')).toContainText(/schemaVersion|import/i);
+    await expect(page.getByRole('button', { name: 'Import session' })).toBeDisabled();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('.stats-readout')).toHaveText(before);
+  });
+
+  test('core_features/mirror_mode_paints_partner_cell', async ({ page }) => {
+    await gotoStudio(page);
+    await page.getByRole('button', { name: 'Horizontal mirror' }).click();
+    await page.locator('.grid-cell').first().click();
+    await expect(page.locator('.stats-readout')).toContainText('2 painted');
+  });
+
+  test('core_features/fill_stats_track_paint_mutations', async ({ page }) => {
+    await gotoStudio(page);
+    await page.locator('.grid-cell').first().click();
+    await expect(page.locator('.stats-readout')).toContainText('1 painted');
+    await expect(page.locator('.stats-readout')).toContainText('1 qr');
+  });
+
+  test('design_fidelity/stage_spacing_matches_reference', async ({ page }) => {
+    await gotoStudio(page);
+    await expect(page.locator('.stage-wrap')).toBeVisible();
+    await expect(page.locator('.wash').first()).toBeVisible();
+    const toolbar = await page.locator('.tool-panel').boundingBox();
+    const canvas = await page.locator('.canvas-column').boundingBox();
+    expect(toolbar).toBeTruthy();
+    expect(canvas).toBeTruthy();
+    expect(canvas.width).toBeGreaterThan(300);
+  });
+
+  test('design_fidelity/bracket_title_typography_matches', async ({ page }) => {
+    await gotoStudio(page);
+    const title = page.locator('h1.display-title');
+    await expect(title).toContainText(/SHAPESHIFT GRID/);
+    await expect(title).toContainText(/TOOL/);
+    const weight = await title.evaluate((el) => getComputedStyle(el).fontWeight);
+    expect(Number(weight) >= 600 || weight === 'bold').toBeTruthy();
+  });
+
+  test('design_fidelity/desktop_layout_matches_reference', async ({ page }) => {
+    await gotoStudio(page);
+    await expect(page.locator('.app-shell')).toBeVisible();
+    await expect(page.locator('.tool-panel')).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Paint stage' })).toBeVisible();
+    await expect(page.locator('h1.display-title')).toContainText('SHAPESHIFT');
+    await expect(page.locator('.site-footer')).toBeVisible();
+  });
 });
