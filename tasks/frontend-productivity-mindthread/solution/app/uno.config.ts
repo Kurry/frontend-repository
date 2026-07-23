@@ -31,7 +31,7 @@ export default defineConfig({
     'focus-ring':
       'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
     'btn-base':
-      'inline-flex items-center justify-center gap-2 font-body font-medium rounded-md cursor-pointer select-none transition-colors active:translate-y-px disabled:opacity-45 disabled:pointer-events-none',
+      'inline-flex items-center justify-center gap-2 font-body font-medium rounded-md cursor-pointer select-none transition-colors active:translate-y-px active:scale-95 disabled:opacity-45 disabled:pointer-events-none',
     'btn-primary':
       'btn-base bg-primary text-white border-0 shadow-sm hover:bg-primarydeep active:bg-primarydeeper min-h-12 px-5 text-[0.95rem] focus-ring',
     'btn-primary-sm':
