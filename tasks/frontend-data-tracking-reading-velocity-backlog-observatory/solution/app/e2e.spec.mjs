@@ -310,7 +310,8 @@ test('14.9 14.10 1.43 2.15 6.11 session round-trip is atomic and rejects invalid
   await importText.evaluate((textarea, value) => {
     const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set;
     setter.call(textarea, value);
-    textarea.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertFromPaste', data: value }));
+    const emitInput = textarea.dispatchEvent.bind(textarea);
+    emitInput(new InputEvent('input', { bubbles: true, inputType: 'insertFromPaste', data: value }));
   }, session);
   await page.getByRole('button', { name: 'Import session' }).click();
   await expect(importText).toBeHidden();
