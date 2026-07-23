@@ -1,0 +1,6 @@
+[task]
+id = "habit-protocol-trialbench"
+name = "mercor-intelligence/frontend-data-tracking-habit-protocol-trialbench"
+description = "A Habit Protocol Trialbench tracking doses, outcomes, and analytical evaluator state."
+category = "frontend-data-tracking"
+tier = "hard"
