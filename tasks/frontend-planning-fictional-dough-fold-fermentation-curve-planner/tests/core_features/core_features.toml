@@ -1,0 +1,129 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+weight = 0.25
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "CF-01"
+title = "Drag EV-F02 from 09:20 to 09:35; exactly one H-001 appears, gaps become 55/30, net credit at 10:30 becomes 165, target becomes 11:55, buffer becomes 5, and DG-SHAPE-BUFFER appears across timeline, curve, braid, inspector, rail, and export preview."
+description = "Verify that dragging EV-F02 from 09:20 to 09:35 creates exactly one history entry H-001, updates consecutive fold gaps to 55 and 30 minutes, changes net credit at 10:30 from 170 to 165, changes first target crossing from 11:50 to 11:55, updates the shape buffer from 10 to 5 minutes, and correctly creates a warning DG-SHAPE-BUFFER that is visible across the UI."
+weight = 1.0
+
+[[criterion]]
+id = "CF-02"
+title = "Render a desktop timeline with aligned lanes for activity bands, events, fold recovery windows, target crossing, and the shape-buffer bracket."
+description = "Verify that the timeline displays separate, aligned visual lanes for activity bands, events, fold recovery windows, the target crossing marker, and the shape-buffer bracket, with five-minute major snaps clearly labeled."
+weight = 1.0
+
+[[criterion]]
+id = "CF-03"
+title = "Render a cumulative step/line curve sampled every five minutes, with the 250-credit target, first-crossing marker, event verticals, activity-band background, and recovery exclusions."
+description = "Verify that the cumulative curve is drawn correctly with data points every 5 minutes, visually including the 250-credit target line, a marker at the first crossing, vertical indicators for events, a background representing activity bands, and areas showing recovery exclusions."
+weight = 1.0
+
+[[criterion]]
+id = "CF-04"
+title = "Diagnostics cover fold gaps, band coverage, target reachability, shape buffer, event containment, five-minute alignment, duplicate ids, and stale derived values on import."
+description = "Verify that the system implements diagnostics (warnings or errors) for the following conditions: invalid fold gaps, gaps/overlaps in band coverage, unreachable credit target, insufficient shape buffer, events placed outside the planning window, times not aligned to 5 minutes, duplicate entity IDs, and imported packages containing stale or incorrect derived curve values."
+weight = 1.0
+
+[[criterion]]
+id = "CF-05"
+title = "History shows system anchor plus Ari and Sol actions. Selective undo targets the most recent active action by the chosen actor while replaying later non-conflicting actions."
+description = "Verify that the history panel shows an immutable system anchor along with authored actions from Ari and Sol. Check that triggering 'undo' for one actor specifically targets their most recent active action, correctly reverting its state changes while preserving and replaying any subsequent non-conflicting actions made by the other actor."
+weight = 1.0
+
+[[criterion]]
+id = "CF-06"
+title = "Download exactly moonrise-test-loaf-plan.zip with exactly nine root entries"
+description = "Verify that the export function generates a zip file named 'moonrise-test-loaf-plan.zip' that contains exactly these nine files at the root level: manifest.json, plan.json, view-state.json, events.csv, activity-bands.csv, credit-curve.csv, diagnostics.json, schedule.ics, timeline.svg."
+weight = 1.0
