@@ -223,3 +223,9 @@ div.bg-white.rounded-2xl {
     transform: none;
   }
 }
+
+button[style*="background-color: var(--color-accent)"],
+button[style*="background-color: #1a202c"],
+button.bg-black {
+  box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.25);
+}

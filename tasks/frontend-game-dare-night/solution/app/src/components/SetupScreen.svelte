@@ -206,7 +206,7 @@
 
     <!-- Timer -->
     <section class="bg-white rounded-[10px] p-5 mb-5 shadow-lg">
-      <h2 class="text-lg font-semibold mb-2.5" style="color: var(--color-accent);">Round timer</h2>
+      <h2 class="text-lg font-semibold mb-2.5" style="color: var(--color-accent);">Round Timer</h2>
       <div class="flex items-center justify-between gap-2.5">
         <p class="inline-flex items-center gap-2.5 text-gray-700 text-sm"><Timer size={18} weight="bold" aria-hidden="true" /> 15-second countdown per card</p>
         <button class="timer-switch relative inline-flex w-[50px] rounded-full transition-colors duration-200" style={timerEnabled ? 'background-color: var(--color-accent);' : 'background-color: #6B7280;'} onclick={onToggleTimer} role="switch" aria-checked={timerEnabled} aria-label="Round timer">

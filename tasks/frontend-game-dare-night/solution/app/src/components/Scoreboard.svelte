@@ -44,7 +44,7 @@
         </div>
         <div class="text-center">
           <span class="font-bold text-lg text-red-500 tabular-nums">{entry.forfeits}</span>
-          <p class="text-xs text-gray-500">skip</p>
+          <p class="text-xs text-gray-500">forfeits</p>
         </div>
       </div>
     </li>
