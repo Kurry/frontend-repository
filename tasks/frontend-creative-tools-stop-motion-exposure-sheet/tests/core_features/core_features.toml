@@ -1,0 +1,147 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+[[criterion]]
+id = "cf.1"
+name = "exposure_sheet"
+description = "Creates, splits, joins, trims, and moves exposure ranges on the grid; ripples and overwrites update downstream frames predictably."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.2"
+name = "stage_transforms"
+description = "Places and transforms objects on the stage with predictable normalized coordinates; onion skins accurately render configurable offsets."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.3"
+name = "cue_alignment"
+description = "Aligns waveform and dialogue cues to frames; dragging cues or exposures updates exact timing on all linked views."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.4"
+name = "prop_continuity"
+description = "Tracks and resolves continuity conflicts across takes/shots; selecting a conflict highlights prior/current frames and choices."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.5"
+name = "capture_ledger"
+description = "Records immutable capture, missing, and recovery events; planned vs actual capture remain distinct without silent overwriting."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.6"
+name = "take_branches"
+description = "Forks and merges takes per object/range; cut approval is marked stale when underlying state changes and requires reapproval."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.7"
+name = "artifacts"
+description = "Exports a complete project payload (JSON/CSV/SVG/Markdown) that exactly matches UI state; import reliably restores this full state."
+type = "binary"
+weight = 1.0
