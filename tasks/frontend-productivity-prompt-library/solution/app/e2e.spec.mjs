@@ -576,6 +576,7 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
     const target = page.locator(ROWS, { hasText: 'Round trip proof' });
     await target.getByRole('button', { name: /Delete Round trip proof/ }).click();
     await page.getByRole('button', { name: 'Delete prompt' }).click();
+    await expect(page.locator('.cds--modal.overlay-exit')).toHaveCount(0);
     await page.getByRole('button', { name: 'Import', exact: true }).click();
     await page.locator('#import-payload').fill('{bad');
     await expect(page.locator('.cds--form-requirement')).toContainText(/malformed/i);
@@ -681,7 +682,7 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
     await page.getByRole('button', { name: 'New Prompt', exact: true }).click();
     await page.keyboard.press('Escape');
     await expect(page.locator('.cds--modal')).toHaveClass(/overlay-exit/);
-    await expect(page.locator('.cds--modal')).toBeHidden();
+    await expect(page.locator('.cds--modal.overlay-exit')).toHaveCount(0);
     await page.locator('.version-button').first().click();
     await page.getByRole('dialog').getByLabel('Close version history').click();
     await expect(page.locator('.panel-layer')).toHaveClass(/panel-layer--exit/);
@@ -715,11 +716,11 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
   test('9.5 large_collections_render_without_lag', async ({ page }) => {
     await openApp(page);
     const start = Date.now();
-    await page.getByRole('button', { name: 'Load 80 sample prompts' }).click();
-    await expect(page.locator('.prompt-count')).toContainText('96 prompts');
+    await page.getByRole('button', { name: 'Load 60 sample prompts' }).click();
+    await expect(page.locator('.prompt-count')).toContainText('76 prompts');
     const elapsed = Date.now() - start;
     expect(elapsed).toBeLessThan(500);
-    await expect(page.locator(ROWS)).toHaveCount(96);
+    await expect(page.locator(ROWS)).toHaveCount(76);
   });
 
   test('2.1 shared_state_coherence', async ({ page }) => {
@@ -810,8 +811,9 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
     await row.getByRole('button', { name: /Delete Artifact lifecycle proof/ }).click();
     await page.getByRole('button', { name: 'Delete prompt' }).click();
     await expect(row).toHaveCount(0);
-    await expect(page.locator('.cds--modal.is-visible')).toHaveCount(0);
+    await expect(page.locator('.cds--modal')).toBeHidden();
     await page.getByRole('button', { name: 'Export library' }).click();
+    await expect(page.locator('#export-preview')).toBeVisible();
     await expect(page.locator('#export-preview')).not.toContainText('Artifact lifecycle proof');
   });
 

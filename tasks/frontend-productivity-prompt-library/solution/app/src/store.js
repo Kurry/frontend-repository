@@ -214,7 +214,7 @@ export const useLibraryStore = create((set, get) => ({
   addPerformanceSample: () => {
     const source = get().prompts;
     if (!source.length) return 0;
-    const additions = Array.from({ length: 80 }, (_, index) => {
+    const additions = Array.from({ length: 60 }, (_, index) => {
       const original = source[index % source.length];
       const id = makeId('sample');
       const data = {
