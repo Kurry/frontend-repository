@@ -52,9 +52,10 @@ export function parseImportedTheme(input: unknown): ThemeOptions {
   const value = result.data;
 
   return {
+    name: value.name,
     palette: value.palette,
     typography: value.typography,
     shape: value.shape,
     spacing: value.spacing,
-  } as ThemeOptions;
+  } as unknown as ThemeOptions & { name?: string };
 }
