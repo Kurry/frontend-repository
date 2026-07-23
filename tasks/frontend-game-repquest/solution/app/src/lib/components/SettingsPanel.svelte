@@ -158,21 +158,19 @@
       </span>
       <span class="text-sm text-slate-300">{reminderEnabledInput ? 'On' : 'Off'}</span>
     </label>
-    {#if reminderEnabledInput}
-      <div class="mt-2">
-        <label class="text-xs text-slate-400 block mb-1" for="reminder-hour">Remind after</label>
-        <select
-          id="reminder-hour"
-          bind:value={reminderHourInput}
-          class="bg-slate-900 border border-slate-600 rounded-lg px-2 py-1 text-white text-sm
-                 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 hover:border-slate-500"
-        >
-          {#each Array.from({length: 24}, (_, i) => i) as hour}
-            <option value={String(hour)}>{formatHour(hour)}</option>
-          {/each}
-        </select>
-      </div>
-    {/if}
+    <div class="mt-2">
+      <label class="text-xs text-slate-400 block mb-1" for="reminder-hour">Remind after</label>
+      <select
+        id="reminder-hour"
+        bind:value={reminderHourInput}
+        class="bg-slate-900 border border-slate-600 rounded-lg px-2 py-1 text-white text-sm
+                focus:border-amber-500 focus:ring-1 focus:ring-amber-500 hover:border-slate-500"
+      >
+        {#each Array.from({length: 24}, (_, i) => i) as hour}
+          <option value={String(hour)}>{formatHour(hour)}</option>
+        {/each}
+      </select>
+    </div>
     {#if hourError}<p class="text-red-400 text-xs mt-2" role="alert">{hourError}</p>{/if}
   </div>
 
