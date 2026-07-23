@@ -1,0 +1,140 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "core.bed_canvas"
+name = "seasonal_bed_canvas"
+description = "Verify that crop blocks can be drawn into a bed grid for a season, snapped to a 0.25-meter grid, and resized or moved across beds/seasons without overlapping or leaving the boundary. Confirm that variety area/spacing increments are enforced."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core.succession"
+name = "succession_occupancy"
+description = "Verify that a bed cell can host successive blocks only if their intervals do not overlap and the turnaround buffer is met. Confirm that moving a date edge previews which future blocks will shift, orphan, or collide."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core.family_rotation"
+name = "family_rotation_history"
+description = "Verify that the app tracks crop family history per cell and enforces a declared gap before the same family returns. Confirm that the rotation-debt lens accurately colors cells and lists exact prior/future blocks when a conflict occurs."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core.companion_graph"
+name = "companion_incompatibility_graph"
+description = "Verify that users can link blocks as companion or succession pairs, subject to valid distance/time overlaps, and that contradictory/duplicate edges are rejected. Confirm selecting an edge highlights the spatial regions and dates."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core.light_water_capacity"
+name = "light_water_capacity_bands"
+description = "Verify that each block correctly derives light demand, water demand, and casts a north-oriented shadow footprint, and that bed/day water bands aggregate planned demand against fixed capacities."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core.seed_allocation"
+name = "seed_lot_allocation"
+description = "Verify that required seeds are computed correctly based on area, spacing, and a germination buffer, and that users can bind valid seed lots without exceeding availability or using expired/incompatible lots."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core.tasks_harvest"
+name = "task_harvest_timeline"
+description = "Verify that blocks correctly generate prepare, sow, thin, water-check, harvest-window, and clear tasks on a timeline with deterministic ranges/yields, and that scoped date edits can adjust a task independently or shift the parent block."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core.branch_eval_artifact"
+name = "branch_evaluate_artifact"
+description = "Verify that users can fork season plans, compare properties (geometry, rotation debt, graph, resources, seed, tasks), and resolve evaluator findings before generating deterministic JSON, SVG, CSV, and ICS exports."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core.invalid_overlap_bounds"
+name = "invalid_overlap_and_bounds"
+description = "Attempt to place a crop block overlapping an existing block or outside the bed boundary. Confirm that the UI prevents or immediately corrects the placement and displays a relevant error."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "core.invalid_seed_allocation"
+name = "invalid_seed_allocation"
+description = "Attempt to allocate a seed lot beyond its available quantity or from an expired lot. Confirm that the allocation is rejected with a clear error identifying the exact lot and reason."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "core.stale_seed_mark"
+name = "stale_seed_mark_on_resize"
+description = "Resize an existing crop block that has seeds allocated. Confirm that the seed allocation and dependent sow tasks are marked stale until manually reconciled."
+type = "binary"
+weight = 1.0
