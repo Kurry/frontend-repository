@@ -68,7 +68,6 @@ function getTopologicalOrder(nodes, edges) {
   if (!nodes.length) return { error: 'There is nothing to run. Drag a node from the palette onto the canvas to get started.' };
   const nodeIds = new Set(nodes.map((node) => node.id));
   const validEdges = edges.filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target));
-  if (nodes.length > 1 && validEdges.length === 0) return { error: 'Connect the nodes into a valid source-to-sink path before running.' };
 
   const neighbors = new Map(nodes.map((node) => [node.id, []]));
   const undirected = new Map(nodes.map((node) => [node.id, []]));
@@ -79,17 +78,6 @@ function getTopologicalOrder(nodes, edges) {
     undirected.get(edge.target).push(edge.source);
     indegree.set(edge.target, indegree.get(edge.target) + 1);
   });
-  if (nodes.length > 1) {
-    const seen = new Set();
-    const queue = [nodes[0].id];
-    while (queue.length) {
-      const id = queue.shift();
-      if (seen.has(id)) continue;
-      seen.add(id);
-      undirected.get(id).forEach((next) => queue.push(next));
-    }
-    if (seen.size !== nodes.length) return { error: 'Every node must belong to one connected source-to-sink path before running.' };
-  }
   const queue = nodes.filter((node) => indegree.get(node.id) === 0).sort((a, b) => a.position.x - b.position.x).map((node) => node.id);
   const order = [];
   while (queue.length) {
@@ -179,6 +167,7 @@ export const useWorkflowStore = create((set, get) => ({
   run: blankRun(),
   activeWorkflowName: 'Example orchestration',
   toast: null,
+  setAnnouncement: (msg) => set({ announcement: msg }),
   announcement: 'Example workflow ready',
   ui: {
     modal: null,
@@ -455,7 +444,7 @@ export const useWorkflowStore = create((set, get) => ({
     const body = saved
       ? { name: saved.name, nodes: saved.nodes, edges: saved.edges }
       : { name: state.activeWorkflowName || 'Untitled workflow', nodes: state.nodes.map(toContractNode), edges: state.edges.map(toContractEdge) };
-    const payload = { schemaVersion: 1, generatedAt: new Date().toISOString(), ...structuredClone(body) };
+    const payload = { schemaVersion: 1, generatedAt: new Date().toISOString().replace(/\.\d+Z$/, 'Z'), ...structuredClone(body) };
     if (!validate || !payload.nodes.length) return payload;
     return workflowDefinitionSchema.parse(payload);
   },
@@ -535,6 +524,11 @@ export const useWorkflowStore = create((set, get) => ({
   startRun: async () => {
     const state = get();
     if (state.run.phase === 'running' || state.run.phase === 'pausing') return false;
+    if (state.nodes.length === 0) {
+      get().showToast('error', 'There is nothing to run.');
+      set({ announcement: 'There is nothing to run. Drag a node from the palette onto the canvas to get started.' });
+      return false;
+    }
     const result = getTopologicalOrder(state.nodes, state.edges);
     if (result.error) {
       get().showToast('error', result.error);
@@ -584,6 +578,7 @@ export const useWorkflowStore = create((set, get) => ({
         if (attempt <= failureCount) {
           if (attempt < maxAttempts) {
             let seconds = 2;
+            get().appendEvent(nodeId, 'failed', 'failed', `Attempt ${attempt} failed with transient timeout`);
             get().setNodeExecution(nodeId, { status: 'retrying', attempt, backoff: seconds, error: 'Transient model timeout' });
             get().appendEvent(nodeId, 'retry scheduled', 'retrying', `Waiting ${seconds}s before retry ${attempt + 1} of ${maxAttempts}`);
             set({ announcement: `${currentNode.data.title} retrying, waiting ${seconds} seconds before retry ${attempt + 1} of ${maxAttempts}` });

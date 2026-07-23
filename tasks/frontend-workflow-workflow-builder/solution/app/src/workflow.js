@@ -25,7 +25,7 @@ export const DEFAULT_CONFIG = {
 const promptConfig = z.object({ prompt: z.enum(PROMPTS, { message: 'Prompt is required' }) });
 const agentConfig = z.object({
   agent: z.enum(AGENTS, { message: 'Agent is required' }),
-  timeoutSeconds: z.coerce.number({ message: 'Timeout is required' }).int('Timeout must be a whole number').min(1, 'Timeout must be at least 1 second').max(300, 'Timeout must be 300 seconds or less'),
+  timeoutSeconds: z.coerce.number({ message: 'timeout_seconds is required' }).int('timeout_seconds must be a whole number').min(1, 'timeout_seconds must be at least 1 second').max(300, 'timeout_seconds must be 300 seconds or less'),
 });
 const evalConfig = z.object({ rubric: z.enum(RUBRICS, { message: 'Rubric is required' }) });
 const conditionConfig = z.object({ conditionExpression: z.string().trim().min(1, 'Condition expression is required') });

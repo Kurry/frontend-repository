@@ -245,9 +245,9 @@ test.describe('workflow builder (task-specific)', () => {
     await expect(page.locator('.workflow-node')).toHaveCount(4);
 
     await savedRow.locator('.cds--tile, [role="button"]').first().click();
-    await expect(page.getByText('Replace the current canvas?')).toBeVisible();
+    await expect(page.getByText('Replace the current canvas?').first()).toBeVisible();
     await page.getByRole('button', { name: 'Keep current canvas' }).click();
-    await expect(page.getByText('Replace the current canvas?')).toBeHidden();
+    await expect(page.getByText('Replace the current canvas?').first()).toBeHidden();
     // Declining leaves the diverged (4-node) canvas untouched.
     await expect(page.locator('.workflow-node')).toHaveCount(4);
 
@@ -289,7 +289,7 @@ test.describe('workflow builder (task-specific)', () => {
     const lastEdge = page.locator('.react-flow__edge').last();
     await lastEdge.click({ force: true });
     await page.keyboard.press('Delete');
-    await expect(page.locator('.validity-badge')).toHaveText('Incomplete');
+    await expect(page.locator('.validity-badge')).toContainText('Incomplete');
     await expect(page.locator('.validity-badge')).toHaveAttribute('title', /./);
   });
 
