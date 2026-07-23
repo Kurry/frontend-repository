@@ -62,7 +62,7 @@ function StepControls({ bundle, stepName, locked }: { bundle: ReviewBundle; step
   return (
     <Paper className="step-controls" component="form">
       <div><Text fw={800}>{stepName} reviewer checkpoint</Text><Text size="xs" c="dimmed">Notes persist for this in-memory review session and appear in the summary and export.</Text></div>
-      <Controller name="notes" control={control} render={({ field }) => <Textarea {...field} disabled={locked} label={`${stepName} step notes`} placeholder={`Record ${stepName.toLowerCase()} observations…`} minRows={2} error={errors.notes?.message} onBlur={(event) => { field.onBlur(); setNotes(bundle.slug, stepName, event.currentTarget.value); }} />} />
+      <Controller name="notes" control={control} render={({ field }) => <Textarea {...field} disabled={locked} label={`${stepName} step notes`} placeholder={`Record ${stepName.toLowerCase()} observations…`} minRows={2} error={errors.notes?.message} onChange={(event) => { field.onChange(event); setNotes(bundle.slug, stepName, event.currentTarget.value); }} />} />
       <Checkbox checked={step.done} disabled={locked} onChange={(event) => setDone(bundle.slug, stepName, event.currentTarget.checked)} label={`Mark ${stepName} done`} description={step.done ? 'Unmarking re-locks every later step while preserving notes.' : 'Completing this checkpoint unlocks the next reviewer step.'} />
     </Paper>
   );

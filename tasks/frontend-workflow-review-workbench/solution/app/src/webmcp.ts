@@ -204,6 +204,9 @@ export function registerWebMCP() {
       if (!REVIEWER_STEPS.includes(input.step as ReviewerStepName)) return failure('step is required for step-notes.');
       if (mutate) store.setStepNotes(slug, input.step as ReviewerStepName, String(input.notes ?? ''));
     } else return failure('action is not a declared workflow action.');
+    if (mutate && (slug !== store.selection.bundleSlug || store.ui.view !== 'workspace')) {
+      store.openBundle(slug, store.ui.workspacePanel);
+    }
     return result(mutate ? `${action} completed through the product handler.` : `${action} is valid.`, { state: snapshotBundle(slug) });
   };
 

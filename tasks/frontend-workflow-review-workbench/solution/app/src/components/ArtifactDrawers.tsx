@@ -27,7 +27,7 @@ export function ArtifactDrawers() {
     if (ui.exportFormat === 'json') buildReviewPackage(bundles, ui.exportGeneratedAt);
     await navigator.clipboard.writeText(preview);
     setAnnouncement('Export preview copied.');
-    notifications.show({ title: 'Preview copied', message: 'The exact visible preview text is on the clipboard.', color: 'teal', icon: <IconCheck size={16} /> });
+    notifications.show({ title: 'Preview copied', message: 'The exact visible preview text is on the clipboard.', color: 'teal', icon: <IconCheck size={16} />, autoClose: 3000 });
   };
   const download = () => {
     if (ui.exportFormat === 'json') buildReviewPackage(bundles, ui.exportGeneratedAt);
@@ -39,7 +39,7 @@ export function ArtifactDrawers() {
     anchor.click();
     URL.revokeObjectURL(url);
     setAnnouncement('Export download started.');
-    notifications.show({ title: 'Download started', message: anchor.download, color: 'teal', icon: <IconDownload size={16} /> });
+    notifications.show({ title: 'Download started', message: anchor.download, color: 'teal', icon: <IconDownload size={16} />, autoClose: 3000 });
   };
   const submitImport = ({ packageText }: { packageText: string }) => {
     clearErrors('packageText');
@@ -49,7 +49,7 @@ export function ArtifactDrawers() {
       return;
     }
     setAnnouncement('Certification package imported.');
-    notifications.show({ title: 'Package imported', message: 'Portfolio and bundle session facets now match the imported document.', color: 'teal', icon: <IconCheck size={16} /> });
+    notifications.show({ title: 'Package imported', message: 'Portfolio and bundle session facets now match the imported document.', color: 'teal', icon: <IconCheck size={16} />, autoClose: 3000 });
   };
   const loadLiveJson = () => {
     const liveJson = reviewPackageJson(bundles, new Date().toISOString());
@@ -124,7 +124,7 @@ export function ArtifactDrawers() {
             <Button type="button" variant="default" leftSection={<IconClipboard size={16} />} onClick={async () => {
               await navigator.clipboard.writeText(ui.importDraft);
               setAnnouncement('Import draft copied.');
-              notifications.show({ title: 'Import draft copied', message: 'The exact JSON in the editor is on the clipboard.', color: 'teal', icon: <IconCheck size={16} /> });
+              notifications.show({ title: 'Import draft copied', message: 'The exact JSON in the editor is on the clipboard.', color: 'teal', icon: <IconCheck size={16} />, autoClose: 3000 });
             }}>Copy</Button>
             <Button type="button" variant="default" leftSection={<IconDownload size={16} />} onClick={() => {
               const blob = new Blob([ui.importDraft || '{}'], { type: 'application/json' });

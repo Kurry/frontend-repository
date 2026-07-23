@@ -91,7 +91,7 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline: 3px s
 .gate-chip-button { display: flex; align-items: center; gap: 3px; border: 1px solid var(--line); border-radius: 999px; background: white; padding: 2px 4px 2px 6px; cursor: pointer; }
 .gate-chip-button > span:first-child { font-size: 9px; font-weight: 850; color: var(--muted); }
 .gate-chip-button:hover { background: #eef8f6; border-color: #9ac8c1; }
-.status-chip { font-weight: 800; text-transform: lowercase; letter-spacing: .01em; white-space: nowrap; }
+.status-chip { font-weight: 800; letter-spacing: .01em; white-space: nowrap; }
 .status-pass { background: #dff4ec; color: #0c735e; }
 .status-fail { background: #ffe1e3; color: #ad2634; }
 .status-errored { background: #eee4fa; color: #6d3da0; }
@@ -317,12 +317,17 @@ html.theme-dark .brand, html.theme-dark .gate-chip-button, html.theme-dark .thre
 html.theme-dark .step-rail, html.theme-dark .portfolio-table-wrap thead, html.theme-dark .breadcrumb, html.theme-dark .reasons-list, html.theme-dark .threshold { background: #1d2b28; }
 html.theme-dark .palette-item { background: #1d2b28; color: var(--ink); }
 html.theme-dark .coachmarks { background: rgba(23,35,32,.98); }
+html.theme-dark .mantine-Drawer-content { background: var(--paper); color: var(--ink); }
+html.theme-dark .export-drawer-content .artifact-preview { background: var(--canvas); color: var(--ink); border-color: var(--line); }
 
 @media print {
-  .app-topbar, .coachmarks, .mantine-Drawer-overlay, .mantine-Drawer-header, .artifact-actions, .app-footer { display: none !important; }
+  body * { visibility: hidden !important; }
+  .export-drawer-content, .export-drawer-content * { visibility: visible !important; }
+  .export-drawer-content { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+  .artifact-preview { border: none !important; background: transparent !important; overflow: visible !important; white-space: pre-wrap !important; word-break: break-word !important; }
+  .app-topbar, .coachmarks, .mantine-Drawer-overlay, .mantine-Drawer-header, .artifact-actions, .app-footer, .mantine-SegmentedControl-root { display: none !important; }
   body { background: white !important; }
   .mantine-Drawer-content, .mantine-Drawer-body { position: static !important; width: 100% !important; max-width: none !important; overflow: visible !important; }
-  .artifact-preview { height: auto !important; min-height: 0 !important; overflow: visible !important; white-space: pre-wrap !important; color: black !important; background: white !important; border: 0 !important; }
 }
 .import-textarea { font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; background: #172421; color: #d8ebe6; }
 .import-textarea::placeholder { color: #8eaaa4; }
@@ -405,7 +410,9 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monos
   .gate-card { padding: 14px; }
   .gate-card > .mantine-Group-root { align-items: flex-start; }
   .gate-card .status-chip { max-width: 120px; }
-  .fix-item { grid-template-columns: 28px 22px minmax(0, 1fr); gap: 7px; padding: 11px; }
+  .fix-item { grid-template-columns: 28px 44px minmax(0, 1fr); gap: 7px; padding: 11px; }
+  .fix-item .mantine-Checkbox-root { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin: -10px -10px -10px 0; }
+  .fix-item .mantine-Checkbox-input { cursor: pointer; }
   .fix-content > .mantine-Group-root:first-child { flex-wrap: wrap; }
   .fix-title { width: 100%; }
   .trial-entry { min-width: 165px; }

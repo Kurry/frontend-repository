@@ -56,7 +56,7 @@ export const exportBundleSchema = z.object({
 });
 
 export const reviewPackageSchema = z.object({
-  schemaVersion: z.literal('review-certification/v1'),
+  schemaVersion: z.literal('review-certification/v1', { errorMap: () => ({ message: "schemaVersion must be 'review-certification/v1'" }) }),
   exportedAt: z.string().datetime({ offset: true }).refine((value) => value.endsWith('Z'), 'exportedAt must be an ISO-8601 timestamp ending in Z.'),
   portfolioSummary: z.object({
     totalBundles: z.number().int(),
