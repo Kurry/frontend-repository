@@ -1,0 +1,125 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+[[criterion]]
+id = "AC-01"
+name = "ac_01_core_features"
+description = "Contract/split/link, packet/request/revise/respond/transfer, negotiate, deliver/verify/reopen/close, and export -> every view/file agrees."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "CF-01"
+name = "cf_01_commitment_contract"
+description = "Each commitment requires outcome, acceptance evidence, requester, current owner, verifier, due instant, effort, priority, dependencies, and status. Ambiguous verbs or missing evidence criteria trigger fixture-based findings. Commitments may split into children whose evidence collectively satisfies the parent; deleting completed/history-bound work is forbidden."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "CF-02"
+name = "cf_02_responsibility_and_dependency_graph"
+description = "Commitment nodes occupy owner lanes and connect by blocks, informs, contributes-to, or verifies edges. Cycles reject for blocks/contributes-to. Selecting a node/edge highlights calendar bars, handoff packet fields, waiting queue, and workload. Keyboard source-target binding and mobile selectors equal graph gestures."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "CF-03"
+name = "cf_03_handoff_packet_composer"
+description = "A proposed handoff contains scope snapshot, relevant dependency/evidence ids, constraints, current progress, open questions, due date, verification rule, and fallback owner. Users include/exclude cards from a spatial packet tray with exact completeness rules. Sensitive fixture notes can be redacted only with a reason and may render the packet incomplete."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "CF-04"
+name = "cf_04_transactional_transfer_workflow"
+description = "States are draft, requested, clarification-needed, revised, accepted, rejected, expired, withdrawn, transfer-ready, transferred, delivered, verification-failed, verified, renegotiating, cancelled, or closed. Requesting reserves capacity but leaves canonical ownership unchanged. Only current-revision acceptance plus complete packet and valid dependencies transfers ownership atomically."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "CF-05"
+name = "cf_05_clarification_and_revision_lineage"
+description = "The proposed owner may ask bounded fixture questions, propose deadline/scope edits, accept, or reject. Editing a field after response creates a revision and resets only responses invalidated by the changed field set. Compare shows packet/contract/deadline differences. Expiry releases capacity and creates a follow-up decision without mutating ownership."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "CF-06"
+name = "cf_06_workload_and_deadline_negotiation"
+description = "Owner lanes show committed, reserved, waiting, and available effort by day. Moving a due date or accepting a handoff previews overload, dependency lateness, and verifier availability. A deterministic suggestion may split, resequence, move deadline, or choose fallback; it remains a proposal with rule evidence."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "CF-07"
+name = "cf_07_delivery_and_verification"
+description = "The owner attaches fixture evidence items to acceptance criteria and marks delivered. The verifier accepts, rejects specific criteria, or requests revision. Partial delivery preserves satisfied criteria and creates a revision loop for the remainder. Verification changes downstream dependency eligibility; closing requires all criteria and follow-up obligations resolved."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "CF-08"
+name = "cf_08_responsive_ledger_and_artifacts"
+description = "Desktop shows owner lanes/graph, commitment detail/packet tray, timeline/workload, and response/verification rail. Mobile becomes owner/commitment cards, vertical dependency/handoff lineage, packet checklist sheets, deadline/workload drilldowns, and response/verification stepper. Export produces canonical JSON, CSV commitment/ownership event ledger, ICS deadlines/follow-ups, and Markdown handoff/verification packets; import reconstructs state exactly."
+type = "binary"
+weight = 1.0
