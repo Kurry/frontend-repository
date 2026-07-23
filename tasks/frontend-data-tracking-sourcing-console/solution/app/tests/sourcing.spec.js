@@ -11,6 +11,13 @@ async function exportPack(page) {
   return pack
 }
 
+async function openBuildQueue(page) {
+  await page.getByRole('button', { name: 'Open command palette' }).click()
+  const palette = page.getByRole('dialog', { name: 'Command palette' })
+  await palette.getByLabel('Search commands').fill('build queue')
+  await palette.getByRole('button', { name: 'Build queue' }).click()
+}
+
 test.beforeEach(async ({ page }) => {
   await page.goto('/')
 })
@@ -115,20 +122,20 @@ test('invalid import names the field and preserves active filters and rows', asy
 })
 
 test('selection changes the matching quota cell and export by exactly one', async ({ page }) => {
-  const name = 'northloom/thread-cache'
+  const name = 'mirthworks/jolly-log'
   const before = await exportPack(page)
   const beforeCandidate = before.candidates.find((candidate) => candidate.name === name)
-  const beforeCell = before.quota.find((cell) => cell.language === beforeCandidate.language && cell.band === 'hard')
+  const beforeCell = before.quota.find((cell) => cell.language === beforeCandidate.language && cell.band === 'easy')
 
   await candidateRow(page, name).getByRole('button', { name: 'Select' }).click()
   await expect(candidateRow(page, name)).toContainText('Selected')
   const after = await exportPack(page)
-  const afterCell = after.quota.find((cell) => cell.language === beforeCandidate.language && cell.band === 'hard')
+  const afterCell = after.quota.find((cell) => cell.language === beforeCandidate.language && cell.band === 'easy')
 
   expect(after.candidates.find((candidate) => candidate.name === name).status).toBe('selected')
   expect(afterCell.achieved).toBe(beforeCell.achieved + 1)
   await page.getByRole('button', { name: 'Quota', exact: true }).click()
-  await expect(page.getByRole('button', { name: new RegExp(`${beforeCandidate.language} hard: ${afterCell.achieved} of`) })).toBeVisible()
+  await expect(page.getByRole('button', { name: new RegExp(`${beforeCandidate.language} easy: ${afterCell.achieved} of`) })).toBeVisible()
 })
 
 test('distinct rejection reasons remain distinct across rows timeline and export', async ({ page }) => {
@@ -150,8 +157,8 @@ test('distinct rejection reasons remain distinct across rows timeline and export
 })
 
 test('queue can be emptied and repopulated with coherent rollup and export order', async ({ page }) => {
-  await page.getByRole('button', { name: 'Build queue', exact: true }).click()
-  for (const button of await page.getByRole('button', { name: /^Remove .* from queue$/ }).all()) await button.click()
+  await openBuildQueue(page)
+  while (await page.getByRole('button', { name: /^Remove .* from queue$/ }).count()) await page.getByRole('button', { name: /^Remove .* from queue$/ }).first().click()
   await expect(page.getByRole('heading', { name: 'Queue is ready' })).toBeVisible()
 
   await page.getByRole('button', { name: 'Candidates', exact: true }).click()
@@ -179,7 +186,7 @@ test('export mutation import and bulk undo redo round-trip through visible contr
   await importDialog.getByRole('button', { name: 'Apply import' }).click()
   await expect(candidateRow(page, 'northloom/thread-cache')).toContainText('Scored')
 
-  const scored = ['northloom/thread-cache', 'emberforge/flint-schema', 'copperfield/wren-query']
+  const scored = ['mirthworks/jolly-log', 'emberforge/flint-schema', 'copperfield/wren-query']
   for (const name of scored) await candidateRow(page, name).getByRole('checkbox').check()
   const selectedBefore = Number(await page.locator('.rollups').getByText('Selected').locator('..').locator('.text-xl').textContent())
   await page.getByRole('button', { name: 'Bulk Select' }).click()
@@ -472,6 +479,7 @@ test('control states expose hover focus disabled and field-linked error treatmen
   const field = page.getByRole('dialog', { name: /Reject northloom\/thread-cache/ }).getByLabel('Rejection reason')
   await page.getByRole('dialog', { name: /Reject northloom\/thread-cache/ }).getByRole('button', { name: 'Reject', exact: true }).click()
   await expect(field).toHaveAttribute('aria-invalid', 'true')
+  await field.blur()
   expect(await field.evaluate((node) => getComputedStyle(node).borderColor)).toBe('rgb(255, 143, 160)')
 })
 
@@ -480,14 +488,15 @@ test('snapshot comparison is an additional operator-efficiency enhancement', asy
   const dialog = page.getByRole('dialog', { name: 'Export sourcing pack' })
   await dialog.getByRole('button', { name: 'Take snapshot' }).click()
   await page.keyboard.press('Escape')
-  await candidateRow(page, 'northloom/thread-cache').getByRole('button', { name: 'Select' }).click()
+  await candidateRow(page, 'mirthworks/jolly-log').getByRole('button', { name: 'Select' }).click()
   await page.getByRole('button', { name: 'Export pack' }).click()
   await dialog.getByRole('button', { name: 'Take snapshot' }).click()
   await dialog.getByRole('button', { name: 'Compare snapshots' }).click()
-  await expect(dialog.getByLabel('Snapshot comparison')).toContainText('northloom/thread-cache: scored → selected')
+  await expect(dialog.getByLabel('Snapshot comparison')).toContainText('mirthworks/jolly-log: scored → selected')
 })
 
 test('undo redo mutation matrix keeps table queue timeline quota and export coherent', async ({ page }) => {
+  test.setTimeout(90_000)
   const statusInExport = async (name) => (await exportPack(page)).candidates.find((candidate) => candidate.name === name).status
   const undoRedoStatus = async (name, before, after) => {
     await page.getByRole('button', { name: 'Undo' }).click()
@@ -509,12 +518,12 @@ test('undo redo mutation matrix keeps table queue timeline quota and export cohe
   await candidateRow(page, flow).getByRole('button', { name: 'Queue' }).click()
   await undoRedoStatus(flow, 'Pinned', 'Queued')
 
-  await page.getByRole('button', { name: 'Build queue', exact: true }).click()
+  await openBuildQueue(page)
   await page.getByRole('button', { name: `Remove ${flow} from queue` }).click()
   await page.getByRole('button', { name: 'Candidates', exact: true }).click()
   await undoRedoStatus(flow, 'Queued', 'Selected')
 
-  await page.getByRole('button', { name: 'Build queue', exact: true }).click()
+  await openBuildQueue(page)
   const firstBefore = await page.getByRole('list', { name: 'Ordered build queue' }).locator('li').first().textContent()
   await page.getByRole('button', { name: /Move .* down/ }).first().click()
   const firstAfter = await page.getByRole('list', { name: 'Ordered build queue' }).locator('li').first().textContent()

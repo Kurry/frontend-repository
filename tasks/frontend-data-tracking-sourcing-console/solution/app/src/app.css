@@ -102,6 +102,7 @@ select.field { appearance:none; background-image:linear-gradient(45deg,transpare
 .dialog-backdrop.layer-panel { z-index:55; }
 .dialog-backdrop.layer-palette { z-index:70; }
 .dialog-card { width:min(560px,100%); background:#0f2136; border:1px solid #35526f; box-shadow:0 30px 90px rgb(0 0 0 / .55); }
+.dialog-card, .palette-card { transition:opacity .24s ease, transform .24s ease; }
 .dialog-card.card-lg { width:min(860px,100%); }
 .dialog-card.card-sm { width:min(460px,100%); }
 .palette-card { width:min(650px,100%); overflow:hidden; border:1px solid #42617e; background:#0d1c2e; box-shadow:0 28px 90px rgb(0 0 0 / .6); }
