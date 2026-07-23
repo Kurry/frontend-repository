@@ -49,10 +49,17 @@ The workflow uses `gpt-5.6-luna` and the repository's `CODEX_AUTH_JSON`
 secret, updates a sticky PR score comment, and appends a successful score to
 `docs/judge-ledger.jsonl` on `main`. Reward artifacts remain ephemeral and must
 never be committed inside task directories. This workflow consumes the owner's
-ChatGPT-plan quota, never runs automatically on PR-controlled code, is globally
-serialized, and accepts one task only. Full-corpus judge sweeps are dispatched
-exclusively by the repository owner via `.github/workflows/judge-oracle-all.yml`.
-A maintainer can also use `.github/workflows/judge-oracle.yml`'s one-slug manual dispatch.
+ChatGPT-plan quota and never runs automatically on PR-controlled code. It grades
+one task per run but is NOT globally serialized: runs are grouped per PR (or per
+dispatch slug) with `cancel-in-progress: false`, so distinct PRs judge
+concurrently (up to the ~20 concurrent-job cap) without cancelling each other,
+while a repeated `/judge` on one PR queues behind its own in-flight run rather
+than killing it. (The previous single global group serialized everything and made
+GitHub coalesce-and-cancel the pending run on every additional `/judge`, so a
+burst of `/judge` comments cancelled almost every run.) Full-corpus judge sweeps
+are dispatched exclusively by the repository owner via
+`.github/workflows/judge-oracle-all.yml`. A maintainer can also use
+`.github/workflows/judge-oracle.yml`'s one-slug manual dispatch.
 
 Dimension tomls (`tests/<dim>/<dim>.toml`) are the single source of truth for criteria and are edited directly (see `docs/rubrics.md` for criterion conventions; the `rubrics` skill does the alignment work). Outcome / user-flow lists are authored as criteria in a dimension toml — the `behavioral` dimension covers them when a task ships it; until then they live in `core_features`. There is no separate outcomes file.
 
