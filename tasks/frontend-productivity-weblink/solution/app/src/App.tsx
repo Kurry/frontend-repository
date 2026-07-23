@@ -21,7 +21,7 @@ export default function App() {
           <h1 class="text-xl font-semibold tracking-tight lg:text-lg">Weblink</h1>
           <span class="hidden text-xs text-slate-600 dark:text-slate-400 sm:inline">peer-to-peer chat &amp; file transfer</span>
         </div>
-        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+        <nav aria-label="Main navigation" class="flex flex-wrap items-center gap-2 sm:gap-3">
           <ExportTranscriptDialog />
           <ImportDialog />
           <ExportDialog />
@@ -34,7 +34,7 @@ export default function App() {
           >
             {state.ui.theme === "light" ? "Dark Mode" : "Light Mode"}
           </button>
-        </div>
+        </nav>
       </header>
 
       <main class="mx-auto grid max-w-7xl grid-cols-1 gap-4 p-4 lg:grid-cols-[280px_1fr_400px]">
