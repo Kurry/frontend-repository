@@ -124,7 +124,7 @@ const enterWorkspace = async (page, width = 1280, height = 900) => {
   await page.getByRole('button', { name: 'Skip Tour' }).click();
 };
 
-test('4.4 te_4 WebMCP covers every podcast workflow domain', async ({ page }) => {
+test('4.4 te_4', async ({ page }) => {
   await enterWorkspace(page);
   const tools = await listTools(page);
   const surface = tools.map(tool => `${tool.name} ${tool.description}`).join('\n').toLowerCase();
@@ -139,7 +139,7 @@ test('4.4 te_4 WebMCP covers every podcast workflow domain', async ({ page }) =>
   expect((await invokeTool(page, 'session.restart')).ok).toBe(true);
 });
 
-test('4.5 te_5 mobile reflow retains source, edit, lineage, approval, render, and export actions', async ({ page }) => {
+test('4.5 te_5', async ({ page }) => {
   await enterWorkspace(page, 375, 812);
   await expect(page.getByRole('button', { name: 'Sources' })).toBeVisible();
   await page.getByRole('button', { name: 'Sources' }).click();
@@ -162,7 +162,7 @@ test('4.5 te_5 mobile reflow retains source, edit, lineage, approval, render, an
   await expect(page.getByRole('button', { name: /Export All/ })).toBeVisible();
 });
 
-test('4.6 te_6 keyboard-only editing, navigation, approval review, render, and export', async ({ page }) => {
+test('4.6 te_6', async ({ page }) => {
   await enterWorkspace(page);
   await page.getByTitle(/Select Clip 1/).first().focus();
   await page.keyboard.press('Enter');
@@ -182,7 +182,7 @@ test('4.6 te_6 keyboard-only editing, navigation, approval review, render, and e
   await expect(page.getByRole('button', { name: /Export All/ })).toBeVisible();
 });
 
-test('4.7 te_7 UI and WebMCP share ids, milliseconds, checksums, history, and artifact files', async ({ page }) => {
+test('4.7 te_7', async ({ page }) => {
   await enterWorkspace(page);
   const selected = await invokeTool(page, 'entity.select', { id: 'inst-1' });
   expect(selected.ok).toBe(true);
