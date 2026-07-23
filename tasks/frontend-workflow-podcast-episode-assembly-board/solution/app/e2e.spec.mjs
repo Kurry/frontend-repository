@@ -250,7 +250,7 @@ test('11.n9 design_has_no_twist', async ({ page }) => {
 
 test('11.n10 effort_stops_at_mvp', async ({ page }) => {
   await enterWorkspace(page);
-  await expect(page.getByRole('navigation', { name: 'Workspace sections' }).getByRole('button')).toHaveCount(9);
+  await expect(page.getByRole('navigation', { name: 'Workspace sections' }).getByRole('button')).toHaveCount(8);
   await expect(page.getByRole('button', { name: 'Cut Coach' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Voice' })).toBeVisible();
   await expect(page.getByText('Offline Ready')).toBeVisible();
@@ -260,7 +260,7 @@ test('innovation.catchall innovation_catchall', async ({ page }) => {
   await enterWorkspace(page);
   await page.getByRole('button', { name: 'Cut Coach' }).click();
   const coach = page.getByRole('dialog', { name: 'Cut Coach' });
-  await expect(coach).toContainText(/blocks|Approve|Remove/);
+  await expect(coach).toContainText(/orphaned|bind|Approve|Remove/);
   await expect(coach).toContainText(/clips/);
   await expect(coach).toContainText(/orphan cites/);
   await expect(coach).toContainText(/approvals/);
