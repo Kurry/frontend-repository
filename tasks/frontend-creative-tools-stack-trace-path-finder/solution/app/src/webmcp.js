@@ -1,6 +1,5 @@
 import { useStore } from './store';
 
-const modules = ['structured-editor-v1', 'entity-collection-v1', 'artifact-transfer-v1'];
 const sessionInfo = {
   tools: [
     'editor_select', 'editor_update_property', 'editor_preview', 'editor_set_content',
@@ -26,41 +25,77 @@ window.webmcp_invoke_tool = (toolName, argsInput) => {
   try {
     switch (toolName) {
       case 'editor_select':
-        return { success: true };
+        store.select(args.id ? { type: args.objectType || 'frame', id: args.id } : null);
+        return { success: true, selection: useStore.getState().selection };
       case 'editor_update_property':
-        if (args.property === 'weights') {
+        // Bound properties: weight, pinned-node, collapsed (same handlers as the UI).
+        if (args.property === 'weight' || args.property === 'weights') {
           store.updateFrame(args.id, { weight: args.value });
-        } else if (args.property === 'pinned') {
+        } else if (args.property === 'pinned-node' || args.property === 'pinned') {
           store.mapCandidate(args.id, args.value);
+        } else if (args.property === 'collapsed') {
+          store.updateFrame(args.id, { collapsed: !!args.value });
+        } else {
+          throw new Error(`Unknown property: ${args.property}`);
         }
         return { success: true };
-      case 'editor_preview':
-        return { success: true, frames: store.frames, path: store.path, valid: store.valid };
+      case 'editor_preview': {
+        const s = useStore.getState();
+        return {
+          success: true,
+          frames: s.frames,
+          path: s.path,
+          valid: s.valid,
+          contradictions: s.contradictions.map((c) => c.message),
+          unresolvedFrameIds: s.unresolved.map((f) => f.id),
+          minimalLocus: s.minimalLocus,
+        };
+      }
       case 'editor_set_content':
         store.setRawTrace(args.content);
         return { success: true };
-      case 'entity_create':
-        store.saveHypothesis(args.name);
-        return { success: true, id: store.activeHypothesisId };
+      case 'entity_create': {
+        const ok = store.saveHypothesis(args.name);
+        const s = useStore.getState();
+        if (!ok) return { success: false, error: 'Hypothesis limit reached (max 2). Delete one first.' };
+        const hyp = s.hypotheses.find((h) => h.id === s.activeHypothesisId);
+        return {
+          success: true,
+          id: s.activeHypothesisId,
+          name: hyp?.name,
+          'frame-count': hyp ? hyp.frames.length : 0,
+          'path-status': hyp?.valid ? 'valid' : 'invalid',
+        };
+      }
       case 'entity_select':
         store.loadHypothesis(args.id);
         return { success: true };
       case 'entity_delete':
+        if (args.confirm !== true) return { success: false, error: 'Delete requires confirm=true.' };
         store.deleteHypothesis(args.id);
         return { success: true };
       case 'artifact_export':
-      case 'artifact_copy':
+      case 'artifact_copy': {
+        const s = useStore.getState();
         return {
           schemaVersion: "stack-path-hypothesis/v1",
           exportedAt: new Date().toISOString(),
-          rawTraceText: store.rawTrace,
-          frames: store.frames,
-          path: store.path,
-          hypotheses: store.hypotheses,
+          rawTraceText: s.rawTrace,
+          frames: s.frames,
+          path: s.path,
+          hypotheses: s.hypotheses,
+          annotations: s.annotations,
+          valid: s.valid,
+          unresolvedFrameIds: s.unresolved.map((f) => f.id),
         };
-      case 'artifact_import':
-        store.importSession(args.data || args);
-        return { success: true };
+      }
+      case 'artifact_import': {
+        const payload = args.data || args.pack || args;
+        const data = typeof payload === 'string' ? JSON.parse(payload) : payload;
+        store.importSession(data);
+        const s = useStore.getState();
+        return { success: true, frameCount: s.frames.length, valid: s.valid, path: s.path };
+      }
       default:
         throw new Error(`Unknown tool: ${toolName}`);
     }

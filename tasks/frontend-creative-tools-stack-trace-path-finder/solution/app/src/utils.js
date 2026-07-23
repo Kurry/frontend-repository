@@ -1,5 +1,16 @@
 import { fixtureGraph } from './fixture';
 
+const nodeById = new Map(fixtureGraph.nodes.map((n) => [n.id, n]));
+
+export function nodeLabel(id) {
+  const n = nodeById.get(id);
+  return n ? `${id} (${n.basename}:${n.symbol})` : id;
+}
+
+export function getNode(id) {
+  return nodeById.get(id) || null;
+}
+
 export function parseTrace(rawText) {
   const lines = rawText.split('\n');
   const frames = [];
@@ -14,7 +25,7 @@ export function parseTrace(rawText) {
       continue;
     }
 
-    let parsed = { id: `f${frameId++}`, originalLine: i, text: line, type: 'frame', pinned: null, candidates: [], weight: 100, mappedNode: null, collapsed: false };
+    let parsed = { id: `f${frameId++}`, originalLine: i, text: line, type: 'frame', pinned: null, candidates: [], rejected: [], weight: 100, mappedNode: null, collapsed: false };
 
     // File "main.py", line 12, in start_app
     const pyMatch = line.match(/File "([^"]+)", line (\d+), in (\S+)(?:\s+\((.*?)\))?/);
@@ -37,14 +48,15 @@ export function parseTrace(rawText) {
       }
     }
 
-    // Expand candidates
+    // Expand deterministic candidates: basename, whole-word symbol, line range,
+    // and language must all agree with a fixture node.
     if (parsed.type === 'frame') {
       parsed.candidates = fixtureGraph.nodes.filter(n =>
         n.basename === parsed.basename &&
         n.symbol === parsed.symbol &&
         n.language === parsed.language &&
         parsed.line >= n.lineRange[0] && parsed.line <= n.lineRange[1]
-      ).map(n => ({ ...n, score: 100 })); // simplified score
+      ).map(n => ({ ...n, score: 100 }));
     }
 
     frames.push(parsed);
@@ -52,118 +64,125 @@ export function parseTrace(rawText) {
   return frames;
 }
 
+function bfs(from, to, neighbors) {
+  const queue = [[from]];
+  const visited = new Set([from]);
+  while (queue.length > 0) {
+    const curPath = queue.shift();
+    const tail = curPath[curPath.length - 1];
+    if (tail === to) return curPath;
+    for (const n of neighbors(tail)) {
+      if (!visited.has(n)) {
+        visited.add(n);
+        queue.push([...curPath, n]);
+      }
+    }
+  }
+  return null;
+}
+
+// Computes the connector route through the frozen graph for the current frame
+// order. Contradictions are structured ({ message, frameIds, nodeIds }) so the
+// UI can focus-sync the offending frames, graph segment, and excerpts.
 export function computePath(frames, edges) {
-  let path = [];
+  const path = [];
   let valid = true;
-  let contradictions = [];
+  const contradictions = [];
+  const unresolved = frames.filter((f) => f.type === 'unresolved');
 
-  const mappedFrames = frames.filter(f => f.mappedNode && !f.collapsed && f.type === 'frame');
-
+  const mappedFrames = frames.filter((f) => f.mappedNode && !f.collapsed && f.type === 'frame');
   if (mappedFrames.length === 0) {
-    return { path: [], valid: true, contradictions: [] };
+    return { path: [], valid: true, contradictions: [], unresolved };
   }
 
-  // Initial path segment is just the first mapped node
   path.push(mappedFrames[0].mappedNode);
 
   for (let i = 0; i < mappedFrames.length - 1; i++) {
-    const from = mappedFrames[i].mappedNode;
-    const to = mappedFrames[i+1].mappedNode;
+    const fromFrame = mappedFrames[i];
+    const toFrame = mappedFrames[i + 1];
+    const from = fromFrame.mappedNode;
+    const to = toFrame.mappedNode;
 
     if (from === to) {
-        contradictions.push(`Duplicate node reuse: ${from}`);
-        valid = false;
-        continue;
+      contradictions.push({
+        message: `Duplicate node reuse: consecutive frames ${fromFrame.id} and ${toFrame.id} both map to ${nodeLabel(from)}.`,
+        frameIds: [fromFrame.id, toFrame.id],
+        nodeIds: [from],
+      });
+      valid = false;
+      continue;
     }
 
-    let q = [[from]];
-    let visited = new Set([from]);
-    let found = false;
-
-    // First try forward path (callee sequence)
-    while (q.length > 0) {
-      let curPath = q.shift();
-      let tail = curPath[curPath.length - 1];
-
-      if (tail === to) {
-        path.push(...curPath.slice(1));
-        found = true;
-        break;
-      }
-
-      let nextNodes = edges.filter(e => e.source === tail).map(e => e.target);
-      for (let n of nextNodes) {
-        if (!visited.has(n)) {
-          visited.add(n);
-          q.push([...curPath, n]);
-        }
-      }
+    // Shortest directed caller→callee segment between consecutive mapped frames.
+    const forward = bfs(from, to, (tail) => edges.filter((e) => e.source === tail).map((e) => e.target));
+    if (forward) {
+      path.push(...forward.slice(1));
+      continue;
     }
 
-    // If not found forward, in stack traces, callers are higher up, so callee edges go UP.
-    // Wait, caller->callee is standard.
-    // In stack trace:
-    // main.py start_app (caller) -> router.py dispatch (callee).
-    // n1 (start_app) -> n2 (run) -> n3 (dispatch).
-    // But sometimes you have returns, or in an error stack it's usually inside out.
-    // Traceback (most recent call last) means caller is AT TOP.
-    // So caller -> callee -> callee
-    // The fixture raw trace:
-    // start_app -> dispatch -> processData -> fetchRecord -> execute
-    // Which matches the forward edges.
-    // n1 -> n2 -> n3 -> n4 -> n5 -> n6 -> n7 -> n8
-    // But then: Unresolved frame ... format (wrapper)
-    // format is n9.
-    // n8 -> n9 fails forward because n8 is execute and doesn't call format.
-    // But n4 (handle_req) calls n9.
-    // This is a known issue the prompt specifically asks to detect: "contradiction detection: ... reversed caller/callee order, missing connectors, forbidden generated-file crossings..."
-    // Wait, if n8 to n9 has no path, it SHOULD be an invalid path. But why did the judge say "no unique valid hypothesis was produced" if it was just testing the core workflow?
-    // Maybe the user mapped it wrong intentionally to test errors, or mapped it to something that should be valid?
-    // The instruction says "ordered frame records... missing connectors".
-    // I will use bidirectional or undirected search to find ANY path, but if it requires going backwards against edges (caller), it should be marked as "reversed caller/callee order" contradiction but still show the path?
-    // No, "missing connectors" means there is no path.
-    // Let's just allow BFS on undirected graph just to see if they're connected, then check direction.
-    // Actually, "missing connectors" = no path.
-    if (!found) {
-        // Try undirected just to see if it's reversed
-        let uq = [[from]];
-        let uvisited = new Set([from]);
-        let ufound = false;
-        while (uq.length > 0) {
-            let curPath = uq.shift();
-            let tail = curPath[curPath.length - 1];
-            if (tail === to) { ufound = true; break; }
-            let nextNodes = edges.filter(e => e.source === tail || e.target === tail).map(e => e.source === tail ? e.target : e.source);
-            for (let n of nextNodes) {
-                if (!uvisited.has(n)) { uvisited.add(n); uq.push([...curPath, n]); }
-            }
-        }
+    // A reversed caller/callee mapping means the opposite directed path
+    // exists; anything else is a genuinely missing connector.
+    const reversed = bfs(to, from, (tail) => edges.filter((e) => e.source === tail).map((e) => e.target));
 
-        if (ufound) {
-            contradictions.push(`Reversed caller/callee order or missing connector from ${from} to ${to}`);
-        } else {
-            contradictions.push(`No path from ${from} to ${to}`);
-        }
-        valid = false;
+    if (reversed) {
+      contradictions.push({
+        message: `Reversed caller/callee order between ${nodeLabel(from)} and ${nodeLabel(to)} — the graph only calls ${nodeLabel(from)} from ${nodeLabel(to)}. Reorder the frames or remap one endpoint.`,
+        frameIds: [fromFrame.id, toFrame.id],
+        nodeIds: [from, to],
+      });
+    } else {
+      const wrapperEnd = toFrame.isWrapper ? toFrame : fromFrame.isWrapper ? fromFrame : null;
+      const hint = wrapperEnd
+        ? ` Collapse the wrapper frame ${wrapperEnd.id} to bridge it out of the route.`
+        : ' Remap one endpoint to a connected node.';
+      contradictions.push({
+        message: `Missing connector: no directed path from ${nodeLabel(from)} to ${nodeLabel(to)}.${hint}`,
+        frameIds: [fromFrame.id, toFrame.id],
+        nodeIds: [from, to],
+      });
+    }
+    valid = false;
+  }
+
+  // Wrapper constraint: a collapse may bridge a frame out of the route, but it
+  // can never hide the unresolved terminal frame.
+  for (const f of frames) {
+    if (f.type === 'unresolved' && f.collapsed) {
+      contradictions.push({
+        message: `Cannot hide unresolved terminal frame ${f.id}: "${f.text}".`,
+        frameIds: [f.id],
+        nodeIds: [],
+      });
+      valid = false;
     }
   }
 
-  // Wrapper constraints
-  frames.forEach(f => {
-      if (f.collapsed && f.isWrapper) {
-          // If a wrapper is collapsed, it must bridge exactly one frame.
-          // This is a complex rule, let's just add a basic check for now.
-      }
-      if (f.type === 'unresolved' && f.collapsed) {
-          contradictions.push(`Cannot hide unresolved terminal frame ${f.id}`);
-          valid = false;
-      }
-  });
+  return { path, valid, contradictions, unresolved };
+}
 
-  if (frames.filter(f => f.type === 'unresolved').length > 0) {
-     // contradictions.push(`Unresolved required frames exist.`);
-     // valid = false;
-  }
+// Deterministic minimal locus: the lowest common enclosing symbol span in the
+// terminal decisive frame's file, covering every decisive mapped node that
+// shares that file.
+export function computeMinimalLocus(frames) {
+  const decisive = frames
+    .filter((f) => f.mappedNode && !f.collapsed && f.type === 'frame')
+    .map((f) => nodeById.get(f.mappedNode))
+    .filter(Boolean);
+  if (decisive.length === 0) return null;
+  const terminal = decisive[decisive.length - 1];
+  const inFile = decisive.filter((n) => n.basename === terminal.basename);
+  return {
+    file: terminal.basename,
+    symbol: terminal.symbol,
+    startLine: Math.min(...inFile.map((n) => n.lineRange[0])),
+    endLine: Math.max(...inFile.map((n) => n.lineRange[1])),
+    nodeIds: inFile.map((n) => n.id),
+  };
+}
 
-  return { path, valid, contradictions };
+// Small stable checksum (djb2) for export provenance fields.
+export function hashString(text) {
+  let h = 5381;
+  for (let i = 0; i < text.length; i++) h = ((h << 5) + h + text.charCodeAt(i)) >>> 0;
+  return h.toString(16).padStart(8, '0');
 }
