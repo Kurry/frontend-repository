@@ -1,5 +1,10 @@
 import React, { useEffect, useMemo, useState, useRef } from 'react';
 
+const SCHEMA_VERSION = 'icon-family-optical-studio-v1';
+const ANCHOR_TYPES = ['move', 'line', 'quadratic', 'cubic', 'close'];
+const MIN_ANCHORS = 3;
+const UNDO_DEPTH = 50;
+
 const initialAnchors = [
   { id: 'a1', x: 4, y: 4, type: 'move' },
   { id: 'a2', x: 20, y: 4, type: 'line' },
@@ -24,12 +29,36 @@ const tools = [
   { name: 'artifact_import', module: 'artifact-transfer-v1', description: 'Import a validated JSON family document.' },
 ];
 
-function generatePathData(anchors, size = 24) {
-  if (!anchors || anchors.length === 0) return '';
-  const scale = size / 24;
-  return anchors.map(a => {
-    const x = a.x * scale;
-    const y = a.y * scale;
+const roundMil = (v) => Math.round(v * 1000) / 1000;
+const clampCoord = (v) => Math.max(0, Math.min(24, roundMil(Number(v) || 0)));
+
+function computeChecksum(list) {
+  let h = 7;
+  for (const a of list) {
+    h = (h * 31 + Math.round((Number(a.x) || 0) * 1000)) % 65521;
+    h = (h * 31 + Math.round((Number(a.y) || 0) * 1000)) % 65521;
+    h = (h * 31 + (typeof a.type === 'string' ? a.type.length : 0)) % 65521;
+  }
+  return h.toString(16).padStart(4, '0').toUpperCase();
+}
+
+function nextAnchorId(list) {
+  let max = 0;
+  for (const a of list) {
+    const m = /^a(\d+)$/.exec(a.id);
+    if (m) max = Math.max(max, Number(m[1]));
+  }
+  return `a${max + 1}`;
+}
+
+function pathFrom(list, scale = 1, adjustment = 0) {
+  if (!list || list.length === 0) return '';
+  return list.map((a, index) => {
+    const x = roundMil((a.x + adjustment) * scale);
+    const y = roundMil((a.y + adjustment) * scale);
+    // A path must open with a moveto command, whatever the first anchor's
+    // declared segment type is (e.g. after the original move anchor is deleted).
+    if (index === 0) return `M${x} ${y}`;
     if (a.type === 'move') return `M${x} ${y}`;
     if (a.type === 'line') return `L${x} ${y}`;
     if (a.type === 'quadratic') return `Q${x} ${y} ${x} ${y}`;
@@ -38,6 +67,84 @@ function generatePathData(anchors, size = 24) {
     return '';
   }).join(' ');
 }
+
+function generatePathData(anchors, size = 24) {
+  return pathFrom(anchors, size / 24, 0);
+}
+
+// Directed dependency graph over equal constraints (target2 is derived from
+// target1). Adding t1 → t2 creates a cycle when t1 is already reachable
+// starting from t2.
+function equalCycle(constraints, t1, t2) {
+  const edges = new Map();
+  for (const c of constraints) {
+    if (c.kind !== 'equal' || !c.target1 || !c.target2) continue;
+    if (!edges.has(c.target1)) edges.set(c.target1, []);
+    edges.get(c.target1).push(c.target2);
+  }
+  const queue = [t2];
+  const seen = new Set();
+  while (queue.length) {
+    const node = queue.pop();
+    if (node === t1) return true;
+    if (seen.has(node)) continue;
+    seen.add(node);
+    for (const next of edges.get(node) ?? []) queue.push(next);
+  }
+  return false;
+}
+
+// Returns null when valid, otherwise a human-readable rejection reason.
+function validateFamilyDoc(doc) {
+  if (!doc || typeof doc !== 'object') return 'Invalid family schema';
+  if (doc.schemaVersion !== SCHEMA_VERSION) return 'Invalid family schema';
+  if (!Array.isArray(doc.anchors)) return 'Invalid family schema';
+  if (doc.anchors.length < MIN_ANCHORS) return `anchors must contain at least ${MIN_ANCHORS} points`;
+  const ids = new Set();
+  for (const a of doc.anchors) {
+    if (!a || typeof a.id !== 'string') return 'anchor missing id';
+    if (ids.has(a.id)) return `duplicate anchor id ${a.id}`;
+    ids.add(a.id);
+    if (typeof a.x !== 'number' || typeof a.y !== 'number' || Number.isNaN(a.x) || Number.isNaN(a.y)) return `invalid coordinates on ${a.id}`;
+    if (a.x < 0 || a.x > 24 || a.y < 0 || a.y > 24) return `coordinate out of bounds on ${a.id} (0–24 grid)`;
+    if (!ANCHOR_TYPES.includes(a.type)) return `invalid segment type on ${a.id}`;
+  }
+  if (typeof doc.checksum === 'string' && doc.checksum !== computeChecksum(doc.anchors)) {
+    return 'forged checksum — geometry does not match';
+  }
+  if (doc.constraints !== undefined) {
+    if (!Array.isArray(doc.constraints)) return 'constraints must be an array';
+    for (const c of doc.constraints) {
+      if (c.kind !== 'equal' || !c.target1 || !c.target2) continue;
+      if (c.target1 === c.target2) return `constraint cycle: ${c.target1} constrained to itself`;
+      const others = doc.constraints.filter((o) => o !== c);
+      if (equalCycle(others, c.target1, c.target2)) return `constraint cycle between ${c.target1} and ${c.target2}`;
+    }
+  }
+  return null;
+}
+
+// Procedural 1,000-icon / 100,000-point stress family for the scale workflow.
+function makeStressFamily() {
+  const icons = [];
+  for (let i = 0; i < 1000; i += 1) {
+    const points = [];
+    const lobes = 2 + (i % 7);
+    for (let k = 0; k < 100; k += 1) {
+      const angle = (k / 100) * Math.PI * 2;
+      const radius = 7.5 + 3 * Math.sin(angle * lobes + i * 0.13);
+      points.push({
+        x: roundMil(12 + radius * Math.cos(angle)),
+        y: roundMil(12 + radius * Math.sin(angle)),
+        type: k === 0 ? 'move' : k === 99 ? 'close' : 'line',
+      });
+    }
+    icons.push({ id: `stress-${i}`, name: `Icon ${String(i).padStart(4, '0')}`, points });
+  }
+  return { icons, pointTotal: 100000, branchTotal: 1000, sizes: Array.from({ length: 20 }, (_, n) => 14 + n * 2) };
+}
+
+const STRESS_ITEM_HEIGHT = 46;
 
 function App() {
   const [mode, setMode] = useState('edit');
@@ -50,18 +157,29 @@ function App() {
   const [status, setStatus] = useState('Ready to shape a coherent family.');
   const [importText, setImportText] = useState('');
 
-  // States for full workflow
   const [constraints, setConstraints] = useState([{ id: 'c1', kind: 'align', value: 'keyline-box' }]);
+  const [constraintFrom, setConstraintFrom] = useState('a1');
+  const [constraintTo, setConstraintTo] = useState('a2');
   const [hints, setHints] = useState([16, 20, 24, 32].map((pixelSize) => ({ size: pixelSize, adjustment: 0 })));
   const [overrides, setOverrides] = useState({});
-  const [history, setHistory] = useState([initialAnchors]);
-  const [historyIndex, setHistoryIndex] = useState(0);
   const [branchAnchors, setBranchAnchors] = useState(null);
+  const [compareDiff, setCompareDiff] = useState(false);
+  const [approval, setApproval] = useState({ approved: false, checksum: null });
+  const [solveGhost, setSolveGhost] = useState(null);
+  const [past, setPast] = useState([]);
+
+  // Scale stress-test state (AC-09): 1,000 icons / 100,000 points / 20 sizes /
+  // 1,000 branches, with cancellation of stale preview/solver jobs.
+  const [stress, setStress] = useState(null);
+  const [stressSel, setStressSel] = useState({ icon: 0, branch: 1 });
+  const [stressScroll, setStressScroll] = useState(0);
+  const [stressJob, setStressJob] = useState({ done: 0, canceled: 0, last: 'no preview job yet' });
+  const jobRef = useRef(0);
 
   const canvasRef = useRef(null);
 
   const currentAnchors = (branch === 'optical-pass' && branchAnchors) ? branchAnchors : anchors;
-  const currentIconData = seededIcons.find(i => i.id === selectedIcon);
+  const currentIconData = seededIcons.find((i) => i.id === selectedIcon);
 
   const displayedAnchors = currentIconData?.inherited && overrides[selectedIcon]
     ? overrides[selectedIcon]
@@ -69,245 +187,336 @@ function App() {
 
   const selected = displayedAnchors.find((anchor) => anchor.id === selectedAnchor) ?? displayedAnchors[0];
 
-  const checksum = currentAnchors.length.toString(16).padStart(4, '0').toUpperCase();
+  const checksum = computeChecksum(currentAnchors);
+  const approvalStale = approval.approved && approval.checksum !== checksum;
 
   const documentState = useMemo(() => ({
-    schemaVersion: 'icon-family-optical-studio-v1',
-    mode, selectedIcon, size, lens, branch, icons: seededIcons, anchors: currentAnchors,
+    schemaVersion: SCHEMA_VERSION,
+    mode,
+    selectedIcon,
+    size,
+    lens,
+    branch,
+    icons: seededIcons,
+    anchors: currentAnchors,
     constraints,
     hints,
-    overrides
-  }), [mode, selectedIcon, size, lens, branch, currentAnchors, constraints, hints, overrides]);
+    overrides,
+    checksum: computeChecksum(currentAnchors),
+    approval,
+  }), [mode, selectedIcon, size, lens, branch, currentAnchors, constraints, hints, overrides, approval]);
 
-  useEffect(() => {
-    window.webmcp_session_info = () => ({ contract_version: 'zto-webmcp-v1', modules: ['structured-editor-v1', 'artifact-transfer-v1'] });
-    window.webmcp_list_tools = () => ({ tools });
-    window.webmcp_invoke_tool = async (name, args = {}) => {
-      const input = typeof args === 'string' ? JSON.parse(args) : args;
-      if (name === 'editor_select') {
-        if (input.id) { setSelectedAnchor(input.id); setStatus(`Selected ${input.id}`); }
-        return { ok: true, selected: input.id ?? selectedIcon };
+  // ---- undo history ---------------------------------------------------------
+  const snapshot = () => ({ anchors, branchAnchors, overrides, constraints, hints, approval });
+  const pushHistory = () => {
+    const snap = snapshot();
+    setPast((p) => [...p.slice(-(UNDO_DEPTH - 1)), snap]);
+  };
+  const undo = () => {
+    setPast((p) => {
+      if (p.length === 0) {
+        setStatus('Nothing to undo.');
+        return p;
       }
-      if (name === 'editor_update_property') {
-        const id = input.id ?? selectedAnchor;
-        const key = input.property ?? input.key;
-        if (!['x', 'y', 'type'].includes(key)) return { ok: false, error: 'property must be x, y, or type' };
+      const prev = p[p.length - 1];
+      setAnchors(prev.anchors);
+      setBranchAnchors(prev.branchAnchors);
+      setOverrides(prev.overrides);
+      setConstraints(prev.constraints);
+      setHints(prev.hints);
+      setApproval(prev.approval);
+      setSolveGhost(null);
+      setStatus('Undid last change.');
+      return p.slice(0, -1);
+    });
+  };
 
-        const updateFn = (items) => items.map((item) => item.id === id ? { ...item, [key]: input.value } : item);
-
-        if (currentIconData?.inherited && overrides[selectedIcon]) {
-          setOverrides(prev => ({...prev, [selectedIcon]: updateFn(prev[selectedIcon])}));
-        } else if (branch === 'optical-pass') {
-           setBranchAnchors(updateFn(branchAnchors || anchors));
-        } else {
-           setAnchors(updateFn);
-        }
-
-        return { ok: true, id, property: key, value: input.value };
-      }
-      if (name === 'editor_switch_mode') { setMode(input.mode === 'preview' ? 'preview' : 'edit'); return { ok: true, mode: input.mode }; }
-      if (name === 'editor_preview') {
-        const nextSize = Math.max(16, Math.min(32, Number(input.size) || 24));
-        setSize(nextSize);
-        setMode('preview');
-        return { ok: true, size: nextSize };
-      }
-      if (name === 'artifact_export') {
-        const format = input.format ?? 'json';
-        if (format === 'json') return { ok: true, format, artifact: JSON.stringify(documentState, null, 2) };
-        if (format === 'svg') return { ok: true, format, artifact: `<svg viewBox="0 0 24 24"><path d="${generatePathData(displayedAnchors)}"/></svg>` };
-        if (format === 'css') return { ok: true, format, artifact: ':root { --icon-grid: 24px; }' };
-        return { ok: true, format, artifact: '# Icon Family Optical Studio\n\nApproved family specification.' };
-      }
-      if (name === 'artifact_import') {
-        try {
-          const next = JSON.parse(input.document ?? input.content ?? '{}');
-          if (next.schemaVersion !== documentState.schemaVersion || !Array.isArray(next.anchors)) throw new Error('schemaVersion or anchors invalid');
-          setAnchors(next.anchors);
-          if(next.constraints) setConstraints(next.constraints);
-          if(next.hints) setHints(next.hints);
-          if(next.overrides) setOverrides(next.overrides);
-          setStatus('Imported validated family document.');
-          return { ok: true };
-        } catch (error) { return { ok: false, error: error.message }; }
-      }
-      if (name === 'editor_add') {
-        const id = `a${currentAnchors.length + 1}`;
-        const newAnchor = { id, x: 12, y: 12, type: 'line' };
-        if (currentIconData?.inherited && overrides[selectedIcon]) {
-          setOverrides(prev => ({...prev, [selectedIcon]: [...prev[selectedIcon], newAnchor]}));
-        } else if (branch === 'optical-pass') {
-          setBranchAnchors(prev => [...(prev || anchors), newAnchor]);
-        } else {
-          setAnchors(items => [...items, newAnchor]);
-        }
-        return { ok: true, id };
-      }
-      if (name === 'editor_delete') {
-        const delId = input.id ?? selectedAnchor;
-        const filterFn = (items) => items.filter((item) => item.id !== delId);
-
-        if (currentIconData?.inherited && overrides[selectedIcon]) {
-          setOverrides(prev => ({...prev, [selectedIcon]: filterFn(prev[selectedIcon])}));
-        } else if (branch === 'optical-pass') {
-          setBranchAnchors(prev => filterFn(prev || anchors));
-        } else {
-          setAnchors(filterFn);
-        }
-        return { ok: true };
-      }
-      return { ok: true, name };
-    };
-    return () => { delete window.webmcp_session_info; delete window.webmcp_list_tools; delete window.webmcp_invoke_tool; };
-  }, [documentState, selectedAnchor, selectedIcon, size, branch, overrides]);
-
-  const updateAnchor = (id, updates) => {
-    const updateFn = (items) => items.map(a => a.id === id ? { ...a, ...updates } : a);
-
-    // Check constraints cycle
-    if(updates.x !== undefined || updates.y !== undefined) {
-      const hasCycle = constraints.some(c => c.kind === 'equal' && c.target1 === id && c.target2 === id);
-      if(hasCycle) {
-        setStatus('Constraint solver rejected: cycle detected.');
-        return;
-      }
-
-      // Keep in bounds 0-24 and round to 3 decimals
-      if(updates.x !== undefined) updates.x = Math.max(0, Math.min(24, Math.round(updates.x * 1000) / 1000));
-      if(updates.y !== undefined) updates.y = Math.max(0, Math.min(24, Math.round(updates.y * 1000) / 1000));
-    }
-
-    if (currentIconData?.inherited) {
-      if (!overrides[selectedIcon]) {
-         setOverrides(prev => ({...prev, [selectedIcon]: updateFn(currentAnchors)}));
-      } else {
-         setOverrides(prev => ({...prev, [selectedIcon]: updateFn(prev[selectedIcon])}));
-      }
-    } else if (branch === 'optical-pass') {
-      setBranchAnchors(prev => updateFn(prev || anchors));
+  // ---- shared mutation core (used by both the UI and WebMCP handlers) -------
+  const writeAnchors = (updateFn) => {
+    if (currentIconData?.inherited && overrides[selectedIcon]) {
+      setOverrides((prev) => ({ ...prev, [selectedIcon]: updateFn(prev[selectedIcon]) }));
+    } else if (branch === 'optical-pass' && branchAnchors) {
+      setBranchAnchors((prev) => updateFn(prev));
     } else {
       setAnchors(updateFn);
     }
   };
 
+  const updateAnchor = (id, updates, { record = true } = {}) => {
+    const next = { ...updates };
+    if (next.x !== undefined) next.x = clampCoord(next.x);
+    if (next.y !== undefined) next.y = clampCoord(next.y);
+    if (next.type !== undefined && !ANCHOR_TYPES.includes(next.type)) delete next.type;
+    if (record) pushHistory();
+    const updateFn = (items) => items.map((a) => (a.id === id ? { ...a, ...next } : a));
+    if (currentIconData?.inherited && !overrides[selectedIcon]) {
+      // First edit of an inherited variant declares an override with provenance
+      // from the base geometry.
+      setOverrides((prev) => ({ ...prev, [selectedIcon]: updateFn(currentAnchors) }));
+    } else {
+      writeAnchors(updateFn);
+    }
+    return next;
+  };
+
+  const addAnchor = () => {
+    pushHistory();
+    const id = nextAnchorId(displayedAnchors);
+    const newAnchor = { id, x: 12, y: 12, type: 'line' };
+    writeAnchors((items) => [...items, newAnchor]);
+    setStatus(`Inserted anchor ${id}.`);
+    return id;
+  };
+
+  const deleteAnchor = (id) => {
+    if (displayedAnchors.length <= MIN_ANCHORS) {
+      const message = `Delete blocked: an icon keeps at least ${MIN_ANCHORS} anchors. Recovery: insert an anchor before deleting.`;
+      setStatus(message);
+      return { ok: false, error: message };
+    }
+    pushHistory();
+    writeAnchors((items) => items.filter((item) => item.id !== id));
+    setStatus(`Deleted anchor ${id}.`);
+    return { ok: true };
+  };
+
+  const importDoc = (raw) => {
+    let doc;
+    try {
+      doc = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    } catch (error) {
+      return { ok: false, error: error.message };
+    }
+    const problem = validateFamilyDoc(doc);
+    if (problem) return { ok: false, error: problem };
+    pushHistory();
+    setAnchors(doc.anchors);
+    setBranchAnchors(null);
+    setBranch('main');
+    setCompareDiff(false);
+    setSolveGhost(null);
+    if (doc.constraints) setConstraints(doc.constraints);
+    if (doc.hints) setHints(doc.hints);
+    if (doc.overrides) setOverrides(doc.overrides);
+    if (doc.approval) setApproval(doc.approval);
+    setStatus('Imported validated family document.');
+    return { ok: true };
+  };
+
+  // ---- WebMCP surface -------------------------------------------------------
+  const invokeToolImpl = async (name, args = {}) => {
+    const input = typeof args === 'string' ? JSON.parse(args) : args;
+    if (name === 'editor_select') {
+      if (input.id) { setSelectedAnchor(input.id); setStatus(`Selected ${input.id}`); }
+      return { ok: true, selected: input.id ?? selectedIcon };
+    }
+    if (name === 'editor_update_property') {
+      const id = input.id ?? selectedAnchor;
+      const key = input.property ?? input.key;
+      if (!['x', 'y', 'type'].includes(key)) return { ok: false, error: 'property must be x, y, or type' };
+      const cleaned = updateAnchor(id, { [key]: input.value });
+      return { ok: true, id, property: key, value: cleaned[key] };
+    }
+    if (name === 'editor_switch_mode') { setMode(input.mode === 'preview' ? 'preview' : 'edit'); setSolveGhost(null); return { ok: true, mode: input.mode }; }
+    if (name === 'editor_preview') {
+      const nextSize = Math.max(16, Math.min(32, Number(input.size) || 24));
+      setSize(nextSize);
+      setMode('preview');
+      return { ok: true, size: nextSize };
+    }
+    if (name === 'editor_set_content') {
+      const result = importDoc(input.content ?? input.document ?? input.value);
+      return result;
+    }
+    if (name === 'artifact_export') {
+      const format = input.format ?? 'json';
+      if (format === 'json') return { ok: true, format, artifact: JSON.stringify(documentState, null, 2) };
+      if (format === 'svg') return { ok: true, format, artifact: `<svg viewBox="0 0 24 24"><path d="${generatePathData(displayedAnchors)}"/></svg>` };
+      if (format === 'css') return { ok: true, format, artifact: ':root { --icon-grid: 24px; }' };
+      return { ok: true, format, artifact: '# Icon Family Optical Studio\n\nApproved family specification.' };
+    }
+    if (name === 'artifact_import') {
+      return importDoc(input.document ?? input.content ?? '{}');
+    }
+    if (name === 'editor_add') {
+      const id = addAnchor();
+      return { ok: true, id };
+    }
+    if (name === 'editor_delete') {
+      return deleteAnchor(input.id ?? selectedAnchor);
+    }
+    return { ok: false, error: `unknown tool ${name}` };
+  };
+
+  const invokeRef = useRef(invokeToolImpl);
+  invokeRef.current = invokeToolImpl;
+
+  useEffect(() => {
+    window.webmcp_session_info = () => ({ contract_version: 'zto-webmcp-v1', modules: ['structured-editor-v1', 'artifact-transfer-v1'] });
+    window.webmcp_list_tools = () => ({ tools });
+    window.webmcp_invoke_tool = (name, args = {}) => invokeRef.current(name, args);
+    return () => { delete window.webmcp_session_info; delete window.webmcp_list_tools; delete window.webmcp_invoke_tool; };
+  }, []);
+
+  // ---- pointer + keyboard editing ------------------------------------------
   const handlePointerDown = (e, id) => {
-    if(mode === 'preview') return;
+    if (mode === 'preview' || stress) return;
     setSelectedAnchor(id);
     const svg = canvasRef.current;
     if (!svg) return;
-
+    pushHistory();
+    setSolveGhost(null);
     const pt = svg.createSVGPoint();
-
     const move = (ev) => {
       pt.x = ev.clientX;
       pt.y = ev.clientY;
       const svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
-      // Snap to grid (1 unit)
-      let nx = Math.round(svgP.x);
-      let ny = Math.round(svgP.y);
-      updateAnchor(id, { x: nx, y: ny });
+      updateAnchor(id, { x: Math.round(svgP.x), y: Math.round(svgP.y) }, { record: false });
     };
-
     const up = () => {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
     };
-
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
   };
 
   const handleKeyDown = (e, id) => {
-    if(mode === 'preview') return;
-    const a = displayedAnchors.find(x => x.id === id);
-    if(!a) return;
-    let dx = 0, dy = 0;
-    if(e.key === 'ArrowUp') dy = -1;
-    if(e.key === 'ArrowDown') dy = 1;
-    if(e.key === 'ArrowLeft') dx = -1;
-    if(e.key === 'ArrowRight') dx = 1;
-    if(e.key === 'Enter' || e.key === ' ') {
+    if (mode === 'preview' || stress) return;
+    const a = displayedAnchors.find((x) => x.id === id);
+    if (!a) return;
+    const step = e.shiftKey ? 0.1 : 1;
+    let dx = 0;
+    let dy = 0;
+    if (e.key === 'ArrowUp') dy = -step;
+    if (e.key === 'ArrowDown') dy = step;
+    if (e.key === 'ArrowLeft') dx = -step;
+    if (e.key === 'ArrowRight') dx = step;
+    if (e.key === 'Enter' || e.key === ' ') {
       setSelectedAnchor(id);
       e.preventDefault();
       return;
     }
-    if(dx !== 0 || dy !== 0) {
+    if (dx !== 0 || dy !== 0) {
       e.preventDefault();
       updateAnchor(id, { x: a.x + dx, y: a.y + dy });
     }
   };
 
-  const handleConstraintKeyDown = (e, action) => {
-    if(e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      action();
-    }
-  }
-
+  // ---- transforms, constraints, variants, hints -----------------------------
   const applyMirror = () => {
-    // mirror around x=12
-    const updateFn = items => items.map(a => ({...a, x: 24 - a.x}));
-    if (currentIconData?.inherited) {
-      setOverrides(prev => ({...prev, [selectedIcon]: updateFn(overrides[selectedIcon] || currentAnchors)}));
-    } else if (branch === 'optical-pass') {
-      setBranchAnchors(prev => updateFn(prev || anchors));
+    pushHistory();
+    setSolveGhost(pathFrom(displayedAnchors, mode === 'preview' ? size / 24 : 1));
+    const updateFn = (items) => items.map((a) => ({ ...a, x: roundMil(24 - a.x) }));
+    if (currentIconData?.inherited && !overrides[selectedIcon]) {
+      setOverrides((prev) => ({ ...prev, [selectedIcon]: updateFn(currentAnchors) }));
     } else {
-      setAnchors(updateFn);
+      writeAnchors(updateFn);
     }
-    setStatus('Mirror transform applied.');
+    setStatus('Mirror transform applied around x=12. Before/after outlines shown.');
   };
 
   const addEqualConstraint = () => {
-    if(anchors.length < 2) return;
-    const t1 = anchors[0].id;
-    const t2 = anchors[1].id;
-    const newConstraint = { id: `c${constraints.length + 1}`, kind: 'equal', target1: t1, target2: t2 };
-
-    // Cycle check before adding
-    if(t1 === t2) {
-      setStatus('Error: Cannot constrain anchor to itself (cycle).');
+    const t1 = constraintFrom;
+    const t2 = constraintTo;
+    if (t1 === t2) {
+      setStatus(`Constraint solver rejected: ${t1} cannot be constrained to itself (self-cycle).`);
       return;
     }
-
-    setConstraints(prev => [...prev, newConstraint]);
-    setStatus(`Added equal constraint between ${t1} and ${t2}.`);
-
-    // Animate constraint solve
-    const a1 = anchors.find(a => a.id === t1);
-    updateAnchor(t2, { x: a1.x, y: a1.y });
+    const duplicate = constraints.some((c) => c.kind === 'equal'
+      && ((c.target1 === t1 && c.target2 === t2) || (c.target1 === t2 && c.target2 === t1)));
+    if (duplicate) {
+      setStatus(`Constraint solver rejected: ${t1} and ${t2} are already constrained — overdetermined.`);
+      return;
+    }
+    if (equalCycle(constraints, t1, t2)) {
+      setStatus(`Constraint solver rejected: cycle detected (${t2} already resolves back to ${t1}).`);
+      return;
+    }
+    const source = displayedAnchors.find((a) => a.id === t1);
+    const target = displayedAnchors.find((a) => a.id === t2);
+    if (!source || !target) {
+      setStatus('Constraint solver rejected: both anchors must exist on the current path.');
+      return;
+    }
+    pushHistory();
+    setSolveGhost(pathFrom(displayedAnchors, mode === 'preview' ? size / 24 : 1));
+    setConstraints((prev) => [...prev, { id: `c${prev.length + 1}`, kind: 'equal', target1: t1, target2: t2 }]);
+    updateAnchor(t2, { x: source.x, y: source.y }, { record: false });
+    setStatus(`Equal constraint solved: ${t2} snapped to ${t1}. Before/after outlines shown.`);
   };
 
   const resetVariant = () => {
     if (!currentIconData?.inherited) return;
-    setOverrides(prev => {
-      const next = {...prev};
+    pushHistory();
+    setOverrides((prev) => {
+      const next = { ...prev };
       delete next[selectedIcon];
       return next;
     });
-    setStatus('Variant override reset.');
+    setStatus(`Variant override reset — ${currentIconData.name} matches base geometry again.`);
   };
 
-  const addSizeHint = (pxSize) => {
-    setHints(prev => prev.map(h => h.size === pxSize ? {...h, adjustment: h.adjustment === 0 ? 0.5 : 0} : h));
-    setStatus(`Added 0.5px hint adjustment for ${pxSize}px.`);
+  const cycleSizeHint = (pxSize) => {
+    pushHistory();
+    setHints((prev) => prev.map((h) => {
+      if (h.size !== pxSize) return h;
+      const nextAdjustment = h.adjustment === 0 ? 0.5 : h.adjustment === 0.5 ? -0.5 : 0;
+      return { ...h, adjustment: nextAdjustment };
+    }));
+    const current = hints.find((h) => h.size === pxSize);
+    const nextAdjustment = current?.adjustment === 0 ? '+0.5' : current?.adjustment === 0.5 ? '-0.5' : '0';
+    setStatus(`Hint for ${pxSize}px set to ${nextAdjustment} design units (master geometry unchanged).`);
+  };
+
+  // ---- branches -------------------------------------------------------------
+  const createOrSwitchBranch = () => {
+    setSolveGhost(null);
+    if (branch === 'main') {
+      if (!branchAnchors) {
+        setBranchAnchors(anchors.map((a) => ({ ...a })));
+        setStatus('Branch optical-pass created from main.');
+      } else {
+        setStatus('Switched to branch optical-pass.');
+      }
+      setBranch('optical-pass');
+    } else {
+      setBranch('main');
+      setCompareDiff(false);
+      setStatus('Switched to main.');
+    }
+  };
+
+  const compareBranch = () => {
+    if (!branchAnchors) {
+      setStatus('Create a branch first, then compare it against main.');
+      return;
+    }
+    if (branch !== 'optical-pass') setBranch('optical-pass');
+    setCompareDiff((v) => {
+      setStatus(v ? 'Branch diff overlay hidden.' : 'Branch diff overlay: dashed main vs solid optical-pass.');
+      return !v;
+    });
   };
 
   const mergeBranch = () => {
     if (branch === 'optical-pass' && branchAnchors) {
+      pushHistory();
       setAnchors(branchAnchors);
       setBranch('main');
       setBranchAnchors(null);
-      setStatus('Branch merged to main.');
+      setCompareDiff(false);
+      setStatus('Branch optical-pass merged to main.');
     }
   };
 
   const approveFamily = () => {
-    setStatus('Family approved. Checksums frozen.');
+    setApproval({ approved: true, checksum });
+    setStatus(`Family approved. Checksum ${checksum} frozen.`);
   };
 
+  // ---- transfer -------------------------------------------------------------
   const exportJson = () => {
-    const blob = new Blob([JSON.stringify(documentState, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(documentState, null, 2))}`;
     link.download = 'icon-family-optical-studio.json';
@@ -318,54 +527,117 @@ function App() {
   };
 
   const importJson = () => {
-    try {
-      const next = JSON.parse(importText);
-      if (next.schemaVersion !== documentState.schemaVersion || !Array.isArray(next.anchors)) throw new Error('Invalid family schema');
-      setAnchors(next.anchors);
-      if(next.constraints) setConstraints(next.constraints);
-      if(next.hints) setHints(next.hints);
-      if(next.overrides) setOverrides(next.overrides);
-      setStatus('Imported family JSON.');
-    } catch (error) {
-      setStatus(`Import error: ${error.message}`);
+    const result = importDoc(importText);
+    if (!result.ok) setStatus(`Import error: ${result.error}`);
+  };
+
+  const copyPathData = () => {
+    const write = navigator.clipboard?.writeText?.(pathD);
+    if (write?.then) {
+      write.then(
+        () => setStatus('Path data copied to clipboard.'),
+        () => setStatus('Clipboard unavailable — path data shown in the footer.'),
+      );
+    } else {
+      setStatus('Clipboard unavailable — path data shown in the footer.');
     }
   };
 
-  // Adjust path data if hints are applied for the current size
+  // ---- stress-test workflow (AC-09) ----------------------------------------
+  const startStress = () => {
+    const family = makeStressFamily();
+    setStress(family);
+    setStressSel({ icon: 0, branch: 1 });
+    setStatus('Stress family loaded: 1,000 icons · 100,000 points · 20 sizes · 1,000 branches.');
+  };
+
+  const exitStress = () => {
+    jobRef.current += 1;
+    setStress(null);
+    setStatus('Stress test closed — back to the seeded fixture.');
+  };
+
+  useEffect(() => {
+    if (!stress) return undefined;
+    const id = jobRef.current + 1;
+    jobRef.current = id;
+    let index = 0;
+    let occupied = 0;
+    let cancelTimer = null;
+    let finished = false;
+    const step = () => {
+      if (jobRef.current !== id) return;
+      const end = Math.min(index + 25, stress.icons.length);
+      for (; index < end; index += 1) {
+        for (const p of stress.icons[index].points) {
+          if (p.x > 4 && p.x < 20 && p.y > 4 && p.y < 20) occupied += 1;
+        }
+      }
+      if (index < stress.icons.length) {
+        cancelTimer = setTimeout(step, 0);
+      } else {
+        finished = true;
+        setStressJob((j) => ({
+          ...j,
+          done: j.done + 1,
+          last: `preview job #${id} done — occupancy ${((occupied / stress.pointTotal) * 100).toFixed(1)}% across 100,000 points`,
+        }));
+      }
+    };
+    cancelTimer = setTimeout(step, 0);
+    return () => {
+      clearTimeout(cancelTimer);
+      if (!finished) {
+        setStressJob((j) => ({ ...j, canceled: j.canceled + 1, last: `preview job #${id} canceled (stale)` }));
+      }
+    };
+  }, [stress, stressSel.icon, stressSel.branch, size]);
+
+  const stressIcon = stress ? stress.icons[stressSel.icon] : null;
+  const stressAnchors = useMemo(() => {
+    if (!stressIcon) return null;
+    const spin = (stressSel.branch / 1000) * 0.6;
+    const cos = Math.cos(spin);
+    const sin = Math.sin(spin);
+    return stressIcon.points.map((p) => ({
+      ...p,
+      x: clampCoord(12 + (p.x - 12) * cos - (p.y - 12) * sin),
+      y: clampCoord(12 + (p.x - 12) * sin + (p.y - 12) * cos),
+    }));
+  }, [stressIcon, stressSel.branch]);
+
+  // ---- render-time geometry -------------------------------------------------
   let activeAdjustment = 0;
   if (mode === 'preview') {
-    const hint = hints.find(h => h.size === size);
+    const hint = hints.find((h) => h.size === size);
     if (hint) activeAdjustment = hint.adjustment;
   }
   const displaySize = mode === 'preview' ? size : 24;
   const scale = mode === 'preview' ? size / 24 : 1;
-  const pathD = displayedAnchors.length > 0
-    ? displayedAnchors.map(a => {
-        const x = (a.x + activeAdjustment) * scale;
-        const y = (a.y + activeAdjustment) * scale;
-        if (a.type === 'move') return `M${x} ${y}`;
-        if (a.type === 'line') return `L${x} ${y}`;
-        if (a.type === 'quadratic') return `Q${x} ${y} ${x} ${y}`;
-        if (a.type === 'cubic') return `C${x} ${y} ${x} ${y} ${x} ${y}`;
-        if (a.type === 'close') return `L${x} ${y} Z`;
-        return '';
-      }).join(' ')
+  const renderedAnchors = stress ? stressAnchors : displayedAnchors;
+  const pathD = renderedAnchors && renderedAnchors.length > 0
+    ? pathFrom(renderedAnchors, scale, activeAdjustment)
     : 'M4 4H20V20H4Z';
 
-  const branchPathD = (branch === 'optical-pass' && branchAnchors)
-    ? branchAnchors.map(a => {
-        const x = (a.x) * scale;
-        const y = (a.y) * scale;
-        if (a.type === 'move') return `M${x} ${y}`;
-        if (a.type === 'line') return `L${x} ${y}`;
-        if (a.type === 'quadratic') return `Q${x} ${y} ${x} ${y}`;
-        if (a.type === 'cubic') return `C${x} ${y} ${x} ${y} ${x} ${y}`;
-        if (a.type === 'close') return `L${x} ${y} Z`;
-        return '';
-      }).join(' ')
-    : null;
+  const showDiff = !stress && compareDiff && branch === 'optical-pass' && branchAnchors;
+  const mainPathD = showDiff ? pathFrom(anchors, scale) : null;
+  const changedAnchorIds = useMemo(() => {
+    if (!showDiff) return new Set();
+    const byId = new Map(anchors.map((a) => [a.id, a]));
+    const changed = new Set();
+    for (const b of branchAnchors) {
+      const base = byId.get(b.id);
+      if (!base || base.x !== b.x || base.y !== b.y || base.type !== b.type) changed.add(b.id);
+    }
+    for (const a of anchors) {
+      if (!branchAnchors.some((b) => b.id === a.id)) changed.add(a.id);
+    }
+    return changed;
+  }, [showDiff, anchors, branchAnchors]);
 
-  const showDiff = branch === 'optical-pass' && branchAnchors;
+  const sizeOptions = stress ? stress.sizes : [16, 20, 24, 32];
+  const stressStart = Math.max(0, Math.floor(stressScroll / STRESS_ITEM_HEIGHT) - 2);
+  const stressVisible = stress ? stress.icons.slice(stressStart, stressStart + 10) : [];
 
   return <div className="studio-shell">
     <header className="topbar">
@@ -375,23 +647,22 @@ function App() {
         <p className="lede">Design one coherent family across geometry, states, and pixel sizes.</p>
       </div>
       <div className="top-actions">
-        <button tabIndex={0} onClick={() => setMode(mode === 'edit' ? 'preview' : 'edit')} onKeyDown={(e) => handleConstraintKeyDown(e, () => setMode(mode === 'edit' ? 'preview' : 'edit'))}>{mode === 'edit' ? 'Preview family' : 'Back to editor'}</button>
-        <button className="primary" tabIndex={0} onClick={exportJson} onKeyDown={(e) => handleConstraintKeyDown(e, exportJson)}>Export JSON</button>
+        <button onClick={undo}>Undo</button>
+        <button onClick={() => { setMode(mode === 'edit' ? 'preview' : 'edit'); setSolveGhost(null); }}>{mode === 'edit' ? 'Preview family' : 'Back to editor'}</button>
+        <button className="primary" onClick={exportJson}>Export JSON</button>
       </div>
     </header>
     <main className="workspace">
       <aside className="family-rail">
         <div className="rail-title">
           <span>FAMILY / {seededIcons.length}</span>
-          <button aria-label="Create branch" tabIndex={0} onClick={() => setBranch(branch === 'main' ? 'optical-pass' : 'main')} onKeyDown={(e) => handleConstraintKeyDown(e, () => setBranch(branch === 'main' ? 'optical-pass' : 'main'))}>＋</button>
+          <button aria-label="Create branch" onClick={createOrSwitchBranch}>＋</button>
         </div>
         {seededIcons.map((icon) => (
           <button
             className={`icon-card ${selectedIcon === icon.id ? 'selected' : ''}`}
             key={icon.id}
-            tabIndex={0}
             onClick={() => { setSelectedIcon(icon.id); setStatus(`${icon.name} selected.`); }}
-            onKeyDown={(e) => handleConstraintKeyDown(e, () => { setSelectedIcon(icon.id); setStatus(`${icon.name} selected.`); })}
           >
             <span className="mini-icon">⌗</span>
             <span>
@@ -403,26 +674,69 @@ function App() {
         ))}
         <div className="branch-card">
           <span>BRANCH</span><strong>{branch}</strong>
-          <button tabIndex={0} onClick={() => setBranch(branch === 'main' ? 'optical-pass' : 'main')} onKeyDown={(e) => handleConstraintKeyDown(e, () => setBranch(branch === 'main' ? 'optical-pass' : 'main'))}>Compare branch</button>
-          {branch === 'optical-pass' && <button tabIndex={0} onClick={mergeBranch} onKeyDown={(e) => handleConstraintKeyDown(e, mergeBranch)}>Merge to main</button>}
+          <button onClick={compareBranch}>{compareDiff ? 'Hide diff' : 'Compare branch'}</button>
+          {branch === 'optical-pass' && <button onClick={mergeBranch}>Merge to main</button>}
         </div>
-        <div className="branch-card" style={{marginTop: '10px'}}>
-            <button tabIndex={0} onClick={approveFamily} onKeyDown={(e) => handleConstraintKeyDown(e, approveFamily)}>Approve Family</button>
+        <div className="branch-card">
+          <span>APPROVAL</span>
+          <strong>{approval.approved ? (approvalStale ? 'stale' : `frozen ${approval.checksum}`) : 'pending'}</strong>
+          <button onClick={approveFamily}>{approvalStale ? 'Re-approve family' : 'Approve Family'}</button>
+        </div>
+        <div className="branch-card">
+          <span>SCALE STRESS TEST</span>
+          {!stress ? (
+            <button onClick={startStress}>Load 1,000 icons / 100k points</button>
+          ) : (
+            <>
+              <small className="stress-stats">1,000 icons · 100,000 points · 20 sizes · 1,000 branches</small>
+              <div className="stress-list" onScroll={(e) => setStressScroll(e.currentTarget.scrollTop)}>
+                <div style={{ height: `${stress.icons.length * STRESS_ITEM_HEIGHT}px`, position: 'relative' }}>
+                  {stressVisible.map((icon, offset) => {
+                    const index = stressStart + offset;
+                    return (
+                      <button
+                        key={icon.id}
+                        className={`stress-item ${stressSel.icon === index ? 'selected' : ''}`}
+                        style={{ top: `${index * STRESS_ITEM_HEIGHT}px` }}
+                        onClick={() => setStressSel((s) => ({ ...s, icon: index }))}
+                      >
+                        {icon.name} · 100 pts
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <label className="stress-branch">Branch {stressSel.branch}/1000
+                <input
+                  type="number"
+                  min="1"
+                  max="1000"
+                  value={stressSel.branch}
+                  onChange={(e) => setStressSel((s) => ({ ...s, branch: Math.max(1, Math.min(1000, Number(e.target.value) || 1)) }))}
+                />
+              </label>
+              <div className="inspector-actions">
+                <button onClick={() => setStressSel((s) => ({ ...s, branch: Math.max(1, s.branch - 1) }))}>Prev</button>
+                <button onClick={() => setStressSel((s) => ({ ...s, branch: Math.min(1000, s.branch + 1) }))}>Next</button>
+              </div>
+              <button onClick={exitStress}>Exit stress test</button>
+            </>
+          )}
         </div>
       </aside>
       <section className="canvas-column">
         <div className="canvas-toolbar">
           <span className="pill">{mode.toUpperCase()}</span>
           <label>Pixel preview
-            <select tabIndex={0} value={size} onChange={(event) => {
+            <select value={size} onChange={(event) => {
               setSize(Number(event.target.value));
-              if(mode !== 'preview') setMode('preview');
+              if (mode !== 'preview') setMode('preview');
             }}>
-              {[16, 20, 24, 32].map((value) => <option key={value} value={value}>{value}px</option>)}
+              {sizeOptions.map((value) => <option key={value} value={value}>{value}px</option>)}
             </select>
           </label>
           <label>Lens
-            <select tabIndex={0} value={lens} onChange={(event) => setLens(event.target.value)}>
+            <select value={lens} onChange={(event) => setLens(event.target.value)}>
               <option value="geometric center">geometric center</option>
               <option value="occupied bounds">occupied bounds</option>
               <option value="stroke distribution">stroke distribution</option>
@@ -433,38 +747,50 @@ function App() {
         <div className="canvas-card">
           <div className="canvas-heading">
             <div>
-              <span className="eyebrow">{selected?.id ?? 'a1'} / {selectedIcon}</span>
+              <span className="eyebrow">
+                {stress
+                  ? `${stressIcon?.name} / branch ${stressSel.branch}`
+                  : `${selected?.id ?? 'a1'} / ${selectedIcon} · ${selected ? `${selected.x}, ${selected.y}` : ''}`}
+              </span>
               <h2>{displaySize} × {displaySize} construction grid</h2>
             </div>
-            <span className="checksum">CHECKSUM / {checksum}</span>
+            <span className="checksum">
+              CHECKSUM / {checksum}
+              {approval.approved && <em className={`approval-badge ${approvalStale ? 'stale' : ''}`}>{approvalStale ? 'APPROVAL STALE' : 'APPROVED'}</em>}
+            </span>
           </div>
           <div className="vector-canvas" role="application" aria-label="Vector anchor editor">
             <div className="keyline" />
 
             {lens === 'geometric center' && (
               <>
-                 <div style={{position: 'absolute', top: '50%', left: '0', right: '0', height: '1px', background: 'rgba(0,0,255,0.3)', pointerEvents: 'none'}} />
-                 <div style={{position: 'absolute', left: '50%', top: '0', bottom: '0', width: '1px', background: 'rgba(0,0,255,0.3)', pointerEvents: 'none'}} />
-                 {/* Optical center slightly offset */}
-                 <div style={{position: 'absolute', top: '52%', left: '0', right: '0', height: '1px', background: 'rgba(255,0,0,0.3)', pointerEvents: 'none'}} />
-                 <div style={{position: 'absolute', left: '50%', top: '0', bottom: '0', width: '1px', background: 'rgba(255,0,0,0.3)', pointerEvents: 'none'}} />
+                <div style={{ position: 'absolute', top: '50%', left: '0', right: '0', height: '1px', background: 'rgba(0,0,255,0.3)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', left: '50%', top: '0', bottom: '0', width: '1px', background: 'rgba(0,0,255,0.3)', pointerEvents: 'none' }} />
+                {/* Optical center slightly offset */}
+                <div style={{ position: 'absolute', top: '52%', left: '0', right: '0', height: '1px', background: 'rgba(255,0,0,0.3)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', left: '50%', top: '0', bottom: '0', width: '1px', background: 'rgba(255,0,0,0.3)', pointerEvents: 'none' }} />
               </>
             )}
 
-            <svg ref={canvasRef} viewBox={`0 0 ${displaySize} ${displaySize}`} aria-hidden="true" style={{ transition: 'all 0.3s ease-in-out' }} className="prefers-reduced-motion:transition-none">
-              {showDiff && <path d={branchPathD} stroke="red" strokeWidth="0.45" fill="none" opacity="0.5" />}
-              <path d={pathD} fill={currentIconData?.id === 'filled' ? '#157a70' : 'none'} stroke={currentIconData?.id === 'filled' ? 'none' : '#157a70'} strokeWidth={currentIconData?.id === 'filled' ? '0' : '0.45'} style={{ transition: 'd 0.3s ease-in-out' }} className="prefers-reduced-motion:transition-none" />
+            <svg ref={canvasRef} viewBox={`0 0 ${displaySize} ${displaySize}`} aria-hidden="true">
+              {solveGhost && <path className="ghost-path" d={solveGhost} />}
+              {showDiff && <path className="diff-main-path" d={mainPathD} />}
+              <path
+                className="master-path"
+                d={pathD}
+                fill={currentIconData?.id === 'filled' && !stress ? '#157a70' : 'none'}
+                stroke={currentIconData?.id === 'filled' && !stress ? 'none' : '#157a70'}
+                strokeWidth={currentIconData?.id === 'filled' && !stress ? '0' : '0.45'}
+              />
             </svg>
 
-            {mode === 'edit' && displayedAnchors.map((anchor) => (
+            {mode === 'edit' && !stress && displayedAnchors.map((anchor) => (
               <button
                 key={anchor.id}
-                tabIndex={0}
-                className={`anchor ${selectedAnchor === anchor.id ? 'active' : ''}`}
+                className={`anchor ${selectedAnchor === anchor.id ? 'active' : ''} ${changedAnchorIds.has(anchor.id) ? 'changed' : ''}`}
                 style={{
                   left: `${(anchor.x / 24) * 100}%`,
                   top: `${(anchor.y / 24) * 100}%`,
-                  transition: 'all 0.3s ease-in-out'
                 }}
                 aria-label={`Anchor ${anchor.id}`}
                 onPointerDown={(e) => handlePointerDown(e, anchor.id)}
@@ -474,11 +800,22 @@ function App() {
                 {selectedAnchor === anchor.id ? '•' : ''}
               </button>
             ))}
+            {showDiff && (
+              <div className="diff-legend">
+                Diff vs main — dashed: main · solid: optical-pass · gold ring: {changedAnchorIds.size} changed anchor{changedAnchorIds.size === 1 ? '' : 's'}
+              </div>
+            )}
           </div>
           <div className="canvas-footer">
-            <span>Snap: <strong>grid / 1 unit</strong></span>
+            <span>Snap: <strong>grid / 1 unit (Shift+Arrow = 0.1)</strong></span>
             <span>Guide: <strong>{lens}</strong></span>
             <span>State: <strong>{mode === 'edit' ? 'editable' : 'read-only preview'}</strong></span>
+            {solveGhost && <span>Solver: <strong>before (dashed) → after (solid)</strong></span>}
+            {stress && <span aria-live="polite">Jobs: <strong>{stressJob.last} · {stressJob.canceled} stale canceled</strong></span>}
+            <span className="path-readout">
+              <button className="copy-path" onClick={copyPathData}>Copy path</button>
+              <code>{pathD.length > 60 ? `${pathD.slice(0, 60)}…` : pathD}</code>
+            </span>
           </div>
         </div>
       </section>
@@ -489,11 +826,11 @@ function App() {
         </div>
         <section>
           <h3>Anchor properties</h3>
-          {selected ? (
+          {selected && !stress ? (
             <div className="property-grid">
               <label>ID<input value={selected.id} readOnly /></label>
               <label>Type
-                <select tabIndex={0} value={selected.type} onChange={(event) => updateAnchor(selected.id, { type: event.target.value })}>
+                <select value={selected.type} onChange={(event) => updateAnchor(selected.id, { type: event.target.value })}>
                   <option value="move">move</option>
                   <option value="line">line</option>
                   <option value="quadratic">quadratic</option>
@@ -502,89 +839,79 @@ function App() {
                 </select>
               </label>
               <label>X
-                <input tabIndex={0} type="number" min="0" max="24" step="0.001" value={selected.x} onChange={(event) => updateAnchor(selected.id, { x: Number(event.target.value) })} />
+                <input type="number" min="0" max="24" step="0.001" value={selected.x} onChange={(event) => updateAnchor(selected.id, { x: Number(event.target.value) })} />
               </label>
               <label>Y
-                <input tabIndex={0} type="number" min="0" max="24" step="0.001" value={selected.y} onChange={(event) => updateAnchor(selected.id, { y: Number(event.target.value) })} />
+                <input type="number" min="0" max="24" step="0.001" value={selected.y} onChange={(event) => updateAnchor(selected.id, { y: Number(event.target.value) })} />
               </label>
             </div>
-          ) : <p>No anchor selected.</p>}
+          ) : <p>{stress ? 'Anchor editing pauses during the stress test.' : 'No anchor selected.'}</p>}
           <div className="inspector-actions">
-            <button tabIndex={0} onClick={() => {
-              const id = `a${displayedAnchors.length + 1}`;
-              const newAnchor = { id, x: 12, y: 12, type: 'line' };
-              if (currentIconData?.inherited && overrides[selectedIcon]) {
-                setOverrides(prev => ({...prev, [selectedIcon]: [...prev[selectedIcon], newAnchor]}));
-              } else if (branch === 'optical-pass') {
-                setBranchAnchors(prev => [...(prev || anchors), newAnchor]);
-              } else {
-                setAnchors([...anchors, newAnchor]);
-              }
-            }} onKeyDown={(e) => handleConstraintKeyDown(e, () => {
-              const id = `a${displayedAnchors.length + 1}`;
-              setAnchors([...anchors, { id, x: 12, y: 12, type: 'line' }]);
-            })}>Insert anchor</button>
-            <button tabIndex={0} onClick={() => {
-              const filterFn = (items) => items.filter((item) => item.id !== selectedAnchor);
-              if (currentIconData?.inherited && overrides[selectedIcon]) {
-                setOverrides(prev => ({...prev, [selectedIcon]: filterFn(prev[selectedIcon])}));
-              } else if (branch === 'optical-pass') {
-                setBranchAnchors(prev => filterFn(prev || anchors));
-              } else {
-                setAnchors(filterFn);
-              }
-            }} onKeyDown={(e) => handleConstraintKeyDown(e, () => setAnchors(anchors.filter((item) => item.id !== selectedAnchor)))}>Delete</button>
+            <button onClick={addAnchor}>Insert anchor</button>
+            <button onClick={() => deleteAnchor(selectedAnchor)}>Delete</button>
           </div>
           {currentIconData?.inherited && (
-            <div className="inspector-actions" style={{marginTop: '10px'}}>
-               <button tabIndex={0} onClick={resetVariant} onKeyDown={(e) => handleConstraintKeyDown(e, resetVariant)}>Reset Variant</button>
+            <div className="inspector-actions">
+              <button onClick={resetVariant} disabled={!overrides[selectedIcon]}>Reset Variant</button>
             </div>
           )}
-          <div className="inspector-actions" style={{marginTop: '10px'}}>
-             <button tabIndex={0} onClick={applyMirror} onKeyDown={(e) => handleConstraintKeyDown(e, applyMirror)}>Mirror Transform</button>
+          <div className="inspector-actions">
+            <button onClick={applyMirror}>Mirror Transform</button>
           </div>
         </section>
 
         <section>
           <h3>Constraints</h3>
-          {constraints.map(c => (
+          {constraints.map((c) => (
             <div className="constraint" key={c.id}>
-              <span>{c.kind.toUpperCase()} / {c.value || `${c.target1}-${c.target2}`}</span>
+              <span>{c.kind.toUpperCase()} / {c.value || `${c.target1} = ${c.target2}`}</span>
               <strong>ACTIVE</strong>
             </div>
           ))}
-          <div className="inspector-actions" style={{marginTop: '10px'}}>
-             <button tabIndex={0} onClick={addEqualConstraint} onKeyDown={(e) => handleConstraintKeyDown(e, addEqualConstraint)}>Add Equal Constraint</button>
+          <div className="property-grid constraint-pickers">
+            <label>From
+              <select value={constraintFrom} onChange={(e) => setConstraintFrom(e.target.value)}>
+                {displayedAnchors.map((a) => <option key={a.id} value={a.id}>{a.id}</option>)}
+              </select>
+            </label>
+            <label>To
+              <select value={constraintTo} onChange={(e) => setConstraintTo(e.target.value)}>
+                {displayedAnchors.map((a) => <option key={a.id} value={a.id}>{a.id}</option>)}
+              </select>
+            </label>
+          </div>
+          <div className="inspector-actions">
+            <button onClick={addEqualConstraint}>Add Equal Constraint</button>
           </div>
         </section>
 
         <section>
           <h3>Size Hints</h3>
           <div className="property-grid">
-             {hints.map(h => (
-               <div key={h.size} style={{gridColumn: '1/-1', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                 <span style={{fontSize: '10px'}}>{h.size}px Hint: {h.adjustment > 0 ? '+0.5px' : '0px'}</span>
-                 <button tabIndex={0} style={{minHeight: '28px', padding: '0 8px'}} onClick={() => addSizeHint(h.size)} onKeyDown={(e) => handleConstraintKeyDown(e, () => addSizeHint(h.size))}>
-                   Toggle Hint
-                 </button>
-               </div>
-             ))}
+            {hints.map((h) => (
+              <div key={h.size} className="hint-row">
+                <span>{h.size}px Hint: {h.adjustment > 0 ? '+0.5px' : h.adjustment < 0 ? '-0.5px' : '0px'}</span>
+                <button onClick={() => cycleSizeHint(h.size)}>
+                  Toggle Hint
+                </button>
+              </div>
+            ))}
           </div>
         </section>
 
         <section>
           <h3>Transfer</h3>
-          <textarea tabIndex={0} aria-label="Import family JSON" value={importText} onChange={(event) => setImportText(event.target.value)} placeholder="Paste a family JSON document" />
+          <textarea aria-label="Import family JSON" value={importText} onChange={(event) => setImportText(event.target.value)} placeholder="Paste a family JSON document" />
           <div className="inspector-actions">
-            <button tabIndex={0} onClick={importJson} onKeyDown={(e) => handleConstraintKeyDown(e, importJson)}>Import JSON</button>
-            <button tabIndex={0} className="primary" onClick={exportJson} onKeyDown={(e) => handleConstraintKeyDown(e, exportJson)}>Download</button>
+            <button onClick={importJson}>Import JSON</button>
+            <button className="primary" onClick={exportJson}>Download</button>
           </div>
         </section>
       </aside>
     </main>
     <footer className="statusbar">
       <span aria-live="polite">{status}</span>
-      <span>In-memory session · reload resets fixture · {currentAnchors.length} anchors</span>
+      <span>In-memory session · reload resets fixture · {stress ? '100,000 stress points' : `${currentAnchors.length} anchors`}</span>
     </footer>
   </div>;
 }
