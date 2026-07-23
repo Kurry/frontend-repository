@@ -41,8 +41,7 @@
         >
           <div class="flex-1 min-w-0">
             <div class="flex items-baseline gap-2">
-              <span class="text-lg font-bold" style="color: var(--accent-strong)">{set.reps}</span>
-              <span class="text-xs text-slate-400">reps</span>
+              <span class="text-sm font-bold" style="color: var(--accent-strong)">Logged {set.reps} reps</span>
               <span class="text-xs text-slate-500 ml-auto sm:ml-0">{formatDate(set.timestamp)}</span>
             </div>
             <p class="text-[10px] text-slate-500 truncate">ID: {set.setId || set.id} · {set.loggedAt || new Date(set.timestamp).toISOString()}</p>

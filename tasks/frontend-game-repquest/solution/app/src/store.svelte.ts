@@ -204,12 +204,9 @@ export function getCurrentWaypointIndex(state: QuestState): number {
 }
 
 export function getCurrentZone(state: QuestState): Zone {
-  const wpIdx = getCurrentWaypointIndex(state);
-  if (wpIdx >= 0) {
-    const zoneId = state.waypoints[wpIdx].zoneId;
-    return state.zones.find((z) => z.id === zoneId) || state.zones[0];
-  }
-  return state.zones[0];
+  return [...state.zones]
+    .sort((a, b) => b.startReps - a.startReps)
+    .find((zone) => state.lifetimeReps >= zone.startReps) || state.zones[0];
 }
 
 export function getProgressToNextWaypoint(state: QuestState): { current: number; target: number; pct: number } {
@@ -530,7 +527,7 @@ export class QuestStore {
     this.ariaLive = message;
     setTimeout(() => {
       this.toasts = this.toasts.filter((t) => t.id !== id);
-    }, 3200);
+    }, 1800);
   }
 
   dismissToast(id: number): void {
@@ -724,7 +721,6 @@ export class QuestStore {
 
     const prevLifetime = this.state.lifetimeReps;
     const newLifetime = prevLifetime + reps;
-    const prevWpIdx = getCurrentWaypointIndex(this.state);
 
     const today = getLocalDate();
     const setId = `set-${this.state.nextSetId}`;
@@ -742,7 +738,7 @@ export class QuestStore {
     this.state.repHistory.unshift(set);
 
     for (const wp of this.state.waypoints) {
-      if (wp.isBoss && !wp.bossDefeated && newLifetime >= wp.repsRequired && prevLifetime >= wp.repsRequired) {
+      if (wp.isBoss && !wp.bossDefeated && newLifetime >= wp.repsRequired) {
         if (reps >= (wp.bossMinReps || 0)) {
           wp.bossDefeated = true;
           const bonus = wp.bossBonusQP || 0;
@@ -757,11 +753,8 @@ export class QuestStore {
     this.state.questPoints += reps;
     this.glideToken++;
 
-    const newWpIdx = getCurrentWaypointIndex(this.state);
-    for (let i = Math.max(0, prevWpIdx + 1); i <= newWpIdx; i++) {
-      const wp = this.state.waypoints[i];
-      const zone = this.state.zones.find((z) => z.id === wp.zoneId);
-      if (zone && !this.state.unlockedZoneIds.includes(zone.id)) {
+    for (const zone of this.state.zones) {
+      if (prevLifetime < zone.startReps && newLifetime >= zone.startReps && !this.state.unlockedZoneIds.includes(zone.id)) {
         this.state.unlockedZoneIds.push(zone.id);
         if (!this.state.zoneUnlockMessages.includes(zone.id)) {
           this.state.zoneUnlockMessages.push(zone.id);
@@ -803,13 +796,9 @@ export class QuestStore {
 
     this.state.todayReps = getTodayReps(this.state);
 
-    const wpIdx = getCurrentWaypointIndex(this.state);
-    const unlocked = new Set<string>(['foothills']);
-    for (let i = 0; i <= wpIdx; i++) {
-      const zoneId = this.state.waypoints[i].zoneId;
-      unlocked.add(zoneId);
-    }
-    this.state.unlockedZoneIds = [...unlocked];
+    this.state.unlockedZoneIds = this.state.zones
+      .filter((zone) => this.state.lifetimeReps >= zone.startReps)
+      .map((zone) => zone.id);
 
     this._recalculateBossesAndQP();
     this._recalculateStreak();
@@ -833,7 +822,7 @@ export class QuestStore {
       const prevCumulative = cumulativeReps;
       cumulativeReps += repSet.reps;
       for (const wp of this.state.waypoints) {
-        if (wp.isBoss && !wp.bossDefeated && cumulativeReps >= wp.repsRequired && prevCumulative >= wp.repsRequired) {
+        if (wp.isBoss && !wp.bossDefeated && cumulativeReps >= wp.repsRequired) {
           if (repSet.reps >= (wp.bossMinReps || 0)) {
             wp.bossDefeated = true;
             bossQp += wp.bossBonusQP || 0;
@@ -945,6 +934,9 @@ export class QuestStore {
       // coherently with the rest of the state (never silently reverting).
       reminderEnabled: this.state.dailyReminder,
       reminderHour: this.state.reminderHour,
+      lastGoalMetDate: this.state.lastGoalMetDate,
+      zoneUnlockMessages: [...this.state.zoneUnlockMessages],
+      challengeCheckpoint: this.state.challengeCheckpoint ? { ...this.state.challengeCheckpoint } : null,
       sets: this.state.repHistory.map(({ setId, id, reps, loggedAt, timestamp, note }) => ({
         setId: setId || id,
         reps,
@@ -981,7 +973,11 @@ export class QuestStore {
         || !(doc.unlockedGearIds as unknown[]).every((id) => typeof id === 'string' && knownGearIds.has(id))
         || !(doc.defeatedBossIds as unknown[]).every((id) => (typeof id === 'string' || typeof id === 'number') && knownBossIds.has(String(id)))
         || (doc.reminderEnabled != null && typeof doc.reminderEnabled !== 'boolean')
-        || (doc.reminderHour != null && (!Number.isInteger(doc.reminderHour) || (doc.reminderHour as number) < 0 || (doc.reminderHour as number) > 23))) return false;
+        || (doc.reminderHour != null && (!Number.isInteger(doc.reminderHour) || (doc.reminderHour as number) < 0 || (doc.reminderHour as number) > 23))
+        || (doc.lastGoalMetDate != null && typeof doc.lastGoalMetDate !== 'string')
+        || (doc.zoneUnlockMessages != null && (!Array.isArray(doc.zoneUnlockMessages)
+          || !(doc.zoneUnlockMessages as unknown[]).every((id) => typeof id === 'string' && defaults.zones.some((zone) => zone.id === id))))
+        || (doc.challengeCheckpoint != null && !this._validCheckpoint(doc.challengeCheckpoint))) return false;
       const sets: RepSet[] = doc.sets.map((raw) => {
         if (!raw || typeof raw !== 'object') throw new Error('invalid set');
         const item = raw as Record<string, unknown>;
@@ -1012,13 +1008,28 @@ export class QuestStore {
       this._restoreState({ ...defaults, dailyGoal: doc.dailyGoal as number, currentStreak: doc.streak as number,
         questPoints: doc.questPoints as number, repHistory: sets, lifetimeReps: doc.lifetimeReps as number,
         unlockedZoneIds, equippedGearId: doc.equippedGearId as string, nextSetId,
-        dailyReminder: reminderEnabled, reminderHour });
+        dailyReminder: reminderEnabled, reminderHour,
+        lastGoalMetDate: typeof doc.lastGoalMetDate === 'string' ? doc.lastGoalMetDate : '',
+        zoneUnlockMessages: Array.isArray(doc.zoneUnlockMessages) ? [...doc.zoneUnlockMessages] as string[] : [],
+        challengeCheckpoint: doc.challengeCheckpoint ? { ...(doc.challengeCheckpoint as ChallengeCheckpoint) } : null });
       this.gameMode = 'quest';
       this.challengeRun = null;
       this.glideToken++;
       this._pushSnapshot('Imported quest log'); this._save(); this._toast('Quest Log imported', 'success');
       return true;
     } catch { return false; }
+  }
+
+  private _validCheckpoint(value: unknown): value is ChallengeCheckpoint {
+    if (!value || typeof value !== 'object') return false;
+    const cp = value as Record<string, unknown>;
+    return (cp.runStatus === 'active' || cp.runStatus === 'paused')
+      && (cp.difficulty === 'Easy' || cp.difficulty === 'Normal' || cp.difficulty === 'Hard')
+      && Number.isInteger(cp.bossWaypointId)
+      && Number.isInteger(cp.repsLogged) && (cp.repsLogged as number) >= 0
+      && Number.isInteger(cp.targetReps) && (cp.targetReps as number) > 0
+      && typeof cp.savedAt === 'string' && Number.isFinite(Date.parse(cp.savedAt))
+      && typeof cp.elapsedMs === 'number' && cp.elapsedMs >= 0;
   }
 
   resetQuest(): void {
