@@ -137,7 +137,7 @@ kbd { min-width: 22px; display: inline-flex; align-items: center; justify-conten
 .timeline-list button:hover, .timeline-list button.selected { background: #edf5ff; }.timeline-list button span { color: #6f6f6f; white-space: nowrap; }
 
 .annotation-card, .view-shell { width: min(1180px, calc(100% - 48px)); margin: 24px auto 70px; }
-.annotation-card { background: white; border: 1px solid var(--line); box-shadow: var(--shadow); }
+.annotation-card { background: white; border: 1px solid var(--line); box-shadow: var(--shadow); transition: all 250ms ease; }
 .card-enter { animation: card-in .25s ease both; }
 .annotation-card > * { animation: section-in .3s ease both; }
 .annotation-card > *:nth-child(2) { animation-delay: 30ms; }
