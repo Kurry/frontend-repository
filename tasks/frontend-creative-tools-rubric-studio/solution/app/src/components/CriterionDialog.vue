@@ -38,7 +38,7 @@ const duplicateId = computed(() => {
   const normalized = (id.value || '').trim()
   return store.activeRubric.criteria.some((item) => item.id === normalized && (props.mode === 'add' || item.id !== props.criterion?.id))
 })
-const canSubmit = computed(() => meta.value.valid && !duplicateId.value)
+const canSubmit = computed(() => meta.value.valid && !duplicateId.value && (props.mode === 'add' || meta.value.dirty))
 
 watch(() => props.open, async (open) => {
   if (!open) return

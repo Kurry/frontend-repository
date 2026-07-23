@@ -61,7 +61,7 @@ const submit = handleSubmit(({ json: source }) => {
 </script>
 
 <template>
-  <Dialog :visible="open" :modal="false" header="Import package" class="import-dialog" :style="{ width: 'min(720px, calc(100vw - 24px))' }" @update:visible="!$event && emit('close')">
+  <Dialog :visible="open" modal header="Import package" class="import-dialog" :style="{ width: 'min(720px, calc(100vw - 24px))' }" @update:visible="!$event && emit('close')">
     <form class="import-form" novalidate @submit.prevent="submit">
       <p class="dialog-intro">Paste or choose a <strong>rubric-package-v1</strong> JSON file. A valid package replaces the in-memory library; invalid input changes nothing.</p>
       <label class="file-picker">
