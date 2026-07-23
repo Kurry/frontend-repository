@@ -469,28 +469,28 @@ test('1.23 undo_redo_restores_board_and_export', async ({ page }) => {
   const targetBox = await target.boundingBox();
   await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
   await page.mouse.down();
-  await page.waitForTimeout(200);
   await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + 20, { steps: 5 });
-  await page.waitForTimeout(200);
   await page.mouse.up();
-  await page.waitForTimeout(500);
+  await expect(page.locator('.announcement')).toHaveText(/moved to|WIP limit/i);
 
   await page.locator('button').filter({ hasText: 'Export' }).click();
-  const text1 = await page.locator('pre[aria-label="json export preview"]').first().textContent();
+  const exportPreview = page.locator('pre[aria-label="json export preview"]').first();
+  await expect(exportPreview).toBeVisible();
+  const text1 = await exportPreview.textContent();
   await page.locator('.export-drawer button[aria-label="Close Export drawer"], .export-drawer button:has(svg)').first().click();
 
   await page.keyboard.press('Control+z');
-  await page.waitForTimeout(500);
+  await expect(page.locator('.announcement')).toHaveText(/undone/i);
   await page.locator('button').filter({ hasText: 'Export' }).click();
-  const text2 = await page.locator('pre[aria-label="json export preview"]').first().textContent();
+  await expect(exportPreview).toBeVisible();
+  await expect(exportPreview).not.toHaveText(text1);
   await page.locator('.export-drawer button[aria-label="Close Export drawer"], .export-drawer button:has(svg)').first().click();
-  expect(text1).not.toBe(text2);
 
   await page.keyboard.press('Control+Shift+Z');
-  await page.waitForTimeout(500);
+  await expect(page.locator('.announcement')).toHaveText(/redone/i);
   await page.locator('button').filter({ hasText: 'Export' }).click();
-  const text3 = await page.locator('pre[aria-label="json export preview"]').first().textContent();
-  expect(text1).toBe(text3);
+  await expect(exportPreview).toBeVisible();
+  await expect(exportPreview).toHaveText(text1);
 });
 test('1.24 board_json_export_api_shaped', async ({ page }) => {
   await page.goto('/');
@@ -591,23 +591,19 @@ test('1.31 undo_covers_comment_and_import', async ({ page }) => {
   await page.goto('/');
 
   await page.locator('.column-backlog .card-tile').first().click();
-  await page.waitForTimeout(500);
-
-  await page.fill('#detail-comment', 'Test Comment 1234');
+  const commentInput = page.locator('#detail-comment');
+  await expect(commentInput).toBeVisible();
+  await commentInput.fill('Test Comment 1234');
   await page.locator('form.comment-form').evaluate(f => f.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })));
-  await page.waitForTimeout(500);
-  const commentCount1 = await page.locator('p:has-text("Test Comment 1234")').count();
-  expect(commentCount1).toBe(1);
+  await expect(page.locator('p:has-text("Test Comment 1234")')).toHaveCount(1);
 
   await page.locator('.cds--modal-footer button:has-text("Cancel")').click();
-  await page.waitForTimeout(500);
 
   await page.keyboard.press('Control+z');
-  await page.waitForTimeout(500);
+  await expect(page.locator('.announcement')).toHaveText(/undone/i);
 
   await page.locator('.column-backlog .card-tile').first().click();
-  await page.waitForTimeout(500);
+  await expect(commentInput).toBeVisible();
 
-  const commentCount2 = await page.locator('p:has-text("Test Comment 1234")').count();
-  expect(commentCount2).toBe(0);
+  await expect(page.locator('p:has-text("Test Comment 1234")')).toHaveCount(0);
 });
