@@ -173,7 +173,7 @@ function buildManifest(pr) {
     maxFiles: Number(pr.request.maxFiles),
     checks: { skeleton: true, validate: true },
     stages,
-    generatedAt: pr.generatedAt && /Z$/.test(pr.generatedAt) ? pr.generatedAt : new Date().toISOString(),
+    generatedAt: pr.generatedAt && pr.generatedAt.endsWith('Z') ? pr.generatedAt : new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
   }
   const parsed = taskManifestSchema.safeParse(payload)
   return parsed.success ? parsed.data : null
