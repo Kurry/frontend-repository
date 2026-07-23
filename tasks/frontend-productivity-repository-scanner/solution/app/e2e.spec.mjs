@@ -515,7 +515,7 @@ test.describe('task criteria', () => {
     await expect(topology).toContainText('Product catalog');
     await expect(topology).toContainText(/risk index \d+/);
     await expect(topology).toContainText('Next best action');
-    await page.locator('#pattern-readme').click();
+    await page.locator('label[for="pattern-readme"]').click();
     await page.locator('#repository-repo-2').getByRole('button', { name: 'Scan now' }).click();
     await expect.poll(async () => topology.getByText('Coverage gap').count(), { timeout: 15000 }).toBe(1);
     await expect(topology).toContainText('3/4');

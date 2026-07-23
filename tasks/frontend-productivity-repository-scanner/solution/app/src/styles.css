@@ -388,6 +388,18 @@ footer { max-width: 1520px; margin: 0 auto; padding: 20px 40px 32px; color: #697
 .topology-coverage .is-missing { border-color: #8e6a00; background: rgb(73 53 0 / .24); }
 .topology-coverage .is-missing strong { color: #fddc69; }
 .topology-coverage .is-missing i { background: #f1c21b; }
+
+@media (prefers-reduced-motion: reduce) {
+  .guidance-topology,
+  .guidance-topology *,
+  .guidance-topology::before,
+  .guidance-topology *::before,
+  .guidance-topology *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
 .topology-recommendation { grid-column: 2 / 4; display: flex; align-items: center; gap: 12px; margin-top: -7px; padding: 9px 12px; border-left: 3px solid #42beb9; background: rgb(4 17 34 / .38); }
 .topology-recommendation strong { color: #d9fbf8; font-size: 11px; font-weight: 500; }
 
