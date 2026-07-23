@@ -302,7 +302,7 @@ export function createTheme(name) {
   const trimmed = String(name || '').trim();
   if (!trimmed) return { ok: false, error: 'Name is required — give the theme a name before adding it' };
   if (trimmed.length < 2 || trimmed.length > 30) return { ok: false, error: 'Name must be 2–30 characters long' };
-  if (!NAME_RE.test(trimmed)) return { ok: false, error: 'Name must start with a lowercase letter and use only lowercase letters, numbers, hyphens, and underscores' };
+  if (!NAME_RE.test(trimmed)) return { ok: false, error: 'Name must start with a letter and use only letters, numbers, spaces, hyphens, and underscores' };
   if (findByName(trimmed)) return { ok: false, error: `A theme named “${trimmed}” already exists — pick a unique name` };
   pushHistory();
   const seed = BUILTINS[0];
@@ -332,7 +332,7 @@ export function validateRename(raw) {
   const trimmed = String(raw || '').trim();
   if (!trimmed) return { ok: false, error: 'Name is required — the theme keeps its current name' };
   if (trimmed.length < 2 || trimmed.length > 30) return { ok: false, error: 'Name must be 2–30 characters long' };
-  if (!NAME_RE.test(trimmed)) return { ok: false, error: 'Name must start with a lowercase letter and use only lowercase letters, numbers, hyphens, and underscores' };
+  if (!NAME_RE.test(trimmed)) return { ok: false, error: 'Name must start with a letter and use only letters, numbers, spaces, hyphens, and underscores' };
   const clash = state.customs.find((t) => t.id !== state.activeId && slugOf(t.name) === slugOf(trimmed));
   if (clash) return { ok: false, error: `A theme named “${trimmed}” already exists in My Themes` };
   return { ok: true, value: trimmed };
@@ -465,6 +465,7 @@ export function loadFromHash() {
     state.activeId = 'builtin-light';
     state.previewTab = 'demo';
     state.colorBlind = 'none';
+    try { history.replaceState(null, '', location.pathname + location.search); } catch { /* noop */ }
     notify('structure');
     return false;
   }
