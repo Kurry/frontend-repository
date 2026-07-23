@@ -7,18 +7,21 @@
         <p class="font-heading text-[1.25rem] font-bold text-ink">
           Mind<span class="text-primary">Thread</span>
         </p>
-        <nav aria-label="Views" class="flex flex-wrap items-center gap-2">
+        <nav aria-label="Views" role="tablist" class="flex flex-wrap items-center gap-2" @keydown="handleNavKeydown">
           <button
-            v-for="view in views"
+            v-for="(view, idx) in views"
             :key="view.id"
+            :ref="el => { if (el) navRefs[idx] = el as HTMLButtonElement }"
             type="button"
+            role="tab"
             class="rounded-md px-3 py-2 text-[0.9rem] font-medium transition-colors focus-ring"
             :class="
               currentView === view.id
                 ? 'bg-primary text-white shadow-sm'
                 : 'text-inksoft hover:bg-hoverwash hover:text-ink'
             "
-            :aria-current="currentView === view.id ? 'page' : undefined"
+            :aria-selected="currentView === view.id"
+            :tabindex="currentView === view.id ? 0 : -1"
             @click="setView(view.id)"
           >
             {{ view.label }}
@@ -117,9 +120,31 @@ const { currentView } = storeToRefs(ui)
 
 const store = useSparkStore()
 const { canUndo, canRedo } = storeToRefs(store)
+const navRefs = ref<HTMLButtonElement[]>([])
 
 function setView(view: ViewId) {
   ui.setView(view)
+}
+
+function handleNavKeydown(e: KeyboardEvent) {
+  const currentIndex = views.findIndex(v => v.id === currentView.value)
+  let nextIndex = currentIndex
+
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    e.preventDefault()
+    nextIndex = (currentIndex + 1) % views.length
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    e.preventDefault()
+    nextIndex = (currentIndex - 1 + views.length) % views.length
+  }
+
+  if (nextIndex !== currentIndex) {
+    const view = views[nextIndex]
+    if (view) {
+      setView(view.id)
+      navRefs.value[nextIndex]?.focus()
+    }
+  }
 }
 
 function handleUndo() {

@@ -81,6 +81,7 @@ const editor = useEditor({
   editorProps: {
     attributes: {
       class: 'outline-none min-h-20',
+      'aria-label': 'Reflection',
     },
   },
 })

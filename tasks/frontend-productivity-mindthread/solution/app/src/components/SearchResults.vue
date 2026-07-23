@@ -9,7 +9,7 @@
 
     <div v-if="totalCount === 0" class="px-6 py-10 text-center">
       <h3 class="font-heading text-[0.95rem] font-semibold text-ink">
-        No matching sparks, reflections or threads
+        No matching sparks
       </h3>
       <p class="mx-auto mt-1 max-w-md text-[0.85rem] text-inksoft">
         Nothing contains "{{ query }}". Try a different term, or select Clear to browse

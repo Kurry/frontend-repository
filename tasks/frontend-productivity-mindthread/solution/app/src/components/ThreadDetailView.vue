@@ -9,9 +9,9 @@
 
     <header class="mt-3">
       <div class="flex flex-wrap items-center gap-3">
-        <h1 class="break-words font-heading text-[1.6rem] font-semibold leading-tight text-ink">
+        <h2 class="break-words font-heading text-[1.6rem] font-semibold leading-tight text-ink">
           {{ thread.title }}
-        </h1>
+        </h2>
         <StatusBadge :status="thread.status" />
       </div>
       <p class="mt-2 meta-mono">{{ statsLabel }}</p>
@@ -21,20 +21,24 @@
           <span class="field-label mb-0">Status</span>
           <div
             class="inline-flex items-center gap-1 rounded-md border border-line bg-surface p-1"
-            role="group"
+            role="radiogroup"
             aria-label="Status"
+            @keydown="handleStatusKeydown"
           >
             <button
-              v-for="option in statusOptions"
+              v-for="(option, idx) in statusOptions"
               :key="option.value"
+              :ref="el => { if (el) statusRefs[idx] = el as HTMLButtonElement }"
               type="button"
+              role="radio"
               class="rounded-md px-3 py-1 text-[0.8rem] font-medium transition-colors focus-ring"
               :class="
                 thread.status === option.value
                   ? option.selectedClass
                   : 'text-inksoft hover:bg-hoverwash hover:text-ink'
               "
-              :aria-pressed="thread.status === option.value"
+              :aria-checked="thread.status === option.value"
+              :tabindex="thread.status === option.value ? 0 : -1"
               @click="setStatus(option.value)"
             >
               {{ option.label }}
@@ -76,7 +80,16 @@
             aria-hidden="true"
           ></span>
           <div class="rounded-lg border border-linesoft bg-surface p-4 transition-shadow hover:shadow-md">
-            <p class="break-words text-[0.95rem] text-ink">{{ spark.text }}</p>
+            <div class="flex justify-between items-start gap-3">
+              <p class="break-words text-[0.95rem] text-ink">{{ spark.text }}</p>
+              <button
+                type="button"
+                class="btn-quiet text-error shrink-0"
+                @click="deleteSpark(spark.id)"
+              >
+                Delete
+              </button>
+            </div>
             <p class="mt-1 meta-mono">Captured {{ formatTimestamp(spark.createdAt) }}</p>
 
             <div class="mt-3">
@@ -150,10 +163,33 @@ const timelineSparks = computed(() => store.sparksInThread(props.threadId))
 const stats = computed(() => store.threadStats(props.threadId))
 const isMergeOpen = ref(false)
 const reflectionSparkId = ref<string | null>(null)
+const statusRefs = ref<HTMLButtonElement[]>([])
 
 watchEffect(() => {
   if (!thread.value) emit('close')
 })
+
+function handleStatusKeydown(e: KeyboardEvent) {
+  if (!thread.value) return
+  const currentIndex = statusOptions.findIndex(o => o.value === thread.value!.status)
+  let nextIndex = currentIndex
+
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    e.preventDefault()
+    nextIndex = (currentIndex + 1) % statusOptions.length
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    e.preventDefault()
+    nextIndex = (currentIndex - 1 + statusOptions.length) % statusOptions.length
+  }
+
+  if (nextIndex !== currentIndex) {
+    const option = statusOptions[nextIndex]
+    if (option) {
+      setStatus(option.value)
+      statusRefs.value[nextIndex]?.focus()
+    }
+  }
+}
 
 const statusOptions: {
   value: ThreadStatus
@@ -193,6 +229,11 @@ function archiveThread() {
   store.setArchived(props.threadId, true)
   showToast('Thread archived', 'success')
   emit('close')
+}
+
+function deleteSpark(sparkId: string) {
+  store.deleteSpark(sparkId)
+  showToast('Spark deleted', 'info')
 }
 
 function deleteEmptyThread() {
