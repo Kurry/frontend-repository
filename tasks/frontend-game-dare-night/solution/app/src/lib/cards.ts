@@ -115,17 +115,16 @@ export function shuffleArray<T>(array: T[]): T[] {
 function intensityWeight(card: Card, intensity: Intensity): number {
   const wildTagged = card.category === 'Wild' || card.intensity === 'Wild';
   if (intensity === 'Mild') {
-    if (card.intensity === 'Mild') return 6;
+    if (card.intensity === 'Mild') return 20;
     if (card.intensity === 'Spicy') return 2;
-    return wildTagged ? 1 : 1;
+    return 1;
   }
   if (intensity === 'Spicy') {
-    if (card.intensity === 'Spicy') return 6;
+    if (card.intensity === 'Spicy') return 20;
     if (card.intensity === 'Mild') return 2;
-    return wildTagged ? 3 : 2;
+    return 3;
   }
-  // Wild intensity: Wild-tagged cards dominate the front of the deck.
-  if (wildTagged) return 9;
+  if (wildTagged) return 20;
   if (card.intensity === 'Spicy') return 2;
   return 1;
 }
@@ -140,6 +139,6 @@ export function weightedShuffle(cards: Card[], intensity: Intensity): Card[] {
     const key = Math.pow(Math.random(), 1 / w);
     return { card, key };
   });
-  keyed.sort((a, b) => b.key - a.key);
+  keyed.sort((a, b) => a.key - b.key);
   return keyed.map((k) => k.card);
 }

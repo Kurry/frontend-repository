@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { fade, scale } from "svelte/transition";
   import { onMount } from 'svelte';
 
   interface Props {
@@ -53,7 +54,7 @@
   onmousedown={(e) => { if (e.target === e.currentTarget) onClose(); }}
 >
   <div
-    class="dialog-panel bg-white w-full max-w-md p-5 shadow-2xl"
+    class="dialog-panel bg-white w-full max-w-md p-5 shadow-2xl max-h-[90vh] overflow-y-auto" transition:scale={{ start: 0.95, duration: 180 }}
     style="border-radius: 10px;"
     role="dialog"
     aria-modal="true"

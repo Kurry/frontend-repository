@@ -41,7 +41,7 @@
 
 <div class="bg-white rounded-[10px] p-5 shadow-lg w-full">
   <div class="flex items-center justify-between gap-2.5 mb-2.5 flex-wrap">
-    <h2 class="text-lg font-semibold" style="color: var(--color-accent);">Live event feed</h2>
+    <h2 class="text-lg font-semibold" style="color: var(--color-accent);">Live Event Feed</h2>
     <span class="inline-flex items-center gap-2.5 px-2.5 py-1 rounded-full {pillBg(status)} transition-colors duration-300" data-testid="stream-status-pill" data-stream-status={status}>
       {#if status === 'active'}<Broadcast size={16} weight="bold" style="color: {dot(status)};" aria-hidden="true" />
       {:else if status === 'paused'}<PauseCircle size={16} weight="bold" style="color: {dot(status)};" aria-hidden="true" />
@@ -68,7 +68,7 @@
 
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
     <div>
-      <h3 class="text-xs font-semibold text-gray-700 mb-2.5 uppercase tracking-wide">Live bonus by player</h3>
+      <h3 class="text-xs font-semibold text-gray-700 mb-2.5 uppercase tracking-wide">Live Bonus by Player</h3>
       <div class="space-y-1">
         {#each bonuses as row (row.name)}
           <div class="flex items-center justify-between text-sm">
@@ -79,7 +79,7 @@
       </div>
     </div>
     <div>
-      <h3 class="text-xs font-semibold text-gray-700 mb-2.5 uppercase tracking-wide">Applied log (seq order)</h3>
+      <h3 class="text-xs font-semibold text-gray-700 mb-2.5 uppercase tracking-wide">Applied Log (Seq Order)</h3>
       {#if appliedEvents.length === 0}
         <p class="text-xs text-gray-500">No events applied yet. Select Start to begin the stream.</p>
       {:else}
