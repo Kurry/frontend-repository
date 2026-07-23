@@ -1,0 +1,76 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "hierarchy_legibility"
+description = "View a stock sheet with placements, cut lines, and lenses enabled. Verify that overlapping elements, grain direction, visible edges, defect regions, and kerf zones use distinct visual treatments (e.g., distinct colors, patterns, or borders) so that the hierarchy of all states remains clearly legible without visual confusion."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n1"
+name = "visual_clutter"
+description = "Enable all lenses (grain, edge, defect, support) on a densely packed stock sheet. The visual density becomes unreadable, with cut lines indistinguishable from part borders, or colors clashing to the point that defect regions cannot be distinguished from valid parts."
+type = "binary"
+weight = 1.0
+negate = true

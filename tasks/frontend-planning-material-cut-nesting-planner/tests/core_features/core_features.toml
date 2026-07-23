@@ -1,0 +1,117 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "5.1"
+name = "nesting_canvas_drag_rotate"
+description = "Load the planner. Drag a rectangular part onto a stock sheet canvas. Verify that the part snaps to a 1-mm grid. Rotate the part by 90 degrees; verify that rotation is blocked if grain constraints forbid it, or succeeds if grain permits. Move it near the edge; verify that it cannot be placed outside the usable stock area minus the edge margin."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.2"
+name = "part_allocation_bind"
+description = "Select a required part from the project allocation list. Drag it to a stock sheet to create a placement. Verify that the part's quantity is decremented or its state changes to 'allocated', and that duplicating the placed part on the sheet without sufficient required instances leaves the duplicate visually marked as 'unassigned' or 'overproduced'."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.3"
+name = "guillotine_cut_tree"
+description = "On a stock sheet with placed parts, draw a full-length horizontal cut line across the sheet. Verify that the cut consumes a 3-mm kerf and divides the sheet into exactly two child regions. Draw a second cut inside one of the child regions and verify it only spans that leaf region, updating the cut-tree sequence."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.4"
+name = "offcut_inventory"
+description = "Draw guillotine cuts to isolate an unconsumed region of a sheet. Retain this region as an offcut. Verify that the new offcut appears in the offcut inventory with the correct parent stock and remnant properties, and that the consumed, reserved, and available stock quantities reconcile exactly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.5"
+name = "execution_recovery"
+description = "Begin the execution workflow on a planned sheet. Simulate a 'saw stop' failure midway through the cut sequence. Verify that the workflow pauses, allows marking the current child region as damaged/scrap, and permits re-nesting the affected parts into a new branch while preserving the cuts that already succeeded."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.6"
+name = "cost_and_waste_analysis"
+description = "View the cost and waste analysis charts. Select a bar representing a specific waste or cost segment. Verify that the corresponding exact sheet regions and tree leaves are highlighted, and that branch comparison separates cost, raw waste, reusable yield, cut count, and completeness accurately."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.7"
+name = "grain_edge_defect_lenses"
+description = "Enable the grain, edge, defect, and support lenses. Verify that they correctly display the grain direction, required visible edges, defect clearance regions, and support risk across the canvas, and that they update accurately when a part is moved or rotated."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.8"
+name = "reload_survival_and_isolation"
+description = "Make a set of edits (placements, cuts, offcut retentions) and reload the page. Verify that the persisted state survives exactly, and that transient states such as previews, open dialogs, hover effects, drag states, or invalid drafts do not leak into the persisted view."
+type = "binary"
+weight = 1.0

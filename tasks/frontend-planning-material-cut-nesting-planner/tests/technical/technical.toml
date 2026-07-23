@@ -1,0 +1,76 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "10.1"
+name = "technical_coherence"
+description = "Interleave UI and WebMCP placement, cut tree/order, finish/offcut, branch, execution, certification, history, and transfer actions. Verify that all IDs, geometry data, stock quantities, exact cents, and downloaded file shapes match exactly and remain synchronized between the UI display and WebMCP return payloads without reloading."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.n1"
+name = "technical_mutation_leak"
+description = "Attempt an import that contains invalid data (e.g., cross-field contradictions, bounds violations). Verify that the application completely rejects the import, rendering error diagnostics without applying any partial state mutation to the previously working planner session."
+type = "binary"
+weight = 1.0
+negate = true
