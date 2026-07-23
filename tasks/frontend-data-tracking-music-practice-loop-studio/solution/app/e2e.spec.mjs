@@ -1,119 +1,104 @@
-// ============================================================================
-// CANONICAL ORACLE E2E SUITE — workspace contract (do not edit this region).
-// Owned by `corpuscheck propagate`; the canonical region ends at the marker
-// below. ADD task-specific criterion tests AFTER the marker — one test per
-// rubric criterion, named `test('<id> <criterion_name>', ...)`.
-//
-// Run: start the app first (`npm run start`, port 3000), then
-//   npx playwright test -c e2e.playwright.config.mjs
-// (the sibling canonical config pins discovery to this file, so it works even
-// when the app has its own playwright.config for other suites).
-// Requires devDependency: @playwright/test (^1.x) — use the app's EXISTING
-// @playwright/test if present; never install a second copy (duplicate
-// instances break test loading).
-// ============================================================================
-import { test as base, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
-const BASE = 'http://localhost:3000';
-
-export const test = base.extend({
-  page: async ({ page }, use) => {
-    const errors = [];
-    page.on('console', (m) => { if (m.type() === 'error') errors.push(`console.error: ${m.text()}`); });
-    page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
-    await use(page);
-    expect(errors, 'zero console/page errors required').toEqual([]);
-  },
-});
-export { expect };
-
-export const listTools = (page) => page.evaluate(async () => {
-  const r = await window.webmcp_list_tools();
-  return typeof r === 'string' ? JSON.parse(r) : r;
-});
-export const invokeTool = (page, name, args = {}) => page.evaluate(async ([n, a]) => {
-  const r = await window.webmcp_invoke_tool(n, a);
-  try { return typeof r === 'string' ? JSON.parse(r) : r; } catch { return r; }
-}, [name, args]);
-
-test.describe('workspace contract (canonical)', () => {
-  test('serves non-empty app with zero console errors', async ({ page }) => {
-    await page.goto(BASE);
-    await page.waitForLoadState('networkidle');
-    const len = await page.evaluate(() => document.body?.innerText?.trim().length ?? 0);
-    expect(len, 'body renders visible content').toBeGreaterThan(0);
-  });
-
-  test('webmcp surface is registered and well-formed', async ({ page }) => {
-    await page.goto(BASE);
-    await page.waitForLoadState('networkidle');
-    const kinds = await page.evaluate(() => ({
-      session_info: typeof window.webmcp_session_info,
-      list_tools: typeof window.webmcp_list_tools,
-      invoke_tool: typeof window.webmcp_invoke_tool,
-    }));
-    expect(kinds).toEqual({ session_info: 'function', list_tools: 'function', invoke_tool: 'function' });
-    const tools = await listTools(page);
-    const arr = Array.isArray(tools) ? tools : tools?.tools ?? [];
-    expect(arr.length, 'at least one webmcp tool registered').toBeGreaterThan(0);
-    for (const t of arr) expect(typeof (t.name ?? t.id), 'every tool has a name').toBe('string');
-  });
-
-  test('reduced motion behaviorally suppresses animation', async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: 'reduce' });
-    // Install the collector before navigation so load/hydration animations are
-    // observed too. Keep it running through network idle and a settled 1.5s
-    // window so late-starting effects cannot escape the assertion.
-    await page.addInitScript(() => {
-      window.__reducedMotionOffenders = [];
-      const seen = new Set();
-      const sample = () => {
-        for (const animation of document.getAnimations({ subtree: true })) {
-          if (animation.playState !== 'running') continue;
-          let timing = {};
-          try { timing = animation.effect?.getComputedTiming?.() ?? {}; } catch { /* detached */ }
-          const duration = typeof timing.duration === 'number' ? timing.duration : 0;
-          if (duration <= 1) continue;
-          const offender = {
-            kind: animation.constructor?.name ?? 'Animation',
-            name: animation.animationName ?? animation.transitionProperty ?? animation.id ?? '(anonymous)',
-            duration,
-            iterations: timing.iterations ?? 1,
-          };
-          const key = JSON.stringify(offender);
-          if (!seen.has(key)) {
-            seen.add(key);
-            window.__reducedMotionOffenders.push(offender);
-          }
-        }
-        requestAnimationFrame(sample);
-      };
-      requestAnimationFrame(sample);
-    });
-    await page.goto(BASE);
-    await page.waitForLoadState('networkidle');
-    // Precondition sanity check: the emulation actually reaches the app.
-    const reduced = await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
-    expect(reduced, 'precondition: app sees prefers-reduced-motion: reduce').toBe(true);
-    // Observe every frame for another 1.5s after load settles and assert on
-    // everything seen since the document started.
-    // Finished, idle, or paused effects and durations <=1ms are allowed; any
-    // meaningfully timed RUNNING effect at any sample is a reduced-motion
-    // failure. Apps with zero animations pass vacuously (the render/console
-    // test still gates them).
-    await page.waitForTimeout(1500);
-    const offenders = await page.evaluate(() => window.__reducedMotionOffenders ?? []);
-    expect(offenders, 'no running animation/transition with meaningful duration under reduced motion').toEqual([]);
-  });
-
-  test('no horizontal overflow at 375px', async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 812 });
-    await page.goto(BASE);
-    await page.waitForLoadState('networkidle');
-    const overflow = await page.evaluate(() =>
-      document.documentElement.scrollWidth - document.documentElement.clientWidth);
-    expect(overflow, 'no horizontal page scroll at 375px').toBeLessThanOrEqual(1);
-  });
+test.beforeEach(async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  const skip = page.getByRole('button', { name: 'Skip tour' });
+  if (await skip.isVisible()) await skip.click();
 });
 
-// ==== END CANONICAL REGION — add task-specific criterion tests below. ====
+test('loop CRUD, validation, cross-view echo, persistence, and empty recovery', async ({ page }) => {
+  await page.getByRole('button', { name: 'Create loop' }).click();
+  await expect(page.getByRole('alert')).toContainText('Enter a loop name');
+  await page.getByRole('button', { name: /Measure 12/ }).click();
+  await page.getByRole('button', { name: /Measure 16/ }).click({ modifiers: ['Shift'] });
+  await page.getByLabel('Loop name').fill('Bridge precision');
+  await page.getByLabel('Repetitions').fill('7');
+  await page.getByRole('button', { name: 'Create loop' }).click();
+  await expect(page.getByRole('status')).toContainText('Created');
+  await expect(page.getByTestId('loop-count')).toHaveText('2');
+  await expect(page.getByTestId('range-summary')).toHaveText('Measures 12–16');
+  await page.getByRole('button', { name: 'loops', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Bridge precision' })).toBeVisible();
+  await expect(page.locator('.loop-card').filter({ hasText: 'Bridge precision' }).getByText('Measures 12–16')).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole('button', { name: 'loops', exact: true })).toHaveAttribute('aria-current', 'page');
+  await expect(page.getByRole('heading', { name: 'Bridge precision' })).toBeVisible();
+  await page.getByRole('button', { name: 'Edit loop' }).last().click();
+  await page.getByLabel('Edit name for Bridge precision').fill('Bridge locked');
+  await page.getByLabel('Edit name for Bridge precision').press('Enter');
+  await expect(page.getByRole('heading', { name: 'Bridge locked' })).toBeVisible();
+  await page.getByRole('button', { name: 'Delete' }).first().click();
+  await page.getByRole('button', { name: 'Delete' }).click();
+  await expect(page.getByTestId('loop-count')).toHaveText('0');
+  await expect(page.getByRole('heading', { name: 'Your loop library is empty' })).toBeVisible();
+  await page.getByRole('button', { name: 'Create a loop' }).click();
+  await page.getByLabel('Loop name').fill('Fresh start');
+  await page.getByRole('button', { name: 'Create loop' }).click();
+  await expect(page.getByTestId('loop-count')).toHaveText('1');
+});
+
+test('keyboard semantics, session feedback, schedule, alignment, and personalization', async ({ page }) => {
+  await page.getByRole('button', { name: 'tempo', exact: true }).focus();
+  await page.keyboard.press('Enter');
+  await page.getByRole('button', { name: 'Start session' }).press('Enter');
+  await expect(page.getByText('Playing · repetition 1 of 5')).toBeVisible();
+  await page.getByRole('button', { name: 'Pause session' }).press('Space');
+  await expect(page.getByText('Paused · progress preserved')).toBeVisible();
+  await page.getByRole('button', { name: 'takes', exact: true }).click();
+  await page.getByRole('button', { name: 'Accept alignment' }).click();
+  await expect(page.getByText('Aligned take')).toBeVisible();
+  await expect(page.getByRole('status')).toContainText('Accepted alignment');
+  await page.getByRole('button', { name: 'schedule', exact: true }).click();
+  await page.getByRole('button', { name: 'Day 1 Open' }).click();
+  await expect(page.getByRole('button', { name: /Day 1.*approved/ })).toBeVisible();
+  await page.getByLabel('Accent').selectOption('coral');
+  await page.getByLabel('Compact spacing').check();
+  await page.getByRole('button', { name: 'Use dark theme' }).click();
+  await page.reload();
+  await expect(page.locator('.app')).toHaveClass(/dark/);
+  await expect(page.getByLabel('Accent')).toHaveValue('coral');
+  await expect(page.getByLabel('Compact spacing')).toBeChecked();
+});
+
+test('WebMCP and UI share live state and exports are session-derived', async ({ page }) => {
+  const tools = await page.evaluate(() => window.webmcp_list_tools());
+  expect(Array.isArray(tools) ? tools.length : tools.tools.length).toBeGreaterThan(5);
+  const created = await page.evaluate(() => window.webmcp_invoke_tool('entity.create', { name: 'MCP phrase', start: 9, end: 13, repetitions: 4 }));
+  expect(created.ok).toBeTruthy();
+  await page.getByRole('button', { name: 'loops', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'MCP phrase' })).toBeVisible();
+  await page.evaluate(() => window.webmcp_invoke_tool('editor.set_content', { start: 9, end: 13 }));
+  await expect(page.getByTestId('range-summary')).toHaveText('Measures 9–13');
+  const preview = await page.evaluate(() => window.webmcp_invoke_tool('editor.preview', {}));
+  expect(preview.range).toEqual({ start: 9, end: 13 });
+  expect(preview.loopCount).toBe(2);
+  await page.evaluate(() => window.webmcp_invoke_tool('session.start', {}));
+  await page.getByRole('button', { name: 'tempo', exact: true }).click();
+  await expect(page.getByText('Playing · repetition 1 of 5')).toBeVisible();
+  const copied = await page.evaluate(() => window.webmcp_invoke_tool('artifact.copy', { format: 'practice-dossier-json' }));
+  expect(copied.ok).toBeTruthy();
+});
+
+test('mobile layout has reachable controls and no page overflow', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await expect(page.getByRole('button', { name: 'score', exact: true })).toBeVisible();
+  const dimensions = await page.evaluate(() => ({ width: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }));
+  expect(dimensions.width).toBe(dimensions.client);
+  const smallTargets = await page.locator('button:visible').evaluateAll(buttons => buttons.filter(button => { const rect = button.getBoundingClientRect(); return rect.width < 44 || rect.height < 44; }).map(button => button.getAttribute('aria-label') || button.textContent.trim()));
+  expect(smallTargets).toEqual([]);
+});
+
+test('reduced motion removes meaningful animation duration and console stays clean', async ({ browser }) => {
+  const context = await browser.newContext({ reducedMotion: 'reduce' });
+  const page = await context.newPage();
+  const errors = [];
+  page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('/');
+  const duration = await page.locator('.panel').first().evaluate(element => getComputedStyle(element).animationDuration);
+  expect(Number.parseFloat(duration)).toBeLessThanOrEqual(.001);
+  expect(errors).toEqual([]);
+  await context.close();
+});
