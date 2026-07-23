@@ -39,6 +39,11 @@
     "instruction": "variants/ExposureControlLab/instruction.md",
     "description": "Camera exposure control lab variant."
   },
+  "frontend-creative-tools-fictional-spoken-take-seam-composer": {
+    "description": "Fictional Spoken Take Seam Composer",
+    "source": "Fictional Spoken Take Seam Composer PRD",
+    "instruction": "tasks/frontend-creative-tools-fictional-spoken-take-seam-composer/instruction.md"
+  },
   "frontend-creative-tools-frameflick": {
     "source": "Frameflick",
     "instruction": "Frameflick/instruction.md",
