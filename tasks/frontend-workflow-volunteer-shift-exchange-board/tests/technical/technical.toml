@@ -1,0 +1,97 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "technical.clean_start"
+name = "clean_start"
+description = "Verify that the application starts cleanly on its documented start path without generating console errors or unhandled promise rejections."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "technical.interleave_operations"
+name = "interleave_operations"
+description = "Observe that interleaving UI or WebMCP actions for exchange, response, clock, approval, commit, waitlist, history, and transfer operations results in fully matched internal ids, roster state, attempts, checksums, and artifact files."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "technical.performance_fixture"
+name = "performance_fixture"
+description = "At the proposal's maximum declared fixture size (200 shifts, 80 volunteers, 50 exchanges, 100 responses/attempts), direct manipulation acknowledges within 100 ms, linked/derived views settle within 500 ms, and export/import complete within 2 s without dropped interactions, stale views, layout jumps, console errors, page errors, or non-local network dependence."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "technical.artifact_reconstruction"
+name = "artifact_reconstruction"
+description = "Verify that importing an artifact reconstructs the transactions exactly according to the schema (schemaVersion: 'volunteer-exchange-roster/v1') and that canonical re-export changes only 'exportedAt' while keeping ICS, CSV, and SVG byte-identical."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "technical.malformed_import_failure"
+name = "malformed_import_failure"
+description = "The app incorrectly applies a malformed or corrupted artifact payload (e.g. invalid exchange cycle, duplicate reservation/ownership, hard-rule violation), resulting in partial or corrupted application state."
+type = "binary"
+negate = true
+weight = 1.0
