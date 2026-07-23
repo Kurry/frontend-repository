@@ -1,0 +1,104 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+[[criterion]]
+id = "ec.1"
+name = "crossing_keyframes_reorder"
+description = "Drag a keyframe across another on the same property timeline. The timeline strictly prevents silent reordering, requiring explicit confirmation before commuting the crossover."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "ec.2"
+name = "duplicate_keys_merge"
+description = "Paste duplicate property/time keys exactly atop existing ones. The app successfully merges them using the declared rule instead of stacking them endlessly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "ec.3"
+name = "cancel_transient_restore"
+description = "Initiate a complex transient curve preview and cancel it (e.g. via Escape). The complete prior snapshot including selection, viewport, focus, and history anchor is fully restored."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "ec.4"
+name = "adversarial_import_corrupted"
+description = "Attempt to import an adversarial JSON payload featuring cross-field contradictions and duplicate IDs. The import is safely rejected atomically with zero state mutation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "ec.5"
+name = "adversarial_orderings"
+description = "Perform an undo followed immediately by a branch fork, and a branch merge immediately before an approval. Equivalent state orderings safely converge without dropping interactions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "ec.ac6"
+name = "edge_cases_ac_06"
+description = "Test frame 0/288, duplicate/crossing key, exact axis bounds, cubic control limits, safe-area edge, 1/max lines, wrap override inheritance, prominence tie, reduced-motion missing beat, stale approval, forged import. Confirm the app triggers named recovery and explicit resolution."
+type = "binary"
+weight = 1.0

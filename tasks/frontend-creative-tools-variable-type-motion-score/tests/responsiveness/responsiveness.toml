@@ -1,0 +1,97 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+[[criterion]]
+id = "rs.1"
+name = "mobile_numeric_sheets"
+description = "On the 375px mobile viewport, block editing dynamically adapts from canvas drag to responsive block cards and numeric property sheets, preserving all gesture capabilities."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "rs.2"
+name = "no_mobile_overflow"
+description = "At the stated mobile viewport, the full canonical flow is completely operable without page-level horizontal overflow or sub-44px tap targets."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "rs.3"
+name = "desktop_simultaneous_views"
+description = "The desktop layout safely simultaneously presents the stage, timeline curves, block/axis inspector, and multi-viewport validator rails without clipping its own UI tools."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "rs.4"
+name = "responsive_metric_tables"
+description = "Changing the desktop container forces the line-break map and font metric bounds to dynamically recalculate and preview accurately for that viewport dimension."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "rs.ac7"
+name = "responsiveness_ac_07"
+description = "Edit at 1440/768/375 viewports. Confirm that mobile block/keyframe/beat/viewport/fallback flows retain every action with at least 44-pixel touch targets and no layout overflow."
+type = "binary"
+weight = 1.0
