@@ -1,0 +1,238 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+
+
+
+[[criterion]]
+id = "core_features.1"
+name = "core_features_1"
+description = "Requirement extraction: users can select exact spans from the immutable opportunity brief."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.2"
+name = "core_features_2"
+description = "Requirement classification: users can classify spans as must-have, preferred, responsibility, domain, logistics, or unknown."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.3"
+name = "core_features_3"
+description = "Requirement classification form allows adding a priority and note."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.4"
+name = "core_features_4"
+description = "Attempting to bind overlapping or duplicate spans allows merge or separate justification."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.5"
+name = "core_features_5"
+description = "Active must-have requirements correctly appear in the fit lattice and packet review."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.6"
+name = "core_features_6"
+description = "Evidence bindings: dragging evidence cards onto requirements succeeds and correctly categorizes them as direct, transferable, contextual, gap, or excluded."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.7"
+name = "core_features_7"
+description = "Selecting a requirement highlights bound evidence, packet blocks, risks, and stage gate."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.8"
+name = "core_features_8"
+description = "Packet composer: users can assemble ordered resume blocks and cover sections from evidence-bound facts."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.9"
+name = "core_features_9"
+description = "Packet tailoring: adding new factual metrics, dates, technologies, employers, or outcomes not represented in bound evidence succeeds when it should be blocked."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "core_features.10"
+name = "core_features_10"
+description = "Users can fork variants and explicitly merge conflicts, comparing wording, order, evidence, and coverage deltas."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.11"
+name = "core_features_11"
+description = "Fit view incorrectly promises hiring likelihood instead of just exposing weighted coverage."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "core_features.12"
+name = "core_features_12"
+description = "Deterministic reviewer names exact requirement, evidence, and text spans and assigns a label of ready, needs-evidence, needs-edit, or intentional-gap."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.13"
+name = "core_features_13"
+description = "Opportunity cards can be dragged through discovered, researching, tailoring, ready, submitted, screen, interview, offer, declined, withdrawn, and archived stages."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.14"
+name = "core_features_14"
+description = "Invalid drag on the stage board fails to snap back and allows the card to remain in a blocked stage."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "core_features.15"
+name = "core_features_15"
+description = "Submitting fails to freeze opportunity revision, packet variant, bindings, documents, answers, and timestamp."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "core_features.16"
+name = "core_features_16"
+description = "Correcting a submission creates an amendment linked to the original with a required reason."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.17"
+name = "core_features_17"
+description = "Stage events generate preparation, interview, thank-you, response-window, and follow-up tasks with dependencies."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.18"
+name = "core_features_18"
+description = "Users can reschedule tasks by timeline drag under deadline and no-overlap rules."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.19"
+name = "core_features_19"
+description = "Export successfully produces canonical JSON, JSON Resume, Markdown, ICS, and CSV artifact ledgers."
+type = "binary"
+weight = 1.0
