@@ -48,6 +48,15 @@ export async function copySwatch(el) {
 
 export function applyVision() {
   const mode = state.vision;
+  const visualFilter = {
+    none: 'none',
+    protanopia: 'saturate(0.82) hue-rotate(-7deg)',
+    deuteranopia: 'saturate(0.78) hue-rotate(8deg)',
+    tritanopia: 'saturate(0.84) hue-rotate(18deg)',
+  }[mode] || 'none';
+  for (const surface of document.querySelectorAll('#library-canvas, #hue-strip')) {
+    surface.style.filter = visualFilter;
+  }
   const scope = document.querySelectorAll('#library-canvas [data-hex], #hue-strip [data-hex]');
   for (const el of scope) {
     const hex = fmtHex(el.getAttribute('data-hex'));

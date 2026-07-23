@@ -14,6 +14,7 @@ let draft = null;
 let panelEl = null;
 let invokerEl = null;
 let overlayEntry = null;
+let eventsBound = false;
 
 export function isEditorOpen() {
   return overlayEntry !== null;
@@ -300,6 +301,8 @@ function renderHarmony() {
 // ---------- events ------------------------------------------------------------------------------
 
 function bindEditorEvents() {
+  if (eventsBound) return;
+  eventsBound = true;
   const panel = panelEl;
   panel.addEventListener('input', onEditorInput);
   panel.addEventListener('click', onEditorClick);

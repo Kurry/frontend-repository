@@ -236,6 +236,7 @@ kbd {
 .hue-strip {
   display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 3px;
   padding-bottom: 4px; scrollbar-width: thin;
+  transition: filter 0.45s var(--ease-out);
 }
 .hue-chip {
   flex: 1 0 26px; min-width: 26px; height: 30px; border: 0; padding: 0;
@@ -362,6 +363,7 @@ kbd {
 
 /* ---------- library canvas: views ------------------------------------------------------ */
 .palette-library__view { display: none; max-width: 1400px; margin: 0 auto; }
+#library-canvas { transition: filter 0.45s var(--ease-out); }
 .palette-library__view.active { display: grid; }
 
 /* nomenclature */
