@@ -441,8 +441,8 @@ test('all required overlays trap focus, close on Escape, and restore their opene
 test('motion states and reduced motion are observable through real controls', async ({ page }) => {
   const durationMs = async (locator) => locator.evaluate((node) => {
     const style = getComputedStyle(node)
-    const values = style.transitionDuration.match(/[\d.]+m?s/g) || []
-    return Math.max(...values.map((value) => value.endsWith('ms') ? Number.parseFloat(value) : Number.parseFloat(value) * 1000), 0)
+    const values = style.transitionDuration.split(',').map((value) => value.trim())
+    return Math.max(...values.map((value) => value.endsWith('ms') ? Number.parseFloat(value) : value.endsWith('s') ? Number.parseFloat(value) * 1000 : 0), 0)
   })
 
   const chip = candidateRow(page, 'northloom/thread-cache').locator('.status-chip')
