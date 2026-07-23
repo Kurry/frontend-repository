@@ -212,8 +212,7 @@ test('oracle-fix copy feedback, hover motion, vision easing, and narrow interact
   await expect(swatches.nth(1).locator('.copy-label')).toContainText('Copied');
   await expect(swatches.nth(2).locator('.copy-label')).toContainText('Copied');
   await expect(swatches.nth(2)).toHaveClass(/is-flashing/);
-  await page.waitForTimeout(1150);
-  await expect(firstCard.locator('.copy-label')).toHaveCount(0);
+  await expect(firstCard.locator('.copy-label')).toHaveCount(0, { timeout: 2000 });
 
   await swatches.first().hover();
   await expect(swatches.first().locator('.palette-card__swatch-hex')).toHaveCSS('opacity', '1');
@@ -323,10 +322,8 @@ test('oracle-fix archive compare restore and ordered undo redo', async ({ page }
   expect((await exportedPalette(page, a)).archived).toBe(true);
   await expect(page.locator(`.palette-card[data-palette-id="${a}"]`)).toBeVisible();
   await page.locator('#btn-undo').click();
-  await page.waitForTimeout(50);
   expect((await exportedPalette(page, a)).archived).toBe(false);
   await page.locator('#btn-redo').click();
-  await page.waitForTimeout(50);
   expect((await exportedPalette(page, a)).archived).toBe(true);
 });
 
