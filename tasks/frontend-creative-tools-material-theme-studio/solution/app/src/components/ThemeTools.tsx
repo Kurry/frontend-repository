@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store/store';
 import {
   updateActiveOptions,
+  updateActiveOptionsCoalesced,
   addFont,
   removeFont,
   applySnippet,
@@ -11,7 +12,8 @@ import {
   ThemeOptions,
   defaultPaletteColor,
 } from '../store/themeSlice';
-import { Accordion, AccordionSummary, AccordionDetails, Snackbar } from '@mui/material';
+import { Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import { ToastView, useToast } from './Toast';
 
 function Chevron() {
   return <span className="material-symbols-outlined" aria-hidden="true">expand_more</span>;
@@ -81,6 +83,9 @@ function PaletteTool() {
   const [intentErrors, setIntentErrors] = useState<Record<string, string>>({});
   const [pulsingIntent, setPulsingIntent] = useState<string | null>(null);
   const pulseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Tracks the in-flight continuous color-picker gesture ("<field key>") so a
+  // whole drag coalesces into one undo entry (cleared on blur / other fields).
+  const colorGestureRef = useRef<string | null>(null);
   const p = activeOptions.palette;
 
   useEffect(() => {
@@ -97,7 +102,7 @@ function PaletteTool() {
   const pulse = (intent: string) => {
     if (pulseTimer.current) clearTimeout(pulseTimer.current);
     setPulsingIntent(intent);
-    pulseTimer.current = setTimeout(() => setPulsingIntent(null), 650);
+    pulseTimer.current = setTimeout(() => setPulsingIntent(null), 1100);
   };
 
   const updateIntent = (intent: string, channel: string, val: string) => {
@@ -127,12 +132,21 @@ function PaletteTool() {
     }
   };
 
+  /** Live update from a native color picker: recolors immediately on every
+   *  change event while coalescing the whole drag into a single undo entry. */
+  const updateFromPicker = (gestureKey: string, mutate: (options: any) => void) => {
+    const newOptions = JSON.parse(JSON.stringify(activeOptions));
+    mutate(newOptions);
+    const pushHistory = colorGestureRef.current !== gestureKey;
+    colorGestureRef.current = gestureKey;
+    dispatch(updateActiveOptionsCoalesced({ options: newOptions, pushHistory }));
+  };
+
+  const endPickerGesture = () => {
+    colorGestureRef.current = null;
+  };
+
   const deriveHarmonics = (kind: 'complementary' | 'analogous' | 'triadic') => {
-    const btn = document.getElementById('swatch-secondary');
-    if (btn) {
-      btn.classList.add('ring-4', 'ring-white', 'transition-all', 'duration-300');
-      setTimeout(() => btn.classList.remove('ring-4', 'ring-white', 'transition-all', 'duration-300'), 500);
-    }
     const newOptions = JSON.parse(JSON.stringify(activeOptions));
     const degrees = kind === 'complementary' ? 180 : kind === 'analogous' ? 30 : 120;
     const derived = shiftHue(activeOptions.palette.primary.main, degrees);
@@ -196,17 +210,17 @@ function PaletteTool() {
         <AccordionDetails className="bg-gray-900 border-t border-gray-700">
           <div className="space-y-3">
             <label className="flex items-center gap-2"><span className="w-24">Default bg</span><input type="color" value={p.background?.default ?? '#fafafa'} aria-label="Background default color" onChange={e => {
-              const o = JSON.parse(JSON.stringify(activeOptions)); o.palette.background = { ...(o.palette.background || {}), default: e.target.value }; dispatch(updateActiveOptions(o));
-            }} className="bg-transparent border-0 w-8 h-8 cursor-pointer p-0 rounded-full" /></label>
+              updateFromPicker('background.default', o => { o.palette.background = { ...(o.palette.background || {}), default: e.target.value }; });
+            }} onBlur={endPickerGesture} className="bg-transparent border-0 w-8 h-8 cursor-pointer p-0 rounded-full" /></label>
             <label className="flex items-center gap-2"><span className="w-24">Paper bg</span><input type="color" value={p.background?.paper ?? '#ffffff'} aria-label="Background paper color" onChange={e => {
-              const o = JSON.parse(JSON.stringify(activeOptions)); o.palette.background = { ...(o.palette.background || {}), paper: e.target.value }; dispatch(updateActiveOptions(o));
-            }} className="bg-transparent border-0 w-8 h-8 cursor-pointer p-0 rounded-full" /></label>
+              updateFromPicker('background.paper', o => { o.palette.background = { ...(o.palette.background || {}), paper: e.target.value }; });
+            }} onBlur={endPickerGesture} className="bg-transparent border-0 w-8 h-8 cursor-pointer p-0 rounded-full" /></label>
             <label className="flex items-center gap-2"><span className="w-24">Text primary</span><input type="color" value={p.text?.primary ?? '#000000'} aria-label="Text primary color" onChange={e => {
-              const o = JSON.parse(JSON.stringify(activeOptions)); o.palette.text = { ...(o.palette.text || {}), primary: e.target.value }; dispatch(updateActiveOptions(o));
-            }} className="bg-transparent border-0 w-8 h-8 cursor-pointer p-0 rounded-full" /></label>
+              updateFromPicker('text.primary', o => { o.palette.text = { ...(o.palette.text || {}), primary: e.target.value }; });
+            }} onBlur={endPickerGesture} className="bg-transparent border-0 w-8 h-8 cursor-pointer p-0 rounded-full" /></label>
             <label className="flex items-center gap-2"><span className="w-24">Divider</span><input type="color" value={p.divider ?? '#e0e0e0'} aria-label="Divider color" onChange={e => {
-              const o = JSON.parse(JSON.stringify(activeOptions)); o.palette.divider = e.target.value; dispatch(updateActiveOptions(o));
-            }} className="bg-transparent border-0 w-8 h-8 cursor-pointer p-0 rounded-full" /></label>
+              updateFromPicker('divider', o => { o.palette.divider = e.target.value; });
+            }} onBlur={endPickerGesture} className="bg-transparent border-0 w-8 h-8 cursor-pointer p-0 rounded-full" /></label>
           </div>
         </AccordionDetails>
       </Accordion>
@@ -217,11 +231,12 @@ function PaletteTool() {
         const wcag = getWcag(color.main, color.contrastText);
         const bgWcag = getWcag(p.background?.default || '#fafafa', color.main);
         return (
-          <Accordion key={intent} disableGutters className="!bg-gray-800 !text-white !mb-2 rounded">
+          <Accordion key={intent} disableGutters defaultExpanded={intent === 'primary'} className="!bg-gray-800 !text-white !mb-2 rounded">
             <AccordionSummary expandIcon={<Chevron />} className="hover:bg-gray-700/50 flex items-center" aria-label={`${intent} palette row`}>
               <div className="flex items-center gap-3 w-full">
                 <div
-                  className={`w-5 h-5 rounded-full border border-gray-600 ${pulsingIntent === intent ? 'animate-swatch-pulse' : ''}`}
+                  id={`swatch-${intent}`}
+                  className={`w-5 h-5 rounded-full border border-gray-600 ${pulsingIntent === intent ? 'animate-swatch-pulse swatch-highlight' : ''}`}
                   style={{ backgroundColor: color.main }}
                   aria-hidden="true"
                 ></div>
@@ -252,9 +267,13 @@ function PaletteTool() {
                   <span className="w-24 capitalize">{ch}</span>
                   <input
                     type="color"
-                    defaultValue={color[ch]}
+                    value={color[ch]}
                     aria-label={`${intent} ${ch} color picker`}
-                    onBlur={(e) => updateIntent(intent, ch, e.target.value)}
+                    onChange={(e) => {
+                      updateFromPicker(`${intent}.${ch}`, o => { (o.palette as any)[intent][ch] = e.target.value; });
+                      pulse(intent);
+                    }}
+                    onBlur={endPickerGesture}
                     className="bg-transparent border-0 w-8 h-8 cursor-pointer p-0 rounded-full shrink-0"
                   />
                   <div className="flex-1 min-w-0">
@@ -468,7 +487,7 @@ function TypographyTool() {
 function SnippetsTool() {
   const dispatch = useDispatch();
   const activeOptions = useSelector((state: RootState) => state.theme.activeOptions);
-  const [toastMsg, setToastMsg] = useState('');
+  const { toast, show } = useToast();
 
   const snippets = [
     {
@@ -494,7 +513,7 @@ function SnippetsTool() {
   const applySnip = (snip: typeof snippets[0]) => {
     const o = JSON.parse(JSON.stringify(activeOptions));
     dispatch(applySnippet(snip.apply(o)));
-    setToastMsg(`${snip.name} applied`);
+    show(`${snip.name} applied`);
     dispatch(announce(`${snip.name} snippet applied`));
   };
 
@@ -514,13 +533,7 @@ function SnippetsTool() {
           </button>
         </div>
       ))}
-      <Snackbar
-        open={!!toastMsg}
-        autoHideDuration={3000}
-        onClose={() => setToastMsg('')}
-        message={toastMsg}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      />
+      <ToastView toast={toast} />
     </div>
   );
 }

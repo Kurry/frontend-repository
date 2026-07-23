@@ -97,7 +97,7 @@ export default function ExportTab() {
     );
 
     return (
-        <div className="flex flex-col lg:flex-row h-full bg-[#121212] text-white overflow-auto lg:overflow-hidden p-4 lg:p-8 gap-6 lg:gap-8">
+        <div className="flex flex-col lg:flex-row min-h-full lg:h-full bg-[#121212] text-white lg:overflow-hidden p-4 lg:p-8 gap-6 lg:gap-8">
             <div className="flex-1 flex flex-col max-w-4xl min-w-0">
                 <header className="mb-6">
                     <h2 className="text-3xl font-normal mb-2">Export</h2>

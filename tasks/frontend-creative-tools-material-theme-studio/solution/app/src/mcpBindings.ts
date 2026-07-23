@@ -6,7 +6,8 @@ import {
   deleteTheme,
   updateActiveOptions,
   importTheme,
-  setTab
+  setTab,
+  closeThemeForm
 } from './store/themeSlice';
 import { parseImportedTheme } from './utils/importTheme';
 import { copyThemeArtifact, ThemeArtifactFormat } from './utils/themeArtifacts';

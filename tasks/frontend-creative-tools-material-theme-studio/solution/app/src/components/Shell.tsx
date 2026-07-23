@@ -60,7 +60,7 @@ function TutorialDialog({ open, onClose }: { open: boolean; onClose: () => void 
       </div>
 
       <div className="px-5 py-5">
-        <p className="text-xs font-medium uppercase tracking-wide text-blue-600 hover:underline">
+        <p className="text-xs font-medium uppercase tracking-wide text-blue-600">
           Step {step + 1} of {TOUR_STEPS.length} — guided tour
         </p>
         <h3 className="mt-1 text-xl font-semibold text-gray-900">{current.title}</h3>
@@ -219,7 +219,10 @@ export default function Shell({ children }: { children: ReactNode }) {
         />
       </nav>
 
-      <main className="flex-1 overflow-hidden lg:overflow-hidden relative flex flex-col">{children}</main>
+      {/* Below lg the main region itself scrolls (Saved Themes / Export content
+          taller than the viewport stays reachable at 768px); at lg+ each tab
+          manages its own internal scrolling. */}
+      <main className="flex-1 overflow-y-auto lg:overflow-hidden relative">{children}</main>
 
       {/* Polite live region for validation + status announcements. The span is
           re-keyed on every announce dispatch so identical consecutive messages

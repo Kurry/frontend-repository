@@ -5,6 +5,7 @@ import { RootState } from '../store/store';
 import {
   addVersion,
   announce,
+  createTheme,
   deleteTheme,
   loadTheme,
   openThemeForm,
@@ -37,6 +38,20 @@ export default function SavedThemes() {
     }, 280);
   };
 
+  // One-click duplicate: copies a card's options into a new uniquely named
+  // theme ("<name> copy", "<name> copy 2", …) so a saved theme can be used as
+  // the starting point for a variant without retyping anything.
+  const duplicateTheme = (id: string) => {
+    const source = themes.find(theme => theme.id === id);
+    if (!source) return;
+    const base = `${source.name} copy`.slice(0, 59);
+    const taken = new Set(themes.map(theme => theme.name.trim().toLocaleLowerCase()));
+    let name = base;
+    for (let n = 2; taken.has(name.trim().toLocaleLowerCase()); n += 1) name = `${base} ${n}`;
+    dispatch(createTheme({ id: `theme-${Date.now()}`, name, options: JSON.parse(JSON.stringify(source.options)) }));
+    dispatch(announce(`Theme ${source.name} duplicated as ${name} — it is now the active theme`));
+  };
+
   const saveVersion = () => {
     const name = versionName.trim();
     if (!name) {
@@ -52,7 +67,7 @@ export default function SavedThemes() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#121212] p-8 text-white overflow-auto">
+    <div className="flex flex-col min-h-full lg:h-full bg-[#121212] p-8 text-white lg:overflow-auto">
       <div className="max-w-6xl mx-auto w-full">
         <header className="mb-8">
           <h2 className="text-3xl font-normal mb-2">Saved Themes</h2>
@@ -167,11 +182,21 @@ export default function SavedThemes() {
                       color="error"
                       size="small"
                       onClick={() => setConfirmDeleteId(t.id)}
-                      className="focus-visible:ring-2 focus-visible:ring-blue-400 outline-none"
                       sx={{ minHeight: 44, flex: 1 }}
                       data-delete={t.id}
                     >
                       Delete
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => duplicateTheme(t.id)}
+                      aria-label={`Duplicate ${t.name}`}
+                      title={`Duplicate ${t.name} as a new theme`}
+                      sx={{ minHeight: 44, minWidth: 44, px: 1 }}
+                      data-duplicate={t.id}
+                    >
+                      <span className="material-symbols-outlined text-[18px]" aria-hidden="true">content_copy</span>
                     </Button>
                   </div>
                 </div>
@@ -196,7 +221,7 @@ export default function SavedThemes() {
                 helperText={versionError}
                 inputProps={{ maxLength: 64, 'aria-label': 'Version name' }}
               />
-              <Button variant="contained" onClick={saveVersion} sx={{ minHeight: 44 }} className="focus-visible:ring-2 focus-visible:ring-blue-400 outline-none">
+              <Button variant="contained" onClick={saveVersion} sx={{ minHeight: 44 }}>
                 Save version
               </Button>
             </div>

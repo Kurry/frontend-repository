@@ -176,6 +176,22 @@ export const themeSlice = createSlice({
       state.activeOptions = action.payload;
       syncDirtyState(state);
     },
+    // Continuous-control edits (dragging a native color picker) fire dozens of
+    // change events per gesture. The first event of a gesture pushes one undo
+    // snapshot (pushHistory=true); the rest only replace activeOptions, so a
+    // single Undo returns to the pre-gesture value across every surface.
+    updateActiveOptionsCoalesced: (
+      state,
+      action: PayloadAction<{ options: ThemeOptions; pushHistory: boolean }>
+    ) => {
+      if (JSON.stringify(state.activeOptions) === JSON.stringify(action.payload.options)) return;
+      if (action.payload.pushHistory) {
+        state.undoStack.push(JSON.parse(JSON.stringify(state.activeOptions)));
+        state.redoStack = [];
+      }
+      state.activeOptions = action.payload.options;
+      syncDirtyState(state);
+    },
     undo: (state) => {
       if (state.undoStack.length > 0) {
         state.redoStack.push(JSON.parse(JSON.stringify(state.activeOptions)));
@@ -313,7 +329,7 @@ export const themeSlice = createSlice({
 
 export const {
   setTab, setDevice, setSample, setTool, setColorBlindness, setCompareMode, setSearchQuery,
-  loadTheme, updateActiveOptions, undo, redo, saveTheme,
+  loadTheme, updateActiveOptions, updateActiveOptionsCoalesced, undo, redo, saveTheme,
   createTheme, updateTheme, deleteTheme, addVersion, restoreVersion, importTheme,
   addFont, removeFont, applySnippet, openThemeForm, closeThemeForm, announce, flashPreview
 } = themeSlice.actions;
