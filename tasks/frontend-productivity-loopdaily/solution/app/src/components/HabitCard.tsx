@@ -320,7 +320,7 @@ export default function HabitCard({ habit, dragControls, onOpenHeatmap }: HabitC
                   <button
                     type="button"
                     onClick={() => handleStep(-1)}
-                    disabled={count <= 0}
+                    disabled={false}
                     aria-label="Decrease count by one"
                     data-action="step-dec"
                     className="stepper-btn inline-flex items-center justify-center rounded-[8px] border border-[#E2E8F0] bg-[#FFFFFF] text-[#1B2430] hover:border-[#EF4444] hover:text-[#EF4444]"

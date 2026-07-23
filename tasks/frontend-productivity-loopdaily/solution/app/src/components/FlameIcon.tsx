@@ -19,6 +19,20 @@ export function flameTier(streak: number): FlameTier {
 // computed styles, while the tier treatments stay clearly different.
 function FlameGlyph({ tier }: { tier: FlameTier }) {
   const goldGlowId = `flame-gold-${useId().replaceAll(":", "")}`;
+  if (tier === "plain") {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style={{ color: "#94A3B8" }}>
+        <path fill="currentColor" d="M11.25,21.05a5.53,5.53,0,0,1-3.66-1.5,5.65,5.65,0,0,1-1.63-3.62,11.23,11.23,0,0,1,1.15-5.46c.35-.74.77-1.45,1.2-2.14a37.23,37.23,0,0,0,2.15-3.67,1,1,0,0,1,1.82.26,8,8,0,0,0,1.38,3,8,8,0,0,0,3.32,2.7A5.67,5.67,0,0,1,16.5,21a5.52,5.52,0,0,1-5.25.05Z"/>
+      </svg>
+    );
+  }
+  if (tier === "bright") {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style={{ color: "#F59E0B" }}>
+        <path fill="currentColor" d="M11.25,21.05a5.53,5.53,0,0,1-3.66-1.5,5.65,5.65,0,0,1-1.63-3.62,11.23,11.23,0,0,1,1.15-5.46c.35-.74.77-1.45,1.2-2.14a37.23,37.23,0,0,0,2.15-3.67,1,1,0,0,1,1.82.26,8,8,0,0,0,1.38,3,8,8,0,0,0,3.32,2.7A5.67,5.67,0,0,1,16.5,21a5.52,5.52,0,0,1-5.25.05Z"/>
+      </svg>
+    );
+  }
   if (tier === "gold") {
     return (
       <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style={{ color: "#FFB020" }}>

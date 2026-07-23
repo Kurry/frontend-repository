@@ -56,7 +56,8 @@ export default function HabitForm({ onClose }: HabitFormProps) {
     watch,
     setValue,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
+    formState,
   } = useForm<HabitFormValues>({
     resolver: zodResolver(habitSchema),
     defaultValues: {
@@ -126,8 +127,8 @@ export default function HabitForm({ onClose }: HabitFormProps) {
         </div>
 
         {/* Icon picker */}
-        <div>
-          <label className="block text-sm font-medium text-[#64748B] mb-1">Icon</label>
+        <fieldset>
+          <legend className="block text-sm font-medium text-[#64748B] mb-1">Icon</legend>
           <div className="flex flex-wrap gap-1.5">
             {EMOJI_PALETTE.map((e) => (
               <button
@@ -152,11 +153,11 @@ export default function HabitForm({ onClose }: HabitFormProps) {
               {errors.icon.message}
             </p>
           )}
-        </div>
+        </fieldset>
 
         {/* Target type */}
-        <div>
-          <label className="block text-sm font-medium text-[#64748B] mb-1">Target</label>
+        <fieldset>
+          <legend className="block text-sm font-medium text-[#64748B] mb-1">Target</legend>
           <div className="flex gap-3 items-center flex-wrap">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -182,12 +183,13 @@ export default function HabitForm({ onClose }: HabitFormProps) {
                 data-field="target-type"
                 data-value="count"
               />
-              <span className="text-sm text-[#1B2430]">Daily count:</span>
+              <label htmlFor="habit-target-count" className="text-sm text-[#1B2430]">Daily count:</label>
               {targetType === "count" && (
                 <input
                   type="number"
                   min="1"
                   max="100"
+                  id="habit-target-count"
                   {...register("targetCount", { valueAsNumber: true })}
                   className="w-16 px-2 py-1 rounded-[8px] border border-[#E2E8F0] text-sm text-[#1B2430] outline-none focus:border-[#0F9D74]"
                   aria-label="Daily target count"
@@ -202,7 +204,7 @@ export default function HabitForm({ onClose }: HabitFormProps) {
               {errors.targetCount.message}
             </p>
           )}
-        </div>
+        </fieldset>
 
         {/* Category */}
         <div>
@@ -249,6 +251,7 @@ export default function HabitForm({ onClose }: HabitFormProps) {
         <div className="flex gap-2">
           <button
             type="submit"
+            disabled={formState.isSubmitting}
             className="btn-primary flex-1 font-semibold text-sm"
             data-action="submit-habit"
           >

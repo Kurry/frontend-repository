@@ -145,12 +145,112 @@ export function validateWorkspaceDoc(data: unknown): string[] {
   if (!Array.isArray(obj.habits)) {
     errors.push("habits must be an array");
   }
+
+
   if (!Array.isArray(obj.categories)) {
     errors.push("categories must be an array");
   }
   if (!("activeCategoryFilter" in obj)) {
     errors.push("activeCategoryFilter is required (category id or null)");
-  } else if (obj.activeCategoryFilter !== null && typeof obj.activeCategoryFilter !== "string") {
+  }
+
+
+  if (Array.isArray(obj.categories)) {
+    obj.categories.forEach((c: any, i: number) => {
+      if (!c || typeof c !== "object") {
+        errors.push(`categories[${i}] must be an object`);
+        return;
+      }
+      if (typeof c.id !== "string" || !c.id.trim()) {
+        errors.push(`categories[${i}].id must be a non-empty string`);
+      }
+      if (typeof c.name !== "string" || !c.name.trim() || c.name.length > 40) {
+        errors.push(`categories[${i}].name must be a 1-40 character string`);
+      }
+    });
+  }
+
+  if (Array.isArray(obj.habits)) {
+    let prevOrder = -1;
+    obj.habits.forEach((h: any, i: number) => {
+      if (!h || typeof h !== "object") {
+        errors.push(`habits[${i}] must be an object`);
+        return;
+      }
+      if (typeof h.id !== "string" || !h.id.trim()) errors.push(`habits[${i}].id must be non-empty`);
+      if (typeof h.name !== "string" || !h.name.trim() || h.name.length > 80) errors.push(`habits[${i}].name must be 1-80 chars`);
+      if (typeof h.icon !== "string" || !['🎯', '💧', '🏃', '📚', '🧘', '🍎', '💤', '🌱', '☀️', '📝', '🎸', '🎨'].includes(h.icon)) errors.push(`habits[${i}].icon must be a fixed palette emoji`);
+      if (h.targetType !== "once" && h.targetType !== "count") errors.push(`habits[${i}].targetType must be once|count`);
+      if (typeof h.targetCount !== "number" || !Number.isInteger(h.targetCount) || h.targetCount < 1 || h.targetCount > 100) errors.push(`habits[${i}].targetCount must be 1-100`);
+      if (h.targetType === "once" && h.targetCount !== 1) errors.push(`habits[${i}].targetCount must be 1 if once`);
+      if (h.categoryId !== null && typeof h.categoryId !== "string") errors.push(`habits[${i}].categoryId unresolved`);
+      if (typeof h.reminder !== "string" || h.reminder.length > 40) errors.push(`habits[${i}].reminder must be 0-40 chars`);
+      if (typeof h.paused !== "boolean") errors.push(`habits[${i}].paused must be boolean`);
+      if (typeof h.order !== "number" || h.order < 0) errors.push(`habits[${i}].order must be non-negative integer`);
+      if (h.order < prevOrder) errors.push(`habits[${i}] ordering is not strictly sequential`);
+      prevOrder = h.order;
+      if (typeof h.createdAt !== "string" || isNaN(Date.parse(h.createdAt))) errors.push(`habits[${i}].createdAt must be ISO-8601`);
+
+      if (!h.completions || typeof h.completions !== "object" || Array.isArray(h.completions)) {
+        errors.push(`habits[${i}].completions must be an object`);
+      } else {
+        for (const [k, v] of Object.entries(h.completions)) {
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(k)) errors.push(`habits[${i}].completions key ${k} must be YYYY-MM-DD`);
+          if (typeof v !== "number" || !Number.isInteger(v) || v < 0) errors.push(`habits[${i}].completions[${k}] must be >= 0`);
+        }
+      }
+    });
+  }
+
+
+
+  if (Array.isArray(obj.categories)) {
+    obj.categories.forEach((c: any, i: number) => {
+      if (!c || typeof c !== "object") {
+        errors.push(`categories[${i}] must be an object`);
+        return;
+      }
+      if (typeof c.id !== "string" || !c.id.trim()) {
+        errors.push(`categories[${i}].id must be a non-empty string`);
+      }
+      if (typeof c.name !== "string" || !c.name.trim() || c.name.length > 40) {
+        errors.push(`categories[${i}].name must be a 1-40 character string`);
+      }
+    });
+  }
+
+  if (Array.isArray(obj.habits)) {
+    let prevOrder = -1;
+    obj.habits.forEach((h: any, i: number) => {
+      if (!h || typeof h !== "object") {
+        errors.push(`habits[${i}] must be an object`);
+        return;
+      }
+      if (typeof h.id !== "string" || !h.id.trim()) errors.push(`habits[${i}].id must be non-empty`);
+      if (typeof h.name !== "string" || !h.name.trim() || h.name.length > 80) errors.push(`habits[${i}].name must be 1-80 chars`);
+      if (typeof h.icon !== "string" || !['🎯', '💧', '🏃', '📚', '🧘', '🍎', '💤', '🌱', '☀️', '📝', '🎸', '🎨'].includes(h.icon)) errors.push(`habits[${i}].icon must be a fixed palette emoji`);
+      if (h.targetType !== "once" && h.targetType !== "count") errors.push(`habits[${i}].targetType must be once|count`);
+      if (typeof h.targetCount !== "number" || !Number.isInteger(h.targetCount) || h.targetCount < 1 || h.targetCount > 100) errors.push(`habits[${i}].targetCount must be 1-100`);
+      if (h.targetType === "once" && h.targetCount !== 1) errors.push(`habits[${i}].targetCount must be 1 if once`);
+      if (h.categoryId !== null && typeof h.categoryId !== "string") errors.push(`habits[${i}].categoryId unresolved`);
+      if (typeof h.reminder !== "string" || h.reminder.length > 40) errors.push(`habits[${i}].reminder must be 0-40 chars`);
+      if (typeof h.paused !== "boolean") errors.push(`habits[${i}].paused must be boolean`);
+      if (typeof h.order !== "number" || h.order < 0) errors.push(`habits[${i}].order must be non-negative integer`);
+      if (h.order < prevOrder) errors.push(`habits[${i}] ordering is not strictly sequential`);
+      prevOrder = h.order;
+      if (typeof h.createdAt !== "string" || isNaN(Date.parse(h.createdAt))) errors.push(`habits[${i}].createdAt must be ISO-8601`);
+
+      if (!h.completions || typeof h.completions !== "object" || Array.isArray(h.completions)) {
+        errors.push(`habits[${i}].completions must be an object`);
+      } else {
+        for (const [k, v] of Object.entries(h.completions)) {
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(k)) errors.push(`habits[${i}].completions key ${k} must be YYYY-MM-DD`);
+          if (typeof v !== "number" || !Number.isInteger(v) || v < 0) errors.push(`habits[${i}].completions[${k}] must be >= 0`);
+        }
+      }
+    });
+  }
+ else if (obj.activeCategoryFilter !== null && typeof obj.activeCategoryFilter !== "string") {
     errors.push("activeCategoryFilter must be a category id string or null");
   }
   if (errors.length) return errors; // structural problems first
@@ -241,7 +341,8 @@ function loadInitialState(): { state: AppState; recoveryActive: boolean; recover
     return { state: defaultState, recoveryActive: false, recoveryMessage: "" };
   }
 
-  const primary = parseStoredState(localStorage.getItem(STORAGE_KEY));
+  const primaryRaw = localStorage.getItem(STORAGE_KEY);
+  const primary = parseStoredState(primaryRaw);
   if (primary) {
     return { state: primary, recoveryActive: false, recoveryMessage: "" };
   }
@@ -257,7 +358,7 @@ function loadInitialState(): { state: AppState; recoveryActive: boolean; recover
     };
   }
 
-  const hadPrimary = localStorage.getItem(STORAGE_KEY) !== null;
+  const hadPrimary = primaryRaw !== null;
   if (hadPrimary) localStorage.removeItem(STORAGE_KEY);
 
   return {
@@ -395,7 +496,7 @@ export const reorderHabitsAtom = atom(null, (get, set, fromIndex: number, toInde
 // Commit a new ordering for a visible subset. The subset is projected back into
 // its existing global order slots so filtered-out and paused habits never move.
 export const reorderByIdsAtom = atom(null, (get, set, ids: string[]) => {
-  const state = get(appStateAtom);
+  const state = get(appStateBaseAtom);
   const idSet = new Set(ids);
   const slots = state.habits
     .filter((h) => idSet.has(h.id))

@@ -93,12 +93,13 @@ export default function App() {
   const activeHabits = filteredHabits.filter((h) => !h.paused);
   const pausedHabits = filteredHabits.filter((h) => h.paused);
   const activeKey = activeHabits.map((h) => h.id).join("|");
+  const activeOrderKey = activeHabits.map((h) => h.order).join("|");
 
   useEffect(() => {
     const ids = activeHabits.map((h) => h.id);
     setOrderIds(ids);
     committedKey.current = ids.join("|");
-  }, [activeKey]);
+  }, [activeKey, activeOrderKey]);
 
   const changeView = useCallback(
     (next: ViewMode) => {
@@ -316,7 +317,7 @@ export default function App() {
         {view === "import" && <ImportExport />}
       </main>
 
-      <Toaster position="bottom-center" />
+      <Toaster position="bottom-center" className="toast-slide" duration={4000} />
     </div>
   );
 }
