@@ -408,8 +408,9 @@ async function submitImport() {
     setImportFieldError('payload', message)
     return
   }
-  const entries = isTriage ? parsed.data.entries : parsed.data.triage
-  const result = store.importClassifications(entries)
+  const result = isTriage
+    ? store.importClassifications(parsed.data.entries)
+    : store.importCalibrationPack(parsed.data)
   if (!result.ok) {
     importError.value = result.message
     setImportFieldError('payload', result.message)
@@ -817,7 +818,7 @@ onBeforeUnmount(() => {
               <div class="trial-table-wrap"><table class="trial-table"><thead><tr><th>Trial id</th><th>Reward</th><th>Runtime</th><th>Cost</th></tr></thead><tbody><tr v-for="trial in store.selectedCell.trials" :key="trial.id"><td>{{ trial.id }}</td><td>{{ trial.reward.toFixed(3) }}</td><td>{{ trial.runtime.toFixed(2) }}s</td><td>${{ trial.cost.toFixed(4) }}</td></tr></tbody></table></div>
             </section>
           </div>
-          <section v-if="selectedRun && ['queued', 'running'].includes(selectedRun.status)" class="run-progress">
+          <section v-if="selectedRun" class="run-progress" aria-live="polite">
             <div class="drawer-section-title"><h3>Re-run progress</h3><span class="run-status">{{ selectedRun.status }}</span></div>
             <transition name="fade" mode="out-in">
               <div v-if="selectedRun.status === 'queued'" class="queue-message"><v-progress-circular indeterminate size="18" width="2" />Queued — preparing trial workers…</div>
@@ -834,7 +835,7 @@ onBeforeUnmount(() => {
       :scrim="true" role="dialog" aria-modal="true" aria-label="Export calibration pack"
       @update:model-value="$event ? null : closeOverlay('export')"
     >
-      <div class="drawer-head export-head"><div><p class="section-label">SESSION ARTIFACT</p><h2>Export calibration pack</h2><span>Live, schema-validated session state</span></div><div class="export-head-tools"><span class="schema-badge">schemaVersion 1</span><v-btn data-export-close icon="mdi-close" variant="text" aria-label="Close export drawer" @click="closeOverlay('export')" /></div></div>
+      <div class="drawer-head export-head"><div><p class="section-label">SESSION ARTIFACT</p><h2>Export calibration pack</h2><span>Live, schema-validated session state</span><span class="session-fingerprint" aria-label="Reproducibility fingerprint">{{ store.sessionFingerprint }}</span></div><div class="export-head-tools"><span class="schema-badge">schemaVersion 1</span><v-btn data-export-close icon="mdi-close" variant="text" aria-label="Close export drawer" @click="closeOverlay('export')" /></div></div>
       <div class="export-summary"><div><span>Cells</span><strong>{{ store.calibrationPack.cells.length }}</strong></div><div><span>Divergent</span><strong><AnimatedNumber :value="store.divergentCount" /></strong></div><div><span>Classified</span><strong>{{ store.calibrationPack.triage.length }}</strong></div><div><span>Events</span><strong>{{ store.timeline.length }}</strong></div></div>
       <v-tabs v-model="store.ui.exportTab" color="primary" grow><v-tab value="json">JSON</v-tab><v-tab value="csv">CSV</v-tab></v-tabs>
       <div class="export-preview">

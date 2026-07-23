@@ -188,6 +188,19 @@ export const useCalibrationStore = defineStore('calibration', {
         triage: Object.values(state.classifications).map((record) => ({ ...record })),
       }
     },
+    sessionFingerprint() {
+      const payload = JSON.stringify({
+        sigmaThreshold: this.sigmaThreshold,
+        cells: this.allCellRecords.map(({ model, harness, mean, trialCount }) => ({ model, harness, mean, trialCount })),
+        triage: Object.values(this.classifications).sort((a, b) => a.task.localeCompare(b.task)),
+      })
+      let hash = 2166136261
+      for (let index = 0; index < payload.length; index += 1) {
+        hash ^= payload.charCodeAt(index)
+        hash = Math.imul(hash, 16777619)
+      }
+      return `MC-${(hash >>> 0).toString(16).padStart(8, '0').toUpperCase()}`
+    },
     exportJson() {
       return JSON.stringify(this.calibrationPack, null, 2)
     },
@@ -376,6 +389,28 @@ export const useCalibrationStore = defineStore('calibration', {
       this.showToast(`${matches.length} classifications imported`)
       return { ok: true, count: matches.length }
     },
+    importCalibrationPack(pack) {
+      const parsed = calibrationPackSchema.safeParse(pack)
+      if (!parsed.success) return { ok: false, error: parsed.error }
+      const importedThreshold = round(parsed.data.sigmaThreshold, 2)
+      const divergentAtImportedThreshold = new Set(this.tasks
+        .map((task) => {
+          const values = this.harnesses.map((harness) => meanOf(this.models.map((model) => scoreFor(task, model, harness, this.cells[keyFor(model, harness)]))))
+          const cv = coefficient(values)
+          return { task: task.name, divergent: importedThreshold <= 0 || (importedThreshold < 0.4 && cv > importedThreshold) }
+        })
+        .filter((row) => row.divergent)
+        .map((row) => row.task))
+      const matches = parsed.data.triage.filter((entry) => divergentAtImportedThreshold.has(entry.task))
+      if (parsed.data.triage.length && !matches.length) return { ok: false, message: 'triage: no tasks match divergent rows at the imported sigmaThreshold' }
+      this.checkpoint()
+      this.sigmaThreshold = importedThreshold
+      this.classifications = Object.fromEntries(matches.map((entry) => [entry.task, { ...entry }]))
+      this.addClassificationEvents(matches)
+      this.sanitizeSelection()
+      this.showToast(`CalibrationPack restored at sigma ${this.sigmaThreshold.toFixed(2)} with ${matches.length} classifications`)
+      return { ok: true, count: matches.length }
+    },
     pinBaseline() {
       this.checkpoint()
       this.baseline = { cells: this.models.flatMap((model) => this.harnesses.map((harness) => ({ model, harness, mean: this.heatmapMean(model, harness) }))) }
@@ -447,7 +482,7 @@ export const useCalibrationStore = defineStore('calibration', {
       if (!this.cells[key] || ['queued', 'running'].includes(this.reruns[key]?.status)) return { ok: false, message: 'run already active' }
       const runId = Date.now().toString(36)
       this.reruns = { ...this.reruns, [key]: { status: 'queued', progress: [], runId } }
-      await sleep(window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 700)
+      await sleep(window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 900)
       if (this.reruns[key]?.runId !== runId) return { ok: false }
       const count = 4 + Math.floor(Math.random() * 3)
       const currentMean = cellMean(this.cells[key])
@@ -467,7 +502,7 @@ export const useCalibrationStore = defineStore('calibration', {
         progress: nextTrials.map((trial) => ({ id: trial.id, complete: false })),
       } }
       for (let index = 0; index < nextTrials.length; index += 1) {
-        await sleep(window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 380)
+        await sleep(window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 520)
         if (this.reruns[key]?.runId !== runId) return { ok: false }
         this.reruns[key].progress[index].complete = true
         this.reruns = { ...this.reruns }
