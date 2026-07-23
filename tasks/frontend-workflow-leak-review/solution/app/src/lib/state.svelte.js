@@ -13,10 +13,11 @@ class ReviewConsoleState {
     if (next < 0.5 || next > 0.95 || Number.isNaN(next)) return;
     this._threshold = next;
     const confirmedIds = new Set(this.decisions.map((decision) => decision.submissionId));
-    this.submissions.forEach((submission) => {
+    this.submissions = this.submissions.map((submission) => {
       if (!confirmedIds.has(submission.id)) {
-        submission.reviewState = submission.similarity >= next ? 'review-triggered' : 'unreviewed';
+        return { ...submission, reviewState: submission.similarity >= next ? 'review-triggered' : 'unreviewed' };
       }
+      return { ...submission };
     });
     this.bumpExportTimestamp();
   }

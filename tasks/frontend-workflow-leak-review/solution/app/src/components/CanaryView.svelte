@@ -94,6 +94,7 @@
 
 <style>
   .disclosure-grid { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 250ms ease; }
+  .disclosure-grid > div { min-height: 0; }
   .disclosure-grid.is-open { grid-template-rows: 1fr; }
   @media (prefers-reduced-motion: reduce) { .disclosure-grid { transition: none; } }
 </style>
