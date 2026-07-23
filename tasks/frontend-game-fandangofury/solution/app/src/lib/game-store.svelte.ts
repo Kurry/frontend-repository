@@ -471,7 +471,10 @@ function enemyStrike(enemy: Enemy) {
   scheduleRun(200, () => {
     gameState.playerHitFlash = false;
   });
-  if (gameState.playerHealth <= 0) pushHistory('Player defeated');
+  if (gameState.playerHealth <= 0) {
+    gameState.view = 'defeat';
+    pushHistory('Player defeated');
+  }
 }
 
 export const game = {

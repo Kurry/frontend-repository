@@ -93,7 +93,10 @@
     <div class="flex items-center gap-2 sm:gap-3">
       {#key gameState.pesosChangeSeq}
         <div class="flex items-center gap-1 text-fury-gold text-sm font-semibold pesos-flash" aria-label="{gameState.pesos} pesos">
-          <span aria-hidden="true">💰</span> {gameState.pesos}
+          <span aria-hidden="true">💰</span> {gameState.pesos} Pesos
+        </div>
+        <div class="flex items-center gap-1 text-amber-300 text-sm font-semibold ml-2">
+          <span aria-hidden="true">⚡</span> {gameState.comboCount}x Combo
         </div>
       {/key}
       {#if gameState.equippedMask}
