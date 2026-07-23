@@ -4,6 +4,8 @@ import { Save, Download, Copy, Play, SkipForward } from 'lucide-react';
 
 function App() {
   const store = useStore();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalInput, setModalInput] = useState("");
 
   useEffect(() => {
     // Initial mount behavior: trigger trace parse if not done
@@ -60,27 +62,31 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-900 text-gray-100 p-4 font-mono text-sm overflow-hidden">
+    <main role="main" className="flex flex-col h-screen bg-gray-900 text-gray-100 p-4 font-mono text-sm overflow-hidden">
       <header className="flex justify-between items-center pb-4 border-b border-gray-700">
         <h1 className="text-xl font-bold">Stack-Trace Path Finder</h1>
+        <div aria-live="polite" className="sr-only">{store.valid ? "Path is valid" : "Path is invalid: " + store.contradictions.join(", ")}</div>
         <div className="flex gap-2">
-          <button className="px-3 py-1 bg-blue-600 hover:bg-blue-500 rounded flex items-center gap-1" onClick={() => handleExport('copy')}>
-            <Copy size={16} /> Copy
+          <button className="px-3 py-2 bg-blue-600 hover:bg-blue-500 rounded flex items-center gap-1 transition-colors duration-200 motion-reduce:transition-none min-h-[44px]" onClick={() => handleExport('copy')}>
+            <Copy size={16} aria-hidden="true" /> Copy
           </button>
-          <button className="px-3 py-1 bg-blue-600 hover:bg-blue-500 rounded flex items-center gap-1" onClick={() => handleExport('download')}>
-            <Download size={16} /> Download
+          <button className="px-3 py-2 bg-blue-600 hover:bg-blue-500 rounded flex items-center gap-1 transition-colors duration-200 motion-reduce:transition-none min-h-[44px]" onClick={() => handleExport('download')}>
+            <Download size={16} aria-hidden="true" /> Download
           </button>
-          <label className="px-3 py-1 bg-green-600 hover:bg-green-500 rounded cursor-pointer">
+          <label className="px-3 py-2 bg-green-600 hover:bg-green-500 rounded cursor-pointer transition-colors duration-200 motion-reduce:transition-none min-h-[44px] flex items-center">
             Import
             <input type="file" className="hidden" accept=".json" onChange={handleImport} />
           </label>
         </div>
       </header>
 
-      <div className="flex flex-1 mt-4 gap-4 overflow-hidden">
+      <div className="flex flex-col md:flex-row flex-1 mt-4 gap-4 overflow-hidden">
         {/* Left Column: Trace Input & Frames */}
-        <div className="flex flex-col w-1/3 border-r border-gray-700 pr-4">
+        <div className="flex flex-col w-full md:w-1/3 border-r border-gray-700 pr-4">
+          <label className="sr-only" htmlFor="trace-input">Stack Trace</label>
+          {store.rawTrace.trim() === "" && <div className="text-red-400 text-xs mb-2 bg-red-900/20 p-2 rounded border border-red-700">Error: Trace cannot be empty. Please input a stack trace.</div>}
           <textarea
+            id="trace-input"
             className="w-full h-32 bg-gray-800 p-2 border border-gray-600 rounded text-xs mb-4"
             value={store.rawTrace}
             onChange={(e) => store.setRawTrace(e.target.value)}
@@ -91,7 +97,7 @@ function App() {
                 <div className="flex justify-between items-center mb-1">
                   <span className="font-bold text-xs">{frame.id} ({frame.type})</span>
                   {frame.type === 'frame' && (
-                    <button className="text-xs bg-gray-700 px-1 rounded hover:bg-gray-600" onClick={() => store.updateFrame(frame.id, { collapsed: !frame.collapsed })}>
+                    <button className="text-xs bg-gray-700 px-2 py-1 min-h-[44px] min-w-[44px] rounded hover:bg-gray-600 transition-colors duration-200 motion-reduce:transition-none" onClick={() => store.updateFrame(frame.id, { collapsed: !frame.collapsed })}>
                       {frame.collapsed ? 'Expand' : 'Collapse'}
                     </button>
                   )}
@@ -99,12 +105,12 @@ function App() {
                 <div className="text-xs break-words">{frame.text}</div>
                 {frame.candidates && frame.candidates.length > 0 && !frame.collapsed && (
                   <div className="mt-2 pl-2 border-l border-blue-500">
-                    <div className="text-[10px] text-gray-400">Candidates:</div>
+                    <div className="text-xs text-gray-400">Candidates:</div>
                     {frame.candidates.map(c => (
                       <div key={c.id} className="flex justify-between items-center py-1">
                         <span className={`text-xs ${frame.mappedNode === c.id ? 'text-green-400' : ''}`}>{c.basename} : {c.symbol}</span>
                         <button
-                          className={`text-[10px] px-1 rounded ${frame.mappedNode === c.id ? 'bg-green-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}
+                          className={`text-xs px-2 py-1 min-h-[44px] min-w-[44px] rounded transition-colors duration-200 motion-reduce:transition-none ${frame.mappedNode === c.id ? 'bg-green-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}
                           onClick={() => store.mapCandidate(frame.id, frame.mappedNode === c.id ? null : c.id)}
                         >
                           {frame.mappedNode === c.id ? 'Mapped' : 'Map'}
@@ -112,9 +118,10 @@ function App() {
                       </div>
                     ))}
                     <div className="mt-1 flex items-center gap-2">
-                      <span className="text-[10px]">Weight:</span>
-                      <input type="range" min="0" max="100" value={frame.weight} className="flex-1 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer" onChange={(e) => store.updateFrame(frame.id, { weight: parseInt(e.target.value) })}/>
-                      <span className="text-[10px]">{frame.weight}</span>
+                      <span className="text-xs">Weight:</span>
+                      <label className="sr-only" htmlFor={`weight-${frame.id}`}>Weight</label>
+                      <input id={`weight-${frame.id}`} type="range" min="0" max="100" value={frame.weight} className="flex-1 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer" onChange={(e) => store.updateFrame(frame.id, { weight: parseInt(e.target.value) })}/>
+                      <span className="text-xs">{frame.weight}</span>
                     </div>
                   </div>
                 )}
@@ -158,9 +165,8 @@ function App() {
           <div className="mt-4 pt-4 border-t border-gray-700">
              <h3 className="font-bold mb-2 flex justify-between">
                Hypotheses
-               <button className="text-xs bg-blue-600 px-2 py-1 rounded" onClick={() => {
-                 const name = prompt("Hypothesis name:");
-                 if(name) store.saveHypothesis(name);
+               <button className="text-xs bg-blue-600 px-2 py-1 rounded hover:bg-blue-500 transition-colors duration-200 motion-reduce:transition-none" onClick={() => {
+                 setIsModalOpen(true);
                }}>Save Current</button>
              </h3>
              <div className="flex gap-2">
@@ -169,12 +175,40 @@ function App() {
                    {h.name}
                  </div>
                ))}
-               {store.hypotheses.length === 0 && <div className="text-xs text-gray-500">No hypotheses saved.</div>}
+               {store.hypotheses.length === 0 && <div className="text-xs text-gray-500">No hypotheses saved. Click 'Save Current' to create one.</div>}
              </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setIsModalOpen(false)}>
+          <div className="bg-gray-800 p-4 rounded shadow-lg border border-gray-600" onClick={e => e.stopPropagation()}>
+            <h2 className="text-lg font-bold mb-2">Save Hypothesis</h2>
+            <label className="sr-only" htmlFor="hyp-name">Hypothesis name</label>
+            <input
+              id="hyp-name"
+              type="text"
+              className="w-full bg-gray-900 border border-gray-700 rounded p-2 mb-4 text-white"
+              placeholder="Name..."
+              value={modalInput}
+              onChange={e => setModalInput(e.target.value)}
+            />
+            <div className="flex justify-end gap-2">
+              <button className="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600 transition-colors" onClick={() => setIsModalOpen(false)}>Cancel</button>
+              <button className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500 transition-colors" onClick={() => {
+                if(modalInput.trim()) {
+                  store.saveHypothesis(modalInput.trim());
+                  setIsModalOpen(false);
+                  setModalInput("");
+                }
+              }}>Save</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+    </main>
   );
 }
 
