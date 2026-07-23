@@ -501,13 +501,14 @@ function TimelineView() {
   const events = useFactoryStore((s) => s.events)
   const filter = useFactoryStore((s) => s.timelineFilter)
   const setFilter = useFactoryStore((s) => s.setTimelineFilter)
-  const filtered = filter && filter !== 'all' ? events.filter((event) => event.status === filter) : events
+  const filtered = filter ? events.filter((event) => event.status === filter) : events
   return (
     <div className="page">
       <div className="page-header"><div><p className="page-eyebrow"><IconHistory size={14} />Factory activity</p><h1 className="page-title">Event timeline</h1><p className="page-subtitle">A durable in-session record of stage transitions, retries, and accepted tasks.</p></div><div className="header-actions"><Button variant="secondary" onClick={exportAllAccepted}><IconDownload size={15} />Export accepted tasks</Button></div></div>
       <div className="filter-row" aria-label="Filter events by status"><button className={cn('filter-chip', !filter && 'active')} onClick={() => setFilter(null)}>All · {events.length}</button>{EVENT_STATUSES.map((status) => <button key={status} className={cn('filter-chip', filter === status && 'active')} onClick={() => setFilter(status)}>{status}</button>)}</div>
+      <p className="timeline-summary" role="status" data-visible-count={filtered.length} data-total-count={events.length}>Showing {filtered.length} of {events.length} events{filter ? ` · ${filter} only` : ''}</p>
       <Card>
-        {filtered.length ? <div className="timeline" ref={listRef}>{filtered.map((event) => <div className="event-row" key={event.id}><span className={cn('event-icon', event.status)}>{event.status === 'failed' ? <IconX size={11} aria-hidden /> : event.status === 'retry' ? <IconRefresh size={11} aria-hidden /> : event.status === 'started' ? <IconActivity size={11} aria-hidden /> : <IconCheck size={11} aria-hidden />}</span><div className="event-main"><strong>{event.text}</strong><span>{event.repository} · PR #{event.prNumber}</span></div><time className="event-time" dateTime={event.at}>{formatTime(event.at)} UTC</time></div>)}</div> : <EmptyState title="No events match" description="No timeline entries carry this status. The underlying event record is unchanged." onClear={() => setFilter(null)} />}
+        {filtered.length ? <div className="timeline" key={filter || 'all'} ref={listRef}>{filtered.map((event) => <div className="event-row" key={event.id}><span className={cn('event-icon', event.status)}>{event.status === 'failed' ? <IconX size={11} aria-hidden /> : event.status === 'retry' ? <IconRefresh size={11} aria-hidden /> : event.status === 'started' ? <IconActivity size={11} aria-hidden /> : <IconCheck size={11} aria-hidden />}</span><div className="event-main"><strong>{event.text}</strong><span>{event.repository} · PR #{event.prNumber}</span></div><time className="event-time" dateTime={event.at}>{formatTime(event.at)} UTC</time></div>)}</div> : <EmptyState title="No events match" description="No timeline entries carry this status. The underlying event record is unchanged." onClear={() => setFilter(null)} />}
       </Card>
     </div>
   )
@@ -686,18 +687,20 @@ function CreateTaskDialog() {
   }
   const cancel = () => setOpen(false)
   const prValue = watch('pullRequestNumber')
+  const repoValue = watch('repository') || 'quartz-orm'
+  // Reactive duplicate-run guard: subscribe to runningIds so the submit control
+  // disables the instant a run with this exact repository + PR number starts
+  // (runKey format matches startRun's `${repository}-${pullRequestNumber}`).
+  const runningIds = useFactoryStore((s) => s.runningIds)
+  const duplicateRunning = runningIds.includes(`${repoValue}-${prValue}`)
   const returnFocusRef = useRef(null)
 
   return (
     <Dialog.Root open={open} modal={false} onOpenChange={(next) => setOpen(next)}>
       <Dialog.Portal>
-        <Dialog.Overlay
-          className="dialog-overlay"
-
-        />
+        <Dialog.Overlay className="dialog-overlay" />
         <Dialog.Content
           className="dialog-content"
-
           aria-describedby="create-task-description"
           onOpenAutoFocus={() => { returnFocusRef.current = document.activeElement }}
           onCloseAutoFocus={(event) => {
@@ -708,9 +711,11 @@ function CreateTaskDialog() {
           onEscapeKeyDown={() => setOpen(false)}
           aria-modal="true"
           onInteractOutside={(event) => {
-            if (event.target instanceof Element && event.target.closest('.sidebar')) {
-              // do nothing, let the click pass through to the sidebar
-            }
+            // The dialog is deliberately non-modal for sidebar interleaving:
+            // clicking sidebar navigation must NOT dismiss an in-progress draft
+            // (interleaved flows keep their state), so cancel the outside-
+            // interaction dismissal for sidebar targets only.
+            if (event.target instanceof Element && event.target.closest('.sidebar')) event.preventDefault()
           }}
           onKeyDown={(event) => {
             if (event.key !== 'Tab') return
@@ -737,7 +742,7 @@ function CreateTaskDialog() {
                 <span>Or swipe up on mobile with gesture shortcuts enabled</span>
               </div>
             </div>
-            <div className="dialog-actions"><Button type="button" variant="secondary" onClick={cancel}>Cancel</Button><Button type="submit" disabled={!isValid || isSubmitting || !!useFactoryStore.getState().runningIds.find(id => id.includes(prValue))}><IconSparkles size={15} aria-hidden />Start pipeline run</Button></div>
+            <div className="dialog-actions"><Button type="button" variant="secondary" onClick={cancel}>Cancel</Button><Button type="submit" disabled={!isValid || isSubmitting || duplicateRunning}><IconSparkles size={15} aria-hidden />Start pipeline run</Button></div>
           </form>
         </Dialog.Content>
       </Dialog.Portal>
