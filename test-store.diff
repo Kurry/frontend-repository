@@ -1,0 +1,13 @@
+diff --git a/tasks/frontend-planning-execution-kanban/solution/app/src/store.js b/tasks/frontend-planning-execution-kanban/solution/app/src/store.js
+index a9c05b4b..c8d83961 100644
+--- a/tasks/frontend-planning-execution-kanban/solution/app/src/store.js
++++ b/tasks/frontend-planning-execution-kanban/solution/app/src/store.js
+@@ -48,7 +48,7 @@ const snapshot = (state) => clone({
+ const historyCommit = (state, domainPatch) => ({
+   ...domainPatch,
+   undoStack: [...state.undoStack.slice(-39), snapshot(state)],
+-  redoStack: []
++  redoStack: [],
+ })
+
+ const updateCardRecord = (cards, cardId, updater) => {
