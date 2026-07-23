@@ -197,7 +197,7 @@ export function initializeWebMCP() {
         if (store.getState().theme.themes.some(theme => theme.name === themeName)) {
           throw new Error('name must be unique');
         }
-        const id = args.id || 'theme-' + Date.now();
+        const id = args.id || 'theme-' + Date.now() + '-' + Math.random().toString(36).slice(2);
         if (store.getState().theme.themes.some(theme => theme.id === id)) {
           throw new Error('id must be unique');
         }
@@ -205,6 +205,7 @@ export function initializeWebMCP() {
         const options = args.palette ? { ...current, palette: mergePalette(current.palette, args.palette) } : current;
         store.dispatch(createTheme({ id, name: themeName, options }));
         store.dispatch(setTab('saved'));
+        store.dispatch(closeThemeForm());
         return { success: true };
       }
       case 'entity_select': {

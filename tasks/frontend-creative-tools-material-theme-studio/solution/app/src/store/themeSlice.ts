@@ -268,12 +268,20 @@ export const themeSlice = createSlice({
         state.undoStack.push(JSON.parse(JSON.stringify(state.activeOptions)));
         state.redoStack = [];
         state.activeOptions = JSON.parse(JSON.stringify(action.payload));
+        if (action.payload.name) {
+            const theme = state.themes.find(t => t.id === state.activeId);
+            if (theme) theme.name = action.payload.name;
+        }
         state.dirty = true;
     },
-    importTheme: (state, action: PayloadAction<ThemeOptions>) => {
+    importTheme: (state, action: PayloadAction<ThemeOptions & { name?: string }>) => {
         state.undoStack.push(JSON.parse(JSON.stringify(state.activeOptions)));
         state.redoStack = [];
         state.activeOptions = JSON.parse(JSON.stringify(action.payload));
+        if (action.payload.name) {
+            const theme = state.themes.find(t => t.id === state.activeId);
+            if (theme) theme.name = action.payload.name;
+        }
         state.dirty = true;
     },
     addFont: (state, action: PayloadAction<string>) => {

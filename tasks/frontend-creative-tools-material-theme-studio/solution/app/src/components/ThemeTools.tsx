@@ -83,6 +83,11 @@ function PaletteTool() {
   const pulseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const p = activeOptions.palette;
 
+  useEffect(() => {
+    setIntentDrafts({});
+    setIntentErrors({});
+  }, [activeOptions]);
+
   useEffect(() => () => {
     if (pulseTimer.current) clearTimeout(pulseTimer.current);
   }, []);
@@ -123,6 +128,11 @@ function PaletteTool() {
   };
 
   const deriveHarmonics = (kind: 'complementary' | 'analogous' | 'triadic') => {
+    const btn = document.getElementById('swatch-secondary');
+    if (btn) {
+      btn.classList.add('ring-4', 'ring-white', 'transition-all', 'duration-300');
+      setTimeout(() => btn.classList.remove('ring-4', 'ring-white', 'transition-all', 'duration-300'), 500);
+    }
     const newOptions = JSON.parse(JSON.stringify(activeOptions));
     const degrees = kind === 'complementary' ? 180 : kind === 'analogous' ? 30 : 120;
     const derived = shiftHue(activeOptions.palette.primary.main, degrees);
@@ -242,9 +252,9 @@ function PaletteTool() {
                   <span className="w-24 capitalize">{ch}</span>
                   <input
                     type="color"
-                    value={color[ch]}
+                    defaultValue={color[ch]}
                     aria-label={`${intent} ${ch} color picker`}
-                    onChange={(e) => updateIntent(intent, ch, e.target.value)}
+                    onBlur={(e) => updateIntent(intent, ch, e.target.value)}
                     className="bg-transparent border-0 w-8 h-8 cursor-pointer p-0 rounded-full shrink-0"
                   />
                   <div className="flex-1 min-w-0">
@@ -357,6 +367,13 @@ function TypographyTool() {
   const [borderRadiusDraft, setBorderRadiusDraft] = useState<string | null>(null);
   const [borderRadiusError, setBorderRadiusError] = useState('');
   const t = activeOptions.typography;
+
+  useEffect(() => {
+    setFontSizeDraft(null);
+    setFontSizeError('');
+    setBorderRadiusDraft(null);
+    setBorderRadiusError('');
+  }, [activeOptions]);
   const s = activeOptions.shape;
   const fontOptions = Array.from(new Set([t.fontFamily, ...fonts]));
 

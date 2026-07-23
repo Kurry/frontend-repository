@@ -116,7 +116,7 @@ export default function SavedThemes() {
                   data-theme-card={t.id}
                   className={`bg-[#1e1e1e] rounded overflow-hidden shadow-lg border transition-colors ${
                     isActive ? 'border-blue-500' : 'border-gray-700 hover:border-gray-500'
-                  } ${exiting ? 'card-exiting' : 'animate-card-in'}`}
+                  } ${exiting ? 'animate-card-out' : 'animate-card-in'}`}
                 >
                   <div className="p-4 flex flex-col gap-3">
                     <div className="flex justify-between items-start">
@@ -167,6 +167,7 @@ export default function SavedThemes() {
                       color="error"
                       size="small"
                       onClick={() => setConfirmDeleteId(t.id)}
+                      className="focus-visible:ring-2 focus-visible:ring-blue-400 outline-none"
                       sx={{ minHeight: 44, flex: 1 }}
                       data-delete={t.id}
                     >
@@ -195,7 +196,7 @@ export default function SavedThemes() {
                 helperText={versionError}
                 inputProps={{ maxLength: 64, 'aria-label': 'Version name' }}
               />
-              <Button variant="contained" onClick={saveVersion} sx={{ minHeight: 44 }}>
+              <Button variant="contained" onClick={saveVersion} sx={{ minHeight: 44 }} className="focus-visible:ring-2 focus-visible:ring-blue-400 outline-none">
                 Save version
               </Button>
             </div>

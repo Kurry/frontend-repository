@@ -53,17 +53,14 @@ export default function ThemeFormPanel() {
     formState: { errors, isValid },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { name: initialName },
+    values: { name: initialName },
     mode: 'onChange',
     reValidateMode: 'onChange',
   });
 
   const nameValue = watch('name') ?? '';
 
-  // Re-seed the field whenever the form opens for a different target.
-  useEffect(() => {
-    if (open) reset({ name: initialName });
-  }, [open, initialName, reset]);
+
 
   // Announce inline validation problems to the polite live region.
   const errorMessage = errors.name?.message ?? (!nameValue.trim() ? 'Theme name is required — enter a name for the theme' : '');
@@ -89,7 +86,7 @@ export default function ThemeFormPanel() {
       dispatch(updateTheme({ id: editingTheme.id, name }));
       dispatch(announce(`Theme renamed to ${name}`));
     } else {
-      dispatch(createTheme({ id: `theme-${Date.now()}`, name }));
+      dispatch(createTheme({ id: `theme-${Date.now()}-${Math.random().toString(36).slice(2)}`, name }));
       dispatch(announce(`Theme ${name} created — it is now the active theme`));
     }
     close();
