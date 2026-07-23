@@ -1,0 +1,105 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+[[criterion]]
+id = "pf.1"
+name = "direct_manipulation_latency"
+description = "Direct manipulation of a curve or stage block acknowledges the action and renders the initial visual change within 100 milliseconds."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "pf.2"
+name = "derived_views_settle"
+description = "Linked and derived views (like prominence scores, multi-viewport previews, and line-break maps) completely calculate and settle within 500 milliseconds of the mutation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "pf.3"
+name = "export_latency"
+description = "Generation and parsing of the export artifact (JSON, CSS, SVG, Markdown) strictly completes within 2 seconds of clicking export."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "pf.4"
+name = "no_console_errors"
+description = "Loading the app, running a branch merge, and exporting artifacts generates zero fatal console errors or uncontrolled unhandled rejections."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "pf.5"
+name = "maximum_fixture_stability"
+description = "Operating at the maximum fixture limit (200 blocks, 5000 keyframes, 3 viewports) causes noticeable dropped interactions or stale views during 24-fps playback."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "pf.ac9"
+name = "performance_ac_09"
+description = "Operate 200 blocks, 5,000 keyframes, across three viewports with real-time 24-fps preview. Confirm that the interaction remains responsive and any stale sampling or layout computations are correctly cancelled."
+type = "binary"
+weight = 1.0

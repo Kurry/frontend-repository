@@ -1,0 +1,90 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+[[criterion]]
+id = "bh.1"
+name = "session_isolation"
+description = "Multiple isolated import attempts and branches cleanly segregate state. They do not silently share references or accidentally overwrite unconnected DAG states."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "bh.2"
+name = "override_inheritance_resolution"
+description = "Viewport overrides successfully inherit properties linearly unless an explicit conflict resolution rule disrupts it, with a clear fallback history."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "bh.3"
+name = "approval_freezes_checksum"
+description = "Once zero validation failures are met and a score is approved, the derived validation checksums permanently freeze, locking the branch state from unversioned mutability."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "bh.ac13"
+name = "behavioral_ac_13"
+description = "Interleave stage/keyframe edits, viewport overrides, reduced score, branch merge, playback, undo, approval, and export/import. Confirm that tracks, samples, lineage, and files round-trip exactly."
+type = "binary"
+weight = 1.0

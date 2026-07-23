@@ -1,0 +1,105 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+[[criterion]]
+id = "ax.1"
+name = "keyboard_parity"
+description = "Stage geometry, axis values, keyframe moves, curve controls, beat roles, and viewport overrides are fully accessible and adjustable via documented keyboard shortcuts and standard traversal."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "ax.2"
+name = "modal_focus_trap"
+description = "Opening the validator or export drawer traps keyboard focus within the modal and correctly returns it to the opener element upon closure."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "ax.3"
+name = "live_announcements"
+description = "Significant asynchronous outcomes, such as a successful artifact export, validation failure, or branch merge resolution, trigger appropriate live ARIA announcements."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "ax.4"
+name = "non_color_evidence"
+description = "The semantic lane highlights prominence ties, priority inversions, or missing emphasis using color exclusively without secondary non-color evidence (like an icon or text)."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "ax.5"
+name = "reduced_motion_causal_parity"
+description = "Forced system-level reduced motion respects the causal parity of the active score without skipping or deadlocking logical frame execution."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "ax.ac8"
+name = "accessibility_ac_08"
+description = "Using only the keyboard (no pointer), move/resize blocks, edit axes/keyframes/curves, scrub/frame-step, assign beats, author viewport/fallback, merge/approve, and export. Confirm focus states and resulting changes exactly match pointer equivalent."
+type = "binary"
+weight = 1.0

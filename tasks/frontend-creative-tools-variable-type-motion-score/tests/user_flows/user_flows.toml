@@ -1,0 +1,97 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+[[criterion]]
+id = "uf.1"
+name = "branch_merge_flow"
+description = "User branches the active score, alters a curve in the branch, opens the comparison diff, chooses to merge the specific time range, and verifies the active score adopts the edit."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "uf.2"
+name = "semantic_emphasis_flow"
+description = "User scrubs to a message beat, explicitly assigns a block as primary support, overrides the contrast/size prominence, and visually verifies the score lane updates accordingly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "uf.3"
+name = "viewport_override_flow"
+description = "User switches to 375px mobile preview, creates a line-break override on a specific block, scrubs to ensure it is isolated from the 1440px desktop score, and resolves any triggered conflicts."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "uf.4"
+name = "validator_approval_flow"
+description = "User opens the validator, encounters an axis bounds violation, fixes the specific keyframe clamp, sees the validator turn green, and approves the score to freeze checksums."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "uf.ac5"
+name = "user_flows_ac_05"
+description = "Perform the full sequence: Layout -> axes/keyframes -> beats -> responsive overrides -> reduced motion -> compare/merge -> validate/approve -> export -> reset/import. Confirm successful completion across all milestones without data loss."
+type = "binary"
+weight = 1.0

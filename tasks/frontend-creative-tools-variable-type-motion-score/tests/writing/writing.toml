@@ -1,0 +1,90 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+[[criterion]]
+id = "wr.1"
+name = "error_copy_field_identification"
+description = "Error copy uniquely identifies the rejected field, explicitly lists the violated rule (e.g. out of bound, uniqueness violation), and proposes a specific recovery action."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "wr.2"
+name = "error_clear_on_correction"
+description = "Correcting a rejected bounded field specifically clears the corresponding error message for only that field without requiring a full form reload or submit."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "wr.3"
+name = "motion_spec_markdown"
+description = "The generated Markdown motion/accessibility spec utilizes consistent and professional terminology, exactly referencing the canonical beats and fallback sequences."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "wr.ac10"
+name = "writing_ac_10"
+description = "Trigger every time/axis/layout/wrap/prominence/fallback/export conflict. Confirm that the resulting error copy explicitly names the exact block/property/frame/viewport/beat/value and offers a clear recovery action."
+type = "binary"
+weight = 1.0

@@ -1,0 +1,139 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+[[criterion]]
+id = "cf.1"
+name = "clean_state_start"
+description = "Upon fresh load, the app starts from a clean state with no authored work, pre-seeded completions, exports, or evidence of success beyond the bundled fixture."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.2"
+name = "block_geometry_bind"
+description = "Blocks drag, resize, and rotate within a fixed safe area, correctly binding content, semantic role, and alignment using normalized millionths per viewport."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.3"
+name = "axis_inspector_clamps"
+description = "Selecting a text block exposes wght, wdth, slnt, and opsz axes. Ensure sliders and inputs strictly clamp to their exact bounds without overflowing."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.4"
+name = "timeline_keyframe_share"
+description = "Axis, opacity, position, rotation, and tracking curves all share a single timeline. Moving a keyframe visibly changes the relevant property across time."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.5"
+name = "semantic_beats"
+description = "The 12-second fixture declares five message beats. Assign blocks as primary, supporting, or hidden for each interval and confirm the role is correctly recorded."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.6"
+name = "responsive_containers"
+description = "Desktop, tablet, and mobile views provide fixed containers. Ensure font metrics and line-break tables dynamically update according to the active viewport size."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.7"
+name = "playback_controls"
+description = "Logical playback controls (scrub, play, pause, frame step, loop, speed) correctly manipulate the playback state and update the canvas preview."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.8"
+name = "branch_fork"
+description = "Fork a score branch. Confirm the branch DAG tracks the fork and allows independent edits without affecting the original score until merged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.9"
+name = "export_artifact_generation"
+description = "Export the task. Confirm it generates canonical JSON, CSS custom properties/keyframes, standalone SVG storyboards, and a Markdown motion/accessibility spec."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.10"
+name = "artifact_import"
+description = "Importing an exported JSON artifact atomically restores the complete authored state and generated derivatives exactly as they were exported."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.ac1"
+name = "core_features_ac_01"
+description = "Lay out, keyframe/curve, choreograph beats, override viewports, play/scrub, author reduced mode, branch/merge, validate/approve, and export. Confirm all samples/files agree exactly with the performed operations."
+type = "binary"
+weight = 1.0
