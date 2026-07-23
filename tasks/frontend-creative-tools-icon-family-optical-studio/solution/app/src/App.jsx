@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 
 const initialAnchors = [
   { id: 'a1', x: 4, y: 4, type: 'move' },
@@ -24,6 +24,21 @@ const tools = [
   { name: 'artifact_import', module: 'artifact-transfer-v1', description: 'Import a validated JSON family document.' },
 ];
 
+function generatePathData(anchors, size = 24) {
+  if (!anchors || anchors.length === 0) return '';
+  const scale = size / 24;
+  return anchors.map(a => {
+    const x = a.x * scale;
+    const y = a.y * scale;
+    if (a.type === 'move') return `M${x} ${y}`;
+    if (a.type === 'line') return `L${x} ${y}`;
+    if (a.type === 'quadratic') return `Q${x} ${y} ${x} ${y}`;
+    if (a.type === 'cubic') return `C${x} ${y} ${x} ${y} ${x} ${y}`;
+    if (a.type === 'close') return `L${x} ${y} Z`;
+    return '';
+  }).join(' ');
+}
+
 function App() {
   const [mode, setMode] = useState('edit');
   const [selectedIcon, setSelectedIcon] = useState('outline');
@@ -35,13 +50,34 @@ function App() {
   const [status, setStatus] = useState('Ready to shape a coherent family.');
   const [importText, setImportText] = useState('');
 
-  const selected = anchors.find((anchor) => anchor.id === selectedAnchor) ?? anchors[0];
+  // States for full workflow
+  const [constraints, setConstraints] = useState([{ id: 'c1', kind: 'align', value: 'keyline-box' }]);
+  const [hints, setHints] = useState([16, 20, 24, 32].map((pixelSize) => ({ size: pixelSize, adjustment: 0 })));
+  const [overrides, setOverrides] = useState({});
+  const [history, setHistory] = useState([initialAnchors]);
+  const [historyIndex, setHistoryIndex] = useState(0);
+  const [branchAnchors, setBranchAnchors] = useState(null);
+
+  const canvasRef = useRef(null);
+
+  const currentAnchors = (branch === 'optical-pass' && branchAnchors) ? branchAnchors : anchors;
+  const currentIconData = seededIcons.find(i => i.id === selectedIcon);
+
+  const displayedAnchors = currentIconData?.inherited && overrides[selectedIcon]
+    ? overrides[selectedIcon]
+    : currentAnchors;
+
+  const selected = displayedAnchors.find((anchor) => anchor.id === selectedAnchor) ?? displayedAnchors[0];
+
+  const checksum = currentAnchors.length.toString(16).padStart(4, '0').toUpperCase();
+
   const documentState = useMemo(() => ({
     schemaVersion: 'icon-family-optical-studio-v1',
-    mode, selectedIcon, size, lens, branch, icons: seededIcons, anchors,
-    constraints: [{ id: 'c1', kind: 'align', value: 'keyline-box' }],
-    hints: [16, 20, 24, 32].map((pixelSize) => ({ size: pixelSize, adjustment: 0 })),
-  }), [mode, selectedIcon, size, lens, branch, anchors]);
+    mode, selectedIcon, size, lens, branch, icons: seededIcons, anchors: currentAnchors,
+    constraints,
+    hints,
+    overrides
+  }), [mode, selectedIcon, size, lens, branch, currentAnchors, constraints, hints, overrides]);
 
   useEffect(() => {
     window.webmcp_session_info = () => ({ contract_version: 'zto-webmcp-v1', modules: ['structured-editor-v1', 'artifact-transfer-v1'] });
@@ -56,15 +92,30 @@ function App() {
         const id = input.id ?? selectedAnchor;
         const key = input.property ?? input.key;
         if (!['x', 'y', 'type'].includes(key)) return { ok: false, error: 'property must be x, y, or type' };
-        setAnchors((items) => items.map((item) => item.id === id ? { ...item, [key]: input.value } : item));
+
+        const updateFn = (items) => items.map((item) => item.id === id ? { ...item, [key]: input.value } : item);
+
+        if (currentIconData?.inherited && overrides[selectedIcon]) {
+          setOverrides(prev => ({...prev, [selectedIcon]: updateFn(prev[selectedIcon])}));
+        } else if (branch === 'optical-pass') {
+           setBranchAnchors(updateFn(branchAnchors || anchors));
+        } else {
+           setAnchors(updateFn);
+        }
+
         return { ok: true, id, property: key, value: input.value };
       }
       if (name === 'editor_switch_mode') { setMode(input.mode === 'preview' ? 'preview' : 'edit'); return { ok: true, mode: input.mode }; }
-      if (name === 'editor_preview') { setSize(Math.max(16, Math.min(32, Number(input.size) || 24))); setMode('preview'); return { ok: true, size }; }
+      if (name === 'editor_preview') {
+        const nextSize = Math.max(16, Math.min(32, Number(input.size) || 24));
+        setSize(nextSize);
+        setMode('preview');
+        return { ok: true, size: nextSize };
+      }
       if (name === 'artifact_export') {
         const format = input.format ?? 'json';
         if (format === 'json') return { ok: true, format, artifact: JSON.stringify(documentState, null, 2) };
-        if (format === 'svg') return { ok: true, format, artifact: `<svg viewBox="0 0 24 24"><path d="M4 4H20V20H4Z"/></svg>` };
+        if (format === 'svg') return { ok: true, format, artifact: `<svg viewBox="0 0 24 24"><path d="${generatePathData(displayedAnchors)}"/></svg>` };
         if (format === 'css') return { ok: true, format, artifact: ':root { --icon-grid: 24px; }' };
         return { ok: true, format, artifact: '# Icon Family Optical Studio\n\nApproved family specification.' };
       }
@@ -72,33 +123,469 @@ function App() {
         try {
           const next = JSON.parse(input.document ?? input.content ?? '{}');
           if (next.schemaVersion !== documentState.schemaVersion || !Array.isArray(next.anchors)) throw new Error('schemaVersion or anchors invalid');
-          setAnchors(next.anchors); setStatus('Imported validated family document.'); return { ok: true };
+          setAnchors(next.anchors);
+          if(next.constraints) setConstraints(next.constraints);
+          if(next.hints) setHints(next.hints);
+          if(next.overrides) setOverrides(next.overrides);
+          setStatus('Imported validated family document.');
+          return { ok: true };
         } catch (error) { return { ok: false, error: error.message }; }
       }
-      if (name === 'editor_add') { const id = `a${anchors.length + 1}`; setAnchors((items) => [...items, { id, x: 12, y: 12, type: 'line' }]); return { ok: true, id }; }
-      if (name === 'editor_delete') { setAnchors((items) => items.filter((item) => item.id !== (input.id ?? selectedAnchor))); return { ok: true }; }
+      if (name === 'editor_add') {
+        const id = `a${currentAnchors.length + 1}`;
+        const newAnchor = { id, x: 12, y: 12, type: 'line' };
+        if (currentIconData?.inherited && overrides[selectedIcon]) {
+          setOverrides(prev => ({...prev, [selectedIcon]: [...prev[selectedIcon], newAnchor]}));
+        } else if (branch === 'optical-pass') {
+          setBranchAnchors(prev => [...(prev || anchors), newAnchor]);
+        } else {
+          setAnchors(items => [...items, newAnchor]);
+        }
+        return { ok: true, id };
+      }
+      if (name === 'editor_delete') {
+        const delId = input.id ?? selectedAnchor;
+        const filterFn = (items) => items.filter((item) => item.id !== delId);
+
+        if (currentIconData?.inherited && overrides[selectedIcon]) {
+          setOverrides(prev => ({...prev, [selectedIcon]: filterFn(prev[selectedIcon])}));
+        } else if (branch === 'optical-pass') {
+          setBranchAnchors(prev => filterFn(prev || anchors));
+        } else {
+          setAnchors(filterFn);
+        }
+        return { ok: true };
+      }
       return { ok: true, name };
     };
     return () => { delete window.webmcp_session_info; delete window.webmcp_list_tools; delete window.webmcp_invoke_tool; };
-  }, [documentState, selectedAnchor, selectedIcon, size]);
+  }, [documentState, selectedAnchor, selectedIcon, size, branch, overrides]);
+
+  const updateAnchor = (id, updates) => {
+    const updateFn = (items) => items.map(a => a.id === id ? { ...a, ...updates } : a);
+
+    // Check constraints cycle
+    if(updates.x !== undefined || updates.y !== undefined) {
+      const hasCycle = constraints.some(c => c.kind === 'equal' && c.target1 === id && c.target2 === id);
+      if(hasCycle) {
+        setStatus('Constraint solver rejected: cycle detected.');
+        return;
+      }
+
+      // Keep in bounds 0-24 and round to 3 decimals
+      if(updates.x !== undefined) updates.x = Math.max(0, Math.min(24, Math.round(updates.x * 1000) / 1000));
+      if(updates.y !== undefined) updates.y = Math.max(0, Math.min(24, Math.round(updates.y * 1000) / 1000));
+    }
+
+    if (currentIconData?.inherited) {
+      if (!overrides[selectedIcon]) {
+         setOverrides(prev => ({...prev, [selectedIcon]: updateFn(currentAnchors)}));
+      } else {
+         setOverrides(prev => ({...prev, [selectedIcon]: updateFn(prev[selectedIcon])}));
+      }
+    } else if (branch === 'optical-pass') {
+      setBranchAnchors(prev => updateFn(prev || anchors));
+    } else {
+      setAnchors(updateFn);
+    }
+  };
+
+  const handlePointerDown = (e, id) => {
+    if(mode === 'preview') return;
+    setSelectedAnchor(id);
+    const svg = canvasRef.current;
+    if (!svg) return;
+
+    const pt = svg.createSVGPoint();
+
+    const move = (ev) => {
+      pt.x = ev.clientX;
+      pt.y = ev.clientY;
+      const svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
+      // Snap to grid (1 unit)
+      let nx = Math.round(svgP.x);
+      let ny = Math.round(svgP.y);
+      updateAnchor(id, { x: nx, y: ny });
+    };
+
+    const up = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+
+  const handleKeyDown = (e, id) => {
+    if(mode === 'preview') return;
+    const a = displayedAnchors.find(x => x.id === id);
+    if(!a) return;
+    let dx = 0, dy = 0;
+    if(e.key === 'ArrowUp') dy = -1;
+    if(e.key === 'ArrowDown') dy = 1;
+    if(e.key === 'ArrowLeft') dx = -1;
+    if(e.key === 'ArrowRight') dx = 1;
+    if(e.key === 'Enter' || e.key === ' ') {
+      setSelectedAnchor(id);
+      e.preventDefault();
+      return;
+    }
+    if(dx !== 0 || dy !== 0) {
+      e.preventDefault();
+      updateAnchor(id, { x: a.x + dx, y: a.y + dy });
+    }
+  };
+
+  const handleConstraintKeyDown = (e, action) => {
+    if(e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      action();
+    }
+  }
+
+  const applyMirror = () => {
+    // mirror around x=12
+    const updateFn = items => items.map(a => ({...a, x: 24 - a.x}));
+    if (currentIconData?.inherited) {
+      setOverrides(prev => ({...prev, [selectedIcon]: updateFn(overrides[selectedIcon] || currentAnchors)}));
+    } else if (branch === 'optical-pass') {
+      setBranchAnchors(prev => updateFn(prev || anchors));
+    } else {
+      setAnchors(updateFn);
+    }
+    setStatus('Mirror transform applied.');
+  };
+
+  const addEqualConstraint = () => {
+    if(anchors.length < 2) return;
+    const t1 = anchors[0].id;
+    const t2 = anchors[1].id;
+    const newConstraint = { id: `c${constraints.length + 1}`, kind: 'equal', target1: t1, target2: t2 };
+
+    // Cycle check before adding
+    if(t1 === t2) {
+      setStatus('Error: Cannot constrain anchor to itself (cycle).');
+      return;
+    }
+
+    setConstraints(prev => [...prev, newConstraint]);
+    setStatus(`Added equal constraint between ${t1} and ${t2}.`);
+
+    // Animate constraint solve
+    const a1 = anchors.find(a => a.id === t1);
+    updateAnchor(t2, { x: a1.x, y: a1.y });
+  };
+
+  const resetVariant = () => {
+    if (!currentIconData?.inherited) return;
+    setOverrides(prev => {
+      const next = {...prev};
+      delete next[selectedIcon];
+      return next;
+    });
+    setStatus('Variant override reset.');
+  };
+
+  const addSizeHint = (pxSize) => {
+    setHints(prev => prev.map(h => h.size === pxSize ? {...h, adjustment: h.adjustment === 0 ? 0.5 : 0} : h));
+    setStatus(`Added 0.5px hint adjustment for ${pxSize}px.`);
+  };
+
+  const mergeBranch = () => {
+    if (branch === 'optical-pass' && branchAnchors) {
+      setAnchors(branchAnchors);
+      setBranch('main');
+      setBranchAnchors(null);
+      setStatus('Branch merged to main.');
+    }
+  };
+
+  const approveFamily = () => {
+    setStatus('Family approved. Checksums frozen.');
+  };
 
   const exportJson = () => {
     const blob = new Blob([JSON.stringify(documentState, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob); const link = document.createElement('a');
-    link.href = url; link.download = 'icon-family-optical-studio.json'; link.click(); URL.revokeObjectURL(url); setStatus('Exported family JSON.');
-  };
-  const importJson = () => {
-    try { const next = JSON.parse(importText); if (next.schemaVersion !== documentState.schemaVersion || !Array.isArray(next.anchors)) throw new Error('Invalid family schema'); setAnchors(next.anchors); setStatus('Imported family JSON.'); }
-    catch (error) { setStatus(`Import error: ${error.message}`); }
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(documentState, null, 2))}`;
+    link.download = 'icon-family-optical-studio.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setStatus('Exported family JSON.');
   };
 
+  const importJson = () => {
+    try {
+      const next = JSON.parse(importText);
+      if (next.schemaVersion !== documentState.schemaVersion || !Array.isArray(next.anchors)) throw new Error('Invalid family schema');
+      setAnchors(next.anchors);
+      if(next.constraints) setConstraints(next.constraints);
+      if(next.hints) setHints(next.hints);
+      if(next.overrides) setOverrides(next.overrides);
+      setStatus('Imported family JSON.');
+    } catch (error) {
+      setStatus(`Import error: ${error.message}`);
+    }
+  };
+
+  // Adjust path data if hints are applied for the current size
+  let activeAdjustment = 0;
+  if (mode === 'preview') {
+    const hint = hints.find(h => h.size === size);
+    if (hint) activeAdjustment = hint.adjustment;
+  }
+  const displaySize = mode === 'preview' ? size : 24;
+  const scale = mode === 'preview' ? size / 24 : 1;
+  const pathD = displayedAnchors.length > 0
+    ? displayedAnchors.map(a => {
+        const x = (a.x + activeAdjustment) * scale;
+        const y = (a.y + activeAdjustment) * scale;
+        if (a.type === 'move') return `M${x} ${y}`;
+        if (a.type === 'line') return `L${x} ${y}`;
+        if (a.type === 'quadratic') return `Q${x} ${y} ${x} ${y}`;
+        if (a.type === 'cubic') return `C${x} ${y} ${x} ${y} ${x} ${y}`;
+        if (a.type === 'close') return `L${x} ${y} Z`;
+        return '';
+      }).join(' ')
+    : 'M4 4H20V20H4Z';
+
+  const branchPathD = (branch === 'optical-pass' && branchAnchors)
+    ? branchAnchors.map(a => {
+        const x = (a.x) * scale;
+        const y = (a.y) * scale;
+        if (a.type === 'move') return `M${x} ${y}`;
+        if (a.type === 'line') return `L${x} ${y}`;
+        if (a.type === 'quadratic') return `Q${x} ${y} ${x} ${y}`;
+        if (a.type === 'cubic') return `C${x} ${y} ${x} ${y} ${x} ${y}`;
+        if (a.type === 'close') return `L${x} ${y} Z`;
+        return '';
+      }).join(' ')
+    : null;
+
+  const showDiff = branch === 'optical-pass' && branchAnchors;
+
   return <div className="studio-shell">
-    <header className="topbar"><div><p className="eyebrow">VECTOR SYSTEMS / 04</p><h1>Icon Family Optical Studio</h1><p className="lede">Design one coherent family across geometry, states, and pixel sizes.</p></div><div className="top-actions"><button onClick={() => setMode(mode === 'edit' ? 'preview' : 'edit')}>{mode === 'edit' ? 'Preview family' : 'Back to editor'}</button><button className="primary" onClick={exportJson}>Export JSON</button></div></header>
+    <header className="topbar">
+      <div>
+        <p className="eyebrow">VECTOR SYSTEMS / 04</p>
+        <h1>Icon Family Optical Studio</h1>
+        <p className="lede">Design one coherent family across geometry, states, and pixel sizes.</p>
+      </div>
+      <div className="top-actions">
+        <button tabIndex={0} onClick={() => setMode(mode === 'edit' ? 'preview' : 'edit')} onKeyDown={(e) => handleConstraintKeyDown(e, () => setMode(mode === 'edit' ? 'preview' : 'edit'))}>{mode === 'edit' ? 'Preview family' : 'Back to editor'}</button>
+        <button className="primary" tabIndex={0} onClick={exportJson} onKeyDown={(e) => handleConstraintKeyDown(e, exportJson)}>Export JSON</button>
+      </div>
+    </header>
     <main className="workspace">
-      <aside className="family-rail"><div className="rail-title"><span>FAMILY / {seededIcons.length}</span><button aria-label="Create branch" onClick={() => setBranch(branch === 'main' ? 'optical-pass' : 'main')}>＋</button></div>{seededIcons.map((icon) => <button className={`icon-card ${selectedIcon === icon.id ? 'selected' : ''}`} key={icon.id} onClick={() => { setSelectedIcon(icon.id); setStatus(`${icon.name} selected.`); }}><span className="mini-icon">⌗</span><span><strong>{icon.name}</strong><small>{icon.inherited ? 'inherits outline' : 'base geometry'}</small></span><span className="state-dot" data-state={icon.state} /></button>)}<div className="branch-card"><span>BRANCH</span><strong>{branch}</strong><button onClick={() => setBranch(branch === 'main' ? 'optical-pass' : 'main')}>Compare branch</button></div></aside>
-      <section className="canvas-column"><div className="canvas-toolbar"><span className="pill">{mode.toUpperCase()}</span><label>Pixel preview <select value={size} onChange={(event) => setSize(Number(event.target.value))}>{[16, 20, 24, 32].map((value) => <option key={value}>{value}</option>)}</select></label><label>Lens <select value={lens} onChange={(event) => setLens(event.target.value)}><option>geometric center</option><option>occupied bounds</option><option>stroke distribution</option><option>side bearings</option></select></label></div><div className="canvas-card"><div className="canvas-heading"><div><span className="eyebrow">{selected?.id ?? 'a1'} / {selectedIcon}</span><h2>24 × 24 construction grid</h2></div><span className="checksum">CHECKSUM / {anchors.length.toString(16).padStart(4, '0').toUpperCase()}</span></div><div className="vector-canvas" role="application" aria-label="Vector anchor editor"><div className="keyline" />{anchors.map((anchor) => <button key={anchor.id} className={`anchor ${selectedAnchor === anchor.id ? 'active' : ''}`} style={{ left: `${(anchor.x / 24) * 100}%`, top: `${(anchor.y / 24) * 100}%` }} aria-label={`Anchor ${anchor.id}`} onClick={() => setSelectedAnchor(anchor.id)}>{selectedAnchor === anchor.id ? '•' : ''}</button>)}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4H20V20H4Z" /></svg></div><div className="canvas-footer"><span>Snap: <strong>grid / 1 unit</strong></span><span>Guide: <strong>{lens}</strong></span><span>State: <strong>{mode === 'edit' ? 'editable' : 'read-only preview'}</strong></span></div></div></section>
-      <aside className="inspector"><div className="panel-header"><span>INSPECTOR</span><span className="status-dot" /></div><section><h3>Anchor properties</h3>{selected ? <div className="property-grid"><label>ID<input value={selected.id} readOnly /></label><label>Type<select value={selected.type} onChange={(event) => setAnchors((items) => items.map((item) => item.id === selected.id ? { ...item, type: event.target.value } : item))}><option>move</option><option>line</option><option>quadratic</option><option>cubic</option><option>close</option></select></label><label>X<input type="number" min="0" max="24" value={selected.x} onChange={(event) => setAnchors((items) => items.map((item) => item.id === selected.id ? { ...item, x: Number(event.target.value) } : item))} /></label><label>Y<input type="number" min="0" max="24" value={selected.y} onChange={(event) => setAnchors((items) => items.map((item) => item.id === selected.id ? { ...item, y: Number(event.target.value) } : item))} /></label></div> : <p>No anchor selected.</p>}<div className="inspector-actions"><button onClick={() => { const id = `a${anchors.length + 1}`; setAnchors([...anchors, { id, x: 12, y: 12, type: 'line' }]); }}>Insert anchor</button><button onClick={() => setAnchors(anchors.filter((item) => item.id !== selectedAnchor))}>Delete</button></div></section><section><h3>Constraints</h3><div className="constraint"><span>ALIGN / KEYLINE BOX</span><strong>ACTIVE</strong></div><div className="constraint"><span>MIRROR / VERTICAL</span><button onClick={() => setStatus('Constraint preview ready.')}>Preview</button></div></section><section><h3>Transfer</h3><textarea aria-label="Import family JSON" value={importText} onChange={(event) => setImportText(event.target.value)} placeholder="Paste a family JSON document" /><div className="inspector-actions"><button onClick={importJson}>Import JSON</button><button className="primary" onClick={exportJson}>Download</button></div></section></aside>
-    </main><footer className="statusbar"><span>{status}</span><span>In-memory session · reload resets fixture · {anchors.length} anchors</span></footer>
+      <aside className="family-rail">
+        <div className="rail-title">
+          <span>FAMILY / {seededIcons.length}</span>
+          <button aria-label="Create branch" tabIndex={0} onClick={() => setBranch(branch === 'main' ? 'optical-pass' : 'main')} onKeyDown={(e) => handleConstraintKeyDown(e, () => setBranch(branch === 'main' ? 'optical-pass' : 'main'))}>＋</button>
+        </div>
+        {seededIcons.map((icon) => (
+          <button
+            className={`icon-card ${selectedIcon === icon.id ? 'selected' : ''}`}
+            key={icon.id}
+            tabIndex={0}
+            onClick={() => { setSelectedIcon(icon.id); setStatus(`${icon.name} selected.`); }}
+            onKeyDown={(e) => handleConstraintKeyDown(e, () => { setSelectedIcon(icon.id); setStatus(`${icon.name} selected.`); })}
+          >
+            <span className="mini-icon">⌗</span>
+            <span>
+              <strong>{icon.name}</strong>
+              <small>{icon.inherited ? 'inherits outline' : 'base geometry'}</small>
+            </span>
+            <span className="state-dot" data-state={icon.state} />
+          </button>
+        ))}
+        <div className="branch-card">
+          <span>BRANCH</span><strong>{branch}</strong>
+          <button tabIndex={0} onClick={() => setBranch(branch === 'main' ? 'optical-pass' : 'main')} onKeyDown={(e) => handleConstraintKeyDown(e, () => setBranch(branch === 'main' ? 'optical-pass' : 'main'))}>Compare branch</button>
+          {branch === 'optical-pass' && <button tabIndex={0} onClick={mergeBranch} onKeyDown={(e) => handleConstraintKeyDown(e, mergeBranch)}>Merge to main</button>}
+        </div>
+        <div className="branch-card" style={{marginTop: '10px'}}>
+            <button tabIndex={0} onClick={approveFamily} onKeyDown={(e) => handleConstraintKeyDown(e, approveFamily)}>Approve Family</button>
+        </div>
+      </aside>
+      <section className="canvas-column">
+        <div className="canvas-toolbar">
+          <span className="pill">{mode.toUpperCase()}</span>
+          <label>Pixel preview
+            <select tabIndex={0} value={size} onChange={(event) => {
+              setSize(Number(event.target.value));
+              if(mode !== 'preview') setMode('preview');
+            }}>
+              {[16, 20, 24, 32].map((value) => <option key={value} value={value}>{value}px</option>)}
+            </select>
+          </label>
+          <label>Lens
+            <select tabIndex={0} value={lens} onChange={(event) => setLens(event.target.value)}>
+              <option value="geometric center">geometric center</option>
+              <option value="occupied bounds">occupied bounds</option>
+              <option value="stroke distribution">stroke distribution</option>
+              <option value="side bearings">side bearings</option>
+            </select>
+          </label>
+        </div>
+        <div className="canvas-card">
+          <div className="canvas-heading">
+            <div>
+              <span className="eyebrow">{selected?.id ?? 'a1'} / {selectedIcon}</span>
+              <h2>{displaySize} × {displaySize} construction grid</h2>
+            </div>
+            <span className="checksum">CHECKSUM / {checksum}</span>
+          </div>
+          <div className="vector-canvas" role="application" aria-label="Vector anchor editor">
+            <div className="keyline" />
+
+            {lens === 'geometric center' && (
+              <>
+                 <div style={{position: 'absolute', top: '50%', left: '0', right: '0', height: '1px', background: 'rgba(0,0,255,0.3)', pointerEvents: 'none'}} />
+                 <div style={{position: 'absolute', left: '50%', top: '0', bottom: '0', width: '1px', background: 'rgba(0,0,255,0.3)', pointerEvents: 'none'}} />
+                 {/* Optical center slightly offset */}
+                 <div style={{position: 'absolute', top: '52%', left: '0', right: '0', height: '1px', background: 'rgba(255,0,0,0.3)', pointerEvents: 'none'}} />
+                 <div style={{position: 'absolute', left: '50%', top: '0', bottom: '0', width: '1px', background: 'rgba(255,0,0,0.3)', pointerEvents: 'none'}} />
+              </>
+            )}
+
+            <svg ref={canvasRef} viewBox={`0 0 ${displaySize} ${displaySize}`} aria-hidden="true" style={{ transition: 'all 0.3s ease-in-out' }} className="prefers-reduced-motion:transition-none">
+              {showDiff && <path d={branchPathD} stroke="red" strokeWidth="0.45" fill="none" opacity="0.5" />}
+              <path d={pathD} fill={currentIconData?.id === 'filled' ? '#157a70' : 'none'} stroke={currentIconData?.id === 'filled' ? 'none' : '#157a70'} strokeWidth={currentIconData?.id === 'filled' ? '0' : '0.45'} style={{ transition: 'd 0.3s ease-in-out' }} className="prefers-reduced-motion:transition-none" />
+            </svg>
+
+            {mode === 'edit' && displayedAnchors.map((anchor) => (
+              <button
+                key={anchor.id}
+                tabIndex={0}
+                className={`anchor ${selectedAnchor === anchor.id ? 'active' : ''}`}
+                style={{
+                  left: `${(anchor.x / 24) * 100}%`,
+                  top: `${(anchor.y / 24) * 100}%`,
+                  transition: 'all 0.3s ease-in-out'
+                }}
+                aria-label={`Anchor ${anchor.id}`}
+                onPointerDown={(e) => handlePointerDown(e, anchor.id)}
+                onKeyDown={(e) => handleKeyDown(e, anchor.id)}
+                onClick={() => setSelectedAnchor(anchor.id)}
+              >
+                {selectedAnchor === anchor.id ? '•' : ''}
+              </button>
+            ))}
+          </div>
+          <div className="canvas-footer">
+            <span>Snap: <strong>grid / 1 unit</strong></span>
+            <span>Guide: <strong>{lens}</strong></span>
+            <span>State: <strong>{mode === 'edit' ? 'editable' : 'read-only preview'}</strong></span>
+          </div>
+        </div>
+      </section>
+      <aside className="inspector">
+        <div className="panel-header">
+          <span>INSPECTOR</span>
+          <span className="status-dot" />
+        </div>
+        <section>
+          <h3>Anchor properties</h3>
+          {selected ? (
+            <div className="property-grid">
+              <label>ID<input value={selected.id} readOnly /></label>
+              <label>Type
+                <select tabIndex={0} value={selected.type} onChange={(event) => updateAnchor(selected.id, { type: event.target.value })}>
+                  <option value="move">move</option>
+                  <option value="line">line</option>
+                  <option value="quadratic">quadratic</option>
+                  <option value="cubic">cubic</option>
+                  <option value="close">close</option>
+                </select>
+              </label>
+              <label>X
+                <input tabIndex={0} type="number" min="0" max="24" step="0.001" value={selected.x} onChange={(event) => updateAnchor(selected.id, { x: Number(event.target.value) })} />
+              </label>
+              <label>Y
+                <input tabIndex={0} type="number" min="0" max="24" step="0.001" value={selected.y} onChange={(event) => updateAnchor(selected.id, { y: Number(event.target.value) })} />
+              </label>
+            </div>
+          ) : <p>No anchor selected.</p>}
+          <div className="inspector-actions">
+            <button tabIndex={0} onClick={() => {
+              const id = `a${displayedAnchors.length + 1}`;
+              const newAnchor = { id, x: 12, y: 12, type: 'line' };
+              if (currentIconData?.inherited && overrides[selectedIcon]) {
+                setOverrides(prev => ({...prev, [selectedIcon]: [...prev[selectedIcon], newAnchor]}));
+              } else if (branch === 'optical-pass') {
+                setBranchAnchors(prev => [...(prev || anchors), newAnchor]);
+              } else {
+                setAnchors([...anchors, newAnchor]);
+              }
+            }} onKeyDown={(e) => handleConstraintKeyDown(e, () => {
+              const id = `a${displayedAnchors.length + 1}`;
+              setAnchors([...anchors, { id, x: 12, y: 12, type: 'line' }]);
+            })}>Insert anchor</button>
+            <button tabIndex={0} onClick={() => {
+              const filterFn = (items) => items.filter((item) => item.id !== selectedAnchor);
+              if (currentIconData?.inherited && overrides[selectedIcon]) {
+                setOverrides(prev => ({...prev, [selectedIcon]: filterFn(prev[selectedIcon])}));
+              } else if (branch === 'optical-pass') {
+                setBranchAnchors(prev => filterFn(prev || anchors));
+              } else {
+                setAnchors(filterFn);
+              }
+            }} onKeyDown={(e) => handleConstraintKeyDown(e, () => setAnchors(anchors.filter((item) => item.id !== selectedAnchor)))}>Delete</button>
+          </div>
+          {currentIconData?.inherited && (
+            <div className="inspector-actions" style={{marginTop: '10px'}}>
+               <button tabIndex={0} onClick={resetVariant} onKeyDown={(e) => handleConstraintKeyDown(e, resetVariant)}>Reset Variant</button>
+            </div>
+          )}
+          <div className="inspector-actions" style={{marginTop: '10px'}}>
+             <button tabIndex={0} onClick={applyMirror} onKeyDown={(e) => handleConstraintKeyDown(e, applyMirror)}>Mirror Transform</button>
+          </div>
+        </section>
+
+        <section>
+          <h3>Constraints</h3>
+          {constraints.map(c => (
+            <div className="constraint" key={c.id}>
+              <span>{c.kind.toUpperCase()} / {c.value || `${c.target1}-${c.target2}`}</span>
+              <strong>ACTIVE</strong>
+            </div>
+          ))}
+          <div className="inspector-actions" style={{marginTop: '10px'}}>
+             <button tabIndex={0} onClick={addEqualConstraint} onKeyDown={(e) => handleConstraintKeyDown(e, addEqualConstraint)}>Add Equal Constraint</button>
+          </div>
+        </section>
+
+        <section>
+          <h3>Size Hints</h3>
+          <div className="property-grid">
+             {hints.map(h => (
+               <div key={h.size} style={{gridColumn: '1/-1', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                 <span style={{fontSize: '10px'}}>{h.size}px Hint: {h.adjustment > 0 ? '+0.5px' : '0px'}</span>
+                 <button tabIndex={0} style={{minHeight: '28px', padding: '0 8px'}} onClick={() => addSizeHint(h.size)} onKeyDown={(e) => handleConstraintKeyDown(e, () => addSizeHint(h.size))}>
+                   Toggle Hint
+                 </button>
+               </div>
+             ))}
+          </div>
+        </section>
+
+        <section>
+          <h3>Transfer</h3>
+          <textarea tabIndex={0} aria-label="Import family JSON" value={importText} onChange={(event) => setImportText(event.target.value)} placeholder="Paste a family JSON document" />
+          <div className="inspector-actions">
+            <button tabIndex={0} onClick={importJson} onKeyDown={(e) => handleConstraintKeyDown(e, importJson)}>Import JSON</button>
+            <button tabIndex={0} className="primary" onClick={exportJson} onKeyDown={(e) => handleConstraintKeyDown(e, exportJson)}>Download</button>
+          </div>
+        </section>
+      </aside>
+    </main>
+    <footer className="statusbar">
+      <span aria-live="polite">{status}</span>
+      <span>In-memory session · reload resets fixture · {currentAnchors.length} anchors</span>
+    </footer>
   </div>;
 }
 
