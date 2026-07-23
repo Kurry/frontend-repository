@@ -50,10 +50,7 @@ export default function FileQueueTable() {
   const handleRemoveSelected = () => {
     const count = selectedIds().size;
     if (count === 0) return;
-    const confirmed = window.confirm(
-      `Remove ${count} selected file${count === 1 ? "" : "s"} from the queue? This cannot be undone.`,
-    );
-    if (!confirmed) return;
+
     removeSelectedFiles(Array.from(selectedIds()));
     setSelectedIds(new Set());
   };
@@ -156,13 +153,7 @@ export default function FileQueueTable() {
           <tr class="text-slate-500 border-b border-slate-200 dark:border-slate-700">
             <th class="py-2 w-8 text-center">
               <label class="sr-only">Select All</label>
-              <input
-                type="checkbox"
-                class="rounded border-slate-300 text-sky-600 focus:ring-sky-500"
-                checked={isAllSelected()}
-                onChange={toggleSelectAll}
-                data-testid="select-all-checkbox"
-              />
+              <label class="sr-only" for="select-all-checkbox">Select All</label><input id="select-all-checkbox" type="checkbox" class="rounded border-slate-300 text-sky-600 focus:ring-sky-500" checked={isAllSelected()} onChange={toggleSelectAll} data-testid="select-all-checkbox" aria-label="Select All" />
             </th>
             <th class="py-2 w-8"></th>{/* Drag handle */}
             <th class="py-2 font-medium">Name</th>
