@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { createForm } from '@tanstack/solid-form';
 import { drawAnnotation, applyBlurEffect, applyPixelateEffect, applySpotlightEffect } from './canvas';
 import { registerWebMcp } from './webmcp';
+import { IconRectangle, IconOvalVertical, IconLine, IconArrowRight, IconTypography, IconBlur, IconGridDots, IconFocusCentered, IconZoomIn, IconHighlight, IconClipboardList, IconPhoto } from "@tabler/icons-solidjs";
 
 const COLOR_SWATCHES = [
   '#FF0000', '#FF6600', '#FFCC00', '#00CC00', '#0066FF', '#9900CC',
@@ -134,7 +135,7 @@ function serializeAnnotation(ann: Annotation): Record<string, unknown> {
 function ToolButton(props: { 
   tool: ToolType; 
   label: string; 
-  icon: string; 
+  icon: any;
   activeTool: ToolType; 
   onClick: () => void;
 }) {
@@ -143,7 +144,7 @@ function ToolButton(props: {
     <button
       class={`tool-button flex flex-col items-center justify-center gap-0.5 px-1 py-1.5 lg:py-1 rounded-lg
         transition-all duration-150 min-w-[52px] min-h-[52px] lg:min-w-0 lg:min-h-0 text-[11px] font-medium
-        focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]
         ${isActive()
           ? 'bg-[var(--color-accent)] text-white shadow-lg hover:brightness-110 hover:shadow-xl'
           : 'bg-transparent text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] hover:text-[var(--color-text-primary)]'
@@ -153,9 +154,9 @@ function ToolButton(props: {
       aria-label={props.label}
       aria-pressed={isActive()}
     >
-      <span class="text-base lg:text-sm leading-none" aria-hidden="true">{isActive() ? '✓' : ''}{props.icon}</span>
+      <span class="text-base lg:text-sm leading-none flex items-center gap-1" aria-hidden="true">{typeof props.icon === "string" ? (isActive() ? "✓" : "") + props.icon : <props.icon size={16} />}</span>
       <span class="hidden lg:block text-[8px] leading-[1.05] text-center">{props.label.split(' ').slice(-1)[0]}</span>
-      <span class="lg:hidden text-[10px] leading-tight">{props.label}</span>
+      <span class="lg:hidden text-xs leading-tight">{props.label}</span>
     </button>
   );
 }
@@ -164,7 +165,7 @@ function ColorSwatch(props: { color: string; active: boolean; onClick: () => voi
   return (
     <button
       class={`color-swatch w-12 h-12 rounded-md border-2 transition-all duration-150
-        focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]
         ${props.active ? 'border-white scale-110 shadow-lg hover:brightness-110 hover:scale-[1.15]' : 'border-transparent hover:border-[var(--color-border)] hover:scale-105'}`}
       style={{ 'background-color': props.color }}
       onClick={props.onClick}
@@ -245,7 +246,7 @@ function LayerRow(props: {
           {props.annotation.type === 'text' && props.annotation.text ? `: "${props.annotation.text.slice(0, 15)}"` : ''}
         </span>
         <button
-          class="layer-action text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border)]"
+          class="layer-action text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
           onClick={(e) => { e.stopPropagation(); props.onMove(-1); }}
           disabled={props.index === 0}
           aria-label={`Move ${typeLabel()} up`}
@@ -254,7 +255,7 @@ function LayerRow(props: {
           ↑
         </button>
         <button
-          class="layer-action text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border)]"
+          class="layer-action text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
           onClick={(e) => { e.stopPropagation(); props.onMove(1); }}
           disabled={props.index === props.count - 1}
           aria-label={`Move ${typeLabel()} down`}
@@ -264,7 +265,7 @@ function LayerRow(props: {
         </button>
         <button
           class="layer-action text-red-300 hover:text-red-100 hover:bg-red-500/20
-            focus:outline-none focus:ring-1 focus:ring-red-400"
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
           onClick={(e) => { e.stopPropagation(); props.onDelete(); }}
           aria-label={`Delete ${typeLabel()}`}
           title={`Delete ${typeLabel()}`}
@@ -1309,7 +1310,7 @@ export default function App() {
               placeholder="Snapshot name"
               value={snapshotNameValue()}
               onInput={(e) => { setSnapshotNameValue(e.currentTarget.value); if (snapshotNameError()) setSnapshotNameError(''); }}
-              class={`bg-transparent text-sm text-[var(--color-text-primary)] px-2 py-0.5 w-32 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] rounded ${snapshotShownError() ? 'border border-red-500' : ''}`}
+              class={`bg-transparent text-sm text-[var(--color-text-primary)] px-2 py-0.5 w-32 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] rounded ${snapshotShownError() ? 'border border-red-500' : ''}`}
               aria-label="Snapshot name"
               aria-invalid={!!snapshotShownError()}
               aria-describedby={snapshotShownError() ? 'snapshot-name-error' : undefined}
@@ -1323,7 +1324,7 @@ export default function App() {
               Save snapshot
             </button>
             <Show when={snapshotShownError()}>
-              <p id="snapshot-name-error" class="absolute left-0 top-full mt-1 z-50 whitespace-nowrap rounded-md border border-red-500 bg-[var(--color-surface)] px-2 py-1 text-[10px] text-red-400" role="alert" aria-live="polite">{snapshotShownError()}</p>
+              <p id="snapshot-name-error" class="absolute left-0 top-full mt-1 z-50 whitespace-nowrap rounded-md border border-red-500 bg-[var(--color-surface)] px-2 py-1 text-xs text-red-400" role="alert" aria-live="polite">{snapshotShownError()}</p>
             </Show>
           </form>
 
@@ -1363,7 +1364,7 @@ export default function App() {
           <button
             class="px-4 py-1.5 rounded-lg text-sm font-semibold bg-[var(--color-primary)] text-white 
               hover:bg-blue-700 transition-all duration-150
-              focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
             onClick={handleExportPNG}
             aria-label="Export PNG"
           >
@@ -1381,11 +1382,11 @@ export default function App() {
 
           {/* Shapes section */}
           <div class="tool-section flex flex-row lg:grid lg:grid-cols-2 gap-1 flex-shrink-0">
-            <h2 class="toolbar-heading hidden lg:block col-span-2 text-[10px] font-semibold uppercase text-[var(--color-text-secondary)] tracking-wider px-0.5">Shapes</h2>
-            <ToolButton tool="rectangle" label="Draw rectangle" icon="▭" activeTool={state.activeTool} onClick={() => activateTool('rectangle')} />
-            <ToolButton tool="oval" label="Draw oval" icon="◯" activeTool={state.activeTool} onClick={() => activateTool('oval')} />
-            <ToolButton tool="line" label="Draw line" icon="╱" activeTool={state.activeTool} onClick={() => activateTool('line')} />
-            <ToolButton tool="arrow" label="Draw arrow" icon="➜" activeTool={state.activeTool} onClick={() => activateTool('arrow')} />
+            <h2 class="toolbar-heading hidden lg:block col-span-2 text-xs font-semibold uppercase text-[var(--color-text-secondary)] tracking-wider px-0.5">Shapes</h2>
+            <ToolButton tool="rectangle" label="Draw rectangle" icon={IconRectangle} activeTool={state.activeTool} onClick={() => activateTool('rectangle')} />
+            <ToolButton tool="oval" label="Draw oval" icon={IconOvalVertical} activeTool={state.activeTool} onClick={() => activateTool('oval')} />
+            <ToolButton tool="line" label="Draw line" icon={IconLine} activeTool={state.activeTool} onClick={() => activateTool('line')} />
+            <ToolButton tool="arrow" label="Draw arrow" icon={IconArrowRight} activeTool={state.activeTool} onClick={() => activateTool('arrow')} />
           </div>
 
           <div class="hidden lg:block w-full h-px bg-[var(--color-border)] flex-shrink-0" />
@@ -1393,13 +1394,13 @@ export default function App() {
 
           {/* Effects section */}
           <div class="tool-section flex flex-row lg:grid lg:grid-cols-2 gap-1 flex-shrink-0">
-            <h2 class="toolbar-heading hidden lg:block col-span-2 text-[10px] font-semibold uppercase text-[var(--color-text-secondary)] tracking-wider px-0.5">Effects</h2>
-            <ToolButton tool="text" label="Add text" icon="T" activeTool={state.activeTool} onClick={() => activateTool('text')} />
-            <ToolButton tool="blur" label="Apply blur" icon="◌" activeTool={state.activeTool} onClick={() => activateTool('blur')} />
-            <ToolButton tool="pixelate" label="Apply pixelate" icon="▦" activeTool={state.activeTool} onClick={() => activateTool('pixelate')} />
-            <ToolButton tool="spotlight" label="Apply spotlight" icon="◎" activeTool={state.activeTool} onClick={() => activateTool('spotlight')} />
-            <ToolButton tool="loupe" label="Add loupe" icon="🔍" activeTool={state.activeTool} onClick={() => activateTool('loupe')} />
-            <ToolButton tool="highlighter" label="Add highlighter" icon="▬" activeTool={state.activeTool} onClick={() => activateTool('highlighter')} />
+            <h2 class="toolbar-heading hidden lg:block col-span-2 text-xs font-semibold uppercase text-[var(--color-text-secondary)] tracking-wider px-0.5">Effects</h2>
+            <ToolButton tool="text" label="Add text" icon={IconTypography} activeTool={state.activeTool} onClick={() => activateTool('text')} />
+            <ToolButton tool="blur" label="Apply blur" icon={IconBlur} activeTool={state.activeTool} onClick={() => activateTool('blur')} />
+            <ToolButton tool="pixelate" label="Apply pixelate" icon={IconGridDots} activeTool={state.activeTool} onClick={() => activateTool('pixelate')} />
+            <ToolButton tool="spotlight" label="Apply spotlight" icon={IconFocusCentered} activeTool={state.activeTool} onClick={() => activateTool('spotlight')} />
+            <ToolButton tool="loupe" label="Add loupe" icon={IconZoomIn} activeTool={state.activeTool} onClick={() => activateTool('loupe')} />
+            <ToolButton tool="highlighter" label="Add highlighter" icon={IconHighlight} activeTool={state.activeTool} onClick={() => activateTool('highlighter')} />
           </div>
 
           <div class="hidden lg:block w-full h-px bg-[var(--color-border)] flex-shrink-0" />
@@ -1407,7 +1408,7 @@ export default function App() {
 
           {/* Style section */}
           <div class="tool-section flex flex-col gap-1 flex-shrink-0 w-full lg:w-auto">
-            <h2 class="toolbar-heading hidden lg:block text-[10px] font-semibold uppercase text-[var(--color-text-secondary)] tracking-wider px-0.5">Style</h2>
+            <h2 class="toolbar-heading hidden lg:block text-xs font-semibold uppercase text-[var(--color-text-secondary)] tracking-wider px-0.5">Style</h2>
 
             {/* Color swatches */}
             <div class="flex flex-row lg:grid lg:grid-cols-3 gap-1 flex-wrap">
@@ -1441,8 +1442,8 @@ export default function App() {
             <div class="grid grid-cols-3 gap-1">
               {(['thin', 'medium', 'thick'] as StrokeWidth[]).map((sw) => (
                 <button
-                  class={`stroke-button compact px-1 py-1 rounded text-[10px] font-medium transition-all duration-150
-                    focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]
+                  class={`stroke-button compact px-1 py-1 rounded text-xs font-medium transition-all duration-150
+                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]
                     ${state.activeStrokeWidth === sw
                       ? 'bg-[var(--color-accent)] text-white hover:brightness-110'
                       : 'bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]'}`}
@@ -1461,7 +1462,7 @@ export default function App() {
             {/* Copy / Paste Style */}
             <div class="grid grid-cols-2 gap-1">
               <button
-                class="compact px-1 py-1 rounded text-[10px] font-medium transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)] disabled:opacity-50 disabled:cursor-not-allowed"
+                class="compact px-1 py-1 rounded text-xs font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)] disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={() => { store.copyStyle(); announce('Style copied'); }}
                 disabled={!state.selectedAnnotationId}
                 aria-label="Copy style"
@@ -1469,7 +1470,7 @@ export default function App() {
                 Copy
               </button>
               <button
-                class="compact px-1 py-1 rounded text-[10px] font-medium transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)] disabled:opacity-50 disabled:cursor-not-allowed"
+                class="compact px-1 py-1 rounded text-xs font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)] disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={() => { store.pasteStyle(); announce('Style pasted'); setTimeout(() => renderFullCanvas(), 20); }}
                 disabled={!state.copiedStyleBuffer || !state.selectedAnnotationId}
                 aria-label="Paste style"
@@ -1484,10 +1485,10 @@ export default function App() {
 
           {/* Presets section */}
           <div class="tool-section flex flex-col gap-1 flex-shrink-0 w-full lg:w-auto">
-            <h2 class="toolbar-heading hidden lg:block text-[10px] font-semibold uppercase text-[var(--color-text-secondary)] tracking-wider px-0.5">Presets</h2>
+            <h2 class="toolbar-heading hidden lg:block text-xs font-semibold uppercase text-[var(--color-text-secondary)] tracking-wider px-0.5">Presets</h2>
 
             <button
-              class="preset-button compact px-1 py-1 rounded text-[10px] font-medium leading-tight transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]"
+              class="preset-button compact px-1 py-1 rounded text-xs font-medium leading-tight transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]"
               onClick={() => {
                 if (!state.imageDataUrl) return;
                 const width = state.imageWidth;
@@ -1511,7 +1512,7 @@ export default function App() {
             </button>
 
             <button
-              class="preset-button compact px-1 py-1 rounded text-[10px] font-medium leading-tight transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]"
+              class="preset-button compact px-1 py-1 rounded text-xs font-medium leading-tight transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]"
               onClick={() => {
                 if (!state.imageDataUrl) return;
                 const width = state.imageWidth;
@@ -1545,7 +1546,7 @@ export default function App() {
             </button>
 
             <button
-              class="preset-button compact px-1 py-1 rounded text-[10px] font-medium leading-tight transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]"
+              class="preset-button compact px-1 py-1 rounded text-xs font-medium leading-tight transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]"
               onClick={() => {
                 if (!state.imageDataUrl) return;
                 const width = state.imageWidth;
@@ -1568,7 +1569,7 @@ export default function App() {
             </button>
 
             <button
-              class="preset-button compact px-1 py-1 rounded text-[10px] font-medium leading-tight transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]"
+              class="preset-button compact px-1 py-1 rounded text-xs font-medium leading-tight transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]"
               onClick={() => {
                 if (!state.imageDataUrl) return;
                 const width = state.imageWidth;
@@ -1615,7 +1616,7 @@ export default function App() {
                 }
               }}
             >
-              <div class="text-5xl sm:text-6xl" aria-hidden="true">🖼️</div>
+              <div class="text-5xl sm:text-6xl text-[var(--color-text-secondary)] flex justify-center mb-4" aria-hidden="true"><IconPhoto size={64} /></div>
               <div class="text-center">
                 <h2 class="text-lg sm:text-xl font-semibold text-[var(--color-text-primary)] mb-2">
                   Drop an image here
@@ -1628,15 +1629,15 @@ export default function App() {
                 <button
                   class="px-6 py-2.5 rounded-lg bg-[var(--color-primary)] text-white font-semibold
                     hover:bg-blue-700 transition-all duration-150
-                    focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
                   onClick={(e) => { e.stopPropagation(); handleDropZoneClick(); }}
                 >
                   Choose image
                 </button>
                 <button
                   class="px-6 py-2.5 rounded-lg bg-[var(--color-surface)] text-[var(--color-text-primary)] font-semibold
-                    border border-[var(--color-border)] hover:bg-[var(--color-border)] transition-all duration-150
-                    focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                    border border-[var(--color-border)] hover:bg-[var(--color-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] transition-all duration-150
+                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
                   onClick={(e) => { e.stopPropagation(); loadSampleImage(); }}
                 >
                   Try sample image
@@ -1718,7 +1719,7 @@ export default function App() {
                       }}
                       class="bg-[var(--color-bg)] text-[var(--color-text-primary)] px-3 py-1.5 rounded-md 
                         border border-[var(--color-border)] text-sm w-48
-                        focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
                       placeholder="Enter text..."
                       aria-label="Text annotation input"
                     />
@@ -1751,11 +1752,11 @@ export default function App() {
               <Show when={state.activeTool === 'text'}>
                 <div class="absolute bottom-2 left-2 bg-[var(--color-surface)]/95 backdrop-blur-sm border border-[var(--color-border)] rounded-lg p-2 shadow-lg z-40">
                   <div class="flex items-center gap-1.5 flex-wrap">
-                    <span class="text-[10px] font-semibold text-[var(--color-text-secondary)]">Style:</span>
+                    <span class="text-xs font-semibold text-[var(--color-text-secondary)]">Style:</span>
                     <For each={TEXT_STYLES}>
                       {(style) => (
                         <button
-                          class={`px-2 py-1 rounded text-[10px] font-medium transition-all duration-150
+                          class={`px-2 py-1 rounded text-xs font-medium transition-all duration-150
                             ${state.activeTextStyle === style.value 
                               ? 'bg-[var(--color-accent)] text-white' 
                               : 'bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'}`}
@@ -1765,7 +1766,7 @@ export default function App() {
                         </button>
                       )}
                     </For>
-                    <span class="text-[10px] font-semibold text-[var(--color-text-secondary)] ml-2">Size:</span>
+                    <span class="text-xs font-semibold text-[var(--color-text-secondary)] ml-2">Size:</span>
                     <input
                       type="range"
                       min="10"
@@ -1783,7 +1784,7 @@ export default function App() {
                       class="w-16 accent-[var(--color-accent)]"
                       aria-label="Font size"
                     />
-                    <span class="text-[10px] text-[var(--color-text-secondary)] min-w-[24px]">{state.activeFontSize}px</span>
+                    <span class="text-xs text-[var(--color-text-secondary)] min-w-[24px]">{state.activeFontSize}px</span>
                   </div>
                 </div>
               </Show>
@@ -1795,7 +1796,7 @@ export default function App() {
         <aside class="layer-panel w-full lg:w-64 xl:w-72 bg-[var(--color-surface)] border-t lg:border-t-0 lg:border-l border-[var(--color-border)] 
           flex-shrink-0 flex flex-col max-h-[280px] lg:max-h-none overflow-hidden">
           <div class="px-4 py-3 border-b border-[var(--color-border)] flex-shrink-0">
-            <h2 class="text-base font-bold text-[var(--color-text-primary)]">Layers</h2>
+            <h2 class="text-xs font-semibold text-[var(--color-text-primary)]">Layers</h2>
           </div>
           
           <div class="flex-1 overflow-y-auto p-2 space-y-1" role="list" aria-label="Annotation layers" ref={(el) => {
@@ -1808,7 +1809,7 @@ export default function App() {
           }}>
             <Show when={state.annotations.length > 0} fallback={
               <div class="flex flex-col items-center justify-center py-8 text-[var(--color-text-secondary)]">
-                <span class="text-2xl mb-2">📋</span>
+                <span class="text-[var(--color-text-secondary)] mb-2"><IconClipboardList size={24} /></span>
                 <p class="text-sm text-center px-4">No annotations yet.<br/>Use the tools to start annotating!</p>
               </div>
             }>
@@ -1863,9 +1864,9 @@ export default function App() {
 
           {/* History Panel */}
           <section class="history-panel border-t border-[var(--color-border)] p-3 flex-shrink-0 max-h-40 overflow-y-auto" aria-labelledby="history-heading">
-            <h3 id="history-heading" class="text-xs font-bold text-[var(--color-text-primary)] mb-2">History</h3>
+            <h3 id="history-heading" class="text-xs font-semibold text-[var(--color-text-primary)] mb-2">History</h3>
             <Show when={state.history.length > 0} fallback={
-              <p class="text-[10px] text-[var(--color-text-secondary)] text-center py-2">History is empty. Actions will appear here.</p>
+              <p class="text-xs text-[var(--color-text-secondary)] text-center py-2">History is empty. Actions will appear here.</p>
             }>
               <ul class="space-y-1">
                 <For each={state.history}>
@@ -1873,7 +1874,7 @@ export default function App() {
                     <li>
                       <button
                         type="button"
-                        class="history-entry w-full text-left text-[10px] text-[var(--color-text-secondary)] truncate hover:text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] rounded"
+                        class="history-entry w-full text-left text-xs text-[var(--color-text-secondary)] truncate hover:text-[var(--color-text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] rounded"
                         onClick={() => {
                           store.restoreHistoryEntry(entry.id);
                           announce(`Restored: ${entry.action}`);
@@ -1891,9 +1892,9 @@ export default function App() {
 
           {/* Versions Panel */}
           <section class="versions-panel border-t border-[var(--color-border)] p-3 flex-shrink-0 max-h-56 overflow-y-auto" aria-labelledby="versions-heading">
-            <h3 id="versions-heading" class="text-xs font-bold text-[var(--color-text-primary)] mb-2">Versions</h3>
+            <h3 id="versions-heading" class="text-xs font-semibold text-[var(--color-text-primary)] mb-2">Versions</h3>
             <Show when={state.versions.length > 0} fallback={
-              <p class="text-[10px] text-[var(--color-text-secondary)] text-center py-2">No versions saved. Save a snapshot to see it here.</p>
+              <p class="text-xs text-[var(--color-text-secondary)] text-center py-2">No versions saved. Save a snapshot to see it here.</p>
             }>
               <ul class="space-y-1" ref={(el) => {
                 if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -1904,14 +1905,14 @@ export default function App() {
               }}>
                 <For each={state.versions}>
                   {(snapshot) => (
-                    <li class="flex items-center justify-between text-[10px] text-[var(--color-text-secondary)]">
+                    <li class="flex items-center justify-between text-xs text-[var(--color-text-secondary)]">
                       <span class="truncate max-w-[100px]">{snapshot.name}</span>
                       <div class="flex gap-1">
-                        <button class="px-1.5 py-0.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded hover:text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]" onClick={() => {
+                        <button class="px-1.5 py-0.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded hover:text-[var(--color-text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]" onClick={() => {
                           store.restoreSnapshot(snapshot.id);
                           setTimeout(() => renderFullCanvas(), 20);
                         }}>Restore</button>
-                        <button class="px-1.5 py-0.5 text-red-400 hover:text-red-300 focus:outline-none focus:ring-1 focus:ring-red-400" onClick={() => store.deleteSnapshot(snapshot.id)}>Delete</button>
+                        <button class="px-1.5 py-0.5 text-red-400 hover:text-red-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400" onClick={() => store.deleteSnapshot(snapshot.id)}>Delete</button>
                       </div>
                     </li>
                   )}
@@ -1939,7 +1940,7 @@ export default function App() {
                   const shownError = field().state.meta.errors[0]?.message || derivedError;
                   return (
                   <div class="mb-2">
-                    <label class="text-[10px] text-[var(--color-text-secondary)] block mb-1" for={field().name}>Project name</label>
+                    <label class="text-xs text-[var(--color-text-secondary)] block mb-1" for={field().name}>Project name</label>
                     <div class="flex gap-2 mb-1">
                       <input
                         id={field().name}
@@ -1947,21 +1948,21 @@ export default function App() {
                         value={field().state.value}
                         onInput={(e) => field().handleChange(e.target.value)}
                         onBlur={field().handleBlur}
-                        class={`project-name-input flex-1 min-w-0 bg-[var(--color-bg)] text-[var(--color-text-primary)] text-xs px-2 rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] ${shownError ? 'border border-red-500' : ''}`}
+                        class={`project-name-input flex-1 min-w-0 bg-[var(--color-bg)] text-[var(--color-text-primary)] text-xs px-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] ${shownError ? 'border border-red-500' : ''}`}
                         placeholder="Annotation project"
                         aria-invalid={!!shownError}
                         aria-describedby={shownError ? 'project-name-error' : undefined}
                       />
                       <button
                         type="submit"
-                        class="project-action bg-[var(--color-primary)] text-white rounded-md px-2 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={trimmed.length === 0 || tooLong}
+                        class="project-action bg-[var(--color-primary)] text-white rounded-md px-2 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={trimmed.length === 0 || tooLong || !!shownError}
                       >
                         Save project
                       </button>
                     </div>
                     <Show when={shownError}>
-                      <div id="project-name-error" class="text-[10px] text-red-400 mt-0.5" role="alert" aria-live="polite">
+                      <div id="project-name-error" class="text-xs text-red-400 mt-0.5" role="alert" aria-live="polite">
                         {shownError}
                       </div>
                     </Show>
@@ -2067,7 +2068,7 @@ export default function App() {
             </div>
             
             <div class="mb-2">
-              <label class="text-[10px] text-[var(--color-text-secondary)] block mb-1" for="shared-editor">Shared editor</label>
+              <label class="text-xs text-[var(--color-text-secondary)] block mb-1" for="shared-editor">Shared editor</label>
               <textarea
                 id="shared-editor"
                 value={sharedContent()}
@@ -2082,14 +2083,14 @@ export default function App() {
                 }}
                 class="w-full h-16 bg-[var(--color-bg)] text-[var(--color-text-primary)] text-xs px-2 py-1.5 rounded-md 
                   form-control-border border resize-none
-                  focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
                 placeholder="Type shared content..."
                 aria-label="Shared editor"
               />
             </div>
 
             <div class="mb-2">
-              <label class="text-[10px] text-[var(--color-text-secondary)] block mb-1" for="remote-editor">Remote editor</label>
+              <label class="text-xs text-[var(--color-text-secondary)] block mb-1" for="remote-editor">Remote editor</label>
               <textarea
                 id="remote-editor"
                 value={remoteContent()}
@@ -2121,18 +2122,18 @@ export default function App() {
             </div>
             
             <div class="bg-[var(--color-bg)] rounded-md p-2">
-              <label class="text-[10px] text-[var(--color-text-secondary)] block mb-1">Shared content</label>
+              <label class="text-xs text-[var(--color-text-secondary)] block mb-1">Shared content</label>
               <p class="text-xs text-[var(--color-text-primary)] break-words">
                 {sharedContentMerged() || sharedContent() || '(empty)'}
               </p>
               <Show when={mergeConflict()}>
-                <div class="mt-1 p-1.5 bg-yellow-900/30 rounded text-[10px]">
+                <div class="mt-1 p-1.5 bg-yellow-900/30 rounded text-xs">
                   <p class="text-yellow-400 font-medium">Conflict detected</p>
                   <p class="text-[var(--color-text-secondary)] mt-0.5">Local: {mergeConflict()!.local || '(empty)'}</p>
                   <p class="text-[var(--color-text-secondary)]">Remote: {mergeConflict()!.remote || '(empty)'}</p>
                   <div class="flex gap-1 mt-1">
                     <button 
-                      class="px-2 py-0.5 bg-yellow-600 text-white text-[10px] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                      class="px-2 py-0.5 bg-yellow-600 text-white text-xs rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
                       onClick={() => {
                         setSharedContentMerged(mergeConflict()!.local);
                         setMergeConflict(null);
@@ -2141,7 +2142,7 @@ export default function App() {
                       aria-label="Keep local"
                     >Keep local</button>
                     <button 
-                      class="px-2 py-0.5 bg-yellow-600 text-white text-[10px] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                      class="px-2 py-0.5 bg-yellow-600 text-white text-xs rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
                       onClick={() => {
                         setSharedContent(mergeConflict()!.remote);
                         setSharedContentMerged(mergeConflict()!.remote);
@@ -2151,7 +2152,7 @@ export default function App() {
                       aria-label="Keep remote"
                     >Keep remote</button>
                     <button 
-                      class="px-2 py-0.5 bg-green-600 text-white text-[10px] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                      class="px-2 py-0.5 bg-green-600 text-white text-xs rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
                       onClick={() => {
                         setSharedContentMerged(combineChanges(mergeConflict()!.local, mergeConflict()!.remote));
                         setMergeConflict(null);
@@ -2163,12 +2164,12 @@ export default function App() {
                 </div>
               </Show>
               <Show when={state.collaborationState === 'offline' && !mergeConflict()}>
-                <p class="text-[10px] text-yellow-400 mt-1" role="status" aria-live="polite">
+                <p class="text-xs text-yellow-400 mt-1" role="status" aria-live="polite">
                   Offline — {state.offlineQueue.length} pending change{state.offlineQueue.length === 1 ? '' : 's'} will sync when you go online
                 </p>
               </Show>
               <Show when={state.collaborationState === 'syncing'}>
-                <p class="text-[10px] text-green-400 mt-1 animate-pulse motion-reduce:animate-none">
+                <p class="text-xs text-green-400 mt-1 animate-pulse motion-reduce:animate-none">
                   Syncing...
                 </p>
               </Show>
