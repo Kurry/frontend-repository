@@ -180,12 +180,12 @@ export const useAppStore = create((set, get) => ({
     get().refreshExport()
   },
   undo: () => {
-    const state = get(); const entry = state.undoStack.at(-1)
+    const state = get(); const entry = state.undoStack.filter(e => e.trialId === state.activeTrialId).at(-1)
     if (!entry) return false
     set({
       annotationsByTrial: { ...state.annotationsByTrial, [entry.trialId]: entry.before.annotations },
       reportsByTrial: { ...state.reportsByTrial, [entry.trialId]: entry.before.report },
-      undoStack: state.undoStack.slice(0, -1), redoStack: [...state.redoStack, entry],
+      undoStack: state.undoStack.filter(e => e !== entry), redoStack: [...state.redoStack, entry],
     })
     get().refreshExport(); return true
   },
