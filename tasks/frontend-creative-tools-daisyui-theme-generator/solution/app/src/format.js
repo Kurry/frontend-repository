@@ -5,7 +5,11 @@ import {
   BORDER_VALUES, FONT_FAMILIES, FIELD_HEIGHT, SELECTOR_SIZE,
 } from './data.js';
 
-export const NAME_RE = /^[a-z][a-z0-9_-]*$/;
+// Display-name shape shared by create, rename, import, and the hash codec.
+// Human-readable names like 'Cosmos Dawn' are accepted; every exported
+// artifact (CSS data-theme, JSON name, Config identifier) uses slugOf(name),
+// which always matches ^[a-z][a-z0-9_-]*$.
+export const NAME_RE = /^[A-Za-z][A-Za-z0-9 _-]*$/;
 
 export function slugOf(name) {
   return String(name).trim().toLowerCase().replace(/\s+/g, '-');
@@ -44,7 +48,8 @@ export function toJSON(theme) {
     radius: { box: theme.radius.box, field: theme.radius.field, selector: theme.radius.selector },
     size: { field: theme.size.field, selector: theme.size.selector },
     border: theme.border,
-    effects: { depth: theme.depth === 1, noise: theme.noise === 1 },
+    depth: theme.depth === 1 ? 1 : 0,
+    noise: theme.noise === 1 ? 1 : 0,
     fontFamily: fontContractValue(theme.fontFamily),
     options: {
       defaultTheme: !!theme.options.defaultTheme,
@@ -91,7 +96,7 @@ export function validateDeclaredTheme(text) {
   if (typeof doc !== 'object' || doc === null || Array.isArray(doc)) {
     return { ok: false, errors: ['Payload must be a JSON object matching the declared-theme contract'] };
   }
-  const known = new Set(['name', 'colors', 'radius', 'size', 'border', 'effects', 'fontFamily', 'options', 'generatedAt']);
+  const known = new Set(['name', 'colors', 'radius', 'size', 'border', 'depth', 'noise', 'fontFamily', 'options', 'generatedAt']);
   for (const key of Object.keys(doc)) {
     if (!known.has(key)) errors.push(`Unexpected key '${key}' is not part of the declared-theme contract`);
   }
@@ -100,7 +105,7 @@ export function validateDeclaredTheme(text) {
   } else {
     const t = doc.name.trim();
     if (t.length < 2 || t.length > 30) errors.push(`name must be 2-30 characters (got ${t.length})`);
-    else if (!NAME_RE.test(t)) errors.push('name must start with a lowercase letter and use only lowercase letters, numbers, hyphens, or underscores');
+    else if (!NAME_RE.test(t)) errors.push('name must start with a letter and use only letters, numbers, spaces, hyphens, or underscores');
   }
   const colors = {};
   if (typeof doc.colors !== 'object' || doc.colors === null || Array.isArray(doc.colors)) {
@@ -136,14 +141,10 @@ export function validateDeclaredTheme(text) {
   else border = doc.border;
   let depth = 1;
   let noise = 0;
-  if (typeof doc.effects !== 'object' || doc.effects === null) {
-    errors.push('effects is required (object with boolean depth and noise)');
-  } else {
-    if (typeof doc.effects.depth !== 'boolean') errors.push('effects.depth must be a boolean');
-    else depth = doc.effects.depth ? 1 : 0;
-    if (typeof doc.effects.noise !== 'boolean') errors.push('effects.noise must be a boolean');
-    else noise = doc.effects.noise ? 1 : 0;
-  }
+  if (typeof doc.depth !== 'number' || (doc.depth !== 0 && doc.depth !== 1)) errors.push('depth must be 0 or 1');
+  else depth = doc.depth;
+  if (typeof doc.noise !== 'number' || (doc.noise !== 0 && doc.noise !== 1)) errors.push('noise must be 0 or 1');
+  else noise = doc.noise;
   let fontFamily = 'outfit';
   const declaredFont = FONT_FAMILIES.find((f) => f.contract === doc.fontFamily);
   if (!declaredFont) {
@@ -248,7 +249,10 @@ function fromB64url(s) {
 }
 
 export function encodeThemeHash(theme) {
-  const payload = JSON.stringify(toJSON(theme));
+  // The hash payload is the declared-theme contract object, except name keeps
+  // the human-readable display name so a shared URL restores it verbatim
+  // (exports keep the slug via toJSON).
+  const payload = JSON.stringify({ ...toJSON(theme), name: String(theme.name).trim() });
   return toB64url(lzwEncode(payload));
 }
 
