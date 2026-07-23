@@ -132,7 +132,7 @@ const tools = [
         name: 'artifact.export',
         description: 'Export a declared blocking-score artifact through the visible Export control.',
         inputSchema: objectSchema({ format: { type: 'string', enum: exportFormats } }, ['format']),
-        execute: ({ format }) => { document.querySelector('button:nth-of-type(2)')?.click(); return { ok: true, format, visible: 'export-control' }; },
+        execute: ({ format }) => { document.querySelector('[data-action="export"]')?.click(); return { ok: true, format, visible: 'export-control' }; },
     },
     {
         name: 'artifact.import',

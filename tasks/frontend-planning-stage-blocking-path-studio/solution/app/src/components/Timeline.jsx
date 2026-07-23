@@ -1,62 +1,13 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { useStore } from '../store';
 
-export const Timeline = () => {
-    const { fixture, currentBeat, setBeat, score, activeTool, addRehearsalEvent } = useStore();
-    const branch = score.branches[score.activeBranch];
-
-    // Check if empty collection
-    const isEmpty = Object.keys(branch.waypoints).length === 0;
-
-    const handleRehearsalAction = (action) => {
-        addRehearsalEvent({ id: `rehearsal-${Date.now()}`, beat: currentBeat, status: action, at: new Date().toISOString() });
-        if (action === 'restart') setBeat(1);
-        if (action === 'advance') setBeat(Math.min(fixture.totalBeats, currentBeat + 1));
-    };
-
-    return (
-        <div className="w-full bg-white border-t border-gray-200 p-4 h-48 overflow-y-auto overflow-x-auto flex-shrink-0">
-            <div className="flex items-center justify-between mb-2">
-                <h2 className="font-semibold text-lg">Beat Timeline</h2>
-
-                {activeTool === 'rehearsal' && (
-                    <div className="flex gap-2 bg-gray-100 p-1 rounded-md">
-                        {['start', 'pause', 'advance', 'stop', 'restart'].map(action => (
-                            <button
-                                key={action}
-                                onClick={() => handleRehearsalAction(action)}
-                                className="min-h-[44px] px-3 py-1 bg-white border border-gray-300 rounded shadow-sm text-sm hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 capitalize"
-                            >
-                                {action}
-                            </button>
-                        ))}
-                    </div>
-                )}
-            </div>
-
-            {isEmpty && (
-                <div className="text-gray-500 italic mb-2">
-                    No waypoints added yet. Select a tool above to start placing actors.
-                </div>
-            )}
-
-            <div className="flex flex-col gap-2 w-full overflow-x-auto">
-                <div className="flex items-center gap-2 pb-4 min-w-max">
-                    {Array.from({ length: fixture.totalBeats }).map((_, i) => {
-                        const beat = i + 1;
-                        const isCurrent = currentBeat === beat;
-                        return (
-                            <button
-                                key={beat}
-                                onClick={() => setBeat(beat)}
-                                className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md text-sm transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${isCurrent ? 'bg-blue-600 text-white font-medium' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
-                            >
-                                {beat}
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
-        </div>
-    );
-};
+export function Timeline({ notify }) {
+  const store = useStore(); const [running, setRunning] = useState(false);
+  const branch = store.score.branches[store.score.activeBranch];
+  const beats = useMemo(() => [...new Set(Object.values(branch.waypoints).map((w) => w.beat))].sort((a, b) => a - b), [branch.waypoints]);
+  const visible = Array.from({ length: store.fixture.totalBeats }, (_, index) => index + 1);
+  const rehearse = (status) => { store.addRehearsalEvent({ id: crypto.randomUUID(), beat: store.currentBeat, status, at: new Date().toISOString() }); setRunning(status === 'start' || status === 'resume'); if (status === 'restart') store.setBeat(1); if (status === 'advance') store.setBeat(Math.min(48, store.currentBeat + 1)); notify(`Rehearsal ${status} recorded at beat ${status === 'restart' ? 1 : store.currentBeat}`); };
+  return <section className="timeline" aria-labelledby="timeline-title"><div className="timeline-head"><div><p className="eyebrow">Cue sequence</p><h2 id="timeline-title">Beat timeline</h2></div><div className="rehearsal-controls" aria-label="Rehearsal controls"><span className={`run-state ${running ? 'running' : ''}`}>{running ? 'Running' : 'Ready'}</span>{['start', 'pause', 'advance', 'restart'].map((action) => <button key={action} title={`${action} rehearsal`} onClick={() => rehearse(action)}>{action === 'start' ? '▶' : action === 'pause' ? 'Ⅱ' : action === 'advance' ? '→' : '↺'}<span>{action}</span></button>)}</div></div>
+    {!beats.length ? <div className="timeline-empty"><b>No blocking beats yet.</b><span>Add a waypoint to start the cue sequence.</span></div> : <div className="beat-strip" role="list" aria-label="Blocking beats">{visible.map((beat) => { const count = Object.values(branch.waypoints).filter((w) => w.beat === beat).length; return <button aria-label={String(beat)} key={beat} aria-current={store.currentBeat === beat ? 'step' : undefined} className={store.currentBeat === beat ? 'current bg-blue-600' : ''} onClick={() => { store.setBeat(beat); notify(`Previewing beat ${beat}`); }}><span>{beat}</span><small>{count} cue{count === 1 ? '' : 's'}</small></button>; })}</div>}
+  </section>;
+}

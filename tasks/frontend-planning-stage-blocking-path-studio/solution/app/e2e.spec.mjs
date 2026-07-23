@@ -14,7 +14,7 @@
 // ============================================================================
 import { test as base, expect } from '@playwright/test';
 
-const BASE = 'http://localhost:3000';
+const BASE = process.env.BASE_URL || 'http://localhost:3000';
 
 export const test = base.extend({
   page: async ({ page }, use) => {
@@ -119,7 +119,7 @@ test.describe('workspace contract (canonical)', () => {
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
 
 test('cf.1 place_path_analyze_approve_export', async ({ page }) => {
-    await page.goto('http://localhost:3000/');
+    await page.goto(BASE);
     await expect(page.locator('text=Stage Blocking Path Studio')).toBeVisible();
     await page.click('button:has-text("Approve")');
     await page.click('button:has-text("Export")');
@@ -130,13 +130,13 @@ test('vd.1 visual_hierarchy_legible', async ({ page }) => {
 });
 
 test('mo.1 move_retime_propagate_causality', async ({ page }) => {
-    await page.goto('http://localhost:3000/');
+    await page.goto(BASE);
     await page.click('button:has-text("Path")');
     await page.click('button:has-text("Select")');
 });
 
 test('te.1 interleave_ui_webmcp_actions', async ({ page }) => {
-    await page.goto('http://localhost:3000/');
+    await page.goto(BASE);
     const result = await page.evaluate(async () => {
         return window.webmcp_invoke_tool('session.advance', {});
     });
@@ -145,18 +145,18 @@ test('te.1 interleave_ui_webmcp_actions', async ({ page }) => {
 });
 
 test('AC-05 Place -> path/time -> analyze/fix -> entrance -> prop -> branch -> rehearse -> approve -> export -> reset/import', async ({ page }) => {
-    await page.goto('http://localhost:3000/');
+    await page.goto(BASE);
     await page.click('button:has-text("Approve")');
 });
 
 test('AC-06 Test stage boundary, exact bounds, and recovery', async ({ page }) => {
-    await page.goto('http://localhost:3000/');
+    await page.goto(BASE);
     await page.click('button:has-text("Path")');
 });
 
 test('AC-07 Complete at 1440/768/375', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('http://localhost:3000/');
+    await page.goto(BASE);
     await expect(page.locator('text=Stage Blocking Path Studio')).toBeVisible();
 
     await page.setViewportSize({ width: 768, height: 900 });
@@ -167,27 +167,133 @@ test('AC-07 Complete at 1440/768/375', async ({ page }) => {
 });
 
 test('AC-08 Place/face, edit paths, manage findings without pointer', async ({ page }) => {
-    await page.goto('http://localhost:3000/');
+    await page.goto(BASE);
     await page.keyboard.press('Tab');
 });
 
 test('AC-09 Operate 200 actors, 10000 beats, 1000 branches', async ({ page }) => {
-    await page.goto('http://localhost:3000/');
+    await page.goto(BASE);
     await page.click('button:has-text("Select")');
 });
 
 test('AC-10 Trigger every conflict naming exact recovery', async ({ page }) => {
-    await page.goto('http://localhost:3000/');
+    await page.goto(BASE);
 });
 
 test('AC-11 Move one handoff keeps artifacts coherent', async ({ page }) => {
-    await page.goto('http://localhost:3000/');
+    await page.goto(BASE);
 });
 
 test('AC-12 Verify exact interpolation, bounds, and SVG/CSV semantic fidelity', async ({ page }) => {
-    await page.goto('http://localhost:3000/');
+    await page.goto(BASE);
 });
 
 test('AC-13 Interleave edits, rehearsal repair, future-only undo, approval, export/import round-trips exactly', async ({ page }) => {
-    await page.goto('http://localhost:3000/');
+    await page.goto(BASE);
+});
+
+test('oracle-fix accessibility, guidance, and modal focus contract', async ({ page }) => {
+    await page.goto(BASE);
+    const dialog = page.getByRole('dialog', { name: 'Welcome to the rehearsal room' });
+    if (await dialog.isVisible()) await dialog.getByRole('button', { name: 'Enter the studio' }).click();
+    const alice = page.getByRole('button', { name: /Alice, actor/ });
+    await alice.focus();
+    await page.keyboard.press('Enter');
+    await expect(alice).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByText(/Alice selected at beat/)).toBeVisible();
+    await page.getByRole('button', { name: 'Add waypoint' }).click();
+    const addDialog = page.getByRole('dialog', { name: 'Add waypoint' });
+    await expect(addDialog).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(addDialog).toBeHidden();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Stage Blocking Path Studio');
+    await expect(page.getByRole('heading', { level: 2 }).first()).toBeVisible();
+});
+
+test('oracle-fix create edit delete updates stage inspector timeline and count', async ({ page }) => {
+    await page.goto(BASE);
+    const welcome = page.getByRole('dialog', { name: 'Welcome to the rehearsal room' });
+    if (await welcome.isVisible()) await welcome.getByRole('button', { name: 'Enter the studio' }).click();
+    const before = Number(await page.locator('.count').first().textContent());
+    await page.getByRole('button', { name: 'Add waypoint' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Add waypoint' });
+    await dialog.getByLabel('Entity').selectOption('a1');
+    await dialog.getByLabel('Beat').fill('12');
+    await dialog.getByLabel('X position (m)').fill('9.4');
+    await dialog.getByLabel('Y position (m)').fill('6.2');
+    await dialog.getByRole('button', { name: 'Add waypoint', exact: true }).click();
+    await expect(page.locator('.count').first()).toHaveText(String(before + 1));
+    await expect(page.getByRole('button', { name: /Alice, actor/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: '12', exact: true })).toContainText('1 cue');
+    await page.getByRole('button', { name: 'Edit waypoint' }).click();
+    await page.getByLabel('Facing (degrees)').fill('180');
+    await page.getByRole('button', { name: 'Save waypoint' }).click();
+    await expect(page.getByText('180°')).toBeVisible();
+    await page.getByRole('button', { name: 'Delete waypoint' }).click();
+    await page.getByRole('dialog', { name: 'Delete waypoint?' }).getByRole('button', { name: 'Delete waypoint', exact: true }).click();
+    await expect(page.locator('.count').first()).toHaveText(String(before));
+});
+
+test('oracle-fix invalid creation explains stage bounds', async ({ page }) => {
+    await page.goto(BASE);
+    const welcome = page.getByRole('dialog'); if (await welcome.isVisible()) await page.keyboard.press('Escape');
+    await page.getByRole('button', { name: 'Add waypoint' }).click();
+    await page.getByRole('dialog').getByRole('spinbutton', { name: 'Beat' }).fill('49');
+    await page.getByRole('dialog').getByRole('button', { name: 'Add waypoint', exact: true }).click();
+    await expect(page.getByRole('alert')).toContainText('Beat must be 1–48');
+});
+
+test('oracle-fix sort reversal, filter, branch, and persisted mode stay coherent', async ({ page }) => {
+    await page.goto(BASE);
+    const welcome = page.getByRole('dialog'); if (await welcome.isVisible()) await page.keyboard.press('Escape');
+    await page.getByRole('button', { name: 'Path', exact: true }).click();
+    await page.getByLabel('Filter waypoints').selectOption('actor');
+    await page.getByRole('button', { name: 'Sort descending' }).click();
+    await page.getByRole('button', { name: 'New branch' }).click();
+    await page.getByLabel('Branch name').fill('rehearsal-b');
+    await page.getByRole('button', { name: 'Create branch' }).click();
+    await page.reload();
+    await expect(page.getByRole('button', { name: 'Path', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByLabel('Filter waypoints')).toHaveValue('actor');
+    await expect(page.getByLabel('Select branch')).toHaveValue('rehearsal-b');
+    await expect(page.getByRole('button', { name: 'Sort ascending' })).toBeVisible();
+});
+
+test('oracle-fix beat interpolation visibly changes derived stage position', async ({ page }) => {
+    await page.goto(BASE);
+    const welcome = page.getByRole('dialog'); if (await welcome.isVisible()) await page.keyboard.press('Escape');
+    const actor = page.getByRole('button', { name: /Alice, actor/ });
+    const atOne = await actor.getAttribute('transform');
+    await page.getByRole('button', { name: 'Add waypoint' }).click();
+    await page.getByLabel('Beat').fill('20'); await page.getByLabel('X position (m)').fill('10'); await page.getByLabel('Y position (m)').fill('7');
+    await page.getByRole('dialog').getByRole('button', { name: 'Add waypoint' }).click();
+    await page.getByRole('button', { name: '20', exact: true }).click();
+    await page.waitForTimeout(500);
+    expect(await actor.getAttribute('transform')).not.toBe(atOne);
+});
+
+test('oracle-fix analysis rehearsal approval and artifact flows provide feedback', async ({ page }) => {
+    await page.goto(BASE);
+    const welcome = page.getByRole('dialog'); if (await welcome.isVisible()) await page.keyboard.press('Escape');
+    await page.getByRole('button', { name: 'Analyze', exact: true }).click();
+    await expect(page.getByText(/Sightlines and access clear|Collision risk/).first()).toBeVisible();
+    await page.getByRole('button', { name: 'Rehearse', exact: true }).click();
+    await page.getByTitle('start rehearsal').click();
+    await expect(page.getByText('Running', { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Approve' }).click();
+    await expect(page.getByText(/Branch .* approved/)).toBeVisible();
+    await page.getByRole('button', { name: 'Artifacts' }).click();
+    await expect(page.getByRole('dialog', { name: 'Artifact transfer' })).toBeVisible();
+    await expect(page.getByText('Canonical JSON')).toBeVisible();
+});
+
+test('oracle-fix responsive layouts avoid overflow and preserve 44px controls', async ({ page }) => {
+    for (const width of [1440, 768, 375]) {
+        await page.setViewportSize({ width, height: 900 }); await page.goto(BASE);
+        const welcome = page.getByRole('dialog'); if (await welcome.isVisible()) await page.keyboard.press('Escape');
+        const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+        expect(overflow).toBeLessThanOrEqual(1);
+    }
+    const boxes = await page.locator('button:visible').evaluateAll((buttons) => buttons.map((b) => b.getBoundingClientRect()).filter((r) => r.width < 44 || r.height < 44));
+    expect(boxes).toEqual([]);
 });
