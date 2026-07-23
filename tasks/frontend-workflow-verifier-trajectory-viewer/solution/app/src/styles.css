@@ -93,3 +93,36 @@ button:disabled { cursor: not-allowed; }
 @media (max-width: 639px) {
   .app-command-button { display: none !important; }
 }
+
+/* Animations and motion */
+@media (prefers-reduced-motion: no-preference) {
+  .verdict-crossfade {
+    animation: crossfade 250ms ease-in-out;
+  }
+  @keyframes crossfade {
+    0% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+
+  .rollup-segment {
+    transition: width 250ms ease-in-out, background-color 250ms ease-in-out;
+  }
+
+  .mark-emphasis {
+    animation: pop-emphasis 300ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes pop-emphasis {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
