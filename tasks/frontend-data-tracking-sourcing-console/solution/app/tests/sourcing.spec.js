@@ -212,3 +212,107 @@ test('dialogs trap focus, restore openers, and workflows survive reduced motion'
   await expect(page.getByLabel('Fetch more candidates progress')).toContainText('running')
   await expect(page.getByRole('button', { name: 'Fetch more candidates' })).toBeEnabled()
 })
+
+test('queued candidate echoes through timeline quota and export without reload', async ({ page }) => {
+  const name = 'emberforge/ash-parser'
+  const row = candidateRow(page, name)
+  await row.getByRole('button', { name: 'Pin' }).click()
+  await page.getByRole('dialog', { name: /Pin emberforge\/ash-parser/ }).getByRole('button', { name: 'Confirm pin' }).click()
+  await row.getByRole('button', { name: 'Queue' }).click()
+
+  await page.getByRole('button', { name: 'Timeline', exact: true }).click()
+  const events = page.locator('article').filter({ hasText: name })
+  await expect(events.nth(0)).toContainText('Pinned')
+  await expect(events.nth(0)).toContainText('Queued')
+  await expect(events.nth(1)).toContainText('Selected')
+  await expect(events.nth(1)).toContainText('Pinned')
+
+  await page.getByRole('button', { name: 'Quota', exact: true }).click()
+  await expect(page.getByRole('button', { name: /Python medium:/ })).toContainText('1')
+  await page.getByRole('button', { name: 'Candidates', exact: true }).click()
+  const pack = await exportPack(page)
+  expect(pack.queue.map((entry) => entry.name)).toContain(name)
+  expect(pack.candidates.find((candidate) => candidate.name === name)).toMatchObject({ status: 'queued', queuePosition: 3 })
+})
+
+test('full mutation pipeline exports queued commit rejection quota and exact clipboard text', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+  const queuedName = 'emberforge/ash-parser'
+  const rejectedName = 'northloom/thread-cache'
+  const before = await exportPack(page)
+
+  await candidateRow(page, queuedName).getByRole('button', { name: 'Pin' }).click()
+  await page.getByRole('dialog', { name: /Pin emberforge\/ash-parser/ }).getByRole('button', { name: 'Confirm pin' }).click()
+  await candidateRow(page, queuedName).getByRole('button', { name: 'Queue' }).click()
+  await candidateRow(page, rejectedName).getByRole('button', { name: 'Reject' }).click()
+  await page.getByRole('dialog', { name: /Reject northloom\/thread-cache/ }).getByLabel('Rejection reason').selectOption('gui-heavy')
+  await page.getByRole('dialog', { name: /Reject northloom\/thread-cache/ }).getByRole('button', { name: 'Reject', exact: true }).click()
+
+  await page.getByRole('button', { name: 'Export pack' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Export sourcing pack' })
+  const text = await dialog.getByLabel('Active export text').textContent()
+  const after = JSON.parse(text)
+  const queued = after.candidates.find((candidate) => candidate.name === queuedName)
+  const rejected = after.candidates.find((candidate) => candidate.name === rejectedName)
+  expect(before.candidates.find((candidate) => candidate.name === queuedName).status).toBe('selected')
+  expect(queued.status).toBe('queued')
+  expect(queued.commit).toMatch(/^[0-9a-f]{12}$/)
+  expect(queued.queuePosition).toBeGreaterThan(0)
+  expect(rejected).toMatchObject({ status: 'rejected', rejectionReason: 'gui-heavy' })
+  expect(after.quotaFillPercent).toBe(before.quotaFillPercent)
+  await dialog.getByRole('button', { name: 'Copy', exact: true }).click()
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(text)
+})
+
+test('two fetch runs expose ordered progress and append twelve distinct rows', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  const initial = await candidateRows(page).count()
+  for (const expected of [initial + 6, initial + 12]) {
+    await page.getByRole('button', { name: 'Fetch more candidates' }).click()
+    const progress = page.getByLabel('Fetch more candidates progress')
+    await expect(page.getByRole('button', { name: 'Sourcing in progress…' })).toBeDisabled()
+    await expect(progress).toContainText('Querying')
+    await expect(progress).toContainText('Scoring')
+    await expect(progress).toContainText('Classifying')
+    await expect(page.getByRole('button', { name: 'Fetch more candidates' })).toBeEnabled()
+    await expect(candidateRows(page)).toHaveCount(expected)
+  }
+  const names = await candidateRows(page).evaluateAll((rows) => rows.map((row) => row.children[1].textContent.trim()))
+  expect(new Set(names).size).toBe(names.length)
+})
+
+test('command palette invokes candidate and top-level flows with focus restoration', async ({ page }) => {
+  const name = 'emberforge/cinder-cli'
+  await candidateRow(page, name).getByRole('checkbox').check()
+  await page.getByRole('button', { name: 'Open command palette' }).click()
+  let palette = page.getByRole('dialog', { name: 'Command palette' })
+  await palette.getByLabel('Search commands').fill('score cinder')
+  await palette.getByRole('button', { name: new RegExp(`Score ${name.replace('/', '\\/')}`) }).click()
+  await expect(candidateRow(page, name)).toContainText('Scored')
+
+  await page.getByRole('button', { name: 'Open command palette' }).click()
+  palette = page.getByRole('dialog', { name: 'Command palette' })
+  await palette.getByLabel('Search commands').fill('select cinder')
+  await palette.getByRole('button', { name: new RegExp(`Select ${name.replace('/', '\\/')}`) }).click()
+  await expect(candidateRow(page, name)).toContainText('Selected')
+
+  await candidateRow(page, name).click()
+  await page.getByRole('button', { name: 'Open command palette' }).click()
+  palette = page.getByRole('dialog', { name: 'Command palette' })
+  await palette.getByLabel('Search commands').fill('pin cinder')
+  await palette.getByRole('button', { name: new RegExp(`Pin ${name.replace('/', '\\/')}`) }).click()
+  await expect(page.getByRole('dialog', { name: new RegExp(`Pin ${name.replace('/', '\\/')}`) })).toBeVisible()
+  await page.keyboard.press('Escape')
+
+  for (const [query, heading] of [['export', 'Export sourcing pack'], ['import', 'Import sourcing pack']]) {
+    const opener = page.getByRole('button', { name: 'Open command palette' })
+    await opener.click()
+    palette = page.getByRole('dialog', { name: 'Command palette' })
+    await palette.getByLabel('Search commands').fill(query)
+    await palette.getByRole('button', { name: new RegExp(heading) }).click()
+    const dialog = page.getByRole('dialog', { name: heading })
+    await expect(dialog).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(opener).toBeFocused()
+  }
+})
