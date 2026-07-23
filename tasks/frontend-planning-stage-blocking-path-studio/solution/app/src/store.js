@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 // Deterministic Fixture Data
 const FIXTURE = {
@@ -65,7 +66,7 @@ const getInitialBlocking = () => {
     };
 };
 
-export const useStore = create((set, get) => ({
+export const useStore = create(persist((set, get) => ({
   fixture: FIXTURE,
 
   // Logical state
@@ -224,5 +225,16 @@ export const useStore = create((set, get) => ({
       selectedEntity: null,
       selectedWaypoint: null,
       analysisFindings: [],
+      feedbackMessage: null,
+  }),
+  setFeedbackMessage: (msg) => set({ feedbackMessage: msg }),
+}), {
+  name: 'stage-blocking-storage',
+  partialize: (state) => ({
+    score: state.score,
+    activeTool: state.activeTool,
+    currentBeat: state.currentBeat,
+    selectedEntity: state.selectedEntity,
+    selectedWaypoint: state.selectedWaypoint
   })
 }));
