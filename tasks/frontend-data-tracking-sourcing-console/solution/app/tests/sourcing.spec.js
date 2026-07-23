@@ -455,6 +455,7 @@ test('motion states and reduced motion are observable through real controls', as
   await page.keyboard.press('Escape')
 
   await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.reload()
   await page.getByRole('button', { name: 'Export pack' }).click()
   expect(await durationMs(page.getByRole('dialog', { name: 'Export sourcing pack' }))).toBeLessThan(1)
   await page.keyboard.press('Escape')
@@ -480,7 +481,7 @@ test('control states expose hover focus disabled and field-linked error treatmen
   await page.getByRole('dialog', { name: /Reject northloom\/thread-cache/ }).getByRole('button', { name: 'Reject', exact: true }).click()
   await expect(field).toHaveAttribute('aria-invalid', 'true')
   await field.blur()
-  expect(await field.evaluate((node) => getComputedStyle(node).borderColor)).toBe('rgb(255, 143, 160)')
+  await expect.poll(() => field.evaluate((node) => getComputedStyle(node).borderColor)).toBe('rgb(255, 143, 160)')
 })
 
 test('snapshot comparison is an additional operator-efficiency enhancement', async ({ page }) => {
