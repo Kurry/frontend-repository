@@ -22,7 +22,7 @@ export function DatasetDialog() {
   const attempt = handleSubmit(submit, () => {})
   return (
     <ModalShell title="New dataset" subtitle="Define the record contract used by every row mutation." onClose={() => setUi({ modal: null })} wide
-      footer={<><Btn kind="secondary" onClick={() => setUi({ modal: null })}>Cancel</Btn><Btn type="submit" form="dataset-form" disabled={isSubmitting || !formValid}>Create dataset</Btn></>}>
+      footer={<><Btn kind="secondary" onClick={() => setUi({ modal: null })}>Cancel</Btn><Btn type="submit" form="dataset-form" disabled={isSubmitting}>Create dataset</Btn></>}>
       <form id="dataset-form" onSubmit={attempt} noValidate>
         <div className="space-y-5 p-5">
           <TextField id="dataset-name" label="Dataset name" required placeholder="e.g. Release candidate prompts" error={errors.name?.message} {...register('name')} />
@@ -81,7 +81,7 @@ export function RowDialog({ dataset, mode, rowId }) {
   return (
     <ModalShell title={mode === 'edit' ? 'Edit row' : 'Add row'} subtitle={`Values are validated against ${dataset.name}’s record contract.`}
       onClose={() => setUi({ modal: null })}
-      footer={<><Btn kind="secondary" onClick={() => setUi({ modal: null })}>Cancel</Btn><Btn type="submit" form="row-form" disabled={isSubmitting || !formValid}>{mode === 'edit' ? 'Save changes' : 'Add row'}</Btn></>}>
+      footer={<><Btn kind="secondary" onClick={() => setUi({ modal: null })}>Cancel</Btn><Btn type="submit" form="row-form" disabled={isSubmitting}>{mode === 'edit' ? 'Save changes' : 'Add row'}</Btn></>}>
       <form id="row-form" onSubmit={handleSubmit(submit, () => {})} noValidate>
         <div className="grid gap-5 p-5 sm:grid-cols-2">
           {dataset.schema.map((field) => (

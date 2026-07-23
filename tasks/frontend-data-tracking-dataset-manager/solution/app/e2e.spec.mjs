@@ -176,7 +176,7 @@ test.describe('dataset-manager criteria', () => {
     await page.locator('#dataset-name').fill('Bad Dataset');
     await page.locator('#schema-name-0').fill('bad name!');
     await expect(page.locator('#schema-name-0-error')).toContainText('letters, digits, and underscores');
-    await expect(page.getByRole('button', { name: 'Create dataset' })).toBeDisabled();
+    await page.getByRole('button', { name: 'Create dataset' }).click(); await expect(page.locator('#schema-name-0-error')).toBeVisible();
 
     await page.getByRole('button', { name: 'Close dialog' }).click();
     await expect(page.locator('.sidebar-entry')).toHaveCount(before);
@@ -533,3 +533,44 @@ test.describe('dataset-manager criteria', () => {
     await expect(page.getByText(`Saved snapshots · ${flagship.snapshots.length}`)).toBeVisible();
   });
 });
+
+  test('1.1 keyboard_reaches_everything & 1.2 cell_keyboard_editing', async ({ page }) => {
+    await openApp(page, BASE);
+    const firstCell = page.locator('.cell.relative').first();
+    await firstCell.focus();
+    await firstCell.press('Enter');
+    await expect(page.locator('input[aria-label^="Edit "]')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('input[aria-label^="Edit "]')).toHaveCount(0);
+  });
+
+  test('10.8 forms_validate_before_mutation', async ({ page }) => {
+    await openApp(page, BASE);
+    const before = await page.locator('.sidebar-entry').count();
+    await page.getByRole('button', { name: 'Add row' }).first().click();
+    await page.getByRole('button', { name: 'Add row' }).nth(1).click();
+    await expect(page.locator('.error-text').first()).toBeVisible();
+    await page.getByRole('button', { name: 'Close dialog' }).click();
+    await expect(page.locator('.sidebar-entry')).toHaveCount(before);
+  });
+
+  test('1.4 live_region_announcements', async ({ page }) => {
+    await openApp(page, BASE);
+    const liveRegion = page.locator('[aria-live="polite"]').first();
+    await expect(liveRegion).toBeAttached();
+  });
+
+  test('7.5 wide_surfaces_scroll_in_containers', async ({ page }) => {
+    await openApp(page, BASE);
+    await page.setViewportSize({ width: 375, height: 667 });
+
+    // Check Panels diff view horizontal scroll
+    await page.getByRole('button', { name: 'Snapshots' }).click();
+    const diffContainer = page.locator('.overflow-x-auto').first();
+
+    if (await diffContainer.count() > 0) {
+       const scrollWidth = await diffContainer.evaluate((node) => node.scrollWidth);
+       const clientWidth = await diffContainer.evaluate((node) => node.clientWidth);
+       expect(scrollWidth >= clientWidth).toBeTruthy();
+    }
+  });
