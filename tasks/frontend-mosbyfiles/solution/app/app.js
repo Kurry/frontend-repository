@@ -145,7 +145,7 @@
   function focusableIn(container) {
     if (!container) return [];
     return $$("button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), video[controls], audio[controls], a[href], [tabindex]:not([tabindex='-1'])", container)
-      .filter(function (element) { return !element.hidden && element.getClientRects().length > 0; });
+      .filter(function (element) { return !element.hidden && (element.offsetWidth > 0 || element.offsetHeight > 0 || element.getClientRects().length > 0); });
   }
   function activeOverlay() {
     if (state.popup.open) return popup;
@@ -456,6 +456,12 @@
         "</div>";
       group.addEventListener("mouseenter", function () { group.classList.add("is-hovered"); });
       group.addEventListener("mouseleave", function () { group.classList.remove("is-hovered"); });
+      group.querySelectorAll('.tag').forEach(function(tagBtn) {
+        tagBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          openCase(tagBtn.dataset.tag, "folder-open");
+        });
+      });
       $(".stack-cover__head", group).addEventListener("click", function (event) {
         group.classList.toggle("is-unfolded");
         state.unfolded = group.classList.contains("is-unfolded") ? cat.id : null;
@@ -744,7 +750,7 @@
       el.style.left = newLeft + "px";
       el.style.top = newTop + "px";
     });
-    function end() {
+    function end(e) { if(e && e.pointerId) { try { el.releasePointerCapture(e.pointerId); } catch(err) {} }
       if (!dragging) return;
       dragging = false;
       var pr = el.offsetParent.getBoundingClientRect();
@@ -1169,7 +1175,14 @@
 
   function openPalette() {
     if (state.paletteOpen) return;
-    paletteFocusEl = document.activeElement;
+
+    var active = document.activeElement;
+    if (active && (readingList.contains(active) || dossierPanel.contains(active) || popup.contains(active))) {
+      paletteFocusEl = null; // Do not return focus to another overlay
+    } else {
+      paletteFocusEl = active;
+    }
+
     state.paletteOpen = true;
     state.paletteIndex = 0;
     commandPalette.classList.add("is-open");
@@ -1407,6 +1420,8 @@
 
   // ================= Boot =================
   function wireChrome() {
+    popup.addEventListener("click", function(e) { if(e.target === popup) closePopup(); });
+
     document.querySelectorAll("[data-nav]").forEach(bindNav);
     $("#readingListBtn").addEventListener("click", openReadingList);
     $("#readingListBtnCase").addEventListener("click", openReadingList);
