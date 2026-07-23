@@ -264,7 +264,7 @@ test.describe('task criteria', () => {
   test('1.17 type_filter_checkboxes', async ({ page }) => {
     await gotoApp(page);
     const totalBefore = await page.locator('.document-row').count();
-    await page.locator('label[for="filter-CLAUDE.md"]').click();
+    await page.getByRole('checkbox', { name: 'CLAUDE.md', exact: true }).check({ force: true });
     const filteredCount = await page.locator('.document-row').count();
     expect(filteredCount, 'checking one type narrows the tree').toBeLessThan(totalBefore);
     await expect(page.locator('.document-group')).toHaveCount(1);
@@ -474,7 +474,7 @@ test.describe('task criteria', () => {
     await gotoApp(page);
     const scanRow = page.locator('#repository-repo-3');
     await scanRow.getByRole('button', { name: 'Scan now' }).click();
-    await page.getByRole('checkbox', { name: 'CLAUDE.md', exact: true }).check({ force: true });
+    await page.locator('label[for="filter-CLAUDE.md"]').click();
     await page.locator('.document-row').first().locator('.document-open').click();
     await expect(page.locator('.code-viewer')).toBeVisible();
     await page.locator('.scan-actions').getByRole('button', { name: 'Pause' }).click();
