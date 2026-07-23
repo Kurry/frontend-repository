@@ -140,9 +140,9 @@ const [state, setState] = createStore<AppState>({
   activeTextStyle: 'plain',
   activeFontSize: 16,
   copiedStyleBuffer: null,
-  undoStack: [],
-  redoStack: [],
-  history: [],
+  undoStack: savedState?.undoStack ?? [],
+  redoStack: savedState?.redoStack ?? [],
+  history: savedState?.history ?? [],
   versions: savedState?.versions ?? [],
   selectedAnnotationId: null,
   isOffline: false,
@@ -170,6 +170,9 @@ function persistState() {
     remoteContent: state.remoteContent,
     sharedContentMerged: state.sharedContentMerged,
     viewMode: state.viewMode,
+    undoStack: state.undoStack,
+    redoStack: state.redoStack,
+    history: state.history,
   });
 }
 

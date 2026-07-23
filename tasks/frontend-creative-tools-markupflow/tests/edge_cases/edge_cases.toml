@@ -155,7 +155,7 @@ weight = 1.0
 [[criterion]]
 id = "4.9"
 name = "conflict_keeps_prior_until_choice"
-description = "Creating conflicting Collaboration edits never silently drops either side: the Shared content region keeps its prior converged text until the user picks Keep local, Keep remote, or Merge both."
+description = "Creating conflicting Collaboration edits never omits or discards either side: the Shared content region keeps its prior converged text until the user picks Keep local, Keep remote, or Merge both."
 type = "binary"
 weight = 1.0
 
