@@ -154,6 +154,12 @@ jobs:
           set -o pipefail
           compact_auth="$(jq -c . <<<"$CODEX_AUTH_JSON")"
           echo "::add-mask::$compact_auth"
+          # GitHub-hosted ubuntu-latest runners expose 2 vCPUs / 7 GB, but every
+          # task.toml requests cpus = 4 (tuned for Modal). Docker hard-refuses to
+          # start a container asking for more CPUs than the host has ("range of
+          # CPUs is from 0.01 to 2.00"), which failed every trial before the judge
+          # ran. Cap the container here (same override judge-oracle-all.yml uses)
+          # instead of editing the canonical template, so Modal keeps its 4 CPUs.
           uv run harbor run \
             --path tasks \
             --include-task-name "$SLUG" \
@@ -162,6 +168,8 @@ jobs:
             --jobs-dir "$JOBS_DIR" \
             --job-name "$JOB_NAME" \
             --n-concurrent 1 \
+            --override-cpus 2 \
+            --memory ignore \
             --yes \
             --verifier-env "CODEX_AUTH_JSON=$compact_auth" \
             --verifier-env "REWARDKIT_MODEL=$JUDGE_MODEL" \
