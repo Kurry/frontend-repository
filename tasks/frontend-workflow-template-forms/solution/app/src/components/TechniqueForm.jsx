@@ -537,7 +537,7 @@ export default function TechniqueForm({ technique, active }) {
               kind="primary"
               size="md"
               renderIcon={(props) => <ArrowRight {...props} aria-hidden="true" />}
-              disabled={!isValid || generating}
+              disabled={generating}
             >
               {generating ? <InlineLoading description="Generating..." /> : 'Generate prompt'}
             </Button>
