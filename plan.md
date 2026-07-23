@@ -1,0 +1,1 @@
+1. **Submit Change**: Complete pre-commit steps to ensure proper testing, verification, review, and reflection are done. Then use the `submit` tool with a message referencing `Fixes Mercor-Intelligence/frontend-repository#2229` to finalize the PR.
