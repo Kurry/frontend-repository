@@ -1,0 +1,6 @@
+[task]
+id = "mercor-intelligence/frontend-data-tracking-home-air-quality-trendbook-forecast-ribbon-rn-github-issue-fields"
+name = "mercor-intelligence/frontend-data-tracking-home-air-quality-trendbook-forecast-ribbon-rn-github-issue-fields"
+description = "Variant focus: adjust a selected record on a forecast ribbon and compare projected outcomes."
+category = "frontend"
+tags = ["data-tracking", "good-app"]
