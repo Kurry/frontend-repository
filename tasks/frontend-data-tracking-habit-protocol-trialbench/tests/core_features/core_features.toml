@@ -1,0 +1,119 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+
+[[criterion]]
+id = "core_features.1"
+name = "phase_composer"
+description = "Compose phases (baseline, intervention, washout, follow-up) on a timeline. Dragging a boundary previews reassignment counts before commit, and dates cannot overlap."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.2"
+name = "adherence_logging"
+description = "Log daily adherence and outcomes. Editing a value updates adherence, lag pairing, phase metric, finding, and artifact consequences before commit."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.3"
+name = "branchable_amendments"
+description = "Changing target, window, lag, or skip policy after observations exist creates an acyclic protocol branch on a future date. Compare and switch active analysis head."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.4"
+name = "confounder_ledger"
+description = "Log travel, illness, and workload intervals to mark paired observations excluded, included, or sensitivity-only, remaining separately countable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.5"
+name = "linked_analytical_views"
+description = "Brush any dates to synchronize the heatmap, dose/outcome chart, phase table, distribution panel, and record ledger. Toggle raw, eligible, and sensitivity sets."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.6"
+name = "evaluator_workflow"
+description = "Run the deterministic evaluator workflow (validate, pair, classify, compute, compare, check) to present findings under declared thresholds."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.7"
+name = "decision_plan"
+description = "Review the finding, pin evidence rows, accept/reject, and create a continuation branch. Approval freezes a result checksum; later edits mark it stale."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.8"
+name = "ac_01_core"
+description = "Compose phases, log, amend/branch, mark confounders, brush/analyze, run/review evaluator, continue, and export. All state and artifacts agree."
+type = "binary"
+weight = 1.0
