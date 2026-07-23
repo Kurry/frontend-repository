@@ -418,8 +418,7 @@ test.describe('issue 2297 completion contract', () => {
     await page.getByRole('button', { name: /Save settings/i }).click();
     await expect(page.getByText(/Daily goal.*1.*9999/i)).toBeVisible();
     await goal.fill('10');
-    const reminder = page.getByLabel(/Daily reminder/i);
-    if (!(await reminder.isChecked())) await page.locator('label[for="daily-reminder"]').click();
+    await page.locator('label[for="daily-reminder"]').click();
     await page.getByLabel('Remind after').selectOption('0');
     await page.getByRole('button', { name: /Save settings/i }).click();
     const banner = page.getByText(/Daily reminder/i).last();
@@ -451,7 +450,11 @@ test.describe('issue 2297 completion contract', () => {
   test('round-trips JSON and CSV atomically, persists complete state, and survives blocked storage', async ({ page, browser }) => {
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
-    page.on('console', msg => { if (msg.type() === 'error' || msg.type() === 'warning') errors.push(msg.text()); });
+    page.on('console', msg => {
+      // eslint-disable-next-line playwright/missing-playwright-await -- ConsoleMessage.type() is synchronous.
+      const kind = msg.type();
+      if (kind === 'error' || kind === 'warning') errors.push(msg.text());
+    });
     await reset(page);
     await page.getByRole('tab', { name: 'Quest' }).click();
     await page.getByLabel('Number of reps').fill('100');
@@ -491,7 +494,7 @@ test.describe('issue 2297 completion contract', () => {
     await page.getByRole('button', { name: 'Import Quest Log' }).click();
     await (await chooser).setFiles({ name: 'bad.json', mimeType: 'application/json', buffer: Buffer.from('{"bad":true}') });
     await expect(page.getByLabel('Quest Log export and import').locator('[data-artifact-feedback]')).toContainText('Invalid Quest Log file');
-    expect(await page.locator('[data-export-preview="json"]').textContent()).toBe(stablePreview);
+    await expect(page.locator('[data-export-preview="json"]')).toHaveText(stablePreview!);
     await page.reload();
     await page.getByRole('tab', { name: 'Settings' }).click();
     await expect(page.locator('[data-export-preview="json"]')).toContainText('round trip');
