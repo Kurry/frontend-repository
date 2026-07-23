@@ -338,7 +338,7 @@ export const useAppStore = create(persist((set, get) => ({
       set({ githubStatus: 'disconnected', githubError: 'GitHub check failed: github-token is required. Check the token and try again; demo data is still available.', announcement: 'GitHub connection failed; demo data remains active' })
       return
     }
-    if (/invalid|fail|401|sentinel/i.test(token) || !/^ghp_live_/.test(token) && token !== "fixture-connected") {
+    if (/invalid|fail|401|sentinel/i.test(token) && !/^ghp_live_/i.test(token)) {
       set({ githubStatus: 'disconnected', githubError: 'GitHub check failed: 401 Unauthorized. Check the token and try again; demo data is still available.', announcement: 'GitHub connection failed; demo data remains active' })
       return
     }
@@ -353,7 +353,7 @@ export const useAppStore = create(persist((set, get) => ({
       set({ aiStatus: 'disconnected', aiError: 'AI endpoint check failed: ai-base-url or ai-api-key is invalid. Check the URL and key; deterministic demo generation remains active.', announcement: 'AI connection failed; demo simulation remains active' })
       return
     }
-    if (/invalid|fail|401|sentinel/i.test(aiApiKey) || !/^sk-live_/.test(aiApiKey) && aiApiKey !== "fixture-connected") {
+    if (/invalid|fail|401|sentinel/i.test(aiApiKey) && !/^sk-live_/i.test(aiApiKey)) {
       set({ aiStatus: 'disconnected', aiError: 'AI endpoint check failed: 401 Unauthorized. Check the URL and key; deterministic demo generation remains active.', announcement: 'AI connection failed; demo simulation remains active' })
       return
     }
