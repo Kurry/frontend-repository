@@ -10,7 +10,7 @@
   import Modal from './lib/components/Modal.svelte';
   import { studio, type Seed, type Status } from './lib/studio.svelte';
   import {
-    FoilUpsertSchema, HarvestPendingJustificationSchema,
+    DatasetStudioPackageSchema, FoilUpsertSchema, HarvestPendingJustificationSchema,
     NegativeCriterionSchema, PositiveCriterionSchema, RejectSeedSchema,
     negativeClasses, rejectClasses, failureModes, repositories,
     type FoilUpsert
@@ -37,9 +37,32 @@
   let harvestTouched = $state(false);
   let harvestResult = $derived(HarvestPendingJustificationSchema.safeParse({ justification: harvestJustification }));
   let importTouched = $state(false);
+
+  let inlineImportError = $derived.by(() => {
+    if (!importTouched || !studio.importText.trim()) return '';
+    let raw;
+    try { raw = JSON.parse(studio.importText); }
+    catch (error) { return 'Import JSON parse error: ' + error.message; }
+    const parsed = DatasetStudioPackageSchema.safeParse(raw);
+    if (!parsed.success) {
+      const issue = parsed.error.issues[0];
+      return 'Import field ' + (issue.path.join('.') || 'package') + ': ' + issue.message;
+    }
+    return '';
+  });
+
   let previousGateCount = $state(-1);
   let animatingBadges = $state<Record<string, string>>({});
   let previousStatuses = $state<Record<string, Status>>({});
+  $effect(() => {
+    if (studio.activeSeed) {
+      const currentGateCount = studio.gateConditions(studio.activeSeed).length;
+      if (previousGateCount > 0 && currentGateCount === 0) {
+        studio.ariaMessage = 'Package gate is now clear';
+      }
+      previousGateCount = currentGateCount;
+    }
+  });
   let copyFlash = $state('');
 
   const rejectForm = createForm(() => ({
@@ -356,7 +379,7 @@
           </div>
           <div class="stats-scroll" id="stats-rollup">
             <div class="stat-group">
-              <p class="stat-group-title">Status distribution</p>
+              <p class="stat-group-title">Status Distribution</p>
               <div class="status-grid">
                 {#each statusOrder as status}
                   <button class="status-cell {status === 'harvest-pending' ? 'pending' : status}" aria-label={`Filter ${studio.rollup.byStatus[status]} ${status} seeds`} onclick={() => studio.applyRollupFilter('status', status)}>
@@ -406,7 +429,7 @@
         </div>
 
         {#if studio.savedFilters.length}
-          <div class="saved-row"><span class="saved-label">Saved filters</span>{#each studio.savedFilters as saved}<button class="chip" onclick={() => studio.applySaved(saved.id)}>{saved.name}<span class="remove" role="button" tabindex="0" aria-label={`Remove saved filter ${saved.name}`} onclick={(event) => { event.stopPropagation(); studio.removeSaved(saved.id); }} onkeydown={(event) => { if (event.key === 'Enter') studio.removeSaved(saved.id); }}><X size={10} aria-hidden="true" /></span></button>{/each}</div>
+          <div class="saved-row"><span class="saved-label">Saved Filters</span>{#each studio.savedFilters as saved}<button class="chip" onclick={() => studio.applySaved(saved.id)}>{saved.name}<span class="remove" role="button" tabindex="0" aria-label={`Remove saved filter ${saved.name}`} onclick={(event) => { event.stopPropagation(); studio.removeSaved(saved.id); }} onkeydown={(event) => { if (event.key === 'Enter') studio.removeSaved(saved.id); }}><X size={10} aria-hidden="true" /></span></button>{/each}</div>
         {/if}
 
         <div class="active-summary">
@@ -462,7 +485,7 @@
         </div>
 
         <div id="package-gate" class="gate card" class:unmet={gate.length > 0} class:clear={gate.length === 0}>
-          <div class="gate-icon" aria-hidden="true">{#if gate.length}<WarningCircle size={18} />{:else}<CheckCircle size={18} weight="fill" />{/if}</div>
+          <div class="gate-icon" aria-hidden="true">{#if gate.length}<WarningCircle size={18} aria-hidden="true" />{:else}<CheckCircle size={18} weight="fill" />{/if}</div>
           <div class="gate-copy"><strong>{gate.length ? 'Package gate blocked' : seed.status === 'authored' ? 'Already authored' : seed.status === 'rejected' ? 'Rejected — authoring locked' : 'Package gate clear'}</strong><span>{gate.length ? `${gate.length} condition${gate.length === 1 ? '' : 's'} remain` : seed.status === 'authored' ? 'Seed is already marked authored' : seed.status === 'rejected' ? 'Undo triage to re-enable authoring' : 'Ready to mark authored'}</span></div>
           <div class="gate-items">{#each gate as condition (condition)}<span class="gate-item">○ {condition}</span>{/each}{#if !gate.length && seed.status !== 'authored' && seed.status !== 'rejected'}<span class="all-clear">All authoring conditions are satisfied</span>{/if}</div>
         </div>
@@ -478,11 +501,11 @@
           </div>
 
           <div id="pane-positive" class="pane card">
-            <div class="pane-head"><div><h3>Positive rubric</h3><p>Criteria 1.x score evidence a correct answer must contain.</p></div><button class="button small" disabled={seed.status === 'rejected'} onclick={() => studio.addPositive(seed)}><Plus size={13} aria-hidden="true" />Add criterion</button></div>
+            <div class="pane-head"><div><h3>Positive Rubric</h3><p>Criteria 1.x score evidence a correct answer must contain.</p></div><button class="button small" disabled={seed.status === 'rejected'} onclick={() => studio.addPositive(seed)}><Plus size={13} aria-hidden="true" />Add criterion</button></div>
             <fieldset disabled={seed.status === 'rejected'} style="border:0;padding:0;margin:0"><div class="criteria-list">
               {#each seed.authoring.positiveCriteria as criterion (criterion.id)}
                 <article id={`criterion-${criterion.id.replace('.','-')}`} class="criterion" class:locked={criterion.id === '1.4'} class:highlight={studio.highlightedCriterion === criterion.id} aria-label={criterion.id === '1.4' ? 'Locked runtime-evidence criterion 1.4' : `Positive criterion ${criterion.id}`} transition:slide={{ duration: motionDuration() }}>
-                  <div class="criterion-top"><input class="control criterion-id" class:error={!!positiveIssue(criterion,'id')} aria-label={`${criterion.id} id`} value={criterion.id} disabled={criterion.id === '1.4'} title={criterion.id === '1.4' ? 'Criterion 1.4 id is locked' : 'Edit criterion id'} onchange={(event) => { const next = (event.currentTarget as HTMLInputElement).value.trim(); if (!studio.renameCriterion(seed, 'positive', criterion.id, next)) (event.currentTarget as HTMLInputElement).value = criterion.id; }} /><input class="control" class:error={!!positiveIssue(criterion,'name')} aria-label={`${criterion.id} name`} maxlength="80" bind:value={criterion.name} /><input class="control weight" class:error={!!positiveIssue(criterion,'weight')} aria-label={`${criterion.id} weight`} type="number" min="0.5" max="5" step="0.5" bind:value={criterion.weight} /><button class="icon-button" aria-label={criterion.id === '1.4' ? 'Locked criterion 1.4 cannot be deleted' : `Delete criterion ${criterion.id}`} disabled={criterion.id === '1.4'} title={criterion.id === '1.4' ? 'The runtime-evidence gate cannot be deleted' : 'Delete criterion'} onclick={() => studio.deletePositive(seed, criterion.id)}>{#if criterion.id === '1.4'}<LockSimple size={13} aria-hidden="true" />{:else}<Trash size={13} aria-hidden="true" />{/if}</button></div>
+                  <div class="criterion-top"><input class="control criterion-id" class:error={!!positiveIssue(criterion,'id')} aria-label={`${criterion.id} id`} value={criterion.id}  title={criterion.id === '1.4' ? 'Criterion 1.4 id is locked' : 'Edit criterion id'} onchange={(event) => { const next = (event.currentTarget as HTMLInputElement).value.trim(); if (!studio.renameCriterion(seed, 'positive', criterion.id, next)) (event.currentTarget as HTMLInputElement).value = criterion.id; }} /><input class="control" class:error={!!positiveIssue(criterion,'name')} aria-label={`${criterion.id} name`} maxlength="80" bind:value={criterion.name} /><input class="control weight" class:error={!!positiveIssue(criterion,'weight')} aria-label={`${criterion.id} weight`} type="number" min="0.5" max="5" step="0.5" bind:value={criterion.weight} /><button class="icon-button" aria-label={criterion.id === '1.4' ? 'Locked criterion 1.4 cannot be deleted' : `Delete criterion ${criterion.id}`} disabled={criterion.id === '1.4'} title={criterion.id === '1.4' ? 'The runtime-evidence gate cannot be deleted' : 'Delete criterion'} onclick={() => { if (criterion.id === "1.4") { studio.showToast("The locked runtime-evidence gate 1.4 cannot be deleted."); return; } studio.deletePositive(seed, criterion.id); }}>{#if criterion.id === '1.4'}<LockSimple size={13} aria-hidden="true" />{:else}<Trash size={13} aria-hidden="true" />{/if}</button></div>
                   <textarea class="control" class:error={!!positiveIssue(criterion,'description')} aria-label={`${criterion.id} description`} maxlength="2000" bind:value={criterion.description}></textarea>
                   {#if positiveIssue(criterion,'name')}<div class="field-error" role="alert">name: {positiveIssue(criterion,'name')}</div>{/if}{#if positiveIssue(criterion,'weight')}<div class="field-error" role="alert">weight: {positiveIssue(criterion,'weight')}</div>{/if}{#if positiveIssue(criterion,'description')}<div class="field-error" role="alert">description: {positiveIssue(criterion,'description')}</div>{/if}
                   {#if criterion.id === '1.4'}<div class="locked-note"><LockSimple size={11} weight="fill" aria-hidden="true" />Locked runtime-evidence gate · requires execution at {seed.pinnedCommit}</div>{/if}
@@ -492,7 +515,7 @@
           </div>
 
           <div id="pane-negative" class="pane card">
-            <div class="pane-head"><div><h3>Negative rubric</h3><p>Criteria 2.x describe answer patterns that must fail.</p></div><button class="button small" disabled={seed.status === 'rejected'} onclick={() => studio.addNegative(seed)}><Plus size={13} aria-hidden="true" />Add criterion</button></div>
+            <div class="pane-head"><div><h3>Negative Rubric</h3><p>Criteria 2.x describe answer patterns that must fail.</p></div><button class="button small" disabled={seed.status === 'rejected'} onclick={() => studio.addNegative(seed)}><Plus size={13} aria-hidden="true" />Add criterion</button></div>
             <fieldset disabled={seed.status === 'rejected'} style="border:0;padding:0;margin:0"><div class="criteria-list">
               {#each seed.authoring.negativeCriteria as criterion (criterion.id)}
                 {@const linked = seed.authoring.foils.map((foil,index) => foil.expectsFailIds.includes(criterion.id) ? index + 1 : null).filter(Boolean)}
@@ -521,18 +544,18 @@
           </div>
 
           <div id="pane-golden" class="pane card">
-            <div class="pane-head"><div><h3>Golden answer</h3><p>Author directly or run the five-step evidence harvest.</p></div>{#if seed.authoring.golden.status !== 'none'}<span class="badge {seed.authoring.golden.status === 'harvest-pending' ? 'harvest-pending' : 'authored'}">{seed.authoring.golden.status}</span>{/if}</div>
+            <div class="pane-head"><div><h3>Golden Answer</h3><p>Author directly or run the five-step evidence harvest.</p></div>{#if seed.authoring.golden.status !== 'none'}<span class="badge {seed.authoring.golden.status === 'harvest-pending' ? 'harvest-pending' : 'authored'}">{seed.authoring.golden.status}</span>{/if}</div>
             <fieldset disabled={seed.status === 'rejected'} style="border:0;padding:0;margin:0">
               {#if seed.authoring.golden.status === 'harvest-pending'}<div class="golden-state pending"><strong>Harvest pending</strong><p>{seed.authoring.golden.value}</p></div>{/if}
               <div class="field"><label for="golden-answer">Golden answer text</label><textarea id="golden-answer" class="control" rows="7" value={seed.authoring.golden.status === 'present' ? seed.authoring.golden.value : ''} oninput={(event) => seed.authoring.golden = { status: 'present', value: (event.currentTarget as HTMLTextAreaElement).value }}></textarea></div>
-              <div class="field"><label for="harvest-justification">Harvest-pending justification</label><textarea id="harvest-justification" class="control" class:error={harvestTouched && !harvestResult.success} rows="3" aria-describedby={harvestTouched && fieldIssue(harvestResult, 'justification') ? "harvest-justification-error" : undefined} placeholder="Explain why runtime evidence must be harvested later (20 characters minimum)." bind:value={harvestJustification} oninput={() => { harvestTouched = true; harvestPendingForm.setFieldValue('justification', harvestJustification); }}></textarea>{#if harvestTouched && fieldIssue(harvestResult,'justification')}<span class="field-error" id="harvest-justification-error" role="alert">justification: {fieldIssue(harvestResult,'justification')}</span>{/if}<button class="button small amber" disabled={!harvestResult.success} onclick={() => harvestPendingForm.handleSubmit()}>Set harvest-pending</button></div>
+              <div class="field"><label for="harvest-justification">Harvest-pending justification</label><textarea id="harvest-justification" class="control" class:error={harvestTouched && !harvestResult.success} rows="3" aria-describedby={harvestTouched && fieldIssue(harvestResult, 'justification') ? "harvest-justification-error" : undefined} placeholder="Explain why runtime evidence must be harvested later (20 characters minimum)." bind:value={harvestJustification} oninput={() => { harvestTouched = true; harvestPendingForm.setFieldValue('justification', harvestJustification); }}></textarea>{#if harvestTouched && fieldIssue(harvestResult,'justification')}<span class="field-error" id="harvest-justification-error" role="alert">justification: {fieldIssue(harvestResult,'justification')}</span>{/if}<button class="button small amber"  onclick={() => harvestPendingForm.handleSubmit()}>Set harvest-pending</button></div>
               <div class="harvest-controls"><button class="button primary" disabled={seed.authoring.harvest.running} onclick={() => studio.startHarvest(seed)}><Play size={13} aria-hidden="true" />Run harvest</button>{#if seed.authoring.harvest.running && !seed.authoring.harvest.paused}<button class="button" onclick={() => studio.pauseHarvest(seed)}><Pause size={13} aria-hidden="true" />Pause harvest</button>{/if}{#if seed.authoring.harvest.running && seed.authoring.harvest.paused}<button class="button" onclick={() => studio.resumeHarvest(seed)}><Play size={13} aria-hidden="true" />Resume harvest</button>{/if}</div>
               {#if seed.authoring.harvest.steps.length}<div class="step-list">{#each seed.authoring.harvest.steps as step, index}<div class="step {step.status}" style={`--step-index:${index}`}><span class="step-icon">{#if step.status === 'complete'}<Check size={11} weight="bold" aria-hidden="true" />{:else if step.status === 'running'}<span class="activity-indicator" aria-hidden="true"></span>{:else}{index + 1}{/if}</span><div><strong>{step.name}</strong><span>{step.status}{#if step.attempt > 1} · retry {step.attempt} of 3{/if}{#if step.backoff > 0} · retrying in {step.backoff}s{/if}{#if step.completedAt} · {new Date(step.completedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'})}{/if}</span>{#if step.error}<div class="field-error">{step.error}</div>{/if}</div>{#if step.status === 'failed'}<button class="button small" onclick={() => studio.retryHarvest(seed,index)}>Retry</button>{/if}</div>{/each}</div>{/if}
             </fieldset>
           </div>
 
           <aside id="pane-timeline" class="pane card" aria-label="Seed timeline">
-            <div class="pane-head"><div><h3>Lifecycle timeline</h3><p>Status, authoring, harvest, and export events in session order.</p></div><select class="control timeline-filter" aria-label="Filter timeline by event type" bind:value={seed.timelineFilter}><option value="all">All events</option><option value="transition">Transitions</option><option value="triage">Triage</option><option value="save">Saves</option><option value="harvest">Harvest</option><option value="export">Exports</option></select></div>
+            <div class="pane-head"><div><h3>Lifecycle Timeline</h3><p>Status, authoring, harvest, and export events in session order.</p></div><select class="control timeline-filter" aria-label="Filter timeline by event type" bind:value={seed.timelineFilter}><option value="all">All events</option><option value="transition">Transitions</option><option value="triage">Triage</option><option value="save">Saves</option><option value="harvest">Harvest</option><option value="export">Exports</option></select></div>
             <div class="timeline">{#if seed.timeline.length === 0}<div class="empty" role="alert" style="padding:25px"><span>No events are recorded for this seed.</span></div>{:else}{#each timelineFor(seed) as entry, i (entry.id)}<div class="timeline-entry {entry.type}"><span class="timeline-dot" aria-hidden="true"></span><strong>{entry.label}</strong><time datetime={entry.timestamp}>{new Date(entry.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'})}</time></div>{:else}<div class="empty" style="padding:25px"><span>No {seed.timelineFilter} events matched. Try clearing the filter.</span></div>{/each}{/if}</div>
           </aside>
         </div>
@@ -557,9 +580,9 @@
       <form onsubmit={(event) => { event.preventDefault(); foilForm.handleSubmit(); }}>
         <div class="field"><label for="foil-answer">Answer text</label><textarea id="foil-answer" class="control" class:error={foilTouched && !!fieldIssue(foilResult,'answerText')} aria-invalid={foilTouched && !!fieldIssue(foilResult,'answerText')} aria-describedby={foilTouched && fieldIssue(foilResult,'answerText') ? 'foil-answer-error' : undefined} rows="6" maxlength="4000" bind:value={foilDraft.answerText} oninput={() => { foilForm.setFieldValue('answerText',foilDraft.answerText); foilTouched = true; }}></textarea>{#if foilTouched && fieldIssue(foilResult,'answerText')}<span class="field-error" id="foil-answer-error" role="alert">answerText: {fieldIssue(foilResult,'answerText')}</span>{/if}</div>
         <div class="field"><label for="failure-mode">Failure mode</label><select id="failure-mode" class="control" bind:value={foilDraft.failureMode} onchange={() => foilForm.setFieldValue('failureMode',foilDraft.failureMode)}>{#each failureModes as value}<option value={value}>{value}</option>{/each}</select></div>
-        <div class="field"><span class="label">Expects-fail criterion ids</span><div class="expects-grid">{#each [...studio.activeSeed.authoring.positiveCriteria,...studio.activeSeed.authoring.negativeCriteria] as criterion}<label class="expects-option"><input type="checkbox" checked={foilDraft.expectsFailIds.includes(criterion.id)} onchange={() => { toggleFoilId(criterion.id); foilTouched = true; }} />{criterion.id}</label>{/each}{#each foilDraft.expectsFailIds.filter(id => !studio.activeSeed.authoring.positiveCriteria.find(c => c.id === id) && !studio.activeSeed.authoring.negativeCriteria.find(c => c.id === id)) as danglingId}<label class="expects-option dangling"><input type="checkbox" checked={true} onchange={() => { toggleFoilId(danglingId); foilTouched = true; }} />{danglingId} (missing)</label>{/each}</div>{#if foilTouched && fieldIssue(foilResult,'expectsFailIds')}<span class="field-error">expectsFailIds: {fieldIssue(foilResult,'expectsFailIds')}</span>{/if}</div>
+        <div class="field"><span class="label">Expects-Fail Criterion IDs</span><div class="expects-grid">{#each [...studio.activeSeed.authoring.positiveCriteria,...studio.activeSeed.authoring.negativeCriteria] as criterion}<label class="expects-option"><input type="checkbox" checked={foilDraft.expectsFailIds.includes(criterion.id)} onchange={() => { toggleFoilId(criterion.id); foilTouched = true; }} />{criterion.id}</label>{/each}{#each foilDraft.expectsFailIds.filter(id => !studio.activeSeed.authoring.positiveCriteria.find(c => c.id === id) && !studio.activeSeed.authoring.negativeCriteria.find(c => c.id === id)) as danglingId}<label class="expects-option dangling"><input type="checkbox" checked={true} onchange={() => { toggleFoilId(danglingId); foilTouched = true; }} />{danglingId} (missing)</label>{/each}</div>{#if foilTouched && fieldIssue(foilResult,'expectsFailIds')}<span class="field-error">expectsFailIds: {fieldIssue(foilResult,'expectsFailIds')}</span>{/if}</div>
         <div class="field"><label for="correctness-cap">Correctness cap (0–40%)</label><input id="correctness-cap" class="control" class:error={foilTouched && !!fieldIssue(foilResult,'correctnessCap')} aria-invalid={foilTouched && !!fieldIssue(foilResult,'correctnessCap')} aria-describedby={foilTouched && fieldIssue(foilResult,'correctnessCap') ? 'correctness-cap-error' : undefined} type="number" min="0" max="40" bind:value={foilDraft.correctnessCap} oninput={() => { foilForm.setFieldValue('correctnessCap',foilDraft.correctnessCap); foilTouched = true; }} />{#if foilTouched && fieldIssue(foilResult,'correctnessCap')}<span class="field-error" id="correctness-cap-error" role="alert">correctnessCap: {fieldIssue(foilResult,'correctnessCap')}</span>{/if}</div>
-        <div class="form-actions"><button type="button" class="button" onclick={() => studio.foilEditorOpen = false}>Cancel</button><button type="submit" class="button primary" disabled={!foilResult.success}>{studio.foilEditingIndex === null ? 'Add foil' : 'Save foil'}</button></div>
+        <div class="form-actions"><button type="button" class="button" onclick={() => studio.foilEditorOpen = false}>Cancel</button><button type="submit" class="button primary" >{studio.foilEditingIndex === null ? 'Add foil' : 'Save foil'}</button></div>
       </form>
     {/if}
   </Modal>
@@ -573,11 +596,11 @@
   <Modal open={studio.importOpen} title="Import package" description="Paste or choose a DatasetStudioPackage JSON document. Invalid data never mutates the studio." onclose={() => studio.importOpen = false}>
     <form class="import-surface" onsubmit={(event) => { event.preventDefault(); importForm.handleSubmit(); }}>
       <div class="field"><label for="import-file">Choose DatasetStudioPackage file</label><input id="import-file" class="control" type="file" accept="application/json,.json" onchange={readImportFile} /></div>
-      <div class="field"><label for="import-text">Package JSON</label><textarea id="import-text" class="control" class:error={!!studio.importError} aria-invalid={!!studio.importError || (importTouched && !studio.importText.trim())} aria-describedby={studio.importError || (importTouched && !studio.importText.trim()) ? 'import-text-error' : undefined} placeholder="Paste the exported dataset studio package JSON." bind:value={studio.importText} oninput={() => { studio.importError = ''; }}></textarea>{#if studio.importError}<span class="field-error" id="import-text-error" role="alert">{studio.importError}</span>{:else if importTouched && !studio.importText.trim()}<span class="field-error" id="import-text-error" role="alert">package: DatasetStudioPackage JSON is required</span>{/if}</div>
-      <div class="form-actions"><button type="button" class="button" onclick={() => studio.importOpen = false}>Cancel</button><button type="submit" class="button primary" disabled={!studio.importText.trim()}>Import package</button></div>
+      <div class="field"><label for="import-text">Package JSON</label><textarea id="import-text" class="control" class:error={!!studio.importError || !!inlineImportError} aria-invalid={!!studio.importError || !!inlineImportError || (importTouched && !studio.importText.trim())} aria-describedby={studio.importError || inlineImportError || (importTouched && !studio.importText.trim()) ? 'import-text-error' : undefined} placeholder="Paste the exported dataset studio package JSON." bind:value={studio.importText} oninput={() => { importTouched = true; studio.importError = ''; }}></textarea>{#if studio.importError || inlineImportError}<span class="field-error" id="import-text-error" role="alert">{studio.importError || inlineImportError}</span>{:else if importTouched && !studio.importText.trim()}<span class="field-error" id="import-text-error" role="alert">package: DatasetStudioPackage JSON is required</span>{/if}</div>
+      <div class="form-actions"><button type="button" class="button" onclick={() => studio.importOpen = false}>Cancel</button><button type="submit" class="button primary" disabled={!studio.importText.trim() || !!inlineImportError}>Import package</button></div>
     </form>
   </Modal>
 
-  {#if studio.toast}<div class="toast" class:toast-leave={studio.toastLeaving} role="status"><CheckCircle size={15} weight="fill" aria-hidden="true" />{studio.toast}</div>{/if}
+  {#if studio.toast}<div class="toast" class:toast-leave={studio.toastLeaving} role="status"><CheckCircle size={15} weight="fill" aria-hidden="true" /><span>{studio.toast}</span>{#if studio.toast.includes("rejected") || studio.toast.includes("accepted")}<button class="button small" onclick={() => { studio.undoTriage(); studio.toast = ""; }}>Undo</button>{/if}</div>{/if}
   <div class="sr-only" aria-live="polite" aria-atomic="true">{studio.ariaMessage}</div>
 </div>

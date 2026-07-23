@@ -168,7 +168,7 @@ const createSeeds = (): Seed[] => Array.from({ length: 66 }, (_, index) => {
     difficulty: index > 0 && index % 4 === 0 ? 'hard' : 'unset',
     deferenceProfile: deferenceProfiles[index % deferenceProfiles.length],
     failureModel: failureModes[index % failureModes.length],
-    pinnedCommit: (index + 1).toString(16).padStart(40, '0'),
+    pinnedCommit: crypto.getRandomValues(new Uint8Array(20)).reduce((a, b) => a + b.toString(16).padStart(2, '0'), ''),
     authoring: makeAuthoring(status, repository, title),
     timeline: [event('transition', `Seed entered ${status}`)],
     timelineFilter: 'all'

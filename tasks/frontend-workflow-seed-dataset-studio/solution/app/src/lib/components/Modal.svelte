@@ -48,7 +48,8 @@
     if (event.key === 'Escape') { event.preventDefault(); onclose(); return; }
     if (event.key !== 'Tab' || !panel) return;
     const items = [...panel.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex="0"]')];
-    if (!items.length) return;
+    if (!items.length) { event.preventDefault(); return; }
+    if (!panel.contains(document.activeElement)) { event.preventDefault(); items[event.shiftKey ? items.length - 1 : 0].focus(); return; }
     const first = items[0];
     const last = items[items.length - 1];
     if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
