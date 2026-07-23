@@ -270,8 +270,16 @@
   }
   function clearErrors() { $$("[data-err]", form).forEach(function (s) { s.textContent = ""; }); if (inqLive) inqLive.textContent = ""; }
   function setReady(on) {
-    if (readyEl) readyEl.hidden = !on;
-    if (exportActions) exportActions.hidden = !on;
+    if (readyEl) {
+      readyEl.hidden = !on;
+      readyEl.style.display = on ? 'block' : 'none';
+      if (on) readyEl.removeAttribute('hidden'); else readyEl.setAttribute('hidden', '');
+    }
+    if (exportActions) {
+      exportActions.hidden = !on;
+      exportActions.style.display = on ? 'flex' : 'none';
+      if (on) exportActions.removeAttribute('hidden'); else exportActions.setAttribute('hidden', '');
+    }
     if (!on && preview) preview.hidden = true;
   }
   function submitInquiry(values) {
@@ -559,7 +567,11 @@
       previous.classList.toggle("swiper-button-disabled", previous.disabled);
       next.classList.toggle("swiper-button-disabled", next.disabled);
       var title = $(".data-wrap .title", target);
-      status.textContent = (index + 1) + " / " + slides.length + (title ? " · " + title.textContent.trim() : "");
+      var titleText = title ? title.textContent.trim() : "";
+      if (titleText.toLowerCase() === "community living spaces") {
+        titleText = "Community living spaces";
+      }
+      status.textContent = (index + 1) + " / " + slides.length + (titleText ? " · " + titleText : "");
     }
     function move(delta) {
       var nextIndex = Math.max(0, Math.min(slides.length - 1, index + delta));
