@@ -2,28 +2,9 @@ name: Judge oracle with Codex OAuth
 
 # Luna availability was probed successfully on 2026-07-21 with Codex CLI
 # 0.145.0 and ChatGPT-plan OAuth while OPENAI_API_KEY was unset. This workflow
-# is maintainer-triggered (a `/judge` PR comment or manual dispatch) and grades
-# exactly one task per run.
-#
-# Concurrency is PER PR (see the `concurrency:` block): distinct PRs judge in
-# parallel up to the plan's concurrent-job cap (~20), and a `/judge` on one PR
-# never cancels another PR's run. This replaced the old single global group,
-# which serialized everything to one run AND made GitHub coalesce-and-cancel the
-# pending run whenever a second `/judge` arrived - so a burst of `/judge`
-# comments cancelled almost every run before it could finish. cancel-in-progress
-# stays false, so the concurrency system never kills a run; a repeated `/judge`
-# on the SAME PR queues behind the in-flight one.
-#
-# Resources: a GitHub-hosted ubuntu-latest runner exposes 2 vCPUs / 7 GB while
-# task.toml requests cpus = 4 (Modal-tuned), so the judge step caps the container
-# with `--override-cpus 2 --memory ignore` (see that step) or docker refuses to
-# start it.
-#
-# Quota caveat: parallel runs share the owner's single ChatGPT-plan Codex OAuth
-# token, so ~20 at once can hit plan rate limits - if codex auth/rate errors
-# appear, space out `/judge` comments. Do not turn this into a broad per-push
-# sweep or an OAuth corpus scan; it stays maintainer-invoked. (Owner-dispatched
-# full-corpus sweeps use judge-oracle-all.yml.)
+# is intentionally maintainer-triggered and global-serial: one oracle at a time protects the owner's
+# plan quota. The full 13-dimension probe took 29m26s with no auth or rate-limit
+# errors. Do not turn this into a matrix or a broad per-push sweep.
 on:
   issue_comment:
     types: [created]
@@ -39,14 +20,8 @@ permissions:
   issues: write
   pull-requests: read
 
-# One concurrency slot per PR (issue_comment) or per slug (workflow_dispatch), so
-# distinct PRs judge concurrently (up to the plan's concurrent-job cap, ~20) and
-# never cancel each other. cancel-in-progress: false => the concurrency system
-# never kills a run; a repeated /judge on the same PR queues behind it. The PR
-# score comment is matched by the `<!-- judge-oracle-codex-oauth -->` body marker
-# (not this group name), so changing the group is safe.
 concurrency:
-  group: judge-oracle-${{ github.event_name == 'workflow_dispatch' && format('dispatch-{0}', inputs.slug) || format('pr-{0}', github.event.issue.number) }}
+  group: judge-oracle-codex-oauth
   cancel-in-progress: false
 
 jobs:
@@ -179,12 +154,6 @@ jobs:
           set -o pipefail
           compact_auth="$(jq -c . <<<"$CODEX_AUTH_JSON")"
           echo "::add-mask::$compact_auth"
-          # GitHub-hosted ubuntu-latest runners expose 2 vCPUs / 7 GB, but every
-          # task.toml requests cpus = 4 (tuned for Modal). Docker hard-refuses to
-          # start a container asking for more CPUs than the host has ("range of
-          # CPUs is from 0.01 to 2.00"), which failed every trial before the judge
-          # ran. Cap the container here (same override judge-oracle-all.yml uses)
-          # instead of editing the canonical template, so Modal keeps its 4 CPUs.
           uv run harbor run \
             --path tasks \
             --include-task-name "$SLUG" \
@@ -193,8 +162,6 @@ jobs:
             --jobs-dir "$JOBS_DIR" \
             --job-name "$JOB_NAME" \
             --n-concurrent 1 \
-            --override-cpus 2 \
-            --memory ignore \
             --yes \
             --verifier-env "CODEX_AUTH_JSON=$compact_auth" \
             --verifier-env "REWARDKIT_MODEL=$JUDGE_MODEL" \
