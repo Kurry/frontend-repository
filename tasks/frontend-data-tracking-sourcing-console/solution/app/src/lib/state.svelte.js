@@ -43,9 +43,9 @@ const seedRows = [
   ['northloom/thread-cache','Rust',6200,7.6,'Storage','cl-aurora','weak-copyleft','scored'],
   ['emberforge/cinder-cli','Go',3910,3.2,'CLI','cl-cinder','permissive','candidate'],
   ['emberforge/flint-schema','TypeScript',7120,5.8,'Validation','cl-flint','strong-copyleft','scored'],
-  ['quietmesa/dune-index','Elixir',4860,5.4,'Indexing','cl-dune','permissive','selected'],
-  ['silversprig/moss-router','Elixir',3375,4.8,'Routing','cl-moss','permissive','selected'],
-  ['hollowpeak/ridge-worker','Python',9840,2.8,'Workers','cl-ridge','weak-copyleft','selected'],
+  ['quietmesa/dune-index','Elixir',4860,5.4,'Indexing','cl-dune','permissive','pinned',undefined,'a3f29b7c14de'],
+  ['silversprig/moss-router','Elixir',3375,4.8,'Routing','cl-moss','permissive','queued',undefined,'5c7e1f90b3a2'],
+  ['hollowpeak/ridge-worker','Python',9840,2.8,'Workers','cl-ridge','weak-copyleft','queued',undefined,'9d804e2b61af'],
   ['tidefoundry/brine-map','Python',5230,3.6,'Data','cl-brine','unlicensed','selected'],
   ['opalharbor/keel-test','Python',2900,1.7,'Testing','cl-keel','permissive','selected'],
   ['copperfield/wren-query','Kotlin',11800,8.3,'Query','cl-wren','strong-copyleft','scored'],
@@ -73,16 +73,26 @@ const seedRows = [
 ];
 
 function makeCandidate(row) {
-  const [name, language, stars, difficulty, category, clusterId, license, status, rejectionReason] = row;
-  return { id: fnvHex(name), name, language, stars, difficulty, category, clusterId, license, status, rejectionReason, commit: '', notes: '', guardMessage: '', fresh: false };
+  const [name, language, stars, difficulty, category, clusterId, license, status, rejectionReason, commit] = row;
+  return { id: fnvHex(name), name, language, stars, difficulty, category, clusterId, license, status, rejectionReason, commit: commit ?? '', notes: '', guardMessage: '', fresh: false };
 }
+
+// Seeded build-queue order (fixed, so every reload restores the identical
+// baseline): both entries are seeded 'queued' rows with frozen commits, giving
+// the queue panel two reorderable entries out of the box.
+const SEED_QUEUE_NAMES = ['hollowpeak/ridge-worker', 'silversprig/moss-router'];
 
 export const QUOTA_TARGETS = Object.fromEntries(LANGUAGES.flatMap((language) => BANDS.map((band) => [`${language}:${band}`, band === 'hard' ? 1 : 2])));
 QUOTA_TARGETS['Python:easy'] = 1;
 QUOTA_TARGETS['Elixir:medium'] = 1;
 
 const initialTimeline = [
-  { at: '2026-07-22T00:00:00.000Z', name: 'Seed review', fromStatus: 'candidate', toStatus: 'scored' }
+  { at: '2026-07-22T00:00:00.000Z', name: 'Seed review', fromStatus: 'candidate', toStatus: 'scored' },
+  { at: '2026-07-22T00:04:00.000Z', name: 'quietmesa/dune-index', fromStatus: 'selected', toStatus: 'pinned' },
+  { at: '2026-07-22T00:05:00.000Z', name: 'hollowpeak/ridge-worker', fromStatus: 'selected', toStatus: 'pinned' },
+  { at: '2026-07-22T00:06:00.000Z', name: 'hollowpeak/ridge-worker', fromStatus: 'pinned', toStatus: 'queued' },
+  { at: '2026-07-22T00:07:00.000Z', name: 'silversprig/moss-router', fromStatus: 'selected', toStatus: 'pinned' },
+  { at: '2026-07-22T00:08:00.000Z', name: 'silversprig/moss-router', fromStatus: 'pinned', toStatus: 'queued' }
 ];
 
 // Runes wrap collections in reactive proxies; JSON copying captures the plain
@@ -110,7 +120,7 @@ const TRANSITION_TYPES = {
 
 class AppState {
   candidates = $state(seedRows.map(makeCandidate));
-  queue = $state([]);
+  queue = $state(SEED_QUEUE_NAMES.map((name) => fnvHex(name)));
   timeline = $state(deepCopy(initialTimeline));
   filters = $state({ language: '', band: '', license: '', status: '', search: '' });
   sort = $state({ key: 'name', direction: 'asc' });

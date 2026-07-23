@@ -114,8 +114,8 @@ select.field { appearance:none; background-image:linear-gradient(45deg,transpare
 .progress-dot.running { background:#58c7f3; box-shadow:0 0 0 4px rgb(88 199 243 / .14); animation:pulse 1s ease infinite; }
 .progress-dot.complete { background:#55d6be; }
 @keyframes pulse { 50% { transform:scale(.65); opacity:.55; } }
-@keyframes row-in { from { opacity:0; transform:translateY(-10px); } }
-.fresh-row { animation:row-in .55s ease both; }
+@keyframes row-in { from { opacity:0; transform:translateY(-10px); background:#1c4a41; } 60% { background:#153a34; } }
+.fresh-row { animation:row-in .8s ease both; }
 
 .coach-step { display:inline-flex; align-items:center; gap:.35rem; padding:.3rem .6rem; border:1px solid #2c455f; background:#122539; color:#9fb4c7; font-size:.72rem; font-weight:700; transition:background .25s, color .25s, border-color .25s; }
 .coach-step.done { border-color:#267062; background:#11342f; color:#86ead6; }

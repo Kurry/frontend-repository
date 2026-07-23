@@ -194,7 +194,7 @@
   function choosePalette(code) {
     const candidate=app.find(app.focusedId) || app.find(app.selectedIds[0]); closePalette();
     if(['candidates','quota','timeline','build-queue'].includes(code)) switchView(code);
-    else if(code==='fetch') app.fetchMore(reduced?60:800);
+    else if(code==='fetch') app.fetchMore(reduced?60:1000);
     else if(code==='export'||code==='import') setTimeout(()=>openPanel(code), reduced?0:260);
     else if(code==='help') setTimeout(()=>openHelp(), reduced?0:260);
     else if(candidate) setTimeout(()=>statusAction(candidate,code), reduced?0:260);
@@ -286,7 +286,7 @@
         <section aria-labelledby="candidates-title">
           <div class="mb-4 flex flex-wrap items-end justify-between gap-3">
             <div><div class="eyebrow">Repository intake</div><h1 id="candidates-title" class="mt-1 text-2xl font-semibold tracking-tight lg:text-3xl">Candidate workbench</h1><p class="mt-1 text-sm text-[#8ea6bc]">Score, guard, and freeze benchmark-ready repositories.</p></div>
-            <button class="btn-soft btn-primary" onclick={()=>app.fetchMore(reduced?60:800)} disabled={app.fetchState.running}><IconSparkles size={17}/>{app.fetchState.running?'Sourcing in progress…':'Fetch more candidates'}</button>
+            <button class="btn-soft btn-primary" onclick={()=>app.fetchMore(reduced?60:1000)} disabled={app.fetchState.running}><IconSparkles size={17}/>{app.fetchState.running?'Sourcing in progress…':'Fetch more candidates'}</button>
           </div>
 
           {#if !coachDismissed}
@@ -463,7 +463,7 @@
     <ol class="space-y-2" aria-label="Ordered build queue">
       {#each app.queueEntries() as entry,index (entry.candidate.id)}
         <li class="queue-entry" class:opacity-60={dragId===entry.candidate.id}
-          animate:flip={{duration:D(260)}} in:fly={{x:24,duration:D(240)}} out:fly={{x:24,duration:D(200)}}>
+          animate:flip={{duration:D(300)}} in:fly={{x:24,duration:D(300)}} out:fly={{x:24,duration:D(260)}}>
           <button type="button" class="flex w-full items-start gap-2 text-left"
             aria-label={`Queue position ${entry.position}: ${entry.candidate.name}. Press Alt+ArrowUp or Alt+ArrowDown to move it.`}
             draggable="true" ondragstart={()=>dragId=entry.candidate.id} ondragover={(event)=>event.preventDefault()} ondrop={(event)=>queueDrop(event,index)}
@@ -483,7 +483,7 @@
 {/if}
 
 {#if app.selectedCount>0}
-  <div class="bulk-tray" transition:fly={{y:50,duration:D(220)}} aria-label="Bulk action tray"><span class="mr-auto text-sm font-semibold"><span class="mr-2 rounded-full bg-[#55d6be] px-2 py-1 text-xs text-[#071714]">{app.selectedCount}</span>selected</span><button class="btn-soft" onclick={()=>app.bulk('score')}>Bulk Score</button><button class="btn-soft btn-primary group relative" onclick={()=>app.bulk('select')}>Bulk Select<div class="absolute bottom-full mb-2 hidden group-hover:block w-max max-w-xs bg-[#0f2439] border border-[#2a4159] p-2 text-[10px] text-left text-[#b5c7d8] whitespace-pre shadow-lg z-50 rounded" aria-label="Diff preview">{app.bulkDiff('selected')}</div></button><button class="btn-soft btn-danger group relative" onclick={()=>openReject([...app.selectedIds],true)}>Bulk Reject<div class="absolute bottom-full mb-2 hidden group-hover:block w-max max-w-xs bg-[#0f2439] border border-[#2a4159] p-2 text-[10px] text-left text-[#b5c7d8] whitespace-pre shadow-lg z-50 rounded" aria-label="Diff preview">{app.bulkDiff('rejected')}</div></button><button class="btn-soft icon-btn" onclick={()=>app.selectedIds=[]} aria-label="Clear selection"><IconX size={16}/></button></div>
+  <div class="bulk-tray" transition:fly={{y:50,duration:D(260)}} aria-label="Bulk action tray"><span class="mr-auto text-sm font-semibold"><span class="mr-2 rounded-full bg-[#55d6be] px-2 py-1 text-xs text-[#071714]">{app.selectedCount}</span>selected</span><button class="btn-soft" onclick={()=>app.bulk('score')}>Bulk Score</button><button class="btn-soft btn-primary group relative" onclick={()=>app.bulk('select')}>Bulk Select<div class="absolute bottom-full mb-2 hidden group-hover:block w-max max-w-xs bg-[#0f2439] border border-[#2a4159] p-2 text-[10px] text-left text-[#b5c7d8] whitespace-pre shadow-lg z-50 rounded" aria-label="Diff preview">{app.bulkDiff('selected')}</div></button><button class="btn-soft btn-danger group relative" onclick={()=>openReject([...app.selectedIds],true)}>Bulk Reject<div class="absolute bottom-full mb-2 hidden group-hover:block w-max max-w-xs bg-[#0f2439] border border-[#2a4159] p-2 text-[10px] text-left text-[#b5c7d8] whitespace-pre shadow-lg z-50 rounded" aria-label="Diff preview">{app.bulkDiff('rejected')}</div></button><button class="btn-soft icon-btn" onclick={()=>app.selectedIds=[]} aria-label="Clear selection"><IconX size={16}/></button></div>
 {/if}
 
 {#if app.modal?.type==='reject'}
