@@ -35,6 +35,7 @@ import { execSync, spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { observePageFailures, resolvePlaywright, waitForServer } from './browser_smoke_shared.mjs';
+import { needsPrebuiltOutput } from './start_script_semantics.mjs';
 
 // This script ships inside the corpuscheck python package; the repository is
 // located by walking up from the working directory (the CLI wrapper runs it
@@ -79,18 +80,35 @@ function taskSlugs() {
     .sort();
 }
 
+// `start` scripts that hand off to `vite preview` / `astro preview` / `http-server
+// <build-dir>` all assume a build output directory (dist/, build/, etc.) already
+// exists on disk — they never build it themselves. Build output is no longer
+// committed to git, so this script has to build it on demand before serving.
+// Scripts that already chain a build step (e.g. "npm run build && npm run
+// preview") are left alone — running a second build would be redundant, not
+// harmful, but skipping keeps this a no-op for those tasks.
+function buildIfNeeded(appDir, pkg, start) {
+  if (!needsPrebuiltOutput(start)) return;
+  const buildScript = pkg.scripts?.build ? 'build' : (pkg.scripts?.['verify:build'] ? 'verify:build' : null);
+  if (!buildScript) return;
+  execSync(`npm run ${buildScript}`, { cwd: appDir, stdio: 'ignore' });
+}
+
 function startServer(appDir) {
   const pkgPath = path.join(appDir, 'package.json');
   let cmd, args;
   if (fs.existsSync(pkgPath)) {
     const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
     const start = pkg.scripts?.start || '';
-    const usesServePkg = /(npx\s+(-y\s+|--yes\s+)?serve\b|\bserve@\d)/.test(start) && !start.includes('&&');
-    if (start && !usesServePkg) {
-      // real app server (e.g. vite): needs deps
+    if (start) {
+      // Honor every declared app server. In particular, `npx serve dist` is
+      // semantically different from the static-folder fallback below: it
+      // needs a build first and must serve that output directory.
       if (!fs.existsSync(path.join(appDir, 'node_modules'))) {
         execSync('npm install --no-audit --no-fund', { cwd: appDir, stdio: 'ignore' });
       }
+      // build first if `start` serves a pre-built output dir it doesn't build itself
+      buildIfNeeded(appDir, pkg, start);
       // rewrite any hardcoded port via PORT env; vite-style scripts use --port 3000,
       // http-server uses -p 3000, serve uses -l 3000
       const patched = start

@@ -1,1 +1,0 @@
-import{v as e}from"./core.min-DVALGa4Q.js";import"./preloader-Bns9QiKi.js";const i=()=>{const[r]=e();r.phase!=="playing"||r.currentTurn!=="player"||r.isRivalThinking||(r.playerMode=r.playerMode==="flag"?"reveal":"flag")};export{i as s_V00XREVXB7M};
