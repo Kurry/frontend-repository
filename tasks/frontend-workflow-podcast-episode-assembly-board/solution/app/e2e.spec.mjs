@@ -117,3 +117,93 @@ test.describe('workspace contract (canonical)', () => {
 });
 
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
+
+const enterWorkspace = async (page, width = 1280, height = 900) => {
+  await page.setViewportSize({ width, height });
+  await page.goto(BASE);
+  await page.getByRole('button', { name: 'Skip Tour' }).click();
+};
+
+test('4.4 te_4 WebMCP covers every podcast workflow domain', async ({ page }) => {
+  await enterWorkspace(page);
+  const tools = await listTools(page);
+  const surface = tools.map(tool => `${tool.name} ${tool.description}`).join('\n').toLowerCase();
+  for (const domain of ['clip', 'timeline', 'transcript', 'citation', 'chapter', 'mix', 'rights', 'approval', 'branch', 'render', 'history', 'transfer', 'reset']) {
+    expect(surface, `WebMCP surface documents ${domain}`).toContain(domain);
+  }
+
+  expect((await invokeTool(page, 'editor.switch_mode', { mode: 'transcript' })).ok).toBe(true);
+  expect((await invokeTool(page, 'editor.add', { object_type: 'branch-cut', name: 'te4-fork' })).ok).toBe(true);
+  expect((await invokeTool(page, 'editor.preview')).history.length).toBeGreaterThan(0);
+  expect((await invokeTool(page, 'artifact.export', { format: 'canonical-json' })).ok).toBe(true);
+  expect((await invokeTool(page, 'session.restart')).ok).toBe(true);
+});
+
+test('4.5 te_5 mobile reflow retains source, edit, lineage, approval, render, and export actions', async ({ page }) => {
+  await enterWorkspace(page, 375, 812);
+  await expect(page.getByRole('button', { name: 'Sources' })).toBeVisible();
+  await page.getByRole('button', { name: 'Sources' }).click();
+  await expect(page.getByRole('button', { name: 'Insert', exact: true }).first()).toBeVisible();
+  await page.getByRole('button', { name: 'Timeline' }).click();
+  await expect(page.getByLabel('Timeline mini-map')).toBeVisible();
+
+  await page.getByTitle(/Select Clip 1/).first().click();
+  await expect(page.getByRole('region', { name: 'Selected clip editor' })).toBeVisible();
+  await expect(page.getByLabel('Episode start (ms)')).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Approval and render stepper' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Chapters' }).click();
+  await expect(page.getByText(/Narrative Outline|Chapter Lineage/).first()).toBeVisible();
+  await page.getByRole('button', { name: 'Render' }).first().click();
+  await expect(page.getByText('Render Pipeline')).toBeVisible();
+  await page.getByRole('button', { name: 'Export' }).click();
+  await expect(page.getByRole('button', { name: /Export All/ })).toBeVisible();
+});
+
+test('4.6 te_6 keyboard-only editing, navigation, approval review, render, and export', async ({ page }) => {
+  await enterWorkspace(page);
+  await page.getByTitle(/Select Clip 1/).first().focus();
+  await page.keyboard.press('Enter');
+  const start = page.getByLabel('Episode start (ms)');
+  const before = Number(await start.inputValue());
+  await page.keyboard.press('ArrowRight');
+  await expect(start).toHaveValue(String(before + 10));
+  await page.keyboard.press('s');
+  await expect(page.getByText('Undo available')).toBeVisible();
+
+  await page.keyboard.press('Alt+6');
+  await expect(page.getByText('Rights Review').first()).toBeVisible();
+  await page.keyboard.press('Alt+8');
+  await expect(page.getByText('Render Pipeline')).toBeVisible();
+  await page.keyboard.press('Alt+9');
+  await expect(page.getByRole('button', { name: /Export All/ })).toBeVisible();
+});
+
+test('4.7 te_7 UI and WebMCP share ids, milliseconds, checksums, history, and artifact files', async ({ page }) => {
+  await enterWorkspace(page);
+  const selected = await invokeTool(page, 'entity.select', { id: 'inst-1' });
+  expect(selected.ok).toBe(true);
+  const changed = await invokeTool(page, 'editor.update_property', {
+    object_type: 'timeline-instance', id: 'inst-1', property: 'start-ms', value: 1230,
+  });
+  expect(changed.ok).toBe(true);
+  await expect(page.getByLabel('Episode start (ms)')).toHaveValue('1230');
+
+  const preview = await invokeTool(page, 'editor.preview');
+  expect(preview.ok).toBe(true);
+  expect(preview.checksum).toMatch(/^cut-/);
+  expect(preview.history.some(entry => entry.detail.includes('inst-1'))).toBe(true);
+
+  const exported = await invokeTool(page, 'artifact.export', { format: 'timeline-svg' });
+  expect(exported.ok).toBe(true);
+  expect(exported.formats).toEqual(expect.objectContaining({
+    'canonical-json': expect.any(Number),
+    'edl-csv': expect.any(Number),
+    'transcript-csv': expect.any(Number),
+    webvtt: expect.any(Number),
+    'rss-xml': expect.any(Number),
+    'show-notes-markdown': expect.any(Number),
+    'timeline-svg': expect.any(Number),
+  }));
+  await expect(page.getByRole('button', { name: /Re-Export/ })).toBeVisible();
+});

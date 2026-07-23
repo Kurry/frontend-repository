@@ -76,6 +76,11 @@ export default function App() {
       if (typing) return;
       if (e.key === '?') { setShowHelp(h => !h); return; }
       const s = useStore.getState();
+      if (e.altKey && /^[1-9]$/.test(e.key)) {
+        e.preventDefault();
+        s.setMode(MODES[Number(e.key) - 1].id);
+        return;
+      }
       const id = s.selectedInstance;
       if (!id) return;
       const step = e.shiftKey ? 1000 : 10;
@@ -171,6 +176,7 @@ export default function App() {
                     <button
                       key={m.id}
                       onClick={() => store.setMode(m.id)}
+                      aria-keyshortcuts={`Alt+${MODES.findIndex(mode => mode.id === m.id) + 1}`}
                       className={`${btn} shrink-0 ${mainMode === m.id ? 'bg-[var(--accent)] text-white' : 'bg-[var(--panel2)] hover:bg-[var(--border)]'} ${m.id === 'sources' ? 'md:hidden' : ''}`}
                     >
                       {m.label}
@@ -1624,6 +1630,7 @@ function SettingsModal({ close }: { close: () => void }) {
 function HelpModal({ close }: { close: () => void }) {
   const rows: [string, string][] = [
     ['Ctrl/⌘ + K', 'Command palette'],
+    ['Alt + 1–9', 'Open Sources, Timeline, Transcript, Chapters, Mix, Rights, Branches, Render, or Export'],
     ['? ', 'Toggle this help'],
     ['← / →', 'Move selected clip 10 ms (Shift: 1 s, Alt: ripple)'],
     ['[ and ]', 'Trim head/tail 10 ms earlier/later (Shift: 1 s)'],
