@@ -194,8 +194,6 @@ test('AC-13 Interleave edits, rehearsal repair, future-only undo, approval, expo
 
 test('oracle-fix accessibility, guidance, and modal focus contract', async ({ page }) => {
     await page.goto(BASE);
-    const dialog = page.getByRole('dialog', { name: 'Welcome to the rehearsal room' });
-    if (await dialog.isVisible()) await dialog.getByRole('button', { name: 'Enter the studio' }).click();
     const alice = page.getByRole('button', { name: /Alice, actor/ });
     await alice.focus();
     await page.keyboard.press('Enter');
@@ -212,8 +210,6 @@ test('oracle-fix accessibility, guidance, and modal focus contract', async ({ pa
 
 test('oracle-fix create edit delete updates stage inspector timeline and count', async ({ page }) => {
     await page.goto(BASE);
-    const welcome = page.getByRole('dialog', { name: 'Welcome to the rehearsal room' });
-    if (await welcome.isVisible()) await welcome.getByRole('button', { name: 'Enter the studio' }).click();
     const before = Number(await page.locator('.count').first().textContent());
     await page.getByRole('button', { name: 'Add waypoint' }).click();
     const dialog = page.getByRole('dialog', { name: 'Add waypoint' });
@@ -236,7 +232,6 @@ test('oracle-fix create edit delete updates stage inspector timeline and count',
 
 test('oracle-fix invalid creation explains stage bounds', async ({ page }) => {
     await page.goto(BASE);
-    const welcome = page.getByRole('dialog'); if (await welcome.isVisible()) await page.keyboard.press('Escape');
     await page.getByRole('button', { name: 'Add waypoint' }).click();
     await page.getByRole('dialog').getByRole('spinbutton', { name: 'Beat' }).fill('49');
     await page.getByRole('dialog').getByRole('button', { name: 'Add waypoint', exact: true }).click();
@@ -245,7 +240,6 @@ test('oracle-fix invalid creation explains stage bounds', async ({ page }) => {
 
 test('oracle-fix sort reversal, filter, branch, and persisted mode stay coherent', async ({ page }) => {
     await page.goto(BASE);
-    const welcome = page.getByRole('dialog'); if (await welcome.isVisible()) await page.keyboard.press('Escape');
     await page.getByRole('button', { name: 'Path', exact: true }).click();
     await page.getByLabel('Filter waypoints').selectOption('actor');
     await page.getByRole('button', { name: 'Sort descending' }).click();
@@ -261,20 +255,17 @@ test('oracle-fix sort reversal, filter, branch, and persisted mode stay coherent
 
 test('oracle-fix beat interpolation visibly changes derived stage position', async ({ page }) => {
     await page.goto(BASE);
-    const welcome = page.getByRole('dialog'); if (await welcome.isVisible()) await page.keyboard.press('Escape');
     const actor = page.getByRole('button', { name: /Alice, actor/ });
-    const atOne = await actor.getAttribute('transform');
+    const atOne = await actor.evaluate((element) => element.getAttribute('transform'));
     await page.getByRole('button', { name: 'Add waypoint' }).click();
     await page.getByLabel('Beat').fill('20'); await page.getByLabel('X position (m)').fill('10'); await page.getByLabel('Y position (m)').fill('7');
     await page.getByRole('dialog').getByRole('button', { name: 'Add waypoint' }).click();
     await page.getByRole('button', { name: '20', exact: true }).click();
-    await page.waitForTimeout(500);
-    expect(await actor.getAttribute('transform')).not.toBe(atOne);
+    await expect(actor).not.toHaveAttribute('transform', atOne);
 });
 
 test('oracle-fix analysis rehearsal approval and artifact flows provide feedback', async ({ page }) => {
     await page.goto(BASE);
-    const welcome = page.getByRole('dialog'); if (await welcome.isVisible()) await page.keyboard.press('Escape');
     await page.getByRole('button', { name: 'Analyze', exact: true }).click();
     await expect(page.getByText(/Sightlines and access clear|Collision risk/).first()).toBeVisible();
     await page.getByRole('button', { name: 'Rehearse', exact: true }).click();
@@ -290,7 +281,6 @@ test('oracle-fix analysis rehearsal approval and artifact flows provide feedback
 test('oracle-fix responsive layouts avoid overflow and preserve 44px controls', async ({ page }) => {
     for (const width of [1440, 768, 375]) {
         await page.setViewportSize({ width, height: 900 }); await page.goto(BASE);
-        const welcome = page.getByRole('dialog'); if (await welcome.isVisible()) await page.keyboard.press('Escape');
         const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
         expect(overflow).toBeLessThanOrEqual(1);
     }
