@@ -1,0 +1,89 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "tech.interleave_match"
+name = "ui_webmcp_interleave_match"
+description = "Interleave UI and WebMCP actions for blocks, edges, dates, seeds, tasks, branches, and evaluations. Confirm that IDs, geometry, quantities, checksums, and artifact files exactly match expected canonical state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "tech.reload_isolation"
+name = "reload_state_isolation"
+description = "Reload the page during an invalid draft, transient preview, or dialog. Confirm that these transient states do not leak into persistent storage and that promised persistent state survives exactly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "tech.import_validation"
+name = "atomic_import_validation"
+description = "Import an artifact with a known conflict (e.g., duplicate ID or overlapping block). Confirm the import fails atomically with zero state mutation and reports the diagnostic."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "tech.performance_latency"
+name = "performance_latency_limits"
+description = "With a maximum fixture loaded, confirm direct manipulation acknowledges within 100ms, linked/derived views settle within 500ms, and export/import complete within 2s without drops, layout jumps, or console errors."
+type = "binary"
+weight = 1.0
