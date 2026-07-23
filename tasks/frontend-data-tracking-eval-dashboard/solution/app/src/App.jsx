@@ -204,7 +204,8 @@ function useDrawerBehavior(open, close, panelRef) {
       : [];
     const onFocus = (event) => {
       if (!panelRef.current || panelRef.current.contains(event.target)) return;
-      (focusableNodes()[0] || panelRef.current).focus();
+      const target = focusableNodes()[0] || panelRef.current;
+      if (document.activeElement !== target) target.focus();
     };
     const onKey = (event) => {
       if (event.key === 'Escape') {
@@ -338,9 +339,9 @@ function SuiteCard({ suite }) {
         <div className="night-toggle-wrap" title={state.nightWindow ? `Run during ${state.nightWindow.startTime}–${state.nightWindow.endTime}` : 'Configure Night Window in the toolbar'}>
           <Toggle id={`night-${suite.id}`} size="sm" labelText="Night Mode" hideLabel toggled={suite.nightMode} onToggle={() => state.toggleNightMode(suite.id)} />
         </div>
-        <IconButton label={pinned ? `Unpin ${suite.name}` : `Pin ${suite.name} to top`} size="sm" kind="ghost" className={`pin-button ${pinned ? 'is-pinned' : ''}`} onClick={() => state.togglePin(suite.id)}>{pinned ? <StarFilled /> : <Star />}</IconButton>
-        <IconButton label={`Edit ${suite.name}`} size="sm" kind="ghost" onClick={(event) => { captureLauncher(event); state.openSuiteModal('edit', suite.id); }}><Edit /></IconButton>
-        <IconButton label={`Delete ${suite.name}`} size="sm" kind="ghost" onClick={(event) => { captureLauncher(event); state.requestDelete(suite.id); }}><TrashCan /></IconButton>
+        <IconButton aria-label={pinned ? `Unpin ${suite.name}` : `Pin ${suite.name} to top`} label={pinned ? `Unpin ${suite.name}` : `Pin ${suite.name} to top`} size="sm" kind="ghost" className={`pin-button ${pinned ? 'is-pinned' : ''}`} onClick={() => state.togglePin(suite.id)}>{pinned ? <StarFilled /> : <Star />}</IconButton>
+        <IconButton aria-label={`Edit ${suite.name}`} label={`Edit ${suite.name}`} size="sm" kind="ghost" onClick={(event) => { captureLauncher(event); state.openSuiteModal('edit', suite.id); }}><Edit /></IconButton>
+        <IconButton aria-label={`Delete ${suite.name}`} label={`Delete ${suite.name}`} size="sm" kind="ghost" onClick={(event) => { captureLauncher(event); state.requestDelete(suite.id); }}><TrashCan /></IconButton>
       </div>
     </article>
   );
@@ -967,7 +968,7 @@ function Toasts() {
       <div className="toast-stack" aria-label="Notifications">
         {state.toasts.map((toast) => (
           <div key={toast.id}>
-            <ToastNotification lowContrast kind="success" title={toast.title} subtitle={toast.subtitle} timeout={0} onClose={() => state.dismissToast(toast.id)} />
+            <ToastNotification lowContrast kind="success" title={toast.title} subtitle={toast.subtitle} timeout={4300} onClose={() => state.dismissToast(toast.id)} />
           </div>
         ))}
       </div>
@@ -984,7 +985,7 @@ function Toasts() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.32, ease: 'easeOut' }}
           >
-            <ToastNotification lowContrast kind="success" title={toast.title} subtitle={toast.subtitle} timeout={0} onClose={() => state.dismissToast(toast.id)} />
+            <ToastNotification lowContrast kind="success" title={toast.title} subtitle={toast.subtitle} timeout={4300} onClose={() => state.dismissToast(toast.id)} />
           </motion.div>
         ))}
       </AnimatePresence>
