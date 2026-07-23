@@ -1,0 +1,138 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "core_features.roster_canvas_reassignment"
+name = "roster_canvas_reassignment"
+description = "Starting from a clean load, locate the roster canvas. Ensure shift cards are visible occupying time lanes by volunteer and venue. Drag a card to another volunteer and confirm that doing so proposes a reassignment."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.roster_canvas_exchange_loop"
+name = "roster_canvas_exchange_loop"
+description = "In the roster canvas, draw successive edges between shift cards and confirm it creates a multi-person exchange loop (two- to five-person)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.coverage_cells"
+name = "coverage_cells"
+description = "Verify that the coverage cells correctly show the required versus assigned role counts and that selecting a cell selects exact shifts."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.exchange_transaction_composer"
+name = "exchange_transaction_composer"
+description = "Compose an exchange transaction. Verify that it stores the offered shift, requested/received shift, role assignment, participants, rationale, and expiry. Also verify that open chains are invalid and duplicate shift/participant roles and self-loops are rejected."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.exchange_composer_preview"
+name = "exchange_composer_preview"
+description = "In the exchange composer, verify that it previews the before/after roster, coverage, hours, fairness, travel, and conflicts without mutating the committed ownership."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.constraint_graph"
+name = "constraint_graph"
+description = "Verify the constraint graph. Check that hard rules (availability, skill/certification, accessibility-compatible venue, overlapping time, 11-hour rest, 20-hour cap, role coverage, cross-venue travel) and soft rules (preferences, fairness) are enforced. Selecting a conflict must highlight the exact volunteer, shifts, edge, threshold, and remediation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.participant_response_workflow"
+name = "participant_response_workflow"
+description = "Send a proposal and confirm it creates tentative shift reservations and response tasks for every participant, and that one decline or expiry releases all reservations."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.coordinator_approval"
+name = "coordinator_approval"
+description = "Verify coordinator approval. When all participants accept and hard constraints pass, the coordinator can approve. If the current roster changed since proposal, confirm that approval becomes stale and requires a rebase/review."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.atomic_commit"
+name = "atomic_commit"
+description = "Verify atomic commit. Commit an approved exchange and confirm it changes all shift owners simultaneously and appends ownership history without ever showing an intermediate roster as committed."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.partial_failure_rollback"
+name = "partial_failure_rollback"
+description = "Simulate a partial internal ownership write failure. Expose the failed commit attempt in the UI while the canonical roster remains at the pretransaction snapshot, and allow retry atomic commit, rebase, edit revision, or cancel without duplicating events."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.fairness_waitlist_routing"
+name = "fairness_waitlist_routing"
+description = "Verify the fairness and waitlist routing. Charts must show desirable/undesirable hours, total hours, preference match, and recent swap burden per volunteer. Ensure a waitlist routes open shifts to eligible volunteers in deterministic priority order, producing only proposals."
+type = "binary"
+weight = 1.0
