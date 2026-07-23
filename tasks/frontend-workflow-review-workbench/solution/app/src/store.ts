@@ -158,9 +158,9 @@ export const useReviewStore = create<StoreState>((set, get) => ({
   selectCriterion: (criterionId) => set((state) => ({ selection: { ...state.selection, criterionId } })),
   breadcrumbNavigate: (level) => {
     if (level === 'portfolio') return get().openPortfolio();
-    if (level === 'bundle') set((state) => ({ selection: { ...state.selection, gateName: null, trialId: null, criterionId: null }, ui: { ...state.ui, workspacePanel: 'Resolve', diff: baseDiff } }));
-    if (level === 'gate') set((state) => ({ selection: { ...state.selection, trialId: null, criterionId: null }, ui: { ...state.ui, workspacePanel: 'Gate', diff: baseDiff } }));
-    if (level === 'trial') set((state) => ({ selection: { ...state.selection, criterionId: null }, ui: { ...state.ui, workspacePanel: 'Audit' } }));
+    if (level === 'bundle') set((state) => ({ selection: { ...state.selection, gateName: null, trialId: null, criterionId: null }, ui: { ...state.ui, view: 'workspace', workspacePanel: 'Resolve', diff: baseDiff } }));
+    if (level === 'gate') set((state) => ({ selection: { ...state.selection, trialId: null, criterionId: null }, ui: { ...state.ui, view: 'workspace', workspacePanel: 'Gate', diff: baseDiff } }));
+    if (level === 'trial') set((state) => ({ selection: { ...state.selection, criterionId: null }, ui: { ...state.ui, view: 'workspace', workspacePanel: 'Audit' } }));
   },
   setHeroFilter: (value) => set((state) => ({ filters: { ...state.filters, heroState: value } })),
   setGateFilter: (name, status) => set((state) => ({ filters: { ...state.filters, gateName: name, gateStatus: status } })),
@@ -372,7 +372,11 @@ export const useReviewStore = create<StoreState>((set, get) => ({
       announcement = cleared
         ? `${gateName} changed from ${oldStatus} to ${gate.status}. Recommendation ${cleared} became disallowed and was cleared.`
         : `${gateName} changed from ${oldStatus} to ${gate.status}.`;
-    }), ui: { ...state.ui, announcement: announcement || state.ui.announcement } }));
+    }) }));
+    set((state) => {
+      const finalAnnouncement = announcement || state.ui.announcement;
+      return { ui: { ...state.ui, announcement: state.ui.announcement === finalAnnouncement ? finalAnnouncement + '\u200B' : finalAnnouncement } };
+    });
     if (shouldContinue) scheduleAdvance(slug, gateName, delay);
   },
   pauseRerun: (slug, gateName) => set((state) => ({ bundles: updateBundle(state.bundles, slug, (bundle) => {
@@ -463,7 +467,7 @@ export const useReviewStore = create<StoreState>((set, get) => ({
       return { ok: false, error: formatImportError(error) };
     }
   },
-  setAnnouncement: (text) => set((state) => ({ ui: { ...state.ui, announcement: text } })),
+  setAnnouncement: (text) => set((state) => ({ ui: { ...state.ui, announcement: state.ui.announcement === text ? text + '\u200B' : text } })),
 }));
 
 declare global {
