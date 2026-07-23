@@ -223,13 +223,13 @@ export function ExportCenter() {
         class="w-full max-w-lg bg-[var(--color-surface)] h-full overflow-y-auto shadow-xl export-panel"
         role="dialog"
         aria-modal="true"
-        aria-label="Export center"
+        aria-label="Export Center"
         onClick={e => e.stopPropagation()}
       >
         <TrapScope active containerRef={dialogRef} onEscape={close} />
         <div class="p-4 border-b border-neutral-400 flex items-center justify-between gap-2">
-          <h2>Export center</h2>
-          <button type="button" class="btn-secondary btn-compact" onClick={close} aria-label="Close Export center">
+          <h2>Export Center</h2>
+          <button type="button" class="btn-secondary btn-compact" onClick={close} aria-label="Close Export Center">
             <Icon name="close" size={16} /> Close
           </button>
         </div>
@@ -264,7 +264,7 @@ export function ExportCenter() {
                     <button type="button" class="btn-secondary btn-compact" data-export-copy="study-pack"
                       onClick={() => copy('Study pack JSON', studyPackText)}>
                       <Icon name="copy" size={14} />
-                      {copied.value === 'Study pack JSON' ? 'Copied!' : copyFailed.value === 'Study pack JSON' ? 'Copy failed' : 'Copy'}
+                      {copied.value === 'Study pack JSON' ? 'Copied to clipboard!' : copyFailed.value === 'Study pack JSON' ? 'Copy failed' : 'Copy JSON'}
                     </button>
                     <button type="button" class="btn-primary btn-compact"
                       onClick={() => download('lineforge-study-pack.json', studyPackText, 'application/json')}>
@@ -282,7 +282,7 @@ export function ExportCenter() {
                     <button type="button" class="btn-secondary btn-compact"
                       onClick={() => copy('Current line PGN', pgnText)}>
                       <Icon name="copy" size={14} />
-                      {copied.value === 'Current line PGN' ? 'Copied!' : copyFailed.value === 'Current line PGN' ? 'Copy failed' : 'Copy'}
+                      {copied.value === 'Current line PGN' ? 'Copied to clipboard!' : copyFailed.value === 'Current line PGN' ? 'Copy failed' : 'Copy PGN'}
                     </button>
                     <button type="button" class="btn-primary btn-compact"
                       onClick={() => download('lineforge-current-line.pgn', pgnText, 'application/x-chess-pgn')}>
