@@ -356,7 +356,10 @@ button:active:not(:disabled),
 
 .library-table-container {
   width: 100%;
+  max-width: 100%;
   overflow-x: auto;
+  contain: inline-size;
+  overscroll-behavior-inline: contain;
 }
 
 .library-table {
@@ -407,6 +410,10 @@ button:active:not(:disabled),
   animation: row-collapse 150ms cubic-bezier(0.2, 0, 0.38, 0.9) both;
   transform-origin: top;
   pointer-events: none;
+}
+
+.library-table tbody tr.row-deleting > td {
+  animation: cell-collapse 150ms cubic-bezier(0.2, 0, 0.38, 0.9) both;
 }
 
 .library-table td {
@@ -1126,6 +1133,12 @@ button:active:not(:disabled),
   box-shadow: var(--shadow-float);
 }
 
+.toast-region--exit { animation: toast-exit 220ms ease-in both; }
+.overlay-exit .cds--modal-container { animation: modal-exit 220ms cubic-bezier(0.2, 0, 1, 0.9) both; }
+.overlay-exit { animation: fade-out 220ms ease both; }
+.panel-layer--exit .side-panel { animation: panel-exit 240ms cubic-bezier(0.2, 0, 1, 0.9) both; }
+.panel-layer--exit .panel-backdrop { animation: fade-out 240ms ease both; }
+
 .sr-only {
   position: absolute !important;
   width: 1px !important;
@@ -1144,29 +1157,34 @@ button:active:not(:disabled),
 }
 
 @keyframes row-collapse {
-  from { opacity: 1; transform: scaleY(1); }
-  to { opacity: 0; transform: scaleY(0); }
+  from { height: 5.25rem; opacity: 1; transform: scaleY(1); }
+  to { height: 0; opacity: 0; transform: scaleY(0); }
 }
+@keyframes cell-collapse { to { height: 0; padding-block: 0; border-width: 0; } }
 
 @keyframes modal-enter {
   from { opacity: 0; transform: scale(0.975); }
   to { opacity: 1; transform: scale(1); }
 }
+@keyframes modal-exit { to { opacity: 0; transform: scale(0.975); } }
 
 @keyframes panel-enter {
   from { transform: translateX(100%); }
   to { transform: translateX(0); }
 }
+@keyframes panel-exit { to { transform: translateX(100%); } }
 
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+@keyframes fade-out { to { opacity: 0; } }
 
 @keyframes toast-enter {
   from { opacity: 0; transform: translateY(1rem); }
   to { opacity: 1; transform: translateY(0); }
 }
+@keyframes toast-exit { to { opacity: 0; transform: translateY(1rem); } }
 
 @media (max-width: 82rem) {
   .toolbar-main {
@@ -1192,6 +1210,13 @@ button:active:not(:disabled),
   .toolbar-actions .cds--btn {
     min-height: 2.75rem;
   }
+
+  .sortable-header {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+
+  .library-table-container { width: calc(100vw - 2rem); }
 
   .header-actions .cds--btn,
   .mobile-overflow {
@@ -1433,18 +1458,10 @@ button:active:not(:disabled),
 
 .onboarding-layer {
   position: fixed;
-  inset: 0;
+  right: 1rem;
+  bottom: 1rem;
   z-index: 10000;
-  display: grid;
-  place-items: center;
-  padding: 1rem;
-}
-
-.onboarding-backdrop {
-  position: absolute;
-  inset: 0;
-  border: 0;
-  background: rgb(22 22 22 / 0.72);
+  width: min(32rem, calc(100vw - 2rem));
 }
 
 .onboarding-card {
@@ -1463,6 +1480,16 @@ button:active:not(:disabled),
   font-size: 1.25rem;
   font-weight: 600;
 }
+
+.onboarding-progress {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+.onboarding-progress span { height: 0.25rem; background: #e0e0e0; }
+.onboarding-progress span.is-complete { background: var(--color-accent); }
+.mutation-progress { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--color-muted); }
 
 .onboarding-card p {
   margin: 0 0 1rem;

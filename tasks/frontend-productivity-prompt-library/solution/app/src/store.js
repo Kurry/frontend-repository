@@ -10,14 +10,19 @@ import {
 
 let idCounter = 100;
 let toastTimer;
+let toastExitTimer;
 let copyTimer;
 
 const makeId = (prefix) => `${prefix}-${Date.now().toString(36)}-${(idCounter += 1).toString(36)}`;
 
 const showTimedToast = (set, toast) => {
   window.clearTimeout(toastTimer);
-  set({ toast: { id: makeId('toast'), ...toast } });
-  toastTimer = window.setTimeout(() => set({ toast: null }), 3600);
+  window.clearTimeout(toastExitTimer);
+  set({ toast: { id: makeId('toast'), exiting: false, ...toast } });
+  toastTimer = window.setTimeout(() => {
+    set((state) => ({ toast: state.toast ? { ...state.toast, exiting: true } : null }));
+    toastExitTimer = window.setTimeout(() => set({ toast: null }), 220);
+  }, 3600);
 };
 
 const attachmentFromFilename = (filename) => {
@@ -100,7 +105,6 @@ export const useLibraryStore = create((set, get) => ({
     set((state) => ({
       prompts: [prompt, ...state.prompts],
       selectedIds: [],
-      activeModal: null,
       newPromptId: id,
     }));
     window.setTimeout(() => set({ newPromptId: null }), 450);
@@ -128,7 +132,6 @@ export const useLibraryStore = create((set, get) => ({
         };
         return updated;
       }),
-      activeModal: null,
     }));
     if (updated) showTimedToast(set, { kind: 'success', title: 'Prompt updated', subtitle: `Version ${updated.version} saved.` });
     return updated;
@@ -140,7 +143,6 @@ export const useLibraryStore = create((set, get) => ({
     set((state) => ({
       prompts: state.prompts.filter((item) => item.id !== id),
       selectedIds: state.selectedIds.filter((selectedId) => selectedId !== id),
-      activeModal: null,
       detailPromptId: state.detailPromptId === id ? null : state.detailPromptId,
       historyPromptId: state.historyPromptId === id ? null : state.historyPromptId,
     }));
@@ -197,7 +199,6 @@ export const useLibraryStore = create((set, get) => ({
         selectedIds: [],
         searchQuery: '',
         techniqueFilter: 'all',
-        activeModal: null,
         detailPromptId: null,
         historyPromptId: null,
       });
@@ -206,6 +207,32 @@ export const useLibraryStore = create((set, get) => ({
     } finally {
       set({ isLoading: false });
     }
+  },
+
+  addPerformanceSample: () => {
+    const source = get().prompts;
+    if (!source.length) return 0;
+    const additions = Array.from({ length: 120 }, (_, index) => {
+      const original = source[index % source.length];
+      const id = makeId('sample');
+      const data = {
+        ...requestFromPrompt(original),
+        title: `Sample ${String(index + 1).padStart(3, '0')} · ${original.title}`.slice(0, 60),
+      };
+      const created = new Date(Date.now() - index * 1000).toISOString();
+      return {
+        ...original,
+        ...data,
+        id,
+        created,
+        version: 1,
+        sources: [original.id],
+        versions: [{ id: `${id}-v1`, version: 1, timestamp: created, summary: 'Performance sample', data }],
+      };
+    });
+    set((state) => ({ prompts: [...state.prompts, ...additions] }));
+    showTimedToast(set, { kind: 'success', title: 'Performance sample ready', subtitle: `${additions.length} prompts added without blocking the library.` });
+    return additions.length;
   },
 }));
 
