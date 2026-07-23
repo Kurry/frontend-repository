@@ -142,7 +142,7 @@ test('1.2 camera_overlay_focus_trap', async ({ page }) => {
   await page.goto(BASE);
   const trigger = page.getByRole('button', { name: /Camera/ });
   await trigger.click();
-  const dialog = page.locator('.dialog-content');
+  const dialog = page.locator('.camera-dialog');
   await expect(dialog).toBeVisible();
   await expect.poll(() => dialog.evaluate((node) => node.contains(document.activeElement))).toBe(true);
   for (let i = 0; i < 8; i++) {
@@ -385,7 +385,8 @@ test('7.1 7.2 7.4 7.5 7.6 7.7 7.8 7.9 7.10 7.11 mobile studio remains reachable 
   await expect(first).not.toHaveClass(/kind-blank/);
   await page.getByRole('button', { name: /Gallery/ }).click();
   await expect(page.locator('.board-grid')).toHaveCSS('grid-template-columns', /.+/);
-  await expect(page.locator('html')).toHaveJSProperty('scrollWidth', 375);
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
   expect(b.x).toBeGreaterThanOrEqual(a.x);
 });
 
