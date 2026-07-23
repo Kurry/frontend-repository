@@ -34,8 +34,8 @@ export function ToastView({ toast }: { toast: ToastState | null }) {
     <div
       role="status"
       aria-live="polite"
-      className={`fixed bottom-5 left-1/2 z-[1400] rounded bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-xl transition-opacity duration-300 ${
-        toast.leaving ? 'opacity-0' : 'opacity-100'
+      className={`fixed bottom-5 left-1/2 z-[1400] rounded bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-xl transition-all duration-300 transform ${
+        toast.leaving ? 'opacity-0 translate-y-8' : 'opacity-100 translate-y-0'
       }`}
       style={{ animation: 'toast-in 0.25s ease both' }}
     >

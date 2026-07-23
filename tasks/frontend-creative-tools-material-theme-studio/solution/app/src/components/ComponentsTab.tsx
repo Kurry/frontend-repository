@@ -49,7 +49,7 @@ export default function ComponentsTab() {
                             <a
                                 key={s.id}
                                 href={`#comp-${s.id}`}
-                                className="block px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-colors"
+                                className="block px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white hover:underline rounded transition-colors"
                             >
                                 {s.name}
                             </a>

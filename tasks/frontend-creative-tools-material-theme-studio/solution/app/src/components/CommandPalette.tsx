@@ -156,8 +156,7 @@ export default function CommandPalette({ open, onClose }: { open: boolean; onClo
               event.preventDefault();
               runHighlighted();
             } else if (event.key === 'Escape') {
-              event.preventDefault();
-              onClose();
+              // Let Overlay capture handle it
             }
           }}
           placeholder="Search tabs, tools, themes, samples, and components"
