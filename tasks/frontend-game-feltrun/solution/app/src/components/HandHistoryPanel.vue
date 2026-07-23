@@ -15,7 +15,7 @@
         </template>
       </div>
 
-      <ul class="m-0 p-0 flex flex-col gap-2" style="list-style: none; max-height: 420px; overflow-y: auto;">
+      <transition-group name="history-list" tag="ul" class="m-0 p-0 flex flex-col gap-2" style="list-style: none; max-height: 420px; overflow-y: auto;">
         <li
           v-for="entry in s.history"
           :key="entry.id"
@@ -78,7 +78,7 @@
             </div>
           </div>
         </li>
-      </ul>
+      </transition-group>
     </template>
   </section>
 </template>
@@ -188,9 +188,22 @@ function isRedCode(code: string): boolean {
   to { opacity: 1; transform: translateY(0); }
 }
 .history-new {
-  animation: history-in 0.45s ease-out;
+  /* animation: history-in 0.45s ease-out; let Vue transition group handle it */
+}
+.history-list-enter-active,
+.history-list-leave-active {
+  transition: all 0.45s ease;
+}
+.history-list-enter-from {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+.history-list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
 }
 @media (prefers-reduced-motion: reduce) {
+  .history-list-enter-active, .history-list-leave-active { transition: none; }
   .history-new { animation: none; }
   .row-detail { transition: none; }
 }
