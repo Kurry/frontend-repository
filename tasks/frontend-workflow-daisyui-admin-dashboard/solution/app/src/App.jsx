@@ -1,5 +1,5 @@
 import { cloneElement } from 'preact';
-import { useEffect, useRef } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -426,7 +426,7 @@ const commands=[
 function CommandPalette({triggerRef}) {
   const ref=useRef(null); const filtered=commands.filter(([,label])=>label.toLowerCase().includes(store.commandQuery.value.toLowerCase()));
   const close=()=>{store.commandOpen.value=false;store.commandQuery.value=''}; useFocusTrap(true,ref,close,triggerRef);
-  const choose=(id)=>{close();if(id==='export-drawer')store.openExport('json');else if(id==='toggle-theme')store.setTheme(store.theme.value==='dark'?'light':'dark');else store.setView(id)};
+  const choose=(id)=>{close();if(id==='export-drawer'){window.__lastExportTrigger=triggerRef.current;store.openExport('json');}else if(id==='toggle-theme')store.setTheme(store.theme.value==='dark'?'light':'dark');else store.setView(id)};
   const [activeIndex, setActiveIndex] = useState(0);
   useEffect(() => { setActiveIndex(0); }, [store.commandQuery.value]);
   const onKeyDown = (e) => {
@@ -464,5 +464,5 @@ export default function App() {
   useEffect(()=>{if(!store.toast.value)return;const timer=setTimeout(()=>store.toast.value='',2600);return()=>clearTimeout(timer)},[store.toast.value]);
   useEffect(()=>registerWebMcp(),[]);
   const rememberExportTrigger=(event)=>{const button=event.target.closest?.('button');if(!button)return;const label=`${button.textContent} ${button.getAttribute('aria-label')||''}`;if(/export/i.test(label))window.__lastExportTrigger=button.closest('.command-card')?commandTriggerRef.current:button;};
-  return <div className="app-shell" onClickCapture={rememberExportTrigger}><Sidebar/><div className="main"><Header commandTriggerRef={commandTriggerRef} exportTriggerRef={exportTriggerRef}/><CurrentView key={activeView} view={activeView}/></div>{store.commandOpen.value&&<CommandPalette triggerRef={commandTriggerRef}/>} {store.exportOpen.value&&<ExportDrawer triggerRef={exportTriggerRef}/>} {store.importOpen.value&&<ImportModal/>}<BulkDialog/>{store.toast.value&&<div className="toast-live" role="status" aria-live="polite"><CheckCircleIcon className="icon-sm" style={{display:'inline',marginRight:7}}/>{store.toast.value}</div>}<div className="sr-only" aria-live="polite">{store.toast.value}</div></div>;
+  return <div className="app-shell" onClickCapture={rememberExportTrigger}><Sidebar/><div className="main"><Header commandTriggerRef={commandTriggerRef} exportTriggerRef={exportTriggerRef}/><CurrentView key={activeView} view={activeView}/></div>{store.commandOpen.value&&<CommandPalette triggerRef={commandTriggerRef}/>} {store.exportOpen.value&&<ExportDrawer triggerRef={exportTriggerRef}/>} {store.importOpen.value&&<ImportModal/>}{store.bulkDialog.value&&<BulkDialog/>}{store.toast.value&&<div className="toast-live" role="status" aria-live="polite"><CheckCircleIcon className="icon-sm" style={{display:'inline',marginRight:7}}/>{store.toast.value}</div>}<div className="sr-only" aria-live="polite">{store.toast.value}</div></div>;
 }
