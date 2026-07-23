@@ -619,7 +619,7 @@ test.describe('oracle-fix interaction contracts', () => {
       const observer = 'PerformanceObserver' in window
         ? new PerformanceObserver((list) => longTasks.push(...list.getEntries().map((entry) => entry.duration)))
         : null;
-      try { observer?.observe({ type: 'longtask', buffered: true }); } catch { /* unsupported */ }
+      try { observer?.observe({ type: 'longtask' }); } catch { /* unsupported */ }
       const frames = [];
       let previous = performance.now();
       const bottom = document.documentElement.scrollHeight - innerHeight;
