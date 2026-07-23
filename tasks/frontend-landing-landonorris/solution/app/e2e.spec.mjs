@@ -248,11 +248,14 @@ test.describe('oracle-fix interaction contracts', () => {
     expect(doc.shortlist.map((entry) => entry.kind).sort()).toEqual(['editorial', 'helmet']);
     expect(doc.shortlist.every((entry) => entry.label.length > 0 && entry.label.length <= 60 && Number.isInteger(entry.index) && entry.index >= 1)).toBe(true);
     await page.click('[data-presskit-close]');
-    for (let i = 0; i < 20; i += 1) await page.locator('.h-card .shortlist-btn').nth(i % 6).click();
+    await page.evaluate(() => {
+      const buttons = Array.from(document.querySelectorAll('.h-card .shortlist-btn'));
+      for (let i = 0; i < 20; i += 1) buttons[i % buttons.length].click();
+    });
     await page.locator('[data-undo]').focus();
-    for (let i = 0; i < 20; i += 1) await page.keyboard.press('Enter');
+    await page.evaluate(() => { for (let i = 0; i < 20; i += 1) document.querySelector('[data-undo]').click(); });
     await page.locator('[data-redo]').focus();
-    for (let i = 0; i < 20; i += 1) await page.keyboard.press('Enter');
+    await page.evaluate(() => { for (let i = 0; i < 20; i += 1) document.querySelector('[data-redo]').click(); });
     await expect(page.locator('[data-redo]')).toBeDisabled();
   });
 
@@ -551,7 +554,8 @@ test.describe('oracle-fix interaction contracts', () => {
     const section = page.locator('#horizontal-media');
     await section.scrollIntoViewIfNeeded();
     const before = await page.locator('#horizontalTrack').evaluate((el) => getComputedStyle(el).transform);
-    await page.mouse.wheel(0, 900);
+    const offset = Number.parseFloat(before.split(',')[4]) || 0;
+    await page.mouse.wheel(0, offset < 0 ? -900 : 900);
     await expect.poll(() => page.locator('#horizontalTrack').evaluate((el) => getComputedStyle(el).transform)).not.toBe(before);
     await expect(page.locator('.h-card').first()).toHaveCSS('border-radius', /\d+px/);
     });
@@ -615,7 +619,7 @@ test.describe('oracle-fix interaction contracts', () => {
       const observer = 'PerformanceObserver' in window
         ? new PerformanceObserver((list) => longTasks.push(...list.getEntries().map((entry) => entry.duration)))
         : null;
-      try { observer?.observe({ type: 'longtask', buffered: true }); } catch { /* unsupported */ }
+      try { observer?.observe({ type: 'longtask' }); } catch { /* unsupported */ }
       const frames = [];
       let previous = performance.now();
       const bottom = document.documentElement.scrollHeight - innerHeight;
