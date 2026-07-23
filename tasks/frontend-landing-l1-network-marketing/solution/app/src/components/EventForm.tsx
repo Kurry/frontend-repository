@@ -99,7 +99,7 @@ export default function EventForm({ eventToEdit, onClose }: Props) {
           {errorSummary ? `Form has errors. ${errorSummary}` : ''}
         </p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+        <form onSubmit={handleSubmit(onSubmit, () => announce('Form has errors. Please check the highlighted fields.'))} className="space-y-4" noValidate>
           <div>
             <label htmlFor="ef-title" className="block text-sm font-medium mb-1">Title</label>
             <input
@@ -199,7 +199,7 @@ export default function EventForm({ eventToEdit, onClose }: Props) {
 
           <div className="flex justify-end gap-3 mt-8 pt-4 border-t border-white/10">
             <button type="button" className="btn btn-ghost notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={onClose}>Cancel</button>
-            <button type="submit" className="btn btn-primary notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" disabled={!isValid} aria-disabled={!isValid}>
+            <button type="submit" className="btn btn-primary notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" >
               {eventToEdit ? 'Save Changes' : 'Create Event'}
             </button>
           </div>

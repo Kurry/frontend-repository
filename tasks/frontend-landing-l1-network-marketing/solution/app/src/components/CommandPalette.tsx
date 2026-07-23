@@ -26,12 +26,12 @@ export default function CommandPalette() {
   const requestClose = () => {
     if (closing) return;
     setClosing(true);
+    lastFocused.current?.focus({ preventScroll: true });
+    lastFocused.current = null;
     window.setTimeout(() => {
       $commandPaletteOpen.set(false);
       setClosing(false);
-      lastFocused.current?.focus({ preventScroll: true });
-      lastFocused.current = null;
-    }, 160);
+    }, 200);
   };
 
   useEffect(() => {

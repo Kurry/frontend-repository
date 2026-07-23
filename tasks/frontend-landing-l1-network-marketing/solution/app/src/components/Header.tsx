@@ -61,7 +61,9 @@ export default function Header() {
               aria-pressed={theme === 'dark'}
               onClick={toggleTheme}
             >
-               {theme === 'dark' ? <Moon size={16} /> : <Sun size={16} />}
+               <span key={theme} className="theme-icon-swap" aria-hidden="true">
+                 {theme === 'dark' ? <Moon size={16} /> : <Sun size={16} />}
+               </span>
             </button>
             <button
               type="button"

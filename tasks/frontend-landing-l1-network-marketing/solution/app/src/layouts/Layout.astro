@@ -15,6 +15,21 @@ const { title } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 3 29 29H3z' fill='%23e11d48'/%3E%3C/svg%3E" />
     <title>{title}</title>
+    <script is:inline>
+      // Pre-paint entrance state: hide the load-entrance targets before first
+      // paint so a fresh load never paints fully settled (MotionManager removes
+      // the class once GSAP owns the styles). Reduced-motion paints settled.
+      // The timeout is a safety net so the page can never stay hidden if the
+      // interactive islands fail to hydrate.
+      try {
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          document.documentElement.classList.add('entrance-pending');
+          window.setTimeout(function () {
+            document.documentElement.classList.remove('entrance-pending');
+          }, 6000);
+        }
+      } catch (e) { /* never block paint */ }
+    </script>
   </head>
   <body>
     <div id="root">

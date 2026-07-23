@@ -25,18 +25,29 @@ export default function ContactForm() {
     mode: 'all',
   });
 
+  const showSuccess = () => {
+    setSuccess(true);
+    setTimeout(() => setSuccess(false), 5000);
+  };
+
   const onSubmit = (data: ContactFormValues) => {
     addLead(data);
-    setSuccess(true);
+    showSuccess();
     announce(`Contact lead captured from ${data.name}. Session leads total updated.`);
     reset();
-    setTimeout(() => setSuccess(false), 5000);
   };
 
   useEffect(() => {
     const resetFromWorkflow = () => { reset(); setSuccess(false); };
+    // WebMCP form.submit routes through the same store action as the visible
+    // form; this event keeps the visible success state in sync with it.
+    const successFromWorkflow = () => { reset(); showSuccess(); };
     window.addEventListener('ridge:contact-reset', resetFromWorkflow);
-    return () => window.removeEventListener('ridge:contact-reset', resetFromWorkflow);
+    window.addEventListener('ridge:contact-success', successFromWorkflow);
+    return () => {
+      window.removeEventListener('ridge:contact-reset', resetFromWorkflow);
+      window.removeEventListener('ridge:contact-success', successFromWorkflow);
+    };
   }, [reset]);
 
   const errorSummary = Object.values(errors).map(e => e?.message).filter(Boolean).join(' ');
@@ -44,7 +55,7 @@ export default function ContactForm() {
   return (
     <section className="contact chapter py-24 bg-void relative z-20" id="contact" aria-label="Contact">
       <div className="container mx-auto px-4 max-w-3xl">
-        <h2 className="chapter-title text-4xl md:text-5xl font-bold mb-12 tracking-tight text-center">GET IN TOUCH</h2>
+        <h2 className="chapter-title text-4xl md:text-5xl font-bold mb-12 tracking-tight text-center">Get In Touch</h2>
 
         <div className="surface-copy bg-surface p-8 md:p-12 notch-br border border-current/10 relative overflow-hidden">
           {success ? (
@@ -63,7 +74,7 @@ export default function ContactForm() {
             {errorSummary ? `Contact form has errors. ${errorSummary}` : ''}
           </p>
 
-          {!success && <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
+          {!success && <form onSubmit={handleSubmit(onSubmit, () => announce('Form has errors. Please check the highlighted fields.'))} className="space-y-6" noValidate>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium mb-2">Name</label>
@@ -127,14 +138,14 @@ export default function ContactForm() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="flex items-center gap-3 cursor-pointer">
+              <label className="flex items-center gap-3 cursor-pointer" htmlFor="privacy_consent">
                 <input id="privacy_consent" type="checkbox" className="checkbox notch-br" aria-invalid={errors.privacy_consent ? true : undefined} {...register('privacy_consent')} />
                 <span className="text-sm">I agree to the privacy policy</span>
               </label>
               {errors.privacy_consent && <span className="text-error text-sm block" role="alert">{errors.privacy_consent.message}</span>}
             </div>
 
-            <button type="submit" className="btn btn-primary w-full notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" disabled={!isValid} aria-disabled={!isValid}>Send contact request</button>
+            <button type="submit" className="btn btn-primary w-full notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" >Send contact request</button>
           </form>}
         </div>
       </div>
