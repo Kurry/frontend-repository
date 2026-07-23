@@ -1,1 +1,0 @@
-import{v as s}from"./core.min-DVALGa4Q.js";import{x as u}from"./core.min-DVALGa4Q.js";import{h as e}from"./gameLogic-BOGBTXck.js";import"./preloader-Bns9QiKi.js";const n=({track:o})=>{const[t]=s();if(!o(()=>t.toast))return;const r=setTimeout(()=>e(t),1700);return()=>clearTimeout(r)};export{u as _hW,n as s_NbCPVgdXbTo};

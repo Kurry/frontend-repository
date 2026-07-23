@@ -16,6 +16,37 @@ from corpuscheck.oracle_ci import (
 )
 
 
+_SCREENSHOT_CAPTURE_HELPER = (
+    Path(__file__).parents[1]
+    / "src/corpuscheck/assets/start_script_semantics.mjs"
+)
+
+
+@pytest.mark.parametrize(
+    ("start", "expected"),
+    [
+        ("vite preview", True),
+        ("npx http-server dist -p 3000", True),
+        ("npx serve -l 3000 -n dist", True),
+        ("npx serve build", True),
+        ("npx serve -l 3000 -n .", False),
+        ("npm run build && npx serve dist", False),
+    ],
+)
+def test_screenshot_capture_identifies_prebuilt_start_scripts(start: str, expected: bool) -> None:
+    script = f"""
+      import {{ needsPrebuiltOutput }} from {json.dumps(_SCREENSHOT_CAPTURE_HELPER.as_uri())};
+      console.log(JSON.stringify(needsPrebuiltOutput({json.dumps(start)})));
+    """
+    result = subprocess.run(
+        ["node", "--input-type=module", "--eval", script],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert json.loads(result.stdout) is expected
+
+
 def completed(
     command: list[str] | None = None,
     *,
@@ -849,7 +880,7 @@ def test_full_corpus_aggregate_rejects_invalid_duplicate_and_unexpected_results(
     assert any("Could not parse broken/app-result.json" in value for value in diagnostics)
 
 
-def test_task_directory_config_parallelizes_the_pinned_suite(tmp_path: Path) -> None:
+def test_task_directory_config_serializes_the_pinned_suite(tmp_path: Path) -> None:
     helper = (
         Path(__file__).parents[1]
         / "src/corpuscheck/assets/oracle_ci_e2e.mjs"
@@ -865,8 +896,10 @@ def test_task_directory_config_parallelizes_the_pinned_suite(tmp_path: Path) -> 
         text=True,
     )
 
-    assert "fullyParallel: true" in result.stdout
-    assert "workers: 4" in result.stdout
+    assert "fullyParallel: false" in result.stdout
+    assert "workers: 1" in result.stdout
+    assert "timeout: 60_000" in result.stdout
+    assert "expect: { timeout: 8_000 }" in result.stdout
     assert "name: 'functional'" in result.stdout
     assert "testIgnore: '**/performance.spec.{mjs,cjs,js,ts,tsx,jsx}'" in result.stdout
     assert "name: 'performance'" in result.stdout
