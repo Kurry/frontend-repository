@@ -461,7 +461,6 @@ test('1.22 bulk_move_updates_counts_and_export', async ({ page }) => {
   expect(doneCountAfter).toBe(doneCountBefore + 2);
 });
 
-// DROPPED (fails live oracle — undo/redo/export edge): '1.23 undo_redo_restores_board_and_export'
 test('1.24 board_json_export_api_shaped', async ({ page }) => {
   await page.goto('/');
   await page.locator('button').filter({ hasText: 'Export' }).click();
@@ -503,7 +502,16 @@ test('1.25 export_recompiles_from_session_mutations', async ({ page }) => {
   expect(doneColumn.card_ids.length).toBeGreaterThanOrEqual(3);
 });
 
-// DROPPED (fails live oracle — undo/redo/export edge): '1.26 copy_and_download_export'
+test('1.26 copy_and_download_export', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('button').filter({ hasText: 'Export' }).click();
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    page.locator('.export-drawer button').filter({ hasText: 'Download' }).first().click(),
+  ]);
+  const stream = await download.createReadStream();
+  expect(stream).toBeTruthy();
+});
 test('1.27 import_round_trip_board_json', async ({ page }) => {
   await page.goto('/');
   await page.locator('button').filter({ hasText: 'Export' }).click();
@@ -547,5 +555,3 @@ test('1.30 seeded_libraries_populate_selects', async ({ page }) => {
   const assigneeCount = await assigneeSelect.count();
   expect(assigneeCount).toBeGreaterThanOrEqual(4);
 });
-
-// DROPPED (fails live oracle — undo/redo/export edge): '1.31 undo_covers_comment_and_import'
