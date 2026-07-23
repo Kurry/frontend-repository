@@ -1,0 +1,7 @@
+[[criterion]]
+id = "wr_conflict_copy"
+name = "Conflict copy identifies specific items and rules"
+description = "Trigger every outfit, time, lifecycle, care, repair, and capsule conflict. Verify the copy specifically names the exact garment, slot, event, batch, resource, rule, or plan in conflict, along with the required recovery action."
+type = "browser_interaction"
+weight = 1.0
+negate = false

@@ -1,0 +1,15 @@
+[[criterion]]
+id = "in_coherent_ecosystem"
+name = "Overall ecosystem remains coherent after actual wear"
+description = "Record one actual wear. Verify that availability, future plans, care workflow, utilization metrics, cost calculation, capsule capacity, lifecycle history, and portable artifacts remain perfectly coherent across the entire application ecosystem."
+type = "browser_interaction"
+weight = 1.0
+negate = false
+
+[[criterion]]
+id = "innovation.catchall"
+name = "innovation_catchall"
+description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "browser_interaction"
+weight = 1.0
+negate = false

@@ -1,0 +1,7 @@
+[[criterion]]
+id = "ac_keyboard_accessibility"
+name = "Full keyboard accessibility across features"
+description = "Verify that a user can compose/layer, schedule/log wear, navigate lifecycle, build/recover care batch, mark regions via controls, inspect analytics, merge capsule, and export the dossier entirely without pointer actions. Focus management and state must match pointer behavior."
+type = "browser_interaction"
+weight = 1.0
+negate = false

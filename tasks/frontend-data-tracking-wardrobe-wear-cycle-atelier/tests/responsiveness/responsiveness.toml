@@ -1,0 +1,7 @@
+[[criterion]]
+id = "re_responsive_viewports"
+name = "Complete functionality at responsive viewports"
+description = "Verify the application is fully operable at 1440, 768, and 375 pixel viewports. The garment/outfit/slot/lifecycle/care/capsule mobile flows must retain every action, provide minimum 44-pixel targets, and present no horizontal page-level overflow."
+type = "browser_interaction"
+weight = 1.0
+negate = false

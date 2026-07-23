@@ -1,0 +1,15 @@
+[[criterion]]
+id = "vd_lifecycle_states"
+name = "Distinct lifecycle states are visually differentiated"
+description = "Verify that planned, actually worn, partial subset, available, airing, washing, drying, repairing, lent, lost, retired, conflicted, and in-capsule states are distinct and visually discernible across the atelier."
+type = "browser_interaction"
+weight = 1.0
+negate = false
+
+[[criterion]]
+id = "vd_error_copy"
+name = "Error copy names rejected fields and recovery actions"
+description = "Verify that error copies display exact bounding values, capacity warnings, and specific error messages naming rejected fields or rules alongside actionable recovery steps."
+type = "browser_interaction"
+weight = 1.0
+negate = false

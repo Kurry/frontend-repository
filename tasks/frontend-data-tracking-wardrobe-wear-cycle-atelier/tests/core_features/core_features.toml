@@ -1,0 +1,63 @@
+[[criterion]]
+id = "cf_outfit_composition_propagate"
+name = "Garment drags propagate to all seven surfaces in one transition"
+description = "Verify that dragging a garment onto the outfit silhouette or weekly timeline updates compatibility edges, availability, care queue, utilization matrix, capsule capacity, lifecycle history, and artifacts together in one transition. The utilization matrix and pairing views recompute from the new plan immediately (not on later navigation)."
+type = "browser_interaction"
+weight = 1.0
+negate = false
+
+[[criterion]]
+id = "cf_plan_vs_actual_wear"
+name = "Plan versus actual wear stays distinguishable and actuals never rewrite"
+description = "Verify that planned wears and recorded actual wears are separate states with visible distinction. Recording an actual wear appends to lifecycle history and never rewrites the plan or prior actuals. Correcting an actual wear creates an amended record with provenance."
+type = "browser_interaction"
+weight = 1.0
+negate = false
+
+[[criterion]]
+id = "cf_availability_enforced"
+name = "Availability is enforced by lifecycle state"
+description = "Verify that garments in care or repair are unavailable for planning. Planning an unavailable garment is blocked with a visible reason naming the blocking event, all surfaces identical before and after. Care-batch completion and repair closure restore availability."
+type = "browser_interaction"
+weight = 1.0
+negate = false
+
+[[criterion]]
+id = "cf_care_batch_constraints"
+name = "Care-batch constraints are exact"
+description = "Verify that care batches account exactly. Items enter/exit the queue with visible state transitions. A batch's contents are immutable once started except by explicit abort path."
+type = "browser_interaction"
+weight = 1.0
+negate = false
+
+[[criterion]]
+id = "cf_capsule_capacity_constraints"
+name = "Capsule-capacity constraints are exact"
+description = "Verify that capsule capacity over-allocation is blocked with a named diagnostic and zero mutation. Packing constraints for capsule branches name exact limits, and violations are graded no-ops."
+type = "browser_interaction"
+weight = 1.0
+negate = false
+
+[[criterion]]
+id = "cf_repair_evidence"
+name = "Repair and condition evidence are append-only"
+description = "Verify that repair records append with condition evidence naming before/after state. Condition history is immutable to later wears. Closing a repair with unresolved condition evidence is blocked with a named reason and zero mutation."
+type = "browser_interaction"
+weight = 1.0
+negate = false
+
+[[criterion]]
+id = "cf_capsule_branches"
+name = "Capsule branches compare and converge"
+description = "Verify that branching a capsule copies the composition and constraint state. Edits on a branch never rewrite the trunk or sibling capsules. Comparing branches shows both from one shared state with per-garment deltas named. Reconciliation requires an explicit choice per conflicting garment."
+type = "browser_interaction"
+weight = 1.0
+negate = false
+
+[[criterion]]
+id = "cf_actual_wear_double_record_negative"
+name = "Rapid double-record of actual wear produces duplicate entries"
+description = "The application fails to prevent rapid double-record of the same wear, producing duplicate or corrupted state instead of exactly one entry."
+type = "browser_interaction"
+weight = 1.0
+negate = true
