@@ -51,7 +51,7 @@ export function AssistPanel() {
           return <div key={step.id} className={`assist-step status-${step.status} ${highlighted ? 'highlighted' : ''}`}>
             <Icon size={16} className={step.status === 'running' ? 'spinning' : ''} />
             <div className="grow"><strong>{step.title}</strong><span key={step.status + (waiting ?? '')} className="status-line">{step.status === 'retrying' ? `Retrying in ${waiting}s · attempt ${step.attempts + 1} of ${step.maxAttempts}` : assistStatusCopy[step.status] || step.status} {step.error && `· ${step.error}`}</span></div>
-            {step.status === 'failed' && <Button hasIconOnly size="sm" kind="ghost" renderIcon={Restart} iconDescription="Retry failed step" onClick={() => retry(run.suiteId, step.id)} />}
+            {step.status === 'failed' && <Button hasIconOnly tooltipPosition="bottom" size="sm" kind="ghost" renderIcon={Restart} iconDescription="Retry failed step" onClick={() => retry(run.suiteId, step.id)} />}
           </div>;
         })}
       </div>
@@ -101,7 +101,7 @@ export default function Sidebar() {
                 <span><strong>{suite.name}</strong><small>{completed} completed</small></span>
                 <span className="suite-badges"><b key={remaining} className="badge-pulse">{remaining}</b>{skipped > 0 && <em>{skipped} skipped</em>}</span>
               </button>
-              <Button hasIconOnly kind="ghost" size="sm" renderIcon={Play} iconDescription={`Run Assist on ${suite.name}`} onClick={() => startAssist(suite.id)} />
+              <Button hasIconOnly tooltipPosition="bottom" kind="ghost" size="sm" renderIcon={Play} iconDescription={`Run Assist on ${suite.name}`} onClick={() => startAssist(suite.id)} />
             </div>;
           })}
         </nav>
