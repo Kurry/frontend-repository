@@ -1,0 +1,122 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "clean_state_start"
+description = "Begin from a genuinely clean state: no authored work, completion, approval, export, or success evidence may be preseeded."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "milestone_observability"
+description = "Each milestone becomes observable only after its real UI action, with exact before/after entity and event-count deltas."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "canonical_event_convergence"
+description = "Keyboard/exact-value path converges to one canonical event with identical stable IDs, derived values, linked-view selection, history, WebMCP-observable state, persistence, and export bytes after normalization."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "adversarial_ordering_convergence"
+description = "Adversarial orderings (e.g. canonical edit before/after proposal's merge) converge properly without diverging state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "import_atomic_transaction"
+description = "Every import mode is treated as an atomic transaction over the same API-shaped schema used by create/edit/export. Invalid records are rejected with zero state mutation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "export_schema_compliance"
+description = "Exported artifact specifies exact filenames, schemas, required keys/columns, units, precision, stable sort order, relationship integrity, and regenerated generatedAt/exportedAt values."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "genre_correct_reload"
+description = "State that the PRD promises to persist survives reload exactly; transient previews, dialogs, hover, drag, and invalid drafts do not leak into persistence."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "bounded_field_validation"
+description = "Validates exact minimum, maximum, just-inside, and just-outside values for every bounded field, plus enum, format, uniqueness, and cross-field rules."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "technical_interleave_actions"
+description = "Interleave UI/WebMCP correction, branch/rebase, concept/pattern, exercise/schedule/run, review/transfer, history, and transfer-file actions. All ids, offsets, attempts, checksums, files match exactly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "negative_technical_interleave"
+description = "Interleaving UI/WebMCP correction actions causes ids, offsets, attempts, checksums, or files to diverge or mismatch."
+type = "binary"
+weight = 1.0
+negate = true

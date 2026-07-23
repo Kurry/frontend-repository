@@ -1,0 +1,122 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "edge_overlap_operation"
+description = "Correction operations overlap incompatibly but trigger correct error copy identifying the exact attempt, concept, or recovery action."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "edge_stale_offset_rebase"
+description = "Applying operations marks downstream offsets stale until deterministic rebase/review, and rebase correctly resolves offset shifts."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "edge_prerequisite_cycle"
+description = "Cycles are correctly rejected for prerequisite concepts without crashing."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "edge_zero_eligible_denominator"
+description = "Zero eligible denominator correctly handles calculations without crashing or returning NaN."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "edge_not_applicable_vs_unreviewed"
+description = "Matrix correctly distinguishes not-applicable vs unreviewed opportunities."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "edge_immutable_retry"
+description = "Retry creates a new attempt, never overwrites an existing score."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "edge_partial_disputed_score"
+description = "Disputes preserve original evaluation and track partial scores correctly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "edge_stale_transfer"
+description = "Changing classification or opportunity eligibility marks findings stale and requires rerun."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "edge_forged_import"
+description = "Import correctly rejects fixture/normalization mismatch, out-of-range/stale/overlapping operation, or forged checksums."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "negative_edge_cases_failure"
+description = "A stale offset/rebase conflict, prerequisite cycle, or zero eligible denominator fails to trigger the named recovery or causes a silent failure."
+type = "binary"
+weight = 1.0
+negate = true

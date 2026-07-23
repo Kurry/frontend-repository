@@ -1,0 +1,92 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "perf_acknowledgment_time"
+description = "Direct manipulation acknowledges within 100 ms at maximum declared fixture."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "perf_settle_time"
+description = "Linked/derived views settle within 500 ms at maximum declared fixture."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "perf_export_import_time"
+description = "Export/import completes within 2 s without dropped interactions, stale views, layout jumps, console errors, page errors, or non-local network dependence."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "scale_performance"
+description = "Operate 10,000 attempts, 100,000 operations, 5,000 concepts/patterns, and 50,000 exercise runs -> interactions remain responsive and stale diff/analysis work cancels."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "negative_scale_lag"
+description = "At 10,000 attempts and 100,000 operations, interactions become unresponsive or stale diff/analysis work fails to cancel, causing layout jumps or console errors."
+type = "binary"
+weight = 1.0
+negate = true
