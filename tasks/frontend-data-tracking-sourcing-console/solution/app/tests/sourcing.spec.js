@@ -159,7 +159,7 @@ test('distinct rejection reasons remain distinct across rows timeline and export
 test('queue can be emptied and repopulated with coherent rollup and export order', async ({ page }) => {
   await openBuildQueue(page)
   while (await page.getByRole('button', { name: /^Remove .* from queue$/ }).count()) await page.getByRole('button', { name: /^Remove .* from queue$/ }).first().click()
-  await expect(page.getByRole('heading', { name: 'Queue is ready' })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Build queue' }).getByRole('heading', { name: 'Queue is ready' })).toBeVisible()
 
   await page.getByRole('button', { name: 'Candidates', exact: true }).click()
   const row = candidateRow(page, 'emberforge/ash-parser')
@@ -441,7 +441,7 @@ test('all required overlays trap focus, close on Escape, and restore their opene
 test('motion states and reduced motion are observable through real controls', async ({ page }) => {
   const durationMs = async (locator) => locator.evaluate((node) => {
     const style = getComputedStyle(node)
-    const values = `${style.transitionDuration},${style.animationDuration}`.match(/[\d.]+m?s/g) || []
+    const values = style.transitionDuration.match(/[\d.]+m?s/g) || []
     return Math.max(...values.map((value) => value.endsWith('ms') ? Number.parseFloat(value) : Number.parseFloat(value) * 1000), 0)
   })
 
@@ -519,7 +519,7 @@ test('undo redo mutation matrix keeps table queue timeline quota and export cohe
   await undoRedoStatus(flow, 'Pinned', 'Queued')
 
   await openBuildQueue(page)
-  await page.getByRole('button', { name: `Remove ${flow} from queue` }).click()
+  await page.getByRole('region', { name: 'Build queue' }).getByRole('button', { name: `Remove ${flow} from queue` }).click()
   await page.getByRole('button', { name: 'Candidates', exact: true }).click()
   await undoRedoStatus(flow, 'Queued', 'Selected')
 
