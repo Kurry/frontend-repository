@@ -1,0 +1,7 @@
+{
+  "ignore_files": [
+    "node_modules",
+    "dist",
+    "build"
+  ]
+}
