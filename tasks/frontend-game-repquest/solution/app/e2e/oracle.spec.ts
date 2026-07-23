@@ -333,7 +333,7 @@ test.describe('issue 2297 completion contract', () => {
     await page.getByRole('button', { name: 'Reset everything' }).click();
   }
 
-  test('serializes 25 WebMCP logs, unlocks zone, recalculates delete, and preserves branches', async ({ page }) => {
+  test('rapid_logging_integrity serializes 25 WebMCP logs, unlocks zone, recalculates delete, and preserves branches', async ({ page }) => {
     await reset(page);
     const results = await page.evaluate(async () => {
       const invoke = (window as any).webmcp_invoke_tool;
@@ -365,7 +365,7 @@ test.describe('issue 2297 completion contract', () => {
     await expect(page.locator('[data-stat="lifetime-reps"]').first()).toHaveText('107');
   });
 
-  test('preserves interleaved challenge state and proves every lifecycle state plus checkpoint', async ({ page }) => {
+  test('challenge_run_lifecycle_gating preserves interleaved state and proves every lifecycle state plus checkpoint', async ({ page }) => {
     await reset(page);
     await page.getByRole('tab', { name: 'Quest' }).click();
     await page.getByRole('button', { name: 'Challenge mode' }).click();
@@ -410,7 +410,7 @@ test.describe('issue 2297 completion contract', () => {
     await expect(page.locator('[data-celebration="confetti"]')).toBeVisible();
   });
 
-  test('validates settings and notes, reminder attention, heatmap, hover and mobile targets', async ({ page }) => {
+  test('daily_goal_invalid_rejected validates settings and notes, reminder attention, heatmap, hover and mobile targets', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 760 });
     await reset(page);
     const goal = page.getByLabel(/Daily goal/i);
@@ -447,7 +447,7 @@ test.describe('issue 2297 completion contract', () => {
     await expect(page.locator('[data-action="delete-set"]')).toHaveCount(1);
   });
 
-  test('round-trips JSON and CSV atomically, persists complete state, and survives blocked storage', async ({ page, browser }) => {
+  test('import_quest_log_round_trip handles JSON and CSV atomically, persists complete state, and survives blocked storage', async ({ page, browser }) => {
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
     page.on('console', msg => {
