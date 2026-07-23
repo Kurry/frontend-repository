@@ -17,6 +17,11 @@ const seededIcons = [
   { id: 'hover', name: 'Hover', state: 'hover', inherited: true },
   { id: 'focus', name: 'Focus', state: 'focus', inherited: true },
 ];
+const seededSvgSymbols = seededIcons.map((icon) => ({
+  id: `icon-${icon.id}`,
+  titleId: `icon-${icon.id}-title`,
+  title: icon.name,
+}));
 const tools = [
   { name: 'editor_select', module: 'structured-editor-v1', description: 'Select an icon, anchor, path, constraint, variant, hint, or branch.' },
   { name: 'editor_add', module: 'structured-editor-v1', description: 'Add a bounded editor object.' },
@@ -61,11 +66,56 @@ function pathFrom(list, scale = 1, adjustment = 0) {
     if (index === 0) return `M${x} ${y}`;
     if (a.type === 'move') return `M${x} ${y}`;
     if (a.type === 'line') return `L${x} ${y}`;
-    if (a.type === 'quadratic') return `Q${x} ${y} ${x} ${y}`;
-    if (a.type === 'cubic') return `C${x} ${y} ${x} ${y} ${x} ${y}`;
+    if (a.type === 'quadratic') {
+      const cx = roundMil(((a.cx ?? a.x - 1) + adjustment) * scale);
+      const cy = roundMil(((a.cy ?? a.y) + adjustment) * scale);
+      return `Q${cx} ${cy} ${x} ${y}`;
+    }
+    if (a.type === 'cubic') {
+      const c1x = roundMil(((a.c1x ?? a.x - 1) + adjustment) * scale);
+      const c1y = roundMil(((a.c1y ?? a.y) + adjustment) * scale);
+      const c2x = roundMil(((a.c2x ?? a.x + 1) + adjustment) * scale);
+      const c2y = roundMil(((a.c2y ?? a.y) + adjustment) * scale);
+      return `C${c1x} ${c1y} ${c2x} ${c2y} ${x} ${y}`;
+    }
     if (a.type === 'close') return `L${x} ${y} Z`;
     return '';
   }).join(' ');
+}
+
+function windingArea(anchors) {
+  let area = 0;
+  for (let i = 0; i < anchors.length; i += 1) {
+    const current = anchors[i];
+    const next = anchors[(i + 1) % anchors.length];
+    area += current.x * next.y - next.x * current.y;
+  }
+  return area / 2;
+}
+
+function validateSvgSymbols(symbols) {
+  if (!Array.isArray(symbols) || symbols.length === 0) return 'SVG export requires at least one symbol';
+  const symbolIds = new Set();
+  const titleIds = new Set();
+  for (const symbol of symbols) {
+    if (!symbol?.id || !symbol?.titleId) return 'SVG symbol and title ids are required';
+    if (symbolIds.has(symbol.id)) return `duplicate SVG symbol id ${symbol.id}`;
+    if (titleIds.has(symbol.titleId)) return `duplicate SVG title id ${symbol.titleId}`;
+    symbolIds.add(symbol.id);
+    titleIds.add(symbol.titleId);
+  }
+  return null;
+}
+
+function buildSvgSprite(symbols, anchors) {
+  const problem = validateSvgSymbols(symbols);
+  if (problem) return { ok: false, error: problem };
+  const path = generatePathData(anchors);
+  const content = symbols.map((symbol) => (
+    `<symbol id="${symbol.id}" viewBox="0 0 24 24" aria-labelledby="${symbol.titleId}">`
+    + `<title id="${symbol.titleId}">${symbol.title}</title><path d="${path}"/></symbol>`
+  )).join('');
+  return { ok: true, artifact: `<svg xmlns="http://www.w3.org/2000/svg"><defs>${content}</defs></svg>` };
 }
 
 function generatePathData(anchors, size = 24) {
@@ -108,7 +158,22 @@ function validateFamilyDoc(doc) {
     if (typeof a.x !== 'number' || typeof a.y !== 'number' || Number.isNaN(a.x) || Number.isNaN(a.y)) return `invalid coordinates on ${a.id}`;
     if (a.x < 0 || a.x > 24 || a.y < 0 || a.y > 24) return `coordinate out of bounds on ${a.id} (0–24 grid)`;
     if (!ANCHOR_TYPES.includes(a.type)) return `invalid segment type on ${a.id}`;
+    if (a.type === 'quadratic') {
+      if (![a.cx, a.cy].every(Number.isFinite)) return `quadratic anchor ${a.id} requires a finite control handle`;
+      if (a.cx === a.x && a.cy === a.y) return `zero-length quadratic handle on ${a.id}`;
+    }
+    if (a.type === 'cubic') {
+      if (![a.c1x, a.c1y, a.c2x, a.c2y].every(Number.isFinite)) return `cubic anchor ${a.id} requires two finite control handles`;
+      if ((a.c1x === a.x && a.c1y === a.y) || (a.c2x === a.x && a.c2y === a.y)) return `zero-length cubic handle on ${a.id}`;
+    }
   }
+  if (doc.anchors[0].type !== 'move') return 'open path recovery: first anchor must be move';
+  if (doc.anchors.at(-1).type !== 'close' || doc.anchors.slice(0, -1).some((a) => a.type === 'close')) {
+    return 'closed path recovery: exactly the final anchor must close the path';
+  }
+  const area = windingArea(doc.anchors);
+  if (area === 0) return 'winding recovery: path area must be non-zero';
+  if (area < 0) return 'winding recovery: outer path must use clockwise screen-space winding';
   if (typeof doc.checksum === 'string' && doc.checksum !== computeChecksum(doc.anchors)) {
     return 'forged checksum — geometry does not match';
   }
@@ -120,6 +185,10 @@ function validateFamilyDoc(doc) {
       const others = doc.constraints.filter((o) => o !== c);
       if (equalCycle(others, c.target1, c.target2)) return `constraint cycle between ${c.target1} and ${c.target2}`;
     }
+  }
+  if (doc.svgSymbols !== undefined) {
+    const svgProblem = validateSvgSymbols(doc.svgSymbols);
+    if (svgProblem) return svgProblem;
   }
   return null;
 }
@@ -204,6 +273,7 @@ function App() {
     overrides,
     checksum: computeChecksum(currentAnchors),
     approval,
+    svgSymbols: seededSvgSymbols,
   }), [mode, selectedIcon, size, lens, branch, currentAnchors, constraints, hints, overrides, approval]);
 
   // ---- undo history ---------------------------------------------------------
@@ -247,6 +317,17 @@ function App() {
     if (next.x !== undefined) next.x = clampCoord(next.x);
     if (next.y !== undefined) next.y = clampCoord(next.y);
     if (next.type !== undefined && !ANCHOR_TYPES.includes(next.type)) delete next.type;
+    const existing = displayedAnchors.find((anchor) => anchor.id === id);
+    if (next.type === 'quadratic' && existing) {
+      next.cx = clampCoord(existing.x - 1);
+      next.cy = existing.y;
+    }
+    if (next.type === 'cubic' && existing) {
+      next.c1x = clampCoord(existing.x - 1);
+      next.c1y = existing.y;
+      next.c2x = clampCoord(existing.x + 1);
+      next.c2y = existing.y;
+    }
     if (record) pushHistory();
     const updateFn = (items) => items.map((a) => (a.id === id ? { ...a, ...next } : a));
     if (currentIconData?.inherited && !overrides[selectedIcon]) {
@@ -331,7 +412,10 @@ function App() {
     if (name === 'artifact_export') {
       const format = input.format ?? 'json';
       if (format === 'json') return { ok: true, format, artifact: JSON.stringify(documentState, null, 2) };
-      if (format === 'svg') return { ok: true, format, artifact: `<svg viewBox="0 0 24 24"><path d="${generatePathData(displayedAnchors)}"/></svg>` };
+      if (format === 'svg') {
+        const exported = buildSvgSprite(documentState.svgSymbols, displayedAnchors);
+        return exported.ok ? { ...exported, format } : exported;
+      }
       if (format === 'css') return { ok: true, format, artifact: ':root { --icon-grid: 24px; }' };
       return { ok: true, format, artifact: '# Icon Family Optical Studio\n\nApproved family specification.' };
     }
