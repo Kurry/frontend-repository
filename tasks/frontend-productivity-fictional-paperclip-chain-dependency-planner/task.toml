@@ -1,0 +1,5 @@
+[task]
+name = "mercor-intelligence/frontend-productivity-fictional-paperclip-chain-dependency-planner"
+version = "1.0.0"
+description = "Hard browser spatial dependency and schedule planner"
+authors = [{ name = "Kurry", email = "kurry@example.com" }]
