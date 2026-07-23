@@ -151,7 +151,11 @@ class TriageStore {
   reportText = $derived.by(() => JSON.stringify(this.report, null, 2));
 
   selectSuite(suiteId: string): boolean {
-    const suite = this.suites.find((candidate) => candidate.id === suiteId);
+    const suite = this.suites.find((candidate) =>
+      candidate.id === suiteId ||
+      candidate.id.includes(suiteId) ||
+      candidate.name.toLowerCase().includes(suiteId.toLowerCase())
+    );
     if (!suite) return false;
     this.selectedSuiteId = suite.id;
     this.selectedTestId = suite.tests[0]?.id ?? '';
@@ -161,8 +165,13 @@ class TriageStore {
   }
 
   selectTest(testId: string): boolean {
-    if (!this.activeSuite.tests.some((test) => test.id === testId)) return false;
-    this.selectedTestId = testId;
+    const test = this.activeSuite.tests.find((candidate) =>
+      candidate.id === testId ||
+      candidate.id.endsWith(testId) ||
+      candidate.id.includes(testId)
+    );
+    if (!test) return false;
+    this.selectedTestId = test.id;
     return true;
   }
 

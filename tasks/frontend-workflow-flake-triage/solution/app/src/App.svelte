@@ -112,7 +112,7 @@
 {#if triage.exportOpen}
   <ExportDrawer />
 {/if}
-<ImportDialog />
+{#if triage.importOpen}<ImportDialog />{/if}
 <ToastViewport />
 <Coachmarks />
 

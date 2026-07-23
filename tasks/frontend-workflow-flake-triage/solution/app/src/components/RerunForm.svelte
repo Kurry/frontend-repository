@@ -18,7 +18,7 @@
     onSubmit: ({ value }) => {
       const parsed = rerunRequestSchema.safeParse(value);
       if (!parsed.success) {
-        runCountError = parsed.error.issues[0]?.message ?? 'runCount is required and must be 3, 5, or 10';
+        runCountError = parsed.error.issues[0]?.message ?? 'runCount: runCount is required and must be 3, 5, or 10';
         return;
       }
       runCountError = '';
@@ -38,7 +38,7 @@
   function submitRerun() {
     const parsed = rerunRequestSchema.safeParse({ runCount });
     if (!parsed.success) {
-      runCountError = parsed.error.issues[0]?.message ?? 'runCount is required and must be 3, 5, or 10';
+      runCountError = parsed.error.issues[0]?.message ?? 'runCount: runCount is required and must be 3, 5, or 10';
       return;
     }
     runCountError = '';
@@ -89,7 +89,7 @@
       form.setFieldValue('runCount', runCount);
       runCountError = rerunRequestSchema.safeParse({ runCount }).success
         ? ''
-        : 'runCount is required and must be 3, 5, or 10';
+        : 'runCount: runCount is required and must be 3, 5, or 10';
     }}
   >
     <option value={0} disabled>Choose run count</option>
