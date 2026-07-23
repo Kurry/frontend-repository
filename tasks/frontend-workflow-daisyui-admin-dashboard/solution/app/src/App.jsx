@@ -144,7 +144,7 @@ function Header({ commandTriggerRef, exportTriggerRef }) {
     <div className="page-title-top">{label}</div>
     <label className="header-search">
       <MagnifyingGlassIcon className="icon-sm muted" />
-      <input aria-label="Search users" placeholder="Search users" autoComplete="off" value={store.searchQuery.value} onInput={(e) => { store.searchQuery.value = e.currentTarget.value; store.page.value = 1; }} />
+      <input aria-label="Search users" placeholder="Search users" autoComplete="off" value={store.searchQuery.value} onInput={(e) => { store.searchQuery.value = e.currentTarget.value; store.page.value = 1; store.filters.value = { role: null, status: null }; }} />
     </label>
     <button ref={commandTriggerRef} className="command-button" onClick={() => store.commandOpen.value = true} aria-label="Open Command palette"><CommandLineIcon className="icon-sm" /><span>Command palette</span><span className="kbd">⌘ K</span></button>
     {store.lastMutationLabel.value && <span className="mutation-chip" aria-live="polite">{store.lastMutationLabel.value}</span>}
@@ -255,7 +255,7 @@ function KpiCard({ label, value, color }) {
 }
 
 function UsersShell({ children, title, subtitle, actions = true }) {
-  return <main className="content"><Breadcrumb current={title}/><div className="page-head"><div><h1>{title}</h1><p>{subtitle}</p></div>{actions&&<div className="actions"><button className="btn" onClick={() => store.importOpen.value = true}><ArrowUpTrayIcon className="icon-sm"/>Import directory</button><button className="btn" onClick={() => store.openExport('json')}><DocumentArrowDownIcon className="icon-sm"/>Export directory</button><button className="btn btn-primary" onClick={() => {store.editUserId.value=null;store.duplicateSourceId.value=null;store.setView('add-user')}}><UserPlusIcon className="icon-sm"/>Add user</button></div>}</div>{children}</main>;
+  return <main className="content"><Breadcrumb current={title}/><div className="page-head"><div><h1>{title}</h1><p>{subtitle}</p></div>{actions&&<div className="actions"><button className="btn" onClick={() => store.importOpen.value = true}><ArrowUpTrayIcon className="icon-sm"/>Import directory</button><button className="btn" onClick={() => store.openExport('json')}><DocumentArrowDownIcon className="icon-sm"/>Export directory</button><button className="btn btn-primary" onClick={() => { if (store.formDraft.value) { store.editUserId.value = store.formDraft.value.editId; store.duplicateSourceId.value = store.formDraft.value.sourceId; } else { store.editUserId.value=null; store.duplicateSourceId.value=null; } store.setView('add-user'); }}><UserPlusIcon className="icon-sm"/>Add user</button></div>}</div>{children}</main>;
 }
 
 function AllUsers() {
@@ -427,7 +427,14 @@ function CommandPalette({triggerRef}) {
   const ref=useRef(null); const filtered=commands.filter(([,label])=>label.toLowerCase().includes(store.commandQuery.value.toLowerCase()));
   const close=()=>{store.commandOpen.value=false;store.commandQuery.value=''}; useFocusTrap(true,ref,close,triggerRef);
   const choose=(id)=>{close();if(id==='export-drawer')store.openExport('json');else if(id==='toggle-theme')store.setTheme(store.theme.value==='dark'?'light':'dark');else store.setView(id)};
-  return <div className="overlay" onMouseDown={(e)=>{if(e.target===e.currentTarget)close()}}><div ref={ref} className="modal-card command-card" role="dialog" aria-modal="true" aria-label="Command palette"><div className="command-search"><MagnifyingGlassIcon className="icon"/><input aria-label="Search Command palette" placeholder="Type a command…" value={store.commandQuery.value} onInput={(e)=>store.commandQuery.value=e.currentTarget.value}/><span className="kbd">ESC</span></div><div className="command-list">{filtered.map(([id,label,kind])=><button className="command-item" key={id} onClick={()=>choose(id)}>{id==='export-drawer'?<DocumentArrowDownIcon className="icon"/>:id==='toggle-theme'?<SunIcon className="icon"/>:<CommandLineIcon className="icon"/>}<span>{label}</span><small>{kind}</small></button>)}{!filtered.length&&<div className="empty" style={{minHeight:130}}><span className="muted">No matching commands</span></div>}</div></div></div>;
+  const [activeIndex, setActiveIndex] = useState(0);
+  useEffect(() => { setActiveIndex(0); }, [store.commandQuery.value]);
+  const onKeyDown = (e) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); setActiveIndex((i) => Math.min(i + 1, filtered.length - 1)); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setActiveIndex((i) => Math.max(i - 1, 0)); }
+    else if (e.key === 'Enter' && filtered[activeIndex]) { e.preventDefault(); choose(filtered[activeIndex][0]); }
+  };
+  return <div className="overlay" onMouseDown={(e)=>{if(e.target===e.currentTarget)close()}}><div ref={ref} className="modal-card command-card" role="dialog" aria-modal="true" aria-label="Command palette" onKeyDown={onKeyDown}><div className="command-search"><MagnifyingGlassIcon className="icon"/><input aria-label="Search Command palette" placeholder="Type a command…" value={store.commandQuery.value} onInput={(e)=>store.commandQuery.value=e.currentTarget.value}/><span className="kbd">ESC</span></div><div className="command-list">{filtered.map(([id,label,kind], index)=><button className={`command-item ${index===activeIndex?'active':''}`} key={id} onClick={()=>choose(id)} onMouseMove={()=>setActiveIndex(index)}>{id==='export-drawer'?<DocumentArrowDownIcon className="icon"/>:id==='toggle-theme'?<SunIcon className="icon"/>:<CommandLineIcon className="icon"/>}<span>{label}</span><small>{kind}</small></button>)}{!filtered.length&&<div className="empty" style={{minHeight:130}}><span className="muted">No matching commands</span></div>}</div></div></div>;
 }
 
 function ExportDrawer({triggerRef}) {
