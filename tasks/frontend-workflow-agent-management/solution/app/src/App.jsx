@@ -265,7 +265,7 @@ function AgentModal() {
   if (!open) return null
   const onSubmit = (payload) => isEdit ? updateAgent(current.id, payload) : registerAgent(payload)
   return (
-    <Modal open modalHeading={isEdit ? `Edit ${current?.name}` : 'Register Agent'} modalLabel="Agent registry" primaryButtonText={isEdit ? 'Save changes' : 'Register Agent'} secondaryButtonText="Cancel" primaryButtonDisabled={isSubmitting} onRequestClose={closeModal} onSecondarySubmit={closeModal} onRequestSubmit={handleSubmit(onSubmit)} preventCloseOnClickOutside selectorPrimaryFocus="#agent-name">
+    <Modal open modalHeading={isEdit ? `Edit ${current?.name}` : 'Register Agent'} modalLabel="Agent registry" primaryButtonText={isEdit ? 'Save changes' : 'Register Agent'} secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || isSubmitting} onRequestClose={closeModal} onSecondarySubmit={closeModal} onRequestSubmit={handleSubmit(onSubmit)} preventCloseOnClickOutside selectorPrimaryFocus="#agent-name">
       <div ref={containerRef}>
         <p className="modal-intro">{isEdit ? 'Update the API configuration for this fleet agent.' : 'Create the exact payload sent to the fleet registration API.'}</p>
         <div className="form-grid">
