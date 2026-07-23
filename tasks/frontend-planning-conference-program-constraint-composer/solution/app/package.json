@@ -1,0 +1,12 @@
+{
+  "name": "conference-program-constraint-composer",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "vite --port 3000 --host 0.0.0.0",
+    "verify:build": "vite build",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.0"
+  }
+}
