@@ -264,7 +264,7 @@ test.describe('task criteria', () => {
   test('1.17 type_filter_checkboxes', async ({ page }) => {
     await gotoApp(page);
     const totalBefore = await page.locator('.document-row').count();
-    await page.getByRole('checkbox', { name: 'CLAUDE.md', exact: true }).check({ force: true });
+    await page.locator('label[for="filter-CLAUDE.md"]').click();
     const filteredCount = await page.locator('.document-row').count();
     expect(filteredCount, 'checking one type narrows the tree').toBeLessThan(totalBefore);
     await expect(page.locator('.document-group')).toHaveCount(1);
