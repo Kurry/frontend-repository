@@ -1,0 +1,21 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+
+[[criterion]]
+id = "vd-01"
+title = "Color-independent hierarchy"
+description = "Hierarchy and meaning remain clear without color alone for all cell states (shared, query-only, candidate-only)."
+weight = 1.0

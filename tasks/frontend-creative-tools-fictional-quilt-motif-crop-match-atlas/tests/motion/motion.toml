@@ -1,0 +1,21 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+
+[[criterion]]
+id = "mo-01"
+title = "Causal motion and exact values"
+description = "Sample early/settled canonical crop, stable-ID rank reorder, and reduced motion fallback exposes bounds, rank deltas, focus."
+weight = 1.0

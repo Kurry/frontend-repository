@@ -1,0 +1,21 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+
+[[criterion]]
+id = "te-01"
+title = "Tool and artifact parity"
+description = "Visible UI and WebMCP actions maintain exact tool and artifact parity with no console/page errors."
+weight = 1.0

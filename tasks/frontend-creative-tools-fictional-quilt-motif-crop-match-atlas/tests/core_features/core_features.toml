@@ -1,0 +1,39 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+
+[[criterion]]
+id = "cf-01"
+title = "Drag canonical crop and inspect preview"
+description = "Starting clean, drag canonical crop to [24,16,24,32] and inspect the 8x8 preview."
+weight = 1.0
+
+[[criterion]]
+id = "cf-02"
+title = "Accept motif-23 and confirm consequences"
+description = "Accept motif-23 with edge rhythm rationale, verify query hash, top-three, mismatches, and one event appended."
+weight = 1.0
+
+[[criterion]]
+id = "cf-03"
+title = "Correction lineage and revalidation"
+description = "Reveal correction corr-04 for motif-23, cancel, then confirm revalidation and verify proof hashes."
+weight = 1.0
+
+[[criterion]]
+id = "cf-04"
+title = "Undo and exact export import roundtrip"
+description = "Apply a note, selective undo filter event, review, approve, export zip, reset, and import."
+weight = 1.0
