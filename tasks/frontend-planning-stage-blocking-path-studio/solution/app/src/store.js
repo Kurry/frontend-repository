@@ -96,6 +96,10 @@ export const useStore = create(persist((set, get) => ({
     const next = Object.keys(waypoints)[0] || null;
     return { score: { ...state.score, approval: null, branches: { ...state.score.branches, [state.score.activeBranch]: { ...branch, waypoints } } }, selectedWaypoint: next, selectedEntity: next ? waypoints[next].entityId : null };
   }),
+  clearWaypoints: () => set((state) => {
+    const branch = state.score.branches[state.score.activeBranch];
+    return { score: { ...state.score, approval: null, branches: { ...state.score.branches, [state.score.activeBranch]: { ...branch, waypoints: {} } } }, selectedWaypoint: null, selectedEntity: null };
+  }),
   addHandoff: (data) => set((state) => {
     const branch = state.score.branches[state.score.activeBranch];
     return { score: { ...state.score, branches: { ...state.score.branches, [state.score.activeBranch]: { ...branch, handoffs: [...branch.handoffs, data] } } } };

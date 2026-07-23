@@ -20,6 +20,18 @@ export function Canvas({ onEdit, notify }) {
 
   const choose = (entity, waypointKey) => {
     store.selectEntity(entity.id); if (waypointKey) store.selectWaypoint(waypointKey);
+    if (store.activeTool === 'face' && waypointKey) {
+      const waypoint = branch.waypoints[waypointKey];
+      store.updateWaypoint(waypointKey, { facing: (waypoint.facing + 45) % 360 });
+      notify(`${entity.name} rotated 45 degrees at beat ${waypoint.beat}`);
+      return;
+    }
+    if (store.activeTool === 'handoff' && entity.id.startsWith('p')) {
+      const recipient = store.fixture.actors[0];
+      store.addHandoff({ id: crypto.randomUUID(), propId: entity.id, toActorId: recipient.id, beat: store.currentBeat });
+      notify(`${entity.name} custody handed to ${recipient.name} at beat ${store.currentBeat}`);
+      return;
+    }
     notify(`${entity.name} selected at beat ${store.currentBeat}`);
   };
   const stageClick = (event) => {
