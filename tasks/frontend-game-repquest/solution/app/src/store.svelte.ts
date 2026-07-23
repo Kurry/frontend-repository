@@ -457,18 +457,22 @@ export class QuestStore {
   }
 
   private _pushSnapshot(action: string): void {
-    const branch = this.activeBranch;
+    let branch = this.activeBranch;
 
     if (branch.currentIndex < branch.snapshots.length - 1) {
       const tail = branch.snapshots.slice(branch.currentIndex + 1);
       const altId = `branch-${Date.now()}`;
-      this.branches.push({
+
+      const newBranch: HistoryBranch = {
         id: altId,
-        label: `Branch ${this.branches.length}`,
-        snapshots: [...branch.snapshots.slice(0, branch.currentIndex + 1).map((s) => ({ ...s, state: cloneState(s.state) })), ...tail.map((s) => ({ ...s, state: cloneState(s.state) }))],
-        currentIndex: branch.snapshots.length - 1,
-      });
-      branch.snapshots = branch.snapshots.slice(0, branch.currentIndex + 1);
+        label: `Branch ${this.branches.length + 1}`,
+        snapshots: [...branch.snapshots.slice(0, branch.currentIndex + 1).map((s) => ({ ...s, state: cloneState(s.state) }))],
+        currentIndex: branch.currentIndex,
+      };
+
+      this.branches.push(newBranch);
+      this.activeBranchId = altId;
+      branch = newBranch;
     }
 
     branch.snapshots.push({
@@ -796,6 +800,8 @@ export class QuestStore {
 
     this.state.repHistory = this.state.repHistory.filter((s) => s.id !== setId);
     this.state.lifetimeReps = Math.max(0, this.state.repHistory.reduce((sum, s) => sum + s.reps, 0));
+
+    this.state.todayReps = getTodayReps(this.state);
 
     const wpIdx = getCurrentWaypointIndex(this.state);
     const unlocked = new Set<string>(['foothills']);
