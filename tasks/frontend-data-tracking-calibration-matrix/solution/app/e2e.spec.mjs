@@ -271,10 +271,10 @@ test('1.18 cancel_leaves_triage_unchanged', async ({ page }) => {
   await openApp(page);
   await openVarianceAtMinimum(page);
   await expect(page.locator('.triage-metrics .animated-number').last()).toHaveText('12');
-  const before = await page.locator('.triage-metrics').innerText();
+  const before = await page.locator('.triage-metrics .animated-number').allTextContents();
   await page.getByRole('button', { name: 'Classify', exact: true }).first().click();
   await page.getByRole('button', { name: 'Cancel', exact: true }).click();
-  expect(await page.locator('.triage-metrics').innerText()).toBe(before);
+  await expect(page.locator('.triage-metrics .animated-number')).toHaveText(before);
 });
 
 test('1.19 reload_resets_to_seed', async ({ page }) => {
@@ -337,7 +337,7 @@ test('1.28 export_reflects_session_mutations', async ({ page }) => {
   await expect(page.getByRole('button', { name: /Copied JSON/ })).toBeVisible();
   const download = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Download JSON' }).click();
-  await expect(await download).toBeTruthy();
+  expect(await download).toBeTruthy();
 });
 
 test('1.29 import_calibration_pack_round_trip', async ({ page }) => {
@@ -439,7 +439,7 @@ test('3.5 stack_below_1024_matches_spec', async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 800 });
   await openApp(page);
   await openFirstCell(page);
-  await page.waitForTimeout(350);
+  await expect.poll(async () => (await page.locator('.detail-drawer').boundingBox())?.x).toBe(0);
   const box = await page.locator('.detail-drawer').boundingBox();
   expect(box.x).toBe(0);
   expect(box.width).toBe(900);
