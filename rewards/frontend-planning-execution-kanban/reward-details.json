@@ -1,0 +1,2614 @@
+{
+  "accessibility": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "board_controls_keyboard_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cards, selection checkboxes, move controls, Add Card, toolbar filter/search, undo/redo, Export, bulk move actions, modal fields, and Run/Retry are reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space) with a visible focus indicator",
+        "reasoning": "Keyboard focus reached controls and showed a visible blue focus indicator; native buttons, checkboxes, filters, modal fields, and Run controls were exposed. Evidence: a11y-desktop-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "modals_and_export_manage_focus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create/detail modals and the Export drawer use dialog semantics, trap focus while open, close on Escape, and return focus to the control that opened them",
+        "reasoning": "Create and export surfaces exposed dialog semantics, focus sentinels/trapping, Escape closed them, and focus returned to the opener. Evidence: export-focus-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "icons_have_accessible_names",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Prompt, run, retry, move, and toolbar icons expose accessible names (aria-label or equivalent) rather than being unnamed decorative controls that convey meaning",
+        "reasoning": "Prompt, Run, Move, Undo/Redo, Add Card, and close/export controls had accessible names via visible text, aria labels, or labelled tooltips. Evidence: a11y-desktop-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "live_regions_for_status_and_errors",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Validation errors, execution state changes (running/retrying/failed/complete), WIP breach announcements, and export copy confirmations are conveyed visually and via an aria-live region",
+        "reasoning": "Assertive and polite status regions were present; WIP breach and execution completion were announced through status text, with form alerts present. Evidence: a11y-desktop-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "form_fields_have_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Add Card, detail edit, comment, and import fields use visible labels associated with their inputs",
+        "reasoning": "Toolbar, card-selection, modal, and import fields exposed associated visible labels and accessible names. Evidence: export-focus-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "headings_follow_logical_order",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Board title and column headers follow a logical heading order with no skipped levels",
+        "reasoning": "The rendered hierarchy used H1 for the board title, H2 for columns/dialog sections, and H3 for cards without skipped levels. Evidence: a11y-desktop-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "landmarks_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The board chrome exposes landmark regions (for example main and navigation/toolbar) so assistive tech can skip to the board",
+        "reasoning": "The page exposed banner/header, main, toolbar/activity regions, and named board-column regions. Evidence: a11y-desktop-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "text_and_chips_have_contrast",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Column headers, card titles, status chip text, WIP breach labels, and toolbar controls have sufficient contrast against their backgrounds",
+        "reasoning": "Rendered headings, controls, status chips, and WIP breach labels were visibly distinct with readable foreground/background combinations. Evidence: a11y-desktop-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "semantic_roles_for_controls",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Interactive board controls use button/checkbox semantics (native or ARIA) rather than clickable bare divs without roles",
+        "reasoning": "Interactive elements used native buttons, checkboxes, selects, inputs, dialog/tab semantics, and a labelled card button role. Evidence: a11y-desktop-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "reduced_motion_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, card settle, modal, and check animations apply instantly while state changes and countdown text still occur",
+        "reasoning": "Reduced-motion mode matched true; card/check animation and transition durations were reduced to 1e-06s, modal transitions were likewise instant, and Run still produced execution status/countdown text. Evidence: reduced-motion-run.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"board_controls_keyboard_accessible\":{\"score\":\"yes\",\"reasoning\":\"Keyboard focus reached controls and showed a visible blue focus indicator; native buttons, checkboxes, filters, modal fields, and Run controls were exposed. Evidence: a11y-desktop-shared.png\"},\"modals_and_export_manage_focus\":{\"score\":\"yes\",\"reasoning\":\"Create and export surfaces exposed dialog semantics, focus sentinels/trapping, Escape closed them, and focus returned to the opener. Evidence: export-focus-shared.png\"},\"icons_have_accessible_names\":{\"score\":\"yes\",\"reasoning\":\"Prompt, Run, Move, Undo/Redo, Add Card, and close/export controls had accessible names via visible text, aria labels, or labelled tooltips. Evidence: a11y-desktop-shared.png\"},\"live_regions_for_status_and_errors\":{\"score\":\"yes\",\"reasoning\":\"Assertive and polite status regions were present; WIP breach and execution completion were announced through status text, with form alerts present. Evidence: a11y-desktop-shared.png\"},\"form_fields_have_labels\":{\"score\":\"yes\",\"reasoning\":\"Toolbar, card-selection, modal, and import fields exposed associated visible labels and accessible names. Evidence: export-focus-shared.png\"},\"headings_follow_logical_order\":{\"score\":\"yes\",\"reasoning\":\"The rendered hierarchy used H1 for the board title, H2 for columns/dialog sections, and H3 for cards without skipped levels. Evidence: a11y-desktop-shared.png\"},\"landmarks_present\":{\"score\":\"yes\",\"reasoning\":\"The page exposed banner/header, main, toolbar/activity regions, and named board-column regions. Evidence: a11y-desktop-shared.png\"},\"text_and_chips_have_contrast\":{\"score\":\"yes\",\"reasoning\":\"Rendered headings, controls, status chips, and WIP breach labels were visibly distinct with readable foreground/background combinations. Evidence: a11y-desktop-shared.png\"},\"semantic_roles_for_controls\":{\"score\":\"yes\",\"reasoning\":\"Interactive elements used native buttons, checkboxes, selects, inputs, dialog/tab semantics, and a labelled card button role. Evidence: a11y-desktop-shared.png\"},\"reduced_motion_respected\":{\"score\":\"yes\",\"reasoning\":\"Reduced-motion mode matched true; card/check animation and transition durations were reduced to 1e-06s, modal transitions were likewise instant, and Run still produced execution status/countdown text. Evidence: reduced-motion-run.png\"}}",
+    "cost_usd": 0.3350068
+  },
+  "behavioral": {
+    "score": 0.8889,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "reload_resets_in_memory_facets",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After creating a card, applying an assignee filter, opening Export, and selecting cards, a page reload returns every facet to the seeded baseline together \u2014 seeded cards and columns, no filters, empty undo/redo, no selection, Export closed \u2014 never a mix of old and new state",
+        "reasoning": "Reload restored 12 seeded cards, assignee=all, zero selection, closed Export, and disabled Clear/Undo. Evidence: reload_resets_in_memory_facets-shared.png"
+      },
+      {
+        "id": "14.2",
+        "name": "keyboard_reorder_proves_live_order",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Using Move down then Move up on a card in a column with at least three cards reverses the relative order correctly both ways, proving order is live board state rather than two hardcoded lists",
+        "reasoning": "Move down changed the first two Backlog cards\u2019 order, and Move up restored it. Evidence: keyboard_reorder_proves_live_order-shared.png"
+      },
+      {
+        "id": "14.3",
+        "name": "export_tracks_board_mutations",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create a card with a unique title, move it to Review, then open Export: the board JSON preview contains that title under review; Undo once and the preview no longer places it under review \u2014 the export is derived from live store state",
+        "reasoning": "The created card exported under review, then after Undo its exported column returned to backlog. Evidence: export_tracks_board_mutations-shared.png"
+      },
+      {
+        "id": "14.4",
+        "name": "detail_board_export_echo",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Editing a card title in the detail modal and saving updates the board card title and the same title string in the board JSON export preview without a reload",
+        "reasoning": "Editing and saving the card title updated the board immediately, and Export contained the same edited title. Evidence: detail_board_export_echo-shared.png"
+      },
+      {
+        "id": "14.5",
+        "name": "column_count_delta_exact",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Measure a column header count immediately before and after dragging one card into that column; the destination count increases by exactly one and the source decreases by exactly one with no lag",
+        "reasoning": "FAIL: Dragging a Backlog card to Review left counts unchanged at Backlog 4 and Review 3. Evidence: column_count_delta_exact-shared.png"
+      },
+      {
+        "id": "14.6",
+        "name": "two_creates_differ_in_export",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create two cards with different titles in Backlog; the board shows both distinct titles and the board JSON export contains both distinct title strings",
+        "reasoning": "Two created cards appeared with distinct titles on the board and both distinct title strings appeared in Board JSON. Evidence: two_creates_differ_in_export-shared.png"
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_create_and_filter",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Start Add Card in Backlog, cancel, apply an assignee filter, then create a valid card in In Progress; the new card appears in In Progress when the filter includes its assignee (or after clearing filters), and the prior cancel did not leave a partial card",
+        "reasoning": "Canceled Add Card left no partial form/card; after filtering/clearing filters, the valid In Progress card appeared with its entered title. Evidence: interleaved_create_and_filter-shared.png"
+      },
+      {
+        "id": "14.8",
+        "name": "empty_column_then_repopulate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Move every card out of Review so the empty state shows, then Add Card into Review; the count goes from zero to one and the new card appears with the entered title, and the export preview lists it under review",
+        "reasoning": "Moving all Review cards out produced Review count 0 and its empty state; adding a card restored count 1 and Export included its title. Evidence: empty_column_then_repopulate-shared.png"
+      },
+      {
+        "id": "14.9",
+        "name": "import_export_full_pipeline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Mutate the board (create or move), Copy the board JSON, reload to seeded baseline, Import that JSON \u2014 the board shows the mutated titles/columns/order and the export preview matches the imported state",
+        "reasoning": "Copied mutated Board JSON, reloaded to baseline, imported it, and observed the mutated card plus matching exported JSON. Evidence: import_export_full_pipeline-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"reload_resets_in_memory_facets\":{\"score\":\"yes\",\"reasoning\":\"Reload restored 12 seeded cards, assignee=all, zero selection, closed Export, and disabled Clear/Undo. Evidence: reload_resets_in_memory_facets-shared.png\"},\"keyboard_reorder_proves_live_order\":{\"score\":\"yes\",\"reasoning\":\"Move down changed the first two Backlog cards\u2019 order, and Move up restored it. Evidence: keyboard_reorder_proves_live_order-shared.png\"},\"export_tracks_board_mutations\":{\"score\":\"yes\",\"reasoning\":\"The created card exported under review, then after Undo its exported column returned to backlog. Evidence: export_tracks_board_mutations-shared.png\"},\"detail_board_export_echo\":{\"score\":\"yes\",\"reasoning\":\"Editing and saving the card title updated the board immediately, and Export contained the same edited title. Evidence: detail_board_export_echo-shared.png\"},\"column_count_delta_exact\":{\"score\":\"no\",\"reasoning\":\"FAIL: Dragging a Backlog card to Review left counts unchanged at Backlog 4 and Review 3. Evidence: column_count_delta_exact-shared.png\"},\"two_creates_differ_in_export\":{\"score\":\"yes\",\"reasoning\":\"Two created cards appeared with distinct titles on the board and both distinct title strings appeared in Board JSON. Evidence: two_creates_differ_in_export-shared.png\"},\"interleaved_create_and_filter\":{\"score\":\"yes\",\"reasoning\":\"Canceled Add Card left no partial form/card; after filtering/clearing filters, the valid In Progress card appeared with its entered title. Evidence: interleaved_create_and_filter-shared.png\"},\"empty_column_then_repopulate\":{\"score\":\"yes\",\"reasoning\":\"Moving all Review cards out produced Review count 0 and its empty state; adding a card restored count 1 and Export included its title. Evidence: empty_column_then_repopulate-shared.png\"},\"import_export_full_pipeline\":{\"score\":\"yes\",\"reasoning\":\"Copied mutated Board JSON, reloaded to baseline, imported it, and observed the mutated card plus matching exported JSON. Evidence: import_export_full_pipeline-shared.png\"}}",
+    "cost_usd": 0.8423473999999999
+  },
+  "core_features": {
+    "score": 0.8696,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "seeded_board_walkthrough",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On load, the board shows exactly four columns named Backlog, In Progress, Review, and Done, each header showing a live card count, with at least 12 seeded cards total distributed so no column is empty (at least 4 Backlog, exactly 3 In Progress, exactly 3 Review, at least 2 Done), and In Progress and Review each show a WIP limit of 3",
+        "reasoning": "Four columns, live counts, 12 seeded cards, and WIP limits were directly observed. Evidence: seeded_board_walkthrough-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "card_anatomy_complete",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every seeded card shows a title, a status chip naming its execution state, and an n of m progress indicator for its task items; cards with an assignee show an avatar or initials, and at least 3 seeded cards show a prompt chip with icon and prompt title",
+        "reasoning": "Seeded cards visibly showed titles, status chips, task progress, assignee initials, and multiple prompt chips. Evidence: seeded_board_walkthrough-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "drag_between_columns_updates_counts",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Using a real pointer drag, moving a card from one column to another places it in the destination column and both column header counts update immediately (source down by one, destination up by one) without a page reload",
+        "reasoning": "A real pointer drag moved a card from Backlog to Review; counts changed from 3/3 to 2/4 without reload. Evidence: drag_between_columns_updates_counts-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "drop_position_exact",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Scripted probe: drag a card and drop it between the first and second cards of another column; the card lands at exactly that index (position 2), not at the top or bottom. Then drag a card within its own column to a new position and confirm it lands at exactly the drop position",
+        "reasoning": "FAIL: A real drag was exercised, but exact insertion at position 2 and an intra-column reposition were not directly confirmed. Evidence: drag_between_columns_updates_counts-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "keyboard_move_control_parity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Each card exposes a move control (overflow menu or equivalent) offering moves to each of the four columns plus Move up and Move down, operable with the keyboard alone; using it moves the card and updates both column counts exactly as a drag would",
+        "reasoning": "The move menu exposed all four destinations plus Move up/down, and keyboard navigation moved the card with count updates. Evidence: keyboard_move_control_parity-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "create_card_valid_submit",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Clicking Add Card in a column opens a modal with title (required, 1 to 120 characters after trim), description (optional, up to 2000), attached prompt select, and assignee select; submitting with a valid title closes the modal, inserts the new card at the top of that column, increments that column count by exactly one, and the board JSON export preview includes the new card under the same field names",
+        "reasoning": "A valid card was created, inserted at the top, incremented the count, and appeared in the JSON preview with matching API fields. Evidence: create_card_valid_submit-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "create_card_invalid_blocked",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "In the Add Card modal, Submit stays disabled while the title is empty after trim; submitting with an empty, whitespace-only, or over-120-character title shows an inline validation message naming the title field and adds no card; rapidly double-activating Submit with a valid title creates exactly one card",
+        "reasoning": "Empty submission was disabled and an over-120-character title produced the inline message \u201cTitle must be 120 characters or fewer.\u201d Evidence: create_card_valid_submit-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "prompt_panel_readonly",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Clicking a card's prompt chip opens a side panel showing the prompt title and full prompt text in read-only form; the panel closes via its close control and via the Escape key",
+        "reasoning": "The prompt panel showed title, full prompt text, read-only labeling, and was closed via its close control; Escape handling was also exercised. Evidence: prompt_panel_readonly-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "card_detail_edit_saves_in_place",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Clicking a card opens a detail modal showing title, description, attached prompt, assignee, a comment thread area, the task item checklist, and a status badge matching the card's current column; editing the title and clicking Save updates the card on the board in place without a reload, while Cancel leaves it unchanged; submitting a comment appends it to the thread with a visible timestamp",
+        "reasoning": "Detail view contained title, description, assignee, prompt, checklist, status, and comments; title save updated the board and a comment displayed with timestamp. Evidence: card_detail_edit_saves_in_place-shared.png"
+      },
+      {
+        "id": "1.12",
+        "name": "filter_search_narrow_all_columns",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Selecting an assignee in the toolbar filter narrows all four columns simultaneously to that assignee's cards while the four-column structure remains, and column counts change to reflect visible cards; typing in the search input narrows cards incrementally by title, a visible Clear filters control restores the full board, and clearing the search restores the full board exactly",
+        "reasoning": "Assignee filtering narrowed all columns, title search narrowed results, Clear filters appeared, and clearing restored the board. Evidence: empty_column_state_with_add-shared.png"
+      },
+      {
+        "id": "1.14",
+        "name": "run_progresses_subitems_sequentially",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Pressing Run on a card starts a watchable simulated execution: sub-items advance one at a time in order through pending, running, and complete states, the card's status chip reads running with an active indicator during the run, the n of m progress indicator increments live, and on completion the chip reads complete with m of m shown",
+        "reasoning": "Run visibly changed the card to running, advanced task progress sequentially, and completed at 5 of 5 with a complete chip. Evidence: keyboard_move_control_parity-shared.png"
+      },
+      {
+        "id": "1.15",
+        "name": "retry_backoff_visible",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Running the seeded failing card shows a sub-item entering a retrying state with a visible attempt counter and a live backoff countdown of the form 'waiting Ns before retry 2 of 3' before the next attempt starts",
+        "reasoning": "FAIL: The failing card reached failed and showed Retry, but no visible retrying state with attempt counter and live backoff countdown was observed. Evidence: keyboard_move_control_parity-shared.png"
+      },
+      {
+        "id": "1.16",
+        "name": "manual_retry_resumes_from_failed_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After a run reaches a failed state, a Retry control appears; activating it resumes execution from exactly the failed sub-item \u2014 sub-items already complete keep their checked state and visibly do not re-run from the start",
+        "reasoning": "After failure, Retry resumed from the failed task while the first completed task remained complete; the run then completed. Evidence: keyboard_move_control_parity-shared.png"
+      },
+      {
+        "id": "1.17",
+        "name": "empty_column_state_with_add",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Moving or filtering the last card out of a column leaves that column showing an empty state message with an Add Card control that opens the create flow targeting that column",
+        "reasoning": "Searching for a single card left other columns with \u201cNo matching cards\u201d and Add Card controls. Evidence: empty_column_state_with_add-shared.png"
+      },
+      {
+        "id": "1.21",
+        "name": "wip_limit_breach_visible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Moving or creating a card into In Progress or Review so the visible count exceeds the WIP limit of 3 shifts that column to a deep amber warning background with a visible breach label beside the count; moving cards out until the count is 3 or fewer clears the amber state and breach label",
+        "reasoning": "Creating cards raised In Progress to 4, visibly showing LIMIT BREACHED and the warning state; the app also reported the breach in status text. Evidence: wip_limit_breach_visible-shared.png"
+      },
+      {
+        "id": "1.22",
+        "name": "bulk_move_updates_counts_and_export",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Selecting two or more cards reveals a bulk action bar; confirming Move to Done relocates every selected card to Done in selection order, updates all four column counts immediately, clears the selection, dismisses the bar, and the board JSON export lists those cards under done",
+        "reasoning": "Selecting two cards exposed the bulk bar; Move to Done moved both, cleared selection, and updated counts and export membership. Evidence: bulk_move_updates_counts_and_export-shared.png"
+      },
+      {
+        "id": "1.23",
+        "name": "undo_redo_restores_board_and_export",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After a create, move, or bulk move, Undo restores the prior column membership, counts, WIP breach state, and export preview; Redo reapplies the same change; Undo and Redo are disabled when their stacks are empty and respond to Ctrl+Z / Ctrl+Shift+Z (Cmd on macOS)",
+        "reasoning": "Undo restored prior counts and membership, Redo reapplied them, controls reflected stack state, and Ctrl+Z/Ctrl+Shift+Z were exercised. Evidence: undo_redo_restores_board_and_export-shared.png"
+      },
+      {
+        "id": "1.24",
+        "name": "board_json_export_api_shaped",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening Export shows a live monospaced preview with board JSON and markdown digest tabs; the JSON is API-shaped with a board object, columns (id one of backlog/in-progress/review/done, name, wip_limit, ordered card_ids), cards (id, title, description, column, position, assignee, attached_prompt, status one of pending/running/retrying/failed/complete, tasks with id/title/status/attempts, comments with id/body/created_at ISO-8601), plus prompts and assignees arrays \u2014 these field names and enums are visible in the preview text",
+        "reasoning": "Export showed live JSON and Markdown tabs; the JSON visibly included board, columns, cards, task fields, comments, prompts, assignees, IDs, enums, positions, and ISO timestamps. Evidence: board_json_export_api_shaped-shared.png"
+      },
+      {
+        "id": "1.25",
+        "name": "export_recompiles_from_session_mutations",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After creating a card, moving a card, completing a run, or undoing, the Export preview updates without a reload so the compiled board JSON and markdown digest reflect the session mutations currently visible on the board",
+        "reasoning": "The export preview reflected created cards, moved cards, completed tasks, and restored/imported session state without reload. Evidence: board_json_export_api_shaped-shared.png"
+      },
+      {
+        "id": "1.26",
+        "name": "copy_and_download_export",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Copy writes the exact visible export preview text to the clipboard and shows a brief confirmation; Download starts a file download of that same preview text",
+        "reasoning": "Copy produced the visible confirmation and Download emitted promptops-board.json from the current preview. Evidence: board_json_export_api_shaped-shared.png"
+      },
+      {
+        "id": "1.27",
+        "name": "import_round_trip_board_json",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After mutating the board, importing a previously exported board JSON restores the imported cards titles, columns, order, and task progress to match the pre-export mutated state, and the export preview matches again",
+        "reasoning": "A previously captured JSON preview was imported after a move; the app reported \u201cBoard imported\u201d and restored the prior counts/order state. Evidence: import_round_trip_board_json-shared.png"
+      },
+      {
+        "id": "1.30",
+        "name": "seeded_libraries_populate_selects",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Add Card modal's attached prompt select lists at least 5 seeded prompts and its assignee select lists at least 4 distinct seeded assignees, matching the seeded libraries",
+        "reasoning": "The Add Card selects contained 5 seeded prompts and 4 distinct seeded assignees. Evidence: create_card_valid_submit-shared.png"
+      },
+      {
+        "id": "1.31",
+        "name": "undo_covers_comment_and_import",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Undo also reverses a comment submit (the comment disappears from the thread and any comment count restores) and a successful board import (the board returns to its pre-import cards, order, and counts); Redo reapplies each with the same completeness",
+        "reasoning": "FAIL: Import undo/redo was directly confirmed, but a complete comment undo-and-redo disappearance/restoration cycle was not directly observed. Evidence: undo_covers_comment_and_import-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"seeded_board_walkthrough\":{\"score\":\"yes\",\"reasoning\":\"Four columns, live counts, 12 seeded cards, and WIP limits were directly observed. Evidence: seeded_board_walkthrough-shared.png\"},\"card_anatomy_complete\":{\"score\":\"yes\",\"reasoning\":\"Seeded cards visibly showed titles, status chips, task progress, assignee initials, and multiple prompt chips. Evidence: seeded_board_walkthrough-shared.png\"},\"drag_between_columns_updates_counts\":{\"score\":\"yes\",\"reasoning\":\"A real pointer drag moved a card from Backlog to Review; counts changed from 3/3 to 2/4 without reload. Evidence: drag_between_columns_updates_counts-shared.png\"},\"drop_position_exact\":{\"score\":\"no\",\"reasoning\":\"FAIL: A real drag was exercised, but exact insertion at position 2 and an intra-column reposition were not directly confirmed. Evidence: drag_between_columns_updates_counts-shared.png\"},\"keyboard_move_control_parity\":{\"score\":\"yes\",\"reasoning\":\"The move menu exposed all four destinations plus Move up/down, and keyboard navigation moved the card with count updates. Evidence: keyboard_move_control_parity-shared.png\"},\"create_card_valid_submit\":{\"score\":\"yes\",\"reasoning\":\"A valid card was created, inserted at the top, incremented the count, and appeared in the JSON preview with matching API fields. Evidence: create_card_valid_submit-shared.png\"},\"create_card_invalid_blocked\":{\"score\":\"yes\",\"reasoning\":\"Empty submission was disabled and an over-120-character title produced the inline message \u201cTitle must be 120 characters or fewer.\u201d Evidence: create_card_valid_submit-shared.png\"},\"prompt_panel_readonly\":{\"score\":\"yes\",\"reasoning\":\"The prompt panel showed title, full prompt text, read-only labeling, and was closed via its close control; Escape handling was also exercised. Evidence: prompt_panel_readonly-shared.png\"},\"card_detail_edit_saves_in_place\":{\"score\":\"yes\",\"reasoning\":\"Detail view contained title, description, assignee, prompt, checklist, status, and comments; title save updated the board and a comment displayed with timestamp. Evidence: card_detail_edit_saves_in_place-shared.png\"},\"filter_search_narrow_all_columns\":{\"score\":\"yes\",\"reasoning\":\"Assignee filtering narrowed all columns, title search narrowed results, Clear filters appeared, and clearing restored the board. Evidence: empty_column_state_with_add-shared.png\"},\"run_progresses_subitems_sequentially\":{\"score\":\"yes\",\"reasoning\":\"Run visibly changed the card to running, advanced task progress sequentially, and completed at 5 of 5 with a complete chip. Evidence: keyboard_move_control_parity-shared.png\"},\"retry_backoff_visible\":{\"score\":\"no\",\"reasoning\":\"FAIL: The failing card reached failed and showed Retry, but no visible retrying state with attempt counter and live backoff countdown was observed. Evidence: keyboard_move_control_parity-shared.png\"},\"manual_retry_resumes_from_failed_step\":{\"score\":\"yes\",\"reasoning\":\"After failure, Retry resumed from the failed task while the first completed task remained complete; the run then completed. Evidence: keyboard_move_control_parity-shared.png\"},\"empty_column_state_with_add\":{\"score\":\"yes\",\"reasoning\":\"Searching for a single card left other columns with \u201cNo matching cards\u201d and Add Card controls. Evidence: empty_column_state_with_add-shared.png\"},\"wip_limit_breach_visible\":{\"score\":\"yes\",\"reasoning\":\"Creating cards raised In Progress to 4, visibly showing LIMIT BREACHED and the warning state; the app also reported the breach in status text. Evidence: wip_limit_breach_visible-shared.png\"},\"bulk_move_updates_counts_and_export\":{\"score\":\"yes\",\"reasoning\":\"Selecting two cards exposed the bulk bar; Move to Done moved both, cleared selection, and updated counts and export membership. Evidence: bulk_move_updates_counts_and_export-shared.png\"},\"undo_redo_restores_board_and_export\":{\"score\":\"yes\",\"reasoning\":\"Undo restored prior counts and membership, Redo reapplied them, controls reflected stack state, and Ctrl+Z/Ctrl+Shift+Z were exercised. Evidence: undo_redo_restores_board_and_export-shared.png\"},\"board_json_export_api_shaped\":{\"score\":\"yes\",\"reasoning\":\"Export showed live JSON and Markdown tabs; the JSON visibly included board, columns, cards, task fields, comments, prompts, assignees, IDs, enums, positions, and ISO timestamps. Evidence: board_json_export_api_shaped-shared.png\"},\"export_recompiles_from_session_mutations\":{\"score\":\"yes\",\"reasoning\":\"The export preview reflected created cards, moved cards, completed tasks, and restored/imported session state without reload. Evidence: board_json_export_api_shaped-shared.png\"},\"copy_and_download_export\":{\"score\":\"yes\",\"reasoning\":\"Copy produced the visible confirmation and Download emitted promptops-board.json from the current preview. Evidence: board_json_export_api_shaped-shared.png\"},\"import_round_trip_board_json\":{\"score\":\"yes\",\"reasoning\":\"A previously captured JSON preview was imported after a move; the app reported \u201cBoard imported\u201d and restored the prior counts/order state. Evidence: import_round_trip_board_json-shared.png\"},\"seeded_libraries_populate_selects\":{\"score\":\"yes\",\"reasoning\":\"The Add Card selects contained 5 seeded prompts and 4 distinct seeded assignees. Evidence: create_card_valid_submit-shared.png\"},\"undo_covers_comment_and_import\":{\"score\":\"no\",\"reasoning\":\"FAIL: Import undo/redo was directly confirmed, but a complete comment undo-and-redo disappearance/restoration cycle was not directly observed. Evidence: undo_covers_comment_and_import-shared.png\"}}",
+    "cost_usd": 1.1767592
+  },
+  "design_fidelity": {
+    "score": 0.7,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "column_tiles_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Columns render as fixed-width tiles in a horizontal board scroller with internally scrollable card lists, matching the visual_design layout contract",
+        "reasoning": "Fixed-width 334px columns are arranged horizontally in a board with scrollWidth greater than the viewport, and each column has an internally scrollable card area. Evidence: column_tiles_match_spec-desktop.png"
+      },
+      {
+        "id": "3.2",
+        "name": "typography_hierarchy_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Board title is larger than column headers, which are larger than card titles, which are larger than metadata text",
+        "reasoning": "Observed hierarchy: board title 25.6px, column headers 16px, card titles 15px, and metadata 12px. Evidence: column_tiles_match_spec-desktop.png"
+      },
+      {
+        "id": "3.3",
+        "name": "accent_borders_match_columns",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Card left accent borders match the column color coding \u2014 gray Backlog, blue In Progress, yellow Review, green Done \u2014 and update when a card moves",
+        "reasoning": "Observed card left borders: gray Backlog, blue In Progress, yellow Review, and green Done. Evidence: column_tiles_match_spec-desktop.png"
+      },
+      {
+        "id": "3.4",
+        "name": "specified_motions_present",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Drop settle (~200ms), create fade-in (~150ms), modal enter/exit, and status chip color transitions are present for the state changes the instruction calls out",
+        "reasoning": "FAIL: Modal transition and 200ms card transform transition were observed, but the complete set of required create fade-in and status-chip color transitions was not directly verified. Evidence: specified_motions_present-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "responsive_board_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 768px and 375px the toolbar stacking and board-internal horizontal scroll behave as specified in responsiveness",
+        "reasoning": "At 768px and 375px, the toolbar stacks vertically and the board retains horizontal overflow (scrollWidth 1322/1278 versus client width 753/360). Evidence: responsive_board_matches_spec-768.png; responsive_board_matches_spec-375.png"
+      },
+      {
+        "id": "3.6",
+        "name": "controls_match_carbon_chrome",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, selects, tags, and modals show designed Carbon-style chrome rather than bare browser defaults",
+        "reasoning": "Buttons, selects, tags, modal, drawer, tabs, and text fields visibly use designed Carbon-style chrome rather than browser defaults. Evidence: export_drawer_matches_spec-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "count_and_wip_badges_styled",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Column count badges and WIP/breach labels read as compact designed tags adjacent to column names",
+        "reasoning": "Column counts appear as compact adjacent badges, and WIP limits appear as designed labels beneath applicable headers. Evidence: column_tiles_match_spec-desktop.png"
+      },
+      {
+        "id": "3.8",
+        "name": "component_states_match_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Buttons and inputs show distinct default, hover, focus ring, disabled, and error treatments as specified",
+        "reasoning": "FAIL: Disabled and focus-ring states were observed, but hover verification was blocked by the active modal and no complete error treatment was observed. Evidence: component_states_match_spec-shared.png"
+      },
+      {
+        "id": "3.9",
+        "name": "export_drawer_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export drawer shows format tabs, monospaced preview, and Copy/Download/Import actions as a coherent designed surface",
+        "reasoning": "Export drawer visibly includes Board JSON and Markdown digest tabs, monospaced JSON preview, and Copy, Download, and Import Board actions. Evidence: export_drawer_matches_spec-shared.png"
+      },
+      {
+        "id": "3.10",
+        "name": "drag_ghost_matches_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "During drag, raised shadow and ghost placeholder match the specified insertion affordance",
+        "reasoning": "FAIL: A real drag gesture was exercised, but the captured state showed text selection rather than a raised drag shadow and ghost placeholder. Evidence: drag_ghost_matches_spec-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"column_tiles_match_spec\":{\"score\":\"yes\",\"reasoning\":\"Fixed-width 334px columns are arranged horizontally in a board with scrollWidth greater than the viewport, and each column has an internally scrollable card area. Evidence: column_tiles_match_spec-desktop.png\"},\"typography_hierarchy_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"Observed hierarchy: board title 25.6px, column headers 16px, card titles 15px, and metadata 12px. Evidence: column_tiles_match_spec-desktop.png\"},\"accent_borders_match_columns\":{\"score\":\"yes\",\"reasoning\":\"Observed card left borders: gray Backlog, blue In Progress, yellow Review, and green Done. Evidence: column_tiles_match_spec-desktop.png\"},\"specified_motions_present\":{\"score\":\"no\",\"reasoning\":\"FAIL: Modal transition and 200ms card transform transition were observed, but the complete set of required create fade-in and status-chip color transitions was not directly verified. Evidence: specified_motions_present-shared.png\"},\"responsive_board_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"At 768px and 375px, the toolbar stacks vertically and the board retains horizontal overflow (scrollWidth 1322/1278 versus client width 753/360). Evidence: responsive_board_matches_spec-768.png; responsive_board_matches_spec-375.png\"},\"controls_match_carbon_chrome\":{\"score\":\"yes\",\"reasoning\":\"Buttons, selects, tags, modal, drawer, tabs, and text fields visibly use designed Carbon-style chrome rather than browser defaults. Evidence: export_drawer_matches_spec-shared.png\"},\"count_and_wip_badges_styled\":{\"score\":\"yes\",\"reasoning\":\"Column counts appear as compact adjacent badges, and WIP limits appear as designed labels beneath applicable headers. Evidence: column_tiles_match_spec-desktop.png\"},\"component_states_match_spec\":{\"score\":\"no\",\"reasoning\":\"FAIL: Disabled and focus-ring states were observed, but hover verification was blocked by the active modal and no complete error treatment was observed. Evidence: component_states_match_spec-shared.png\"},\"export_drawer_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"Export drawer visibly includes Board JSON and Markdown digest tabs, monospaced JSON preview, and Copy, Download, and Import Board actions. Evidence: export_drawer_matches_spec-shared.png\"},\"drag_ghost_matches_spec\":{\"score\":\"no\",\"reasoning\":\"FAIL: A real drag gesture was exercised, but the captured state showed text selection rather than a raised drag shadow and ghost placeholder. Evidence: drag_ghost_matches_spec-shared.png\"}}",
+    "cost_usd": 0.2710204
+  },
+  "edge_cases": {
+    "score": 0.9091,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "empty_column_state_designed",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When a column has zero visible cards (after move or filter), it shows a designed empty message rather than a bare gap, and still offers Add Card for that column",
+        "reasoning": "yes \u2014 Filtering to zero matches showed \u201cNo matching cards\u201d in every column while Add Card remained available. Evidence: empty_column_state_designed-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "create_and_import_validate_inline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Add Card and board import show inline validation naming the offending field before any board mutation; whitespace-only titles and titles over 120 characters are rejected",
+        "reasoning": "yes \u2014 Whitespace-only and 121-character titles were rejected inline; invalid import was rejected before mutation. Evidence: create_and_import_validate_inline-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "validation_errors_name_fields",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create and import errors name the field and the problem (for example title or import) rather than only saying Invalid",
+        "reasoning": "yes \u2014 Errors explicitly identified Title and Import fields and described the problem. Evidence: create_and_import_validate_inline-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "copy_export_and_save_confirm",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Copy export shows a brief confirmation, and successful create/save/import show visible feedback (toast or equivalent)",
+        "reasoning": "yes \u2014 Copy displayed a \u201cCopied\u201d confirmation, and card creation displayed a \u201cCard created\u201d toast. Evidence: copy_export_and_save_confirm-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "run_shows_progressive_status",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "While a card is running, sub-items visibly progress through pending/running/complete (or retrying) rather than jumping straight to a final state with no intermediate UI",
+        "reasoning": "yes \u2014 Running the card visibly showed partial task completion and retry/wait status before failure. Evidence: run_shows_progressive_status-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "undo_after_move_or_import",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After a card move or successful import, Undo restores the prior board; a failed import is not treated as an undoable success",
+        "reasoning": "FAIL: After moving a card, Undo changed the board from 14 cards to 13 rather than restoring the immediately prior 14-card board state. Evidence: undo_after_move_or_import-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "drop_back_to_origin_noop",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Dragging a card and dropping it back in its original position leaves the board and all counts unchanged",
+        "reasoning": "yes \u2014 A real drag-and-drop back onto the same card position left the card order and board counts unchanged. Evidence: drop_back_to_origin_noop-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "long_title_truncates_on_card",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A card title longer than 80 characters is truncated with an ellipsis on the board card and shown in full in the detail view and export preview",
+        "reasoning": "yes \u2014 The board card displayed an ellipsis-truncated title, while the detail view and export preview showed the complete title. Evidence: long_title_truncates_on_card-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "run_disabled_while_running",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Run control on a card that is already running is disabled or absent until the run finishes or fails",
+        "reasoning": "yes \u2014 During the active run/retry state, the card\u2019s Run control was absent until the run failed. Evidence: run_shows_progressive_status-shared.png"
+      },
+      {
+        "id": "4.10",
+        "name": "wip_breach_and_bulk_empty",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Filling In Progress past WIP limit 3 shows amber breach immediately; bulk move with zero selected cards does nothing and the bulk bar stays hidden",
+        "reasoning": "yes \u2014 In Progress over WIP 3 showed an immediate over-limit indicator, and with no cards selected no bulk bar appeared. Evidence: wip_breach_and_bulk_empty-shared.png"
+      },
+      {
+        "id": "4.11",
+        "name": "redo_stack_cleared_by_new_action",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After an Undo, performing a new mutating action (for example a create) disables Redo and the cleared redo stack cannot resurrect the undone change",
+        "reasoning": "yes \u2014 After Undo, creating a new card left Redo disabled, so the undone change could not be resurrected. Evidence: undo_after_move_or_import-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"empty_column_state_designed\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Filtering to zero matches showed \u201cNo matching cards\u201d in every column while Add Card remained available. Evidence: empty_column_state_designed-shared.png\"},\"create_and_import_validate_inline\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Whitespace-only and 121-character titles were rejected inline; invalid import was rejected before mutation. Evidence: create_and_import_validate_inline-shared.png\"},\"validation_errors_name_fields\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Errors explicitly identified Title and Import fields and described the problem. Evidence: create_and_import_validate_inline-shared.png\"},\"copy_export_and_save_confirm\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Copy displayed a \u201cCopied\u201d confirmation, and card creation displayed a \u201cCard created\u201d toast. Evidence: copy_export_and_save_confirm-shared.png\"},\"run_shows_progressive_status\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Running the card visibly showed partial task completion and retry/wait status before failure. Evidence: run_shows_progressive_status-shared.png\"},\"undo_after_move_or_import\":{\"score\":\"no\",\"reasoning\":\"FAIL: After moving a card, Undo changed the board from 14 cards to 13 rather than restoring the immediately prior 14-card board state. Evidence: undo_after_move_or_import-shared.png\"},\"drop_back_to_origin_noop\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 A real drag-and-drop back onto the same card position left the card order and board counts unchanged. Evidence: drop_back_to_origin_noop-shared.png\"},\"long_title_truncates_on_card\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 The board card displayed an ellipsis-truncated title, while the detail view and export preview showed the complete title. Evidence: long_title_truncates_on_card-shared.png\"},\"run_disabled_while_running\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 During the active run/retry state, the card\u2019s Run control was absent until the run failed. Evidence: run_shows_progressive_status-shared.png\"},\"wip_breach_and_bulk_empty\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 In Progress over WIP 3 showed an immediate over-limit indicator, and with no cards selected no bulk bar appeared. Evidence: wip_breach_and_bulk_empty-shared.png\"},\"redo_stack_cleared_by_new_action\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 After Undo, creating a new card left Redo disabled, so the undone change could not be resurrected. Evidence: undo_after_move_or_import-shared.png\"}}",
+    "cost_usd": 0.7697476
+  },
+  "innovation": {
+    "score": 0.8182,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "polished_drag_microinteractions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Card drag/drop or keyboard move includes polish beyond bare relocation \u2014 for example coordinated settle of neighbors and a clear insertion ghost that feels intentional",
+        "reasoning": "BLOCKED: No decisive live observation of a polished drag insertion ghost or coordinated neighbor settling. Evidence: initial-shared.png"
+      },
+      {
+        "id": "11.2",
+        "name": "execution_timeline_clarity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Card execution presents a clear, watchable progression (status chip, per-item states, progress n of m) that reads as a designed run timeline rather than a bare checkbox flip",
+        "reasoning": "A real Run interaction showed a running status chip, disabled Running control, task progress changing to 3 of 4, attempt labeling, and completion state. Evidence: execution-timeline-shared.png"
+      },
+      {
+        "id": "11.3",
+        "name": "wip_breach_affordance",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "WIP breach uses a distinctive amber treatment and breach label that makes capacity problems obvious at a glance",
+        "reasoning": "After creating a fourth In Progress card, the board visibly showed \u201cLimit breached\u201d; its computed text color was amber (rgb(253, 220, 105)). Evidence: wip-breach-shared.png"
+      },
+      {
+        "id": "11.4",
+        "name": "export_as_centerpiece",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Export drawer feels like a first-class product surface \u2014 live preview, format tabs, copy confirmation \u2014 not a hidden dump",
+        "reasoning": "The Export drawer provided JSON/Markdown tabs, a live preview, Copy/Download controls, and a visible Copied confirmation after real interaction. Evidence: export-shared.png"
+      },
+      {
+        "id": "11.5",
+        "name": "bulk_bar_ergonomics",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Multi-select and the bulk action bar make batch moves feel intentional and low-friction",
+        "reasoning": "Selecting two cards exposed a dedicated bulk bar showing \u201c2 selected\u201d with clear Move to Backlog/In Progress/Review/Done actions and a clear-selection control. Evidence: bulk-bar-shared.png"
+      },
+      {
+        "id": "11.6",
+        "name": "undo_confidence",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Undo/redo affordances make destructive board edits feel safe and reversible",
+        "reasoning": "After a real bulk move, Undo became enabled; clicking it restored the prior board arrangement and enabled Redo, with \u201cLast board action undone.\u201d Evidence: undo-confidence-shared.png"
+      },
+      {
+        "id": "11.7",
+        "name": "prompt_panel_readability",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The prompt side panel presents full prompt text in a readable, focused reading surface",
+        "reasoning": "The prompt side panel presented a focused full-text reading surface with a clear title, \u201cFull prompt text,\u201d readable prompt content, and read-only metadata. Evidence: prompt-panel-shared.png"
+      },
+      {
+        "id": "11.8",
+        "name": "status_chip_craft",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Status chips and progress indicators are visually refined and consistent across card and detail views",
+        "reasoning": "Card and detail views visibly used consistent pending/running/complete status chips plus task progress counts and progress bars across the workflow. Evidence: execution-timeline-shared.png"
+      },
+      {
+        "id": "11.9",
+        "name": "empty_state_craft",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Empty column and empty filter states are designed, helpful, and on-brand rather than blank gaps",
+        "reasoning": "A real no-match search produced designed empty states in every column with an icon, \u201cNo matching cards,\u201d helpful guidance, and Clear filters actions. Evidence: empty-filter-shared.png"
+      },
+      {
+        "id": "11.10",
+        "name": "keyboard_parity_delight",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Keyboard move controls feel as capable as drag, making the board fully operable without a pointer",
+        "reasoning": "BLOCKED: No decisive live observation of keyboard move controls providing parity with drag; the visible board exposed pointer-oriented move controls but no verified keyboard move workflow. Evidence: initial-shared.png"
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "The board includes a useful live \u201cFlow pulse\u201d insight that summarizes current bottleneck pressure, such as \u201cBacklog is carrying 4 active cards,\u201d beyond basic Kanban status display. Evidence: initial-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"polished_drag_microinteractions\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No decisive live observation of a polished drag insertion ghost or coordinated neighbor settling. Evidence: initial-shared.png\"},\"execution_timeline_clarity\":{\"score\":\"yes\",\"reasoning\":\"A real Run interaction showed a running status chip, disabled Running control, task progress changing to 3 of 4, attempt labeling, and completion state. Evidence: execution-timeline-shared.png\"},\"wip_breach_affordance\":{\"score\":\"yes\",\"reasoning\":\"After creating a fourth In Progress card, the board visibly showed \u201cLimit breached\u201d; its computed text color was amber (rgb(253, 220, 105)). Evidence: wip-breach-shared.png\"},\"export_as_centerpiece\":{\"score\":\"yes\",\"reasoning\":\"The Export drawer provided JSON/Markdown tabs, a live preview, Copy/Download controls, and a visible Copied confirmation after real interaction. Evidence: export-shared.png\"},\"bulk_bar_ergonomics\":{\"score\":\"yes\",\"reasoning\":\"Selecting two cards exposed a dedicated bulk bar showing \u201c2 selected\u201d with clear Move to Backlog/In Progress/Review/Done actions and a clear-selection control. Evidence: bulk-bar-shared.png\"},\"undo_confidence\":{\"score\":\"yes\",\"reasoning\":\"After a real bulk move, Undo became enabled; clicking it restored the prior board arrangement and enabled Redo, with \u201cLast board action undone.\u201d Evidence: undo-confidence-shared.png\"},\"prompt_panel_readability\":{\"score\":\"yes\",\"reasoning\":\"The prompt side panel presented a focused full-text reading surface with a clear title, \u201cFull prompt text,\u201d readable prompt content, and read-only metadata. Evidence: prompt-panel-shared.png\"},\"status_chip_craft\":{\"score\":\"yes\",\"reasoning\":\"Card and detail views visibly used consistent pending/running/complete status chips plus task progress counts and progress bars across the workflow. Evidence: execution-timeline-shared.png\"},\"empty_state_craft\":{\"score\":\"yes\",\"reasoning\":\"A real no-match search produced designed empty states in every column with an icon, \u201cNo matching cards,\u201d helpful guidance, and Clear filters actions. Evidence: empty-filter-shared.png\"},\"keyboard_parity_delight\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No decisive live observation of keyboard move controls providing parity with drag; the visible board exposed pointer-oriented move controls but no verified keyboard move workflow. Evidence: initial-shared.png\"},\"innovation_catchall\":{\"score\":\"yes\",\"reasoning\":\"The board includes a useful live \u201cFlow pulse\u201d insight that summarizes current bottleneck pressure, such as \u201cBacklog is carrying 4 active cards,\u201d beyond basic Kanban status display. Evidence: initial-shared.png\"}}",
+    "cost_usd": 0.47851219999999994
+  },
+  "motion": {
+    "score": 0.8182,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "hover_feedback_required",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Hovering with the real pointer (verify computed styles while hovering): buttons ease background and shadow with a slight press effect; cards lift subtly; toolbar controls and menu rows take a visible hover wash; form controls show focus rings",
+        "reasoning": "PASS \u2014 live hover changed button shadow/background and card shadow; focused search input showed a visible focus outline. Evidence: hover_feedback_required-desktop.png"
+      },
+      {
+        "id": "3.2",
+        "name": "drop_settle_transition",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After a real pointer drag, the dropped card settles into its new position with a transition of roughly 200 milliseconds rather than snapping, and surrounding cards in both columns animate to their new positions",
+        "reasoning": "FAIL: A real drag was attempted, but the card remained in Backlog and did not complete the drop workflow. Evidence: drop_settle_transition.png"
+      },
+      {
+        "id": "3.3",
+        "name": "keyboard_move_animates",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Moving a card via its keyboard move control (not a drag and not a WebMCP shortcut) animates the card to its destination with the same settle motion as a drag",
+        "reasoning": "PASS \u2014 the real move control moved the card to Done, with a 0.2s transform transition. Evidence: keyboard_move_animates.png"
+      },
+      {
+        "id": "3.4",
+        "name": "create_card_animates_in",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting the Add Card form makes the new card animate in from opacity 0 over roughly 150 milliseconds at the top of its column",
+        "reasoning": "PASS \u2014 submitting Add Card created the card with a 0.15s card-in animation. Evidence: keyboard_move_animates.png"
+      },
+      {
+        "id": "3.5",
+        "name": "modal_panel_and_export_transitions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create and detail modals enter and exit with a short opacity/scale transition of roughly 200 to 300 milliseconds; the prompt side panel slides in/out; the Export drawer and bulk action bar enter and exit with a short opacity transition of roughly 150 to 250 milliseconds",
+        "reasoning": "PASS \u2014 modal and export drawer transitions were observed at roughly 200\u2013240ms for opacity/scale/slide. Evidence: hover_feedback_required-desktop.png"
+      },
+      {
+        "id": "3.6",
+        "name": "subitem_tick_animation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "During a real Run triggered from the card Run control, each sub-item completion animates its check state rather than flipping instantly, and the card progress indicator animates its increment",
+        "reasoning": "PASS \u2014 during a real Run, a completed task showed a 0.2s check-pop animation and the progress fill had a 0.28s width transition. Evidence: subitem_tick_animation.png"
+      },
+      {
+        "id": "3.8",
+        "name": "toasts_slide_and_dismiss",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Feedback toasts after create, save, failed runs, copy export, and successful import slide in, remain readable, and auto-dismiss with a fade",
+        "reasoning": "PASS \u2014 live card creation produced a readable toast with toast-in animation and opacity/transform transition; it disappeared after waiting. Evidence: toasts_slide_and_dismiss-confirmed.png"
+      },
+      {
+        "id": "3.9",
+        "name": "reduced_motion_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, card movements, modal transitions, and check animations apply instantly while all state changes and countdown text still occur",
+        "reasoning": "PASS \u2014 reduced-motion browser reported prefers-reduced-motion=true and card animation/transition durations were reduced to approximately 0.001ms. Evidence: reduced_motion_respected.png"
+      },
+      {
+        "id": "3.11",
+        "name": "wip_breach_fades_in",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When a column crosses its WIP limit via a real move or create, the amber breach background fades in rather than hard-swapping",
+        "reasoning": "PASS \u2014 creating a card over the In Progress limit produced wip-breach with a 0.3s background/border transition. Evidence: wip_breach_fades_in.png"
+      },
+      {
+        "id": "3.12",
+        "name": "status_chip_color_transitions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Status chip changes (pending to running, running to complete, retrying to failed) transition their color rather than hard-swapping, observed during a real Run",
+        "reasoning": "PASS \u2014 real Run transitions were observed from pending to running/complete, and status tags expose a 0.24s background-color/color transition. Evidence: subitem_tick_animation.png"
+      },
+      {
+        "id": "3.13",
+        "name": "backoff_countdown_ticks",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "On the seeded failing card during a real Run, the retry backoff countdown visibly ticks down once per second until the next attempt starts",
+        "reasoning": "FAIL: The seeded failing run reached Failed/Retry states, but no visible countdown text ticking once per second was observed. Evidence: subitem_tick_animation.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"hover_feedback_required\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 live hover changed button shadow/background and card shadow; focused search input showed a visible focus outline. Evidence: hover_feedback_required-desktop.png\"},\"drop_settle_transition\":{\"score\":\"no\",\"reasoning\":\"FAIL: A real drag was attempted, but the card remained in Backlog and did not complete the drop workflow. Evidence: drop_settle_transition.png\"},\"keyboard_move_animates\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 the real move control moved the card to Done, with a 0.2s transform transition. Evidence: keyboard_move_animates.png\"},\"create_card_animates_in\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 submitting Add Card created the card with a 0.15s card-in animation. Evidence: keyboard_move_animates.png\"},\"modal_panel_and_export_transitions\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 modal and export drawer transitions were observed at roughly 200\u2013240ms for opacity/scale/slide. Evidence: hover_feedback_required-desktop.png\"},\"subitem_tick_animation\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 during a real Run, a completed task showed a 0.2s check-pop animation and the progress fill had a 0.28s width transition. Evidence: subitem_tick_animation.png\"},\"toasts_slide_and_dismiss\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 live card creation produced a readable toast with toast-in animation and opacity/transform transition; it disappeared after waiting. Evidence: toasts_slide_and_dismiss-confirmed.png\"},\"reduced_motion_respected\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 reduced-motion browser reported prefers-reduced-motion=true and card animation/transition durations were reduced to approximately 0.001ms. Evidence: reduced_motion_respected.png\"},\"wip_breach_fades_in\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 creating a card over the In Progress limit produced wip-breach with a 0.3s background/border transition. Evidence: wip_breach_fades_in.png\"},\"status_chip_color_transitions\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 real Run transitions were observed from pending to running/complete, and status tags expose a 0.24s background-color/color transition. Evidence: subitem_tick_animation.png\"},\"backoff_countdown_ticks\":{\"score\":\"no\",\"reasoning\":\"FAIL: The seeded failing run reached Failed/Retry states, but no visible countdown text ticking once per second was observed. Evidence: subitem_tick_animation.png\"}}",
+    "cost_usd": 0.43523359999999994
+  },
+  "performance": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_under_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive within 2 seconds of a local cold load",
+        "reasoning": "Loaded UI was interactive with document load complete at ~451 ms and a rendered board. Evidence: cold-start-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "interactions_remain_responsive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Dragging cards, toggling filters, bulk moving, and opening Export stay responsive with no multi-second UI freezes",
+        "reasoning": "Drag, filtering, export, run, scrolling, and card opening all responded without multi-second freezes. Evidence: export-dialog-shared.png"
+      },
+      {
+        "id": "9.3",
+        "name": "no_jank_during_drag",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Card drag and drop stays smooth with no visible jank while the ghost placeholder tracks the insertion position",
+        "reasoning": "Real pointer drag showed a visible insertion placeholder/ghost and completed successfully without visible jank. Evidence: drag-mid-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "export_compile_does_not_freeze",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening Export and switching JSON/markdown tabs recompiles the preview without freezing the UI for multiple seconds",
+        "reasoning": "Export drawer opened and switching from Board JSON to Markdown digest regenerated the preview responsively. Evidence: export-markdown-shared.png"
+      },
+      {
+        "id": "9.5",
+        "name": "run_progression_stays_smooth",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "During a card run, sub-item status updates and progress n of m increment without locking the rest of the board",
+        "reasoning": "Run status changed through attempts and progress advanced from 0/5 to 5/5 while the board remained rendered and responsive. Evidence: run-finished-shared.png"
+      },
+      {
+        "id": "9.6",
+        "name": "rapid_filter_stable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapid filter and search toggling does not hang the page or leave column counts permanently wrong",
+        "reasoning": "Rapidly changed search filters to three values; final counts were consistent, including one matching card and zero in other columns. Evidence: rapid-filter-shared.png"
+      },
+      {
+        "id": "9.7",
+        "name": "console_clean_on_load",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No console errors or warnings appear on initial load before interaction",
+        "reasoning": "Initial load console inspection reported 0 errors and 0 warnings. Evidence: cold-start-shared.png"
+      },
+      {
+        "id": "9.8",
+        "name": "console_clean_during_exercise",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No console errors or unhandled rejections appear during drags, runs, filtering, export, and bulk moves",
+        "reasoning": "After drag, filtering, export, run, scrolling, and card interaction, console inspection still reported 0 errors and 0 warnings. Evidence: board-during-run-shared.png"
+      },
+      {
+        "id": "9.9",
+        "name": "board_usable_during_run",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "While one card is running, the user can still scroll columns and interact with other cards without the UI locking",
+        "reasoning": "While a card showed Running, the board was scrolled and another card was opened in a live dialog; other controls remained available. Evidence: board-during-run-shared.png"
+      },
+      {
+        "id": "9.10",
+        "name": "large_column_scroll_smooth",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A column with many cards scrolls inside itself smoothly without hitching the whole page",
+        "reasoning": "Backlog column had scrollHeight 1376 versus clientHeight 567 and real wheel scrolling moved its scrollTop to 809 without hitching the page. Evidence: column-scroll-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_start_under_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"Loaded UI was interactive with document load complete at ~451 ms and a rendered board. Evidence: cold-start-shared.png\"},\"interactions_remain_responsive\":{\"score\":\"yes\",\"reasoning\":\"Drag, filtering, export, run, scrolling, and card opening all responded without multi-second freezes. Evidence: export-dialog-shared.png\"},\"no_jank_during_drag\":{\"score\":\"yes\",\"reasoning\":\"Real pointer drag showed a visible insertion placeholder/ghost and completed successfully without visible jank. Evidence: drag-mid-shared.png\"},\"export_compile_does_not_freeze\":{\"score\":\"yes\",\"reasoning\":\"Export drawer opened and switching from Board JSON to Markdown digest regenerated the preview responsively. Evidence: export-markdown-shared.png\"},\"run_progression_stays_smooth\":{\"score\":\"yes\",\"reasoning\":\"Run status changed through attempts and progress advanced from 0/5 to 5/5 while the board remained rendered and responsive. Evidence: run-finished-shared.png\"},\"rapid_filter_stable\":{\"score\":\"yes\",\"reasoning\":\"Rapidly changed search filters to three values; final counts were consistent, including one matching card and zero in other columns. Evidence: rapid-filter-shared.png\"},\"console_clean_on_load\":{\"score\":\"yes\",\"reasoning\":\"Initial load console inspection reported 0 errors and 0 warnings. Evidence: cold-start-shared.png\"},\"console_clean_during_exercise\":{\"score\":\"yes\",\"reasoning\":\"After drag, filtering, export, run, scrolling, and card interaction, console inspection still reported 0 errors and 0 warnings. Evidence: board-during-run-shared.png\"},\"board_usable_during_run\":{\"score\":\"yes\",\"reasoning\":\"While a card showed Running, the board was scrolled and another card was opened in a live dialog; other controls remained available. Evidence: board-during-run-shared.png\"},\"large_column_scroll_smooth\":{\"score\":\"yes\",\"reasoning\":\"Backlog column had scrollHeight 1376 versus clientHeight 567 and real wheel scrolling moved its scrollTop to 809 without hitching the page. Evidence: column-scroll-shared.png\"}}",
+    "cost_usd": 0.5468915999999999
+  },
+  "responsiveness": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "board_adapts_desktop_to_mobile",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At desktop widths all four columns are reachable via the horizontal board scroller; at 375px the toolbar stacks and columns remain fixed-width and horizontally scrollable inside the board without page-level horizontal scroll",
+        "reasoning": "Four columns are visible/reachable at 1440px; at 375px the board scrolls internally and the toolbar stacks. Evidence: desktop-1440.png, mobile-375-initial.png"
+      },
+      {
+        "id": "7.2",
+        "name": "mobile_tap_targets_large_enough",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px, Add Card, Run/Retry, undo/redo, Export, filter/search, and bulk move controls are large enough to tap without precise aiming",
+        "reasoning": "At 375px filter/search, undo/redo, Export, Run, Add Card, and bulk controls have usable 30\u201348px hit areas. Evidence: mobile-375-initial.png, bulk-mobile-375.png"
+      },
+      {
+        "id": "7.3",
+        "name": "typography_readable_at_breakpoints",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Column headers and card titles remain readable at 1440px and 375px without becoming microscopic",
+        "reasoning": "Column headers and card titles remain clearly readable at both 1440px and 375px. Evidence: desktop-1440.png, mobile-375-initial.png"
+      },
+      {
+        "id": "7.4",
+        "name": "no_clip_or_overflow_at_375",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px no card, toolbar, Export drawer, or bulk bar content clips or overflows the viewport",
+        "reasoning": "Toolbar, cards, export drawer, and bulk bar remain contained; board and preview scrolling are internal. Evidence: mobile-375-initial.png, export-mobile-375.png, bulk-mobile-375.png"
+      },
+      {
+        "id": "7.5",
+        "name": "toolbar_stacks_on_narrow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 768px and below the toolbar stacks filter, search, undo/redo, Export, and actions without clipping",
+        "reasoning": "At 768px the toolbar uses a vertical column layout with filter/search separated from actions and no clipping. Evidence: toolbar-768.png"
+      },
+      {
+        "id": "7.6",
+        "name": "columns_remain_reachable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At narrow widths the four columns remain reachable by horizontal scrolling inside the board container; the page itself does not scroll horizontally",
+        "reasoning": "At 375px the board scroller has horizontal overflow and fixed-width columns while document width remains equal to the viewport. Evidence: mobile-375-initial.png"
+      },
+      {
+        "id": "7.7",
+        "name": "touch_drag_and_tap_work",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On a narrow viewport, tap targets for Add Card and card open work, and card drag still relocates a card when pointer drag is available",
+        "reasoning": "A card opened successfully on the narrow viewport, and real drag-and-drop relocated it into In Progress. Evidence: card-open-mobile-375.png, drag-mobile-375.png"
+      },
+      {
+        "id": "7.8",
+        "name": "no_page_horizontal_scroll",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px no page-level horizontal scrollbar appears (board-internal column scroll is allowed)",
+        "reasoning": "At 375px document scrollWidth equals clientWidth; horizontal scrolling is confined to the board. Evidence: mobile-375-initial.png"
+      },
+      {
+        "id": "7.9",
+        "name": "export_drawer_fits_narrow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Export drawer preview, format tabs, and Copy/Download/Import remain usable at 375px without covering primary actions permanently",
+        "reasoning": "At 375px the drawer shows format tabs, preview, Copy, Download, and Import Board within a usable full-width drawer. Evidence: export-mobile-375.png"
+      },
+      {
+        "id": "7.10",
+        "name": "bulk_bar_reachable_on_mobile",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When cards are selected at 375px, the bulk action bar remains reachable and operable",
+        "reasoning": "After selecting a card at 375px, the bulk bar appears at the bottom with four operable move buttons. Evidence: bulk-mobile-375.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"board_adapts_desktop_to_mobile\":{\"score\":\"yes\",\"reasoning\":\"Four columns are visible/reachable at 1440px; at 375px the board scrolls internally and the toolbar stacks. Evidence: desktop-1440.png, mobile-375-initial.png\"},\"mobile_tap_targets_large_enough\":{\"score\":\"yes\",\"reasoning\":\"At 375px filter/search, undo/redo, Export, Run, Add Card, and bulk controls have usable 30\u201348px hit areas. Evidence: mobile-375-initial.png, bulk-mobile-375.png\"},\"typography_readable_at_breakpoints\":{\"score\":\"yes\",\"reasoning\":\"Column headers and card titles remain clearly readable at both 1440px and 375px. Evidence: desktop-1440.png, mobile-375-initial.png\"},\"no_clip_or_overflow_at_375\":{\"score\":\"yes\",\"reasoning\":\"Toolbar, cards, export drawer, and bulk bar remain contained; board and preview scrolling are internal. Evidence: mobile-375-initial.png, export-mobile-375.png, bulk-mobile-375.png\"},\"toolbar_stacks_on_narrow\":{\"score\":\"yes\",\"reasoning\":\"At 768px the toolbar uses a vertical column layout with filter/search separated from actions and no clipping. Evidence: toolbar-768.png\"},\"columns_remain_reachable\":{\"score\":\"yes\",\"reasoning\":\"At 375px the board scroller has horizontal overflow and fixed-width columns while document width remains equal to the viewport. Evidence: mobile-375-initial.png\"},\"touch_drag_and_tap_work\":{\"score\":\"yes\",\"reasoning\":\"A card opened successfully on the narrow viewport, and real drag-and-drop relocated it into In Progress. Evidence: card-open-mobile-375.png, drag-mobile-375.png\"},\"no_page_horizontal_scroll\":{\"score\":\"yes\",\"reasoning\":\"At 375px document scrollWidth equals clientWidth; horizontal scrolling is confined to the board. Evidence: mobile-375-initial.png\"},\"export_drawer_fits_narrow\":{\"score\":\"yes\",\"reasoning\":\"At 375px the drawer shows format tabs, preview, Copy, Download, and Import Board within a usable full-width drawer. Evidence: export-mobile-375.png\"},\"bulk_bar_reachable_on_mobile\":{\"score\":\"yes\",\"reasoning\":\"After selecting a card at 375px, the bulk bar appears at the bottom with four operable move buttons. Evidence: bulk-mobile-375.png\"}}",
+    "cost_usd": 0.29361299999999996
+  },
+  "technical": {
+    "score": 0.5,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "cold_load_interactive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app serves via its documented start path and is interactive within 2 seconds of a local cold load",
+        "reasoning": "yes \u2014 Local cold load rendered the interactive board within the observed load window. Evidence: cold_load_interactive-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "console_clean_full_exercise",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise of the board: drags, keyboard moves, create/edit, runs with retries, filtering, bulk moves, undo/redo, and export/import",
+        "reasoning": "FAIL: Partial exercise showed no browser console errors or warnings, but the required full exercise workflow was not completed end-to-end. Evidence: console_clean_full_exercise-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "state_coherence_across_surfaces",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A change made in one surface reflects everywhere immediately without reload: moving a card updates both column counts and the export preview; editing in the detail modal updates the board card and export; a completed run updates the card chip, progress indicator, and export status fields",
+        "reasoning": "FAIL: After a WebMCP move, the visible board and export preview did not consistently reflect the requested cross-surface change; title editing also was not reflected in export. Evidence: state_coherence_across_surfaces-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "reload_returns_seeded_baseline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A page reload after creating, moving, running, selecting, and opening Export returns the app to its seeded baseline (in-memory state only): seeded cards/columns, no filters, empty undo/redo, no selection, Export closed \u2014 with no partial mixture of old and new state",
+        "reasoning": "yes \u2014 Reload returned 12 seeded cards, baseline columns and counts, no filters, disabled undo/redo, no dialog, and Export closed. Evidence: reload_returns_seeded_baseline-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "keyboard_and_dialog_semantics",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Modal dialogs and the Export drawer expose role dialog with aria-modal true, trap focus while open, close on Escape, and return focus to their opener; validation messages are associated with their fields and execution/WIP state changes are announced via an aria-live region",
+        "reasoning": "FAIL: Dialog role, aria-modal, focus trapping, Escape close, and opener focus return were observed, but the overlong-title validation input had aria-invalid without an aria-describedby association. Evidence: keyboard_and_dialog_semantics-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "rapid_input_stability",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The UI stays responsive and consistent under rapid repeated input \u2014 rapid drags, rapid filter toggling, bulk moves, and starting a run while filtering \u2014 with no hangs, dropped interactions, or desynced counts",
+        "reasoning": "FAIL: The complete rapid-input exercise covering repeated drags, filters, bulk moves, and concurrent run was not completed and therefore cannot be directly verified. Evidence: console_clean_full_exercise-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "export_field_contract_visible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The board JSON export preview visibly includes the declared API-shaped field names and enums (column ids, status values, tasks.attempts, comments.created_at) matching the instruction field contract",
+        "reasoning": "yes \u2014 The visible Board JSON preview included column IDs, status values, tasks.attempts, and comments.created_at. Evidence: export_field_contract_visible-shared.png"
+      },
+      {
+        "id": "4.10",
+        "name": "form_rejects_overlong_title",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting Add Card with a title longer than 120 characters shows an inline validation message naming title and does not add a card",
+        "reasoning": "yes \u2014 Entering 121 characters produced the inline message \u201cTitle must be 120 characters or fewer.\u201d and left Add Card disabled; no card was added. Evidence: form_rejects_overlong_title-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_load_interactive\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Local cold load rendered the interactive board within the observed load window. Evidence: cold_load_interactive-shared.png\"},\"console_clean_full_exercise\":{\"score\":\"no\",\"reasoning\":\"FAIL: Partial exercise showed no browser console errors or warnings, but the required full exercise workflow was not completed end-to-end. Evidence: console_clean_full_exercise-shared.png\"},\"state_coherence_across_surfaces\":{\"score\":\"no\",\"reasoning\":\"FAIL: After a WebMCP move, the visible board and export preview did not consistently reflect the requested cross-surface change; title editing also was not reflected in export. Evidence: state_coherence_across_surfaces-shared.png\"},\"reload_returns_seeded_baseline\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Reload returned 12 seeded cards, baseline columns and counts, no filters, disabled undo/redo, no dialog, and Export closed. Evidence: reload_returns_seeded_baseline-shared.png\"},\"keyboard_and_dialog_semantics\":{\"score\":\"no\",\"reasoning\":\"FAIL: Dialog role, aria-modal, focus trapping, Escape close, and opener focus return were observed, but the overlong-title validation input had aria-invalid without an aria-describedby association. Evidence: keyboard_and_dialog_semantics-shared.png\"},\"rapid_input_stability\":{\"score\":\"no\",\"reasoning\":\"FAIL: The complete rapid-input exercise covering repeated drags, filters, bulk moves, and concurrent run was not completed and therefore cannot be directly verified. Evidence: console_clean_full_exercise-shared.png\"},\"export_field_contract_visible\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 The visible Board JSON preview included column IDs, status values, tasks.attempts, and comments.created_at. Evidence: export_field_contract_visible-shared.png\"},\"form_rejects_overlong_title\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Entering 121 characters produced the inline message \u201cTitle must be 120 characters or fewer.\u201d and left Add Card disabled; no card was added. Evidence: form_rejects_overlong_title-shared.png\"}}",
+    "cost_usd": 0.42757219999999996
+  },
+  "user_flows": {
+    "score": 0.9091,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "create_then_move_updates_counts_and_export",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Submitting Add Card with a valid title in Backlog adds exactly one card at the top of Backlog and increases its count by one; dragging that card into In Progress moves it there, decreases Backlog by one, increases In Progress by one, and the board JSON export lists the card under in-progress with the submitted title \u2014 all without a reload",
+        "reasoning": "FAIL: Creating the card succeeded, but the real drag gesture did not move it; only the separate move-menu action succeeded. Evidence: create_then_move_updates_counts_and_export.png"
+      },
+      {
+        "id": "6.2",
+        "name": "invalid_create_names_title_field",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting Add Card with an empty or whitespace-only title shows an inline validation message naming the title field, adds no card, and leaves every column count unchanged",
+        "reasoning": "Whitespace-only submission showed the inline message \u201cTitle is required.\u201d and no card/count change. Evidence: invalid_create_names_title_field.png"
+      },
+      {
+        "id": "6.3",
+        "name": "detail_edit_echoes_board_and_export",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Editing a card title in the detail view and saving updates the board card in place and the same title appears in the board JSON export preview without a reload; Cancel leaves both unchanged",
+        "reasoning": "Editing and saving updated the card and JSON preview to \u201cVerify export pipeline edited\u201d without reload. Evidence: detail_edit_echoes_board_and_export.png"
+      },
+      {
+        "id": "6.4",
+        "name": "bulk_move_then_undo_restores_board",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Selecting three cards, bulk-moving them to Done, raises Done count by three and lists them under done in the export preview; Undo restores their prior columns, counts, and export preview",
+        "reasoning": "Three selected cards moved to Done, then Undo restored Done to 2 and Review to 3 with cards present again. Evidence: bulk_move_then_undo_restores_board.png"
+      },
+      {
+        "id": "6.5",
+        "name": "export_drawer_and_prompt_panel_switch",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening Export shows the export drawer with format tabs while the board remains in its current filtered or unfiltered state; closing Export and opening a prompt panel shows the prompt text; returning to the board retains card positions and counts",
+        "reasoning": "Export drawer displayed Board JSON/Markdown tabs; after closing, the prompt panel displayed its title and full text, and the board remained usable. Evidence: export_drawer_and_prompt_panel_switch.png"
+      },
+      {
+        "id": "6.6",
+        "name": "empty_column_offers_add_card",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Moving the last card out of a column leaves a designed empty state with a message and an Add Card control that opens create targeting that column",
+        "reasoning": "After moving both Done cards out, Done showed a designed empty state and its Add Card opened a dialog targeting Done. Evidence: empty_column_offers_add_card.png"
+      },
+      {
+        "id": "6.7",
+        "name": "filter_round_trip_restores_counts",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Selecting an assignee in the filter narrows every column to that assignee cards and updates every column count; clearing the filter restores the exact prior board and counts",
+        "reasoning": "Maya Chen filtering narrowed columns to 1,1,1,0; clearing restored 4,4,3,2 and the all-assignees state. Evidence: filter_round_trip_restores_counts.png"
+      },
+      {
+        "id": "6.8",
+        "name": "prompt_panel_closes_with_continuity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening a prompt side panel from a card chip shows the prompt title and full text; closing via the close control or Escape returns focus and leaves the board counts and card positions unchanged",
+        "reasoning": "Prompt panel showed the title and full text; Escape closed it and the edited card and counts remained intact. Evidence: prompt_panel_closes_with_continuity.png"
+      },
+      {
+        "id": "6.9",
+        "name": "create_and_detail_modals_support_flows",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create and detail modals open from Add Card and card clicks, support save/cancel/escape, and do not leave the board unusable after close",
+        "reasoning": "Create modal supported validation/save/escape, and detail modal supported save and cancel without leaving the board unusable. Evidence: create_and_detail_modals_support_flows.png"
+      },
+      {
+        "id": "6.10",
+        "name": "failed_run_retry_without_reload",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On the seeded failing card, after the run reaches failed, pressing Retry resumes from the failed sub-item without a page reload; previously completed sub-items stay checked",
+        "reasoning": "The seeded run reached failed at Infer product routing attempt 2; Retry resumed it, preserved the completed first item, and finished all 5 items without reload. Evidence: failed_run_retry_without_reload.png"
+      },
+      {
+        "id": "6.11",
+        "name": "export_import_round_trip_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After creating or moving at least one card, Copy or Download the board JSON, then Import that same JSON \u2014 visible titles, columns, order, and task progress match the pre-export mutated state and the export preview matches again",
+        "reasoning": "The live JSON preview was copied into Import and imported successfully; edited title, columns, order, and task progress were restored and the preview remained available. Evidence: export_import_round_trip_flow.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"create_then_move_updates_counts_and_export\":{\"score\":\"no\",\"reasoning\":\"FAIL: Creating the card succeeded, but the real drag gesture did not move it; only the separate move-menu action succeeded. Evidence: create_then_move_updates_counts_and_export.png\"},\"invalid_create_names_title_field\":{\"score\":\"yes\",\"reasoning\":\"Whitespace-only submission showed the inline message \u201cTitle is required.\u201d and no card/count change. Evidence: invalid_create_names_title_field.png\"},\"detail_edit_echoes_board_and_export\":{\"score\":\"yes\",\"reasoning\":\"Editing and saving updated the card and JSON preview to \u201cVerify export pipeline edited\u201d without reload. Evidence: detail_edit_echoes_board_and_export.png\"},\"bulk_move_then_undo_restores_board\":{\"score\":\"yes\",\"reasoning\":\"Three selected cards moved to Done, then Undo restored Done to 2 and Review to 3 with cards present again. Evidence: bulk_move_then_undo_restores_board.png\"},\"export_drawer_and_prompt_panel_switch\":{\"score\":\"yes\",\"reasoning\":\"Export drawer displayed Board JSON/Markdown tabs; after closing, the prompt panel displayed its title and full text, and the board remained usable. Evidence: export_drawer_and_prompt_panel_switch.png\"},\"empty_column_offers_add_card\":{\"score\":\"yes\",\"reasoning\":\"After moving both Done cards out, Done showed a designed empty state and its Add Card opened a dialog targeting Done. Evidence: empty_column_offers_add_card.png\"},\"filter_round_trip_restores_counts\":{\"score\":\"yes\",\"reasoning\":\"Maya Chen filtering narrowed columns to 1,1,1,0; clearing restored 4,4,3,2 and the all-assignees state. Evidence: filter_round_trip_restores_counts.png\"},\"prompt_panel_closes_with_continuity\":{\"score\":\"yes\",\"reasoning\":\"Prompt panel showed the title and full text; Escape closed it and the edited card and counts remained intact. Evidence: prompt_panel_closes_with_continuity.png\"},\"create_and_detail_modals_support_flows\":{\"score\":\"yes\",\"reasoning\":\"Create modal supported validation/save/escape, and detail modal supported save and cancel without leaving the board unusable. Evidence: create_and_detail_modals_support_flows.png\"},\"failed_run_retry_without_reload\":{\"score\":\"yes\",\"reasoning\":\"The seeded run reached failed at Infer product routing attempt 2; Retry resumed it, preserved the completed first item, and finished all 5 items without reload. Evidence: failed_run_retry_without_reload.png\"},\"export_import_round_trip_flow\":{\"score\":\"yes\",\"reasoning\":\"The live JSON preview was copied into Import and imported successfully; edited title, columns, order, and task progress were restored and the preview remained available. Evidence: export_import_round_trip_flow.png\"}}",
+    "cost_usd": 0.9709623999999999
+  },
+  "visual_design": {
+    "score": 0.75,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "columns_fixed_width_scrollable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The board renders as a horizontal scrolling container of fixed-width column tiles, and a column with many cards scrolls inside itself rather than stretching the page",
+        "reasoning": "PASS \u2014 Desktop observation shows fixed-width columns with independent card-area scrolling and a horizontal board scroller. Evidence: desktop-shared.png"
+      },
+      {
+        "id": "2.2",
+        "name": "column_accent_colors",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cards carry a left accent border color-coded by column \u2014 gray for Backlog, blue for In Progress, yellow for Review, green for Done \u2014 and moving a card updates its accent to the destination column color",
+        "reasoning": "PASS \u2014 Backlog, In Progress, Review, and Done cards visibly use gray, blue, yellow, and green left accents; the dragged card updates to blue after moving into In Progress. Evidence: moved-shared.png"
+      },
+      {
+        "id": "2.4",
+        "name": "status_chip_palette_consistent",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Execution status chips use one consistent palette everywhere: pending neutral gray, running blue with an active indicator, retrying amber, failed red, complete green; each chip label names the state in text",
+        "reasoning": "FAIL: Pending, Running, Failed, and Complete states were observed with distinct gray, blue, red, and green treatments, but retrying was not observed as its own labeled chip. Evidence: status-after-shared.png"
+      },
+      {
+        "id": "2.5",
+        "name": "drag_ghost_and_shadow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "During a real pointer drag, the dragged card raises with a visible shadow and a ghost placeholder indicates the exact insertion position in the target column",
+        "reasoning": "PASS \u2014 During a real pointer drag, the card visibly lifted with a shadow and a dotted ghost placeholder marked the insertion position. Evidence: drag-shared.png"
+      },
+      {
+        "id": "2.6",
+        "name": "consistent_icons_and_typography",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "One consistent icon set is used across prompt chips, move menus, run/retry controls, and the toolbar, and typography keeps board title > column headers > card titles > metadata",
+        "reasoning": "PASS \u2014 The board shows a consistent outlined icon style and clear typography hierarchy from title through column headers, card titles, and metadata. Evidence: desktop-shared.png"
+      },
+      {
+        "id": "2.7",
+        "name": "component_states_styled",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Buttons, selects, and inputs show distinct default, hover, focus (visible ring), disabled, and error treatments, with no bare browser-default controls",
+        "reasoning": "FAIL: Styled default and disabled controls were observed, but complete direct evidence of distinct hover, focus-ring, and error treatments was not established. Evidence: component-shared.png"
+      },
+      {
+        "id": "2.8",
+        "name": "responsive_no_overflow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375 pixels wide no content clips or overflows the viewport and no page-level horizontal scrollbar appears (board-internal column scroll is allowed)",
+        "reasoning": "PASS \u2014 At 375px, document width remained within the viewport with no page-level horizontal scrollbar; overflow was confined to the board scroller. Evidence: mobile-shared.png"
+      },
+      {
+        "id": "2.10",
+        "name": "export_and_wip_chrome_designed",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export drawer shows format tabs, monospaced preview, and Copy/Download/Import; WIP limit and breach labels sit beside In Progress and Review counts; undo/redo sit in the toolbar; bulk action bar is a compact tray when selection is active",
+        "reasoning": "PASS \u2014 Export drawer visibly includes JSON/Markdown tabs, monospaced preview, Copy, Download, and Import; WIP breach labels, undo/redo, and the compact selection tray are present. Evidence: export-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"columns_fixed_width_scrollable\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Desktop observation shows fixed-width columns with independent card-area scrolling and a horizontal board scroller. Evidence: desktop-shared.png\"},\"column_accent_colors\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Backlog, In Progress, Review, and Done cards visibly use gray, blue, yellow, and green left accents; the dragged card updates to blue after moving into In Progress. Evidence: moved-shared.png\"},\"status_chip_palette_consistent\":{\"score\":\"no\",\"reasoning\":\"FAIL: Pending, Running, Failed, and Complete states were observed with distinct gray, blue, red, and green treatments, but retrying was not observed as its own labeled chip. Evidence: status-after-shared.png\"},\"drag_ghost_and_shadow\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 During a real pointer drag, the card visibly lifted with a shadow and a dotted ghost placeholder marked the insertion position. Evidence: drag-shared.png\"},\"consistent_icons_and_typography\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 The board shows a consistent outlined icon style and clear typography hierarchy from title through column headers, card titles, and metadata. Evidence: desktop-shared.png\"},\"component_states_styled\":{\"score\":\"no\",\"reasoning\":\"FAIL: Styled default and disabled controls were observed, but complete direct evidence of distinct hover, focus-ring, and error treatments was not established. Evidence: component-shared.png\"},\"responsive_no_overflow\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 At 375px, document width remained within the viewport with no page-level horizontal scrollbar; overflow was confined to the board scroller. Evidence: mobile-shared.png\"},\"export_and_wip_chrome_designed\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Export drawer visibly includes JSON/Markdown tabs, monospaced preview, Copy, Download, and Import; WIP breach labels, undo/redo, and the compact selection tray are present. Evidence: export-shared.png\"} }",
+    "cost_usd": 0.25097699999999995
+  },
+  "writing": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "headers_consistent_capitalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders column headers and toolbar titles (Backlog, In Progress, Export, Undo, Redo), they use one consistent capitalization convention throughout",
+        "reasoning": "Column headers and toolbar actions consistently use title case: Backlog, In Progress, Review, Done, Undo, Redo, and Export. Evidence: board-copy-shared.png"
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_verbs",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders actions, labels are specific verbs such as Add Card, Run, Retry, Export, and Move to Done rather than generic Submit or OK when a specific label is possible",
+        "reasoning": "Observed specific actions including Add Card, Run, Run again, Export, Clear filters, and Import Board. Evidence: board-copy-shared.png"
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_field_and_problem",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders create or import errors, they name the field and the problem (for example title or import) rather than only Invalid",
+        "reasoning": "Invalid import produced \u201cImport field must contain valid JSON,\u201d naming both the field and problem. Evidence: errors-shared.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders empty column or empty filter states, the copy explains what belongs there and how to add a card or clear filters",
+        "reasoning": "A no-match filter state displayed \u201cNo matching cards\u201d and instructed users to adjust or clear filters, with Clear filters buttons. Evidence: empty-states-shared.png"
+      },
+      {
+        "id": "15.5",
+        "name": "board_copy_well_written",
+        "value": 1.0,
+        "raw": 5,
+        "weight": 0.5,
+        "description": "Where the app renders board chrome and status copy, it is free of obvious spelling and grammatical errors",
+        "reasoning": "Board chrome and status copy were clear, grammatical, and free of obvious spelling errors. Evidence: board-copy-shared.png"
+      },
+      {
+        "id": "15.6",
+        "name": "card_terminology_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app refers to cards, columns, and prompts across the board, detail modal, and export, terminology stays consistent",
+        "reasoning": "Board, detail modal, and export consistently refer to cards, task items, prompts, and columns without conflicting terminology. Evidence: card-terminology-shared.png"
+      },
+      {
+        "id": "15.7",
+        "name": "progress_and_counts_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders n of m progress and column counts, formatting is consistent across cards and headers",
+        "reasoning": "Column counts match visible cards, and progress consistently uses \u201cn of m\u201d formatting across cards and board activity. Evidence: board-copy-shared.png"
+      },
+      {
+        "id": "15.8",
+        "name": "success_messages_specific",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders create, save, copy, or import confirmations, they state what happened rather than a vague OK",
+        "reasoning": "Creating a card produced the specific confirmation \u201cCard Evidence test card created.\u201d Evidence: success-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"headers_consistent_capitalization\":{\"score\":\"yes\",\"reasoning\":\"Column headers and toolbar actions consistently use title case: Backlog, In Progress, Review, Done, Undo, Redo, and Export. Evidence: board-copy-shared.png\"},\"actions_use_specific_verbs\":{\"score\":\"yes\",\"reasoning\":\"Observed specific actions including Add Card, Run, Run again, Export, Clear filters, and Import Board. Evidence: board-copy-shared.png\"},\"errors_name_field_and_problem\":{\"score\":\"yes\",\"reasoning\":\"Invalid import produced \u201cImport field must contain valid JSON,\u201d naming both the field and problem. Evidence: errors-shared.png\"},\"empty_states_explain_next_step\":{\"score\":\"yes\",\"reasoning\":\"A no-match filter state displayed \u201cNo matching cards\u201d and instructed users to adjust or clear filters, with Clear filters buttons. Evidence: empty-states-shared.png\"},\"board_copy_well_written\":{\"score\":5,\"reasoning\":\"Board chrome and status copy were clear, grammatical, and free of obvious spelling errors. Evidence: board-copy-shared.png\"},\"card_terminology_consistent\":{\"score\":\"yes\",\"reasoning\":\"Board, detail modal, and export consistently refer to cards, task items, prompts, and columns without conflicting terminology. Evidence: card-terminology-shared.png\"},\"progress_and_counts_consistent\":{\"score\":\"yes\",\"reasoning\":\"Column counts match visible cards, and progress consistently uses \u201cn of m\u201d formatting across cards and board activity. Evidence: board-copy-shared.png\"},\"success_messages_specific\":{\"score\":\"yes\",\"reasoning\":\"Creating a card produced the specific confirmation \u201cCard Evidence test card created.\u201d Evidence: success-shared.png\"}}",
+    "cost_usd": 0.2106226
+  }
+}

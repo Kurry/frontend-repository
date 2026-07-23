@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>2025 Apex Grand Prix Driver — Avery Vale</title>
+  <meta name="description" content="The fictional Avery Vale / Nova Racing driver homepage: race calendar, editorial media, press kit, and command palette." />
+  <meta name="theme-color" content="#282c20" />
+  <meta property="og:title" content="2025 Apex Grand Prix Driver — Avery Vale" />
+  <meta property="og:image" content="/images/og-image.svg" />
+  <link rel="icon" href="/images/favicon.svg" />
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body>
+  <!-- ===================== PRELOADER ===================== -->
+  <div class="transition-w" id="preloader" data-transition role="status" aria-label="Loading">
+    <span class="transition-label">LOAD VALE</span>
+  </div>
+
+  <!-- ===================== FIXED NAV ===================== -->
+  <header class="nav" id="siteNav">
+    <nav class="nav-inner" aria-label="Primary navigation">
+      <a class="nav-brand-link" href="#hero" data-menu-link data-dest="hero" aria-label="Avery Vale home">
+        <span class="nav-brand" aria-hidden="true">
+          <span class="wordmark-avery">AVERY</span>
+          <span class="wordmark-vale">VALE</span>
+        </span>
+        <span class="nav-brand-sub" data-hide="d">NOVA RACING SINCE 2019</span>
+      </a>
+
+      <div class="nav-middle">
+        <span class="nav-monogram" aria-label="Avery Vale monogram" role="img">
+          <svg viewBox="0 0 64 40" width="58" height="36" fill="none" aria-hidden="true">
+            <path d="M6 34 L15 6 L21 6 L30 34 L23 34 L21.5 28 L14.5 28 L13 34 Z M16 22 L20 22 L18 13 Z" fill="#111112"/>
+            <path d="M32 6 L39 6 L44 26 L49 6 L56 6 L48 34 L40 34 Z" fill="#111112"/>
+          </svg>
+        </span>
+      </div>
+
+      <div class="nav-right">
+        <span class="nav-count" data-anim="none" aria-hidden="false">Selected races <b data-selected-count>0</b></span>
+        <span class="nav-count" aria-hidden="false">Shortlist <b data-shortlist-count>0</b></span>
+        <button type="button" class="history-btn" data-undo disabled aria-label="Undo last race or shortlist change">Undo</button>
+        <button type="button" class="history-btn" data-redo disabled aria-label="Redo last race or shortlist change">Redo</button>
+        <button type="button" class="btn-w is-nav" id="storeBtn" data-store-cta aria-label="Store">
+          <span class="btn-icon-w" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8V6a3 3 0 0 1 6 0v2m-9 0h12l-1 12H4L3 8z"/></svg>
+          </span>
+          <span class="btn-split" data-split-text><span class="btn-split-a">STORE</span><span class="btn-split-b" aria-hidden="true">STORE</span></span>
+        </button>
+        <button type="button" class="btn-presskit" id="pressKitBtn" data-presskit-open>PRESS KIT</button>
+        <button type="button" class="nav-ham" id="navHam" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu" aria-haspopup="dialog">
+          <span class="nav-ham-lines" aria-hidden="true"><span></span><span></span></span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===================== FULL-SCREEN MENU OVERLAY ===================== -->
+  <div class="nav-menu-w" id="navMenu" role="dialog" aria-modal="true" aria-label="Main menu" aria-hidden="true">
+    <div class="nav-menu-topo" aria-hidden="true"></div>
+    <button type="button" class="nav-menu-close" id="navClose" aria-label="Close menu">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 5l14 14M19 5L5 19"/></svg>
+    </button>
+    <div class="nav-menu-inner">
+      <div class="nav-menu-grid">
+        <div class="nav-menu-links-w">
+          <ul class="nav-menu-links-col" role="list">
+            <li class="nav-menu-link-w is-current" data-menu-item>
+              <button type="button" class="nav-menu-link-btn" data-menu-link data-dest="hero">HOME</button>
+              <span class="nav-menu-link-current-svg" aria-hidden="true">
+                <svg viewBox="0 0 200 8" preserveAspectRatio="none"><path d="M2 4 H198" stroke="#d2ff00" stroke-width="3" fill="none"/></svg>
+              </span>
+            </li>
+            <li class="nav-menu-link-w"><button type="button" class="nav-menu-link-btn" data-menu-link data-dest="horizontal-media" data-anim="text-hover">ON TRACK</button></li>
+            <li class="nav-menu-link-w"><button type="button" class="nav-menu-link-btn" data-menu-link data-dest="social-stream" data-anim="text-hover">OFF TRACK</button></li>
+            <li class="nav-menu-link-w"><button type="button" class="nav-menu-link-btn" data-menu-link data-dest="race-calendar" data-anim="text-hover">CALENDAR</button></li>
+          </ul>
+          <div class="nav-menu-social-w">
+            <ul class="nav-menu-socials" role="list">
+              <li><a href="#" class="text-link-w" data-anim="text-hover" data-social="clips">CLIPS</a></li>
+              <li><a href="#" class="text-link-w" data-anim="text-hover" data-social="photos">PHOTOS</a></li>
+              <li><a href="#" class="text-link-w" data-anim="text-hover" data-social="video">VIDEO</a></li>
+              <li><a href="#" class="text-link-w" data-anim="text-hover" data-social="live">LIVE</a></li>
+            </ul>
+            <a href="#" class="text-link-w nav-menu-business" data-anim="text-hover" data-contact aria-label="Business contact hello@averyvale.example — copies the address">hello@averyvale.example</a>
+          </div>
+        </div>
+        <div class="nav-menu-images-w" aria-label="Avery Vale editorial gallery">
+          <div class="nav-menu-img-w"><img src="/menu/menu-1.png" alt="Avery Vale beside her fictional Nova Racing car" width="680" height="906" /></div>
+          <div class="nav-menu-img-w"><img src="/menu/menu-2.png" alt="Avery Vale preparing her gloves in the garage" width="680" height="906" /></div>
+          <div class="nav-menu-img-w"><img src="/menu/menu-3.png" alt="Avery Vale studying the circuit at dawn" width="680" height="906" /></div>
+          <div class="nav-menu-img-w"><img src="/menu/menu-4.png" alt="Avery Vale driving through a fast corner" width="680" height="906" /></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MAIN PAGE ===================== -->
+  <main class="page-w" id="top">
+    <h1 class="visually-hidden">Avery Vale — 2025 Apex Grand Prix Driver</h1>
+
+    <!-- HERO -->
+    <section class="home-hero" id="hero" data-section="hero">
+      <div class="home-hero-bg" aria-hidden="true">
+        <img class="home-hero-topo" src="/images/contour-field.svg" alt="" />
+        <img class="home-hero-figure" src="/images/hero-figure.svg" alt="" />
+      </div>
+      <canvas class="home-hero-gl" data-hero-canvas role="img" aria-label="Abstract Avery Vale racer composition"></canvas>
+      <div class="rive-motif" data-rive-motif role="img" tabindex="0" aria-label="Interactive Avery Vale apex vector emblem">
+        <canvas id="riveMotifCanvas" width="240" height="240" aria-hidden="true"></canvas>
+        <span>APEX / 25</span>
+      </div>
+      <div class="home-hero-next-race-w" data-next-race>
+        <span class="home-hero-next-race-eyebrow">NEXT RACE</span>
+        <span class="home-hero-next-race-circuit" aria-hidden="true">
+          <svg viewBox="0 0 120 60" fill="none" stroke="#111112" stroke-width="2"><path d="M10 40 C20 10 50 12 60 30 C68 44 92 44 100 26 C104 18 96 12 88 18"/></svg>
+        </span>
+        <span class="home-hero-next-race-gp">ALPINE GP</span>
+        <span class="home-hero-next-race-laurel" aria-hidden="true">
+          <svg viewBox="0 0 60 44" fill="none" stroke="#111112" stroke-width="1.5"><circle cx="30" cy="20" r="11"/><path d="M8 8c-4 8-2 20 6 26M52 8c4 8 2 20-6 26"/></svg>
+        </span>
+        <span class="home-hero-next-race-team">NOVA RACING<br/>SINCE 2019</span>
+      </div>
+    </section>
+
+    <!-- HORIZONTAL MEDIA STRIP -->
+    <section class="horizontal-section" id="horizontal-media" data-section="horizontal-media">
+      <div class="horizontal-pin" data-horizontal-pin>
+        <div class="horizontal-track" id="horizontalTrack" data-horizontal-track>
+          <!-- editorial cards injected by app.js so each carries a Shortlist control -->
+        </div>
+      </div>
+    </section>
+
+    <!-- IMPACT STATEMENT -->
+    <section class="impact-content-w" data-section="impact">
+      <h2 class="text-impact" data-split-text aria-label="NO LIMITS">NO LIMITS</h2>
+    </section>
+
+    <!-- HELMET GRID -->
+    <section class="helmet-grid-section" id="helmet-grid" data-section="helmet-grid">
+      <h2 class="section-eyebrow">THE HELMET</h2>
+      <div class="helmet-grid" id="helmetGrid">
+        <!-- helmet cards injected by app.js so each carries a Shortlist control -->
+      </div>
+    </section>
+
+    <!-- RACE CALENDAR -->
+    <section class="calendar-section" id="race-calendar" data-section="race-calendar">
+      <div class="calendar-head">
+        <h2 class="section-eyebrow">RACE CALENDAR</h2>
+        <div class="calendar-filter" role="group" aria-label="Filter races by status">
+          <button type="button" class="filter-btn is-active" data-filter="All">All</button>
+          <button type="button" class="filter-btn" data-filter="Upcoming">Upcoming</button>
+          <button type="button" class="filter-btn" data-filter="Completed">Completed</button>
+        </div>
+      </div>
+      <ul class="calendar-list" id="calendarList" role="list" aria-label="Race calendar"></ul>
+    </section>
+
+    <!-- COLLABS MARQUEE -->
+    <section class="home-collab-w" id="collabs" data-section="collabs">
+      <h2 class="section-eyebrow">COLLABS</h2>
+      <div class="marquee" data-marquee>
+        <ul class="marquee-list" data-marquee-list="left" role="list" id="collabList"></ul>
+        <ul class="marquee-list" data-marquee-list="left" aria-hidden="true" id="collabList2"></ul>
+      </div>
+    </section>
+
+    <!-- SOCIAL VIDEO STREAM -->
+    <section class="social-stream-section" id="social-stream" data-section="social-stream">
+      <h2 class="section-eyebrow">SOCIAL</h2>
+      <div class="video-stream-wrap" data-video-stream-wrap>
+        <video id="socialVideo" data-video-el muted loop playsinline preload="metadata" poster="/images/social-poster.png" aria-label="Muted looping fictional Nova Racing cockpit clip">
+          <source src="/video/avery-loop.webm" type="video/webm" />
+        </video>
+        <img class="video-stream-placeholder" data-video-stream-placeholder src="/images/social-poster.png" alt="Fictional Nova Racing driver in a rain-lit cockpit" width="880" height="495" />
+        <button type="button" class="video-play-btn" data-video-play-btn aria-pressed="false" aria-label="Play the social clip">PLAY</button>
+        <span class="video-stream-hint" data-video-hint aria-hidden="true">HOVER TO PLAY</span>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer" id="footer" data-section="footer">
+      <div class="footer-inner">
+        <h2 class="footer-statement" data-split-text aria-label="DRIVEN BY THE FANS. BUILT FOR THE FUTURE.">DRIVEN BY THE FANS. BUILT FOR THE FUTURE.</h2>
+        <div class="marquee" data-marquee>
+          <ul class="marquee-list" data-marquee-list="right" role="list" id="footerMarquee"></ul>
+          <ul class="marquee-list" data-marquee-list="right" aria-hidden="true" id="footerMarquee2"></ul>
+        </div>
+
+        <form class="newsletter" id="newsletterForm" novalidate>
+          <label class="newsletter-label" for="newsletterEmail">Join the Nova Racing dispatch</label>
+          <div class="newsletter-row">
+            <input class="newsletter-input" id="newsletterEmail" name="email" type="text" inputmode="email" placeholder="fan@averyvale.example" autocomplete="off" aria-describedby="newsletterMsg" />
+            <button type="submit" class="newsletter-submit" id="newsletterSubmit" disabled>Subscribe</button>
+          </div>
+          <p class="newsletter-msg" id="newsletterMsg" data-newsletter-msg role="status" aria-live="polite"></p>
+        </form>
+
+        <div class="footer-bottom">
+          <span class="footer-brand" aria-hidden="true">
+            <span class="wordmark-avery">AVERY</span><span class="wordmark-vale">VALE</span>
+          </span>
+          <ul class="footer-legal" role="list">
+            <li><a href="#" class="text-link-w" data-anim="text-hover" data-legal="privacy">Privacy Policy</a></li>
+            <li><a href="#" class="text-link-w" data-anim="text-hover" data-legal="terms">Terms</a></li>
+            <li><a href="#" class="text-link-w" data-anim="text-hover" data-legal="cookies">Cookies</a></li>
+          </ul>
+          <span class="footer-copy">© 2025 Avery Vale — fictional</span>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <!-- aria-live announcer for counts -->
+  <div class="visually-hidden" aria-live="polite" data-announcer></div>
+
+  <!-- ===================== PRESS KIT DRAWER ===================== -->
+  <div class="drawer-scrim" data-presskit-scrim hidden></div>
+  <aside class="presskit-drawer" id="pressKitDrawer" role="dialog" aria-modal="true" aria-label="Press kit" aria-hidden="true">
+    <div class="presskit-head">
+      <div>
+        <h2>Press kit</h2>
+        <p class="pk-summary" data-pk-summary>Selected races 0 · Shortlist 0 · Newsletter none</p>
+        <p class="pk-empty-note" data-pk-empty>The race selection list and the media shortlist are both empty — select races or shortlist assets to fill this press kit.</p>
+      </div>
+      <button type="button" class="drawer-close" data-presskit-close aria-label="Close press kit">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 5l14 14M19 5L5 19"/></svg>
+      </button>
+    </div>
+    <div class="presskit-tabs" role="tablist" aria-label="Export format">
+      <button type="button" class="presskit-tab is-active" role="tab" aria-selected="true" data-tab="json">JSON</button>
+      <button type="button" class="presskit-tab" role="tab" aria-selected="false" data-tab="markdown">Markdown</button>
+      <button type="button" class="presskit-tab" role="tab" aria-selected="false" data-tab="ics">ICS</button>
+    </div>
+    <pre class="presskit-preview" id="pressKitPreview" data-presskit-preview tabindex="0"></pre>
+    <div class="presskit-actions">
+      <button type="button" class="pk-btn" data-presskit-copy>Copy</button>
+      <button type="button" class="pk-btn" data-presskit-download>Download</button>
+      <span class="pk-confirm" data-presskit-confirm aria-live="polite"></span>
+    </div>
+    <div class="presskit-import">
+      <h3>Import press kit</h3>
+      <textarea class="presskit-import-area" data-import-area placeholder="Paste avery-vale-press-kit.json"></textarea>
+      <div class="presskit-import-row">
+        <button type="button" class="pk-btn" data-import-paste>Import from paste</button>
+        <label class="pk-btn pk-file">Import file<input type="file" accept="application/json,.json" data-import-file hidden /></label>
+      </div>
+      <p class="presskit-import-msg" data-import-msg role="status" aria-live="polite"></p>
+    </div>
+  </aside>
+
+  <!-- ===================== COMMAND PALETTE ===================== -->
+  <div class="palette-scrim" data-palette-scrim hidden></div>
+  <div class="command-palette" id="commandPalette" role="dialog" aria-modal="true" aria-label="Command palette" aria-hidden="true">
+    <input class="palette-input" id="paletteInput" type="text" placeholder="Type a command…" aria-label="Command search" autocomplete="off" />
+    <ul class="palette-list" id="paletteList" role="listbox" aria-label="Commands"></ul>
+  </div>
+
+  <script src="/rive/rive.js"></script>
+  <script src="/rive-motif.js"></script>
+  <script src="/hero-gl.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

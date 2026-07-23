@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+@layer base {
+  html, body, #app {
+    height: 100%;
+  }
+  body {
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+}
+
+@layer components {
+  .hover-wash {
+    transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+  }
+  .hover-wash:hover {
+    transform: translateY(-1px);
+  }
+
+  .dialog-backdrop {
+    animation: fade-in 180ms ease forwards;
+  }
+  .dialog-panel,
+  .drawer-panel {
+    animation: dialog-in 220ms ease forwards;
+  }
+  .dialog-backdrop.dialog-closing {
+    animation: fade-out 180ms ease forwards;
+  }
+  .dialog-panel.dialog-closing,
+  .drawer-panel.dialog-closing {
+    animation: dialog-out 180ms ease forwards;
+  }
+  .drawer-panel {
+    animation-name: drawer-in;
+  }
+  .drawer-panel.dialog-closing {
+    animation-name: drawer-out;
+  }
+
+  .key-reveal {
+    animation: fade-in 180ms ease;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  @keyframes dialog-in {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes dialog-out {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.96); }
+  }
+  @keyframes drawer-in {
+    from { opacity: 0; transform: translateX(100%); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes drawer-out {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(100%); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .hover-wash:hover {
+    transform: none;
+  }
+}
+
+::view-transition-old(dashboard-npub),
+::view-transition-new(dashboard-npub),
+::view-transition-old(dashboard-nsec),
+::view-transition-new(dashboard-nsec) {
+  animation: 250ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+::view-transition-old(dashboard-npub),
+::view-transition-old(dashboard-nsec) {
+  animation-name: fade-out;
+}
+
+::view-transition-new(dashboard-npub),
+::view-transition-new(dashboard-nsec) {
+  animation-name: fade-in;
+}
+
+.toast-enter {
+  animation: toast-slide 300ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes toast-slide {
+  from { opacity: 0; transform: translateY(100%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card-enter {
+  animation: card-in 200ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes card-in {
+  from { opacity: 0; transform: scale(0.96) translateY(4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+
+/* Override text/bg colors for light theme since dark: classes weren't used */
+[data-theme="light"] {
+  --color-slate-950: #ffffff;
+  --color-slate-900: #f8fafc;
+  --color-slate-800: #f1f5f9;
+  --color-slate-700: #e2e8f0;
+  --color-slate-600: #cbd5e1;
+
+  --color-slate-500: #64748b;
+  --color-slate-400: #475569;
+  --color-slate-300: #334155;
+  --color-slate-200: #1e293b;
+  --color-slate-100: #0f172a;
+
+  --color-white: #0f172a;
+}

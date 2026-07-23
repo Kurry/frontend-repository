@@ -1,0 +1,569 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #FFFF7D;
+  --color-accent: #FFFE68;
+  --color-background: #02070C;
+  --color-felt: #0a1826;
+  --color-felt-dark: #060f18;
+  --color-surface: #0b1a2e;
+  --color-surface-2: #122540;
+  --color-line: #9aa7bd;
+  --color-ink: #e8ecf4;
+  --color-ink-muted: #b7c2d4;
+  --color-good: #FFFE68;
+  --color-bad: #ff9d9d;
+  --font-sans: Poppins, sans-serif;
+}
+
+:root {
+  --color-primary: #FFFF7D;
+  --color-accent: #FFFE68;
+  --color-background: #02070C;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Poppins, sans-serif;
+  background-color: var(--color-background);
+  color: #e8ecf4;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+h1, h2, h3 {
+  font-family: Poppins, sans-serif;
+  margin: 0;
+}
+
+/* Type roles */
+.h-app {
+  font-size: 41.47px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-primary);
+}
+
+.h-section {
+  font-size: 34.56px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #e8ecf4;
+}
+
+.copy {
+  font-size: 24.84px;
+  line-height: 1.5;
+  color: #d4dcea;
+  max-width: 26em;
+}
+
+.caption {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #b7c2d4;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: Poppins, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #e8ecf4;
+  background-color: #14273f;
+  border: 1px solid #9aa7bd;
+  border-radius: 5px;
+  padding: 12px 16px;
+  min-height: 48px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.08s ease, box-shadow 0.15s ease;
+}
+
+.btn:hover:not(:disabled) {
+  background-color: #23395a;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.99);
+  background-color: #2b4468;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  background-color: #0d1828;
+  border-color: #5c6879;
+  color: #8b98ad;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #10141c;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #ffffa8;
+  box-shadow: 0 2px 14px rgba(255, 255, 125, 0.35);
+}
+
+.btn-primary:active:not(:disabled) {
+  background-color: #e8e86a;
+  transform: translateY(1px) scale(0.99);
+}
+
+.btn-sm {
+  min-height: 48px;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+/* Focus indicator — distinct from hover */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+[role="tab"]:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Panels */
+.panel {
+  background-color: #0b1a2e;
+  border: 1px solid #9aa7bd;
+  border-radius: 5px;
+  padding: 16px;
+}
+
+/* Inputs */
+.field {
+  background-color: #122540;
+  border: 1px solid #9aa7bd;
+  border-radius: 5px;
+  color: #e8ecf4;
+  font-family: Poppins, sans-serif;
+  font-size: 15px;
+  padding: 10px 12px;
+  min-height: 44px;
+}
+
+.field:hover {
+  border-color: #c6cfdd;
+}
+
+/* Range slider */
+input[type="range"] {
+  accent-color: var(--color-primary);
+  min-height: 24px;
+  cursor: pointer;
+}
+
+/* Checkbox */
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+/* Tabs */
+.tab {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: #b7c2d4;
+  font-family: Poppins, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px 18px;
+  min-height: 48px;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.tab:hover {
+  background-color: #14273f;
+  color: #e8ecf4;
+}
+
+.tab[aria-selected="true"] {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  background-color: #0b1a2e;
+  font-weight: 700;
+}
+
+/* Playing cards */
+.pcard {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 62px;
+  background: #f4f6fa;
+  border: 1px solid #c6cfdd;
+  border-radius: 5px;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+  user-select: none;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.pcard .rank {
+  font-size: 16px;
+  line-height: 1.1;
+}
+
+.pcard .suit {
+  font-size: 17px;
+  line-height: 1.1;
+}
+
+.pcard.red {
+  color: #c0262d;
+}
+
+.pcard.black {
+  color: #14213a;
+}
+
+.pcard.win-card {
+  box-shadow: 0 0 0 3px var(--color-primary), 0 0 16px rgba(255, 255, 125, 0.65);
+  transform: translateY(-3px);
+  transition: box-shadow 0.3s ease 0.45s, transform 0.3s ease 0.45s;
+}
+
+/* Showdown reveal: hole cards flip face-up as the hand resolves */
+@keyframes card-flip {
+  from { transform: rotateY(90deg); opacity: 0.35; }
+  to { transform: rotateY(0deg); opacity: 1; }
+}
+
+.pcard.card-reveal {
+  animation: card-flip 0.4s ease both;
+  transform-style: preserve-3d;
+}
+
+/* Equity street markers */
+.street-markers {
+  display: flex;
+  gap: 4px;
+  margin-top: 3px;
+}
+
+.street-marker {
+  font-size: 10px;
+  font-weight: 700;
+  color: #5c6879;
+  width: 14px;
+  text-align: center;
+  line-height: 1;
+}
+
+.street-marker.active {
+  color: var(--color-accent);
+}
+
+/* Chip-fly micro-interaction */
+.chip-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 5;
+}
+
+.chip-fly {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff6b0, #d6b45f 70%);
+  border: 1px solid #8f6a1f;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Play-by-play entrance */
+@keyframes feed-in {
+  from { opacity: 0; transform: translateX(-6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.feed-new {
+  animation: feed-in 0.4s ease-out;
+}
+
+/* Coachmark */
+.coachmark {
+  background-color: #10233b;
+  border-color: var(--color-accent);
+}
+
+.pcard-back {
+  width: 44px;
+  height: 62px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #1a3a5c, #0d2240);
+  border: 2px solid #7fa0c9;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+  position: relative;
+}
+
+.pcard-back::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 3px;
+}
+
+/* Table felt */
+.felt {
+  background: radial-gradient(ellipse at center, #10263c 0%, #0a1826 55%, #060f18 100%);
+  border: 4px solid #7fa0c9;
+  border-radius: 48px;
+  box-shadow: inset 0 0 70px rgba(0, 0, 0, 0.55), 0 0 30px rgba(0, 0, 0, 0.6);
+}
+
+/* Seat */
+.seat {
+  background-color: rgba(4, 10, 18, 0.72);
+  border: 1px solid #9aa7bd;
+  border-radius: 5px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 104px;
+}
+
+.seat-active {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary), 0 0 18px rgba(255, 255, 125, 0.4);
+}
+
+.seat-human {
+  border-color: var(--color-primary);
+  background-color: rgba(20, 24, 8, 0.72);
+}
+
+.seat-folded {
+  opacity: 0.55;
+}
+
+/* Style badges — distinct color and shape */
+.style-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 5px;
+  padding: 2px 8px;
+  line-height: 1.4;
+}
+
+.style-aggressive {
+  color: #ff8f66;
+  border: 1px solid #ff8f66;
+  background-color: rgba(255, 143, 102, 0.14);
+}
+
+.style-tight {
+  color: #7ec8ff;
+  border: 1px solid #7ec8ff;
+  background-color: rgba(126, 200, 255, 0.14);
+}
+
+.style-bluffer {
+  color: #c792ff;
+  border: 1px solid #c792ff;
+  background-color: rgba(199, 146, 255, 0.14);
+}
+
+/* Equity meter */
+.equity-bar {
+  width: 100%;
+  height: 6px;
+  background-color: #1c2f4a;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.equity-fill {
+  height: 100%;
+  background-color: var(--color-accent);
+  border-radius: 5px;
+  transition: width 0.7s ease;
+}
+
+.equity-value {
+  transition: color 0.4s ease;
+}
+
+@keyframes equity-flash {
+  0% { color: #ffffff; transform: scale(1.12); }
+  100% { color: var(--color-accent); transform: scale(1); }
+}
+
+.equity-changed {
+  animation: equity-flash 0.7s ease;
+}
+
+/* Toasts */
+@keyframes toast-in {
+  from { transform: translateY(-8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.toast {
+  animation: toast-in 0.3s ease-out;
+  background-color: #12233c;
+  border: 1px solid var(--color-primary);
+  border-radius: 5px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+}
+
+/* Turn pulse */
+@keyframes pulse-ring {
+  0%, 100% { box-shadow: 0 0 0 2px var(--color-primary), 0 0 10px rgba(255, 255, 125, 0.35); }
+  50% { box-shadow: 0 0 0 2px var(--color-primary), 0 0 22px rgba(255, 255, 125, 0.6); }
+}
+
+.pulse-ring {
+  animation: pulse-ring 1.6s ease-in-out infinite;
+}
+
+/* Drawer — smooth in-flow collapsible sheet (never overlays the table). The
+   grid display lives inside the mobile media query so it can't override the
+   layered `md:hidden` that removes the drawer from the desktop layout (and the
+   accessibility tree) entirely. */
+.drawer-wrap {
+  transition: grid-template-rows 0.32s ease;
+}
+
+.drawer-inner {
+  overflow: hidden;
+}
+
+@media (max-width: 767px) {
+  .drawer-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+  }
+
+  .drawer-wrap.is-open {
+    grid-template-rows: 1fr;
+  }
+}
+
+.drawer {
+  background-color: #081426;
+  border: 2px solid #9aa7bd;
+  border-radius: 5px;
+  padding: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+}
+
+/* Dialog */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 50;
+}
+
+.dialog {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 51;
+  background-color: #0d1e34;
+  border: 1px solid #9aa7bd;
+  border-radius: 5px;
+  padding: 24px;
+  max-width: 460px;
+  width: calc(100% - 32px);
+}
+
+@media (max-width: 420px) {
+  .pcard,
+  .pcard-back {
+    width: 32px;
+    height: 46px;
+  }
+
+  .pcard .rank {
+    font-size: 12px;
+  }
+
+  .pcard .suit {
+    font-size: 13px;
+  }
+
+  .seat {
+    min-width: 0;
+    padding: 6px;
+  }
+
+  .h-section {
+    font-size: 34.56px;
+  }
+
+  .copy {
+    font-size: 21px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pcard.card-reveal,
+  .feed-new {
+    animation: none;
+  }
+
+  .pcard.win-card {
+    transition: none;
+  }
+
+  .drawer-wrap {
+    transition: none;
+  }
+
+  .equity-fill {
+    transition: none;
+  }
+
+  .pulse-ring {
+    animation: none;
+  }
+}

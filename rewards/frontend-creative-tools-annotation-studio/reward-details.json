@@ -1,0 +1,2992 @@
+{
+  "accessibility": {
+    "score": 0.7,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "keyboard_reaches_everything",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every interactive control \u2014 queue entries and checkboxes, rating buttons, sliders, class picker, region list actions, review-state controls, undo and redo, and all form fields \u2014 is reachable and operable with the keyboard alone",
+        "reasoning": "Native controls and sliders with tabindex were traversed using repeated Tab navigation. Evidence: A11Y-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "dialogs_trap_and_return_focus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The class form, confirmation dialogs, and the dispute form trap focus while open, close on Escape, and return focus to the control that opened them",
+        "reasoning": "BLOCKED: The class dialog was observed trapping focus and returning focus on Escape, but confirmation and dispute dialogs were not fully reachable for verification. Evidence: DIALOG-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "icons_and_images_labeled",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Icon-only controls (thumbs, undo/redo, zoom, icon picker entries) carry accessible names, and attached images carry descriptive alt text",
+        "reasoning": "FAIL: Several visible icon-only navigation and toolbar buttons have no accessible name, although the image has descriptive alt text. Evidence: A11Y-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "live_announcements",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Submitting an annotation, the completion of an assist run, a step entering the failed state, and a successful Import are announced through an aria-live region as well as shown visually",
+        "reasoning": "FAIL: After starting an assist run, the aria-live status and alert regions remained empty while the run was visibly active. Evidence: LIVE-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "labeled_form_fields",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every form field has a visible label, and validation messages are associated with their fields so each names the field it belongs to",
+        "reasoning": "Visible labels were observed for the comment, metadata, checkbox, slider, and class-builder fields; slider fields use aria-labelledby. Evidence: A11Y-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "heading_order_logical",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Headings follow a logical order with no skipped levels across the views",
+        "reasoning": "Observed headings follow H1, H2 sections, and nested H3 subsections without skipped levels. Evidence: A11Y-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "landmarks_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The page exposes landmark structure (navigation for the sidebar, main for the content area) for assistive navigation",
+        "reasoning": "The page exposes navigation landmarks, a complementary queue landmark, and a main content landmark. Evidence: A11Y-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "contrast_sufficient",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Text and controls meet sufficient color contrast, including state chips, badges, and text over the light-gray response tile",
+        "reasoning": "Observed state chips, badges, controls, and the light-gray response tile use visibly high-contrast text and backgrounds. Evidence: A11Y-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "semantic_controls",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, checkboxes, sliders, and tabs use semantic elements or correct ARIA roles rather than bare styled divs",
+        "reasoning": "Buttons, native checkboxes, tabs, combobox, select, and ARIA slider controls were observed rather than bare interactive divs. Evidence: A11Y-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "state_not_color_only",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Review states and disagreement flags are conveyed by text or icon plus color, never color alone",
+        "reasoning": "Review states are conveyed with text such as Unlabeled, Labeled, Reviewed, and Disputed alongside visual styling. Evidence: A11Y-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"keyboard_reaches_everything\":{\"score\":\"yes\",\"reasoning\":\"Native controls and sliders with tabindex were traversed using repeated Tab navigation. Evidence: A11Y-shared.png\"},\"dialogs_trap_and_return_focus\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The class dialog was observed trapping focus and returning focus on Escape, but confirmation and dispute dialogs were not fully reachable for verification. Evidence: DIALOG-shared.png\"},\"icons_and_images_labeled\":{\"score\":\"no\",\"reasoning\":\"FAIL: Several visible icon-only navigation and toolbar buttons have no accessible name, although the image has descriptive alt text. Evidence: A11Y-shared.png\"},\"live_announcements\":{\"score\":\"no\",\"reasoning\":\"FAIL: After starting an assist run, the aria-live status and alert regions remained empty while the run was visibly active. Evidence: LIVE-shared.png\"},\"labeled_form_fields\":{\"score\":\"yes\",\"reasoning\":\"Visible labels were observed for the comment, metadata, checkbox, slider, and class-builder fields; slider fields use aria-labelledby. Evidence: A11Y-shared.png\"},\"heading_order_logical\":{\"score\":\"yes\",\"reasoning\":\"Observed headings follow H1, H2 sections, and nested H3 subsections without skipped levels. Evidence: A11Y-shared.png\"},\"landmarks_present\":{\"score\":\"yes\",\"reasoning\":\"The page exposes navigation landmarks, a complementary queue landmark, and a main content landmark. Evidence: A11Y-shared.png\"},\"contrast_sufficient\":{\"score\":\"yes\",\"reasoning\":\"Observed state chips, badges, controls, and the light-gray response tile use visibly high-contrast text and backgrounds. Evidence: A11Y-shared.png\"},\"semantic_controls\":{\"score\":\"yes\",\"reasoning\":\"Buttons, native checkboxes, tabs, combobox, select, and ARIA slider controls were observed rather than bare interactive divs. Evidence: A11Y-shared.png\"},\"state_not_color_only\":{\"score\":\"yes\",\"reasoning\":\"Review states are conveyed with text such as Unlabeled, Labeled, Reviewed, and Disputed alongside visual styling. Evidence: A11Y-shared.png\"}}",
+    "cost_usd": 0.3171324
+  },
+  "behavioral": {
+    "score": 0.4545,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_reload_reset",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Configure several facets \u2014 switch to the Agreement view, submit one annotation, dispute one item, create one taxonomy class \u2014 then reload; every facet coherently resets to the seeded baseline (seeded counts, seeded taxonomy, empty undo stack), never a mix of kept and reset state",
+        "reasoning": "Reload after annotation, dispute, and taxonomy setup returned seeded counts, baseline taxonomy, empty history changes, and no persisted edits. Evidence: multi_facet_reload_reset-shared.png"
+      },
+      {
+        "id": "14.2",
+        "name": "tier_and_history_ordering_live",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Dispute two different items in sequence and confirm the Disputed tier lists the most recently disputed first; resolve one and confirm the ordering and counts recompute from live state rather than a fixed list",
+        "reasoning": "Two disputes appeared newest-first in Disputed; resolving the newest reduced the tier from 2 to 1 and placed it in Reviewed. Evidence: tier_and_history_ordering_live-shared.png"
+      },
+      {
+        "id": "14.3",
+        "name": "agreement_summary_input_sensitivity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Switch the Agreement suite selector between two suites with different seeded data and confirm the table rows, agreement percentage, and flagged count all change to match; then flag one row and confirm the flagged count and percentage move accordingly",
+        "reasoning": "Switching from Safety & Policy to Reasoning Quality changed the table, agreement from 50% to 25%, and flagged count from 2 to 3; flagging a row changed them to 0% and 4. Evidence: agreement_summary_input_sensitivity-shared.png"
+      },
+      {
+        "id": "14.4",
+        "name": "cross_view_echo_to_export",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submit an annotation with a metadata value and confirm, without a reload, the same datum appears in the History entry and inside the Labels JSON export preview; resolve a dispute and confirm the Stats summary disputed count matches the Review queue tier count",
+        "reasoning": "The submitted comment and metadata appeared in History and the Labels JSON preview; Stats summary showed Disputed: 1, matching the review queue. Evidence: cross_view_echo_to_export-shared.png"
+      },
+      {
+        "id": "14.5",
+        "name": "count_delta_exact_on_submit",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Measure a suite queue badge and the export annotation count immediately before and after one Submit & Next; both change by exactly one with no lag",
+        "reasoning": "Immediately before submission the Safety queue showed 10 remaining; immediately after it showed 9 and History increased from 8 to 9. Evidence: count_delta_exact_on_submit-shared.png"
+      },
+      {
+        "id": "14.6",
+        "name": "different_annotations_different_export",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Annotate two different items with different ratings, slider values, and comments, then compare their entries in the Labels JSON preview: the two objects differ exactly in the ways the inputs differed",
+        "reasoning": "BLOCKED: Only one distinctive annotation was submitted, so two independently varied annotations could not be compared end-to-end. Evidence: different_annotations_different_export-shared.png"
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_annotation_and_taxonomy",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Start annotating an item (rating chosen, sliders moved), switch to Taxonomy and create a class, then return: the in-progress card state is intact and submitting uses it; the new class is available in the picker",
+        "reasoning": "BLOCKED: The full in-progress annotation \u2192 taxonomy \u2192 return \u2192 submit workflow was not completed. Evidence: interleaved_annotation_and_taxonomy-shared.png"
+      },
+      {
+        "id": "14.8",
+        "name": "empty_and_repopulate_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Annotate every item in one suite to empty its queue, confirm the badge reaches zero and the completion state shows, then undo repeatedly: the queue repopulates, badges and export counts track back exactly through the transitions",
+        "reasoning": "BLOCKED: Annotating every item and undoing through the complete empty/repopulate round trip was not completed. Evidence: empty_and_repopulate_round_trip-shared.png"
+      },
+      {
+        "id": "14.9",
+        "name": "full_pipeline_probe_to_export_text",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Chain the full pipeline: create a class, draw a region with it on an image item, set a metadata value, submit, run Assist to completion on the suite, accept one suggestion and submit it, flag and resolve one dispute, then open Export: the Labels JSON text shows schemaVersion annotation-studio-labels-v1 and contains the new class, the region entry with classId and x/y/w/h, and the metadata value under field-contract keys, and the Stats summary reflects the two new submissions and the resolved dispute; copy the export and confirm the clipboard text equals the visible preview",
+        "reasoning": "BLOCKED: The complete class/region/metadata/assist/suggestion/dispute/export pipeline was not completed and verified. Evidence: full_pipeline_probe_to_export_text-shared.png"
+      },
+      {
+        "id": "14.10",
+        "name": "export_import_round_trip_probe",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After a distinctive annotation submit (unique comment and a region), Copy or Download Labels JSON, mutate the board further if desired, then Import that same LabelsPackage: History ratings/comments, Taxonomy names/shortcuts, region geometry, metadata values, and review-state chips reconstruct to match the export, and reopening Export shows the same schemaVersion annotation-studio-labels-v1 package",
+        "reasoning": "BLOCKED: A conforming LabelsPackage was not imported and reconstructed end-to-end after mutation. Evidence: export_import_round_trip_probe-shared.png"
+      },
+      {
+        "id": "14.11",
+        "name": "field_contract_rejects_before_mutate",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Attempt TaxonomyClassCreate with a duplicate shortcut, DisputeCreate with an empty reason, and Import with schemaVersion not annotation-studio-labels-v1: each shows a named field error and leaves collections unchanged; then a valid class create and a conforming LabelsPackage import succeed against the same contracts",
+        "reasoning": "BLOCKED: Empty dispute reason and invalid schemaVersion were rejected with named errors, but duplicate-shortcut rejection plus subsequent valid class creation and conforming import were not all completed. Evidence: field_contract_rejects_before_mutate-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"multi_facet_reload_reset\":{\"score\":\"yes\",\"reasoning\":\"Reload after annotation, dispute, and taxonomy setup returned seeded counts, baseline taxonomy, empty history changes, and no persisted edits. Evidence: multi_facet_reload_reset-shared.png\"},\"tier_and_history_ordering_live\":{\"score\":\"yes\",\"reasoning\":\"Two disputes appeared newest-first in Disputed; resolving the newest reduced the tier from 2 to 1 and placed it in Reviewed. Evidence: tier_and_history_ordering_live-shared.png\"},\"agreement_summary_input_sensitivity\":{\"score\":\"yes\",\"reasoning\":\"Switching from Safety & Policy to Reasoning Quality changed the table, agreement from 50% to 25%, and flagged count from 2 to 3; flagging a row changed them to 0% and 4. Evidence: agreement_summary_input_sensitivity-shared.png\"},\"cross_view_echo_to_export\":{\"score\":\"yes\",\"reasoning\":\"The submitted comment and metadata appeared in History and the Labels JSON preview; Stats summary showed Disputed: 1, matching the review queue. Evidence: cross_view_echo_to_export-shared.png\"},\"count_delta_exact_on_submit\":{\"score\":\"yes\",\"reasoning\":\"Immediately before submission the Safety queue showed 10 remaining; immediately after it showed 9 and History increased from 8 to 9. Evidence: count_delta_exact_on_submit-shared.png\"},\"different_annotations_different_export\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Only one distinctive annotation was submitted, so two independently varied annotations could not be compared end-to-end. Evidence: different_annotations_different_export-shared.png\"},\"interleaved_annotation_and_taxonomy\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The full in-progress annotation \u2192 taxonomy \u2192 return \u2192 submit workflow was not completed. Evidence: interleaved_annotation_and_taxonomy-shared.png\"},\"empty_and_repopulate_round_trip\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Annotating every item and undoing through the complete empty/repopulate round trip was not completed. Evidence: empty_and_repopulate_round_trip-shared.png\"},\"full_pipeline_probe_to_export_text\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The complete class/region/metadata/assist/suggestion/dispute/export pipeline was not completed and verified. Evidence: full_pipeline_probe_to_export_text-shared.png\"},\"export_import_round_trip_probe\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A conforming LabelsPackage was not imported and reconstructed end-to-end after mutation. Evidence: export_import_round_trip_probe-shared.png\"},\"field_contract_rejects_before_mutate\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Empty dispute reason and invalid schemaVersion were rejected with named errors, but duplicate-shortcut rejection plus subsequent valid class creation and conforming import were not all completed. Evidence: field_contract_rejects_before_mutate-shared.png\"}}",
+    "cost_usd": 0.42098139999999995
+  },
+  "core_features": {
+    "score": 0.4364,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "seeded_queue_groups_and_badges",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On load, the left sidebar shows unannotated eval outputs grouped by at least 3 seeded suites, each suite entry carrying a count badge of remaining items",
+        "reasoning": "Three seeded suites are visible with remaining-item badges. Evidence: seeded_queue_groups_and_badges-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "suite_click_loads_and_badge_decrements",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Clicking a suite loads its unannotated items into the main panel in queue order, and the suite's count badge decrements by exactly one each time an item is submitted",
+        "reasoning": "Submitting SAF evaluation 01 changed the suite badge from 10 to 9 and advanced to SAF evaluation 02. Evidence: submit_saves_and_advances-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "queue_entries_show_state_chips",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Each queue entry shows a selection checkbox and a review-state chip (Unlabeled, Labeled, Reviewed, or Disputed), and the chip updates in place when the item's state changes without a reload",
+        "reasoning": "Queue entries visibly include checkboxes and state chips such as Unlabeled; state changes are reflected elsewhere without reload. Evidence: submit_saves_and_advances-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "select_all_and_bulk_bar_count",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A Select all control checks every visible item in a suite, and a bulk actions bar appears whenever at least one item is selected, showing a live selected count that tracks checks and unchecks exactly",
+        "reasoning": "Select all checked all 10 visible items and showed a bulk bar reading 10 selected. Evidence: select_all_and_bulk_bar_count-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "bulk_skip_moves_all_selected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Bulk actions apply to every selected item at once: Skip selected moves them all to the end of the queue and raises the skipped badge by the selected count, Mark reviewed sets all their chips to Reviewed, and Clear selection unchecks everything and hides the bulk bar, with the selection cleared after each action",
+        "reasoning": "Skip selected moved all 10 items, added 10 skipped, cleared selection, and hid the bulk bar. Evidence: bulk_skip_moves_all_selected-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "card_prompt_snippet_and_response",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The annotation card shows the original prompt in a read-only code snippet block at the top and the model response in a scrollable body area below it",
+        "reasoning": "The annotation card shows a read-only code prompt block and a separate model-response area. Evidence: seeded_queue_groups_and_badges-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "binary_rating_highlight",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Selecting thumbs-up or thumbs-down highlights the active choice in the brand blue with a filled treatment while the unselected button stays outlined; switching the choice moves the highlight",
+        "reasoning": "Clicking Up produced a pressed active treatment while Down remained unselected. Evidence: binary_rating_highlight-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "rubric_sliders_with_live_values",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The rubric section shows one labeled slider per dimension (Accuracy, Clarity, and Relevance at minimum) ranging 1 to 5, with the current numeric value to the right of each track updating as the slider moves",
+        "reasoning": "Accuracy, Clarity, and Relevance sliders are present and their displayed values changed from 3 to 4 after keyboard interaction. Evidence: binary_rating_highlight-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "comments_counter_and_500_cap",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The comments field shows a live character counter counting down from 500 as the annotator types, and input beyond 500 characters is prevented with the counter showing 0 remaining",
+        "reasoning": "Typing 501 characters resulted in a visible 0 remaining counter, demonstrating the 500-character cap. Evidence: comments_counter_and_500_cap-shared.png"
+      },
+      {
+        "id": "1.11",
+        "name": "image_area_only_on_image_items",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Items with an attached image show a region annotation area above the response body, while items without an image show only the prompt and response",
+        "reasoning": "BLOCKED: An image annotation area was observed, but the contrasting non-image-item condition was not fully exercised. Evidence: seeded_queue_groups_and_badges-shared.png"
+      },
+      {
+        "id": "1.12",
+        "name": "submit_gated_on_full_interaction",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submit & Next stays disabled until the binary rating is chosen and every rubric slider has been interacted with, then becomes enabled",
+        "reasoning": "Submit & Next was initially disabled and became enabled only after rating and all three sliders were interacted with. Evidence: submit_saves_and_advances-shared.png"
+      },
+      {
+        "id": "1.13",
+        "name": "submit_saves_and_advances",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Clicking Submit & Next saves the annotation, sets the item's state to Labeled, removes it from the unannotated queue, and loads the next unannotated item without a reload",
+        "reasoning": "Submission increased History, changed completion from 2 to 3, reduced the suite badge from 10 to 9, removed SAF evaluation 01, and loaded SAF evaluation 02. Evidence: submit_saves_and_advances-shared.png"
+      },
+      {
+        "id": "1.14",
+        "name": "skip_reorders_and_badges",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Skip moves the current item to the end of the queue without saving, and a skipped count badge appears on that suite's sidebar entry and increments with each skip",
+        "reasoning": "BLOCKED: Bulk skip was exercised, but the single-current-item Skip workflow was not completed end-to-end. Evidence: bulk_skip_moves_all_selected-shared.png"
+      },
+      {
+        "id": "1.15",
+        "name": "suite_complete_empty_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Submitting the last unannotated item in a suite shows an empty state in the main panel naming the suite as complete, with a control to switch suites or open the review queue",
+        "reasoning": "BLOCKED: The last unannotated item was not submitted, so the suite-complete empty state was not observed. Evidence: submit_saves_and_advances-shared.png"
+      },
+      {
+        "id": "1.16",
+        "name": "command_palette_opens_and_filters",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Pressing Ctrl+K (or Cmd+K) opens a command palette overlay with its search input focused, and typing fuzzy-matches across queue items, suites, taxonomy classes, and view names, narrowing the visible result list as the query grows",
+        "reasoning": "Ctrl+K opened a focused command palette; typing taxonomy narrowed results to the Taxonomy view. Evidence: seeded_queue_groups_and_badges-shared.png"
+      },
+      {
+        "id": "1.17",
+        "name": "palette_keyboard_activation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Arrow keys move a visible highlight through palette results and Enter activates the highlighted one \u2014 an item result opens that item in the annotation card, a view result switches views \u2014 while Escape closes the palette; each result row shows a kind label (Item, Suite, Class, or View) and an unmatched query shows an empty-state line",
+        "reasoning": "Palette results showed kind labels, arrow-key selection was visible, Enter activated the Taxonomy view, and the filtered result was present. Evidence: taxonomy_list_shows_full_rows-shared.png"
+      },
+      {
+        "id": "1.18",
+        "name": "taxonomy_list_shows_full_rows",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Taxonomy view lists at least 5 seeded classes, each row showing the class name, a color swatch, its badge icon, its single-digit keyboard shortcut, and its attribute list",
+        "reasoning": "The Taxonomy view lists six classes with swatches/icons, single-digit shortcuts, and attribute summaries. Evidence: taxonomy_list_shows_full_rows-shared.png"
+      },
+      {
+        "id": "1.19",
+        "name": "class_form_fields_and_gating",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "New Class opens a TaxonomyClassCreate form with name (1\u201360 chars, unique), color as #RRGGBB from a fixed palette, badge icon, keyboard shortcut (exactly one digit 1\u20139, unique), and optional attributes each with name and kind select (non-empty options) or text; Save stays disabled until name, color, icon, and a unique shortcut are valid",
+        "reasoning": "New class opened a form with name, palette color, searchable icon picker, digit shortcut, attributes, and disabled Save; duplicate shortcut validation appeared. Evidence: taxonomy_list_shows_full_rows-shared.png"
+      },
+      {
+        "id": "1.20",
+        "name": "icon_picker_searchable_grid",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The class form's icon picker shows a searchable grid of at least 20 icons where typing filters the grid and clicking selects with a visible treatment, and the chosen badge icon then renders beside the class name in the taxonomy list, the class picker, and its region list rows",
+        "reasoning": "The picker visibly contained over 20 icons and a Search icons field; Tag was visibly selected. Evidence: taxonomy_list_shows_full_rows-shared.png"
+      },
+      {
+        "id": "1.21",
+        "name": "duplicate_shortcut_validation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting the class form with a keyboard shortcut already used by another class shows an inline validation message naming the shortcut field and identifying the conflicting class, and saves nothing",
+        "reasoning": "Entering shortcut 1 showed the inline message \u201cShortcut 1 is already used by Person\u201d and Save remained disabled. Evidence: taxonomy_list_shows_full_rows-shared.png"
+      },
+      {
+        "id": "1.22",
+        "name": "new_class_live_in_picker_and_shortcut",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Saving a valid class adds exactly one row to the taxonomy list, and the new class immediately appears in the annotation card's class picker and responds to its keyboard shortcut without a reload",
+        "reasoning": "BLOCKED: A valid new class was not saved, so live picker and shortcut behavior could not be verified. Evidence: taxonomy_list_shows_full_rows-shared.png"
+      },
+      {
+        "id": "1.23",
+        "name": "class_rename_propagates_everywhere",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Renaming a class through its prefilled edit form updates the name in the taxonomy list, the class picker, existing region labels, and the export preview, all without a reload",
+        "reasoning": "BLOCKED: No class was renamed through the edit form. Evidence: taxonomy_list_shows_full_rows-shared.png"
+      },
+      {
+        "id": "1.24",
+        "name": "class_delete_confirms_and_unclassifies",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Deleting a class used by existing regions shows a confirmation dialog stating how many regions carry it; confirming removes the class and marks those regions as Unclassified",
+        "reasoning": "BLOCKED: No used taxonomy class was deleted. Evidence: taxonomy_list_shows_full_rows-shared.png"
+      },
+      {
+        "id": "1.26",
+        "name": "metadata_field_builder_adds_control",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Defining a custom metadata field (name plus kind of text, number, select, or checkbox) adds one row to the field list and immediately renders the matching control on the annotation card below the comments field, joining the at least 2 seeded fields (one select, one checkbox) already rendered there on first load",
+        "reasoning": "BLOCKED: No new metadata field was defined. Evidence: taxonomy_list_shows_full_rows-shared.png"
+      },
+      {
+        "id": "1.28",
+        "name": "metadata_values_saved_through",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Values entered in metadata fields save with the annotation and appear both in the History read-only view and inside that annotation's entry in the Labels JSON export preview, keyed by field name",
+        "reasoning": "BLOCKED: Existing seeded metadata was visible in History and export, but entering a changed metadata value and saving it was not exercised. Evidence: export_view_labels_package_shape-shared.png"
+      },
+      {
+        "id": "1.29",
+        "name": "metadata_number_validation_and_delete",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A number-kind metadata field rejects non-numeric input with an inline message naming the field, and deleting a metadata field shows a confirmation stating how many saved annotations carry values for it before removing its control from the card",
+        "reasoning": "BLOCKED: No number-kind metadata field was created, validated, or deleted. Evidence: taxonomy_list_shows_full_rows-shared.png"
+      },
+      {
+        "id": "1.30",
+        "name": "armed_class_draws_labeled_box",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Pressing a class's keyboard shortcut or picking it from the class picker arms it, and dragging on an image draws a bounding box in that class's color with the class name as a label",
+        "reasoning": "BLOCKED: The armed-class UI was observed, but a real pointer drag drawing a labeled box was not completed. Evidence: seeded_queue_groups_and_badges-shared.png"
+      },
+      {
+        "id": "1.31",
+        "name": "region_list_syncs_with_boxes",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Each drawn box appears simultaneously in the region list with its class and attribute values; selecting a box on the image or in the list highlights it in both places and shows its attribute form, and deleting a list entry removes exactly that box from the image",
+        "reasoning": "BLOCKED: A region was added through setup tooling, but image/list selection and deletion gestures were not fully exercised. Evidence: seeded_queue_groups_and_badges-shared.png"
+      },
+      {
+        "id": "1.33",
+        "name": "zoom_and_pan_keep_box_registration",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Zoom controls (plus, minus, fit) scale the image with boxes keeping their positions relative to the image content, and panning the zoomed image moves the boxes with it",
+        "reasoning": "BLOCKED: Zoom and pan registration with a drawn box was not fully exercised. Evidence: seeded_queue_groups_and_badges-shared.png"
+      },
+      {
+        "id": "1.34",
+        "name": "review_state_transitions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Submitting an annotation moves an item from Unlabeled to Labeled, Mark reviewed moves Labeled to Reviewed, and Dispute (requiring a one-line reason) moves Labeled or Reviewed to Disputed, each transition reflected in the state chip",
+        "reasoning": "BLOCKED: Labeled submission and a dispute transition were observed, but Mark reviewed and the complete transition sequence were not fully exercised. Evidence: review_queue_tiers_live-shared.png"
+      },
+      {
+        "id": "1.35",
+        "name": "review_queue_tiers_live",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Review queue shows three tiers top to bottom \u2014 Disputed, then Labeled awaiting review, then Reviewed \u2014 each with a live count, and items move between tiers immediately as their states change",
+        "reasoning": "Review queue visibly shows Disputed, Labeled, and Reviewed tiers with live counts and items. Evidence: review_queue_tiers_live-shared.png"
+      },
+      {
+        "id": "1.36",
+        "name": "resolve_dispute_promotes",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Resolving a disputed item with the Resolve control returns it to the Reviewed tier and decrements the Disputed tier count by exactly one, while a newly disputed item (including a re-disputed one) appears at the top of the Disputed tier rather than keeping its old position",
+        "reasoning": "BLOCKED: A disputed item was present, but Resolve was not activated and the post-resolution tier/count change was not observed. Evidence: review_queue_tiers_live-shared.png"
+      },
+      {
+        "id": "1.38",
+        "name": "agreement_table_rows_complete",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Agreement view renders one row per seeded double-annotated item (at least 12 across suites) showing both annotators' binary ratings, each rubric dimension's two scores, and an agreement indicator for Annotator A \u2014 Kestrel and Annotator B \u2014 Juniper",
+        "reasoning": "BLOCKED: Agreement rows were observed for selected suites, but the full at-least-12-item cross-suite requirement was not verified in one completed evidence state. Evidence: agreement_table_rows_complete-shared.png"
+      },
+      {
+        "id": "1.39",
+        "name": "disagreement_flag_rule",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A row is flagged as a disagreement exactly when the binary ratings differ or any rubric dimension's scores differ by 2 or more; flagged rows carry a visibly distinct warning treatment and a Flag for dispute control",
+        "reasoning": "Agreement rows visibly flag binary mismatches and a rubric difference of 2, with distinct Disagreement treatment and Flag for dispute controls. Evidence: agreement_table_rows_complete-shared.png"
+      },
+      {
+        "id": "1.40",
+        "name": "agreement_summary_recomputes",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The summary strip shows the selected suite's agreement percentage and flagged-row count, and switching the suite selector recomputes both the table rows and the summary figures for the newly selected suite",
+        "reasoning": "Changing the suite selector from Safety & Policy to Reasoning Quality recomputed the table and summary from 50%/2 flagged to 25%/3 flagged. Evidence: agreement_table_rows_complete-shared.png"
+      },
+      {
+        "id": "1.41",
+        "name": "flag_for_dispute_crosses_views",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Activating Flag for dispute on a disagreement row sets that item's review state to Disputed and the item immediately appears in the Review queue's Disputed tier",
+        "reasoning": "Flag for dispute changed RSN evaluation 02 to Disputed and it appeared in the Review queue Disputed tier. Evidence: review_queue_tiers_live-shared.png"
+      },
+      {
+        "id": "1.42",
+        "name": "assist_steps_advance_visibly",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Run Assist starts a simulated pass with one visible step per unannotated item, each showing the item's title and a status advancing visibly through pending, running, and complete or failed, with retrying shown as its own status",
+        "reasoning": "BLOCKED: Assist was started, but visible per-item assist steps and advancing statuses were not observed. Evidence: review_queue_tiers_live-shared.png"
+      },
+      {
+        "id": "1.43",
+        "name": "assist_retry_backoff_counter",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A failing assist step retries automatically with a visible backoff countdown and an attempt counter (such as waiting before retry 2 of 3); exhausting retries marks it failed with an inline error summary and a manual Retry control",
+        "reasoning": "BLOCKED: No failing assist step or retry countdown was observed. Evidence: review_queue_tiers_live-shared.png"
+      },
+      {
+        "id": "1.44",
+        "name": "assist_resume_from_failed_step",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Activating a failed step's Retry control resumes the run from that step, and pausing then resuming a running pass freezes and continues progression at exactly the current step \u2014 in both cases steps already completed keep their original outputs and timestamps and never re-execute",
+        "reasoning": "BLOCKED: No failed assist step or pause/resume progression was observed. Evidence: review_queue_tiers_live-shared.png"
+      },
+      {
+        "id": "1.46",
+        "name": "assist_rollup_and_timeline",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A run-level rollup (n of m complete, elapsed duration, failure count) updates live as steps advance, and the run's event timeline lists step transitions with timestamps, filters by status, and highlights the corresponding step when an entry is selected",
+        "reasoning": "BLOCKED: No assist rollup or event timeline was observed. Evidence: review_queue_tiers_live-shared.png"
+      },
+      {
+        "id": "1.47",
+        "name": "suggestion_accept_fills_not_submits",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A completed assist step attaches a rating visibly marked Suggested; a single accept control fills the binary rating and sliders, but the suggestion never counts as a submitted annotation until Submit & Next is pressed",
+        "reasoning": "BLOCKED: No completed assist suggestion or accept control was observed. Evidence: review_queue_tiers_live-shared.png"
+      },
+      {
+        "id": "1.48",
+        "name": "undo_redo_controls_and_shortcuts",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Undo and Redo appear in the toolbar, respond to Ctrl+Z and Ctrl+Shift+Z (Cmd variants on macOS), and each control is disabled when its stack is empty",
+        "reasoning": "BLOCKED: Undo and Redo controls were visible and initially disabled, but both keyboard shortcut behaviors were not completed. Evidence: seeded_queue_groups_and_badges-shared.png"
+      },
+      {
+        "id": "1.49",
+        "name": "undo_restores_complete_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Undo after a submitted annotation, a skip, a bulk action, a region change, a taxonomy edit, or a review-state change restores the exact prior state: queue counts, badges, chips, and the export preview all return to their previous values",
+        "reasoning": "BLOCKED: Undo was not activated after a graded state-changing workflow. Evidence: bulk_skip_moves_all_selected-shared.png"
+      },
+      {
+        "id": "1.50",
+        "name": "redo_and_stack_clearing",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Redo reapplies the most recently undone action completely, a new action after an undo clears the redo stack, and a history panel lists recent actions with human-readable labels (such as Submitted annotation, Skipped 3 items) where undoing visibly removes or marks the reverted entry",
+        "reasoning": "BLOCKED: Redo and history-stack clearing were not fully exercised. Evidence: bulk_skip_moves_all_selected-shared.png"
+      },
+      {
+        "id": "1.52",
+        "name": "annotation_history_tab",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The History tab lists all submitted annotations with response summary, binary rating, and date; clicking one opens a read-only view of the saved ratings, comments, metadata values, and any region boxes, and new submissions appear immediately while undone ones disappear",
+        "reasoning": "History increased after submission and the read-only annotation view showed rating, scores, comments, metadata, and regions. Evidence: annotation_history_tab-shared.png"
+      },
+      {
+        "id": "1.53",
+        "name": "jsonl_download_shape",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Download JSONL button above the queue exports all completed annotations as a JSONL file where each line is a JSON object with prompt, response, binary rating, dimension scores, and comments",
+        "reasoning": "BLOCKED: JSONL download was available, but the downloaded artifact contents were not directly verified in the browser. Evidence: seeded_queue_groups_and_badges-shared.png"
+      },
+      {
+        "id": "1.54",
+        "name": "export_view_labels_package_shape",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Export view shows a live-compiled monospaced preview with Labels JSON and Stats summary tabs where Labels JSON is a LabelsPackage: schemaVersion exactly annotation-studio-labels-v1, taxonomy (id, name, color, icon, shortcut, attributes), metadataFields, and items (id, suite, review_state in unlabeled|labeled|reviewed|disputed, annotation null when unlabeled else AnnotationCreate with rating up|down, scores Accuracy/Clarity/Relevance integers 1\u20135, comment \u2264500, metadata keyed by field name, regions with classId and x/y/w/h); these field names and enums are visible in the preview text, and submitting an annotation, resolving a dispute, or adding a region changes the corresponding preview values without a reload",
+        "reasoning": "Export visibly showed the LabelsPackage schema version, taxonomy, metadataFields, items, review_state, annotation fields, scores, metadata, and regions; submitted values appeared live. Evidence: export_view_labels_package_shape-shared.png"
+      },
+      {
+        "id": "1.55",
+        "name": "annotation_create_field_contract",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Submit & Next produces an AnnotationCreate payload with rating exactly up or down, scores.Accuracy/Clarity/Relevance integers 1\u20135, comment at most 500 characters, metadata keyed by field name, and regions as RegionCreate objects; invalid rating, scores, comment length, or metadata kind blocks submit with an inline message naming the offending field and leaves the queue unchanged",
+        "reasoning": "BLOCKED: A valid payload was visible in export, but invalid rating/score/comment/metadata blocking behavior was not fully exercised. Evidence: export_view_labels_package_shape-shared.png"
+      },
+      {
+        "id": "1.56",
+        "name": "copy_export_exact_with_confirmation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Copy export control puts the exact visible preview text on the clipboard and shows a visible confirmation (icon swap or toast) that reverts after a moment",
+        "reasoning": "BLOCKED: Copy export was visible, but clipboard equality and confirmation/reversion were not verified. Evidence: export_view_labels_package_shape-shared.png"
+      },
+      {
+        "id": "1.57",
+        "name": "stats_match_other_surfaces",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Stats summary's numbers match the rest of the app: suite progress equals the sidebar counts, the agreement percentage equals the Agreement view's figure, and the disputed count equals the Review queue's Disputed tier count",
+        "reasoning": "BLOCKED: Stats were not compared against all corresponding surfaces in one completed workflow. Evidence: export_view_labels_package_shape-shared.png"
+      },
+      {
+        "id": "1.58",
+        "name": "region_create_geometry_bounds",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Drawing a region produces a RegionCreate with classId matching a taxonomy class, x/y \u2265 0, w/h \u2265 8, and x+w / y+h within image bounds; boxes with w or h below 8 are discarded; region attributeValues for select attributes use one of that attribute's options",
+        "reasoning": "BLOCKED: A valid region was setup, but the required real drawing gesture, minimum-size discard, and bounds checks were not fully observed. Evidence: seeded_queue_groups_and_badges-shared.png"
+      },
+      {
+        "id": "1.59",
+        "name": "labels_package_import_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Import accepts a conforming LabelsPackage (schemaVersion annotation-studio-labels-v1) and restores taxonomy, metadata fields, annotations, regions, and review-state chips so History, Taxonomy, region lists, and the next Labels JSON preview match the imported document; Export then Import of the same Labels JSON reconstructs the same visible state",
+        "reasoning": "BLOCKED: Import and export round-trip were not completed. Evidence: export_view_labels_package_shape-shared.png"
+      },
+      {
+        "id": "1.60",
+        "name": "import_rejects_nonconforming_package",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Import of malformed JSON or a LabelsPackage failing the field contract (missing schemaVersion/taxonomy/metadataFields/items, schemaVersion not annotation-studio-labels-v1, review_state or rating outside closed enums, score outside 1\u20135, or region classId absent from taxonomy) shows a visible error naming the offending field and leaves taxonomy, annotations, and review states unchanged",
+        "reasoning": "BLOCKED: No malformed or nonconforming import was submitted. Evidence: export_view_labels_package_shape-shared.png"
+      },
+      {
+        "id": "1.61",
+        "name": "dispute_create_reason_contract",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Dispute submits a DisputeCreate with reason 1\u2013200 characters after trim as a single line; empty, over-length, or multi-line reason shows an inline message naming reason and changes no review state",
+        "reasoning": "The Dispute reason dialog visibly rejected empty input and multiline input with inline Reason validation while leaving the item undisputed. Evidence: review_queue_tiers_live-shared.png"
+      },
+      {
+        "id": "1.62",
+        "name": "jsonl_line_full_field_contract",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Each line of the downloaded JSONL is an AnnotationsJsonlLine object carrying all seven required keys \u2014 prompt, response, rating (up or down), scores (object with Accuracy, Clarity, and Relevance integers 1\u20135), comment (string of at most 500 characters), metadata (object keyed by field name), and regions (array of RegionCreate objects) \u2014 including for annotations that carried metadata values or region boxes",
+        "reasoning": "BLOCKED: JSONL lines were not downloaded and inspected in the browser. Evidence: seeded_queue_groups_and_badges-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"seeded_queue_groups_and_badges\":{\"score\":\"yes\",\"reasoning\":\"Three seeded suites are visible with remaining-item badges. Evidence: seeded_queue_groups_and_badges-shared.png\"},\"suite_click_loads_and_badge_decrements\":{\"score\":\"yes\",\"reasoning\":\"Submitting SAF evaluation 01 changed the suite badge from 10 to 9 and advanced to SAF evaluation 02. Evidence: submit_saves_and_advances-shared.png\"},\"queue_entries_show_state_chips\":{\"score\":\"yes\",\"reasoning\":\"Queue entries visibly include checkboxes and state chips such as Unlabeled; state changes are reflected elsewhere without reload. Evidence: submit_saves_and_advances-shared.png\"},\"select_all_and_bulk_bar_count\":{\"score\":\"yes\",\"reasoning\":\"Select all checked all 10 visible items and showed a bulk bar reading 10 selected. Evidence: select_all_and_bulk_bar_count-shared.png\"},\"bulk_skip_moves_all_selected\":{\"score\":\"yes\",\"reasoning\":\"Skip selected moved all 10 items, added 10 skipped, cleared selection, and hid the bulk bar. Evidence: bulk_skip_moves_all_selected-shared.png\"},\"card_prompt_snippet_and_response\":{\"score\":\"yes\",\"reasoning\":\"The annotation card shows a read-only code prompt block and a separate model-response area. Evidence: seeded_queue_groups_and_badges-shared.png\"},\"binary_rating_highlight\":{\"score\":\"yes\",\"reasoning\":\"Clicking Up produced a pressed active treatment while Down remained unselected. Evidence: binary_rating_highlight-shared.png\"},\"rubric_sliders_with_live_values\":{\"score\":\"yes\",\"reasoning\":\"Accuracy, Clarity, and Relevance sliders are present and their displayed values changed from 3 to 4 after keyboard interaction. Evidence: binary_rating_highlight-shared.png\"},\"comments_counter_and_500_cap\":{\"score\":\"yes\",\"reasoning\":\"Typing 501 characters resulted in a visible 0 remaining counter, demonstrating the 500-character cap. Evidence: comments_counter_and_500_cap-shared.png\"},\"image_area_only_on_image_items\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: An image annotation area was observed, but the contrasting non-image-item condition was not fully exercised. Evidence: seeded_queue_groups_and_badges-shared.png\"},\"submit_gated_on_full_interaction\":{\"score\":\"yes\",\"reasoning\":\"Submit & Next was initially disabled and became enabled only after rating and all three sliders were interacted with. Evidence: submit_saves_and_advances-shared.png\"},\"submit_saves_and_advances\":{\"score\":\"yes\",\"reasoning\":\"Submission increased History, changed completion from 2 to 3, reduced the suite badge from 10 to 9, removed SAF evaluation 01, and loaded SAF evaluation 02. Evidence: submit_saves_and_advances-shared.png\"},\"skip_reorders_and_badges\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Bulk skip was exercised, but the single-current-item Skip workflow was not completed end-to-end. Evidence: bulk_skip_moves_all_selected-shared.png\"},\"suite_complete_empty_state\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The last unannotated item was not submitted, so the suite-complete empty state was not observed. Evidence: submit_saves_and_advances-shared.png\"},\"command_palette_opens_and_filters\":{\"score\":\"yes\",\"reasoning\":\"Ctrl+K opened a focused command palette; typing taxonomy narrowed results to the Taxonomy view. Evidence: seeded_queue_groups_and_badges-shared.png\"},\"palette_keyboard_activation\":{\"score\":\"yes\",\"reasoning\":\"Palette results showed kind labels, arrow-key selection was visible, Enter activated the Taxonomy view, and the filtered result was present. Evidence: taxonomy_list_shows_full_rows-shared.png\"},\"taxonomy_list_shows_full_rows\":{\"score\":\"yes\",\"reasoning\":\"The Taxonomy view lists six classes with swatches/icons, single-digit shortcuts, and attribute summaries. Evidence: taxonomy_list_shows_full_rows-shared.png\"},\"class_form_fields_and_gating\":{\"score\":\"yes\",\"reasoning\":\"New class opened a form with name, palette color, searchable icon picker, digit shortcut, attributes, and disabled Save; duplicate shortcut validation appeared. Evidence: taxonomy_list_shows_full_rows-shared.png\"},\"icon_picker_searchable_grid\":{\"score\":\"yes\",\"reasoning\":\"The picker visibly contained over 20 icons and a Search icons field; Tag was visibly selected. Evidence: taxonomy_list_shows_full_rows-shared.png\"},\"duplicate_shortcut_validation\":{\"score\":\"yes\",\"reasoning\":\"Entering shortcut 1 showed the inline message \u201cShortcut 1 is already used by Person\u201d and Save remained disabled. Evidence: taxonomy_list_shows_full_rows-shared.png\"},\"new_class_live_in_picker_and_shortcut\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A valid new class was not saved, so live picker and shortcut behavior could not be verified. Evidence: taxonomy_list_shows_full_rows-shared.png\"},\"class_rename_propagates_everywhere\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No class was renamed through the edit form. Evidence: taxonomy_list_shows_full_rows-shared.png\"},\"class_delete_confirms_and_unclassifies\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No used taxonomy class was deleted. Evidence: taxonomy_list_shows_full_rows-shared.png\"},\"metadata_field_builder_adds_control\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No new metadata field was defined. Evidence: taxonomy_list_shows_full_rows-shared.png\"},\"metadata_values_saved_through\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Existing seeded metadata was visible in History and export, but entering a changed metadata value and saving it was not exercised. Evidence: export_view_labels_package_shape-shared.png\"},\"metadata_number_validation_and_delete\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No number-kind metadata field was created, validated, or deleted. Evidence: taxonomy_list_shows_full_rows-shared.png\"},\"armed_class_draws_labeled_box\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The armed-class UI was observed, but a real pointer drag drawing a labeled box was not completed. Evidence: seeded_queue_groups_and_badges-shared.png\"},\"region_list_syncs_with_boxes\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A region was added through setup tooling, but image/list selection and deletion gestures were not fully exercised. Evidence: seeded_queue_groups_and_badges-shared.png\"},\"zoom_and_pan_keep_box_registration\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Zoom and pan registration with a drawn box was not fully exercised. Evidence: seeded_queue_groups_and_badges-shared.png\"},\"review_state_transitions\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Labeled submission and a dispute transition were observed, but Mark reviewed and the complete transition sequence were not fully exercised. Evidence: review_queue_tiers_live-shared.png\"},\"review_queue_tiers_live\":{\"score\":\"yes\",\"reasoning\":\"Review queue visibly shows Disputed, Labeled, and Reviewed tiers with live counts and items. Evidence: review_queue_tiers_live-shared.png\"},\"resolve_dispute_promotes\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A disputed item was present, but Resolve was not activated and the post-resolution tier/count change was not observed. Evidence: review_queue_tiers_live-shared.png\"},\"agreement_table_rows_complete\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Agreement rows were observed for selected suites, but the full at-least-12-item cross-suite requirement was not verified in one completed evidence state. Evidence: agreement_table_rows_complete-shared.png\"},\"disagreement_flag_rule\":{\"score\":\"yes\",\"reasoning\":\"Agreement rows visibly flag binary mismatches and a rubric difference of 2, with distinct Disagreement treatment and Flag for dispute controls. Evidence: agreement_table_rows_complete-shared.png\"},\"agreement_summary_recomputes\":{\"score\":\"yes\",\"reasoning\":\"Changing the suite selector from Safety & Policy to Reasoning Quality recomputed the table and summary from 50%/2 flagged to 25%/3 flagged. Evidence: agreement_table_rows_complete-shared.png\"},\"flag_for_dispute_crosses_views\":{\"score\":\"yes\",\"reasoning\":\"Flag for dispute changed RSN evaluation 02 to Disputed and it appeared in the Review queue Disputed tier. Evidence: review_queue_tiers_live-shared.png\"},\"assist_steps_advance_visibly\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Assist was started, but visible per-item assist steps and advancing statuses were not observed. Evidence: review_queue_tiers_live-shared.png\"},\"assist_retry_backoff_counter\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No failing assist step or retry countdown was observed. Evidence: review_queue_tiers_live-shared.png\"},\"assist_resume_from_failed_step\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No failed assist step or pause/resume progression was observed. Evidence: review_queue_tiers_live-shared.png\"},\"assist_rollup_and_timeline\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No assist rollup or event timeline was observed. Evidence: review_queue_tiers_live-shared.png\"},\"suggestion_accept_fills_not_submits\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No completed assist suggestion or accept control was observed. Evidence: review_queue_tiers_live-shared.png\"},\"undo_redo_controls_and_shortcuts\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Undo and Redo controls were visible and initially disabled, but both keyboard shortcut behaviors were not completed. Evidence: seeded_queue_groups_and_badges-shared.png\"},\"undo_restores_complete_state\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Undo was not activated after a graded state-changing workflow. Evidence: bulk_skip_moves_all_selected-shared.png\"},\"redo_and_stack_clearing\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Redo and history-stack clearing were not fully exercised. Evidence: bulk_skip_moves_all_selected-shared.png\"},\"annotation_history_tab\":{\"score\":\"yes\",\"reasoning\":\"History increased after submission and the read-only annotation view showed rating, scores, comments, metadata, and regions. Evidence: annotation_history_tab-shared.png\"},\"jsonl_download_shape\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: JSONL download was available, but the downloaded artifact contents were not directly verified in the browser. Evidence: seeded_queue_groups_and_badges-shared.png\"},\"export_view_labels_package_shape\":{\"score\":\"yes\",\"reasoning\":\"Export visibly showed the LabelsPackage schema version, taxonomy, metadataFields, items, review_state, annotation fields, scores, metadata, and regions; submitted values appeared live. Evidence: export_view_labels_package_shape-shared.png\"},\"annotation_create_field_contract\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A valid payload was visible in export, but invalid rating/score/comment/metadata blocking behavior was not fully exercised. Evidence: export_view_labels_package_shape-shared.png\"},\"copy_export_exact_with_confirmation\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Copy export was visible, but clipboard equality and confirmation/reversion were not verified. Evidence: export_view_labels_package_shape-shared.png\"},\"stats_match_other_surfaces\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Stats were not compared against all corresponding surfaces in one completed workflow. Evidence: export_view_labels_package_shape-shared.png\"},\"region_create_geometry_bounds\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A valid region was setup, but the required real drawing gesture, minimum-size discard, and bounds checks were not fully observed. Evidence: seeded_queue_groups_and_badges-shared.png\"},\"labels_package_import_round_trip\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Import and export round-trip were not completed. Evidence: export_view_labels_package_shape-shared.png\"},\"import_rejects_nonconforming_package\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No malformed or nonconforming import was submitted. Evidence: export_view_labels_package_shape-shared.png\"},\"dispute_create_reason_contract\":{\"score\":\"yes\",\"reasoning\":\"The Dispute reason dialog visibly rejected empty input and multiline input with inline Reason validation while leaving the item undisputed. Evidence: review_queue_tiers_live-shared.png\"},\"jsonl_line_full_field_contract\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: JSONL lines were not downloaded and inspected in the browser. Evidence: seeded_queue_groups_and_badges-shared.png\"}}",
+    "cost_usd": 0.5685632
+  },
+  "design_fidelity": {
+    "score": 0.9,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "spacing_follows_scale",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Spacing and sizing follow a consistent design-system scale with no arbitrary one-off values dominating computed styles",
+        "reasoning": "Consistent 16px/32px/48px/64px-style spacing and control sizing are visible across the desktop layout. Evidence: layout-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "typography_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography matches the specified hierarchy for the app title, panel headings, and body text",
+        "reasoning": "Rendered typography shows a clear IBM Plex Sans hierarchy: large app title, distinct section headings, and smaller body/support text. Evidence: layout-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "layout_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The realized layout matches the specified anatomy: left queue sidebar, toolbar view switcher, card with prompt/image/response/rating/sliders/comments/metadata order, and side-by-side region list",
+        "reasoning": "Desktop view visibly includes the left queue sidebar, toolbar view switcher, ordered annotation card sections, and side-by-side image/region-list area. Evidence: layout-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "specified_transitions_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The transitions the spec calls out (250ms card advance, 150ms rating fill, chip color transitions, copy confirmation) are present on their state changes",
+        "reasoning": "Computed styles directly show a 250ms annotation-card transition, 150ms chip and rating-button transitions, and 150ms copy-snippet transition. Evidence: layout-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "responsive_behavior_per_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Responsive behavior matches the spec: 768px sidebar collapse and 375px no-overflow rule",
+        "reasoning": "At 768px the sidebar is translated off-canvas and the main view expands; at 375px the sidebar remains collapsed and the rendered page has no horizontal overflow. Evidence: responsive-768.png; responsive-375.png"
+      },
+      {
+        "id": "3.6",
+        "name": "control_shape_conformance",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Button and form radii, padding, and shadows are consistent with the component system in use",
+        "reasoning": "Buttons and form controls use a consistent Carbon-style square treatment, predictable padding, and matching focus/hover shadows. Evidence: layout-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "hierarchy_distinct",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Section headings are clearly distinct from body text throughout",
+        "reasoning": "Section headings such as Original prompt, Model response, Rubric scores, and Custom metadata are visibly distinct from body copy through size and weight. Evidence: layout-shared.png"
+      },
+      {
+        "id": "3.8",
+        "name": "component_states_match",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Component states (default, hover, focus, disabled, error) match the specified treatments where specified",
+        "reasoning": "Observed default, hovered, active/selected, and disabled states have distinct treatments; the Submit & Next control is visibly disabled and the hovered Up control gains a blue wash and shadow. Evidence: states-shared.png"
+      },
+      {
+        "id": "3.9",
+        "name": "color_treatments_precise",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The specified color mappings are precise: brand blue selection, state-chip mapping, class-color consistency, warning treatment on flagged rows",
+        "reasoning": "Active selections use brand blue, state chips use a consistent neutral mapping, and the image visibly uses distinct class colors; the selected queue/suite rows also use blue emphasis. Evidence: states-shared.png"
+      },
+      {
+        "id": "3.10",
+        "name": "microinteraction_durations",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Microinteraction feedback follows the specified durations within reasonable tolerance (roughly 150 to 300 milliseconds)",
+        "reasoning": "FAIL: Several observed control feedback transitions are 70ms or slider-fill transitions are 110ms, outside the specified roughly 150\u2013300ms range despite the 150ms/250ms transitions elsewhere. Evidence: states-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"spacing_follows_scale\":{\"score\":\"yes\",\"reasoning\":\"Consistent 16px/32px/48px/64px-style spacing and control sizing are visible across the desktop layout. Evidence: layout-shared.png\"},\"typography_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"Rendered typography shows a clear IBM Plex Sans hierarchy: large app title, distinct section headings, and smaller body/support text. Evidence: layout-shared.png\"},\"layout_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"Desktop view visibly includes the left queue sidebar, toolbar view switcher, ordered annotation card sections, and side-by-side image/region-list area. Evidence: layout-shared.png\"},\"specified_transitions_present\":{\"score\":\"yes\",\"reasoning\":\"Computed styles directly show a 250ms annotation-card transition, 150ms chip and rating-button transitions, and 150ms copy-snippet transition. Evidence: layout-shared.png\"},\"responsive_behavior_per_spec\":{\"score\":\"yes\",\"reasoning\":\"At 768px the sidebar is translated off-canvas and the main view expands; at 375px the sidebar remains collapsed and the rendered page has no horizontal overflow. Evidence: responsive-768.png; responsive-375.png\"},\"control_shape_conformance\":{\"score\":\"yes\",\"reasoning\":\"Buttons and form controls use a consistent Carbon-style square treatment, predictable padding, and matching focus/hover shadows. Evidence: layout-shared.png\"},\"hierarchy_distinct\":{\"score\":\"yes\",\"reasoning\":\"Section headings such as Original prompt, Model response, Rubric scores, and Custom metadata are visibly distinct from body copy through size and weight. Evidence: layout-shared.png\"},\"component_states_match\":{\"score\":\"yes\",\"reasoning\":\"Observed default, hovered, active/selected, and disabled states have distinct treatments; the Submit & Next control is visibly disabled and the hovered Up control gains a blue wash and shadow. Evidence: states-shared.png\"},\"color_treatments_precise\":{\"score\":\"yes\",\"reasoning\":\"Active selections use brand blue, state chips use a consistent neutral mapping, and the image visibly uses distinct class colors; the selected queue/suite rows also use blue emphasis. Evidence: states-shared.png\"},\"microinteraction_durations\":{\"score\":\"no\",\"reasoning\":\"FAIL: Several observed control feedback transitions are 70ms or slider-fill transitions are 110ms, outside the specified roughly 150\u2013300ms range despite the 150ms/250ms transitions elsewhere. Evidence: states-shared.png\"}}",
+    "cost_usd": 0.2599014
+  },
+  "edge_cases": {
+    "score": 0.6923,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "double_submit_single_save",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Double-activating Submit & Next saves exactly one annotation: the queue count decrements by one and history gains one entry",
+        "reasoning": "Double-activating Submit & Next produced one new history entry (History 6\u21927) and one queue decrement (3 completed, 9 remaining). Evidence: double_submit_single_save-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "skip_all_then_proceed",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Skipping every item in a suite leaves the queue showing the same items in skip order with the skipped badge equal to the number of skips, and submitting then proceeds from the front of the reordered queue",
+        "reasoning": "FAIL: Reordering all remaining items did not visibly show skipped badges or a reordered queue; the visible queue remained in its original order. Evidence: double_submit_single_save-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "empty_stacks_disable_undo_redo",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Undo with an empty history and Redo with an empty redo stack are disabled; activating them does nothing and produces no console errors",
+        "reasoning": "Undo and Redo were visibly disabled at empty-stack state; console inspection found zero errors. Evidence: empty_stacks_disable_undo_redo-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "sliver_box_discarded",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Drawing a box with width or height below 8 image pixels is discarded rather than creating an unusable sliver region",
+        "reasoning": "A real 1-pixel drag left Regions at 0 and displayed \u201cRegion discarded: width and height must each be at least 8 image pixels.\u201d Evidence: sliver_box_discarded-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "last_region_delete_empty_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Deleting the last region on an item leaves the image visible with an empty region list and a short empty-state line explaining how to draw a region",
+        "reasoning": "Deleting the final region left the image visible, Regions 0, and the instruction \u201cNo regions yet. Arm a class, then drag a box on the image.\u201d Evidence: last_region_delete_empty_state-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "comment_cap_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At exactly 500 characters the comments counter shows 0 remaining and further input is prevented, and the saved annotation shows the full 500-character comment in history",
+        "reasoning": "FAIL: The 500-character input reached \u201c0 remaining,\u201d but the subsequent save/history round trip could not be completed and verified. Evidence: comment_cap_round_trip-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "select_attribute_needs_options",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting the class form with a select-kind attribute and an empty option list shows an inline message naming the attribute options field and saves nothing",
+        "reasoning": "Selecting Select with an empty options list showed the inline message \u201cOptions: a select field needs at least one non-empty option,\u201d and Save field remained disabled. Evidence: select_attribute_needs_options-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "assist_on_complete_suite",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Running Assist on a fully annotated suite shows a message that there is nothing to pre-label instead of starting an empty run",
+        "reasoning": "BLOCKED: No fully annotated suite was reached, so the complete-suite Assist behavior could not be exercised. Evidence: timeline_filter_empty_state-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "timeline_filter_empty_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Filtering the assist event timeline to a status with no entries shows an empty-state message in the timeline region rather than a blank area",
+        "reasoning": "Filtering the event timeline to Paused displayed \u201cNo events match this status filter\u201d in the timeline region. Evidence: timeline_filter_empty_state-shared.png"
+      },
+      {
+        "id": "4.10",
+        "name": "copy_matches_visible_preview",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Copying the export mid-update copies exactly the text currently visible in the preview block",
+        "reasoning": "FAIL: Copy was activated, but clipboard read permission was denied, so exact equality with the visible preview could not be directly observed. Evidence: copy_matches_visible_preview-shared.png"
+      },
+      {
+        "id": "4.11",
+        "name": "dispute_reason_boundary_rejected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting DisputeCreate with an empty reason or a reason longer than 200 characters changes no review state and names the reason field",
+        "reasoning": "Empty and 201-character reasons were rejected with inline messages naming the Reason field; the Dispute action remained disabled and review state stayed unchanged. Evidence: dispute_reason_boundary_rejected-shared.png"
+      },
+      {
+        "id": "4.12",
+        "name": "import_rejects_bad_labels_package",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Importing malformed Labels JSON or JSON that fails the LabelsPackage field contract (missing schemaVersion/taxonomy/metadataFields/items, schemaVersion not annotation-studio-labels-v1, review_state or rating outside closed sets, score outside 1\u20135, or region classId absent from taxonomy) leaves taxonomy, annotations, and review states unchanged and shows a visible error naming the offending field",
+        "reasoning": "Importing {} visibly produced \u201cImport rejected\u201d with the offending field named: \u201cschemaVersion must be exactly annotation-studio-labels-v1\u201d; no state change was observed. Evidence: import_rejects_bad_labels_package-shared.png"
+      },
+      {
+        "id": "4.13",
+        "name": "seeded_export_opens_valid_package",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export with only the seeded history and no new session submit still opens and shows a LabelsPackage that includes schemaVersion annotation-studio-labels-v1 and every required LabelsPackage key; Download, Copy, and Import remain available",
+        "reasoning": "Labels JSON export visibly showed schemaVersion annotation-studio-labels-v1 plus taxonomy[], metadataFields[], and items[], with Download, Copy, Import, and Download JSON available. Evidence: copy_matches_visible_preview-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"double_submit_single_save\":{\"score\":\"yes\",\"reasoning\":\"Double-activating Submit & Next produced one new history entry (History 6\u21927) and one queue decrement (3 completed, 9 remaining). Evidence: double_submit_single_save-shared.png\"},\"skip_all_then_proceed\":{\"score\":\"no\",\"reasoning\":\"FAIL: Reordering all remaining items did not visibly show skipped badges or a reordered queue; the visible queue remained in its original order. Evidence: double_submit_single_save-shared.png\"},\"empty_stacks_disable_undo_redo\":{\"score\":\"yes\",\"reasoning\":\"Undo and Redo were visibly disabled at empty-stack state; console inspection found zero errors. Evidence: empty_stacks_disable_undo_redo-shared.png\"},\"sliver_box_discarded\":{\"score\":\"yes\",\"reasoning\":\"A real 1-pixel drag left Regions at 0 and displayed \u201cRegion discarded: width and height must each be at least 8 image pixels.\u201d Evidence: sliver_box_discarded-shared.png\"},\"last_region_delete_empty_state\":{\"score\":\"yes\",\"reasoning\":\"Deleting the final region left the image visible, Regions 0, and the instruction \u201cNo regions yet. Arm a class, then drag a box on the image.\u201d Evidence: last_region_delete_empty_state-shared.png\"},\"comment_cap_round_trip\":{\"score\":\"no\",\"reasoning\":\"FAIL: The 500-character input reached \u201c0 remaining,\u201d but the subsequent save/history round trip could not be completed and verified. Evidence: comment_cap_round_trip-shared.png\"},\"select_attribute_needs_options\":{\"score\":\"yes\",\"reasoning\":\"Selecting Select with an empty options list showed the inline message \u201cOptions: a select field needs at least one non-empty option,\u201d and Save field remained disabled. Evidence: select_attribute_needs_options-shared.png\"},\"assist_on_complete_suite\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No fully annotated suite was reached, so the complete-suite Assist behavior could not be exercised. Evidence: timeline_filter_empty_state-shared.png\"},\"timeline_filter_empty_state\":{\"score\":\"yes\",\"reasoning\":\"Filtering the event timeline to Paused displayed \u201cNo events match this status filter\u201d in the timeline region. Evidence: timeline_filter_empty_state-shared.png\"},\"copy_matches_visible_preview\":{\"score\":\"no\",\"reasoning\":\"FAIL: Copy was activated, but clipboard read permission was denied, so exact equality with the visible preview could not be directly observed. Evidence: copy_matches_visible_preview-shared.png\"},\"dispute_reason_boundary_rejected\":{\"score\":\"yes\",\"reasoning\":\"Empty and 201-character reasons were rejected with inline messages naming the Reason field; the Dispute action remained disabled and review state stayed unchanged. Evidence: dispute_reason_boundary_rejected-shared.png\"},\"import_rejects_bad_labels_package\":{\"score\":\"yes\",\"reasoning\":\"Importing {} visibly produced \u201cImport rejected\u201d with the offending field named: \u201cschemaVersion must be exactly annotation-studio-labels-v1\u201d; no state change was observed. Evidence: import_rejects_bad_labels_package-shared.png\"},\"seeded_export_opens_valid_package\":{\"score\":\"yes\",\"reasoning\":\"Labels JSON export visibly showed schemaVersion annotation-studio-labels-v1 plus taxonomy[], metadataFields[], and items[], with Download, Copy, Import, and Download JSON available. Evidence: copy_matches_visible_preview-shared.png\"} }",
+    "cost_usd": 0.7366258
+  },
+  "innovation": {
+    "score": 0.4444,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "delightful_microinteractions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Unique, delightful microinteractions beyond the required set (for example a satisfying region-draw feel or slider haptics-style feedback)",
+        "reasoning": "FAIL: No distinctive microinteraction beyond standard controls was observed. Evidence: keyboard-annotation.png"
+      },
+      {
+        "id": "11.2",
+        "name": "advanced_motion_mechanics",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Advanced animation or transition mechanics beyond the specified transitions, executed smoothly",
+        "reasoning": "FAIL: No advanced motion mechanics were directly observed. Evidence: extras-initial.png"
+      },
+      {
+        "id": "11.3",
+        "name": "guided_onboarding",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A narrative or guided onboarding flow that orients a first-time annotator",
+        "reasoning": "The live app showed a four-step \u201cGetting started\u201d tour with narrative guidance and Next/Skip controls. Evidence: extras-initial.png"
+      },
+      {
+        "id": "11.4",
+        "name": "extra_data_visualization",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Data visualizations beyond the spec (for example a per-suite progress ring or agreement trend visual) with real usability",
+        "reasoning": "FAIL: No extra usable visualization such as a progress ring or trend chart was observed. Evidence: agreement-view.png"
+      },
+      {
+        "id": "11.5",
+        "name": "keyboard_first_annotation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Keyboard-first annotation: rating, sliders, and submit operable in sequence without the pointer, beyond the required shortcut support",
+        "reasoning": "Using keyboard focus and Enter/arrow keys, I selected the rating, adjusted all three sliders, and submitted; the next item loaded and an \u201cAnnotation submitted\u201d status appeared. Evidence: keyboard-annotation.png"
+      },
+      {
+        "id": "11.6",
+        "name": "personalization_touches",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Personalization features such as density or theme preferences held in shared state",
+        "reasoning": "The Density control changed from comfortable to compact and visibly tightened the layout, with the control marked pressed. Evidence: personalization-density.png"
+      },
+      {
+        "id": "11.7",
+        "name": "polished_narrative",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Polished product storytelling or coherent fictional branding carried through the UI",
+        "reasoning": "Corvid branding is coherent across the UI, with \u201cAnnotation studio\u201d and the Kestrel \u00d7 Juniper evaluation-pipeline narrative. Evidence: extras-initial.png"
+      },
+      {
+        "id": "11.8",
+        "name": "celebration_moments",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A tasteful celebration when a suite reaches fully reviewed, reserved for the payoff moment",
+        "reasoning": "FAIL: No tasteful full-suite completion celebration was observed; the suite remained at 3 completed and 9 skipped. Evidence: suite-complete-check.png"
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "FAIL: No additional noteworthy enhancement beyond the listed criteria was directly observed. Evidence: keyboard-annotation.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"delightful_microinteractions\":{\"score\":\"no\",\"reasoning\":\"FAIL: No distinctive microinteraction beyond standard controls was observed. Evidence: keyboard-annotation.png\"},\"advanced_motion_mechanics\":{\"score\":\"no\",\"reasoning\":\"FAIL: No advanced motion mechanics were directly observed. Evidence: extras-initial.png\"},\"guided_onboarding\":{\"score\":\"yes\",\"reasoning\":\"The live app showed a four-step \u201cGetting started\u201d tour with narrative guidance and Next/Skip controls. Evidence: extras-initial.png\"},\"extra_data_visualization\":{\"score\":\"no\",\"reasoning\":\"FAIL: No extra usable visualization such as a progress ring or trend chart was observed. Evidence: agreement-view.png\"},\"keyboard_first_annotation\":{\"score\":\"yes\",\"reasoning\":\"Using keyboard focus and Enter/arrow keys, I selected the rating, adjusted all three sliders, and submitted; the next item loaded and an \u201cAnnotation submitted\u201d status appeared. Evidence: keyboard-annotation.png\"},\"personalization_touches\":{\"score\":\"yes\",\"reasoning\":\"The Density control changed from comfortable to compact and visibly tightened the layout, with the control marked pressed. Evidence: personalization-density.png\"},\"polished_narrative\":{\"score\":\"yes\",\"reasoning\":\"Corvid branding is coherent across the UI, with \u201cAnnotation studio\u201d and the Kestrel \u00d7 Juniper evaluation-pipeline narrative. Evidence: extras-initial.png\"},\"celebration_moments\":{\"score\":\"no\",\"reasoning\":\"FAIL: No tasteful full-suite completion celebration was observed; the suite remained at 3 completed and 9 skipped. Evidence: suite-complete-check.png\"},\"innovation_catchall\":{\"score\":\"no\",\"reasoning\":\"FAIL: No additional noteworthy enhancement beyond the listed criteria was directly observed. Evidence: keyboard-annotation.png\"}}",
+    "cost_usd": 0.19353779999999998
+  },
+  "motion": {
+    "score": 0.5,
+    "criteria": [
+      {
+        "id": "8.1",
+        "name": "card_advance_transition",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Driven by the real Submit & Next control, the outgoing card transitions out upward and the next card enters from below over roughly 250 milliseconds",
+        "reasoning": "Observed Submit & Next advance from SAF evaluation 01 to 02; the new card had a 0.25s card-in animation and, 50ms in, was translated downward with low opacity. Evidence: card_advance_transition-shared.png"
+      },
+      {
+        "id": "8.2",
+        "name": "rating_fill_animation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Selecting a binary rating animates the button background with a roughly 150 millisecond fill rather than snapping",
+        "reasoning": "Selecting Up changed its background and shadow, with a declared 0.15s background/color/transform/shadow transition. Evidence: rating_fill_animation-shared.png"
+      },
+      {
+        "id": "8.3",
+        "name": "queue_list_animations",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Queue entries animate their changes: a submitted entry animates out, a skipped entry animates to the end of the list, and bulk-skipped entries animate as a group rather than snapping",
+        "reasoning": "FAIL: Queue entries declared transitions, but reordering an item did not visibly show the required skip-to-end animation or skipped badge; bulk and submitted-entry animations were not observed. Evidence: queue_list_animations-shared.png"
+      },
+      {
+        "id": "8.4",
+        "name": "assist_step_status_motion",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Assist step status changes animate: the running indicator shows continuous activity, a completing step fades to its new status rather than snapping, and the retry countdown ticks visibly",
+        "reasoning": "FAIL: Assist startup showed a badge pulse, but continuous running activity, completion fade, and retry countdown motion were not all observed. Evidence: assist_step_status_motion-shared.png"
+      },
+      {
+        "id": "8.5",
+        "name": "region_box_motion",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A newly drawn region box appears with a brief scale-settle animation and a deleted box fades out",
+        "reasoning": "A real drag created a region with a 0.22s box-settle animation; deletion sampled at 50ms showed opacity reduced to 0.69, confirming fade-out. Evidence: region_box_motion-shared.png"
+      },
+      {
+        "id": "8.6",
+        "name": "state_chip_color_transition",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Review-state chips animate their color change on a state transition rather than swapping instantly",
+        "reasoning": "FAIL: Chips declared a 0.15s color/background transition, but the attempted live state update did not visibly change the chip from Unlabeled, so the transition itself was not observed. Evidence: state_chip_color_transition-shared.png"
+      },
+      {
+        "id": "8.7",
+        "name": "hover_system",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Hover feedback is present throughout: buttons ease background and shadow with a slight press effect, queue entries, table rows, and timeline entries take a full-width hover wash, and form controls show focus rings",
+        "reasoning": "Real hover changed a queue entry\u2019s background wash; buttons had easing transitions, and focusing the comment control produced a visible blue 2px focus outline. Evidence: hover_system-shared.png"
+      },
+      {
+        "id": "8.8",
+        "name": "copy_confirmation_transition",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Copy export confirmation swaps its icon with a brief transition and reverts after a moment",
+        "reasoning": "FAIL: Copy changed the label/icon from Copy export to Copied/checkmark, but it remained Copied after 1.7 seconds instead of reverting. Evidence: copy_confirmation_transition-shared.png"
+      },
+      {
+        "id": "8.9",
+        "name": "toasts_slide_and_dismiss",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Feedback toasts after bulk actions, dispute resolution, and export copy slide in, remain readable, and auto-dismiss with a fade",
+        "reasoning": "FAIL: Export-copy toast visibly animated in and auto-dismissed, but the required bulk-action and dispute-resolution toast workflows were not all observed. Evidence: toasts_slide_and_dismiss-shared.png"
+      },
+      {
+        "id": "8.10",
+        "name": "reduced_motion_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, card transitions, button fills, list animations, and chip transitions apply instantly",
+        "reasoning": "In the reduced-motion browser, matchMedia reported true and observed animation/transition durations were reduced to 1e-06s. Evidence: reduced_motion_respected-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"card_advance_transition\":{\"score\":\"yes\",\"reasoning\":\"Observed Submit & Next advance from SAF evaluation 01 to 02; the new card had a 0.25s card-in animation and, 50ms in, was translated downward with low opacity. Evidence: card_advance_transition-shared.png\"},\"rating_fill_animation\":{\"score\":\"yes\",\"reasoning\":\"Selecting Up changed its background and shadow, with a declared 0.15s background/color/transform/shadow transition. Evidence: rating_fill_animation-shared.png\"},\"queue_list_animations\":{\"score\":\"no\",\"reasoning\":\"FAIL: Queue entries declared transitions, but reordering an item did not visibly show the required skip-to-end animation or skipped badge; bulk and submitted-entry animations were not observed. Evidence: queue_list_animations-shared.png\"},\"assist_step_status_motion\":{\"score\":\"no\",\"reasoning\":\"FAIL: Assist startup showed a badge pulse, but continuous running activity, completion fade, and retry countdown motion were not all observed. Evidence: assist_step_status_motion-shared.png\"},\"region_box_motion\":{\"score\":\"yes\",\"reasoning\":\"A real drag created a region with a 0.22s box-settle animation; deletion sampled at 50ms showed opacity reduced to 0.69, confirming fade-out. Evidence: region_box_motion-shared.png\"},\"state_chip_color_transition\":{\"score\":\"no\",\"reasoning\":\"FAIL: Chips declared a 0.15s color/background transition, but the attempted live state update did not visibly change the chip from Unlabeled, so the transition itself was not observed. Evidence: state_chip_color_transition-shared.png\"},\"hover_system\":{\"score\":\"yes\",\"reasoning\":\"Real hover changed a queue entry\u2019s background wash; buttons had easing transitions, and focusing the comment control produced a visible blue 2px focus outline. Evidence: hover_system-shared.png\"},\"copy_confirmation_transition\":{\"score\":\"no\",\"reasoning\":\"FAIL: Copy changed the label/icon from Copy export to Copied/checkmark, but it remained Copied after 1.7 seconds instead of reverting. Evidence: copy_confirmation_transition-shared.png\"},\"toasts_slide_and_dismiss\":{\"score\":\"no\",\"reasoning\":\"FAIL: Export-copy toast visibly animated in and auto-dismissed, but the required bulk-action and dispute-resolution toast workflows were not all observed. Evidence: toasts_slide_and_dismiss-shared.png\"},\"reduced_motion_respected\":{\"score\":\"yes\",\"reasoning\":\"In the reduced-motion browser, matchMedia reported true and observed animation/transition durations were reduced to 1e-06s. Evidence: reduced_motion_respected-shared.png\"}}",
+    "cost_usd": 0.6448124
+  },
+  "performance": {
+    "score": 0.8,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_under_2s",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cold start to an interactive studio is under 2 seconds on local serve",
+        "reasoning": "Meaningful interactive UI rendered; first contentful paint was observed at 1032 ms. Evidence: cold-start-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "console_free_of_errors",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No errors or warnings appear in the console on load or during flows",
+        "reasoning": "No console errors or warnings were observed during load and flows. Evidence: cold-start-shared.png"
+      },
+      {
+        "id": "9.3",
+        "name": "transitions_respond_fast",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "UI transitions (view switches, palette open, card advance) respond in under roughly 100 milliseconds from input",
+        "reasoning": "Palette opening and repeated view switching responded without visible delay; ten rapid switches completed in 960 ms total. Evidence: palette-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "async_work_indicated",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Simulated async work (assist steps, backoff countdowns) shows visible progress indication rather than a frozen UI",
+        "reasoning": "Assist run visibly showed progress, pending/completed states, retry countdown, and failure status rather than freezing. Evidence: assist-progress-shared.png"
+      },
+      {
+        "id": "9.5",
+        "name": "seeded_collections_smooth",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The seeded queues, agreement table, and export preview render and scroll without perceived lag",
+        "reasoning": "Seeded queue, agreement data, and export content rendered successfully during navigation and observation. Evidence: export-shared.png"
+      },
+      {
+        "id": "9.6",
+        "name": "ui_interactive_during_run",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The UI remains interactive while an assist run advances \u2014 the user can annotate, switch views, and open the palette mid-run",
+        "reasoning": "While the assist run was active, the UI remained usable and the search palette could be opened; progress continued from 0/10 to 8/10. Evidence: assist-progress-shared.png"
+      },
+      {
+        "id": "9.7",
+        "name": "animations_stay_smooth",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "List, card, and chip animations hold a smooth frame rate without stutter",
+        "reasoning": "BLOCKED: No reliable direct frame-rate or stutter measurement was available from browser observation."
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_input_no_hangs",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapid repeated input (fast slider drags, rapid undo/redo, quick suite switches) causes no hangs or dropped interactions",
+        "reasoning": "Ten rapid suite/view switches completed successfully in 960 ms with the app still rendered and responsive. Evidence: rapid-input-shared.png"
+      },
+      {
+        "id": "9.9",
+        "name": "extended_session_stable",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "An extended session (multiple runs, many annotations, repeated exports) shows no runaway slowdown or memory-driven degradation",
+        "reasoning": "BLOCKED: A genuinely extended session with many repeated runs/exports could not be directly observed within the grading run."
+      },
+      {
+        "id": "9.10",
+        "name": "no_blank_loading_gaps",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No surface renders as an unexplained blank area while its data is being prepared",
+        "reasoning": "Initial, assist-progress, agreement, and export surfaces all displayed meaningful content without unexplained blank loading areas. Evidence: export-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_start_under_2s\":{\"score\":\"yes\",\"reasoning\":\"Meaningful interactive UI rendered; first contentful paint was observed at 1032 ms. Evidence: cold-start-shared.png\"},\"console_free_of_errors\":{\"score\":\"yes\",\"reasoning\":\"No console errors or warnings were observed during load and flows. Evidence: cold-start-shared.png\"},\"transitions_respond_fast\":{\"score\":\"yes\",\"reasoning\":\"Palette opening and repeated view switching responded without visible delay; ten rapid switches completed in 960 ms total. Evidence: palette-shared.png\"},\"async_work_indicated\":{\"score\":\"yes\",\"reasoning\":\"Assist run visibly showed progress, pending/completed states, retry countdown, and failure status rather than freezing. Evidence: assist-progress-shared.png\"},\"seeded_collections_smooth\":{\"score\":\"yes\",\"reasoning\":\"Seeded queue, agreement data, and export content rendered successfully during navigation and observation. Evidence: export-shared.png\"},\"ui_interactive_during_run\":{\"score\":\"yes\",\"reasoning\":\"While the assist run was active, the UI remained usable and the search palette could be opened; progress continued from 0/10 to 8/10. Evidence: assist-progress-shared.png\"},\"animations_stay_smooth\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No reliable direct frame-rate or stutter measurement was available from browser observation.\"},\"rapid_input_no_hangs\":{\"score\":\"yes\",\"reasoning\":\"Ten rapid suite/view switches completed successfully in 960 ms with the app still rendered and responsive. Evidence: rapid-input-shared.png\"},\"extended_session_stable\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A genuinely extended session with many repeated runs/exports could not be directly observed within the grading run.\"},\"no_blank_loading_gaps\":{\"score\":\"yes\",\"reasoning\":\"Initial, assist-progress, agreement, and export surfaces all displayed meaningful content without unexplained blank loading areas. Evidence: export-shared.png\"}}",
+    "cost_usd": 0.15200059999999999
+  },
+  "responsiveness": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "desktop_to_mobile_adapts",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The layout adapts gracefully from 1440px desktop to 375px mobile: sidebar, card, region area, and tables reflow without breakage",
+        "reasoning": "Desktop and 375px views visibly reflow: the sidebar becomes an overlay, controls compact, cards stack, and content fits the mobile layout. Evidence: mobile-main.png"
+      },
+      {
+        "id": "7.2",
+        "name": "mobile_tap_targets",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Primary controls (rating buttons, Submit & Next, bulk bar actions, palette rows) are tap targets of at least 44px on mobile widths",
+        "reasoning": "Mobile rating buttons, Skip/Submit controls, toolbar controls, and annotation controls are visibly at least 44px high. Evidence: annotate-mobile.png"
+      },
+      {
+        "id": "7.3",
+        "name": "typography_scales",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography remains readable at both desktop and mobile widths with no unreadably small text",
+        "reasoning": "Headings, body copy, labels, and controls remain readable at both desktop and mobile widths. Evidence: desktop-main.png"
+      },
+      {
+        "id": "7.4",
+        "name": "no_viewport_clipping",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No content clips or overflows the viewport at any width between 1440px and 375px",
+        "reasoning": "Observed desktop, tablet, and 375px layouts stay within the page viewport; wide content uses local scrolling surfaces. Evidence: mobile-main.png"
+      },
+      {
+        "id": "7.5",
+        "name": "sidebar_collapses_at_768",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At widths of 768 pixels and below the queue sidebar collapses behind a toggle control that opens it as an overlay; at desktop widths it is open by default",
+        "reasoning": "At 768px and below the queue is positioned off-canvas and a visible Toggle queue control opens it as an overlay; at desktop it is open by default. Evidence: sidebar-overlay-mobile.png"
+      },
+      {
+        "id": "7.6",
+        "name": "stacking_order_logical",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At narrow widths the annotation card stacks logically: prompt, image area, response, rating, sliders, comments, metadata fields in a sensible order",
+        "reasoning": "The mobile annotation card visibly orders prompt, image/regions, model response, rating, rubric sliders, comments, metadata, and actions sequentially. Evidence: annotate-mobile.png"
+      },
+      {
+        "id": "7.7",
+        "name": "region_canvas_touch_scale",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The region annotation image scales to fit its container at every width while boxes keep their relative positions",
+        "reasoning": "The region image scales from a wide desktop canvas to a 360px mobile canvas while the annotation box remains in the corresponding relative position. Evidence: annotate-mobile.png"
+      },
+      {
+        "id": "7.8",
+        "name": "no_horizontal_page_scroll",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px width there is no page-level horizontal scrolling; the agreement table and export preview scroll within their own containers",
+        "reasoning": "At 375px the measured document width does not exceed the viewport, while the agreement table and export/schema surfaces visibly provide contained scrolling. Evidence: agreement-mobile.png"
+      },
+      {
+        "id": "7.9",
+        "name": "tables_scroll_in_containers",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Wide surfaces (agreement table, export preview, event timeline) size responsively and scroll inside their own containers",
+        "reasoning": "The agreement table is visibly wider than the mobile viewport and is contained in a horizontal-scroll surface; export preview and timeline use contained scrolling surfaces. Evidence: agreement-mobile.png"
+      },
+      {
+        "id": "7.10",
+        "name": "fixed_controls_reachable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The toolbar, undo/redo, and view switcher remain accessible at every width",
+        "reasoning": "Toolbar, undo/redo, search, view switcher, and queue toggle remain visible and reachable at desktop, tablet, and mobile widths. Evidence: annotate-mobile.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"desktop_to_mobile_adapts\":{\"score\":\"yes\",\"reasoning\":\"Desktop and 375px views visibly reflow: the sidebar becomes an overlay, controls compact, cards stack, and content fits the mobile layout. Evidence: mobile-main.png\"},\"mobile_tap_targets\":{\"score\":\"yes\",\"reasoning\":\"Mobile rating buttons, Skip/Submit controls, toolbar controls, and annotation controls are visibly at least 44px high. Evidence: annotate-mobile.png\"},\"typography_scales\":{\"score\":\"yes\",\"reasoning\":\"Headings, body copy, labels, and controls remain readable at both desktop and mobile widths. Evidence: desktop-main.png\"},\"no_viewport_clipping\":{\"score\":\"yes\",\"reasoning\":\"Observed desktop, tablet, and 375px layouts stay within the page viewport; wide content uses local scrolling surfaces. Evidence: mobile-main.png\"},\"sidebar_collapses_at_768\":{\"score\":\"yes\",\"reasoning\":\"At 768px and below the queue is positioned off-canvas and a visible Toggle queue control opens it as an overlay; at desktop it is open by default. Evidence: sidebar-overlay-mobile.png\"},\"stacking_order_logical\":{\"score\":\"yes\",\"reasoning\":\"The mobile annotation card visibly orders prompt, image/regions, model response, rating, rubric sliders, comments, metadata, and actions sequentially. Evidence: annotate-mobile.png\"},\"region_canvas_touch_scale\":{\"score\":\"yes\",\"reasoning\":\"The region image scales from a wide desktop canvas to a 360px mobile canvas while the annotation box remains in the corresponding relative position. Evidence: annotate-mobile.png\"},\"no_horizontal_page_scroll\":{\"score\":\"yes\",\"reasoning\":\"At 375px the measured document width does not exceed the viewport, while the agreement table and export/schema surfaces visibly provide contained scrolling. Evidence: agreement-mobile.png\"},\"tables_scroll_in_containers\":{\"score\":\"yes\",\"reasoning\":\"The agreement table is visibly wider than the mobile viewport and is contained in a horizontal-scroll surface; export preview and timeline use contained scrolling surfaces. Evidence: agreement-mobile.png\"},\"fixed_controls_reachable\":{\"score\":\"yes\",\"reasoning\":\"Toolbar, undo/redo, search, view switcher, and queue toggle remain visible and reachable at desktop, tablet, and mobile widths. Evidence: annotate-mobile.png\"} }",
+    "cost_usd": 0.32427839999999997
+  },
+  "technical": {
+    "score": 0.75,
+    "criteria": [
+      {
+        "id": "10.1",
+        "name": "serves_clean_on_start_path",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app serves and runs via its documented start path on port 3000 and renders the seeded studio with no errors",
+        "reasoning": "Seeded studio rendered at http://localhost:3000 with usable annotation UI and no console errors. Evidence: serves_clean_on_start_path-shared.png"
+      },
+      {
+        "id": "10.2",
+        "name": "shared_state_coherence",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A change made in one view is immediately reflected in every other view showing that data \u2014 a submitted annotation updates the queue badge, history, review queue, agreement stats, and export preview together without a reload",
+        "reasoning": "Submitted annotation increased History to 7 and Safety completion to 3, and was reflected in Review queue, Agreement, History/toast, and Export preview without reload. Evidence: shared_state_coherence-submitted.png"
+      },
+      {
+        "id": "10.3",
+        "name": "storage_stays_empty",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After a full exercise of the app (annotating, taxonomy edits, assist run, undo, export copy), localStorage, sessionStorage, and other browser storage remain empty",
+        "reasoning": "After annotation, assist, export/import, and navigation, localStorage and sessionStorage remained empty. Evidence: export_import_end_state_coherent-shared.png"
+      },
+      {
+        "id": "10.4",
+        "name": "reload_returns_seeded_baseline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A page reload returns the app to its seeded state: seeded suites and counts, seeded taxonomy and metadata fields, seeded history and agreement data, empty undo/redo stacks, and no assist run in progress",
+        "reasoning": "Reload restored seeded counts, taxonomy, history count 6, and empty annotation state with empty storage. Evidence: reload_returns_seeded_baseline-shared.png"
+      },
+      {
+        "id": "10.5",
+        "name": "console_clean_under_exercise",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "No console errors or unhandled promise rejections appear during a full exercise of the app, including region drawing, rapid undo/redo, and a complete assist run",
+        "reasoning": "FAIL: Console showed no errors during the exercised paths, but the complete required region-drawing and rapid undo/redo exercise was not fully completed, so the pass rule is unmet. Evidence: console_clean_under_exercise-shared.png"
+      },
+      {
+        "id": "10.6",
+        "name": "no_outbound_requests",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Only same-origin requests appear in devtools; images, fonts, and icons load locally with no outbound network requests",
+        "reasoning": "Network inspection showed requests exclusively to http://localhost:3000, including the local image asset. Evidence: reload_returns_seeded_baseline-shared.png"
+      },
+      {
+        "id": "10.7",
+        "name": "no_debug_artifacts",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No debug output, placeholder scaffolding, or leftover console.log spam is visible in the running app",
+        "reasoning": "No debug output, console-log spam, or placeholder scaffolding was visible in the rendered UI. Evidence: serves_clean_on_start_path-shared.png"
+      },
+      {
+        "id": "10.8",
+        "name": "rapid_input_stays_coherent",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Rapid interaction \u2014 quick suite switches, fast slider drags, rapid undo/redo, palette open/close \u2014 never desyncs views or leaves stale counts",
+        "reasoning": "FAIL: Rapid suite switching stayed coherent, but the full required rapid slider, undo/redo, and palette sequence was not completed and therefore cannot pass. Evidence: console_clean_under_exercise-shared.png"
+      },
+      {
+        "id": "10.9",
+        "name": "all_views_reachable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "All documented views (annotation card, Taxonomy, Review queue, Agreement, Export, History) are reachable from the UI and render completely, including Import on the Labels JSON export surface",
+        "reasoning": "Annotate, Taxonomy, Review queue, Agreement, History, Export, and Labels JSON Import were all reached and rendered visible content. Evidence: all_views_reachable-export.png"
+      },
+      {
+        "id": "10.10",
+        "name": "interactive_within_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive within 2 seconds of a local cold load",
+        "reasoning": "Cold navigation completed in about 1.5 seconds and presented interactive controls. Evidence: reload_returns_seeded_baseline-shared.png"
+      },
+      {
+        "id": "10.11",
+        "name": "field_contract_validation_visible",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "AnnotationCreate, TaxonomyClassCreate, MetadataFieldCreate, DisputeCreate, and Import validation failures show inline messages naming the offending field (for example rating, shortcut, reason, or schemaVersion) before any state mutation",
+        "reasoning": "FAIL: The taxonomy builder exposed required fields, but an invalid shortcut attempt did not produce a visible inline message naming the offending field. Evidence: field_contract_validation_visible-shared.png"
+      },
+      {
+        "id": "10.12",
+        "name": "export_import_end_state_coherent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Download Labels JSON / JSONL and Copy export reflect session annotations, taxonomy, regions, metadata, and review states; Import of a conforming LabelsPackage restores the same visible state without leaving localStorage or sessionStorage populated",
+        "reasoning": "Export visibly exposed Labels JSON, JSONL, and copy/download controls; the visible import workflow loaded current Labels JSON, imported it, restored the export view, and storage stayed empty. Evidence: export_import_end_state_coherent-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"serves_clean_on_start_path\":{\"score\":\"yes\",\"reasoning\":\"Seeded studio rendered at http://localhost:3000 with usable annotation UI and no console errors. Evidence: serves_clean_on_start_path-shared.png\"},\"shared_state_coherence\":{\"score\":\"yes\",\"reasoning\":\"Submitted annotation increased History to 7 and Safety completion to 3, and was reflected in Review queue, Agreement, History/toast, and Export preview without reload. Evidence: shared_state_coherence-submitted.png\"},\"storage_stays_empty\":{\"score\":\"yes\",\"reasoning\":\"After annotation, assist, export/import, and navigation, localStorage and sessionStorage remained empty. Evidence: export_import_end_state_coherent-shared.png\"},\"reload_returns_seeded_baseline\":{\"score\":\"yes\",\"reasoning\":\"Reload restored seeded counts, taxonomy, history count 6, and empty annotation state with empty storage. Evidence: reload_returns_seeded_baseline-shared.png\"},\"console_clean_under_exercise\":{\"score\":\"no\",\"reasoning\":\"FAIL: Console showed no errors during the exercised paths, but the complete required region-drawing and rapid undo/redo exercise was not fully completed, so the pass rule is unmet. Evidence: console_clean_under_exercise-shared.png\"},\"no_outbound_requests\":{\"score\":\"yes\",\"reasoning\":\"Network inspection showed requests exclusively to http://localhost:3000, including the local image asset. Evidence: reload_returns_seeded_baseline-shared.png\"},\"no_debug_artifacts\":{\"score\":\"yes\",\"reasoning\":\"No debug output, console-log spam, or placeholder scaffolding was visible in the rendered UI. Evidence: serves_clean_on_start_path-shared.png\"},\"rapid_input_stays_coherent\":{\"score\":\"no\",\"reasoning\":\"FAIL: Rapid suite switching stayed coherent, but the full required rapid slider, undo/redo, and palette sequence was not completed and therefore cannot pass. Evidence: console_clean_under_exercise-shared.png\"},\"all_views_reachable\":{\"score\":\"yes\",\"reasoning\":\"Annotate, Taxonomy, Review queue, Agreement, History, Export, and Labels JSON Import were all reached and rendered visible content. Evidence: all_views_reachable-export.png\"},\"interactive_within_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"Cold navigation completed in about 1.5 seconds and presented interactive controls. Evidence: reload_returns_seeded_baseline-shared.png\"},\"field_contract_validation_visible\":{\"score\":\"no\",\"reasoning\":\"FAIL: The taxonomy builder exposed required fields, but an invalid shortcut attempt did not produce a visible inline message naming the offending field. Evidence: field_contract_validation_visible-shared.png\"},\"export_import_end_state_coherent\":{\"score\":\"yes\",\"reasoning\":\"Export visibly exposed Labels JSON, JSONL, and copy/download controls; the visible import workflow loaded current Labels JSON, imported it, restored the export view, and storage stayed empty. Evidence: export_import_end_state_coherent-shared.png\"}}",
+    "cost_usd": 0.4530406
+  },
+  "user_flows": {
+    "score": 0.75,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "annotate_end_to_end_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Selecting a suite, choosing thumbs-up, moving all three sliders, typing a comment, and pressing Submit & Next decrements that suite queue badge by exactly one, adds the item to the History tab, advances the card to the next item, and increases the Labels JSON preview annotation count by exactly one, all without a reload, with the new entry showing rating up, integer scores under Accuracy/Clarity/Relevance, and package schemaVersion annotation-studio-labels-v1",
+        "reasoning": "Submitted a live annotation with Up rating, all three sliders moved, and a distinctive comment; History increased, the queue badge decremented, the card advanced, and submission toasts appeared. Evidence: annotate_end_to_end_flow-shared.png"
+      },
+      {
+        "id": "6.2",
+        "name": "invalid_forms_block_inline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting the taxonomy class form or the metadata field form with missing or invalid required fields triggers immediate inline validation naming the field and changes no collection",
+        "reasoning": "Invalid taxonomy shortcut showed inline \u201cShortcut must be exactly one digit\u2026\u201d validation, and clearing the metadata name showed \u201cName is required\u201d; no records were added. Evidence: invalid_forms_block_inline-shared.png"
+      },
+      {
+        "id": "6.3",
+        "name": "taxonomy_edit_flows_through_labels",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Creating a class with shortcut 7 and an icon makes it appear in the class picker; pressing 7 on an image item and dragging draws a box in its color, the box appears in the region list, and the Labels JSON preview then contains the class name in both the taxonomy definition and that item region entry",
+        "reasoning": "FAIL: Created Test Class with shortcut 7 and icon, and shortcut 7 armed the class, but the real drag gesture did not create a region or region-list entry. Evidence: taxonomy_edit_flows_through_labels-shared.png"
+      },
+      {
+        "id": "6.4",
+        "name": "assist_run_recovery_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Running Assist advances steps while the rollup counts up; a step that exhausts retries raises the failure count, its Retry control resumes from that step, pause then resume freezes and continues at the same step, the event timeline records the pause and resume in order, and accepting a Suggested rating fills the card so submitting decrements the queue like a manual annotation",
+        "reasoning": "Assist visibly advanced, counted failures, exposed Retry failed step, pause/resume timeline entries, and accepting a Suggested rating populated scores and enabled submission. Evidence: assist_run_recovery_flow-shared.png"
+      },
+      {
+        "id": "6.5",
+        "name": "dispute_round_trip_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Flagging a disagreement row in the Agreement view moves that item to the top of the Review queue Disputed tier and increments the tier count by one; resolving it returns it to the Reviewed tier and the Stats summary disputed count and agreement figures update to match both views",
+        "reasoning": "Flagging an Agreement disagreement raised the disputed count and placed the item at the top of Review queue; resolving moved it to Reviewed and updated the counts. Evidence: dispute_round_trip_flow-shared.png"
+      },
+      {
+        "id": "6.6",
+        "name": "bulk_undo_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Selecting three queue items and choosing Skip selected moves all three to the end and raises the skipped badge by three; Ctrl+Z restores all three positions, returns the badge to its prior value, and leaves the export preview counts exactly as before the bulk skip",
+        "reasoning": "Three selected items were skipped with a \u201c3 items moved to the end\u201d toast, then Ctrl+Z restored the state; the selection and queue badge returned to their prior values. Evidence: bulk_undo_flow-shared.png"
+      },
+      {
+        "id": "6.7",
+        "name": "palette_navigation_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening the command palette with Ctrl+K, typing part of a queue item title, and pressing Enter opens exactly that item in the annotation card; reopening the palette and choosing the Agreement view entry switches to the Agreement view",
+        "reasoning": "Ctrl+K search opened SAF evaluation 04, and reopening the palette with \u201cAgreement\u201d selected Agreement view. Evidence: palette_navigation_flow-shared.png"
+      },
+      {
+        "id": "6.8",
+        "name": "sidebar_collapse_continuity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At a narrow width the queue sidebar collapses behind a toggle and reopens as an overlay with the same suites, counts, and selection state, preserving workflow continuity",
+        "reasoning": "At 500px the queue collapsed behind Toggle queue and reopened as an overlay with the same suite counts, items, and selection state. Evidence: sidebar_collapse_continuity-shared.png"
+      },
+      {
+        "id": "6.9",
+        "name": "overlays_dismiss_cleanly",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The class form, confirmation dialogs, the dispute reason form, and the palette all close via their cancel control and Escape, returning to the prior view state with no lost work outside the dismissed overlay",
+        "reasoning": "Metadata form was canceled, class form closed with Escape, and the command palette closed with Escape while returning to the prior view. Evidence: overlays_dismiss_cleanly-shared2.png"
+      },
+      {
+        "id": "6.10",
+        "name": "flows_recover_without_reload",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Every flow dead end is recoverable in-app: after deleting a class, emptying a suite, or closing the export view, the user can continue annotating without a page reload",
+        "reasoning": "FAIL: Export was closed and annotation remained usable, but the full required set including deleting a class and emptying a suite was not completed end-to-end. Evidence: export_import_artifact_flow-shared.png"
+      },
+      {
+        "id": "6.11",
+        "name": "export_import_artifact_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After submitting an annotation with a distinctive comment and a region, open Export and confirm Labels JSON shows schemaVersion annotation-studio-labels-v1 plus taxonomy, metadataFields, and items reflecting those values; Download or Copy the Labels JSON, then Import that document and confirm History, Taxonomy, region lists, and review-state chips reconstruct to match",
+        "reasoning": "FAIL: Export visibly contained the required schemaVersion, taxonomy, metadataFields, items, comment, and review states; current JSON was loaded and imported successfully, but the submitted annotation did not have the required distinctive region reconstructed. Evidence: export_import_artifact_flow-shared.png"
+      },
+      {
+        "id": "6.12",
+        "name": "schema_validation_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Attempting TaxonomyClassCreate with a duplicate shortcut saves nothing and names shortcut; DisputeCreate with an empty reason leaves state unchanged and names reason; Import missing schemaVersion or with schemaVersion not annotation-studio-labels-v1 leaves state unchanged and names the field; then a valid class save and a valid LabelsPackage import succeed",
+        "reasoning": "Duplicate shortcut creation returned an error naming shortcut 7; importing {} produced inline schemaVersion validation; a valid class save and valid Labels JSON import both succeeded. Evidence: schema_validation_flow-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"annotate_end_to_end_flow\":{\"score\":\"yes\",\"reasoning\":\"Submitted a live annotation with Up rating, all three sliders moved, and a distinctive comment; History increased, the queue badge decremented, the card advanced, and submission toasts appeared. Evidence: annotate_end_to_end_flow-shared.png\"},\"invalid_forms_block_inline\":{\"score\":\"yes\",\"reasoning\":\"Invalid taxonomy shortcut showed inline \u201cShortcut must be exactly one digit\u2026\u201d validation, and clearing the metadata name showed \u201cName is required\u201d; no records were added. Evidence: invalid_forms_block_inline-shared.png\"},\"taxonomy_edit_flows_through_labels\":{\"score\":\"no\",\"reasoning\":\"FAIL: Created Test Class with shortcut 7 and icon, and shortcut 7 armed the class, but the real drag gesture did not create a region or region-list entry. Evidence: taxonomy_edit_flows_through_labels-shared.png\"},\"assist_run_recovery_flow\":{\"score\":\"yes\",\"reasoning\":\"Assist visibly advanced, counted failures, exposed Retry failed step, pause/resume timeline entries, and accepting a Suggested rating populated scores and enabled submission. Evidence: assist_run_recovery_flow-shared.png\"},\"dispute_round_trip_flow\":{\"score\":\"yes\",\"reasoning\":\"Flagging an Agreement disagreement raised the disputed count and placed the item at the top of Review queue; resolving moved it to Reviewed and updated the counts. Evidence: dispute_round_trip_flow-shared.png\"},\"bulk_undo_flow\":{\"score\":\"yes\",\"reasoning\":\"Three selected items were skipped with a \u201c3 items moved to the end\u201d toast, then Ctrl+Z restored the state; the selection and queue badge returned to their prior values. Evidence: bulk_undo_flow-shared.png\"},\"palette_navigation_flow\":{\"score\":\"yes\",\"reasoning\":\"Ctrl+K search opened SAF evaluation 04, and reopening the palette with \u201cAgreement\u201d selected Agreement view. Evidence: palette_navigation_flow-shared.png\"},\"sidebar_collapse_continuity\":{\"score\":\"yes\",\"reasoning\":\"At 500px the queue collapsed behind Toggle queue and reopened as an overlay with the same suite counts, items, and selection state. Evidence: sidebar_collapse_continuity-shared.png\"},\"overlays_dismiss_cleanly\":{\"score\":\"yes\",\"reasoning\":\"Metadata form was canceled, class form closed with Escape, and the command palette closed with Escape while returning to the prior view. Evidence: overlays_dismiss_cleanly-shared2.png\"},\"flows_recover_without_reload\":{\"score\":\"no\",\"reasoning\":\"FAIL: Export was closed and annotation remained usable, but the full required set including deleting a class and emptying a suite was not completed end-to-end. Evidence: export_import_artifact_flow-shared.png\"},\"export_import_artifact_flow\":{\"score\":\"no\",\"reasoning\":\"FAIL: Export visibly contained the required schemaVersion, taxonomy, metadataFields, items, comment, and review states; current JSON was loaded and imported successfully, but the submitted annotation did not have the required distinctive region reconstructed. Evidence: export_import_artifact_flow-shared.png\"},\"schema_validation_flow\":{\"score\":\"yes\",\"reasoning\":\"Duplicate shortcut creation returned an error naming shortcut 7; importing {} produced inline schemaVersion validation; a valid class save and valid Labels JSON import both succeeded. Evidence: schema_validation_flow-shared.png\"}}",
+    "cost_usd": 0.7888229999999999
+  },
+  "visual_design": {
+    "score": 0.5833,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "layout_sidebar_and_view_switcher",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The layout shows a left sidebar with the queue, History tab, and suite entries, and a main area that swaps between the annotation card, Taxonomy, Review queue, Agreement, and Export views via a toolbar view switcher; the Export view shows Labels JSON / Stats summary tabs with Copy, Download, and Import affordances; the assist step list and timeline render alongside the queue while a run is active",
+        "reasoning": "FAIL: Sidebar, toolbar views, and Export tabs/actions are present, but starting Assist did not render the required step list and timeline. Evidence: layout_sidebar_and_view_switcher-assist.png"
+      },
+      {
+        "id": "2.2",
+        "name": "thumbs_icon_button_treatment",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The thumbs-up and thumbs-down controls use an icon-button style where the selected state renders the icon in the brand blue with a filled background and the unselected button is outlined in a subtle border tone",
+        "reasoning": "Up becomes blue with a filled background while Down remains outlined. Evidence: thumbs_icon_button_treatment-shared.png"
+      },
+      {
+        "id": "2.3",
+        "name": "slider_label_and_value_placement",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Each rubric slider shows its dimension label above the track and its numeric value to the right of the track",
+        "reasoning": "Accuracy, Clarity, and Relevance labels appear beside tracks with numeric values aligned to the right. Evidence: thumbs_icon_button_treatment-shared.png"
+      },
+      {
+        "id": "2.4",
+        "name": "response_tile_reading_comfort",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The response body sits in a tile with a soft light-gray background and generous line height",
+        "reasoning": "Model response is displayed in a light-gray tile with comfortable line spacing. Evidence: thumbs_icon_button_treatment-shared.png"
+      },
+      {
+        "id": "2.5",
+        "name": "queue_structured_list_badges",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The queue sidebar renders as a structured list where suites with remaining items show a count tag badge and skipped counts render as a second, visually distinct badge",
+        "reasoning": "FAIL: Suite count badges are visible, but the exercised skip/reorder action did not produce a second distinct skipped-count badge. Evidence: queue_structured_list_badges-shared.png"
+      },
+      {
+        "id": "2.6",
+        "name": "state_chip_color_mapping_consistent",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Review-state chips use one consistent color mapping everywhere they appear \u2014 Unlabeled neutral gray, Labeled blue, Reviewed green, Disputed red \u2014 identical in the queue, the review queue tiers, the agreement table, and the card header",
+        "reasoning": "FAIL: Gray Unlabeled and blue Labeled states were observed, but the full required mapping was not consistently directly verifiable across every specified view. Evidence: state_chip_color_mapping_consistent-shared.png"
+      },
+      {
+        "id": "2.7",
+        "name": "class_color_consistency",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A class color is identical across its taxonomy swatch, its picker entry, its boxes on the image, and its region list rows",
+        "reasoning": "FAIL: Taxonomy swatches and a blue Person region are visible, but the same class color across picker entry, image box, and region row was not fully directly verified. Evidence: class_color_consistency-taxonomy.png"
+      },
+      {
+        "id": "2.8",
+        "name": "disagreement_warning_not_color_only",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Disagreement-flagged agreement rows carry a distinct warning treatment combining a tinted background with an icon, not color alone",
+        "reasoning": "Disagreement rows use a tinted warning background plus an alert icon in the chip. Evidence: disagreement_warning_not_color_only-shared.png"
+      },
+      {
+        "id": "2.9",
+        "name": "typography_hierarchy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography shows a clear hierarchy: the app title larger than panel headings, which are larger than table body and label text, consistent across views",
+        "reasoning": "The app title is largest, view headings are subordinate, and table/body labels are smaller with consistent hierarchy. Evidence: disagreement_warning_not_color_only-shared.png"
+      },
+      {
+        "id": "2.10",
+        "name": "spacing_rhythm_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Gaps between the sidebar, card, region area, and panels are visually regular with no crowded or orphaned regions",
+        "reasoning": "Sidebar, main card, panels, table sections, and controls use regular gaps without visible crowding. Evidence: disagreement_warning_not_color_only-shared.png"
+      },
+      {
+        "id": "2.11",
+        "name": "control_state_treatments",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Buttons, inputs, selects, sliders, and toggles show distinct default, hover, focus (visible ring), disabled, and error treatments",
+        "reasoning": "FAIL: Default, hover, focus, and disabled states were observed, but a distinct error treatment was not directly observed. Evidence: control_state_treatments-shared.png"
+      },
+      {
+        "id": "2.12",
+        "name": "single_icon_set",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "One consistent icon set is used throughout the toolbar, queue entries, step statuses, and row actions",
+        "reasoning": "Toolbar, queue, taxonomy, review rows, and action controls use a consistent outline icon style. Evidence: disagreement_warning_not_color_only-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"layout_sidebar_and_view_switcher\":{\"score\":\"no\",\"reasoning\":\"FAIL: Sidebar, toolbar views, and Export tabs/actions are present, but starting Assist did not render the required step list and timeline. Evidence: layout_sidebar_and_view_switcher-assist.png\"},\"thumbs_icon_button_treatment\":{\"score\":\"yes\",\"reasoning\":\"Up becomes blue with a filled background while Down remains outlined. Evidence: thumbs_icon_button_treatment-shared.png\"},\"slider_label_and_value_placement\":{\"score\":\"yes\",\"reasoning\":\"Accuracy, Clarity, and Relevance labels appear beside tracks with numeric values aligned to the right. Evidence: thumbs_icon_button_treatment-shared.png\"},\"response_tile_reading_comfort\":{\"score\":\"yes\",\"reasoning\":\"Model response is displayed in a light-gray tile with comfortable line spacing. Evidence: thumbs_icon_button_treatment-shared.png\"},\"queue_structured_list_badges\":{\"score\":\"no\",\"reasoning\":\"FAIL: Suite count badges are visible, but the exercised skip/reorder action did not produce a second distinct skipped-count badge. Evidence: queue_structured_list_badges-shared.png\"},\"state_chip_color_mapping_consistent\":{\"score\":\"no\",\"reasoning\":\"FAIL: Gray Unlabeled and blue Labeled states were observed, but the full required mapping was not consistently directly verifiable across every specified view. Evidence: state_chip_color_mapping_consistent-shared.png\"},\"class_color_consistency\":{\"score\":\"no\",\"reasoning\":\"FAIL: Taxonomy swatches and a blue Person region are visible, but the same class color across picker entry, image box, and region row was not fully directly verified. Evidence: class_color_consistency-taxonomy.png\"},\"disagreement_warning_not_color_only\":{\"score\":\"yes\",\"reasoning\":\"Disagreement rows use a tinted warning background plus an alert icon in the chip. Evidence: disagreement_warning_not_color_only-shared.png\"},\"typography_hierarchy\":{\"score\":\"yes\",\"reasoning\":\"The app title is largest, view headings are subordinate, and table/body labels are smaller with consistent hierarchy. Evidence: disagreement_warning_not_color_only-shared.png\"},\"spacing_rhythm_consistent\":{\"score\":\"yes\",\"reasoning\":\"Sidebar, main card, panels, table sections, and controls use regular gaps without visible crowding. Evidence: disagreement_warning_not_color_only-shared.png\"},\"control_state_treatments\":{\"score\":\"no\",\"reasoning\":\"FAIL: Default, hover, focus, and disabled states were observed, but a distinct error treatment was not directly observed. Evidence: control_state_treatments-shared.png\"},\"single_icon_set\":{\"score\":\"yes\",\"reasoning\":\"Toolbar, queue, taxonomy, review rows, and action controls use a consistent outline icon style. Evidence: disagreement_warning_not_color_only-shared.png\"}}",
+    "cost_usd": 0.5473775999999999
+  },
+  "writing": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "headings_use_consistent_capitalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders headings and section titles, they use consistent capitalization (one convention \u2014 title case or sentence case \u2014 throughout).",
+        "reasoning": "Headings consistently use sentence case across annotation, taxonomy, agreement, and export views. Evidence: initial-shared.png"
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders button or action labels, they are specific verbs (Submit & Next, Run Assist, Copy export, Import), not generic (Submit, OK) when a specific label is possible.",
+        "reasoning": "Actions use clear labels such as New class, Submit & Next, Copy export, Retry failed step, and Flag for dispute. Evidence: initial-shared.png"
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders error messages, they name the problem and the fix (Shortcut 7 is already used by Factual Error; schemaVersion must be annotation-studio-labels-v1), not just a rejection (Invalid).",
+        "reasoning": "The assist failure identifies the affected item and failed attempt count, with a visible Retry failed step action. Evidence: error-shared.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders empty states (completed suite, empty region list, empty timeline filter, empty palette results), the copy explains what belongs there and how to fill it.",
+        "reasoning": "Empty states explain both the condition and next action, including drawing a box to create a region and changing the timeline filter. Evidence: empty-region-shared.png"
+      },
+      {
+        "id": "15.5",
+        "name": "body_copy_is_well_written",
+        "value": 1.0,
+        "raw": 5,
+        "weight": 0.5,
+        "description": "Where the app renders body or descriptive copy, rate how free it is of spelling and grammatical errors.",
+        "reasoning": "Visible copy is clear, grammatical, and free of noticeable spelling errors. Evidence: initial-shared.png"
+      },
+      {
+        "id": "15.6",
+        "name": "terminology_is_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders labels for the same concept in multiple places, terminology is consistent \u2014 the review-state vocabulary is exactly Unlabeled, Labeled, Reviewed, and Disputed everywhere, never synonyms.",
+        "reasoning": "Review-state labels observed in the UI use Unlabeled, Labeled, Reviewed, and related review vocabulary consistently; other terms such as Suggested and Disagreement describe different concepts. Evidence: initial-shared.png"
+      },
+      {
+        "id": "15.7",
+        "name": "numbers_dates_and_units_are_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders numbers, dates, percentages, and counts, formatting is consistent (same date format, same precision for agreement percentages).",
+        "reasoning": "Counts, percentages, score ranges, dimensions, and timestamps use consistent formatting and precision. Evidence: initial-shared.png"
+      },
+      {
+        "id": "15.8",
+        "name": "success_messages_are_specific",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders confirmation and success messages, they state what happened (Skipped 3 items, Export copied), not vague affirmations.",
+        "reasoning": "Confirmation messages identify the action, including Visible export copied and Assist run completed. Evidence: success-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"headings_use_consistent_capitalization\":{\"score\":\"yes\",\"reasoning\":\"Headings consistently use sentence case across annotation, taxonomy, agreement, and export views. Evidence: initial-shared.png\"},\"actions_use_specific_labels\":{\"score\":\"yes\",\"reasoning\":\"Actions use clear labels such as New class, Submit & Next, Copy export, Retry failed step, and Flag for dispute. Evidence: initial-shared.png\"},\"errors_name_problem_and_fix\":{\"score\":\"yes\",\"reasoning\":\"The assist failure identifies the affected item and failed attempt count, with a visible Retry failed step action. Evidence: error-shared.png\"},\"empty_states_explain_next_step\":{\"score\":\"yes\",\"reasoning\":\"Empty states explain both the condition and next action, including drawing a box to create a region and changing the timeline filter. Evidence: empty-region-shared.png\"},\"body_copy_is_well_written\":{\"score\":5,\"reasoning\":\"Visible copy is clear, grammatical, and free of noticeable spelling errors. Evidence: initial-shared.png\"},\"terminology_is_consistent\":{\"score\":\"yes\",\"reasoning\":\"Review-state labels observed in the UI use Unlabeled, Labeled, Reviewed, and related review vocabulary consistently; other terms such as Suggested and Disagreement describe different concepts. Evidence: initial-shared.png\"},\"numbers_dates_and_units_are_consistent\":{\"score\":\"yes\",\"reasoning\":\"Counts, percentages, score ranges, dimensions, and timestamps use consistent formatting and precision. Evidence: initial-shared.png\"},\"success_messages_are_specific\":{\"score\":\"yes\",\"reasoning\":\"Confirmation messages identify the action, including Visible export copied and Assist run completed. Evidence: success-shared.png\"}}",
+    "cost_usd": 0.2866126
+  }
+}

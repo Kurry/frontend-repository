@@ -1,0 +1,36 @@
+{
+  "name": "oracle-static",
+  "private": true,
+  "scripts": {
+    "verify:build": "npm run build && node -e \"require('fs').accessSync('dist/index.html')\"",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs",
+    "start": "npx --yes serve dist -l 3000 -n",
+    "build": "astro build",
+    "dev": "astro dev",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/node": "^11.0.2",
+    "@astrojs/react": "^6.0.1",
+    "@hookform/resolvers": "^5.4.0",
+    "@iconify-json/ph": "^1.2.2",
+    "@nanostores/react": "^1.1.0",
+    "@tailwindcss/vite": "^4.3.2",
+    "astro": "^7.1.1",
+    "astro-icon": "^1.1.5",
+    "daisyui": "^5.6.18",
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.25",
+    "nanostores": "^1.4.0",
+    "phosphor-react": "^1.4.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-hook-form": "^7.82.0",
+    "serve": "^14.2.4",
+    "tailwindcss": "^4.3.2",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.0"
+  }
+}

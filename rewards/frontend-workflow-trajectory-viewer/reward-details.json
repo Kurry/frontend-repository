@@ -1,0 +1,2551 @@
+{
+  "accessibility": {
+    "score": 0.7273,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "controls_are_keyboard_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Catalog entries, table rows, filesystem toggle, timeline entries, scrubber, tree rows, disclosures, forms, annotation links, step-type filter, undo/redo, export tabs, copy/download/import, and the command palette are keyboard accessible with Tab, Shift+Tab, Enter, or Space",
+        "reasoning": "Buttons, radios, slider, timeline entries, and form controls are exposed as keyboard-operable elements. Evidence: timeline-keyboard-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "modals_manage_focus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening the note form or command palette moves focus to its first field; closing returns focus to the originating control; Escape dismisses the overlay",
+        "reasoning": "The annotation dialog focused its first textarea, Escape dismissed it, and focus returned to Annotate. Evidence: validation-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "images_and_icons_have_alt_text",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Images rendered in the file workspace and meaningful icons carry descriptive alternative text or accessible names",
+        "reasoning": "FAIL: Multiple rendered img elements had no accessible names or alt text in the browser snapshot. Evidence: trial-viewer-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "feedback_uses_live_regions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Validation errors and copy-export confirmation are conveyed visually and via ARIA live regions or equivalent accessible announcements",
+        "reasoning": "FAIL: Validation used role=alert, but clicking Copy export produced no visible or live-region confirmation. Evidence: export-copy-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "forms_have_explicit_labels",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Note and classification form fields use explicit labels associated with their inputs",
+        "reasoning": "FAIL: Note fields had explicit labels, but classification selects were visually labeled only by generic text without associated label elements. Evidence: trial-viewer-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "headings_follow_logical_order",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Headings in the catalog, task page, and trial viewer follow a logical order with no skips",
+        "reasoning": "Catalog, task page, and viewer headings followed sequential H1/H2/H3 structure without skips. Evidence: task-page-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "landmark_navigation_is_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Skip-to-content or landmark regions (main, navigation) are present for the catalog and viewer chrome",
+        "reasoning": "The catalog and viewer expose main content plus complementary landmark regions for navigation/workspace areas. Evidence: trial-viewer-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "text_and_controls_have_contrast",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Timeline text, badges, form labels, and export preview text have sufficient color contrast against their backgrounds",
+        "reasoning": "Rendered timeline text, badges, labels, and primary controls were visibly distinguishable against their dark backgrounds. Evidence: trial-viewer-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "semantic_html_roles_are_used",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Semantic roles such as nav, main, and button are used for catalog navigation, viewer chrome, and primary actions",
+        "reasoning": "Primary UI uses semantic main, header, buttons, complementary regions, radiogroups, table, dialog, tabs, and form controls. Evidence: trial-viewer-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "reduced_motion_is_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Animations respect prefers-reduced-motion while timeline, forms, palette, and export remain fully usable",
+        "reasoning": "In the reduced-motion browser, prefers-reduced-motion matched true, transitions/animations were reduced to 0.00001s, and the viewer timeline and export dialog remained usable. Evidence: reduced-viewer-shared.png"
+      },
+      {
+        "id": "1.11",
+        "name": "timeline_keyboard_current",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With the timeline focused, arrow keys move the active step among visible steps, Home and End jump to the first and last visible steps, and the active entry is programmatically marked as current",
+        "reasoning": "ArrowRight moved the timeline from step 1 to 2; End selected step 14; Home returned to step 1, with aria-current=\"step\" observed on the active entry. Evidence: timeline-keyboard-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"controls_are_keyboard_accessible\":{\"score\":\"yes\",\"reasoning\":\"Buttons, radios, slider, timeline entries, and form controls are exposed as keyboard-operable elements. Evidence: timeline-keyboard-shared.png\"},\"modals_manage_focus\":{\"score\":\"yes\",\"reasoning\":\"The annotation dialog focused its first textarea, Escape dismissed it, and focus returned to Annotate. Evidence: validation-shared.png\"},\"images_and_icons_have_alt_text\":{\"score\":\"no\",\"reasoning\":\"FAIL: Multiple rendered img elements had no accessible names or alt text in the browser snapshot. Evidence: trial-viewer-shared.png\"},\"feedback_uses_live_regions\":{\"score\":\"no\",\"reasoning\":\"FAIL: Validation used role=alert, but clicking Copy export produced no visible or live-region confirmation. Evidence: export-copy-shared.png\"},\"forms_have_explicit_labels\":{\"score\":\"no\",\"reasoning\":\"FAIL: Note fields had explicit labels, but classification selects were visually labeled only by generic text without associated label elements. Evidence: trial-viewer-shared.png\"},\"headings_follow_logical_order\":{\"score\":\"yes\",\"reasoning\":\"Catalog, task page, and viewer headings followed sequential H1/H2/H3 structure without skips. Evidence: task-page-shared.png\"},\"landmark_navigation_is_present\":{\"score\":\"yes\",\"reasoning\":\"The catalog and viewer expose main content plus complementary landmark regions for navigation/workspace areas. Evidence: trial-viewer-shared.png\"},\"text_and_controls_have_contrast\":{\"score\":\"yes\",\"reasoning\":\"Rendered timeline text, badges, labels, and primary controls were visibly distinguishable against their dark backgrounds. Evidence: trial-viewer-shared.png\"},\"semantic_html_roles_are_used\":{\"score\":\"yes\",\"reasoning\":\"Primary UI uses semantic main, header, buttons, complementary regions, radiogroups, table, dialog, tabs, and form controls. Evidence: trial-viewer-shared.png\"},\"reduced_motion_is_respected\":{\"score\":\"yes\",\"reasoning\":\"In the reduced-motion browser, prefers-reduced-motion matched true, transitions/animations were reduced to 0.00001s, and the viewer timeline and export dialog remained usable. Evidence: reduced-viewer-shared.png\"},\"timeline_keyboard_current\":{\"score\":\"yes\",\"reasoning\":\"ArrowRight moved the timeline from step 1 to 2; End selected step 14; Home returned to step 1, with aria-current=\\\"step\\\" observed on the active entry. Evidence: timeline-keyboard-shared.png\"}}",
+    "cost_usd": 0.3666646
+  },
+  "behavioral": {
+    "score": 0.4444,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_reset_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Multi-facet reload round-trip: open a trial, add an annotation, submit a classification, set the step-type filter to tool-call, and switch the export tab to Review markdown, then reload. All facets coherently reset to the seeded baseline \u2014 no annotations, no report card, filter back to All, empty undo history, and default export preview with empty annotations and null failure_report \u2014 never a mix where some facets survive",
+        "reasoning": "FAIL: After reload, the annotation, classification, tool-call filter, and Review markdown tab all persisted instead of resetting. Evidence: multi_facet_reset_round_trip-shared.png"
+      },
+      {
+        "id": "14.2",
+        "name": "reward_sort_reversal_live",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sort-reversal proof: on a task page, click the reward column header to sort ascending, note the first and last model names, then click again for descending; the order reverses correctly relative to reward values, proving sort derives from live data rather than two hardcoded orders",
+        "reasoning": "Ascending and descending clicks reversed the live rows by reward: 0.41\u21920.92 and then 0.92\u21920.41. Evidence: reward_sort_reversal_live-shared.png"
+      },
+      {
+        "id": "14.3",
+        "name": "export_and_badges_track_inputs",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Derived-view sensitivity: add a note on step 3, then submit a classification with evidence mentioning a unique phrase; the annotations list, report card, and Review JSON export preview each change to include that note_text and evidence while unrelated trials remain untouched",
+        "reasoning": "The live annotations list, failure report, and Review JSON visibly contained the entered note and unique evidence phrase. Evidence: export_and_badges_track_inputs-shared.png"
+      },
+      {
+        "id": "14.4",
+        "name": "cross_view_echo_without_reload",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cross-view echo: submit a classification on a trial, then confirm the report card and the Export panel failure_report object show the same stage, root_cause, behavior, impact, evidence, and implicated_steps without a reload; clicking an implicated-step link also moves the timeline highlight to that step",
+        "reasoning": "Without reload, the report and export showed matching classification fields, evidence, and implicated step 3; clicking Step 3 left the timeline scrubber at 3. Evidence: cross_view_echo_without_reload-shared.png"
+      },
+      {
+        "id": "14.5",
+        "name": "annotation_count_delta_exact",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Count-delta integrity: note the annotations list count, add exactly one valid note, and immediately confirm the list length increased by exactly one and the Review JSON annotations array length matches; remove that note and confirm both counts decrease by exactly one",
+        "reasoning": "Observed annotation count 0\u21921 after adding one note, Review JSON annotations length 1, then count 1\u21920 after removal and JSON annotations became []. Evidence: annotation_count_delta_exact-shared.png"
+      },
+      {
+        "id": "14.6",
+        "name": "different_reviews_different_exports",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Input-dependent output: on two different trials (or two successive review sessions with Undo between), enter different note_text and different classification enum values, export each Review JSON, and confirm the two previews differ exactly where the entered values differ",
+        "reasoning": "BLOCKED: Only one distinct review input/export pair was completed; a second differing review session was not fully exercised."
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_flows_preserve_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Interleaved-flow integrity: start a note on trial A, switch to trial B via the catalog, classify trial B, return to trial A, and confirm A's draft or saved annotation state is intact while B shows its report card and both export previews reflect only their own trial's review state",
+        "reasoning": "BLOCKED: The required interleaved trial-A/trial-B workflow was not completed."
+      },
+      {
+        "id": "14.8",
+        "name": "empty_annotations_to_repopulated",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Edge-state round-trip: with no annotations, confirm the empty annotations state and an empty annotations array in the export preview; add two notes and a classification, confirm both surfaces fill; Undo until annotations are empty again and failure_report is null, and confirm the empty state and export preview track both transitions",
+        "reasoning": "BLOCKED: Empty state and repopulation were observed separately, but the full two-note/classification/undo round-trip was not completed."
+      },
+      {
+        "id": "14.9",
+        "name": "full_pipeline_to_export_import",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Full-pipeline probe: open a task, sort by reward descending, open the top trial, annotate a late step, submit a valid classification, open Export and confirm Review JSON shows schemaVersion exactly trajectory-viewer.review-package.v1 and carries those values, Copy export with confirmation, then import that JSON after clearing the session edits and confirm the annotations list and report card match the imported package",
+        "reasoning": "BLOCKED: Export, copy confirmation, and import were exercised, but the exact full pipeline with sorted top trial, late-step annotation, and cleared-session import was not completed end-to-end."
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"multi_facet_reset_round_trip\":{\"score\":\"no\",\"reasoning\":\"FAIL: After reload, the annotation, classification, tool-call filter, and Review markdown tab all persisted instead of resetting. Evidence: multi_facet_reset_round_trip-shared.png\"},\"reward_sort_reversal_live\":{\"score\":\"yes\",\"reasoning\":\"Ascending and descending clicks reversed the live rows by reward: 0.41\u21920.92 and then 0.92\u21920.41. Evidence: reward_sort_reversal_live-shared.png\"},\"export_and_badges_track_inputs\":{\"score\":\"yes\",\"reasoning\":\"The live annotations list, failure report, and Review JSON visibly contained the entered note and unique evidence phrase. Evidence: export_and_badges_track_inputs-shared.png\"},\"cross_view_echo_without_reload\":{\"score\":\"yes\",\"reasoning\":\"Without reload, the report and export showed matching classification fields, evidence, and implicated step 3; clicking Step 3 left the timeline scrubber at 3. Evidence: cross_view_echo_without_reload-shared.png\"},\"annotation_count_delta_exact\":{\"score\":\"yes\",\"reasoning\":\"Observed annotation count 0\u21921 after adding one note, Review JSON annotations length 1, then count 1\u21920 after removal and JSON annotations became []. Evidence: annotation_count_delta_exact-shared.png\"},\"different_reviews_different_exports\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Only one distinct review input/export pair was completed; a second differing review session was not fully exercised.\"},\"interleaved_flows_preserve_state\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The required interleaved trial-A/trial-B workflow was not completed.\"},\"empty_annotations_to_repopulated\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Empty state and repopulation were observed separately, but the full two-note/classification/undo round-trip was not completed.\"},\"full_pipeline_to_export_import\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Export, copy confirmation, and import were exercised, but the exact full pipeline with sorted top trial, late-step annotation, and cleared-session import was not completed end-to-end.\"}}",
+    "cost_usd": 0.6587936
+  },
+  "core_features": {
+    "score": 0.8095,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "seeded_catalog_and_task_page",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On load, the task catalog lists exactly 3 seeded benchmark tasks, each showing a task name, a one-line description, a trial count of 3, and a best-reward value; selecting a task opens its page with the instruction text rendered as formatted rich text, a config summary panel, a reference environment file tree, and a test listing with at least 3 named tests",
+        "reasoning": "Observed exactly 3 seeded task cards, then a task page with formatted instruction text, configuration panel, filesystem tree, and 4 evaluator tests. Evidence: seeded_catalog_and_task_page-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "trial_table_columns_complete",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The task page lists all 3 of that task's trials in a comparison table whose columns include model (fictional model names, no real vendor or product names), reward shown as a number between 0 and 1 with two decimals, a pass or fail outcome, duration, and step count",
+        "reasoning": "Observed all 3 trials with fictional model names, two-decimal rewards, outcomes, durations, and step counts. Evidence: trial_table_columns_complete-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "reward_sort_reversal",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Scripted probe: click the reward column header and note the row order, then click it again; the second order is the reverse of the first relative to the reward values, proving the sort derives from live data rather than fixed markup",
+        "reasoning": "Clicked Reward twice; observed order change from 0.41/0.68/0.92 to 0.92/0.68/0.41. Evidence: reward_sort_reversal-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "filesystem_toggle_swaps_tree",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Activating the two-position toggle above the file tree swaps the visible tree between the reference filesystem and the selected trial's final agent filesystem without a full page reload, the two trees differ in content, and the active side is visibly indicated at all times",
+        "reasoning": "Clicked Reference and Trial final; observed different file contents and visible radio selection without reload. Evidence: filesystem_toggle_swaps_tree-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "ingest_checklist_then_viewer_header",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Clicking a trial row first shows a simulated ingest checklist of at least 4 items that tick complete one by one with per-item status icons and an overall progress indicator, then opens the trial viewer whose header strip shows that trial's model name, reward, pass or fail badge, and duration matching its table row",
+        "reasoning": "Observed a 4-item ingest checklist with Complete/Running/Queued states, then the viewer header matching model, reward, fail outcome, and duration. Evidence: ingest_checklist_then_viewer_header-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "timeline_mixed_step_types",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The trial timeline lists at least 12 ordered steps, includes at least one reasoning, one tool call, one observation, one terminal output, and one screenshot step, and each entry shows a step index, a type glyph, a one-line summary, a timestamp, and a status marker; in the trial seeded with a failed step, that step shows an error status in the timeline and an error-styled output in its tool invocation panel while the viewer remains fully functional",
+        "reasoning": "Observed 14 ordered timeline entries with indices, types, timestamps, summaries, statuses, including reasoning, tool call, observation, terminal, screenshot, and an error step with failed terminal output. Evidence: ingest_checklist_then_viewer_header-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "click_step_syncs_all_panes",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Clicking any timeline entry highlights that entry as active and updates both the center file workspace and the right rail step detail to that step's content in the same interaction, without a page reload",
+        "reasoning": "Clicked step 9 and observed active timeline highlight, workspace state after step 9, and matching right-rail details. Evidence: click_step_syncs_all_panes-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "keyboard_and_scrubber_navigation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "With the timeline focused, pressing the arrow keys moves the active step to the previous or next visible step with the newly active entry scrolled into view and the other panes following; dragging the scrubber updates the active step continuously while the handle moves, not only on release",
+        "reasoning": "FAIL: Arrow-key navigation moved the active step and slider value, but continuous scrubber dragging was not fully observed. Evidence: keyboard_and_scrubber_navigation-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "badge_accumulation_probe",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Scripted probe: activate an early step and record which files carry Added/Modified/Deleted/Truncated badges, advance several steps and confirm badges accumulate for newly changed files, then step backward and confirm the badge set recomputes so it reflects only changes at or before the now-active step",
+        "reasoning": "Observed no badges at step 1, Added/Modified/Truncated badges at step 10, and recomputed badges after returning to step 1. Evidence: badge_accumulation_probe-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "file_renderers_by_type",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Selecting files in the tree renders each by type: a markdown file as formatted rich text (headings/lists, not raw markup), a code file in a monospaced block with syntax-aware coloring, a visible language label, and a copy control that shows visible confirmation and places the exact text on the clipboard, an image file scaled to fit its pane, and a tabular data file as a grid with column headers; a file badged Deleted shows a deleted-file notice instead of stale content",
+        "reasoning": "FAIL: Markdown, code, image, table, deleted-file notice, language label, and copy confirmation were observed, but exact clipboard contents could not be directly verified. Evidence: file_renderers_by_type-shared.png"
+      },
+      {
+        "id": "1.11",
+        "name": "terminal_streaming_and_follow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Activating a step with terminal output renders the output progressively (text appears incrementally) with a status affordance distinguishing streaming from complete; while streaming, the panel auto-follows the latest line, scrolling up pauses following and reveals a jump-to-latest control, and activating that control resumes following",
+        "reasoning": "FAIL: Terminal output and complete/streaming states were observed, but scrolling pause, jump-to-latest, and resumed following were not fully exercised. Evidence: terminal_streaming_and_follow-shared.png"
+      },
+      {
+        "id": "1.12",
+        "name": "annotation_round_trip_probe",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Scripted probe: activate a late step, submit a note through the annotate control, confirm the note appears immediately in the annotations list with that step's index, navigate to an early step, click the note, and confirm the timeline highlight, center workspace, and right rail all jump to the annotated step; the note's remove control then deletes exactly that note",
+        "reasoning": "Added a step-14 note, navigated away, clicked the note from the annotations list, observed jump back to step 14, then removed exactly that note. Evidence: annotation_round_trip_probe-shared.png"
+      },
+      {
+        "id": "1.13",
+        "name": "forms_inline_validation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting the note form with empty note_text or text longer than 500 characters shows an inline message naming note_text and attaches nothing; submitting the classification form with any select unset, evidence outside 20\u20132000 characters, or no implicated steps shows inline per-field messages naming each invalid field and creates no report card",
+        "reasoning": "Empty note submission showed note_text validation; empty classification submission showed per-field messages for all required fields. Evidence: forms_inline_validation-shared.png"
+      },
+      {
+        "id": "1.14",
+        "name": "classification_report_links_jump",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting a valid failure classification using the declared enums (stage in planning/tool-use/verification/recovery; root_cause in wrong-tool/missing-context/hallucinated-path/timeout; behavior in loops/abandons/invents-files/ignores-errors; impact in score-zero/partial-credit/flaky-pass/false-pass) renders a report card showing all four chosen classifications, the evidence text, and one link per implicated step; clicking an implicated-step link jumps the viewer to that step, and re-submitting the form updates the existing card in place",
+        "reasoning": "Valid classification produced a report with all four labels, evidence, and Step 9 link; link navigation worked and resubmission updated the existing report card in place. Evidence: classification_report_links_jump-shared.png"
+      },
+      {
+        "id": "1.16",
+        "name": "reasoning_disclosure_remembers_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The reasoning region on a step is collapsed by default, expands and collapses on activation, and after expanding it on one step, navigating away and back shows that step's reasoning still expanded while other steps remain collapsed",
+        "reasoning": "FAIL: The reasoning paragraph was visibly expanded on initial step activation rather than collapsed by default, so the required disclosure behavior was not satisfied. Evidence: click_step_syncs_all_panes-shared.png"
+      },
+      {
+        "id": "1.19",
+        "name": "step_type_filter_narrows_timeline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The step-type filter above the timeline offers All plus reasoning, tool-call, observation, terminal, and screenshot; activating tool-call narrows the visible timeline to tool-call steps only, and choosing All restores the full ordered list",
+        "reasoning": "Applied tool-call filter and observed 4 tool-call entries only; cleared filter and restored the full 14-step timeline. Evidence: step_type_filter_narrows_timeline-shared.png"
+      },
+      {
+        "id": "1.20",
+        "name": "command_palette_jumps_to_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Pressing Ctrl+K or Cmd+K opens a command palette with search focused; typing part of a step summary on the open trial narrows results, and activating a step result makes that step active with timeline, workspace, and detail in sync; Escape closes the palette",
+        "reasoning": "Opened the palette, searched \u201ctargeted,\u201d observed one result, activated it, and confirmed step 9 became active; Escape closed the palette. Evidence: command_palette_jumps_to_step-shared.png"
+      },
+      {
+        "id": "1.21",
+        "name": "undo_redo_review_edits",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After adding an annotation and submitting a classification, Undo restores the prior report and annotation state across the annotations list, report card, and export preview; Redo reapplies them; Undo and Redo disable when their stacks are empty",
+        "reasoning": "Undo removed the latest annotation state and enabled Redo; Redo restored it, with report and annotation controls reflected in the viewer. Evidence: undo_redo_review_edits-shared.png"
+      },
+      {
+        "id": "1.22",
+        "name": "review_package_export_reflects_session",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After annotating at least one step and submitting a valid classification, the Export panel Review JSON preview shows schemaVersion exactly trajectory-viewer.review-package.v1 and contains the exact note_text, step_index, stage, root_cause, behavior, impact, evidence, and implicated_steps just entered under the required keys schemaVersion, exportedAt, trial_id, task_id, model, reward, outcome, duration, step_count, annotations, and failure_report; Copy export puts that exact preview text on the clipboard with visible confirmation, and Download export yields a file matching the preview",
+        "reasoning": "Export preview showed the required schemaVersion and session fields, exact annotation/classification data, visible copy confirmation, and a downloaded JSON file. Evidence: review_package_export_reflects_session-shared.png"
+      },
+      {
+        "id": "1.23",
+        "name": "review_package_import_round_trip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Exporting Review JSON for a trial with annotations and a report, clearing those session edits, then importing that JSON via Import review package reconstructs the annotations list and report card to match the imported payload",
+        "reasoning": "Cleared the review, imported the exported JSON through the visible import form, and observed the annotation and failure report reconstructed. Evidence: review_package_import_round_trip-shared.png"
+      },
+      {
+        "id": "1.24",
+        "name": "annotation_edit_updates_in_place",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Editing an existing annotation's note_text through its edit control updates that entry in place in the annotations list and in the export preview, leaving other notes unchanged",
+        "reasoning": "Edited the existing note; the annotation list changed to \u201cEdited defect note.\u201d and the export preview reflected the new text without altering other state. Evidence: annotation_edit_updates_in_place-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"seeded_catalog_and_task_page\":{\"score\":\"yes\",\"reasoning\":\"Observed exactly 3 seeded task cards, then a task page with formatted instruction text, configuration panel, filesystem tree, and 4 evaluator tests. Evidence: seeded_catalog_and_task_page-shared.png\"},\"trial_table_columns_complete\":{\"score\":\"yes\",\"reasoning\":\"Observed all 3 trials with fictional model names, two-decimal rewards, outcomes, durations, and step counts. Evidence: trial_table_columns_complete-shared.png\"},\"reward_sort_reversal\":{\"score\":\"yes\",\"reasoning\":\"Clicked Reward twice; observed order change from 0.41/0.68/0.92 to 0.92/0.68/0.41. Evidence: reward_sort_reversal-shared.png\"},\"filesystem_toggle_swaps_tree\":{\"score\":\"yes\",\"reasoning\":\"Clicked Reference and Trial final; observed different file contents and visible radio selection without reload. Evidence: filesystem_toggle_swaps_tree-shared.png\"},\"ingest_checklist_then_viewer_header\":{\"score\":\"yes\",\"reasoning\":\"Observed a 4-item ingest checklist with Complete/Running/Queued states, then the viewer header matching model, reward, fail outcome, and duration. Evidence: ingest_checklist_then_viewer_header-shared.png\"},\"timeline_mixed_step_types\":{\"score\":\"yes\",\"reasoning\":\"Observed 14 ordered timeline entries with indices, types, timestamps, summaries, statuses, including reasoning, tool call, observation, terminal, screenshot, and an error step with failed terminal output. Evidence: ingest_checklist_then_viewer_header-shared.png\"},\"click_step_syncs_all_panes\":{\"score\":\"yes\",\"reasoning\":\"Clicked step 9 and observed active timeline highlight, workspace state after step 9, and matching right-rail details. Evidence: click_step_syncs_all_panes-shared.png\"},\"keyboard_and_scrubber_navigation\":{\"score\":\"no\",\"reasoning\":\"FAIL: Arrow-key navigation moved the active step and slider value, but continuous scrubber dragging was not fully observed. Evidence: keyboard_and_scrubber_navigation-shared.png\"},\"badge_accumulation_probe\":{\"score\":\"yes\",\"reasoning\":\"Observed no badges at step 1, Added/Modified/Truncated badges at step 10, and recomputed badges after returning to step 1. Evidence: badge_accumulation_probe-shared.png\"},\"file_renderers_by_type\":{\"score\":\"no\",\"reasoning\":\"FAIL: Markdown, code, image, table, deleted-file notice, language label, and copy confirmation were observed, but exact clipboard contents could not be directly verified. Evidence: file_renderers_by_type-shared.png\"},\"terminal_streaming_and_follow\":{\"score\":\"no\",\"reasoning\":\"FAIL: Terminal output and complete/streaming states were observed, but scrolling pause, jump-to-latest, and resumed following were not fully exercised. Evidence: terminal_streaming_and_follow-shared.png\"},\"annotation_round_trip_probe\":{\"score\":\"yes\",\"reasoning\":\"Added a step-14 note, navigated away, clicked the note from the annotations list, observed jump back to step 14, then removed exactly that note. Evidence: annotation_round_trip_probe-shared.png\"},\"forms_inline_validation\":{\"score\":\"yes\",\"reasoning\":\"Empty note submission showed note_text validation; empty classification submission showed per-field messages for all required fields. Evidence: forms_inline_validation-shared.png\"},\"classification_report_links_jump\":{\"score\":\"yes\",\"reasoning\":\"Valid classification produced a report with all four labels, evidence, and Step 9 link; link navigation worked and resubmission updated the existing report card in place. Evidence: classification_report_links_jump-shared.png\"},\"reasoning_disclosure_remembers_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: The reasoning paragraph was visibly expanded on initial step activation rather than collapsed by default, so the required disclosure behavior was not satisfied. Evidence: click_step_syncs_all_panes-shared.png\"},\"step_type_filter_narrows_timeline\":{\"score\":\"yes\",\"reasoning\":\"Applied tool-call filter and observed 4 tool-call entries only; cleared filter and restored the full 14-step timeline. Evidence: step_type_filter_narrows_timeline-shared.png\"},\"command_palette_jumps_to_step\":{\"score\":\"yes\",\"reasoning\":\"Opened the palette, searched \u201ctargeted,\u201d observed one result, activated it, and confirmed step 9 became active; Escape closed the palette. Evidence: command_palette_jumps_to_step-shared.png\"},\"undo_redo_review_edits\":{\"score\":\"yes\",\"reasoning\":\"Undo removed the latest annotation state and enabled Redo; Redo restored it, with report and annotation controls reflected in the viewer. Evidence: undo_redo_review_edits-shared.png\"},\"review_package_export_reflects_session\":{\"score\":\"yes\",\"reasoning\":\"Export preview showed the required schemaVersion and session fields, exact annotation/classification data, visible copy confirmation, and a downloaded JSON file. Evidence: review_package_export_reflects_session-shared.png\"},\"review_package_import_round_trip\":{\"score\":\"yes\",\"reasoning\":\"Cleared the review, imported the exported JSON through the visible import form, and observed the annotation and failure report reconstructed. Evidence: review_package_import_round_trip-shared.png\"},\"annotation_edit_updates_in_place\":{\"score\":\"yes\",\"reasoning\":\"Edited the existing note; the annotation list changed to \u201cEdited defect note.\u201d and the export preview reflected the new text without altering other state. Evidence: annotation_edit_updates_in_place-shared.png\"}}",
+    "cost_usd": 0.9139841999999999
+  },
+  "design_fidelity": {
+    "score": 0.9,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "spacing_and_sizing_follow_scale",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Spacing and sizing in the three-pane viewer, catalog, and export panel follow a consistent scale with no arbitrary one-off gaps visible in computed styles",
+        "reasoning": "Consistent panel widths, padding, gaps, and hairline dividers are visible across catalog and viewer. Evidence: viewer-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "typography_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography matches the instruction: monospaced for code, terminal, paths, step indices, and export preview; UI sans elsewhere; clear title > heading > body hierarchy",
+        "reasoning": "UI text uses sans-serif while paths, step indices, timestamps, and export content use monospace. Evidence: viewer-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "layout_matches_spec_composition",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 1440px the trial viewer matches the specified three-pane composition (timeline ~1/5, center widest, detail ~1/4) with hairline separators",
+        "reasoning": "At 1440px, measured panes are approximately 299px / 741px / 385px, matching the requested proportions with visible separators. Evidence: viewer-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "specified_state_changes_animate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Transitions are applied to the state changes the spec calls out: step change cross-fade, disclosure height, annotation list enter/exit, report card enter, palette open, and filter row changes",
+        "reasoning": "Rendered elements expose observed 0.15s/0.2s transitions and pane-fade/item-enter animations for viewer state changes. Evidence: viewer-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "responsive_behavior_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Responsive behavior matches the spec: tabbed collapse at 1024px and below, no page-level horizontal scroll at 375px",
+        "reasoning": "At 1024px the layout collapses into Timeline/Workspace/Detail tabs; at 375px document and body scroll widths remain 375px with no page-level horizontal scroll. Evidence: responsive-1024.png, responsive-375.png"
+      },
+      {
+        "id": "3.6",
+        "name": "control_styling_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, selects, filter chips, and export tabs show distinct default, hover, focus, disabled, and error treatments consistent with the dense instrument register",
+        "reasoning": "Controls visibly distinguish active, default, hover, focus, disabled, and export states through color, borders, opacity, and focus treatment. Evidence: export-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "typography_has_clear_hierarchy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography has a clear hierarchy that distinguishes page titles, section headings, and body/label text across catalog and viewer",
+        "reasoning": "Catalog title, task headings, viewer section labels, and body text have clearly differentiated sizes and weights. Evidence: initial-shared.png, viewer-shared.png"
+      },
+      {
+        "id": "3.8",
+        "name": "component_states_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Component states (default, hover, active, disabled) match the instruction for timeline entries, undo/redo, and export controls",
+        "reasoning": "Timeline active styling, disabled Redo state, active tabs, and export control states were directly observed. Evidence: viewer-shared.png"
+      },
+      {
+        "id": "3.9",
+        "name": "surface_treatments_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Status colors, change-badge treatments, and panel shadows/hairlines follow the instruction's visual system",
+        "reasoning": "Dark panels, violet active states, mint status indicators, red destructive action, inset highlights, and hairline borders are visibly consistent. Evidence: viewer-shared.png"
+      },
+      {
+        "id": "3.10",
+        "name": "microinteractions_match_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Microinteraction feedback for hover washes, copy confirmation, and report-card enter follows the motion section in duration and character",
+        "reasoning": "FAIL: Hover wash and enter-transition styling were observed, but a visible copy-confirmation feedback state was not observed after the real Copy export interaction. Evidence: export-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"spacing_and_sizing_follow_scale\":{\"score\":\"yes\",\"reasoning\":\"Consistent panel widths, padding, gaps, and hairline dividers are visible across catalog and viewer. Evidence: viewer-shared.png\"},\"typography_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"UI text uses sans-serif while paths, step indices, timestamps, and export content use monospace. Evidence: viewer-shared.png\"},\"layout_matches_spec_composition\":{\"score\":\"yes\",\"reasoning\":\"At 1440px, measured panes are approximately 299px / 741px / 385px, matching the requested proportions with visible separators. Evidence: viewer-shared.png\"},\"specified_state_changes_animate\":{\"score\":\"yes\",\"reasoning\":\"Rendered elements expose observed 0.15s/0.2s transitions and pane-fade/item-enter animations for viewer state changes. Evidence: viewer-shared.png\"},\"responsive_behavior_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"At 1024px the layout collapses into Timeline/Workspace/Detail tabs; at 375px document and body scroll widths remain 375px with no page-level horizontal scroll. Evidence: responsive-1024.png, responsive-375.png\"},\"control_styling_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"Controls visibly distinguish active, default, hover, focus, disabled, and export states through color, borders, opacity, and focus treatment. Evidence: export-shared.png\"},\"typography_has_clear_hierarchy\":{\"score\":\"yes\",\"reasoning\":\"Catalog title, task headings, viewer section labels, and body text have clearly differentiated sizes and weights. Evidence: initial-shared.png, viewer-shared.png\"},\"component_states_match_spec\":{\"score\":\"yes\",\"reasoning\":\"Timeline active styling, disabled Redo state, active tabs, and export control states were directly observed. Evidence: viewer-shared.png\"},\"surface_treatments_match_spec\":{\"score\":\"yes\",\"reasoning\":\"Dark panels, violet active states, mint status indicators, red destructive action, inset highlights, and hairline borders are visibly consistent. Evidence: viewer-shared.png\"},\"microinteractions_match_spec\":{\"score\":\"no\",\"reasoning\":\"FAIL: Hover wash and enter-transition styling were observed, but a visible copy-confirmation feedback state was not observed after the real Copy export interaction. Evidence: export-shared.png\"}}",
+    "cost_usd": 0.24569300000000002
+  },
+  "edge_cases": {
+    "score": 0.75,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "empty_annotations_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When a trial has no annotations yet, the annotations region shows a designed empty state explaining that notes attach to steps and naming the annotate control",
+        "reasoning": "The viewer shows \u201cNo annotations yet\u201d and explains that notes attach to steps and to use Annotate. Evidence: empty_annotations_state-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "forms_validate_inline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Inline validation appears on the note form and failure classification form before any review state changes",
+        "reasoning": "Submitting empty note and classification forms produced inline field-specific validation before state changed. Evidence: empty_annotations_state-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "errors_are_actionable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Validation and import error messages name the invalid field or problem (for example note_text, evidence, schemaVersion, trial_id) rather than only saying Invalid",
+        "reasoning": "Errors named fields such as note_text, stage, root_cause, behavior, impact, evidence, implicated_steps, and trial_id. Evidence: empty_annotations_state-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "copy_export_confirmation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Copy export shows visible confirmation after placing the preview text on the clipboard",
+        "reasoning": "FAIL: Copy export was clicked, but no visible confirmation appeared. Evidence: empty_filter_timeline_state-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "ingest_shows_progress",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Opening a trial shows the ingest checklist with per-item progress before the viewer appears",
+        "reasoning": "FAIL: Opening a trial showed a loading message, but no per-item ingest checklist was observed before the viewer. Evidence: failed_step_keeps_viewer_working-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "undo_available_for_review_edits",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Undo is available after annotation create/edit/delete and classification submit/update, and restores the prior review state",
+        "reasoning": "FAIL: Undo was verified after annotation creation and classification submission, but the complete required create/edit/delete and submit/update workflows were not all exercised. Evidence: empty_annotations_state-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "failed_step_keeps_viewer_working",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A trial containing a failed step shows an error status on that step in the timeline and an error-styled output in its tool invocation panel, and the viewer keeps working when that step is activated",
+        "reasoning": "Step 9 visibly had an error status; its detail panel showed error-styled terminal output, and the viewer remained interactive with timeline, workspace, and review controls. Evidence: failed_step_keeps_viewer_working-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "long_filenames_truncate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "File names longer than their tree row truncate with an ellipsis in the tree and show the full name in the content pane header when selected",
+        "reasoning": "The long filename is clipped in the narrow tree row and the selected content header displays the full filename. Evidence: long_filenames_truncate-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "empty_filter_timeline_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Choosing a step-type filter that matches no steps shows a designed empty timeline state naming the active filter and a control that clears it",
+        "reasoning": "The error filter on a trial with no error steps showed \u201cNo error steps,\u201d named the active filter, and provided \u201cClear filter.\u201d Evidence: empty_filter_timeline_state-shared.png"
+      },
+      {
+        "id": "4.10",
+        "name": "import_wrong_trial_rejected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Importing a Review JSON whose trial_id does not match the open trial, or whose schemaVersion is not exactly trajectory-viewer.review-package.v1, shows an inline error naming trial_id or schemaVersion and changes no annotations or report",
+        "reasoning": "Importing a valid review package with the wrong trial_id produced the inline error \u201ctrial_id must match the open trial\u201d; annotations remained unchanged. Evidence: empty_filter_timeline_state-shared.png"
+      },
+      {
+        "id": "4.11",
+        "name": "arrow_keys_stop_at_ends",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Arrow-key navigation stops at the first and last visible steps without wrapping or throwing errors",
+        "reasoning": "ArrowLeft at step 1 and ArrowRight at step 14 left the slider at the respective endpoint without wrapping; no console errors were reported. Evidence: arrow_keys_stop_at_ends-shared.png"
+      },
+      {
+        "id": "4.12",
+        "name": "empty_undo_redo_disabled",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Undo with an empty stack and Redo with an empty redo stack are disabled and produce no console errors",
+        "reasoning": "On the initially empty review stack, Undo and Redo were both visibly disabled, and the console contained zero errors. Evidence: empty_annotations_state-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"empty_annotations_state\":{\"score\":\"yes\",\"reasoning\":\"The viewer shows \u201cNo annotations yet\u201d and explains that notes attach to steps and to use Annotate. Evidence: empty_annotations_state-shared.png\"},\"forms_validate_inline\":{\"score\":\"yes\",\"reasoning\":\"Submitting empty note and classification forms produced inline field-specific validation before state changed. Evidence: empty_annotations_state-shared.png\"},\"errors_are_actionable\":{\"score\":\"yes\",\"reasoning\":\"Errors named fields such as note_text, stage, root_cause, behavior, impact, evidence, implicated_steps, and trial_id. Evidence: empty_annotations_state-shared.png\"},\"copy_export_confirmation\":{\"score\":\"no\",\"reasoning\":\"FAIL: Copy export was clicked, but no visible confirmation appeared. Evidence: empty_filter_timeline_state-shared.png\"},\"ingest_shows_progress\":{\"score\":\"no\",\"reasoning\":\"FAIL: Opening a trial showed a loading message, but no per-item ingest checklist was observed before the viewer. Evidence: failed_step_keeps_viewer_working-shared.png\"},\"undo_available_for_review_edits\":{\"score\":\"no\",\"reasoning\":\"FAIL: Undo was verified after annotation creation and classification submission, but the complete required create/edit/delete and submit/update workflows were not all exercised. Evidence: empty_annotations_state-shared.png\"},\"failed_step_keeps_viewer_working\":{\"score\":\"yes\",\"reasoning\":\"Step 9 visibly had an error status; its detail panel showed error-styled terminal output, and the viewer remained interactive with timeline, workspace, and review controls. Evidence: failed_step_keeps_viewer_working-shared.png\"},\"long_filenames_truncate\":{\"score\":\"yes\",\"reasoning\":\"The long filename is clipped in the narrow tree row and the selected content header displays the full filename. Evidence: long_filenames_truncate-shared.png\"},\"empty_filter_timeline_state\":{\"score\":\"yes\",\"reasoning\":\"The error filter on a trial with no error steps showed \u201cNo error steps,\u201d named the active filter, and provided \u201cClear filter.\u201d Evidence: empty_filter_timeline_state-shared.png\"},\"import_wrong_trial_rejected\":{\"score\":\"yes\",\"reasoning\":\"Importing a valid review package with the wrong trial_id produced the inline error \u201ctrial_id must match the open trial\u201d; annotations remained unchanged. Evidence: empty_filter_timeline_state-shared.png\"},\"arrow_keys_stop_at_ends\":{\"score\":\"yes\",\"reasoning\":\"ArrowLeft at step 1 and ArrowRight at step 14 left the slider at the respective endpoint without wrapping; no console errors were reported. Evidence: arrow_keys_stop_at_ends-shared.png\"},\"empty_undo_redo_disabled\":{\"score\":\"yes\",\"reasoning\":\"On the initially empty review stack, Undo and Redo were both visibly disabled, and the console contained zero errors. Evidence: empty_annotations_state-shared.png\"}}",
+    "cost_usd": 1.08473
+  },
+  "innovation": {
+    "score": 0.8182,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "delightful_microinteractions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Where the build goes beyond the spec, it adds unique, delightful microinteractions \u2014 for example a flourish when a review package first becomes non-empty",
+        "reasoning": "No beyond-spec flourish was present; passes vacuously. Evidence: annotation-visible-shared.png"
+      },
+      {
+        "id": "11.2",
+        "name": "advanced_motion_mechanics",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Where present beyond the spec, advanced animation mechanics (choreographed pane transitions, staggered badge updates) elevate the viewer's motion language",
+        "reasoning": "No advanced choreography or staggered mechanics were observed; passes vacuously. Evidence: trial-viewer-shared.png"
+      },
+      {
+        "id": "11.3",
+        "name": "guided_onboarding_or_shortcuts",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Where present, a guided first-run tour of annotate-classify-export or an on-screen shortcut reference for the command palette goes beyond the specification",
+        "reasoning": "The command palette is accessible and shows keyboard hints (K/ESC). Evidence: command-palette-shared.png"
+      },
+      {
+        "id": "11.4",
+        "name": "step_bookmark_strip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Where present, a step bookmark strip that lets reviewers pin and jump between bookmarked steps goes beyond the required annotation list",
+        "reasoning": "No bookmark feature is offered; passes vacuously. Evidence: trial-viewer-shared.png"
+      },
+      {
+        "id": "11.5",
+        "name": "before_after_file_diff",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Where present, a side-by-side before and after file diff for Modified badges goes beyond the required single-file renderer",
+        "reasoning": "No modified-file diff is offered; passes vacuously. Evidence: trial-viewer-shared.png"
+      },
+      {
+        "id": "11.6",
+        "name": "preference_personalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Where present, a configurable density or theme mode beyond the base requirement personalizes the workspace",
+        "reasoning": "No density or theme personalization control is offered; passes vacuously. Evidence: trial-viewer-shared.png"
+      },
+      {
+        "id": "11.7",
+        "name": "polished_product_narrative",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Where present, the viewer carries a polished product identity \u2014 cohesive naming and purposeful empty states that make the review-package story legible",
+        "reasoning": "Traceframe presents cohesive reviewer identity and purposeful empty states such as \u201cNo annotations yet.\u201d Evidence: trial-viewer-shared.png"
+      },
+      {
+        "id": "11.8",
+        "name": "keyboard_driven_annotation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Where present, keyboard-driven annotation entry from the timeline goes beyond the required annotate control",
+        "reasoning": "No keyboard annotation entry is offered; passes vacuously. Evidence: trial-viewer-shared.png"
+      },
+      {
+        "id": "11.9",
+        "name": "platform_features_where_apt",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Where the genre allows, web platform features (rich clipboard export, print-friendly markdown report) are used to genuine benefit",
+        "reasoning": "Export supports live JSON and Markdown previews, copying, and downloading. Evidence: markdown-export-shared.png"
+      },
+      {
+        "id": "11.10",
+        "name": "competition_level_innovation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Competition-level innovation beyond the specification is visible to users",
+        "reasoning": "FAIL: The observed command palette, annotations, coverage map, and export workflow are useful but no distinct competition-level innovation beyond the specified reviewer product was visible. Evidence: trial-viewer-shared.png"
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "FAIL: No additional noteworthy enhancement outside the covered criteria was observed. Evidence: trial-viewer-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"delightful_microinteractions\":{\"score\":\"yes\",\"reasoning\":\"No beyond-spec flourish was present; passes vacuously. Evidence: annotation-visible-shared.png\"},\"advanced_motion_mechanics\":{\"score\":\"yes\",\"reasoning\":\"No advanced choreography or staggered mechanics were observed; passes vacuously. Evidence: trial-viewer-shared.png\"},\"guided_onboarding_or_shortcuts\":{\"score\":\"yes\",\"reasoning\":\"The command palette is accessible and shows keyboard hints (K/ESC). Evidence: command-palette-shared.png\"},\"step_bookmark_strip\":{\"score\":\"yes\",\"reasoning\":\"No bookmark feature is offered; passes vacuously. Evidence: trial-viewer-shared.png\"},\"before_after_file_diff\":{\"score\":\"yes\",\"reasoning\":\"No modified-file diff is offered; passes vacuously. Evidence: trial-viewer-shared.png\"},\"preference_personalization\":{\"score\":\"yes\",\"reasoning\":\"No density or theme personalization control is offered; passes vacuously. Evidence: trial-viewer-shared.png\"},\"polished_product_narrative\":{\"score\":\"yes\",\"reasoning\":\"Traceframe presents cohesive reviewer identity and purposeful empty states such as \u201cNo annotations yet.\u201d Evidence: trial-viewer-shared.png\"},\"keyboard_driven_annotation\":{\"score\":\"yes\",\"reasoning\":\"No keyboard annotation entry is offered; passes vacuously. Evidence: trial-viewer-shared.png\"},\"platform_features_where_apt\":{\"score\":\"yes\",\"reasoning\":\"Export supports live JSON and Markdown previews, copying, and downloading. Evidence: markdown-export-shared.png\"},\"competition_level_innovation\":{\"score\":\"no\",\"reasoning\":\"FAIL: The observed command palette, annotations, coverage map, and export workflow are useful but no distinct competition-level innovation beyond the specified reviewer product was visible. Evidence: trial-viewer-shared.png\"},\"innovation_catchall\":{\"score\":\"no\",\"reasoning\":\"FAIL: No additional noteworthy enhancement outside the covered criteria was observed. Evidence: trial-viewer-shared.png\"}}",
+    "cost_usd": 0.2389074
+  },
+  "motion": {
+    "score": 0.4286,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "hover_washes_required",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Hovering with the real pointer shows a full-width hover wash on timeline entries, trial table rows, and file tree rows, buttons ease background and shadow with a slight press effect, and form controls show focus rings \u2014 verified while hovering, not from static styles",
+        "reasoning": "FAIL: Timeline, trial-row, and file-row hover washes and easing were observed, but the required focus-ring and press-effect behavior was not fully verified. Evidence: hover-washes-required-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "step_change_crossfade",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Changing the active step through the real timeline controls (click or arrow keys, never a state-shortcut tool call) eases the highlight to the new entry and cross-fades the center and right pane content over roughly 150 to 250 milliseconds rather than snapping instantly",
+        "reasoning": "A real timeline click changed the active step; at ~100ms the pane opacity was 0.795 with a transition, and settled content updated. Evidence: step-change-crossfade-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "disclosure_chevron_height_ease",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Activating the reasoning region or a tool output panel expands and collapses it with an eased height transition while the disclosure chevron rotates over roughly 0.2 seconds",
+        "reasoning": "FAIL: The disclosure toggled aria-expanded, but computed transitions were only `all` with no measurable ~0.2s height/chevron easing. Evidence: disclosure-chevron-height-ease-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "terminal_streaming_indicator",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Activating a terminal-bearing step through the real UI streams its output incrementally with a cursor or streaming indicator while active, and the indicator visibly changes state when streaming completes",
+        "reasoning": "A real terminal-step click showed STREAMING during activation, then changed to COMPLETE with streamed output after completion. Evidence: terminal-streaming-indicator-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "annotation_list_microinteractions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Driven through the real UI controls: a newly added annotation animates into the annotations list and a removed annotation animates out rather than appearing or vanishing instantly, ingest checklist items tick complete with an animated check transition, the code copy control briefly swaps to a confirmation state after copying, and a newly created classification report card enters with a short opacity and scale transition",
+        "reasoning": "FAIL: Annotation creation and removal were exercised, but the observed annotation transition was only `all` with no measurable animation; checklist, copy confirmation, and report-card transitions were not fully demonstrated. Evidence: annotation-list-microinteractions-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "reduced_motion_respected",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, animations are removed and state changes apply instantly, while every surface and flow (step navigation, streaming completion, forms, palette, export) remains complete and usable",
+        "reasoning": "FAIL: Reduced motion was confirmed and transitions were reduced to approximately 1e-05s, but the complete required set of flows was not fully exercised; initial trial ingestion also remained RUNNING before settling. Evidence: reduced-motion-respected-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "palette_and_filter_motion",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Driven through the real UI: the command palette opens with a short opacity and scale transition, and filtered timeline rows animate out and back when the step-type filter changes rather than snapping",
+        "reasoning": "The real command-palette opening showed mid-transition opacity 0.416 and scale transform; changing the real filter showed timeline rows mid-transition at opacity 0.717 and translated position. Evidence: palette-and-filter-motion-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"hover_washes_required\":{\"score\":\"no\",\"reasoning\":\"FAIL: Timeline, trial-row, and file-row hover washes and easing were observed, but the required focus-ring and press-effect behavior was not fully verified. Evidence: hover-washes-required-shared.png\"},\"step_change_crossfade\":{\"score\":\"yes\",\"reasoning\":\"A real timeline click changed the active step; at ~100ms the pane opacity was 0.795 with a transition, and settled content updated. Evidence: step-change-crossfade-shared.png\"},\"disclosure_chevron_height_ease\":{\"score\":\"no\",\"reasoning\":\"FAIL: The disclosure toggled aria-expanded, but computed transitions were only `all` with no measurable ~0.2s height/chevron easing. Evidence: disclosure-chevron-height-ease-shared.png\"},\"terminal_streaming_indicator\":{\"score\":\"yes\",\"reasoning\":\"A real terminal-step click showed STREAMING during activation, then changed to COMPLETE with streamed output after completion. Evidence: terminal-streaming-indicator-shared.png\"},\"annotation_list_microinteractions\":{\"score\":\"no\",\"reasoning\":\"FAIL: Annotation creation and removal were exercised, but the observed annotation transition was only `all` with no measurable animation; checklist, copy confirmation, and report-card transitions were not fully demonstrated. Evidence: annotation-list-microinteractions-shared.png\"},\"reduced_motion_respected\":{\"score\":\"no\",\"reasoning\":\"FAIL: Reduced motion was confirmed and transitions were reduced to approximately 1e-05s, but the complete required set of flows was not fully exercised; initial trial ingestion also remained RUNNING before settling. Evidence: reduced-motion-respected-shared.png\"},\"palette_and_filter_motion\":{\"score\":\"yes\",\"reasoning\":\"The real command-palette opening showed mid-transition opacity 0.416 and scale transform; changing the real filter showed timeline rows mid-transition at opacity 0.717 and translated position. Evidence: palette-and-filter-motion-shared.png\"}}",
+    "cost_usd": 0.576961
+  },
+  "performance": {
+    "score": 0.3333,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_is_under_two_seconds",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Cold start to interactive catalog is under 2 seconds on local render",
+        "reasoning": "FAIL: Browser timing showed the catalog load at about 1.96s and interactive observation at about 2.07s, so under-two-second interactivity was not established. Evidence: perf-initial-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "console_is_clean",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Browser devtools show no errors or warnings on load or during a full exercise including scrub, annotate, classify, palette, undo, and export",
+        "reasoning": "No errors or warnings were reported during navigation and exercised interactions; only an informational React DevTools message appeared. Evidence: trial-viewer-shared.png"
+      },
+      {
+        "id": "9.3",
+        "name": "transitions_respond_under_100ms",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Activating timeline steps, filter chips, and export tabs begins responding in under 100ms of the gesture",
+        "reasoning": "FAIL: Timeline interaction visibly responded, but browser observations did not establish that timeline, filters, and export tabs all began responding within 100ms. Evidence: trial-viewer-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "async_work_has_loading_indicators",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Trial ingest shows its checklist progress indicator before the viewer appears",
+        "reasoning": "BLOCKED: The rendered app exposed seeded trial review but no reachable trial-ingest workflow, so the requested pre-viewer checklist state could not be exercised. Evidence: perf-initial-shared.png"
+      },
+      {
+        "id": "9.5",
+        "name": "timeline_scrub_without_lag",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapidly scrubbing across all steps of a trial stays smooth with no hangs and no pane showing a step other than the active one",
+        "reasoning": "Rapid ArrowRight scrubbing moved the slider through all 14 steps and ended on step 14 with the workspace and step details both showing step 14, without a hang. Evidence: trial-viewer-shared.png"
+      },
+      {
+        "id": "9.6",
+        "name": "state_changes_remain_interactive",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The timeline, tree, forms, undo, and export preview remain interactive while terminal output is streaming",
+        "reasoning": "FAIL: Selecting terminal step 13 worked, but its output was already complete rather than visibly streaming, so interactivity during streaming could not be verified. Evidence: trial-viewer-shared.png"
+      },
+      {
+        "id": "9.7",
+        "name": "animations_maintain_smooth_frame_rate",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Step cross-fades, annotation list motion, and palette open stay smooth without visible frame drops during normal use",
+        "reasoning": "FAIL: Step and palette interactions were reachable, but no visible transient animation or smooth frame-rate behavior was directly established; computed styles showed no active animations. Evidence: palette-shared.png"
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_input_does_not_freeze",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Rapid scrubbing, filter toggling, palette typing, and undo/redo do not hang or freeze the UI",
+        "reasoning": "FAIL: Rapid scrubbing and palette typing remained responsive, but the full required sequence including filter toggling and undo/redo was not completed, so the criterion was not fully verified. Evidence: palette-shared.png"
+      },
+      {
+        "id": "9.10",
+        "name": "palette_typing_stays_responsive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening the command palette and typing to narrow results stays responsive with no dropped keystrokes",
+        "reasoning": "The command palette opened and accepted all typed characters in \u201cterminal\u201d without dropped keystrokes or freezing, updating the result state to zero matches. Evidence: palette-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_start_is_under_two_seconds\":{\"score\":\"no\",\"reasoning\":\"FAIL: Browser timing showed the catalog load at about 1.96s and interactive observation at about 2.07s, so under-two-second interactivity was not established. Evidence: perf-initial-shared.png\"},\"console_is_clean\":{\"score\":\"yes\",\"reasoning\":\"No errors or warnings were reported during navigation and exercised interactions; only an informational React DevTools message appeared. Evidence: trial-viewer-shared.png\"},\"transitions_respond_under_100ms\":{\"score\":\"no\",\"reasoning\":\"FAIL: Timeline interaction visibly responded, but browser observations did not establish that timeline, filters, and export tabs all began responding within 100ms. Evidence: trial-viewer-shared.png\"},\"async_work_has_loading_indicators\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The rendered app exposed seeded trial review but no reachable trial-ingest workflow, so the requested pre-viewer checklist state could not be exercised. Evidence: perf-initial-shared.png\"},\"timeline_scrub_without_lag\":{\"score\":\"yes\",\"reasoning\":\"Rapid ArrowRight scrubbing moved the slider through all 14 steps and ended on step 14 with the workspace and step details both showing step 14, without a hang. Evidence: trial-viewer-shared.png\"},\"state_changes_remain_interactive\":{\"score\":\"no\",\"reasoning\":\"FAIL: Selecting terminal step 13 worked, but its output was already complete rather than visibly streaming, so interactivity during streaming could not be verified. Evidence: trial-viewer-shared.png\"},\"animations_maintain_smooth_frame_rate\":{\"score\":\"no\",\"reasoning\":\"FAIL: Step and palette interactions were reachable, but no visible transient animation or smooth frame-rate behavior was directly established; computed styles showed no active animations. Evidence: palette-shared.png\"},\"rapid_input_does_not_freeze\":{\"score\":\"no\",\"reasoning\":\"FAIL: Rapid scrubbing and palette typing remained responsive, but the full required sequence including filter toggling and undo/redo was not completed, so the criterion was not fully verified. Evidence: palette-shared.png\"},\"palette_typing_stays_responsive\":{\"score\":\"yes\",\"reasoning\":\"The command palette opened and accepted all typed characters in \u201cterminal\u201d without dropped keystrokes or freezing, updating the result state to zero matches. Evidence: palette-shared.png\"}}",
+    "cost_usd": 0.250971
+  },
+  "responsiveness": {
+    "score": 0.8,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "layout_adapts_desktop_to_mobile",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 1440px the three-pane trial viewer is visible; at 1024px and below it collapses to the tabbed timeline/workspace/detail arrangement; at 375px the app remains usable without page-level horizontal scroll",
+        "reasoning": "Three panes are visible on desktop, switchable Timeline/Workspace/Detail tabs appear at 1024px, and the mobile viewer fits the viewport. Evidence: layout-desktop-viewer-shared.png, layout-tablet-shared.png, responsive-mobile-shared.png"
+      },
+      {
+        "id": "7.2",
+        "name": "mobile_tap_targets_are_large_enough",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Timeline tabs, filter controls, undo/redo, export tabs, and primary buttons remain usable tap targets on a 375px viewport",
+        "reasoning": "Mobile tabs are about 40px high, filter controls are usable-sized, and undo/redo/export controls are at least 36px high. Evidence: responsive-mobile-shared.png"
+      },
+      {
+        "id": "7.3",
+        "name": "typography_resizes_across_breakpoints",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Page titles, section headings, and body/label text remain legible and hierarchically distinct from 1440px down to 375px",
+        "reasoning": "The page title changes from 48px desktop to 36px mobile while headings and body text remain distinct and legible. Evidence: responsive-desktop-shared.png, catalog-mobile-shared.png"
+      },
+      {
+        "id": "7.4",
+        "name": "content_avoids_clipping_and_overflow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At 375px, content never clips or overflows the viewport; code blocks, the terminal, and the export preview scroll horizontally within their own containers if needed",
+        "reasoning": "FAIL: The mobile header visibly clips the Export control, and the export preview content extends horizontally with overflow behavior visible. Evidence: responsive-mobile-shared.png, export-mobile-shared.png"
+      },
+      {
+        "id": "7.5",
+        "name": "chrome_adapts_to_small_screens",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 1024px and below the three panes become switchable tabs and the active step stays consistent across tab switches",
+        "reasoning": "At 1024px and mobile widths the three panes become Timeline/Workspace/Detail tabs; switching tabs preserved the active step 1. Evidence: layout-tablet-shared.png"
+      },
+      {
+        "id": "7.6",
+        "name": "stacking_reflows_logically",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At narrow widths the catalog, task page, and viewer reflow into a single-column stack without overlapping controls",
+        "reasoning": "The task page and catalog reflow into single-column cards/panels on mobile without page-level horizontal scroll; the trial table uses its own horizontal overflow container. Evidence: catalog-mobile-shared.png, stack-mobile-shared.png"
+      },
+      {
+        "id": "7.7",
+        "name": "palette_usable_on_mobile",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px the command palette overlay fits the viewport, the search field stays reachable, and results scroll within the overlay",
+        "reasoning": "The command palette fits within the mobile viewport, its search field is reachable, and the results list has its own vertical scrolling container. Evidence: palette-mobile-shared.png"
+      },
+      {
+        "id": "7.8",
+        "name": "small_screens_avoid_horizontal_scroll",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px there is no page-level horizontal scrolling",
+        "reasoning": "At 375px, document and body scroll widths were measured at the viewport width with horizontal overflow hidden. Evidence: responsive-mobile-shared.png"
+      },
+      {
+        "id": "7.9",
+        "name": "media_and_previews_resize",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Images in the file workspace and the export preview size responsively to fit their containers at desktop and mobile widths",
+        "reasoning": "The workspace image resized to 165px wide on mobile and 475px wide on desktop with max-width 100%; the export preview fit its modal and exposed an internal horizontal scrollbar. Evidence: media-mobile-shared.png, media-desktop-shared.png, export-mobile-shared.png"
+      },
+      {
+        "id": "7.10",
+        "name": "fixed_controls_remain_accessible",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Header undo/redo, export entry, and palette triggers remain reachable at all specified widths",
+        "reasoning": "FAIL: Undo/redo and Export remain visible, but the command-palette trigger is positioned beyond the 375px viewport and is not reachable without horizontal displacement. Evidence: responsive-mobile-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"layout_adapts_desktop_to_mobile\":{\"score\":\"yes\",\"reasoning\":\"Three panes are visible on desktop, switchable Timeline/Workspace/Detail tabs appear at 1024px, and the mobile viewer fits the viewport. Evidence: layout-desktop-viewer-shared.png, layout-tablet-shared.png, responsive-mobile-shared.png\"},\"mobile_tap_targets_are_large_enough\":{\"score\":\"yes\",\"reasoning\":\"Mobile tabs are about 40px high, filter controls are usable-sized, and undo/redo/export controls are at least 36px high. Evidence: responsive-mobile-shared.png\"},\"typography_resizes_across_breakpoints\":{\"score\":\"yes\",\"reasoning\":\"The page title changes from 48px desktop to 36px mobile while headings and body text remain distinct and legible. Evidence: responsive-desktop-shared.png, catalog-mobile-shared.png\"},\"content_avoids_clipping_and_overflow\":{\"score\":\"no\",\"reasoning\":\"FAIL: The mobile header visibly clips the Export control, and the export preview content extends horizontally with overflow behavior visible. Evidence: responsive-mobile-shared.png, export-mobile-shared.png\"},\"chrome_adapts_to_small_screens\":{\"score\":\"yes\",\"reasoning\":\"At 1024px and mobile widths the three panes become Timeline/Workspace/Detail tabs; switching tabs preserved the active step 1. Evidence: layout-tablet-shared.png\"},\"stacking_reflows_logically\":{\"score\":\"yes\",\"reasoning\":\"The task page and catalog reflow into single-column cards/panels on mobile without page-level horizontal scroll; the trial table uses its own horizontal overflow container. Evidence: catalog-mobile-shared.png, stack-mobile-shared.png\"},\"palette_usable_on_mobile\":{\"score\":\"yes\",\"reasoning\":\"The command palette fits within the mobile viewport, its search field is reachable, and the results list has its own vertical scrolling container. Evidence: palette-mobile-shared.png\"},\"small_screens_avoid_horizontal_scroll\":{\"score\":\"yes\",\"reasoning\":\"At 375px, document and body scroll widths were measured at the viewport width with horizontal overflow hidden. Evidence: responsive-mobile-shared.png\"},\"media_and_previews_resize\":{\"score\":\"yes\",\"reasoning\":\"The workspace image resized to 165px wide on mobile and 475px wide on desktop with max-width 100%; the export preview fit its modal and exposed an internal horizontal scrollbar. Evidence: media-mobile-shared.png, media-desktop-shared.png, export-mobile-shared.png\"},\"fixed_controls_remain_accessible\":{\"score\":\"no\",\"reasoning\":\"FAIL: Undo/redo and Export remain visible, but the command-palette trigger is positioned beyond the 375px viewport and is not reachable without horizontal displacement. Evidence: responsive-mobile-shared.png\"}}",
+    "cost_usd": 0.46166240000000003
+  },
+  "technical": {
+    "score": 0.7143,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "shared_state_coherence",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "All panes derive from one shared state: changing the active step from any control (timeline click, arrow keys, scrubber, annotation link, report link, command palette) updates the timeline highlight, file tree badges, and right rail together in one interaction, and an added, edited, or removed annotation plus a classification submit update the annotations list, report card, and export preview immediately without a reload",
+        "reasoning": "Active-step search updated the timeline, slider, workspace, and details; annotation, classification, and JSON export updated immediately. Evidence: shared_state_coherence-after-review.png"
+      },
+      {
+        "id": "2.2",
+        "name": "no_storage_reload_seeded",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No browser storage is used: localStorage and sessionStorage remain empty after opening trials, scrubbing, annotating, classifying, exporting, and undoing, and a page reload returns the app to its seeded state \u2014 the 3-task catalog with no annotations, no classification reports, empty undo history, and a default export preview with empty annotations and a null failure_report",
+        "reasoning": "After reload the seeded 3-task catalog returned, with empty storage; reopening a trial showed zero annotations and no report. Evidence: no_storage_reload_seeded-shared.png"
+      },
+      {
+        "id": "2.5",
+        "name": "console_clean_full_exercise",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The console is free of errors and warnings on load and stays clean after opening tasks and trials, scrubbing the timeline, streaming terminal output, filtering steps, using the command palette, annotating, classifying, undoing, and exporting",
+        "reasoning": "Console inspection after the exercised workflows reported 0 errors and 0 warnings. Evidence: shared_state_coherence-after-review.png"
+      },
+      {
+        "id": "2.7",
+        "name": "load_and_interaction_stability",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive (catalog entries respond to activation) within 2 seconds of a local cold load, rapidly scrubbing back and forth across all steps of a trial stays smooth with no hangs, no dropped interactions, and no pane showing a step other than the active one, and the timeline, tree, forms, undo, and export preview remain responsive while terminal output is streaming",
+        "reasoning": "Catalog activation completed promptly; Home/End and rapid ArrowRight/ArrowLeft scrubbing across all 14 steps kept the active timeline, workspace, and details synchronized. Evidence: shared_state_coherence-trial.png"
+      },
+      {
+        "id": "2.8",
+        "name": "keyboard_operability_focus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Every interactive control \u2014 catalog entries, table rows, the filesystem toggle, timeline entries, the scrubber, tree rows, disclosure toggles, form fields, annotation links, step-type filter, undo and redo, export format tabs, copy and download, import, and the command palette \u2014 is reachable and operable with the keyboard alone with a visible focus indicator, Home and End jump the timeline to the first and last visible steps, the active timeline entry is programmatically marked as current, opening the note form or command palette moves focus to its first field with focus returning to the opening control on close, and overlays close on the Escape key",
+        "reasoning": "FAIL: Command palette and annotation dialogs focus their first fields, and Home/End work, but Escape closes the command palette with focus returning to BODY rather than the opening control. Evidence: shared_state_coherence-after-review.png"
+      },
+      {
+        "id": "2.10",
+        "name": "labels_errors_alt_text",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Form fields have visible labels, each validation message names the field it belongs to (including note_text, stage, root_cause, behavior, impact, evidence, and implicated_steps) and renders in association with that field, and images rendered in the file workspace carry descriptive alternative text",
+        "reasoning": "FAIL: Visible form labels and field-specific validation were observed, but file-workspace image/icon elements lacked descriptive alternative text. Evidence: labels_errors_alt_text-shared.png"
+      },
+      {
+        "id": "2.11",
+        "name": "api_shaped_form_and_export_contracts",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The note and classification forms enforce the declared API-shaped bounds and enums (note_text non-empty \u2264500 chars; stage/root_cause/behavior/impact restricted to their declared option sets; evidence 20\u20132000 chars; implicated_steps non-empty), and the Review JSON export uses the same field names and nesting with schemaVersion exactly trajectory-viewer.review-package.v1 plus exportedAt, trial_id, task_id, model, reward, outcome, duration, step_count, annotations[].note_text/step_index, and failure_report.stage/root_cause/behavior/impact/evidence/implicated_steps (or null)",
+        "reasoning": "Visible forms exposed the declared labels/bounds and enum choices; validation rejected empty note_text, and Review JSON visibly matched the required schemaVersion, fields, nesting, and failure_report structure. Evidence: shared_state_coherence-after-review.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"shared_state_coherence\":{\"score\":\"yes\",\"reasoning\":\"Active-step search updated the timeline, slider, workspace, and details; annotation, classification, and JSON export updated immediately. Evidence: shared_state_coherence-after-review.png\"},\"no_storage_reload_seeded\":{\"score\":\"yes\",\"reasoning\":\"After reload the seeded 3-task catalog returned, with empty storage; reopening a trial showed zero annotations and no report. Evidence: no_storage_reload_seeded-shared.png\"},\"console_clean_full_exercise\":{\"score\":\"yes\",\"reasoning\":\"Console inspection after the exercised workflows reported 0 errors and 0 warnings. Evidence: shared_state_coherence-after-review.png\"},\"load_and_interaction_stability\":{\"score\":\"yes\",\"reasoning\":\"Catalog activation completed promptly; Home/End and rapid ArrowRight/ArrowLeft scrubbing across all 14 steps kept the active timeline, workspace, and details synchronized. Evidence: shared_state_coherence-trial.png\"},\"keyboard_operability_focus\":{\"score\":\"no\",\"reasoning\":\"FAIL: Command palette and annotation dialogs focus their first fields, and Home/End work, but Escape closes the command palette with focus returning to BODY rather than the opening control. Evidence: shared_state_coherence-after-review.png\"},\"labels_errors_alt_text\":{\"score\":\"no\",\"reasoning\":\"FAIL: Visible form labels and field-specific validation were observed, but file-workspace image/icon elements lacked descriptive alternative text. Evidence: labels_errors_alt_text-shared.png\"},\"api_shaped_form_and_export_contracts\":{\"score\":\"yes\",\"reasoning\":\"Visible forms exposed the declared labels/bounds and enum choices; validation rejected empty note_text, and Review JSON visibly matched the required schemaVersion, fields, nesting, and failure_report structure. Evidence: shared_state_coherence-after-review.png\"}}",
+    "cost_usd": 0.3254758
+  },
+  "user_flows": {
+    "score": 0.6,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "open_trial_end_to_end",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Comparing and opening a trial end to end: open a task from the catalog, sort its trial table by reward descending, click the top row, watch the ingest checklist complete, and land in the viewer with step 1 active and the header showing that trial's model, reward, outcome, and duration",
+        "reasoning": "FAIL: reward-desc sorting did not visibly reorder the trials; the top opened trial remained reward 0.41 rather than the highest reward. Evidence: open_trial_end_to_end-shared.png"
+      },
+      {
+        "id": "6.2",
+        "name": "scrub_inspect_files_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Scrubbing and inspecting files: drag the scrubber to a mid-trial step, confirm the file tree badges reflect only changes up to that step, select a badged code file and see it rendered with coloring and a working copy control, then advance one step and see any new change badge appear",
+        "reasoning": "FAIL: scrubbing to step 7, badges, syntax-colored code, and Copy code worked, but the required advance to step 8 and verification of a newly appearing badge was not completed. Evidence: timeline_filter_flow-shared.png"
+      },
+      {
+        "id": "6.3",
+        "name": "annotate_and_return_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Annotating and returning: activate a late step, attach a note to it, navigate back to an early step, then click the note in the annotations list and land back on the annotated step with all three panes in sync",
+        "reasoning": "Late-step note was created, the viewer was moved to step 1, and clicking the annotation returned to step 14 with timeline, workspace, and details synchronized. Evidence: annotate_and_return_flow-shared.png"
+      },
+      {
+        "id": "6.4",
+        "name": "classify_failure_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Classifying a failure: submit the classification form with fields missing and see per-field messages, correct every field using the declared enum values, submit, and see the report card with implicated-step links that jump the viewer when clicked",
+        "reasoning": "Missing submission showed per-field validation; valid enum values and evidence produced a Failure report with an implicated Step 14 link. Evidence: classify_failure_flow-shared.png"
+      },
+      {
+        "id": "6.5",
+        "name": "timeline_filter_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Filtering the timeline: choose the tool-call step-type filter, confirm only tool-call steps remain, activate one, then clear the filter and confirm the full ordered timeline returns with the same step still active when it is still in range",
+        "reasoning": "The tool-call filter showed only 4 tool-call steps; step 7 was activated, then clearing returned the ordered 14-step timeline with step 7 still active. Evidence: timeline_filter_flow-shared.png"
+      },
+      {
+        "id": "6.6",
+        "name": "command_palette_jump_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Command palette jump: press Ctrl+K or Cmd+K, type part of a step summary, activate the match, and land on that step with timeline, workspace, and detail in sync",
+        "reasoning": "Ctrl+K opened the palette, searching \u201csmallest implementation\u201d returned step 7, and selecting it synchronized timeline, workspace, and detail panes. Evidence: command_palette_jump_flow-shared.png"
+      },
+      {
+        "id": "6.7",
+        "name": "export_closes_the_loop",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export closes the loop: after annotating at least one step and submitting a valid classification, open the Export panel, confirm Review JSON shows schemaVersion exactly trajectory-viewer.review-package.v1 and carries the exact values just entered, copy it with visible confirmation, then Undo the classification and confirm the preview's failure_report becomes null while annotations remain until undone",
+        "reasoning": "Review JSON showed schemaVersion trajectory-viewer.review-package.v1 and the entered annotation/report values; Copy export displayed confirmation. Undo removed failure_report while the annotation remained. Evidence: export_closes_the_loop-shared.png"
+      },
+      {
+        "id": "6.8",
+        "name": "import_round_trip_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Import round trip: export Review JSON for a trial with annotations and a report, clear the annotations and report, import that JSON, and confirm the annotations list and report card match the imported values",
+        "reasoning": "FAIL: after clearing the review, the import workflow did not expose a usable import dialog or restore the exported annotation/report; the visible export preview remained empty. Evidence: export_closes_the_loop-shared.png"
+      },
+      {
+        "id": "6.9",
+        "name": "reload_returns_seeded_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A page reload returns the app to its seeded state: the task catalog with 3 tasks, no annotations, no classification reports, empty undo history, and a default export preview with empty annotations and a null failure_report",
+        "reasoning": "FAIL: reload visibly returned the catalog with exactly 3 tasks, but the default export preview and all seeded review-state fields were not fully observed after that reload. Evidence: reload_returns_seeded_state-shared.png"
+      },
+      {
+        "id": "6.10",
+        "name": "invalid_create_shows_inline_validation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Invalid note or classification submission triggers immediate inline validation naming the offending fields and changes no review state",
+        "reasoning": "Submitting the empty classification form immediately displayed named inline errors for stage, root_cause, behavior, impact, evidence, and implicated_steps without changing review state. Evidence: classify_failure_flow-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"open_trial_end_to_end\":{\"score\":\"no\",\"reasoning\":\"FAIL: reward-desc sorting did not visibly reorder the trials; the top opened trial remained reward 0.41 rather than the highest reward. Evidence: open_trial_end_to_end-shared.png\"},\"scrub_inspect_files_flow\":{\"score\":\"no\",\"reasoning\":\"FAIL: scrubbing to step 7, badges, syntax-colored code, and Copy code worked, but the required advance to step 8 and verification of a newly appearing badge was not completed. Evidence: timeline_filter_flow-shared.png\"},\"annotate_and_return_flow\":{\"score\":\"yes\",\"reasoning\":\"Late-step note was created, the viewer was moved to step 1, and clicking the annotation returned to step 14 with timeline, workspace, and details synchronized. Evidence: annotate_and_return_flow-shared.png\"},\"classify_failure_flow\":{\"score\":\"yes\",\"reasoning\":\"Missing submission showed per-field validation; valid enum values and evidence produced a Failure report with an implicated Step 14 link. Evidence: classify_failure_flow-shared.png\"},\"timeline_filter_flow\":{\"score\":\"yes\",\"reasoning\":\"The tool-call filter showed only 4 tool-call steps; step 7 was activated, then clearing returned the ordered 14-step timeline with step 7 still active. Evidence: timeline_filter_flow-shared.png\"},\"command_palette_jump_flow\":{\"score\":\"yes\",\"reasoning\":\"Ctrl+K opened the palette, searching \u201csmallest implementation\u201d returned step 7, and selecting it synchronized timeline, workspace, and detail panes. Evidence: command_palette_jump_flow-shared.png\"},\"export_closes_the_loop\":{\"score\":\"yes\",\"reasoning\":\"Review JSON showed schemaVersion trajectory-viewer.review-package.v1 and the entered annotation/report values; Copy export displayed confirmation. Undo removed failure_report while the annotation remained. Evidence: export_closes_the_loop-shared.png\"},\"import_round_trip_flow\":{\"score\":\"no\",\"reasoning\":\"FAIL: after clearing the review, the import workflow did not expose a usable import dialog or restore the exported annotation/report; the visible export preview remained empty. Evidence: export_closes_the_loop-shared.png\"},\"reload_returns_seeded_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: reload visibly returned the catalog with exactly 3 tasks, but the default export preview and all seeded review-state fields were not fully observed after that reload. Evidence: reload_returns_seeded_state-shared.png\"},\"invalid_create_shows_inline_validation\":{\"score\":\"yes\",\"reasoning\":\"Submitting the empty classification form immediately displayed named inline errors for stage, root_cause, behavior, impact, evidence, and implicated_steps without changing review state. Evidence: classify_failure_flow-shared.png\"}}",
+    "cost_usd": 0.9354442
+  },
+  "visual_design": {
+    "score": 0.7333,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "three_pane_workspace_composition",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At a 1440px viewport the trial viewer composes as a fixed three-pane workspace separated by hairline borders \u2014 a left timeline rail roughly one fifth of the width, a center file workspace as the widest pane, and a right detail rail roughly one quarter \u2014 reading as one instrument rather than a stack of disconnected cards",
+        "reasoning": "PASS \u2014 At 1440px, the live viewer shows fixed timeline, center workspace, and detail panes with hairline separations. Evidence: trial-viewer-loaded-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "type_roles_and_hierarchy",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A monospaced face is used for code, terminal output, file paths, step indices, and the export preview while a UI sans is used elsewhere, and page titles are visibly larger than section headings, which are larger than body and label text, consistently across views",
+        "reasoning": "FAIL: Terminal output and paths use monospace, but the visible trial-viewer page title hierarchy is inconsistent: the h1 is visually hidden and section headings are not consistently subordinate to a visible page title. Evidence: trial-viewer-loaded-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "status_color_system_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "One status color system is applied consistently wherever a status appears (timeline markers, tool panels, outcome badges): a single accent marks the active step, green marks complete/pass, red marks error/fail, amber marks running/streaming, and every status also carries a text label or glyph so color is never the only indicator",
+        "reasoning": "PASS \u2014 Complete/pass/fail/streaming states are visibly distinct and carry text labels or glyphs, with green completion, red failure, amber streaming, and an accent active step. Evidence: trial-viewer-loaded-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "change_badge_treatments_distinct",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Added, Modified, Deleted, and Truncated change badges each render a visually distinct treatment and always include their word, never a color chip alone",
+        "reasoning": "PASS \u2014 Added, Modified, Deleted, and Truncated badges are all visibly present as distinct labeled treatments. Evidence: change_badge_treatments_distinct-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "dense_register_icons_states",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The trial table, timeline, and file tree use compact dense rows with cards and panels carrying subtle shadows and hairline borders rather than heavy outlines, one consistent icon set is used across the chrome, and the ingest checklist, empty terminal, empty annotations, and empty filtered timeline states are each deliberately designed surfaces with explanatory copy rather than blank regions",
+        "reasoning": "BLOCKED: Dense rows, file tree, empty terminal, empty annotations, and empty filtered timeline were observed, but no ingest checklist surface was reachable for verification. Evidence: dense_register_icons_states-filtered-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "tabbed_collapse_small_viewport",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At a viewport of 1024px wide or below, the three panes collapse into a tabbed arrangement where timeline, workspace, and detail are switchable one at a time, and the active step stays consistent across tab switches",
+        "reasoning": "PASS \u2014 At 1024px the panes collapse into Timeline, Workspace, and Detail tabs; switching tabs preserves the active step 1. Evidence: tabbed_collapse_small_viewport-shared.png"
+      },
+      {
+        "id": "3.9",
+        "name": "copy_conventions_specific_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Headings, buttons, and labels follow one consistent capitalization convention throughout, and action labels are specific verbs (Add note, Classify failure, Copy export, Import review package) rather than generic labels where a specific one is possible",
+        "reasoning": "PASS \u2014 Labels consistently use title-style capitalization and specific actions such as Import review package, Add/Annotate, Classify failure, Copy export, and Clear filter. Evidence: trial-viewer-loaded-shared.png"
+      },
+      {
+        "id": "3.11",
+        "name": "export_and_palette_first_class",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Export panel shows a monospaced preview with clear format tabs, and the command palette is a centered overlay with a distinct search field and ranked results, reading as first-class surfaces rather than afterthought dialogs",
+        "reasoning": "PASS \u2014 Export is a centered panel with JSON/Markdown tabs, monospaced preview, and copy/download actions; the command palette is a centered overlay with search and ranked action/step results. Evidence: export_and_palette_first_class-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"three_pane_workspace_composition\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 At 1440px, the live viewer shows fixed timeline, center workspace, and detail panes with hairline separations. Evidence: trial-viewer-loaded-shared.png\"},\"type_roles_and_hierarchy\":{\"score\":\"no\",\"reasoning\":\"FAIL: Terminal output and paths use monospace, but the visible trial-viewer page title hierarchy is inconsistent: the h1 is visually hidden and section headings are not consistently subordinate to a visible page title. Evidence: trial-viewer-loaded-shared.png\"},\"status_color_system_consistent\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Complete/pass/fail/streaming states are visibly distinct and carry text labels or glyphs, with green completion, red failure, amber streaming, and an accent active step. Evidence: trial-viewer-loaded-shared.png\"},\"change_badge_treatments_distinct\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Added, Modified, Deleted, and Truncated badges are all visibly present as distinct labeled treatments. Evidence: change_badge_treatments_distinct-shared.png\"},\"dense_register_icons_states\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Dense rows, file tree, empty terminal, empty annotations, and empty filtered timeline were observed, but no ingest checklist surface was reachable for verification. Evidence: dense_register_icons_states-filtered-shared.png\"},\"tabbed_collapse_small_viewport\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 At 1024px the panes collapse into Timeline, Workspace, and Detail tabs; switching tabs preserves the active step 1. Evidence: tabbed_collapse_small_viewport-shared.png\"},\"copy_conventions_specific_labels\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Labels consistently use title-style capitalization and specific actions such as Import review package, Add/Annotate, Classify failure, Copy export, and Clear filter. Evidence: trial-viewer-loaded-shared.png\"},\"export_and_palette_first_class\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Export is a centered panel with JSON/Markdown tabs, monospaced preview, and copy/download actions; the command palette is a centered overlay with search and ranked action/step results. Evidence: export_and_palette_first_class-shared.png\"} }",
+    "cost_usd": 0.41146540000000004
+  },
+  "writing": {
+    "score": 0.625,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "headings_use_consistent_capitalization",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Where the app renders headings and section titles (catalog, task page, trial viewer, Export panel), they use consistent capitalization throughout",
+        "reasoning": "FAIL: Headings mix title case (\u201cTask Instruction\u201d, \u201cConfiguration\u201d) with sentence case (\u201cEnvironment files\u201d, \u201cEvaluator tests\u201d, \u201cTrial comparison\u201d). Evidence: headings_use_consistent_capitalization-task.png"
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders button or action labels, they are specific verbs such as Add note, Classify failure, Copy export, and Import review package, not generic Submit or OK when a specific label is possible",
+        "reasoning": "Buttons use concrete labels such as \u201cImport review package\u201d, \u201cCopy export\u201d, \u201cDownload export\u201d, and \u201cClassify failure\u201d. Evidence: actions_use_specific_labels-shared.png"
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Where the app renders validation or import errors, they name the field or problem (note_text, evidence, schemaVersion, trial_id) and the fix, not just Invalid",
+        "reasoning": "FAIL: The import error identifies `review_json` and malformed JSON, but does not state a corrective fix. Evidence: errors_name_problem_and_fix-shared.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders empty states (annotations, terminal, filtered timeline), the copy explains what belongs there and the control that fills it",
+        "reasoning": "The empty annotation state says notes attach evidence and instructs the user to use Annotate; the terminal empty state explains selecting a terminal step. Evidence: empty_states_explain_next_step-shared.png"
+      },
+      {
+        "id": "15.5",
+        "name": "body_copy_is_well_written",
+        "value": 1.0,
+        "raw": 5,
+        "weight": 0.5,
+        "description": "Where the app renders body or helper copy in the catalog, ingest checklist, and export panel, rate how free it is of spelling and grammatical errors",
+        "reasoning": "Catalog, ingest, and export copy is clear, grammatical, and professional. Evidence: actions_use_specific_labels-shared.png"
+      },
+      {
+        "id": "15.6",
+        "name": "terminology_is_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders labels for the same concept in multiple places, terminology is consistent for annotations, failure report fields, and export formats",
+        "reasoning": "The UI consistently uses annotations, failure classification, Review JSON, and Review markdown across the viewer and export/import surfaces. Evidence: actions_use_specific_labels-shared.png"
+      },
+      {
+        "id": "15.7",
+        "name": "numbers_dates_and_units_are_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders rewards, durations, and step indices, formatting is consistent (reward to two decimals, step indices numeric)",
+        "reasoning": "Rewards display with two decimals, durations use consistent minute/second formatting, and step indices remain numeric throughout. Evidence: headings_use_consistent_capitalization-task.png"
+      },
+      {
+        "id": "15.8",
+        "name": "success_messages_are_specific",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Where the app renders confirmation after Copy export or successful import, the message states what happened rather than a vague affirmation",
+        "reasoning": "FAIL: After clicking Copy export, no specific confirmation message was observed. Evidence: actions_use_specific_labels-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"headings_use_consistent_capitalization\":{\"score\":\"no\",\"reasoning\":\"FAIL: Headings mix title case (\u201cTask Instruction\u201d, \u201cConfiguration\u201d) with sentence case (\u201cEnvironment files\u201d, \u201cEvaluator tests\u201d, \u201cTrial comparison\u201d). Evidence: headings_use_consistent_capitalization-task.png\"},\"actions_use_specific_labels\":{\"score\":\"yes\",\"reasoning\":\"Buttons use concrete labels such as \u201cImport review package\u201d, \u201cCopy export\u201d, \u201cDownload export\u201d, and \u201cClassify failure\u201d. Evidence: actions_use_specific_labels-shared.png\"},\"errors_name_problem_and_fix\":{\"score\":\"no\",\"reasoning\":\"FAIL: The import error identifies `review_json` and malformed JSON, but does not state a corrective fix. Evidence: errors_name_problem_and_fix-shared.png\"},\"empty_states_explain_next_step\":{\"score\":\"yes\",\"reasoning\":\"The empty annotation state says notes attach evidence and instructs the user to use Annotate; the terminal empty state explains selecting a terminal step. Evidence: empty_states_explain_next_step-shared.png\"},\"body_copy_is_well_written\":{\"score\":5,\"reasoning\":\"Catalog, ingest, and export copy is clear, grammatical, and professional. Evidence: actions_use_specific_labels-shared.png\"},\"terminology_is_consistent\":{\"score\":\"yes\",\"reasoning\":\"The UI consistently uses annotations, failure classification, Review JSON, and Review markdown across the viewer and export/import surfaces. Evidence: actions_use_specific_labels-shared.png\"},\"numbers_dates_and_units_are_consistent\":{\"score\":\"yes\",\"reasoning\":\"Rewards display with two decimals, durations use consistent minute/second formatting, and step indices remain numeric throughout. Evidence: headings_use_consistent_capitalization-task.png\"},\"success_messages_are_specific\":{\"score\":\"no\",\"reasoning\":\"FAIL: After clicking Copy export, no specific confirmation message was observed. Evidence: actions_use_specific_labels-shared.png\"}}",
+    "cost_usd": 0.25485399999999997
+  }
+}

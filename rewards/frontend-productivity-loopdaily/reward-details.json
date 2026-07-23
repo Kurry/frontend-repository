@@ -1,0 +1,2832 @@
+{
+  "accessibility": {
+    "score": 0.9,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "habit_controls_keyboard_reachable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every interactive control \u2014 New Habit fields, category chips, steppers, one-tap complete, drag handle, Pause/Resume, Export as JSON, Import, and Load Malformed Sample \u2014 is reachable with keyboard Tab and activatable with Enter or Space, and shows a clearly visible focus indicator",
+        "reasoning": "yes \u2014 Native fields and buttons are tabbable, and keyboard focus shows a visible 3px outline. Evidence: habit_controls_keyboard_reachable-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "import_dialog_traps_and_restores_focus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Import confirmation dialog traps focus while open and returns focus to the invoking Import control on Cancel or Confirm close",
+        "reasoning": "yes \u2014 Tab cycled between dialog controls, and Cancel closed the dialog and restored focus to Import from JSON. Evidence: import_dialog_traps_and_restores_focus-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "chrome_icons_have_accessible_names",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "App chrome icons (Phosphor set) used as controls expose accessible names via aria-label or equivalent text, and decorative icons are hidden from assistive tech",
+        "reasoning": "yes \u2014 Control icons expose aria-labels, while decorative SVG icons use aria-hidden=\"true\". Evidence: semantic_buttons_for_checkin_and_filters-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "recovery_and_malformed_use_alert_live_region",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The recovery notice and Load Malformed Sample outcome are announced through a role=alert live region without requiring focus to move to them",
+        "reasoning": "yes \u2014 Loading the malformed sample produced visible assertive role=alert live regions without moving focus. Evidence: recovery_and_malformed_use_alert_live_region-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "new_habit_fields_explicitly_labeled",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "New Habit form fields (name, icon, targetType, targetCount, category, reminder) and category-create name use explicit labels programmatically associated with their inputs; inline field-contract errors are adjacent to and associated with the named field",
+        "reasoning": "yes \u2014 Habit name, target count, category, reminder, target groups, icon group, and category-create name are explicitly labeled; validation errors are adjacent and associated via aria-describedby. Evidence: new_habit_fields_explicitly_labeled-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "view_headings_logical_order",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "View titles for habits, Stats, Heatmap, and Import/Data use a logical heading order without skipping levels (for example H1 then H2)",
+        "reasoning": "yes \u2014 Habits, Stats, Heatmap, and Data views use H1 followed by H2, with nested H3 sections where present. Evidence: view_headings_logical_order-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "main_landmark_for_habit_shell",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The habit list / Stats / Heatmap shell exposes a main landmark (or equivalent) so keyboard and assistive-tech users can jump past chrome",
+        "reasoning": "yes \u2014 The shell exposes a native main landmark containing the primary content. Evidence: habit_controls_keyboard_reachable-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "habit_text_and_controls_contrast",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Primary text (#1B2430 on #F4F7F6/#FFFFFF), muted secondary text, primary buttons (#0F9D74 with white text), and category chips maintain sufficient contrast for readable labels and active states",
+        "reasoning": "FAIL: Primary green button text measured about 3.45:1 against #0F9D74, below the usual 4.5:1 threshold for normal-sized labels. Evidence: habit_text_and_controls_contrast-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "semantic_buttons_for_checkin_and_filters",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Check-in, stepper, category filter chips, Pause/Resume, Export as JSON, and Import use semantic button (or equivalent role=button) controls rather than bare non-interactive divs",
+        "reasoning": "yes \u2014 Check-in, filters, pause/resume, drag handle, export, import, and related controls are implemented as native buttons; the target count uses a native number input. Evidence: semantic_buttons_for_checkin_and_filters-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "reduced_motion_drops_celebration",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, decorative animations and the streak-milestone confetti celebration are removed or reduced while check-in state, flame treatment, and list membership still update instantly and correctly",
+        "reasoning": "yes \u2014 With prefers-reduced-motion enabled, check-in updated immediately, no confetti appeared, and the card animation duration was reduced to 1e-06s. Evidence: reduced_motion_drops_celebration-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"habit_controls_keyboard_reachable\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Native fields and buttons are tabbable, and keyboard focus shows a visible 3px outline. Evidence: habit_controls_keyboard_reachable-shared.png\"},\"import_dialog_traps_and_restores_focus\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Tab cycled between dialog controls, and Cancel closed the dialog and restored focus to Import from JSON. Evidence: import_dialog_traps_and_restores_focus-shared.png\"},\"chrome_icons_have_accessible_names\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Control icons expose aria-labels, while decorative SVG icons use aria-hidden=\\\"true\\\". Evidence: semantic_buttons_for_checkin_and_filters-shared.png\"},\"recovery_and_malformed_use_alert_live_region\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Loading the malformed sample produced visible assertive role=alert live regions without moving focus. Evidence: recovery_and_malformed_use_alert_live_region-shared.png\"},\"new_habit_fields_explicitly_labeled\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Habit name, target count, category, reminder, target groups, icon group, and category-create name are explicitly labeled; validation errors are adjacent and associated via aria-describedby. Evidence: new_habit_fields_explicitly_labeled-shared.png\"},\"view_headings_logical_order\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Habits, Stats, Heatmap, and Data views use H1 followed by H2, with nested H3 sections where present. Evidence: view_headings_logical_order-shared.png\"},\"main_landmark_for_habit_shell\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 The shell exposes a native main landmark containing the primary content. Evidence: habit_controls_keyboard_reachable-shared.png\"},\"habit_text_and_controls_contrast\":{\"score\":\"no\",\"reasoning\":\"FAIL: Primary green button text measured about 3.45:1 against #0F9D74, below the usual 4.5:1 threshold for normal-sized labels. Evidence: habit_text_and_controls_contrast-shared.png\"},\"semantic_buttons_for_checkin_and_filters\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Check-in, filters, pause/resume, drag handle, export, import, and related controls are implemented as native buttons; the target count uses a native number input. Evidence: semantic_buttons_for_checkin_and_filters-shared.png\"},\"reduced_motion_drops_celebration\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 With prefers-reduced-motion enabled, check-in updated immediately, no confetti appeared, and the card animation duration was reduced to 1e-06s. Evidence: reduced_motion_drops_celebration-shared.png\"}}",
+    "cost_usd": 0.2982812
+  },
+  "behavioral": {
+    "score": 0.625,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_persistence_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Multi-facet round-trip: create habits in two categories, set a reminder, reorder, select a category chip, then reload \u2014 habits, categories, completions, reminders, order, and active filter all survive together with no facet reverting alone",
+        "reasoning": "FAIL: Habits and reminders persisted, but category assignment/filter and reorder were not successfully established together. Evidence: habit_count_delta_exact-shared.png"
+      },
+      {
+        "id": "14.2",
+        "name": "drag_reorder_persists_across_checkin",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Reorder proof: drag a habit to a new position, note the order, complete a check-in on another habit \u2014 the order stays unchanged, proving order is live state rather than a hardcoded list",
+        "reasoning": "FAIL: A real drag was performed, but the visible order remained unchanged, so reorder persistence was not demonstrated. Evidence: habit_count_delta_exact-shared.png"
+      },
+      {
+        "id": "14.3",
+        "name": "stats_and_trend_respond_to_checkin",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Derived-view sensitivity: record a check-in and confirm Stats monthly completions and the trend chart's today value change meaningfully rather than redrawing identically",
+        "reasoning": "The post-check-in Stats view showed 1 July completion and a populated trend chart, while the pre-check-in habit view showed zero completions. Evidence: checkin_echoes_grid_heatmap_stats-shared.png"
+      },
+      {
+        "id": "14.4",
+        "name": "checkin_echoes_grid_heatmap_stats",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cross-view echo: complete a habit check-in and confirm today's weekly-grid cell, Heatmap shading, and Stats monthly completions update without reload",
+        "reasoning": "After check-in, the weekly grid showed Today done, the heatmap marked Jul 23 complete, and Stats showed 1 July completion without reload. Evidence: checkin_echoes_grid_heatmap_stats-shared.png"
+      },
+      {
+        "id": "14.5",
+        "name": "habit_count_delta_exact",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Count-delta integrity: measure the visible habit list count immediately before and after a valid New Habit submit; the delta is exactly one",
+        "reasoning": "The visible list went from the empty \u201cNo habits yet\u201d state to exactly one habit after a valid submit. Evidence: habit_count_delta_exact-shared.png"
+      },
+      {
+        "id": "14.6",
+        "name": "once_vs_count_targets_differ",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Input-dependent output: create one Once a day habit and one numeric-target habit; the first shows a one-tap complete control and the second shows a stepper with n/target \u2014 outcomes differ as the targetType inputs dictate",
+        "reasoning": "The Once habit displayed a one-tap Complete control, while the numeric habit displayed a 0/3 stepper. Evidence: once_vs_count_targets_differ-shared.png"
+      },
+      {
+        "id": "14.7",
+        "name": "export_import_preserves_session_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Artifact pipeline: mutate the workspace (create habit, check-in, category filter), Export as JSON, confirm Workspace JSON contains schemaVersion loopdaily.workspace.v1 and the session's habit fields, then Import that document after confirmation and confirm list, filter, and Stats match",
+        "reasoning": "FAIL: Export preview contained schemaVersion loopdaily.workspace.v1, habit fields, completions, reminders, and categories; import confirmation and replacement succeeded, but no active category filter was established and restored. Evidence: habit_count_delta_exact-shared.png"
+      },
+      {
+        "id": "14.8",
+        "name": "empty_to_repopulated_stats_track",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edge-state round-trip: with no habits the Stats empty message shows; after creating habits and check-ins, Stats numbers and the trend chart populate; pausing or clearing back toward empty updates those derived surfaces",
+        "reasoning": "Stats showed the empty \u201cNo habits yet\u201d message after clearing all habits, then populated with 1 completion and a trend chart after recreating and checking in a habit. Evidence: empty_to_repopulated_stats_track-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"multi_facet_persistence_round_trip\":{\"score\":\"no\",\"reasoning\":\"FAIL: Habits and reminders persisted, but category assignment/filter and reorder were not successfully established together. Evidence: habit_count_delta_exact-shared.png\"},\"drag_reorder_persists_across_checkin\":{\"score\":\"no\",\"reasoning\":\"FAIL: A real drag was performed, but the visible order remained unchanged, so reorder persistence was not demonstrated. Evidence: habit_count_delta_exact-shared.png\"},\"stats_and_trend_respond_to_checkin\":{\"score\":\"yes\",\"reasoning\":\"The post-check-in Stats view showed 1 July completion and a populated trend chart, while the pre-check-in habit view showed zero completions. Evidence: checkin_echoes_grid_heatmap_stats-shared.png\"},\"checkin_echoes_grid_heatmap_stats\":{\"score\":\"yes\",\"reasoning\":\"After check-in, the weekly grid showed Today done, the heatmap marked Jul 23 complete, and Stats showed 1 July completion without reload. Evidence: checkin_echoes_grid_heatmap_stats-shared.png\"},\"habit_count_delta_exact\":{\"score\":\"yes\",\"reasoning\":\"The visible list went from the empty \u201cNo habits yet\u201d state to exactly one habit after a valid submit. Evidence: habit_count_delta_exact-shared.png\"},\"once_vs_count_targets_differ\":{\"score\":\"yes\",\"reasoning\":\"The Once habit displayed a one-tap Complete control, while the numeric habit displayed a 0/3 stepper. Evidence: once_vs_count_targets_differ-shared.png\"},\"export_import_preserves_session_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: Export preview contained schemaVersion loopdaily.workspace.v1, habit fields, completions, reminders, and categories; import confirmation and replacement succeeded, but no active category filter was established and restored. Evidence: habit_count_delta_exact-shared.png\"},\"empty_to_repopulated_stats_track\":{\"score\":\"yes\",\"reasoning\":\"Stats showed the empty \u201cNo habits yet\u201d message after clearing all habits, then populated with 1 completion and a trend chart after recreating and checking in a habit. Evidence: empty_to_repopulated_stats_track-shared.png\"}}",
+    "cost_usd": 0.5044582
+  },
+  "core_features": {
+    "score": 0.4571,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "empty_state_before_first_habit",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On load with no habits, the main list shows a friendly empty-state message inviting the user to create the first habit",
+        "reasoning": "Friendly empty state invites creating the first habit. Evidence: empty_state_before_first_habit-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "create_once_daily_habit",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After creating a habit with a valid field-contract payload \u2014 trimmed name at most 80 characters, an emoji icon from the fixed palette, targetType once with targetCount exactly 1 \u2014 it appears in the list with its chosen icon and a one-tap complete control",
+        "reasoning": "Created Morning Walk with \ud83c\udfc3; card showed a one-tap Complete control. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "one_tap_complete_toggles",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After tapping the one-tap complete control, the habit shows a distinct filled/checked treatment for today and today's weekly-grid cell shows done; tapping it again the same day undoes the completion",
+        "reasoning": "Complete changed the card to Done today, streak to 1, and today\u2019s grid cell to done. Evidence: one_tap_complete_toggles-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "stepper_fraction_below_target",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After creating a numeric-target habit (e.g. target 8) and tapping +1 three times, the fraction reads 3/8 and the habit does not show the complete treatment until the target count is reached",
+        "reasoning": "BLOCKED: Numeric stepper workflow was not completed. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "category_chip_filters_list",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After creating a category and assigning a habit to it, selecting that category's filter chip shows only that habit and visibly highlights the active chip; selecting All restores every habit",
+        "reasoning": "BLOCKED: Category filtering was not fully exercised. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "heatmap_reflects_todays_checkin",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After completing today's check-in and opening the habit's Heatmap view, today's day cell renders a distinctly higher shading intensity than a not-done day in the same month",
+        "reasoning": "Heatmap showed July 23 complete with distinct shading versus not-done days. Evidence: one_tap_complete_toggles-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "drag_reorder_survives_checkin_and_reload",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After creating at least three habits, dragging one by its handle to a new position reorders the list; completing a check-in on a different habit leaves that order unchanged, and a full page reload shows the same order",
+        "reasoning": "BLOCKED: Drag reorder with three habits was not exercised. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "full_state_restored_after_reload",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After creating habits, checking one in, assigning a category, and setting a reminder note, then performing a full page refresh, the habits, their completion state, category assignment, and reminder note are all restored exactly",
+        "reasoning": "BLOCKED: The complete category, reminder, completion, and reload workflow was not verified end-to-end. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "pause_resume_preserves_streak",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After pausing a habit with an existing streak, it disappears from the main habit list without losing its history; after Resume, it reappears with its prior streak value intact",
+        "reasoning": "A checked-in habit was paused, removed from active habits, then resumed with its 1-day streak restored. Evidence: one_tap_complete_toggles-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "stats_reflect_new_checkin",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After completing a check-in and opening the Stats view, it shows the number of active current streaks, the longest streak ever recorded, and total completions this calendar month, reflecting the just-recorded check-in",
+        "reasoning": "Stats showed active streaks 1, longest streak 1, and July completions 1. Evidence: one_tap_complete_toggles-shared.png"
+      },
+      {
+        "id": "1.11",
+        "name": "import_requires_confirmation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After exporting data as JSON and then importing that same file, a confirmation step warns the current data will be replaced before the import proceeds",
+        "reasoning": "Import opened a Confirm import dialog warning that current data would be replaced. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.12",
+        "name": "corrupted_storage_recovery_notice",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "When localStorage is seeded with malformed data for the app's storage key and the page is reloaded, the app shows a recovery notice in a role=alert live region with working Retry and Reset controls instead of a blank screen",
+        "reasoning": "BLOCKED: Malformed localStorage seeding and reload were not directly exercised. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.13",
+        "name": "malformed_sample_reports_outcome",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After clicking Load Malformed Sample, a recovery outcome is announced in the role=alert live region rather than the app silently failing or crashing",
+        "reasoning": "Load Malformed Sample produced role=alert recovery messaging with skipped/repaired outcomes and Retry/Reset controls. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.14",
+        "name": "blank_name_inline_error",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting the New Habit form with a blank name is blocked with a visible inline error naming the name field rather than a silently disabled button, and no phantom habit is added to the list",
+        "reasoning": "Submitting blank name showed inline alert \u201cname must be non-empty\u201d and kept the form open. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.20",
+        "name": "heatmap_month_shading_levels",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Heatmap view renders a full calendar month of day cells whose shading reflects each day's completion, distinguishing fully done, partially done, and not-done, with future days rendered as a distinct not-yet-elapsed shade",
+        "reasoning": "FAIL: Full month, future, done, and not-done states were visible, but partial completion shading was not directly observed. Evidence: one_tap_complete_toggles-shared.png"
+      },
+      {
+        "id": "1.21",
+        "name": "weekly_grid_day_states",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The weekly 7-day grid on a habit row covers today plus the six previous days, distinguishes done, missed, and not-yet-elapsed days, and marks today's cell distinctly",
+        "reasoning": "Weekly grid showed six prior days not-yet-elapsed, today missed/done states, and distinct labels for today. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.27",
+        "name": "heatmap_hover_tooltip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Hovering a day cell in the Heatmap view shows a tooltip naming that date and its completion state",
+        "reasoning": "Hovering July 23 showed a tooltip naming the date and complete state. Evidence: one_tap_complete_toggles-shared.png"
+      },
+      {
+        "id": "1.28",
+        "name": "new_habit_category_dropdown",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The New Habit form includes a category dropdown, and the created habit is assigned to the category chosen at creation time",
+        "reasoning": "New Habit form included a Category dropdown and created habit displayed the assigned category chip. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.30",
+        "name": "double_submit_creates_one_habit",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Double-activating the New Habit submit control in quick succession creates exactly one habit: the list count increases by exactly one",
+        "reasoning": "BLOCKED: Rapid double activation was not exercised. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.31",
+        "name": "stepper_floor_at_zero",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A minus-one tap when a stepper habit's count for today is already zero leaves the count at zero rather than going negative",
+        "reasoning": "BLOCKED: Minus-one at zero was not exercised. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.32",
+        "name": "stats_empty_state_message",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Stats view with no habits created yet shows its own short message instead of blank or placeholder numbers",
+        "reasoning": "Stats with no habits showed \u201cNo habits yet. Create your first habit to start tracking stats!\u201d Evidence: empty_state_before_first_habit-shared.png"
+      },
+      {
+        "id": "1.33",
+        "name": "import_cancel_preserves_data",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Cancelling the import confirmation step leaves the current habits, categories, and history untouched \u2014 no data is replaced",
+        "reasoning": "BLOCKED: Import cancellation was observed, but preservation was not re-verified before later state changes. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.34",
+        "name": "create_flow_multi_surface",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Count the visible habits, then submit a valid New Habit form with a category assigned: the list count increases by exactly one measured immediately around the submit, the new habit appears when its category's chip is selected, and after a full page reload the habit is still present with the same name, icon, target, and category",
+        "reasoning": "FAIL: Creation and category assignment worked, but the complete measured count/filter/reload workflow was not verified. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.35",
+        "name": "once_daily_checkin_cross_surface",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Completing a Once a day habit's check-in fills today's cell in its 7-day grid, updates its streak and flame treatment, increases the Stats view's total completions for the current month by exactly one, and updates the trend chart's value for today \u2014 all without a reload; a full page reload then restores the identical completed state",
+        "reasoning": "FAIL: Check-in, grid, streak, stats, and heatmap were observed, but identical completed state after reload was not verified for that same habit. Evidence: one_tap_complete_toggles-shared.png"
+      },
+      {
+        "id": "1.36",
+        "name": "stepper_target_cross_surface",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Tapping +1 on a numeric-target habit until the count reaches the target switches the card to its complete treatment and marks today done in the 7-day grid, the Heatmap view, and the Stats monthly completions; a single -1 tap dropping the count below target then reverts the card, the grids, and the Stats numbers together",
+        "reasoning": "BLOCKED: Numeric target cross-surface workflow was not exercised. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.37",
+        "name": "pause_flow_stats_and_reload",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Pausing a habit removes it from the main list and from the Stats active-streak count without deleting its history; a full page reload preserves the paused state, and resuming restores the habit with its prior streak value intact, with that restored state also surviving a reload",
+        "reasoning": "FAIL: Pause/resume and streak restoration worked, but paused-state Stats and reload persistence were not fully verified. Evidence: one_tap_complete_toggles-shared.png"
+      },
+      {
+        "id": "1.38",
+        "name": "filter_and_facets_survive_reload",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After selecting a category chip, setting a reminder note, and dragging habits into a new order, a full page refresh restores the active category filter along with all habits, categories, completion history, reminder notes, and habit order coherently \u2014 no single facet reverts while the others survive",
+        "reasoning": "BLOCKED: Combined filter, reminder, reorder, and reload workflow was not exercised. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.39",
+        "name": "trend_chart_input_sensitivity",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Recording a check-in changes the trend chart's plotted value for today the next time the chart is viewed without a reload, and undoing that check-in changes it back \u2014 the chart is not an identical redraw regardless of its inputs",
+        "reasoning": "BLOCKED: Trend values before and after check-in undo were not compared. Evidence: one_tap_complete_toggles-shared.png"
+      },
+      {
+        "id": "1.40",
+        "name": "reminder_note_label_on_card",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After setting a habit's free-text Remind me at field (e.g. 7:00 AM), the note appears as a static label on that habit's card without any system-notification behavior, and the label is still shown after a full page refresh",
+        "reasoning": "FAIL: Reminder label appeared on the card, but persistence after reload was not directly verified. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.41",
+        "name": "invalid_target_count_inline_error",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting the New Habit form with an invalid targetCount under the field contract (empty, non-integer, outside 1\u2013100, or once with targetCount not equal to 1) shows an inline error message naming the targetCount field before submit completes, and no phantom habit is added to the list",
+        "reasoning": "Daily target 0 produced inline alert \u201ctargetCount must be an integer between 1 and 100\u201d and no habit was added. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.42",
+        "name": "flame_treatment_matches_streak_tier",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "With habits whose current streaks fall below 7 days, between 7 and 29 days, and at 30 or more days (set up via a field-contract-valid import path or real history), each habit's flame renders the treatment matching its tier \u2014 plain, bright, and gold respectively \u2014 not the same treatment for all three",
+        "reasoning": "BLOCKED: Multiple streak tiers were not set up and compared. Evidence: one_tap_complete_toggles-shared.png"
+      },
+      {
+        "id": "1.43",
+        "name": "workspace_json_api_shaped_field_contract",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export as JSON produces a single Workspace JSON object whose downloaded contents include the required field-contract keys schemaVersion exactly loopdaily.workspace.v1, exportedAt, habits, categories, and activeCategoryFilter, with each habit showing name, icon, targetType (once|count), targetCount, categoryId, reminder, paused, completions, order, and createdAt",
+        "reasoning": "Live JSON preview showed schemaVersion loopdaily.workspace.v1, exportedAt, habits, categories, activeCategoryFilter, and required habit fields. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.44",
+        "name": "export_contains_session_habit_mutations",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After creating a habit with a distinctive name, assigning a category, and recording a check-in, Export as JSON's Workspace JSON contains that habit's name, categoryId, and today's completion entry \u2014 export content that omits the session's actual mutations is a failure",
+        "reasoning": "Preview JSON contained Pause Test, target data, and today\u2019s completion entry. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.45",
+        "name": "import_rejects_field_contract_failures",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Importing parseable JSON that fails the Workspace JSON field contract \u2014 wrong schemaVersion, missing habits or categories, targetType outside once|count, targetCount outside 1\u2013100 or mismatched with once, icon outside the fixed palette, completion keys not YYYY-MM-DD, unresolved categoryId, or over-length name \u2014 leaves habits, categories, Stats, and history unchanged and shows validation naming the offending field",
+        "reasoning": "BLOCKED: Contract-invalid JSON import cases were not exercised. Evidence: create_once_daily_habit-shared.png"
+      },
+      {
+        "id": "1.46",
+        "name": "artifact_export_import_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Artifact end state: create a habit with a distinctive name, category, and numeric target, record at least one check-in, Export as JSON, then Import that same Workspace JSON after confirmation \u2014 the list, category chips, check-in state, and Stats numbers reconstruct the exported session",
+        "reasoning": "BLOCKED: Export then file import confirmation and reconstruction were not completed. Evidence: create_once_daily_habit-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"empty_state_before_first_habit\":{\"score\":\"yes\",\"reasoning\":\"Friendly empty state invites creating the first habit. Evidence: empty_state_before_first_habit-shared.png\"},\"create_once_daily_habit\":{\"score\":\"yes\",\"reasoning\":\"Created Morning Walk with \ud83c\udfc3; card showed a one-tap Complete control. Evidence: create_once_daily_habit-shared.png\"},\"one_tap_complete_toggles\":{\"score\":\"yes\",\"reasoning\":\"Complete changed the card to Done today, streak to 1, and today\u2019s grid cell to done. Evidence: one_tap_complete_toggles-shared.png\"},\"stepper_fraction_below_target\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Numeric stepper workflow was not completed. Evidence: create_once_daily_habit-shared.png\"},\"category_chip_filters_list\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Category filtering was not fully exercised. Evidence: create_once_daily_habit-shared.png\"},\"heatmap_reflects_todays_checkin\":{\"score\":\"yes\",\"reasoning\":\"Heatmap showed July 23 complete with distinct shading versus not-done days. Evidence: one_tap_complete_toggles-shared.png\"},\"drag_reorder_survives_checkin_and_reload\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Drag reorder with three habits was not exercised. Evidence: create_once_daily_habit-shared.png\"},\"full_state_restored_after_reload\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The complete category, reminder, completion, and reload workflow was not verified end-to-end. Evidence: create_once_daily_habit-shared.png\"},\"pause_resume_preserves_streak\":{\"score\":\"yes\",\"reasoning\":\"A checked-in habit was paused, removed from active habits, then resumed with its 1-day streak restored. Evidence: one_tap_complete_toggles-shared.png\"},\"stats_reflect_new_checkin\":{\"score\":\"yes\",\"reasoning\":\"Stats showed active streaks 1, longest streak 1, and July completions 1. Evidence: one_tap_complete_toggles-shared.png\"},\"import_requires_confirmation\":{\"score\":\"yes\",\"reasoning\":\"Import opened a Confirm import dialog warning that current data would be replaced. Evidence: create_once_daily_habit-shared.png\"},\"corrupted_storage_recovery_notice\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Malformed localStorage seeding and reload were not directly exercised. Evidence: create_once_daily_habit-shared.png\"},\"malformed_sample_reports_outcome\":{\"score\":\"yes\",\"reasoning\":\"Load Malformed Sample produced role=alert recovery messaging with skipped/repaired outcomes and Retry/Reset controls. Evidence: create_once_daily_habit-shared.png\"},\"blank_name_inline_error\":{\"score\":\"yes\",\"reasoning\":\"Submitting blank name showed inline alert \u201cname must be non-empty\u201d and kept the form open. Evidence: create_once_daily_habit-shared.png\"},\"heatmap_month_shading_levels\":{\"score\":\"no\",\"reasoning\":\"FAIL: Full month, future, done, and not-done states were visible, but partial completion shading was not directly observed. Evidence: one_tap_complete_toggles-shared.png\"},\"weekly_grid_day_states\":{\"score\":\"yes\",\"reasoning\":\"Weekly grid showed six prior days not-yet-elapsed, today missed/done states, and distinct labels for today. Evidence: create_once_daily_habit-shared.png\"},\"heatmap_hover_tooltip\":{\"score\":\"yes\",\"reasoning\":\"Hovering July 23 showed a tooltip naming the date and complete state. Evidence: one_tap_complete_toggles-shared.png\"},\"new_habit_category_dropdown\":{\"score\":\"yes\",\"reasoning\":\"New Habit form included a Category dropdown and created habit displayed the assigned category chip. Evidence: create_once_daily_habit-shared.png\"},\"double_submit_creates_one_habit\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Rapid double activation was not exercised. Evidence: create_once_daily_habit-shared.png\"},\"stepper_floor_at_zero\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Minus-one at zero was not exercised. Evidence: create_once_daily_habit-shared.png\"},\"stats_empty_state_message\":{\"score\":\"yes\",\"reasoning\":\"Stats with no habits showed \u201cNo habits yet. Create your first habit to start tracking stats!\u201d Evidence: empty_state_before_first_habit-shared.png\"},\"import_cancel_preserves_data\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Import cancellation was observed, but preservation was not re-verified before later state changes. Evidence: create_once_daily_habit-shared.png\"},\"create_flow_multi_surface\":{\"score\":\"no\",\"reasoning\":\"FAIL: Creation and category assignment worked, but the complete measured count/filter/reload workflow was not verified. Evidence: create_once_daily_habit-shared.png\"},\"once_daily_checkin_cross_surface\":{\"score\":\"no\",\"reasoning\":\"FAIL: Check-in, grid, streak, stats, and heatmap were observed, but identical completed state after reload was not verified for that same habit. Evidence: one_tap_complete_toggles-shared.png\"},\"stepper_target_cross_surface\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Numeric target cross-surface workflow was not exercised. Evidence: create_once_daily_habit-shared.png\"},\"pause_flow_stats_and_reload\":{\"score\":\"no\",\"reasoning\":\"FAIL: Pause/resume and streak restoration worked, but paused-state Stats and reload persistence were not fully verified. Evidence: one_tap_complete_toggles-shared.png\"},\"filter_and_facets_survive_reload\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Combined filter, reminder, reorder, and reload workflow was not exercised. Evidence: create_once_daily_habit-shared.png\"},\"trend_chart_input_sensitivity\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Trend values before and after check-in undo were not compared. Evidence: one_tap_complete_toggles-shared.png\"},\"reminder_note_label_on_card\":{\"score\":\"no\",\"reasoning\":\"FAIL: Reminder label appeared on the card, but persistence after reload was not directly verified. Evidence: create_once_daily_habit-shared.png\"},\"invalid_target_count_inline_error\":{\"score\":\"yes\",\"reasoning\":\"Daily target 0 produced inline alert \u201ctargetCount must be an integer between 1 and 100\u201d and no habit was added. Evidence: create_once_daily_habit-shared.png\"},\"flame_treatment_matches_streak_tier\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Multiple streak tiers were not set up and compared. Evidence: one_tap_complete_toggles-shared.png\"},\"workspace_json_api_shaped_field_contract\":{\"score\":\"yes\",\"reasoning\":\"Live JSON preview showed schemaVersion loopdaily.workspace.v1, exportedAt, habits, categories, activeCategoryFilter, and required habit fields. Evidence: create_once_daily_habit-shared.png\"},\"export_contains_session_habit_mutations\":{\"score\":\"yes\",\"reasoning\":\"Preview JSON contained Pause Test, target data, and today\u2019s completion entry. Evidence: create_once_daily_habit-shared.png\"},\"import_rejects_field_contract_failures\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Contract-invalid JSON import cases were not exercised. Evidence: create_once_daily_habit-shared.png\"},\"artifact_export_import_round_trip\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Export then file import confirmation and reconstruction were not completed. Evidence: create_once_daily_habit-shared.png\"}}",
+    "cost_usd": 0.47771139999999995
+  },
+  "design_fidelity": {
+    "score": 0.7,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "spacing_follows_4px_scale",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 1440px, padding and gaps among habit cards, category chips, and view chrome follow a consistent 4px-base scale matching the reference screenshots \u2014 not arbitrary one-off gaps",
+        "reasoning": "Consistent 4px-based spacing is visible across the desktop shell, including 16px padding, 8px/24px gaps, and 40px controls. Evidence: desktop-shell.png"
+      },
+      {
+        "id": "3.2",
+        "name": "manrope_type_matches_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Habit names and view titles use Manrope (with the specified fallback stack) at roughly 28px-equivalent top-level and 20px section headings, with 16px body for list text \u2014 matching the reference type treatment",
+        "reasoning": "FAIL: Manrope is applied and the 28px top title is correct, but observed section/body typography was undersized relative to the specified 20px headings and 16px list/body treatment. Evidence: habit-card.png"
+      },
+      {
+        "id": "3.3",
+        "name": "desktop_habit_shell_matches_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 1440px the layout matches the reference composition within a small tolerance: habit list with cards on #F4F7F6 canvas, category filter bar, and Stats/Heatmap destinations \u2014 a habit tracker shell, not an unrelated marketing landing",
+        "reasoning": "The 1440px view visibly presents a habit tracker shell with habit cards, category filters, mint canvas, Stats navigation, and working Heatmap destination. Evidence: desktop-shell.png"
+      },
+      {
+        "id": "3.4",
+        "name": "specified_state_changes_have_motion",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "State changes the spec calls out \u2014 habit enter/exit, check-in toast, stepper progress, drag reorder settle, and milestone confetti \u2014 show the specified transitions rather than hard cuts when driven through real UI controls",
+        "reasoning": "FAIL: Check-in and pause state changes worked, but the required check-in toast was not present by observation and the full set of specified animated transitions was not demonstrated. Evidence: checkin-complete.png"
+      },
+      {
+        "id": "3.5",
+        "name": "responsive_matches_reference_patterns",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px vs 1440px, responsive behavior matches the reference patterns: habit rows single-column, Heatmap and 7-day grids still visible, Stats chart fitting the viewport",
+        "reasoning": "At 375px, habit content becomes a single-column row layout; the Heatmap remains a visible 7-column grid and the Stats chart fits within the viewport width. Evidence: mobile-habit-row.png"
+      },
+      {
+        "id": "3.6",
+        "name": "primary_secondary_button_treatments",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Primary buttons (#0F9D74 filled background, white text, 8px radius, no shadow) and secondary buttons (transparent, 1px #64748B border) use the specified treatments rather than unstyled native control chrome",
+        "reasoning": "Observed primary controls use filled #0F9D74 with white text and 8px radius; secondary controls are transparent with a 1px slate border and no shadow. Evidence: habit-card.png"
+      },
+      {
+        "id": "3.7",
+        "name": "clear_hierarchy_titles_vs_body",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography hierarchy clearly distinguishes habit/view titles from 16px body list text, counts, and helper copy",
+        "reasoning": "The 28px LoopDaily title, habit name, headings, counts, and helper copy are visibly differentiated in size and weight. Evidence: desktop-shell.png"
+      },
+      {
+        "id": "3.8",
+        "name": "chip_and_card_states_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Active category chips, hover on rows/chips/buttons, complete treatment on check-in, and paused muted treatment are visually distinct as specified",
+        "reasoning": "Active All chip is green, hovered category chip shows a wash, completed habit state is green with a check, and paused habit is visibly muted with a Paused label and muted surface. Evidence: paused-habit.png"
+      },
+      {
+        "id": "3.9",
+        "name": "surfaces_match_mint_palette",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Surfaces match canvas #F4F7F6, card #FFFFFF, ink #1B2430, muted #64748B, primary accent #0F9D74, and secondary flame accent #FFB020 as in the reference",
+        "reasoning": "Observed canvas is #F4F7F6, cards are white, ink is dark navy, muted copy is slate, primary controls are #0F9D74, and streak/flame accents are present. Evidence: habit-card.png"
+      },
+      {
+        "id": "3.10",
+        "name": "microinteraction_timing_matches_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Hover wash on chips/rows, toast slide/fade auto-dismiss, stepper fraction animation, and drag lift/settle follow the specified microinteraction timing when driven through real controls",
+        "reasoning": "FAIL: Hover wash and CSS transitions were observed, but the required toast timing and the complete set of stepper/drag timing behaviors were not directly verified. Evidence: paused-habit.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"spacing_follows_4px_scale\":{\"score\":\"yes\",\"reasoning\":\"Consistent 4px-based spacing is visible across the desktop shell, including 16px padding, 8px/24px gaps, and 40px controls. Evidence: desktop-shell.png\"},\"manrope_type_matches_spec\":{\"score\":\"no\",\"reasoning\":\"FAIL: Manrope is applied and the 28px top title is correct, but observed section/body typography was undersized relative to the specified 20px headings and 16px list/body treatment. Evidence: habit-card.png\"},\"desktop_habit_shell_matches_reference\":{\"score\":\"yes\",\"reasoning\":\"The 1440px view visibly presents a habit tracker shell with habit cards, category filters, mint canvas, Stats navigation, and working Heatmap destination. Evidence: desktop-shell.png\"},\"specified_state_changes_have_motion\":{\"score\":\"no\",\"reasoning\":\"FAIL: Check-in and pause state changes worked, but the required check-in toast was not present by observation and the full set of specified animated transitions was not demonstrated. Evidence: checkin-complete.png\"},\"responsive_matches_reference_patterns\":{\"score\":\"yes\",\"reasoning\":\"At 375px, habit content becomes a single-column row layout; the Heatmap remains a visible 7-column grid and the Stats chart fits within the viewport width. Evidence: mobile-habit-row.png\"},\"primary_secondary_button_treatments\":{\"score\":\"yes\",\"reasoning\":\"Observed primary controls use filled #0F9D74 with white text and 8px radius; secondary controls are transparent with a 1px slate border and no shadow. Evidence: habit-card.png\"},\"clear_hierarchy_titles_vs_body\":{\"score\":\"yes\",\"reasoning\":\"The 28px LoopDaily title, habit name, headings, counts, and helper copy are visibly differentiated in size and weight. Evidence: desktop-shell.png\"},\"chip_and_card_states_match_spec\":{\"score\":\"yes\",\"reasoning\":\"Active All chip is green, hovered category chip shows a wash, completed habit state is green with a check, and paused habit is visibly muted with a Paused label and muted surface. Evidence: paused-habit.png\"},\"surfaces_match_mint_palette\":{\"score\":\"yes\",\"reasoning\":\"Observed canvas is #F4F7F6, cards are white, ink is dark navy, muted copy is slate, primary controls are #0F9D74, and streak/flame accents are present. Evidence: habit-card.png\"},\"microinteraction_timing_matches_spec\":{\"score\":\"no\",\"reasoning\":\"FAIL: Hover wash and CSS transitions were observed, but the required toast timing and the complete set of stepper/drag timing behaviors were not directly verified. Evidence: paused-habit.png\"}}",
+    "cost_usd": 0.2535098
+  },
+  "edge_cases": {
+    "score": 0.8,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "empty_state_before_first_habit",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Before any habit exists, the main list shows a friendly empty-state message inviting the user to create the first habit rather than a blank area",
+        "reasoning": "Friendly \u201cNo habits yet\u201d empty state with invitation and Create habit button observed. Evidence: empty_state_before_first_habit-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "habit_form_field_contract_inline_errors",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Submitting the New Habit form with a blank name, a name longer than 80 characters, a targetCount outside 1\u2013100, once with targetCount not equal to 1, or a reminder longer than 40 characters shows an inline error naming the offending field and adds no habit",
+        "reasoning": "FAIL: Blank name, >80-character name, targetCount 0, and >40-character reminder produced inline errors, but the once-with-targetCount-not-1 case was not observable through the form. Evidence: habit_form_field_contract_inline_errors-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "field_contract_errors_name_the_field",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Field-contract validation errors name the offending field (name, icon, targetCount, reminder, or category name) and the rule that failed rather than only saying Invalid",
+        "reasoning": "Observed errors explicitly naming name, targetCount, reminder, and category name along with their failed rules. Evidence: habit_validation-contract-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "create_export_import_toasts",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Creating a habit, exporting Workspace JSON, and completing a valid Import each produce a transient visible confirmation toast",
+        "reasoning": "Transient confirmations observed for habit creation, JSON export, and successful valid import. Evidence: create_toast.png, export_toast.png, valid_import_toast.png"
+      },
+      {
+        "id": "4.5",
+        "name": "stats_empty_message",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Stats view with no habits created yet shows its own short message instead of blank numbers",
+        "reasoning": "Stats view displayed \u201cNo habits yet. Create your first habit to start tracking stats!\u201d instead of blank numbers. Evidence: stats_empty_message-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "import_cancel_leaves_data",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cancelling the Import confirmation step leaves the current habits, categories, and history untouched",
+        "reasoning": "Cancelled the confirmation dialog and verified the existing Water and Pushups habits remained present. Evidence: import_cancel_leaves_data-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "category_name_field_contract",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Creating a category with a blank or over-40-character name is rejected with an inline error naming the name field and no category chip is added",
+        "reasoning": "Blank and 41-character category names were rejected with inline name-specific errors; no category chip was added. Evidence: category_name_field_contract-shared.png, category_over40.png"
+      },
+      {
+        "id": "4.8",
+        "name": "stepper_floor_at_zero",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A minus-one tap when a stepper habit's count for today is already zero leaves the count at zero rather than going negative",
+        "reasoning": "Tapped Decrease count by one when the stepper showed 0/2; it remained 0/2. Evidence: stepper_floor_at_zero-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "import_confirm_modal_dismiss",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Import confirmation dialog can be dismissed via Cancel or backdrop without replacing data",
+        "reasoning": "Import confirmation dialog was reachable and Cancel dismissed it without replacing data. Evidence: import_confirm_modal_dismiss-shared.png"
+      },
+      {
+        "id": "4.10",
+        "name": "import_field_contract_rejection",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Importing malformed Workspace JSON, or JSON that fails the field contract (wrong schemaVersion, missing habits or categories, targetType outside once|count, unresolved categoryId, or illegal completions), leaves habits, categories, Stats, and history unchanged and shows validation naming the offending field",
+        "reasoning": "FAIL: Loading the malformed sample skipped and repaired entries, replaced the workspace with recovered data, and showed recovery messaging rather than rejecting the import unchanged with field-contract validation. Evidence: import_field_contract_rejection-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"empty_state_before_first_habit\":{\"score\":\"yes\",\"reasoning\":\"Friendly \u201cNo habits yet\u201d empty state with invitation and Create habit button observed. Evidence: empty_state_before_first_habit-shared.png\"},\"habit_form_field_contract_inline_errors\":{\"score\":\"no\",\"reasoning\":\"FAIL: Blank name, >80-character name, targetCount 0, and >40-character reminder produced inline errors, but the once-with-targetCount-not-1 case was not observable through the form. Evidence: habit_form_field_contract_inline_errors-shared.png\"},\"field_contract_errors_name_the_field\":{\"score\":\"yes\",\"reasoning\":\"Observed errors explicitly naming name, targetCount, reminder, and category name along with their failed rules. Evidence: habit_validation-contract-shared.png\"},\"create_export_import_toasts\":{\"score\":\"yes\",\"reasoning\":\"Transient confirmations observed for habit creation, JSON export, and successful valid import. Evidence: create_toast.png, export_toast.png, valid_import_toast.png\"},\"stats_empty_message\":{\"score\":\"yes\",\"reasoning\":\"Stats view displayed \u201cNo habits yet. Create your first habit to start tracking stats!\u201d instead of blank numbers. Evidence: stats_empty_message-shared.png\"},\"import_cancel_leaves_data\":{\"score\":\"yes\",\"reasoning\":\"Cancelled the confirmation dialog and verified the existing Water and Pushups habits remained present. Evidence: import_cancel_leaves_data-shared.png\"},\"category_name_field_contract\":{\"score\":\"yes\",\"reasoning\":\"Blank and 41-character category names were rejected with inline name-specific errors; no category chip was added. Evidence: category_name_field_contract-shared.png, category_over40.png\"},\"stepper_floor_at_zero\":{\"score\":\"yes\",\"reasoning\":\"Tapped Decrease count by one when the stepper showed 0/2; it remained 0/2. Evidence: stepper_floor_at_zero-shared.png\"},\"import_confirm_modal_dismiss\":{\"score\":\"yes\",\"reasoning\":\"Import confirmation dialog was reachable and Cancel dismissed it without replacing data. Evidence: import_confirm_modal_dismiss-shared.png\"},\"import_field_contract_rejection\":{\"score\":\"no\",\"reasoning\":\"FAIL: Loading the malformed sample skipped and repaired entries, replaced the workspace with recovered data, and showed recovery messaging rather than rejecting the import unchanged with field-contract validation. Evidence: import_field_contract_rejection-shared.png\"}}",
+    "cost_usd": 0.2907802
+  },
+  "innovation": {
+    "score": 0.6667,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "milestone_confetti_craft_beyond_minimum",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Beyond the required streak-milestone confetti burst, celebration craft includes an extra delightful beat (for example a richer particle pattern or brief card pulse) that remains browser-observable (bonus)",
+        "reasoning": "BLOCKED: Only a 1-day streak was reachable, so milestone confetti could not be exercised. Evidence: keyboard_habit_shortcuts_beyond_tab-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.2",
+        "name": "heatmap_tooltip_polish_beyond_baseline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Heatmap day-cell tooltips offer advanced polish beyond naming date and completion \u2014 for example streak context or partial-count detail \u2014 verified via real hover (bonus)",
+        "reasoning": "A real hover on the July 23 heatmap cell showed a tooltip with completion status and streak context (1d). Evidence: heatmap_tooltip_polish_beyond_baseline-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.3",
+        "name": "guided_first_run_for_habits",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "A brief guided first-run or coachmark introduces New Habit, category chips, and Export as JSON without blocking the empty-state create path (bonus beyond required empty-state copy)",
+        "reasoning": "The first-run Quick tour visibly introduced Create habit, category chips, and Data/Export as JSON without blocking the empty-state Create habit button. Evidence: guided_first_run_for_habits-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.4",
+        "name": "trend_chart_interaction_aid",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "An interactive graphic beyond the required trend chart \u2014 for example hover readouts on day points or a longest-streak callout graphic \u2014 adds usability while staying local (bonus)",
+        "reasoning": "Hovering the trend chart produced a day-specific readout showing Jul 16 and completions: 0. Evidence: trend_chart_interaction_aid-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.5",
+        "name": "keyboard_habit_shortcuts_beyond_tab",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Beyond basic Tab/Enter operability, habit check-in or category filtering supports an alternate shortcut such as a key to complete the focused habit (bonus)",
+        "reasoning": "Focusing the habit and pressing C changed it from incomplete to Done today, with a 1-day streak and confirmation toast. Evidence: keyboard_habit_shortcuts_beyond_tab-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.6",
+        "name": "session_personalization_beyond_requirements",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Within the persisted session, the app offers a small personalization beyond requirements (for example remembering last opened view: habits vs Stats) that survives reload with the rest of localStorage state (bonus)",
+        "reasoning": "Stats was opened, localStorage recorded lastView=stats, and a reload restored the Stats view. Evidence: session_personalization_beyond_requirements-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.7",
+        "name": "branded_habit_tracker_narrative",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "The LoopDaily shell, Manrope titles, mint accent, and flame milestone treatments read as a cohesive habit-tracker product narrative rather than generic unstyled controls (bonus execution quality)",
+        "reasoning": "The rendered experience visibly presents a cohesive LoopDaily product shell with Manrope typography, mint accents, habit cards, streak flame treatment, Heatmap, Stats, and Data views. Evidence: branded_habit_tracker_narrative-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.8",
+        "name": "flame_tier_craft_beyond_swap",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Flame tier treatments (plain / bright / gold) show crafted differentiation beyond a bare icon swap \u2014 cohesive glow or color staging that feels designed (bonus)",
+        "reasoning": "BLOCKED: Only the 1-day building streak tier was reachable; distinct plain/bright/gold tier differentiation could not be exercised. Evidence: flame_tier_craft_beyond_swap-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.9",
+        "name": "local_platform_enhancement",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "A genre-appropriate local enhancement (for example high-quality local Manrope rendering or offline-capable app shell assets) is visible without CDN dependence (bonus)",
+        "reasoning": "The rendered app visibly identifies itself as a local-first, offline-ready workspace, and computed styles confirmed loaded local Manrope rendering with localhost-only app assets. Evidence: local_platform_enhancement-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.10",
+        "name": "competition_level_loopdaily_feel",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "The overall experience feels competition-grade: habit create with field contracts, check-ins, Heatmap, Stats, and Workspace JSON export/import read as a professional habit instrument rather than a wired demo (bonus)",
+        "reasoning": "The live app supported habit creation, keyboard check-ins, Heatmap and Stats views, and a working Workspace JSON export with visible confirmation. Evidence: competition_level_loopdaily_feel-shared.png",
+        "optional": true
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "FAIL: No additional noteworthy enhancement beyond the specifically covered criteria was observed during the live workflows. Evidence: competition_level_loopdaily_feel-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"milestone_confetti_craft_beyond_minimum\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Only a 1-day streak was reachable, so milestone confetti could not be exercised. Evidence: keyboard_habit_shortcuts_beyond_tab-shared.png\"},\"heatmap_tooltip_polish_beyond_baseline\":{\"score\":\"yes\",\"reasoning\":\"A real hover on the July 23 heatmap cell showed a tooltip with completion status and streak context (1d). Evidence: heatmap_tooltip_polish_beyond_baseline-shared.png\"},\"guided_first_run_for_habits\":{\"score\":\"yes\",\"reasoning\":\"The first-run Quick tour visibly introduced Create habit, category chips, and Data/Export as JSON without blocking the empty-state Create habit button. Evidence: guided_first_run_for_habits-shared.png\"},\"trend_chart_interaction_aid\":{\"score\":\"yes\",\"reasoning\":\"Hovering the trend chart produced a day-specific readout showing Jul 16 and completions: 0. Evidence: trend_chart_interaction_aid-shared.png\"},\"keyboard_habit_shortcuts_beyond_tab\":{\"score\":\"yes\",\"reasoning\":\"Focusing the habit and pressing C changed it from incomplete to Done today, with a 1-day streak and confirmation toast. Evidence: keyboard_habit_shortcuts_beyond_tab-shared.png\"},\"session_personalization_beyond_requirements\":{\"score\":\"yes\",\"reasoning\":\"Stats was opened, localStorage recorded lastView=stats, and a reload restored the Stats view. Evidence: session_personalization_beyond_requirements-shared.png\"},\"branded_habit_tracker_narrative\":{\"score\":\"yes\",\"reasoning\":\"The rendered experience visibly presents a cohesive LoopDaily product shell with Manrope typography, mint accents, habit cards, streak flame treatment, Heatmap, Stats, and Data views. Evidence: branded_habit_tracker_narrative-shared.png\"},\"flame_tier_craft_beyond_swap\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Only the 1-day building streak tier was reachable; distinct plain/bright/gold tier differentiation could not be exercised. Evidence: flame_tier_craft_beyond_swap-shared.png\"},\"local_platform_enhancement\":{\"score\":\"yes\",\"reasoning\":\"The rendered app visibly identifies itself as a local-first, offline-ready workspace, and computed styles confirmed loaded local Manrope rendering with localhost-only app assets. Evidence: local_platform_enhancement-shared.png\"},\"competition_level_loopdaily_feel\":{\"score\":\"yes\",\"reasoning\":\"The live app supported habit creation, keyboard check-ins, Heatmap and Stats views, and a working Workspace JSON export with visible confirmation. Evidence: competition_level_loopdaily_feel-shared.png\"},\"innovation_catchall\":{\"score\":\"no\",\"reasoning\":\"FAIL: No additional noteworthy enhancement beyond the specifically covered criteria was observed during the live workflows. Evidence: competition_level_loopdaily_feel-shared.png\"}}",
+    "cost_usd": 0.1715288
+  },
+  "motion": {
+    "score": 0.7619,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "hover_states_on_interactives",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Hovering a habit row, a category filter chip, and a stepper control produces a clearly visible hover response on each, verified with computed styles while hovering",
+        "reasoning": "Hover styling was observed on the habit row, category control, and numeric stepper with changed/computed hover treatments and easing transitions. Evidence: initial-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "toasts_slide_and_autodismiss",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Creating a habit, completing a check-in, exporting data, and importing data each produce a transient visible confirmation (toast or equivalent) immediately after the action, and the toast slides or fades in and auto-dismisses smoothly rather than snapping",
+        "reasoning": "Creation, check-in, export, and malformed-import actions each showed confirmation toasts; toastIn/transition styles were observed and the export toast disappeared after waiting. Evidence: toasts-created.png, checkin-toast.png, export-toast.png, recovery-banner.png"
+      },
+      {
+        "id": "4.5",
+        "name": "flame_change_via_real_action",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The milestone flame's treatment change on crossing 7 or 30 days happens live from the real check-in/stepper action, not a hidden shortcut, and is visible immediately after that action completes",
+        "reasoning": "BLOCKED: The visible UI could not produce a 7- or 30-day streak in the live session, so milestone flame crossing could not be exercised."
+      },
+      {
+        "id": "4.6",
+        "name": "recovery_banner_appears_unprompted",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The recovery banner and its Retry/Reset controls appear as soon as a recovery condition is detected and are announced through the role=alert live region without requiring focus to move to them",
+        "reasoning": "Loading the malformed sample produced an immediate role=alert recovery banner with Retry and Reset controls, without focus movement. Evidence: recovery-banner.png"
+      },
+      {
+        "id": "4.9",
+        "name": "habit_enter_exit_animations",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A newly created habit animates into the list rather than appearing instantly, a paused habit animates out of the main list, and the remaining rows settle into place with a smooth transition",
+        "reasoning": "A newly created habit showed cardIn with opacity 0 and translated transform, while pausing a habit showed a live opacity/transform exit state and remaining rows retained smooth transitions. Evidence: habit-pause-exit.png"
+      },
+      {
+        "id": "4.10",
+        "name": "stepper_progress_animates",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A numeric-target habit's stepper progress bar and fraction animate their update immediately on each real +1/-1 tap rather than jumping with no transition",
+        "reasoning": "A real +1 stepper action updated the fraction and produced a fracPop animation (0.28s) during the transition. Evidence: stepper-progress-update.png"
+      },
+      {
+        "id": "4.11",
+        "name": "blank_name_shake_cue",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting the New Habit form with a blank name triggers a visible shake or equivalent motion cue alongside the inline error text",
+        "reasoning": "Submitting the blank New Habit form showed the inline \u201cname must be non-empty\u201d alert and a visible shake animation lasting 0.4s. Evidence: blank-name-shake-cue.png"
+      },
+      {
+        "id": "4.12",
+        "name": "milestone_confetti_burst",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Crossing a 7-day or 30-day streak milestone through a real check-in triggers a brief celebratory confetti-style particle burst near the habit card, and the effect fires only on that milestone action \u2014 never ambiently or on ordinary non-milestone check-ins",
+        "reasoning": "BLOCKED: A 7- or 30-day milestone could not be reached through the available visible actions, so milestone-only confetti behavior could not be verified."
+      },
+      {
+        "id": "4.13",
+        "name": "drag_lift_and_settle",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Reordering a habit via its drag handle shows a lift/drag affordance while dragging and the row settles into its new position with a smooth transition on drop, performed through a real pointer drag",
+        "reasoning": "A real pointer drag reordered the habit, and mid-drag inspection showed lifted shadow treatment; the final order changed after drop. Evidence: drag-reordered.png"
+      },
+      {
+        "id": "4.14",
+        "name": "button_hover_ease_and_press",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Buttons ease their background and border on hover and show a brief press effect on click rather than switching states instantly",
+        "reasoning": "FAIL: Button hover easing transitions were present, but the real press inspection showed no visible transform, filter, or shadow press effect. Evidence: export-toast.png"
+      },
+      {
+        "id": "4.15",
+        "name": "reduced_motion_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, decorative animations and the celebration effect are removed or reduced while state changes (check-ins, creation, pause) still apply instantly and correctly",
+        "reasoning": "The reduced-motion browser reported prefers-reduced-motion=true; animations and transitions were reduced to approximately 1e-06s while habit creation still applied immediately. Evidence: reduced-motion-state.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"hover_states_on_interactives\":{\"score\":\"yes\",\"reasoning\":\"Hover styling was observed on the habit row, category control, and numeric stepper with changed/computed hover treatments and easing transitions. Evidence: initial-shared.png\"},\"toasts_slide_and_autodismiss\":{\"score\":\"yes\",\"reasoning\":\"Creation, check-in, export, and malformed-import actions each showed confirmation toasts; toastIn/transition styles were observed and the export toast disappeared after waiting. Evidence: toasts-created.png, checkin-toast.png, export-toast.png, recovery-banner.png\"},\"flame_change_via_real_action\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The visible UI could not produce a 7- or 30-day streak in the live session, so milestone flame crossing could not be exercised.\"},\"recovery_banner_appears_unprompted\":{\"score\":\"yes\",\"reasoning\":\"Loading the malformed sample produced an immediate role=alert recovery banner with Retry and Reset controls, without focus movement. Evidence: recovery-banner.png\"},\"habit_enter_exit_animations\":{\"score\":\"yes\",\"reasoning\":\"A newly created habit showed cardIn with opacity 0 and translated transform, while pausing a habit showed a live opacity/transform exit state and remaining rows retained smooth transitions. Evidence: habit-pause-exit.png\"},\"stepper_progress_animates\":{\"score\":\"yes\",\"reasoning\":\"A real +1 stepper action updated the fraction and produced a fracPop animation (0.28s) during the transition. Evidence: stepper-progress-update.png\"},\"blank_name_shake_cue\":{\"score\":\"yes\",\"reasoning\":\"Submitting the blank New Habit form showed the inline \u201cname must be non-empty\u201d alert and a visible shake animation lasting 0.4s. Evidence: blank-name-shake-cue.png\"},\"milestone_confetti_burst\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A 7- or 30-day milestone could not be reached through the available visible actions, so milestone-only confetti behavior could not be verified.\"},\"drag_lift_and_settle\":{\"score\":\"yes\",\"reasoning\":\"A real pointer drag reordered the habit, and mid-drag inspection showed lifted shadow treatment; the final order changed after drop. Evidence: drag-reordered.png\"},\"button_hover_ease_and_press\":{\"score\":\"no\",\"reasoning\":\"FAIL: Button hover easing transitions were present, but the real press inspection showed no visible transform, filter, or shadow press effect. Evidence: export-toast.png\"},\"reduced_motion_respected\":{\"score\":\"yes\",\"reasoning\":\"The reduced-motion browser reported prefers-reduced-motion=true; animations and transitions were reduced to approximately 1e-06s while habit creation still applied immediately. Evidence: reduced-motion-state.png\"}}",
+    "cost_usd": 0.47731339999999994
+  },
+  "performance": {
+    "score": 0.6,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_under_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive within 2 seconds of a local cold load (habit list or empty-state create affordance usable)",
+        "reasoning": "Interactive habit UI was available immediately after local navigation. Evidence: cold_start_under_two_seconds-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "console_clean_through_malformed_path",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No console errors appear during a full exercise including create, check-in, Stats, Heatmap, Export as JSON, Import cancel, and Load Malformed Sample",
+        "reasoning": "After create, check-in, Stats, export, import-cancel, and malformed-sample flows, console reported 0 errors and 0 warnings. Evidence: malformed_recovery_without_hang-shared.png"
+      },
+      {
+        "id": "9.3",
+        "name": "checkin_and_filter_transitions_snappy",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Category chip filter changes and check-in/stepper updates begin reflecting in the UI in under about 100ms of perceived lag",
+        "reasoning": "FAIL: Check-ins and stepper updates reflected promptly, but the category filter could not be applied because the category was not found. Evidence: rapid_stepper_taps_stay_responsive-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "export_import_stay_responsive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export as JSON download and Import FileReader confirmation remain responsive with visible confirmation feedback rather than a multi-second frozen shell",
+        "reasoning": "JSON export completed with a download event, and the import confirmation opened and canceled immediately. Evidence: export_import_stay_responsive-shared.png"
+      },
+      {
+        "id": "9.5",
+        "name": "many_habits_list_stays_usable",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "With a moderately large habit list (dozens of habits via create or field-contract-valid import), scrolling the list and tapping steppers remains usable without multi-second freezes",
+        "reasoning": "FAIL: A 33-habit list rendered and remained navigable, but the large-list state exposed no stepper controls to exercise as required. Evidence: many_habits_list_stays_usable-shared.png"
+      },
+      {
+        "id": "9.6",
+        "name": "stats_update_keeps_ui_interactive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Recording a check-in that updates Stats monthly completions and the trend chart leaves the habit list and navigation interactive without a blocking wait",
+        "reasoning": "After recording completions, Stats opened immediately and showed updated monthly totals, streaks, and trend chart. Evidence: stats_update_keeps_ui_interactive-shared.png"
+      },
+      {
+        "id": "9.7",
+        "name": "habit_enter_and_confetti_smooth",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Habit enter/exit list animations and the milestone confetti burst (when not reduced-motion) maintain a smooth perceived frame rate without long jank spikes",
+        "reasoning": "BLOCKED: Habit creation and completion were reachable, but the transient milestone confetti burst could not be directly captured and verified for smoothness. Evidence: rapid_stepper_taps_stay_responsive-shared.png"
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_stepper_taps_stay_responsive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapid repeated stepper taps stay responsive with no hangs, and every tap is reflected in the n/target fraction and progress bar",
+        "reasoning": "Five rapid increase taps completed without a hang and the visible counter reached 5/5 with the target state updated. Evidence: rapid_stepper_taps_stay_responsive-shared.png"
+      },
+      {
+        "id": "9.9",
+        "name": "extended_checkin_session_stable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "An extended session of creates, check-ins, filter toggles, and Export as JSON shows no runaway memory growth that makes the tab unusable",
+        "reasoning": "The session included dozens of habit creates, check-ins, navigation, export, filtering attempts, and malformed recovery; the tab remained usable without visible runaway degradation. Evidence: many_habits_list_stays_usable-shared.png"
+      },
+      {
+        "id": "9.10",
+        "name": "malformed_recovery_without_hang",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Load Malformed Sample and corrupted-localStorage recovery complete with a role=alert outcome without hanging the UI in a blank loading state",
+        "reasoning": "BLOCKED: Malformed Sample produced a visible role=alert recovery outcome, but corrupted-localStorage recovery could not be exercised without prohibited direct storage writes. Evidence: malformed_recovery_without_hang-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_start_under_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"Interactive habit UI was available immediately after local navigation. Evidence: cold_start_under_two_seconds-shared.png\"},\"console_clean_through_malformed_path\":{\"score\":\"yes\",\"reasoning\":\"After create, check-in, Stats, export, import-cancel, and malformed-sample flows, console reported 0 errors and 0 warnings. Evidence: malformed_recovery_without_hang-shared.png\"},\"checkin_and_filter_transitions_snappy\":{\"score\":\"no\",\"reasoning\":\"FAIL: Check-ins and stepper updates reflected promptly, but the category filter could not be applied because the category was not found. Evidence: rapid_stepper_taps_stay_responsive-shared.png\"},\"export_import_stay_responsive\":{\"score\":\"yes\",\"reasoning\":\"JSON export completed with a download event, and the import confirmation opened and canceled immediately. Evidence: export_import_stay_responsive-shared.png\"},\"many_habits_list_stays_usable\":{\"score\":\"no\",\"reasoning\":\"FAIL: A 33-habit list rendered and remained navigable, but the large-list state exposed no stepper controls to exercise as required. Evidence: many_habits_list_stays_usable-shared.png\"},\"stats_update_keeps_ui_interactive\":{\"score\":\"yes\",\"reasoning\":\"After recording completions, Stats opened immediately and showed updated monthly totals, streaks, and trend chart. Evidence: stats_update_keeps_ui_interactive-shared.png\"},\"habit_enter_and_confetti_smooth\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Habit creation and completion were reachable, but the transient milestone confetti burst could not be directly captured and verified for smoothness. Evidence: rapid_stepper_taps_stay_responsive-shared.png\"},\"rapid_stepper_taps_stay_responsive\":{\"score\":\"yes\",\"reasoning\":\"Five rapid increase taps completed without a hang and the visible counter reached 5/5 with the target state updated. Evidence: rapid_stepper_taps_stay_responsive-shared.png\"},\"extended_checkin_session_stable\":{\"score\":\"yes\",\"reasoning\":\"The session included dozens of habit creates, check-ins, navigation, export, filtering attempts, and malformed recovery; the tab remained usable without visible runaway degradation. Evidence: many_habits_list_stays_usable-shared.png\"},\"malformed_recovery_without_hang\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Malformed Sample produced a visible role=alert recovery outcome, but corrupted-localStorage recovery could not be exercised without prohibited direct storage writes. Evidence: malformed_recovery_without_hang-shared.png\"}}",
+    "cost_usd": 0.380163
+  },
+  "responsiveness": {
+    "score": 0.9,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "layout_adapts_1440_to_375",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At roughly 1440px and 375px viewport widths the habit shell remains usable: habit rows, category chips, and New Habit remain operable without broken overlap",
+        "reasoning": "Desktop and 375px views remain usable with accessible habit controls, category controls, and New Habit. Evidence: layout_adapts_1440_to_375-narrow.png"
+      },
+      {
+        "id": "7.2",
+        "name": "mobile_checkin_targets_large_enough",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At roughly 375px, one-tap complete, stepper plus/minus, category chips, and Export as JSON / Import controls present tap targets large enough for touch (approximately 44px or clearly comfortable)",
+        "reasoning": "FAIL: Complete, category, export, and import controls are 40\u201344px, but no plus/minus stepper controls were observed. Evidence: mobile_checkin_targets_large_enough.png"
+      },
+      {
+        "id": "7.3",
+        "name": "type_readable_on_narrow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Habit names, fraction labels (n/target), and Stats numbers remain readable at both desktop and roughly 375px widths",
+        "reasoning": "Habit names and Stats numbers remain legible at desktop and 375px; text is not clipped or excessively small. Evidence: stats_chart_fits_viewport.png"
+      },
+      {
+        "id": "7.4",
+        "name": "heatmap_and_week_grid_unclipped",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At narrow width the Heatmap month grid and the 7-day weekly grid remain fully visible without clipping cells or labels",
+        "reasoning": "The narrow Heatmap shows all seven weekday labels and all July cells within the 375px viewport; the weekly habit grid is also fully visible. Evidence: heatmap_and_week_grid_unclipped-narrow.png"
+      },
+      {
+        "id": "7.5",
+        "name": "view_chrome_adapts_narrow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Habits / Stats / Heatmap / Import view chrome adapts at narrow width (stacked or wrapped navigation) so destinations remain reachable",
+        "reasoning": "Habits, Stats, and Data navigation remains reachable at 375px, and Heatmap has a visible Go back control. Evidence: heatmap_and_week_grid_unclipped-narrow.png"
+      },
+      {
+        "id": "7.6",
+        "name": "habit_rows_single_column_narrow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At roughly 375px habit rows stack in a single column and the New Habit form remains fully usable without overlapping controls",
+        "reasoning": "At 375px the habit card occupies a single column and New Habit opens as a full-width, non-overlapping form. Evidence: layout_adapts_1440_to_375-narrow.png"
+      },
+      {
+        "id": "7.7",
+        "name": "narrow_tap_checkin_works",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At roughly 375px, tapping one-tap complete and stepper controls updates today's completion state without requiring a desktop-only hover path",
+        "reasoning": "A real tap on Complete changed the state to Done today, updated completion from 0 of 1 to 1 of 1, and showed confirmation feedback. Evidence: narrow_tap_checkin_works.png"
+      },
+      {
+        "id": "7.8",
+        "name": "no_horizontal_scroll_at_375",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At roughly 375px viewport width the app renders with no horizontal scrolling",
+        "reasoning": "At innerWidth 375, document and body scroll widths were both 375. Evidence: layout_adapts_1440_to_375-narrow.png"
+      },
+      {
+        "id": "7.9",
+        "name": "stats_chart_fits_viewport",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At narrow width the Stats numbers and completions trend chart fit the viewport without overflowing horizontally",
+        "reasoning": "At 375px the trend SVG is 311px wide within the viewport and document scroll width remains 375px; Stats labels and numbers are visible. Evidence: stats_chart_fits_viewport.png"
+      },
+      {
+        "id": "7.10",
+        "name": "recovery_controls_reachable_narrow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The recovery notice remains legible at narrow width with its Retry and Reset controls reachable",
+        "reasoning": "The recovery notice is legible at 375px, with Retry and Reset both visible as 44px-high reachable controls. Evidence: recovery_controls_reachable_narrow.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"layout_adapts_1440_to_375\":{\"score\":\"yes\",\"reasoning\":\"Desktop and 375px views remain usable with accessible habit controls, category controls, and New Habit. Evidence: layout_adapts_1440_to_375-narrow.png\"},\"mobile_checkin_targets_large_enough\":{\"score\":\"no\",\"reasoning\":\"FAIL: Complete, category, export, and import controls are 40\u201344px, but no plus/minus stepper controls were observed. Evidence: mobile_checkin_targets_large_enough.png\"},\"type_readable_on_narrow\":{\"score\":\"yes\",\"reasoning\":\"Habit names and Stats numbers remain legible at desktop and 375px; text is not clipped or excessively small. Evidence: stats_chart_fits_viewport.png\"},\"heatmap_and_week_grid_unclipped\":{\"score\":\"yes\",\"reasoning\":\"The narrow Heatmap shows all seven weekday labels and all July cells within the 375px viewport; the weekly habit grid is also fully visible. Evidence: heatmap_and_week_grid_unclipped-narrow.png\"},\"view_chrome_adapts_narrow\":{\"score\":\"yes\",\"reasoning\":\"Habits, Stats, and Data navigation remains reachable at 375px, and Heatmap has a visible Go back control. Evidence: heatmap_and_week_grid_unclipped-narrow.png\"},\"habit_rows_single_column_narrow\":{\"score\":\"yes\",\"reasoning\":\"At 375px the habit card occupies a single column and New Habit opens as a full-width, non-overlapping form. Evidence: layout_adapts_1440_to_375-narrow.png\"},\"narrow_tap_checkin_works\":{\"score\":\"yes\",\"reasoning\":\"A real tap on Complete changed the state to Done today, updated completion from 0 of 1 to 1 of 1, and showed confirmation feedback. Evidence: narrow_tap_checkin_works.png\"},\"no_horizontal_scroll_at_375\":{\"score\":\"yes\",\"reasoning\":\"At innerWidth 375, document and body scroll widths were both 375. Evidence: layout_adapts_1440_to_375-narrow.png\"},\"stats_chart_fits_viewport\":{\"score\":\"yes\",\"reasoning\":\"At 375px the trend SVG is 311px wide within the viewport and document scroll width remains 375px; Stats labels and numbers are visible. Evidence: stats_chart_fits_viewport.png\"},\"recovery_controls_reachable_narrow\":{\"score\":\"yes\",\"reasoning\":\"The recovery notice is legible at 375px, with Retry and Reset both visible as 44px-high reachable controls. Evidence: recovery_controls_reachable_narrow.png\"}}",
+    "cost_usd": 0.2290236
+  },
+  "technical": {
+    "score": 0.7857,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "persistence_full_restore",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "All habits, categories, completion history, habit order, category assignments, reminder notes, and the active category filter survive a full page refresh, restored purely from localStorage",
+        "reasoning": "Habits, reminder, completion count, category, ordering, and active Health filter were restored after reload. Evidence: persistence_full_restore-shared.png"
+      },
+      {
+        "id": "2.2",
+        "name": "corrupted_storage_recovery_controls",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "When localStorage holds malformed or unparseable data for the app's storage key, reloading recovers to the last valid snapshot without a blank screen, shows a specific recovery notice in a role=alert live region, and offers working Retry and Reset controls with visible, deterministic effects \u2014 Retry re-applies the last valid snapshot (or reports none is available), Reset clears to the defined empty state",
+        "reasoning": "BLOCKED: Directly corrupting localStorage is prohibited, and no visible workflow installs malformed storage. Evidence: malformed_sample_guarded_path-shared.png"
+      },
+      {
+        "id": "2.3",
+        "name": "malformed_sample_guarded_path",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Clicking Load Malformed Sample exercises the soft-recovery drill (skip-or-repair, distinct from Import's strict field-contract gate) and reports what was skipped or repaired in the role=alert live region",
+        "reasoning": "Load Malformed Sample produced a role=alert describing skipped and repaired entries and exposed Retry and Reset controls. Evidence: malformed_sample_guarded_path-shared.png"
+      },
+      {
+        "id": "2.4",
+        "name": "export_import_no_network",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export as JSON downloads the current Workspace JSON document via a Blob and anchor download attribute with no network request; Import reads a file via FileReader with no network request",
+        "reasoning": "Export produced a Blob download with a JSON filename; import read the exported file and completed successfully, with no dynamic network requests observed. Evidence: export_import_no_network-shared.png"
+      },
+      {
+        "id": "2.5",
+        "name": "rapid_stepper_stability",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Driving the primary check-in/stepper control through 25 rapid deterministic repetitions leaves the final count/state exact, the UI responsive, and produces no blank screen, uncaught error, or sustained freeze, with every tap reflected in the fraction and progress bar",
+        "reasoning": "Twenty-five rapid real clicks left the count at the valid capped target 3/3, with no freeze or blank screen. Evidence: rapid_stepper_stability-shared.png"
+      },
+      {
+        "id": "2.6",
+        "name": "loads_interactive_cleanly",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app reaches an interactive UI on load with no blank page, framework error overlay, or noscript-only fallback, and a full hard reload re-renders cleanly",
+        "reasoning": "The app rendered an interactive UI and repeatedly hard-reloaded successfully without an error overlay. Evidence: loads_interactive_cleanly-desktop.png"
+      },
+      {
+        "id": "2.14",
+        "name": "keyboard_reachability_and_focus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every interactive control \u2014 buttons, category chips, steppers, the drag handle, form fields, and the import/export controls \u2014 is reachable with keyboard Tab and shows a clearly visible focus indicator when focused",
+        "reasoning": "Tab traversal reached the visible controls, groups, drag handles, steppers, and buttons with visible computed focus outlines. Evidence: keyboard_reachability_and_focus-shared.png"
+      },
+      {
+        "id": "2.15",
+        "name": "inline_errors_associated_with_fields",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Inline form validation errors render adjacent to the field they name and are programmatically associated with that field (observable in the DOM via label/description association on the input)",
+        "reasoning": "Blank Habit name showed an adjacent alert, and the input had aria-describedby=\"habit-name-error\". Evidence: inline_errors_associated_with_fields-shared.png"
+      },
+      {
+        "id": "2.16",
+        "name": "dialog_focus_trap_and_return",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Dialogs opened by the app (such as the import confirmation) trap keyboard focus while open and return focus to the invoking control on close",
+        "reasoning": "FAIL: Focus remained trapped inside the import dialog, but after Cancel it returned to the page heading instead of the invoking Import control. Evidence: dialog_focus_trap_and_return-shared.png"
+      },
+      {
+        "id": "2.17",
+        "name": "interactive_within_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive within 2 seconds of a local cold load",
+        "reasoning": "Local navigation reached an interactive page in about 1.2 seconds. Evidence: loads_interactive_cleanly-desktop.png"
+      },
+      {
+        "id": "2.18",
+        "name": "console_clean_full_exercise",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The browser console stays free of errors and unhandled promise rejections during a full exercise of the app, including the malformed-data recovery path",
+        "reasoning": "After exercising creation, rapid stepping, malformed recovery, export, import, and reload paths, the browser reported zero console errors or warnings. Evidence: export_import_no_network-shared.png"
+      },
+      {
+        "id": "2.19",
+        "name": "habit_form_validation_matches_field_contract",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "New Habit and category creation enforce the field contracts in the UI: blank, over-80-character, or whitespace-only habit names; targetCount outside 1\u2013100 or once-with-count-not-1; reminder over 40 characters; and blank or over-40-character category names are rejected with inline feedback naming the offending field, and no habit or category is added",
+        "reasoning": "FAIL: The attempted invalid-name exercise did not reliably keep the form blocked; a Morning Walk habit was subsequently added, so the full field-contract guarantee was not established. Evidence: habit_form_validation_matches_field_contract-shared.png"
+      },
+      {
+        "id": "2.21",
+        "name": "target_type_count_cross_field_contract",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Choosing Once a day forces targetCount to 1 in the created habit record (visible after create on the card or in Export as JSON), and choosing Daily count with a valid 1\u2013100 targetCount persists that count \u2014 the cross-field targetType/targetCount contract holds without a reload",
+        "reasoning": "A Daily count habit visibly persisted at 3/3, while Once a day records exported with targetCount 1. Evidence: persistence_full_restore-shared.png"
+      },
+      {
+        "id": "2.22",
+        "name": "workspace_json_exact_types_order_and_references",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The exported Workspace document has exactly schemaVersion loopdaily.workspace.v1, ISO-8601 exportedAt, habits in visible list order, categories in creation order, and activeCategoryFilter as null or an imported category id; every habit includes a non-empty id, valid name/icon/targetType/targetCount/categoryId/reminder, boolean paused, non-negative integer order, ISO-8601 createdAt, and a completions object whose YYYY-MM-DD keys map to non-negative integers, while each category contains a non-empty id and trimmed 1\u201340 character name and every non-null habit categoryId resolves to that categories array",
+        "reasoning": "Preview visibly showed schemaVersion loopdaily.workspace.v1, ISO timestamps, ordered habits/categories, valid IDs, target fields, booleans, orders, completions, and resolved/null category references. Evidence: workspace_json_exact_types_order_and_references-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"persistence_full_restore\":{\"score\":\"yes\",\"reasoning\":\"Habits, reminder, completion count, category, ordering, and active Health filter were restored after reload. Evidence: persistence_full_restore-shared.png\"},\"corrupted_storage_recovery_controls\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Directly corrupting localStorage is prohibited, and no visible workflow installs malformed storage. Evidence: malformed_sample_guarded_path-shared.png\"},\"malformed_sample_guarded_path\":{\"score\":\"yes\",\"reasoning\":\"Load Malformed Sample produced a role=alert describing skipped and repaired entries and exposed Retry and Reset controls. Evidence: malformed_sample_guarded_path-shared.png\"},\"export_import_no_network\":{\"score\":\"yes\",\"reasoning\":\"Export produced a Blob download with a JSON filename; import read the exported file and completed successfully, with no dynamic network requests observed. Evidence: export_import_no_network-shared.png\"},\"rapid_stepper_stability\":{\"score\":\"yes\",\"reasoning\":\"Twenty-five rapid real clicks left the count at the valid capped target 3/3, with no freeze or blank screen. Evidence: rapid_stepper_stability-shared.png\"},\"loads_interactive_cleanly\":{\"score\":\"yes\",\"reasoning\":\"The app rendered an interactive UI and repeatedly hard-reloaded successfully without an error overlay. Evidence: loads_interactive_cleanly-desktop.png\"},\"keyboard_reachability_and_focus\":{\"score\":\"yes\",\"reasoning\":\"Tab traversal reached the visible controls, groups, drag handles, steppers, and buttons with visible computed focus outlines. Evidence: keyboard_reachability_and_focus-shared.png\"},\"inline_errors_associated_with_fields\":{\"score\":\"yes\",\"reasoning\":\"Blank Habit name showed an adjacent alert, and the input had aria-describedby=\\\"habit-name-error\\\". Evidence: inline_errors_associated_with_fields-shared.png\"},\"dialog_focus_trap_and_return\":{\"score\":\"no\",\"reasoning\":\"FAIL: Focus remained trapped inside the import dialog, but after Cancel it returned to the page heading instead of the invoking Import control. Evidence: dialog_focus_trap_and_return-shared.png\"},\"interactive_within_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"Local navigation reached an interactive page in about 1.2 seconds. Evidence: loads_interactive_cleanly-desktop.png\"},\"console_clean_full_exercise\":{\"score\":\"yes\",\"reasoning\":\"After exercising creation, rapid stepping, malformed recovery, export, import, and reload paths, the browser reported zero console errors or warnings. Evidence: export_import_no_network-shared.png\"},\"habit_form_validation_matches_field_contract\":{\"score\":\"no\",\"reasoning\":\"FAIL: The attempted invalid-name exercise did not reliably keep the form blocked; a Morning Walk habit was subsequently added, so the full field-contract guarantee was not established. Evidence: habit_form_validation_matches_field_contract-shared.png\"},\"target_type_count_cross_field_contract\":{\"score\":\"yes\",\"reasoning\":\"A Daily count habit visibly persisted at 3/3, while Once a day records exported with targetCount 1. Evidence: persistence_full_restore-shared.png\"},\"workspace_json_exact_types_order_and_references\":{\"score\":\"yes\",\"reasoning\":\"Preview visibly showed schemaVersion loopdaily.workspace.v1, ISO timestamps, ordered habits/categories, valid IDs, target fields, booleans, orders, completions, and resolved/null category references. Evidence: workspace_json_exact_types_order_and_references-shared.png\"}}",
+    "cost_usd": 0.5193266
+  },
+  "user_flows": {
+    "score": 0.9,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "create_habit_appears_under_category",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create flow: submitting a valid New Habit form under the field contract increases the list count by exactly one and the habit appears when its category chip is selected",
+        "reasoning": "Created \u201cMorning Walk\u201d under Health; the list increased and the Health chip showed the habit. Evidence: create_habit_appears_under_category-shared.png"
+      },
+      {
+        "id": "6.2",
+        "name": "invalid_habit_field_contract_blocks_create",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create flow: submitting a New Habit payload that fails the field contract (blank name, illegal targetCount, or over-length reminder) shows immediate inline validation naming the offending field and adds no habit",
+        "reasoning": "Submitting a blank form immediately showed inline \u201cname must be non-empty\u201d and the habit count stayed unchanged. Evidence: invalid_habit_field_contract_blocks_create-shared.png"
+      },
+      {
+        "id": "6.3",
+        "name": "checkin_updates_grid_and_stats",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Check-in flow: completing a Once a day habit updates today's weekly-grid cell, streak/flame treatment, and Stats monthly completions without a reload",
+        "reasoning": "Completing Morning Walk changed today\u2019s cell to done, updated the streak to 1, and Stats showed 1 July completion without reload. Evidence: checkin_updates_grid_and_stats-shared.png"
+      },
+      {
+        "id": "6.4",
+        "name": "pause_removes_from_list_and_stats",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Pause flow: pausing a habit removes it from the main list and from the Stats active-streak count without deleting its history",
+        "reasoning": "Pausing Morning Walk removed it from the active list, moved it to Paused habits, reduced Active streaks to 0, and retained its completion history. Evidence: checkin_updates_grid_and_stats-shared.png"
+      },
+      {
+        "id": "6.5",
+        "name": "habits_stats_heatmap_view_switch",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "View switch: opening Stats and Heatmap from the habits list shows those views with state retained for the selected habit, and returning to habits restores the list",
+        "reasoning": "Opened Stats and the Morning Walk heatmap with the completed state retained, then returned to the habits view. Evidence: checkin_updates_grid_and_stats-shared.png"
+      },
+      {
+        "id": "6.6",
+        "name": "empty_list_after_clear_or_start",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edge: with no habits present, the empty-state invitation remains clear and visible",
+        "reasoning": "On the initial empty workspace, \u201cNo habits yet\u201d and the clear \u201cCreate habit\u201d invitation were visible. Evidence: create_habit_appears_under_category-shared.png"
+      },
+      {
+        "id": "6.7",
+        "name": "category_filter_narrows_list",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Filter flow: selecting a category chip narrows the habit list to that category and selecting All restores every habit",
+        "reasoning": "Health showed only the Health habit, Mind showed only the Mind habit, and All restored the complete set. Evidence: create_habit_appears_under_category-shared.png"
+      },
+      {
+        "id": "6.8",
+        "name": "export_import_artifact_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Artifact flow: after creating a habit with a distinctive name and a check-in, Export as JSON then Import of that Workspace JSON after confirmation reconstructs the same visible habits, category chips, check-in state, and Stats numbers",
+        "reasoning": "FAIL: Export and confirmed import reconstructed the visible habits, categories, and check-in state, but the post-import Stats numbers were not directly re-observed before later state changes. Evidence: export_import_artifact_round_trip-shared.png"
+      },
+      {
+        "id": "6.9",
+        "name": "import_confirmation_overlay",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Import confirmation overlay warns that current data will be replaced; Cancel leaves data untouched and Confirm only proceeds for a field-contract-valid document",
+        "reasoning": "Import displayed a confirmation dialog warning that current habits, categories, history, and filter would be replaced; Cancel was available and a valid exported document proceeded only after confirmation. Evidence: import_confirmation_overlay-shared.png"
+      },
+      {
+        "id": "6.10",
+        "name": "recovery_banner_retry_reset",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Recovery: when the recovery notice appears, Retry and Reset produce visible deterministic results without requiring a full page reload to regain a usable UI",
+        "reasoning": "No recovery notice appeared during the live session, so the conditional Retry/Reset workflow was not applicable. Evidence: export_import_artifact_round_trip-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"create_habit_appears_under_category\":{\"score\":\"yes\",\"reasoning\":\"Created \u201cMorning Walk\u201d under Health; the list increased and the Health chip showed the habit. Evidence: create_habit_appears_under_category-shared.png\"},\"invalid_habit_field_contract_blocks_create\":{\"score\":\"yes\",\"reasoning\":\"Submitting a blank form immediately showed inline \u201cname must be non-empty\u201d and the habit count stayed unchanged. Evidence: invalid_habit_field_contract_blocks_create-shared.png\"},\"checkin_updates_grid_and_stats\":{\"score\":\"yes\",\"reasoning\":\"Completing Morning Walk changed today\u2019s cell to done, updated the streak to 1, and Stats showed 1 July completion without reload. Evidence: checkin_updates_grid_and_stats-shared.png\"},\"pause_removes_from_list_and_stats\":{\"score\":\"yes\",\"reasoning\":\"Pausing Morning Walk removed it from the active list, moved it to Paused habits, reduced Active streaks to 0, and retained its completion history. Evidence: checkin_updates_grid_and_stats-shared.png\"},\"habits_stats_heatmap_view_switch\":{\"score\":\"yes\",\"reasoning\":\"Opened Stats and the Morning Walk heatmap with the completed state retained, then returned to the habits view. Evidence: checkin_updates_grid_and_stats-shared.png\"},\"empty_list_after_clear_or_start\":{\"score\":\"yes\",\"reasoning\":\"On the initial empty workspace, \u201cNo habits yet\u201d and the clear \u201cCreate habit\u201d invitation were visible. Evidence: create_habit_appears_under_category-shared.png\"},\"category_filter_narrows_list\":{\"score\":\"yes\",\"reasoning\":\"Health showed only the Health habit, Mind showed only the Mind habit, and All restored the complete set. Evidence: create_habit_appears_under_category-shared.png\"},\"export_import_artifact_round_trip\":{\"score\":\"no\",\"reasoning\":\"FAIL: Export and confirmed import reconstructed the visible habits, categories, and check-in state, but the post-import Stats numbers were not directly re-observed before later state changes. Evidence: export_import_artifact_round_trip-shared.png\"},\"import_confirmation_overlay\":{\"score\":\"yes\",\"reasoning\":\"Import displayed a confirmation dialog warning that current habits, categories, history, and filter would be replaced; Cancel was available and a valid exported document proceeded only after confirmation. Evidence: import_confirmation_overlay-shared.png\"},\"recovery_banner_retry_reset\":{\"score\":\"yes\",\"reasoning\":\"No recovery notice appeared during the live session, so the conditional Retry/Reset workflow was not applicable. Evidence: export_import_artifact_round_trip-shared.png\"}}",
+    "cost_usd": 0.709904
+  },
+  "visual_design": {
+    "score": 0.7143,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "core_palette_computed_colors",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The canvas background computes to #F4F7F6, the habit card surface computes to #FFFFFF, and the primary button computes to #0F9D74 background with white text",
+        "reasoning": "Canvas, card, and primary button computed to #F4F7F6, #FFFFFF, and #0F9D74 with white text. Evidence: desktop-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "manrope_type_hierarchy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Headings and body text render in Manrope (or its declared Segoe UI/system-ui fallback), with headings visibly larger than body text",
+        "reasoning": "Rendered font is Manrope with 28px desktop heading and smaller body text. Evidence: desktop-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "consistent_8px_radius",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Habit cards, buttons, and inputs all render with a consistent 8px border-radius",
+        "reasoning": "Cards, buttons, and inputs visibly/computationally use 8px radius. Evidence: desktop-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "flame_treatments_distinct",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The three flame milestone treatments (plain, bright, gold) are visually distinguishable from each other as a present graphic element, not a placeholder",
+        "reasoning": "FAIL: Only the plain 0-day/building flame treatment was observed; bright and gold milestone treatments were not present. Evidence: flame_treatments_distinct-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "active_chip_highlighted",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The active category filter chip is visually highlighted distinctly from inactive chips",
+        "reasoning": "The active All chip is filled green with white text while inactive controls are transparent. Evidence: desktop-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "paused_habit_dimmed",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "A paused habit renders with a visibly muted or dimmed treatment distinct from active habits wherever it appears",
+        "reasoning": "Paused Read is separated under Paused habits and has a muted gray surface distinct from active white cards. Evidence: paused_habit_dimmed-shared.png",
+        "optional": true
+      },
+      {
+        "id": "3.7",
+        "name": "mobile_single_column_layout",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At approximately 375px viewport width, habit rows stack in a single column with no horizontal scrolling and the New Habit form remains fully usable",
+        "reasoning": "At 375px, habit cards stack vertically, scrollWidth does not exceed the viewport, and the New habit form controls remain within bounds. Evidence: mobile_single_column_layout-shared.png"
+      },
+      {
+        "id": "3.10",
+        "name": "heading_and_body_type_scale",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Top-level headings render at roughly 28px-equivalent size, section headings at roughly 20px, and list text, counts, and helper copy at a 16px base size",
+        "reasoning": "Observed 28px top heading, 20px section headings, and smaller base/helper text consistent with the requested hierarchy. Evidence: desktop-shared.png"
+      },
+      {
+        "id": "3.11",
+        "name": "ink_and_secondary_accent_colors",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Primary text computes to #1B2430, muted secondary text to #64748B, and the #FFB020 secondary accent appears on milestone flame accents",
+        "reasoning": "Primary text computed to #1B2430, muted text to #64748B, and flame accents are visibly present. Evidence: paused_habit_dimmed-shared.png"
+      },
+      {
+        "id": "3.12",
+        "name": "button_styles_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The primary button is a filled #0F9D74 background with white text, 8px border-radius, and no shadow; the secondary button is transparent with a 1px #64748B border, #1B2430 text, 8px border-radius, and no shadow",
+        "reasoning": "Primary buttons are green with white text, while secondary buttons are transparent with a 1px #64748B border; both use 8px radius and no shadow. Evidence: desktop-shared.png"
+      },
+      {
+        "id": "3.13",
+        "name": "spacing_on_4px_grid",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Padding and gaps between elements are multiples of a 4px base unit in computed styles, with no arbitrary one-off spacing values",
+        "reasoning": "FAIL: A visible tabs container uses computed 3px padding, violating an all-multiples-of-4 spacing grid. Evidence: desktop-shared.png"
+      },
+      {
+        "id": "3.14",
+        "name": "consistent_chrome_icon_set",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Icons across the app chrome come from one consistent icon set rendered at consistent sizes, alongside the fixed emoji palette used for habit icons",
+        "reasoning": "Chrome controls use consistent SVG icons at consistent small sizes, alongside distinct habit emoji icons. Evidence: paused_habit_dimmed-shared.png"
+      },
+      {
+        "id": "3.15",
+        "name": "recovery_notice_distinct_styling",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The recovery notice, when active, is visually distinct from ordinary toasts or banners, and its Retry and Reset controls are visually distinguishable from ordinary actions",
+        "reasoning": "FAIL: Malformed sample import reported recovery through the tool, but no visible recovery notice or Retry/Reset controls appeared in the browser. Evidence: recovery_notice_distinct_styling-shared.png"
+      },
+      {
+        "id": "3.16",
+        "name": "narrow_width_grids_and_notice_fit",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At narrow (roughly 375px) width the Heatmap month grid and the 7-day grid remain fully visible without clipping, the Stats numbers and trend chart fit the viewport, and the recovery notice remains legible with its Retry and Reset controls reachable",
+        "reasoning": "FAIL: The 7-day cards, heatmap month grid, stats numbers, and chart fit at 375px, but the recovery notice could not be observed because it did not render after malformed-sample activation. Evidence: heatmap-mobile-shared.png"
+      },
+      {
+        "id": "3.17",
+        "name": "capitalization_and_verb_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Headings, buttons, and chips use one consistent capitalization convention throughout, and action labels are specific verbs or verb phrases such as Add habit, Export as JSON, and Load Malformed Sample rather than generic labels",
+        "reasoning": "Labels use a consistent sentence-case convention and specific actions such as Create habit, Export as JSON, and Load Malformed Sample. Evidence: capitalization_and_verb_labels-shared.png"
+      },
+      {
+        "id": "3.19",
+        "name": "messages_name_problem_and_fix",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Error messages and the recovery notice name the problem and the fix, and empty states explain what belongs there and how to add it",
+        "reasoning": "FAIL: The empty state explains what belongs there and how to add it, but the attempted malformed import produced no visible recovery/error message naming the problem and fix. Evidence: recovery_notice_distinct_styling-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"core_palette_computed_colors\":{\"score\":\"yes\",\"reasoning\":\"Canvas, card, and primary button computed to #F4F7F6, #FFFFFF, and #0F9D74 with white text. Evidence: desktop-shared.png\"},\"manrope_type_hierarchy\":{\"score\":\"yes\",\"reasoning\":\"Rendered font is Manrope with 28px desktop heading and smaller body text. Evidence: desktop-shared.png\"},\"consistent_8px_radius\":{\"score\":\"yes\",\"reasoning\":\"Cards, buttons, and inputs visibly/computationally use 8px radius. Evidence: desktop-shared.png\"},\"flame_treatments_distinct\":{\"score\":\"no\",\"reasoning\":\"FAIL: Only the plain 0-day/building flame treatment was observed; bright and gold milestone treatments were not present. Evidence: flame_treatments_distinct-shared.png\"},\"active_chip_highlighted\":{\"score\":\"yes\",\"reasoning\":\"The active All chip is filled green with white text while inactive controls are transparent. Evidence: desktop-shared.png\"},\"paused_habit_dimmed\":{\"score\":\"yes\",\"reasoning\":\"Paused Read is separated under Paused habits and has a muted gray surface distinct from active white cards. Evidence: paused_habit_dimmed-shared.png\"},\"mobile_single_column_layout\":{\"score\":\"yes\",\"reasoning\":\"At 375px, habit cards stack vertically, scrollWidth does not exceed the viewport, and the New habit form controls remain within bounds. Evidence: mobile_single_column_layout-shared.png\"},\"heading_and_body_type_scale\":{\"score\":\"yes\",\"reasoning\":\"Observed 28px top heading, 20px section headings, and smaller base/helper text consistent with the requested hierarchy. Evidence: desktop-shared.png\"},\"ink_and_secondary_accent_colors\":{\"score\":\"yes\",\"reasoning\":\"Primary text computed to #1B2430, muted text to #64748B, and flame accents are visibly present. Evidence: paused_habit_dimmed-shared.png\"},\"button_styles_match_spec\":{\"score\":\"yes\",\"reasoning\":\"Primary buttons are green with white text, while secondary buttons are transparent with a 1px #64748B border; both use 8px radius and no shadow. Evidence: desktop-shared.png\"},\"spacing_on_4px_grid\":{\"score\":\"no\",\"reasoning\":\"FAIL: A visible tabs container uses computed 3px padding, violating an all-multiples-of-4 spacing grid. Evidence: desktop-shared.png\"},\"consistent_chrome_icon_set\":{\"score\":\"yes\",\"reasoning\":\"Chrome controls use consistent SVG icons at consistent small sizes, alongside distinct habit emoji icons. Evidence: paused_habit_dimmed-shared.png\"},\"recovery_notice_distinct_styling\":{\"score\":\"no\",\"reasoning\":\"FAIL: Malformed sample import reported recovery through the tool, but no visible recovery notice or Retry/Reset controls appeared in the browser. Evidence: recovery_notice_distinct_styling-shared.png\"},\"narrow_width_grids_and_notice_fit\":{\"score\":\"no\",\"reasoning\":\"FAIL: The 7-day cards, heatmap month grid, stats numbers, and chart fit at 375px, but the recovery notice could not be observed because it did not render after malformed-sample activation. Evidence: heatmap-mobile-shared.png\"},\"capitalization_and_verb_labels\":{\"score\":\"yes\",\"reasoning\":\"Labels use a consistent sentence-case convention and specific actions such as Create habit, Export as JSON, and Load Malformed Sample. Evidence: capitalization_and_verb_labels-shared.png\"},\"messages_name_problem_and_fix\":{\"score\":\"no\",\"reasoning\":\"FAIL: The empty state explains what belongs there and how to add it, but the attempted malformed import produced no visible recovery/error message naming the problem and fix. Evidence: recovery_notice_distinct_styling-shared.png\"}}",
+    "cost_usd": 0.3440718
+  },
+  "writing": {
+    "score": 0.7188,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "headings_use_consistent_capitalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders headings and section titles, they use consistent capitalization (one convention \u2014 title case or sentence case \u2014 throughout).",
+        "reasoning": "yes \u2014 Headings consistently use sentence case across the visible views. Evidence: initial-shared.png"
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_labels",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Where the app renders button or action labels, they are specific verbs such as Add habit, Export as JSON, and Load Malformed Sample, not generic Submit or OK when a specific label is possible.",
+        "reasoning": "FAIL: The quick-tour dismissal uses the generic label \u201cGot it\u201d where a more specific action label could be used. Evidence: initial-shared.png"
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders field-contract validation errors for New Habit, category create, or Import, they name the offending field and the rule (for example name must be non-empty, targetCount must be 1\u2013100, schemaVersion must be loopdaily.workspace.v1), not just Invalid.",
+        "reasoning": "yes \u2014 Validation messages identify the field and rule, including \u201cname must be non-empty.\u201d Evidence: errors_name_fix-shared.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders empty states, the copy explains what belongs there and how to add it.",
+        "reasoning": "yes \u2014 The empty state explains that habits belong there and directs users to create their first habit. Evidence: initial-shared.png"
+      },
+      {
+        "id": "15.5",
+        "name": "body_copy_is_well_written",
+        "value": 0.75,
+        "raw": 4,
+        "weight": 0.5,
+        "description": "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors.",
+        "reasoning": "Body copy is generally clear and grammatical, with a visible agreement error: \u201c1 valid categories.\u201d Evidence: import-error-shared.png"
+      },
+      {
+        "id": "15.6",
+        "name": "terminology_is_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there).",
+        "reasoning": "yes \u2014 The app consistently uses \u201chabit,\u201d \u201ccategory,\u201d \u201ccompletion,\u201d and \u201cworkspace\u201d for the same concepts. Evidence: habits-data-shared.png"
+      },
+      {
+        "id": "15.7",
+        "name": "numbers_dates_and_units_are_consistent",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled).",
+        "reasoning": "FAIL: The app mixes formats such as \u201cJuly completions,\u201d \u201cJul 10,\u201d \u201c0d streak,\u201d and \u201c0 day streak.\u201d Evidence: stats-shared.png"
+      },
+      {
+        "id": "15.8",
+        "name": "success_messages_are_specific",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations.",
+        "reasoning": "yes \u2014 Success feedback explicitly states what happened, including \u201cMalformed sample loaded\u201d and the number of habits recovered. Evidence: import-error-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"headings_use_consistent_capitalization\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Headings consistently use sentence case across the visible views. Evidence: initial-shared.png\"},\"actions_use_specific_labels\":{\"score\":\"no\",\"reasoning\":\"FAIL: The quick-tour dismissal uses the generic label \u201cGot it\u201d where a more specific action label could be used. Evidence: initial-shared.png\"},\"errors_name_problem_and_fix\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Validation messages identify the field and rule, including \u201cname must be non-empty.\u201d Evidence: errors_name_fix-shared.png\"},\"empty_states_explain_next_step\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 The empty state explains that habits belong there and directs users to create their first habit. Evidence: initial-shared.png\"},\"body_copy_is_well_written\":{\"score\":4,\"reasoning\":\"Body copy is generally clear and grammatical, with a visible agreement error: \u201c1 valid categories.\u201d Evidence: import-error-shared.png\"},\"terminology_is_consistent\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 The app consistently uses \u201chabit,\u201d \u201ccategory,\u201d \u201ccompletion,\u201d and \u201cworkspace\u201d for the same concepts. Evidence: habits-data-shared.png\"},\"numbers_dates_and_units_are_consistent\":{\"score\":\"no\",\"reasoning\":\"FAIL: The app mixes formats such as \u201cJuly completions,\u201d \u201cJul 10,\u201d \u201c0d streak,\u201d and \u201c0 day streak.\u201d Evidence: stats-shared.png\"},\"success_messages_are_specific\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Success feedback explicitly states what happened, including \u201cMalformed sample loaded\u201d and the number of habits recovered. Evidence: import-error-shared.png\"}}",
+    "cost_usd": 0.1687286
+  }
+}

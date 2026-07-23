@@ -1,0 +1,2497 @@
+{
+  "accessibility": {
+    "score": 0.8,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "controls_are_keyboard_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space.",
+        "reasoning": "Native buttons and card role-buttons are focusable; modal tabbing stayed within the dialog. Evidence: controls-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "modals_manage_focus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Modal dialogs trap focus and return it to the originating control on close.",
+        "reasoning": "The create-task dialog trapped Tab focus and closing it returned focus to the originating Create task button. Evidence: modal-form-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "images_and_icons_have_alt_text",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "All images and icons have descriptive alt text.",
+        "reasoning": "No img elements were present; SVG icons were marked aria-hidden and paired with descriptive visible labels where needed. Evidence: controls-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "feedback_uses_live_regions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Errors and notifications are conveyed both visually and via ARIA live regions.",
+        "reasoning": "Validation feedback appeared visually as an alert with aria-live, and a Notifications region also used aria-live=\"polite\". Evidence: modal-form-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "forms_have_explicit_labels",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "All form elements use explicit label elements.",
+        "reasoning": "FAIL: The visible form included an unlabeled native select element with no associated label and no aria-label, despite the custom combobox being labeled. Evidence: modal-form-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "headings_follow_logical_order",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Headings follow a logical order with no skips, such as H1 to H2 to H3.",
+        "reasoning": "The observed heading structure proceeds from H1 Repository intake to H2 repository headings without skips. Evidence: controls-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "landmark_navigation_is_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Skip-to-content or landmark navigation is present.",
+        "reasoning": "The app exposes aside, nav, header, main, and a labeled Notifications region. Evidence: controls-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "text_and_controls_have_contrast",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "All text and controls have sufficient color contrast.",
+        "reasoning": "FAIL: The visible onboarding Skip control rendered with approximately 2.43:1 contrast against its dark background, below sufficient contrast. Evidence: a11y-initial-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "semantic_html_roles_are_used",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Semantic HTML roles such as nav, main, and button are used.",
+        "reasoning": "Observed semantic main/nav/aside/header elements, native buttons, and labeled ARIA roles for cards, dialogs, and notifications. Evidence: controls-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "reduced_motion_is_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Animations respect the prefers-reduced-motion setting.",
+        "reasoning": "In the reduced-motion browser, prefers-reduced-motion matched true and no visible elements had nonzero animation or transition durations. Evidence: reduced-motion-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"controls_are_keyboard_accessible\":{\"score\":\"yes\",\"reasoning\":\"Native buttons and card role-buttons are focusable; modal tabbing stayed within the dialog. Evidence: controls-shared.png\"},\"modals_manage_focus\":{\"score\":\"yes\",\"reasoning\":\"The create-task dialog trapped Tab focus and closing it returned focus to the originating Create task button. Evidence: modal-form-shared.png\"},\"images_and_icons_have_alt_text\":{\"score\":\"yes\",\"reasoning\":\"No img elements were present; SVG icons were marked aria-hidden and paired with descriptive visible labels where needed. Evidence: controls-shared.png\"},\"feedback_uses_live_regions\":{\"score\":\"yes\",\"reasoning\":\"Validation feedback appeared visually as an alert with aria-live, and a Notifications region also used aria-live=\\\"polite\\\". Evidence: modal-form-shared.png\"},\"forms_have_explicit_labels\":{\"score\":\"no\",\"reasoning\":\"FAIL: The visible form included an unlabeled native select element with no associated label and no aria-label, despite the custom combobox being labeled. Evidence: modal-form-shared.png\"},\"headings_follow_logical_order\":{\"score\":\"yes\",\"reasoning\":\"The observed heading structure proceeds from H1 Repository intake to H2 repository headings without skips. Evidence: controls-shared.png\"},\"landmark_navigation_is_present\":{\"score\":\"yes\",\"reasoning\":\"The app exposes aside, nav, header, main, and a labeled Notifications region. Evidence: controls-shared.png\"},\"text_and_controls_have_contrast\":{\"score\":\"no\",\"reasoning\":\"FAIL: The visible onboarding Skip control rendered with approximately 2.43:1 contrast against its dark background, below sufficient contrast. Evidence: a11y-initial-shared.png\"},\"semantic_html_roles_are_used\":{\"score\":\"yes\",\"reasoning\":\"Observed semantic main/nav/aside/header elements, native buttons, and labeled ARIA roles for cards, dialogs, and notifications. Evidence: controls-shared.png\"},\"reduced_motion_is_respected\":{\"score\":\"yes\",\"reasoning\":\"In the reduced-motion browser, prefers-reduced-motion matched true and no visible elements had nonzero animation or transition durations. Evidence: reduced-motion-shared.png\"}}",
+    "cost_usd": 0.20677579999999998
+  },
+  "behavioral": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_round_trip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline \u2014 never a mix.",
+        "reasoning": "Configured sorting, created run #247, opened its detail, applied a trial filter, and expanded a log; reload returned to the seeded overview with default view, baseline counts, and no #247. Evidence: multi_facet_round_trip-shared.png"
+      },
+      {
+        "id": "14.2",
+        "name": "sort_reversal_proves_live_data",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders.",
+        "reasoning": "The live PR order changed from #247\u2026#165 in Newest first to #165\u2026#247 in Oldest first. Evidence: sort_reversal_proves_live_data-shared.png"
+      },
+      {
+        "id": "14.3",
+        "name": "derived_view_responds_to_input",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input.",
+        "reasoning": "Searching different PR inputs changed the derived register: #247 produced a matching row, while another input produced an empty-state view. Evidence: derived_view_responds_to_input-shared.png"
+      },
+      {
+        "id": "14.4",
+        "name": "cross_view_echo_without_reload",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list \u2194 detail, board \u2194 stats) without reload.",
+        "reasoning": "After creating run #247, its pipeline row opened directly to a detail view showing the same PR number, title, issue, and accepted state without reload. Evidence: cross_view_echo_without_reload-shared.png"
+      },
+      {
+        "id": "14.5",
+        "name": "count_delta_is_exact",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter.",
+        "reasoning": "The quartz-orm summary changed immediately from 3 tasks produced to 4 after creating exactly one run (#247). Evidence: cross_view_echo_without_reload-shared.png"
+      },
+      {
+        "id": "14.6",
+        "name": "different_inputs_change_outcomes",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate.",
+        "reasoning": "The same search workflow with #247 returned a matching PR, while #184 returned no matches in the exercised state. Evidence: derived_view_responds_to_input-shared.png"
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_flows_preserve_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state.",
+        "reasoning": "Entered PR #250 in the create dialog, switched to Analytics, returned to the pipeline, and the draft remained intact; submission completed as PR #250 with a matching detail view. Evidence: cross_view_echo_without_reload-shared.png"
+      },
+      {
+        "id": "14.8",
+        "name": "empty_to_repopulated_round_trip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions.",
+        "reasoning": "Empty register changed the derived totals to 0 and displayed the empty state; Restore seed register repopulated the rows and restored 9 processed, 3 tasks, and 33% yield. Evidence: empty_to_repopulated_round_trip-shared.png"
+      },
+      {
+        "id": "14.9",
+        "name": "reload_resets_factory_baseline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After starting a create-task run, applying a trial-verdict filter, and expanding a log excerpt, a page reload coherently returns the app to its seeded baseline \u2014 seeded repositories, pull requests, trials, and timeline with the default view active, the created run's row gone, and no filters or expansions surviving \u2014 never a mix of kept and reset facets",
+        "reasoning": "After creating runs and applying/expanding detail state, reload returned to the seeded overview: 4 repositories, 33 PRs, 18 accepted tasks, default view, and no created run or filters. Evidence: reload_resets_factory_baseline-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"multi_facet_round_trip\":{\"score\":\"yes\",\"reasoning\":\"Configured sorting, created run #247, opened its detail, applied a trial filter, and expanded a log; reload returned to the seeded overview with default view, baseline counts, and no #247. Evidence: multi_facet_round_trip-shared.png\"},\"sort_reversal_proves_live_data\":{\"score\":\"yes\",\"reasoning\":\"The live PR order changed from #247\u2026#165 in Newest first to #165\u2026#247 in Oldest first. Evidence: sort_reversal_proves_live_data-shared.png\"},\"derived_view_responds_to_input\":{\"score\":\"yes\",\"reasoning\":\"Searching different PR inputs changed the derived register: #247 produced a matching row, while another input produced an empty-state view. Evidence: derived_view_responds_to_input-shared.png\"},\"cross_view_echo_without_reload\":{\"score\":\"yes\",\"reasoning\":\"After creating run #247, its pipeline row opened directly to a detail view showing the same PR number, title, issue, and accepted state without reload. Evidence: cross_view_echo_without_reload-shared.png\"},\"count_delta_is_exact\":{\"score\":\"yes\",\"reasoning\":\"The quartz-orm summary changed immediately from 3 tasks produced to 4 after creating exactly one run (#247). Evidence: cross_view_echo_without_reload-shared.png\"},\"different_inputs_change_outcomes\":{\"score\":\"yes\",\"reasoning\":\"The same search workflow with #247 returned a matching PR, while #184 returned no matches in the exercised state. Evidence: derived_view_responds_to_input-shared.png\"},\"interleaved_flows_preserve_state\":{\"score\":\"yes\",\"reasoning\":\"Entered PR #250 in the create dialog, switched to Analytics, returned to the pipeline, and the draft remained intact; submission completed as PR #250 with a matching detail view. Evidence: cross_view_echo_without_reload-shared.png\"},\"empty_to_repopulated_round_trip\":{\"score\":\"yes\",\"reasoning\":\"Empty register changed the derived totals to 0 and displayed the empty state; Restore seed register repopulated the rows and restored 9 processed, 3 tasks, and 33% yield. Evidence: empty_to_repopulated_round_trip-shared.png\"},\"reload_resets_factory_baseline\":{\"score\":\"yes\",\"reasoning\":\"After creating runs and applying/expanding detail state, reload returned to the seeded overview: 4 repositories, 33 PRs, 18 accepted tasks, default view, and no created run or filters. Evidence: reload_resets_factory_baseline-shared.png\"}}",
+    "cost_usd": 0.7349954
+  },
+  "core_features": {
+    "score": 0.7,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "seeded_repositories_complete",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On load, the Repositories view shows at least 4 fictional repositories, each with a name, primary language, pull-requests-processed count, tasks-produced count, and a yield percentage that equals tasks produced divided by pull requests processed (rounded to a whole percent)",
+        "reasoning": "Four repositories are visible with language, processed count, produced tasks, and matching whole-percent yields. Evidence: seeded_repositories_complete-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "repo_opens_pipeline_view",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Selecting a repository swaps the main canvas to that repository's pipeline view without a full page reload, showing at least 8 seeded pull-request rows, each with a pull-request number, title, source-file count, and a linked-issue chip or a visible no-linked-issue marker; a visible control returns to the Repositories view",
+        "reasoning": "Selecting quartz-orm opened its pipeline in-app with 9 PR rows and an All repositories return control. Evidence: repo_opens_pipeline_view-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "stage_strip_five_stages",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every pull-request row renders a stage strip of exactly 5 named stages in the fixed order Fetch, Evaluate, Skeleton, Generate, Validate, and each stage shows exactly one of the statuses pending, running, complete, failed, or skipped with visually distinct treatments plus a readable label or tooltip",
+        "reasoning": "Rows visibly show exactly Fetch, Evaluate, Skeleton, Generate, Validate with readable statuses including complete, skipped, running, and pending. Evidence: repo_opens_pipeline_view-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "rejection_reason_taxonomy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rejected pull requests show a rejection reason chip whose text is one of exactly five values \u2014 docs-only, formatting-only, too-few-files, too-many-files, no-linked-issue \u2014 and no rejection reason text outside that taxonomy appears anywhere in the app",
+        "reasoning": "Rejected rows show only taxonomy reasons such as docs-only, formatting-only, too-few-files, and no-linked-issue; no out-of-taxonomy rejection reason was observed. Evidence: repo_opens_pipeline_view-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "paired_check_cards",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A task detail for a pull request that reached Validate shows two paired check cards side by side \u2014 a baseline check described as tests must fail on the reproduced bug and a reference check described as tests must pass with the fix applied \u2014 each with its own status, an attempt count, and a log excerpt that is collapsed by default and expands and collapses on activation",
+        "reasoning": "Accepted task detail shows paired Baseline and Reference check cards with descriptions, passing statuses, Attempt 1, and collapsed Log excerpt controls; activation expanded and re-collapsed a log. Evidence: paired_check_cards-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "accepted_badge_derives_from_checks",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A task shows an accepted badge only when both the baseline check and the reference check show passing status; a seeded or created task with either check failing or pending shows no accepted badge, and when a created run's checks both turn green the badge appears without a reload",
+        "reasoning": "FAIL: Accepted badges were observed with both checks passing, including the created run, but the required failing or pending negative branch was not directly verified. Evidence: paired_check_cards-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "trial_panel_distribution_bar",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "An accepted task's detail shows a trial analysis panel with at least 6 seeded trials, each carrying exactly one verdict from good-success, bad-success, good-failure, bad-failure, or infrastructure-error, plus a distribution bar whose segment widths are proportional to the verdict counts",
+        "reasoning": "Accepted task detail shows 7 trials across the required verdict values and a proportional verdict distribution control. Evidence: paired_check_cards-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "verdict_filter_round_trip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Activating a verdict in the distribution bar or its legend narrows the trial list to only trials with that verdict, and a clear control restores the full trial list exactly",
+        "reasoning": "Activating bad-success narrowed the list to trial-02 only, and Clear filter restored all 7 trials. Evidence: paired_check_cards-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "needs_review_banner_on_bad_success",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A needs-review banner is visible on the detail of an accepted task that has at least one bad-success trial, and no such banner appears on an accepted task with zero bad-success trials",
+        "reasoning": "Accepted task with one bad-success trial visibly shows Needs review. Evidence: paired_check_cards-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "create_form_validation_rules",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting the create-task form with an empty or non-numeric pull-request number shows an inline message naming the pull-request number field and starts no run; entering a minimum source-file bound greater than the maximum shows a cross-field message naming both bounds, and the submit control stays disabled while the form is invalid",
+        "reasoning": "Invalid nonnumeric PR input and min-greater-than-max bounds produced named inline errors while Start pipeline run remained disabled. Evidence: create_form_validation_rules-shared.png"
+      },
+      {
+        "id": "1.12",
+        "name": "created_run_stages_advance",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting a valid create-task form adds a new row to the chosen repository's pipeline view whose stage strip advances visibly through Fetch, Evaluate, Skeleton, Generate, and Validate, each stage moving from pending to running to complete over a perceivable interval rather than snapping instantly to a finished state",
+        "reasoning": "Created PR #247 was observed mid-run with Skeleton running and later completed through all five stages, demonstrating interval-based advancement. Evidence: timeline_appends_live-shared.png"
+      },
+      {
+        "id": "1.13",
+        "name": "retry_resumes_from_failed_stage",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "During a created run, a failing stage shows a visible attempt count that increments on retry, and when the retry succeeds the run resumes from that stage while every earlier completed stage keeps its completed status and timestamp unchanged (no restart from the first stage)",
+        "reasoning": "Created run visibly recorded Generate failed attempt 1, retry scheduled attempt 2, then completed with Generate a2 while earlier stage timestamps/statuses remained complete. Evidence: timeline_appends_live-shared.png"
+      },
+      {
+        "id": "1.14",
+        "name": "timeline_appends_live",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The factory event timeline shows ordered, timestamped entries for stage transitions, gains entries live while a created run advances without a reload, supports filtering by event status, and restores the full list when the filter is cleared",
+        "reasoning": "Timeline shows ordered timestamped transitions, including the created run's failure, retry, and acceptance; status filtering worked and Clear filter restored the full list. Evidence: timeline_appends_live-shared.png"
+      },
+      {
+        "id": "1.15",
+        "name": "charts_update_on_completion",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The analytics area renders a tasks-per-week chart, a language distribution chart, and a difficulty histogram with hover tooltips showing underlying values, and after a created run completes as accepted, the tasks-per-week and language distribution charts change to include the new task without a reload",
+        "reasoning": "FAIL: Tasks-per-week, language distribution, and difficulty charts plus a hover tooltip were observed, but a direct before/after chart comparison was not captured. Evidence: charts_update_on_completion-shared.png"
+      },
+      {
+        "id": "1.16",
+        "name": "manifest_copy_confirmation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "An accepted task's detail renders a task manifest in a monospaced code block with a format label and a copy control; activating copy places the exact manifest text on the clipboard and shows visible confirmation (icon swap or toast)",
+        "reasoning": "FAIL: Manifest code block and Copy control were present, but clipboard readback was denied and no visible confirmation was directly observed. Evidence: paired_check_cards-shared.png"
+      },
+      {
+        "id": "1.16b",
+        "name": "create_task_request_body_field_contract",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Create-task validates the request-body field contract: repository from the seeded select, pullRequestNumber a positive 1\u20136 digit integer string, minFiles and maxFiles integers 1\u2013500 with minFiles \u2264 maxFiles; violations keep submit disabled with named errors and start no run",
+        "reasoning": "FAIL: Required and cross-field validation was verified, but all specified range violations, including bounds outside 1\u2013500, were not exercised. Evidence: create_form_validation_rules-shared.png"
+      },
+      {
+        "id": "1.16c",
+        "name": "task_manifest_download_field_contract",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Download task-manifest.json and Copy for an accepted task emit JSON with required schemaVersion 1, id, repository, pullRequestNumber, minFiles, maxFiles, checks.skeleton and checks.validate true, stages array of five named stages with status and attemptCount, and generatedAt ending in Z \u2014 matching the session-created task",
+        "reasoning": "FAIL: The visible manifest contains the required schema fields and five stages, but Download and exact emitted JSON were not directly verified. Evidence: paired_check_cards-shared.png"
+      },
+      {
+        "id": "1.17",
+        "name": "double_submit_single_run",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Rapidly double-activating the create-task form's submit control starts exactly one run: exactly one new row appears in the pipeline view",
+        "reasoning": "BLOCKED: Rapid double activation of the valid submit control was not exercised. Evidence: create_form_validation_rules-shared.png"
+      },
+      {
+        "id": "1.18",
+        "name": "empty_states_on_no_match",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When a verdict filter or timeline filter matches nothing, the filtered region shows an empty state message with a control that clears the filter, instead of a blank or broken panel",
+        "reasoning": "Filtering the timeline to skipped showed a dedicated No events match empty state with a Clear filter control. Evidence: timeline_appends_live-shared.png"
+      },
+      {
+        "id": "1.21",
+        "name": "seed_covers_three_pipeline_situations",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "In at least one repository the seeded pull requests include at least one fully complete and accepted PR, at least one rejected PR showing a taxonomy reason chip, and at least one mid-pipeline PR whose stage strip still shows a pending or running stage",
+        "reasoning": "The seeded quartz-orm pipeline visibly includes accepted complete rows, rejected taxonomy-chip rows, and a mid-pipeline row with running/pending stages. Evidence: repo_opens_pipeline_view-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"seeded_repositories_complete\":{\"score\":\"yes\",\"reasoning\":\"Four repositories are visible with language, processed count, produced tasks, and matching whole-percent yields. Evidence: seeded_repositories_complete-shared.png\"},\"repo_opens_pipeline_view\":{\"score\":\"yes\",\"reasoning\":\"Selecting quartz-orm opened its pipeline in-app with 9 PR rows and an All repositories return control. Evidence: repo_opens_pipeline_view-shared.png\"},\"stage_strip_five_stages\":{\"score\":\"yes\",\"reasoning\":\"Rows visibly show exactly Fetch, Evaluate, Skeleton, Generate, Validate with readable statuses including complete, skipped, running, and pending. Evidence: repo_opens_pipeline_view-shared.png\"},\"rejection_reason_taxonomy\":{\"score\":\"yes\",\"reasoning\":\"Rejected rows show only taxonomy reasons such as docs-only, formatting-only, too-few-files, and no-linked-issue; no out-of-taxonomy rejection reason was observed. Evidence: repo_opens_pipeline_view-shared.png\"},\"paired_check_cards\":{\"score\":\"yes\",\"reasoning\":\"Accepted task detail shows paired Baseline and Reference check cards with descriptions, passing statuses, Attempt 1, and collapsed Log excerpt controls; activation expanded and re-collapsed a log. Evidence: paired_check_cards-shared.png\"},\"accepted_badge_derives_from_checks\":{\"score\":\"no\",\"reasoning\":\"FAIL: Accepted badges were observed with both checks passing, including the created run, but the required failing or pending negative branch was not directly verified. Evidence: paired_check_cards-shared.png\"},\"trial_panel_distribution_bar\":{\"score\":\"yes\",\"reasoning\":\"Accepted task detail shows 7 trials across the required verdict values and a proportional verdict distribution control. Evidence: paired_check_cards-shared.png\"},\"verdict_filter_round_trip\":{\"score\":\"yes\",\"reasoning\":\"Activating bad-success narrowed the list to trial-02 only, and Clear filter restored all 7 trials. Evidence: paired_check_cards-shared.png\"},\"needs_review_banner_on_bad_success\":{\"score\":\"yes\",\"reasoning\":\"Accepted task with one bad-success trial visibly shows Needs review. Evidence: paired_check_cards-shared.png\"},\"create_form_validation_rules\":{\"score\":\"yes\",\"reasoning\":\"Invalid nonnumeric PR input and min-greater-than-max bounds produced named inline errors while Start pipeline run remained disabled. Evidence: create_form_validation_rules-shared.png\"},\"created_run_stages_advance\":{\"score\":\"yes\",\"reasoning\":\"Created PR #247 was observed mid-run with Skeleton running and later completed through all five stages, demonstrating interval-based advancement. Evidence: timeline_appends_live-shared.png\"},\"retry_resumes_from_failed_stage\":{\"score\":\"yes\",\"reasoning\":\"Created run visibly recorded Generate failed attempt 1, retry scheduled attempt 2, then completed with Generate a2 while earlier stage timestamps/statuses remained complete. Evidence: timeline_appends_live-shared.png\"},\"timeline_appends_live\":{\"score\":\"yes\",\"reasoning\":\"Timeline shows ordered timestamped transitions, including the created run's failure, retry, and acceptance; status filtering worked and Clear filter restored the full list. Evidence: timeline_appends_live-shared.png\"},\"charts_update_on_completion\":{\"score\":\"no\",\"reasoning\":\"FAIL: Tasks-per-week, language distribution, and difficulty charts plus a hover tooltip were observed, but a direct before/after chart comparison was not captured. Evidence: charts_update_on_completion-shared.png\"},\"manifest_copy_confirmation\":{\"score\":\"no\",\"reasoning\":\"FAIL: Manifest code block and Copy control were present, but clipboard readback was denied and no visible confirmation was directly observed. Evidence: paired_check_cards-shared.png\"},\"create_task_request_body_field_contract\":{\"score\":\"no\",\"reasoning\":\"FAIL: Required and cross-field validation was verified, but all specified range violations, including bounds outside 1\u2013500, were not exercised. Evidence: create_form_validation_rules-shared.png\"},\"task_manifest_download_field_contract\":{\"score\":\"no\",\"reasoning\":\"FAIL: The visible manifest contains the required schema fields and five stages, but Download and exact emitted JSON were not directly verified. Evidence: paired_check_cards-shared.png\"},\"double_submit_single_run\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Rapid double activation of the valid submit control was not exercised. Evidence: create_form_validation_rules-shared.png\"},\"empty_states_on_no_match\":{\"score\":\"yes\",\"reasoning\":\"Filtering the timeline to skipped showed a dedicated No events match empty state with a Clear filter control. Evidence: timeline_appends_live-shared.png\"},\"seed_covers_three_pipeline_situations\":{\"score\":\"yes\",\"reasoning\":\"The seeded quartz-orm pipeline visibly includes accepted complete rows, rejected taxonomy-chip rows, and a mid-pipeline row with running/pending stages. Evidence: repo_opens_pipeline_view-shared.png\"}}",
+    "cost_usd": 0.5754484
+  },
+  "design_fidelity": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "spacing_and_sizing_follow_scale",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles.",
+        "reasoning": "Consistent card, button, sidebar, and grid spacing is visible across the desktop layout. Evidence: desktop-final-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "typography_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography matches the spec for all headings and body copy.",
+        "reasoning": "Inter is used consistently, with visibly distinct heading, label, and body sizes/weights. Evidence: desktop-final-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "layout_matches_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity.",
+        "reasoning": "Desktop composition shows a stable sidebar, header actions, metric strip, and two-column repository cards. Evidence: desktop-final-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "specified_state_changes_animate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Transitions or animations are applied to the state changes the spec calls out, such as add, delete, filter, or view switch.",
+        "reasoning": "Controls expose short CSS transitions, and the theme state changes through the real Dark-theme interaction. Evidence: theme-state-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "responsive_behavior_matches_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Responsive behavior matches reference patterns.",
+        "reasoning": "At 390px the layout switches to a compact mobile header and vertically stacked content without horizontal overflow. Evidence: responsive-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "control_styling_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Button and form radii, padding, and shadows conform to the spec.",
+        "reasoning": "Buttons consistently use rounded corners, compact padding, and restrained shadows; hover styling changes the primary button visibly. Evidence: desktop-final-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "typography_has_clear_hierarchy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography has a clear hierarchy that distinguishes section and body text.",
+        "reasoning": "Large page titles, uppercase section labels, card titles, and supporting copy form a clear hierarchy. Evidence: desktop-final-shared.png"
+      },
+      {
+        "id": "3.8",
+        "name": "component_states_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Component states (default, hover, active, disabled) match the spec where specified.",
+        "reasoning": "Selected navigation/theme controls and hover feedback are visibly differentiated from resting controls. Evidence: theme-state-shared.png"
+      },
+      {
+        "id": "3.9",
+        "name": "surface_treatments_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Color, depth, and border treatments are precise per the design.",
+        "reasoning": "The app uses distinct dark navigation surfaces, light content surfaces, bordered cards, and subtle depth treatments. Evidence: desktop-final-shared.png"
+      },
+      {
+        "id": "3.10",
+        "name": "microinteractions_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Microinteraction feedback for hover and press follows the spec in duration and motion.",
+        "reasoning": "Real hover observation changed background, shadow, and transform, with a short transition duration. Evidence: desktop-final-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"spacing_and_sizing_follow_scale\":{\"score\":\"yes\",\"reasoning\":\"Consistent card, button, sidebar, and grid spacing is visible across the desktop layout. Evidence: desktop-final-shared.png\"},\"typography_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"Inter is used consistently, with visibly distinct heading, label, and body sizes/weights. Evidence: desktop-final-shared.png\"},\"layout_matches_reference\":{\"score\":\"yes\",\"reasoning\":\"Desktop composition shows a stable sidebar, header actions, metric strip, and two-column repository cards. Evidence: desktop-final-shared.png\"},\"specified_state_changes_animate\":{\"score\":\"yes\",\"reasoning\":\"Controls expose short CSS transitions, and the theme state changes through the real Dark-theme interaction. Evidence: theme-state-shared.png\"},\"responsive_behavior_matches_reference\":{\"score\":\"yes\",\"reasoning\":\"At 390px the layout switches to a compact mobile header and vertically stacked content without horizontal overflow. Evidence: responsive-shared.png\"},\"control_styling_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"Buttons consistently use rounded corners, compact padding, and restrained shadows; hover styling changes the primary button visibly. Evidence: desktop-final-shared.png\"},\"typography_has_clear_hierarchy\":{\"score\":\"yes\",\"reasoning\":\"Large page titles, uppercase section labels, card titles, and supporting copy form a clear hierarchy. Evidence: desktop-final-shared.png\"},\"component_states_match_spec\":{\"score\":\"yes\",\"reasoning\":\"Selected navigation/theme controls and hover feedback are visibly differentiated from resting controls. Evidence: theme-state-shared.png\"},\"surface_treatments_match_spec\":{\"score\":\"yes\",\"reasoning\":\"The app uses distinct dark navigation surfaces, light content surfaces, bordered cards, and subtle depth treatments. Evidence: desktop-final-shared.png\"},\"microinteractions_match_spec\":{\"score\":\"yes\",\"reasoning\":\"Real hover observation changed background, shadow, and transform, with a short transition duration. Evidence: desktop-final-shared.png\"}}",
+    "cost_usd": 0.1344256
+  },
+  "edge_cases": {
+    "score": 0.6667,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "empty_state_is_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Empty state UI is present and renders when a collection is empty.",
+        "reasoning": "Filtered to a verdict with zero trials and observed \u201cNo trials match\u201d with guidance to clear the filter. Evidence: empty_state_is_present-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "forms_validate_inline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Inline validation appears on all forms before submit.",
+        "reasoning": "The create-task form showed inline required and invalid-value messages before submission. Evidence: forms_validate_inline-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "errors_are_actionable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Error messages are clear and actionable rather than only saying 'Invalid'.",
+        "reasoning": "Invalid PR input produced the actionable message \u201cPull-request number must be a positive integer of 1\u20136 digits.\u201d Evidence: forms_validate_inline-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "actions_show_confirmation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Success or confirmation feedback appears after actions.",
+        "reasoning": "After starting a run, notifications visibly reported task acceptance and run completion. Evidence: actions_show_confirmation-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "async_work_shows_loading_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Loading spinners or indicators are shown for async or simulated-async work.",
+        "reasoning": "FAIL: The simulated pipeline run completed, but no loading spinner, progress indicator, or aria-busy state was observed during the interaction. Evidence: actions_show_confirmation-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "destructive_actions_support_undo_or_cancel",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Undo or cancel options are available where destructive actions exist.",
+        "reasoning": "No destructive collection actions such as delete, reset, or clear-data were observed; the available filter-clearing control is reversible."
+      },
+      {
+        "id": "4.7",
+        "name": "non_obvious_controls_have_help",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Help or tooltips are present for non-obvious controls.",
+        "reasoning": "FAIL: Icon-only controls had accessible labels, but no visible help text or tooltip was observed for non-obvious controls. Evidence: empty_state_is_present-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "controls_use_semantic_tags",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, inputs, and labels use semantic tags.",
+        "reasoning": "Observed native button, input, select/combobox, label, dialog, table, and alert elements in the live UI. Evidence: forms_validate_inline-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "modal_supports_close_paths",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Modal close controls and background clicks both close the overlay.",
+        "reasoning": "FAIL: The create-task dialog\u2019s explicit close control worked, but clicking the background outside the dialog left the dialog open. Evidence: modal_supports_close_paths-shared.png"
+      },
+      {
+        "id": "4.10",
+        "name": "long_flows_show_progress",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Long task flows provide progress or feedback steps.",
+        "reasoning": "The completed pipeline visibly presented five ordered factory stages with statuses and attempt counts. Evidence: actions_show_confirmation-shared.png"
+      },
+      {
+        "id": "4.11",
+        "name": "long_pr_title_truncates",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A pull-request title longer than 60 characters renders truncated with an ellipsis in its pipeline row and appears in full in the task or PR detail",
+        "reasoning": "A title over 60 characters had overflow hidden, ellipsis, and a smaller client width than scroll width in the pipeline row; the same full title appeared in the PR detail heading. Evidence: long_pr_title_truncates-shared.png; long_pr_title_truncates-detail.png"
+      },
+      {
+        "id": "4.12",
+        "name": "create_cancel_changes_nothing",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Cancel or close on the create-task form leaves all collections unchanged: the pipeline row count, repository counts, and timeline are identical before and after",
+        "reasoning": "FAIL: Cancel left the pipeline row count and repository metrics unchanged, but the observed timeline changed from 11 to 12 events before/after the cancel workflow, so the required identical state was not fully verified. Evidence: create_cancel_changes_nothing-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"empty_state_is_present\":{\"score\":\"yes\",\"reasoning\":\"Filtered to a verdict with zero trials and observed \u201cNo trials match\u201d with guidance to clear the filter. Evidence: empty_state_is_present-shared.png\"},\"forms_validate_inline\":{\"score\":\"yes\",\"reasoning\":\"The create-task form showed inline required and invalid-value messages before submission. Evidence: forms_validate_inline-shared.png\"},\"errors_are_actionable\":{\"score\":\"yes\",\"reasoning\":\"Invalid PR input produced the actionable message \u201cPull-request number must be a positive integer of 1\u20136 digits.\u201d Evidence: forms_validate_inline-shared.png\"},\"actions_show_confirmation\":{\"score\":\"yes\",\"reasoning\":\"After starting a run, notifications visibly reported task acceptance and run completion. Evidence: actions_show_confirmation-shared.png\"},\"async_work_shows_loading_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: The simulated pipeline run completed, but no loading spinner, progress indicator, or aria-busy state was observed during the interaction. Evidence: actions_show_confirmation-shared.png\"},\"destructive_actions_support_undo_or_cancel\":{\"score\":\"yes\",\"reasoning\":\"No destructive collection actions such as delete, reset, or clear-data were observed; the available filter-clearing control is reversible.\"},\"non_obvious_controls_have_help\":{\"score\":\"no\",\"reasoning\":\"FAIL: Icon-only controls had accessible labels, but no visible help text or tooltip was observed for non-obvious controls. Evidence: empty_state_is_present-shared.png\"},\"controls_use_semantic_tags\":{\"score\":\"yes\",\"reasoning\":\"Observed native button, input, select/combobox, label, dialog, table, and alert elements in the live UI. Evidence: forms_validate_inline-shared.png\"},\"modal_supports_close_paths\":{\"score\":\"no\",\"reasoning\":\"FAIL: The create-task dialog\u2019s explicit close control worked, but clicking the background outside the dialog left the dialog open. Evidence: modal_supports_close_paths-shared.png\"},\"long_flows_show_progress\":{\"score\":\"yes\",\"reasoning\":\"The completed pipeline visibly presented five ordered factory stages with statuses and attempt counts. Evidence: actions_show_confirmation-shared.png\"},\"long_pr_title_truncates\":{\"score\":\"yes\",\"reasoning\":\"A title over 60 characters had overflow hidden, ellipsis, and a smaller client width than scroll width in the pipeline row; the same full title appeared in the PR detail heading. Evidence: long_pr_title_truncates-shared.png; long_pr_title_truncates-detail.png\"},\"create_cancel_changes_nothing\":{\"score\":\"no\",\"reasoning\":\"FAIL: Cancel left the pipeline row count and repository metrics unchanged, but the observed timeline changed from 11 to 12 events before/after the cancel workflow, so the required identical state was not fully verified. Evidence: create_cancel_changes_nothing-shared.png\"}}",
+    "cost_usd": 0.2880898
+  },
+  "innovation": {
+    "score": 0.8182,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "delightful_microinteractions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app has unique, delightful microinteractions.",
+        "reasoning": "Observed animated factory-stage status pills and immediate voice-fill toast feedback. Evidence: delightful-microinteractions-shared.png"
+      },
+      {
+        "id": "11.2",
+        "name": "advanced_motion_mechanics",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app has advanced animation or transition mechanics such as parallax or scroll storytelling.",
+        "reasoning": "Observed scroll-story behavior; after PageDown, the story element had a non-zero transform (matrix translateY -11.616px). Evidence: advanced-motion-mechanics-shared.png"
+      },
+      {
+        "id": "11.3",
+        "name": "guided_onboarding",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app has a narrative or guided onboarding flow.",
+        "reasoning": "Completed the live 3-step onboarding flow from Welcome through Create a run to Read the signals/Analytics. Evidence: innovation-catchall-shared.png"
+      },
+      {
+        "id": "11.4",
+        "name": "enhanced_interactive_graphics",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Data visualizations or interactive graphics provide extra usability.",
+        "reasoning": "Analytics visibly provides interactive line, donut, and histogram charts with hover guidance and task-value inspection. Evidence: enhanced-interactive-graphics-shared.png"
+      },
+      {
+        "id": "11.5",
+        "name": "alternative_input_support",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app supports voice, gesture, or another alternative input.",
+        "reasoning": "Clicked Voice fill (demo); it filled the pull-request field with 999 and showed a Voice draft filled notification. Evidence: alternative-input-support-shared.png"
+      },
+      {
+        "id": "11.6",
+        "name": "preference_personalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app provides personalization features for user preferences.",
+        "reasoning": "Observed live personalization controls for theme, density, and gesture shortcuts. Evidence: dynamic-theming-beyond-requirements-shared.png"
+      },
+      {
+        "id": "11.7",
+        "name": "polished_brand_narrative",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app presents polished storytelling or a branding narrative.",
+        "reasoning": "The app presents a cohesive Forgebeam Factory narrative across Factory overview, Pipeline register, Factory intelligence, stages, and online status. Evidence: brand-narrative-shared.png"
+      },
+      {
+        "id": "11.8",
+        "name": "dynamic_theming_beyond_requirements",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app provides dynamic theming or a color mode beyond requirements.",
+        "reasoning": "Clicked Dark and directly observed the interface switch to a dark visual theme with the Dark control selected. Evidence: dynamic-theming-beyond-requirements-shared.png"
+      },
+      {
+        "id": "11.9",
+        "name": "genre_appropriate_platform_features",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app uses web platform features such as PWA or offline support where the genre allows.",
+        "reasoning": "Browser inspection found a manifest link at /manifest.json and an activated service worker scoped to the app origin; the UI also visibly identifies an offline-ready installable shell. Evidence: brand-narrative-shared.png"
+      },
+      {
+        "id": "11.10",
+        "name": "competition_level_innovation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Competition-level innovation is visible to users.",
+        "reasoning": "FAIL: The app is polished and featureful, but no clearly competition-level breakthrough or unusually novel interaction was directly observed. Evidence: brand-narrative-shared.png"
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "FAIL: The noteworthy enhancements observed are already covered by the other criteria: onboarding, motion, charts, alternative input, personalization, theming, and PWA support. Evidence: innovation-catchall-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"delightful_microinteractions\":{\"score\":\"yes\",\"reasoning\":\"Observed animated factory-stage status pills and immediate voice-fill toast feedback. Evidence: delightful-microinteractions-shared.png\"},\"advanced_motion_mechanics\":{\"score\":\"yes\",\"reasoning\":\"Observed scroll-story behavior; after PageDown, the story element had a non-zero transform (matrix translateY -11.616px). Evidence: advanced-motion-mechanics-shared.png\"},\"guided_onboarding\":{\"score\":\"yes\",\"reasoning\":\"Completed the live 3-step onboarding flow from Welcome through Create a run to Read the signals/Analytics. Evidence: innovation-catchall-shared.png\"},\"enhanced_interactive_graphics\":{\"score\":\"yes\",\"reasoning\":\"Analytics visibly provides interactive line, donut, and histogram charts with hover guidance and task-value inspection. Evidence: enhanced-interactive-graphics-shared.png\"},\"alternative_input_support\":{\"score\":\"yes\",\"reasoning\":\"Clicked Voice fill (demo); it filled the pull-request field with 999 and showed a Voice draft filled notification. Evidence: alternative-input-support-shared.png\"},\"preference_personalization\":{\"score\":\"yes\",\"reasoning\":\"Observed live personalization controls for theme, density, and gesture shortcuts. Evidence: dynamic-theming-beyond-requirements-shared.png\"},\"polished_brand_narrative\":{\"score\":\"yes\",\"reasoning\":\"The app presents a cohesive Forgebeam Factory narrative across Factory overview, Pipeline register, Factory intelligence, stages, and online status. Evidence: brand-narrative-shared.png\"},\"dynamic_theming_beyond_requirements\":{\"score\":\"yes\",\"reasoning\":\"Clicked Dark and directly observed the interface switch to a dark visual theme with the Dark control selected. Evidence: dynamic-theming-beyond-requirements-shared.png\"},\"genre_appropriate_platform_features\":{\"score\":\"yes\",\"reasoning\":\"Browser inspection found a manifest link at /manifest.json and an activated service worker scoped to the app origin; the UI also visibly identifies an offline-ready installable shell. Evidence: brand-narrative-shared.png\"},\"competition_level_innovation\":{\"score\":\"no\",\"reasoning\":\"FAIL: The app is polished and featureful, but no clearly competition-level breakthrough or unusually novel interaction was directly observed. Evidence: brand-narrative-shared.png\"},\"innovation_catchall\":{\"score\":\"no\",\"reasoning\":\"FAIL: The noteworthy enhancements observed are already covered by the other criteria: onboarding, motion, charts, alternative input, personalization, theming, and PWA support. Evidence: innovation-catchall-shared.png\"}}",
+    "cost_usd": 0.3557374
+  },
+  "motion": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "hover_feedback_required",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Hovering with the real pointer shows visible feedback: buttons ease background and shadow with a slight press effect, table rows and nav items take a full-width hover wash, interactive chips respond, and form controls show focus rings",
+        "reasoning": "Direct hover changed the navigation button background, inset shadow, and transform while retaining a transition. Evidence: hover_feedback_required-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "create_dialog_enter_exit",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening the create-task control with the real pointer brings the form dialog in with a short opacity and scale transition of roughly 200 to 300 milliseconds, and closing exits the same way rather than disappearing instantly",
+        "reasoning": "Real-pointer opening and closing showed opacity/scale transitions over roughly 200\u2013300ms. Evidence: create_dialog_enter_exit-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "run_and_timeline_microinteractions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Driven through the real UI controls (never a state-shortcut tool call): submitting the create-task form animates the new run row into the pipeline table, new timeline entries animate in rather than popping, the currently running stage carries a visible animated indicator (pulse or spinner) that settles when the stage completes, and activating a verdict filter animates the distribution bar segments and trial rows to their new arrangement rather than snapping",
+        "reasoning": "A real form submission produced an animated run row, a running stage spinner, timeline entries with eventIn animation, and verdict filtering reduced trials with fadeMove animation. Evidence: run_and_timeline_microinteractions-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "log_disclosure_transition",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Activating a log excerpt disclosure expands it with a smooth height transition and a chevron rotation, and activating it again collapses it the same way",
+        "reasoning": "Real-pointer disclosure toggling showed chevron rotation with a 0.2s transform transition and expanded/collapsed content. Evidence: log_disclosure_transition-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "toasts_slide_autodismiss",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After starting a run, on run completion, and after copying the manifest, a feedback toast slides in, remains readable long enough to scan, and auto-dismisses with a fade",
+        "reasoning": "Start and completion toasts appeared with toastLife animation, and the copy toast appeared then disappeared after its lifecycle. Evidence: toasts_slide_autodismiss-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "reduced_motion_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion enabled, animations are removed or reduced to instant state changes while every flow \u2014 create, run progression, disclosures, filters \u2014 remains fully usable",
+        "reasoning": "The reduced-motion browser matched prefers-reduced-motion, create remained usable, and computed transition/animation durations were all 0s after run progression. Evidence: reduced_motion_respected-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"hover_feedback_required\":{\"score\":\"yes\",\"reasoning\":\"Direct hover changed the navigation button background, inset shadow, and transform while retaining a transition. Evidence: hover_feedback_required-shared.png\"},\"create_dialog_enter_exit\":{\"score\":\"yes\",\"reasoning\":\"Real-pointer opening and closing showed opacity/scale transitions over roughly 200\u2013300ms. Evidence: create_dialog_enter_exit-shared.png\"},\"run_and_timeline_microinteractions\":{\"score\":\"yes\",\"reasoning\":\"A real form submission produced an animated run row, a running stage spinner, timeline entries with eventIn animation, and verdict filtering reduced trials with fadeMove animation. Evidence: run_and_timeline_microinteractions-shared.png\"},\"log_disclosure_transition\":{\"score\":\"yes\",\"reasoning\":\"Real-pointer disclosure toggling showed chevron rotation with a 0.2s transform transition and expanded/collapsed content. Evidence: log_disclosure_transition-shared.png\"},\"toasts_slide_autodismiss\":{\"score\":\"yes\",\"reasoning\":\"Start and completion toasts appeared with toastLife animation, and the copy toast appeared then disappeared after its lifecycle. Evidence: toasts_slide_autodismiss-shared.png\"},\"reduced_motion_respected\":{\"score\":\"yes\",\"reasoning\":\"The reduced-motion browser matched prefers-reduced-motion, create remained usable, and computed transition/animation durations were all 0s after run progression. Evidence: reduced_motion_respected-shared.png\"}}",
+    "cost_usd": 0.5136276
+  },
+  "performance": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_is_under_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cold start to interactive is under 2 seconds on local render.",
+        "reasoning": "DOM became interactive in about 212 ms after navigation; the page rendered normally. Evidence: perf-ready-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "console_is_clean",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Browser devtools show no errors or warnings.",
+        "reasoning": "Playwright reported 0 errors and 0 warnings. Evidence: perf-ready-shared.png"
+      },
+      {
+        "id": "9.3",
+        "name": "transitions_respond_under_100ms",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "UI transitions respond in under 100ms.",
+        "reasoning": "Observed UI transition durations were 70 ms, under the 100 ms threshold. Evidence: perf-theme-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "async_work_has_loading_indicators",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Loading indicators are shown for async or simulated delays.",
+        "reasoning": "No async or simulated-delay workflow was exposed during testing, so no missing loading state was observed. Evidence: perf-ready-shared.png"
+      },
+      {
+        "id": "9.5",
+        "name": "large_collections_render_without_lag",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Large collections render without perceived lag.",
+        "reasoning": "The app exposed only a small four-repository collection, which rendered immediately without perceived lag. Evidence: perf-repositories-shared.png"
+      },
+      {
+        "id": "9.6",
+        "name": "state_changes_remain_interactive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The UI remains interactive during state changes.",
+        "reasoning": "Repeated navigation state changes completed successfully and the app remained responsive throughout. Evidence: perf-rapid-shared.png"
+      },
+      {
+        "id": "9.7",
+        "name": "animations_maintain_smooth_frame_rate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Animations maintain a smooth 60fps; games maintain a stable frame rate during play.",
+        "reasoning": "A 500 ms requestAnimationFrame sample produced 32 frames, with a maximum gap of 16.8 ms and no gaps over 25 ms. Evidence: perf-rapid-shared.png"
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_input_does_not_freeze",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app does not hang or freeze even under rapid user input.",
+        "reasoning": "Eight rapid navigation cycles completed in 1.465 seconds with the app still rendered and interactive. Evidence: perf-rapid-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_start_is_under_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"DOM became interactive in about 212 ms after navigation; the page rendered normally. Evidence: perf-ready-shared.png\"},\"console_is_clean\":{\"score\":\"yes\",\"reasoning\":\"Playwright reported 0 errors and 0 warnings. Evidence: perf-ready-shared.png\"},\"transitions_respond_under_100ms\":{\"score\":\"yes\",\"reasoning\":\"Observed UI transition durations were 70 ms, under the 100 ms threshold. Evidence: perf-theme-shared.png\"},\"async_work_has_loading_indicators\":{\"score\":\"yes\",\"reasoning\":\"No async or simulated-delay workflow was exposed during testing, so no missing loading state was observed. Evidence: perf-ready-shared.png\"},\"large_collections_render_without_lag\":{\"score\":\"yes\",\"reasoning\":\"The app exposed only a small four-repository collection, which rendered immediately without perceived lag. Evidence: perf-repositories-shared.png\"},\"state_changes_remain_interactive\":{\"score\":\"yes\",\"reasoning\":\"Repeated navigation state changes completed successfully and the app remained responsive throughout. Evidence: perf-rapid-shared.png\"},\"animations_maintain_smooth_frame_rate\":{\"score\":\"yes\",\"reasoning\":\"A 500 ms requestAnimationFrame sample produced 32 frames, with a maximum gap of 16.8 ms and no gaps over 25 ms. Evidence: perf-rapid-shared.png\"},\"rapid_input_does_not_freeze\":{\"score\":\"yes\",\"reasoning\":\"Eight rapid navigation cycles completed in 1.465 seconds with the app still rendered and interactive. Evidence: perf-rapid-shared.png\"}}",
+    "cost_usd": 0.084695
+  },
+  "responsiveness": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "layout_adapts_desktop_to_mobile",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Layout adapts gracefully from 1440px desktop to 375px mobile.",
+        "reasoning": "Desktop uses a sidebar and two-column cards; mobile switches to a compact header and single-column cards. Evidence: desktop-shared.png, mobile-shared.png"
+      },
+      {
+        "id": "7.2",
+        "name": "mobile_tap_targets_are_large_enough",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "UI controls are tap targets at least 44px on mobile.",
+        "reasoning": "Measured mobile controls are generally 44px high, including navigation, theme, create-task, card, and dialog buttons. Evidence: mobile-shared.png"
+      },
+      {
+        "id": "7.3",
+        "name": "typography_resizes_across_breakpoints",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography resizes for both mobile and desktop.",
+        "reasoning": "The main heading changes from 36px on desktop to 26px on mobile. Evidence: desktop-shared.png, mobile-shared.png"
+      },
+      {
+        "id": "7.4",
+        "name": "content_avoids_clipping_and_overflow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Content never clips or overflows the viewport.",
+        "reasoning": "Mobile content remains within the viewport width and scrolls vertically without visible horizontal clipping. Evidence: mobile-shared.png"
+      },
+      {
+        "id": "7.5",
+        "name": "chrome_adapts_to_small_screens",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Collapsible chrome such as sidebars and menus adapts for smaller screens.",
+        "reasoning": "The desktop sidebar collapses behind an Open navigation button on mobile; tapping it opened the navigation drawer. Evidence: mobile-nav-shared.png"
+      },
+      {
+        "id": "7.6",
+        "name": "stacking_reflows_logically",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Layout stacking order reflows logically at narrow widths.",
+        "reasoning": "The desktop card grid reflows into a readable single-column sequence on mobile, with header, controls, summary, and content ordered logically. Evidence: mobile-shared.png"
+      },
+      {
+        "id": "7.7",
+        "name": "mobile_touch_gestures_work",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Touch gestures such as swipe and tap work on mobile where present.",
+        "reasoning": "A real mobile-sized tap on Open navigation successfully opened the navigation drawer. Evidence: mobile-nav-shared.png"
+      },
+      {
+        "id": "7.8",
+        "name": "small_screens_avoid_horizontal_scroll",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Small screens have no horizontal scrolling.",
+        "reasoning": "At 375px viewport width, measured document scroll width was 360px, with no horizontal overflow. Evidence: mobile-shared.png"
+      },
+      {
+        "id": "7.9",
+        "name": "media_and_canvases_resize",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Images, grids, and canvases size responsively to fit the layout.",
+        "reasoning": "Rendered cards and interface imagery fit the mobile content width and remain responsive; no oversized canvas or media was present. Evidence: mobile-shared.png"
+      },
+      {
+        "id": "7.10",
+        "name": "fixed_controls_remain_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Fixed controls remain accessible on all devices.",
+        "reasoning": "Mobile header controls and the fixed guided-setup dialog remain within the viewport and expose usable tap targets; desktop fixed dialog is also visible. Evidence: desktop-shared.png, mobile-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"layout_adapts_desktop_to_mobile\":{\"score\":\"yes\",\"reasoning\":\"Desktop uses a sidebar and two-column cards; mobile switches to a compact header and single-column cards. Evidence: desktop-shared.png, mobile-shared.png\"},\"mobile_tap_targets_are_large_enough\":{\"score\":\"yes\",\"reasoning\":\"Measured mobile controls are generally 44px high, including navigation, theme, create-task, card, and dialog buttons. Evidence: mobile-shared.png\"},\"typography_resizes_across_breakpoints\":{\"score\":\"yes\",\"reasoning\":\"The main heading changes from 36px on desktop to 26px on mobile. Evidence: desktop-shared.png, mobile-shared.png\"},\"content_avoids_clipping_and_overflow\":{\"score\":\"yes\",\"reasoning\":\"Mobile content remains within the viewport width and scrolls vertically without visible horizontal clipping. Evidence: mobile-shared.png\"},\"chrome_adapts_to_small_screens\":{\"score\":\"yes\",\"reasoning\":\"The desktop sidebar collapses behind an Open navigation button on mobile; tapping it opened the navigation drawer. Evidence: mobile-nav-shared.png\"},\"stacking_reflows_logically\":{\"score\":\"yes\",\"reasoning\":\"The desktop card grid reflows into a readable single-column sequence on mobile, with header, controls, summary, and content ordered logically. Evidence: mobile-shared.png\"},\"mobile_touch_gestures_work\":{\"score\":\"yes\",\"reasoning\":\"A real mobile-sized tap on Open navigation successfully opened the navigation drawer. Evidence: mobile-nav-shared.png\"},\"small_screens_avoid_horizontal_scroll\":{\"score\":\"yes\",\"reasoning\":\"At 375px viewport width, measured document scroll width was 360px, with no horizontal overflow. Evidence: mobile-shared.png\"},\"media_and_canvases_resize\":{\"score\":\"yes\",\"reasoning\":\"Rendered cards and interface imagery fit the mobile content width and remain responsive; no oversized canvas or media was present. Evidence: mobile-shared.png\"},\"fixed_controls_remain_accessible\":{\"score\":\"yes\",\"reasoning\":\"Mobile header controls and the fixed guided-setup dialog remain within the viewport and expose usable tap targets; desktop fixed dialog is also visible. Evidence: desktop-shared.png, mobile-shared.png\"} }",
+    "cost_usd": 0.1182918
+  },
+  "technical": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "shared_state_coherence",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "All views derive from one shared state: a completed accepted run is reflected at once in the repository counts, the analytics charts, the event timeline, and the task detail without a reload, and no surface shows a value another surface already updated",
+        "reasoning": "Completed run #247 visibly reached Accepted with all stages complete; repository, task detail, analytics, and timeline reflected the run without reload. Evidence: shared_state_coherence-complete.png, shared_state_coherence-analytics-ui.png, shared_state_coherence-timeline-ui.png"
+      },
+      {
+        "id": "2.2",
+        "name": "no_storage_reload_seeded",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "localStorage and sessionStorage remain empty after exercising the app (creating runs, filtering, expanding disclosures), and a page reload returns the app to its seeded state with the default view active",
+        "reasoning": "localStorage and sessionStorage stayed empty, and reload returned to the repository view with seeded repositories and default navigation active. Evidence: no_storage_reload_seeded-shared.png"
+      },
+      {
+        "id": "2.5",
+        "name": "console_clean_during_session",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise of the app, including while simulated runs are advancing",
+        "reasoning": "Console inspection after load, run progression, navigation, and rapid input reported zero errors and warnings. Evidence: cold_load_and_rapid_input-shared.png"
+      },
+      {
+        "id": "2.6",
+        "name": "keyboard_operability_focus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every interactive control \u2014 nav items, repository entries, disclosures, filters, form fields, and the copy control \u2014 is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), showing a visible focus indicator at each stop",
+        "reasoning": "Keyboard tabbing reached navigation, controls, repository entries, and onboarding controls; each observed focus stop had a visible 2px green outline. Evidence: no_storage_reload_seeded-shared.png"
+      },
+      {
+        "id": "2.7",
+        "name": "dialog_focus_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The create-task dialog uses a dialog role, traps focus while open, closes on Escape returning focus to its trigger; form fields have visible labels, each validation message names and is associated with its field (or pair of bound fields), and stage statuses, verdicts, and rejection reasons are conveyed by text or accessible labels in addition to color",
+        "reasoning": "Create-task dialog exposed a dialog role, visible field labels, required-field alert text, textual stage/verdict statuses, and Escape closed it while returning focus to the Create task trigger. Evidence: dialog_focus_labels-shared.png"
+      },
+      {
+        "id": "2.8",
+        "name": "cold_load_and_rapid_input",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive within 2 seconds of a local cold load, stays responsive during simulated runs and under rapid repeated input (fast view switches, filter toggling) with no hangs, and async-feeling surfaces show a deliberate loading affordance rather than a blank region",
+        "reasoning": "Cold navigation completed in about 1.4 seconds, rapid repeated view switching completed in 452ms, and the app remained responsive with no console errors. Simulated runs showed deliberate advancing stage states rather than blank async regions. Evidence: cold_load_and_rapid_input-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"shared_state_coherence\":{\"score\":\"yes\",\"reasoning\":\"Completed run #247 visibly reached Accepted with all stages complete; repository, task detail, analytics, and timeline reflected the run without reload. Evidence: shared_state_coherence-complete.png, shared_state_coherence-analytics-ui.png, shared_state_coherence-timeline-ui.png\"},\"no_storage_reload_seeded\":{\"score\":\"yes\",\"reasoning\":\"localStorage and sessionStorage stayed empty, and reload returned to the repository view with seeded repositories and default navigation active. Evidence: no_storage_reload_seeded-shared.png\"},\"console_clean_during_session\":{\"score\":\"yes\",\"reasoning\":\"Console inspection after load, run progression, navigation, and rapid input reported zero errors and warnings. Evidence: cold_load_and_rapid_input-shared.png\"},\"keyboard_operability_focus\":{\"score\":\"yes\",\"reasoning\":\"Keyboard tabbing reached navigation, controls, repository entries, and onboarding controls; each observed focus stop had a visible 2px green outline. Evidence: no_storage_reload_seeded-shared.png\"},\"dialog_focus_labels\":{\"score\":\"yes\",\"reasoning\":\"Create-task dialog exposed a dialog role, visible field labels, required-field alert text, textual stage/verdict statuses, and Escape closed it while returning focus to the Create task trigger. Evidence: dialog_focus_labels-shared.png\"},\"cold_load_and_rapid_input\":{\"score\":\"yes\",\"reasoning\":\"Cold navigation completed in about 1.4 seconds, rapid repeated view switching completed in 452ms, and the app remained responsive with no console errors. Simulated runs showed deliberate advancing stage states rather than blank async regions. Evidence: cold_load_and_rapid_input-shared.png\"}}",
+    "cost_usd": 0.2163932
+  },
+  "user_flows": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "create_task_advances_pipeline_and_metrics",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create-task flow: submit the create form with valid repository, pullRequestNumber, and file bounds; the new pipeline row's stage strip advances through Fetch\u2192Evaluate\u2192Skeleton\u2192Generate\u2192Validate including one visible failure-and-retry; on completion the repository's tasks-produced count increases by exactly one, yield recomputes, tasks-per-week includes the new task, and the event timeline contains that run's stage entries \u2014 without a reload.",
+        "reasoning": "Accepted PR #247 run visibly completed Fetch\u2192Evaluate\u2192Skeleton\u2192Generate\u2192Validate; Generate showed attempt 2 after failure, and the detail showed accepted status, manifest, and review data. Evidence: create_task_advances_pipeline_and_metrics.png"
+      },
+      {
+        "id": "6.2",
+        "name": "invalid_create_task_inline_validation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create flow: empty/non-numeric pull-request number or minFiles greater than maxFiles shows immediate inline validation naming the offending field(s), keeps submit disabled while invalid, and starts no run (pipeline row count unchanged).",
+        "reasoning": "Invalid PR number and min/max bounds produced immediate field-specific inline alerts and kept Start pipeline run disabled. Evidence: invalid_create_task_inline_validation.png"
+      },
+      {
+        "id": "6.3",
+        "name": "retry_resume_preserves_completed_stages",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Retry/resume flow: during a created run, the failing stage's attempt count increments, then the run resumes from that stage while every earlier stage keeps its completed status and timestamp unchanged.",
+        "reasoning": "The completed run visibly showed Generate attempt 2 while Fetch, Evaluate, and Skeleton remained complete with their original timestamps. Evidence: create_task_advances_pipeline_and_metrics.png"
+      },
+      {
+        "id": "6.4",
+        "name": "verdict_filter_and_needs_review",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Trial filter flow: on an accepted task, activate the bad-success verdict; the trial list shows only bad-success trials and the needs-review banner is visible; clearing the filter restores the full trial list.",
+        "reasoning": "Bad-success filtering reduced the trial list to the bad-success trial while Needs review remained visible; clearing restored the full list. Evidence: verdict_filter_and_needs_review.png"
+      },
+      {
+        "id": "6.5",
+        "name": "repos_pipeline_detail_navigation_retains_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Navigation: move from Repositories to a repository pipeline to a task detail and back; previously applied filters and expanded log excerpts in the detail keep their state while the app stays open.",
+        "reasoning": "After navigating repositories\u2192pipeline\u2192detail, the bad-success filter and expanded Baseline log excerpt were still visibly retained. Evidence: repos_pipeline_detail_navigation_retains_state.png"
+      },
+      {
+        "id": "6.6",
+        "name": "empty_or_filtered_pipeline_empty_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edge: when a filter or selection matches no pull requests/trials, the list region shows a designed empty state explaining what belongs there rather than a blank broken area.",
+        "reasoning": "A zero-result status filter displayed a designed \u201cNo events match\u201d state explaining that the underlying record was unchanged. Evidence: timeline_status_filter_coherence.png"
+      },
+      {
+        "id": "6.7",
+        "name": "timeline_status_filter_coherence",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Timeline filter: filtering the factory event timeline by event status narrows visible entries; clearing the filter restores the full timeline without removing underlying records.",
+        "reasoning": "Filtering timeline events by failed showed 2 of 12 failed entries; the prior unfiltered view showed all 12, and clearing restored the timeline. Evidence: timeline_status_filter_coherence.png"
+      },
+      {
+        "id": "6.8",
+        "name": "analytics_and_timeline_chrome_continuity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Chrome: switching among Repositories, pipeline, Timeline, and Analytics keeps the shared session runs; charts remain interactive (hover tooltips) without navigating away from the factory shell.",
+        "reasoning": "Repositories, pipeline/detail, Timeline, and Analytics were reachable within the shared shell; Analytics rendered three chart applications and hovering a mark displayed a tooltip. Evidence: create_task_advances_pipeline_and_metrics.png"
+      },
+      {
+        "id": "6.9",
+        "name": "create_and_manifest_overlays",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Overlays: Create task form and task-manifest Copy/Download surfaces open, complete their flows, and dismiss without trapping navigation.",
+        "reasoning": "The Create benchmark task dialog opened and was dismissed; accepted-task detail exposed Copy and Download manifest controls, and both actions completed without trapping navigation. Evidence: create_and_manifest_overlays.png"
+      },
+      {
+        "id": "6.10",
+        "name": "manifest_export_and_failed_create_recover",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Recovery: after a rejected create, the form can be corrected and submitted without reload; after an accepted run, task-manifest Copy/Download emit matching text including pullRequestNumber and file bounds.",
+        "reasoning": "A rejected form state was corrected and submitted without reload; accepted detail showed PR/file bounds in the manifest, Copy produced a clipboard notification, and Download emitted a completed download event. Evidence: manifest_export_after_accepted_create.png"
+      },
+      {
+        "id": "6.11",
+        "name": "manifest_export_after_accepted_create",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Manifest export flow: complete a create-task run to accepted, open the task detail, confirm the monospaced manifest includes that pullRequestNumber and file bounds; Copy and Download emit the same text; a second accepted create increases any factory-wide export length by one.",
+        "reasoning": "Two accepted creates completed (#247 and #248); the second task detail visibly showed accepted status and a monospaced manifest containing pullRequestNumber 248, minFiles 3, and maxFiles 9, with Copy and Download controls. Evidence: manifest_export_after_accepted_create.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"create_task_advances_pipeline_and_metrics\":{\"score\":\"yes\",\"reasoning\":\"Accepted PR #247 run visibly completed Fetch\u2192Evaluate\u2192Skeleton\u2192Generate\u2192Validate; Generate showed attempt 2 after failure, and the detail showed accepted status, manifest, and review data. Evidence: create_task_advances_pipeline_and_metrics.png\"},\"invalid_create_task_inline_validation\":{\"score\":\"yes\",\"reasoning\":\"Invalid PR number and min/max bounds produced immediate field-specific inline alerts and kept Start pipeline run disabled. Evidence: invalid_create_task_inline_validation.png\"},\"retry_resume_preserves_completed_stages\":{\"score\":\"yes\",\"reasoning\":\"The completed run visibly showed Generate attempt 2 while Fetch, Evaluate, and Skeleton remained complete with their original timestamps. Evidence: create_task_advances_pipeline_and_metrics.png\"},\"verdict_filter_and_needs_review\":{\"score\":\"yes\",\"reasoning\":\"Bad-success filtering reduced the trial list to the bad-success trial while Needs review remained visible; clearing restored the full list. Evidence: verdict_filter_and_needs_review.png\"},\"repos_pipeline_detail_navigation_retains_state\":{\"score\":\"yes\",\"reasoning\":\"After navigating repositories\u2192pipeline\u2192detail, the bad-success filter and expanded Baseline log excerpt were still visibly retained. Evidence: repos_pipeline_detail_navigation_retains_state.png\"},\"empty_or_filtered_pipeline_empty_state\":{\"score\":\"yes\",\"reasoning\":\"A zero-result status filter displayed a designed \u201cNo events match\u201d state explaining that the underlying record was unchanged. Evidence: timeline_status_filter_coherence.png\"},\"timeline_status_filter_coherence\":{\"score\":\"yes\",\"reasoning\":\"Filtering timeline events by failed showed 2 of 12 failed entries; the prior unfiltered view showed all 12, and clearing restored the timeline. Evidence: timeline_status_filter_coherence.png\"},\"analytics_and_timeline_chrome_continuity\":{\"score\":\"yes\",\"reasoning\":\"Repositories, pipeline/detail, Timeline, and Analytics were reachable within the shared shell; Analytics rendered three chart applications and hovering a mark displayed a tooltip. Evidence: create_task_advances_pipeline_and_metrics.png\"},\"create_and_manifest_overlays\":{\"score\":\"yes\",\"reasoning\":\"The Create benchmark task dialog opened and was dismissed; accepted-task detail exposed Copy and Download manifest controls, and both actions completed without trapping navigation. Evidence: create_and_manifest_overlays.png\"},\"manifest_export_and_failed_create_recover\":{\"score\":\"yes\",\"reasoning\":\"A rejected form state was corrected and submitted without reload; accepted detail showed PR/file bounds in the manifest, Copy produced a clipboard notification, and Download emitted a completed download event. Evidence: manifest_export_after_accepted_create.png\"},\"manifest_export_after_accepted_create\":{\"score\":\"yes\",\"reasoning\":\"Two accepted creates completed (#247 and #248); the second task detail visibly showed accepted status and a monospaced manifest containing pullRequestNumber 248, minFiles 3, and maxFiles 9, with Copy and Download controls. Evidence: manifest_export_after_accepted_create.png\"}}",
+    "cost_usd": 0.3897086
+  },
+  "visual_design": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "dashboard_shell_composition",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app presents an operations-dashboard shell: a fixed left navigation listing Repositories, Timeline, and Analytics destinations plus a Create task control, and a main canvas that changes per destination, with the pipeline view rendered as a dense table register containing the inline stage strip per row",
+        "reasoning": "Desktop view visibly shows a fixed left navigation with Repositories, Timeline, Analytics, and Create task; the main canvas presents repository cards and a dense pipeline table with inline stage strips. Evidence: dashboard_shell_composition-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "stage_status_color_system",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Stage statuses use one consistent color system everywhere they appear \u2014 pending in a muted neutral, running in an accented treatment, complete in green, failed in red, skipped in a dimmed or hatched treatment \u2014 always paired with a readable label or tooltip rather than color alone",
+        "reasoning": "Pipeline stages visibly use green complete, blue running, muted pending, and hatched gray skipped treatments, each paired with readable labels. Evidence: stage_status_color_system-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "verdict_hue_consistency",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The five trial verdicts use five distinct hues, and the distribution bar segments, verdict chips, and legend swatches use the same hue for the same verdict",
+        "reasoning": "Trial analysis visibly shows five distinct hues consistently reused across the distribution bar, verdict chips, legend swatches, and trial verdict labels. Evidence: verdict_hue_consistency-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "typography_hierarchy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography shows a clear hierarchy: page titles visibly larger than section headings, which are larger than table body and chip text, applied consistently across views; numeric rollups (counts, yield percentages) render in an aligned, tabular style",
+        "reasoning": "The live views show clear title, section-heading, body, and chip hierarchy; dashboard rollups and yield figures are visually aligned and tabular. Evidence: dashboard_shell_composition-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "monospace_code_surfaces",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The task manifest block and expanded log excerpts render on a visually distinct monospaced surface, while check cards, trial panels, and chart cards use cards with hairline borders and subtle shadows and one consistent icon set is used across nav, chips, and controls",
+        "reasoning": "The task manifest and expanded log excerpt visibly render on dark monospaced surfaces; check cards, trial panels, and controls use bordered cards with subtle shadows and consistent line icons. Evidence: monospace_code_surfaces-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "responsive_reflow_clean",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 768 pixels and below the left navigation collapses behind a menu control that opens an overlay drawer, and at 375 pixel width no content clips or overflows the viewport, no page-level horizontal scrolling appears, and dense tables and stage strips scroll within their own containers",
+        "reasoning": "At 768px an Open navigation control opens an overlay drawer; at 375px content reflows without page-level overflow, while measurements show the table and stage strip use internal horizontal scrolling containers. Evidence: responsive_reflow_clean-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"dashboard_shell_composition\":{\"score\":\"yes\",\"reasoning\":\"Desktop view visibly shows a fixed left navigation with Repositories, Timeline, Analytics, and Create task; the main canvas presents repository cards and a dense pipeline table with inline stage strips. Evidence: dashboard_shell_composition-shared.png\"},\"stage_status_color_system\":{\"score\":\"yes\",\"reasoning\":\"Pipeline stages visibly use green complete, blue running, muted pending, and hatched gray skipped treatments, each paired with readable labels. Evidence: stage_status_color_system-shared.png\"},\"verdict_hue_consistency\":{\"score\":\"yes\",\"reasoning\":\"Trial analysis visibly shows five distinct hues consistently reused across the distribution bar, verdict chips, legend swatches, and trial verdict labels. Evidence: verdict_hue_consistency-shared.png\"},\"typography_hierarchy\":{\"score\":\"yes\",\"reasoning\":\"The live views show clear title, section-heading, body, and chip hierarchy; dashboard rollups and yield figures are visually aligned and tabular. Evidence: dashboard_shell_composition-shared.png\"},\"monospace_code_surfaces\":{\"score\":\"yes\",\"reasoning\":\"The task manifest and expanded log excerpt visibly render on dark monospaced surfaces; check cards, trial panels, and controls use bordered cards with subtle shadows and consistent line icons. Evidence: monospace_code_surfaces-shared.png\"},\"responsive_reflow_clean\":{\"score\":\"yes\",\"reasoning\":\"At 768px an Open navigation control opens an overlay drawer; at 375px content reflows without page-level overflow, while measurements show the table and stage strip use internal horizontal scrolling containers. Evidence: responsive_reflow_clean-shared.png\"} }",
+    "cost_usd": 0.411651
+  },
+  "writing": {
+    "score": 0.875,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "headings_use_consistent_capitalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders headings and section titles, they use consistent capitalization (one convention \u2014 title case or sentence case \u2014 throughout).",
+        "reasoning": "Headings consistently use sentence case, including \u201cRepository intake,\u201d \u201cValidation checks,\u201d and \u201cTask manifest.\u201d Evidence: initial-shared.png"
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible.",
+        "reasoning": "Actions use clear labels such as \u201cCreate task,\u201d \u201cStart pipeline run,\u201d \u201cDownload task-manifest.json,\u201d and \u201cDismiss notification.\u201d Evidence: success-shared.png"
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid').",
+        "reasoning": "FAIL: The visible validation error says only \u201cPull-request number is required\u201d; it identifies the problem but does not explicitly state the corrective action. Evidence: error-shared.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders empty states, the copy explains what belongs there and how to add it.",
+        "reasoning": "No empty-state panels were rendered in the observed views, so there was no empty-state copy to evaluate. Evidence: timeline-shared.png"
+      },
+      {
+        "id": "15.5",
+        "name": "body_copy_is_well_written",
+        "value": 1.0,
+        "raw": 5,
+        "weight": 0.5,
+        "description": "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors.",
+        "reasoning": "Observed body copy is clear, grammatical, and free of apparent spelling errors. Evidence: initial-shared.png"
+      },
+      {
+        "id": "15.6",
+        "name": "terminology_is_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there).",
+        "reasoning": "The app consistently uses repository, pull request, task, pipeline, stage, and trial terminology across views. Evidence: timeline-shared.png"
+      },
+      {
+        "id": "15.7",
+        "name": "numbers_dates_and_units_are_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled).",
+        "reasoning": "Counts and percentages use consistent formatting, durations use m ss, and timestamps consistently include UTC. Evidence: timeline-shared.png"
+      },
+      {
+        "id": "15.8",
+        "name": "success_messages_are_specific",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations.",
+        "reasoning": "The confirmation explicitly states \u201cRun started for quartz-orm #247,\u201d identifying what happened and which item it affected. Evidence: success-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"headings_use_consistent_capitalization\":{\"score\":\"yes\",\"reasoning\":\"Headings consistently use sentence case, including \u201cRepository intake,\u201d \u201cValidation checks,\u201d and \u201cTask manifest.\u201d Evidence: initial-shared.png\"},\"actions_use_specific_labels\":{\"score\":\"yes\",\"reasoning\":\"Actions use clear labels such as \u201cCreate task,\u201d \u201cStart pipeline run,\u201d \u201cDownload task-manifest.json,\u201d and \u201cDismiss notification.\u201d Evidence: success-shared.png\"},\"errors_name_problem_and_fix\":{\"score\":\"no\",\"reasoning\":\"FAIL: The visible validation error says only \u201cPull-request number is required\u201d; it identifies the problem but does not explicitly state the corrective action. Evidence: error-shared.png\"},\"empty_states_explain_next_step\":{\"score\":\"yes\",\"reasoning\":\"No empty-state panels were rendered in the observed views, so there was no empty-state copy to evaluate. Evidence: timeline-shared.png\"},\"body_copy_is_well_written\":{\"score\":5,\"reasoning\":\"Observed body copy is clear, grammatical, and free of apparent spelling errors. Evidence: initial-shared.png\"},\"terminology_is_consistent\":{\"score\":\"yes\",\"reasoning\":\"The app consistently uses repository, pull request, task, pipeline, stage, and trial terminology across views. Evidence: timeline-shared.png\"},\"numbers_dates_and_units_are_consistent\":{\"score\":\"yes\",\"reasoning\":\"Counts and percentages use consistent formatting, durations use m ss, and timestamps consistently include UTC. Evidence: timeline-shared.png\"},\"success_messages_are_specific\":{\"score\":\"yes\",\"reasoning\":\"The confirmation explicitly states \u201cRun started for quartz-orm #247,\u201d identifying what happened and which item it affected. Evidence: success-shared.png\"}}",
+    "cost_usd": 0.14396799999999998
+  }
+}

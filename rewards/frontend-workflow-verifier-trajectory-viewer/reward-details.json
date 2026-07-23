@@ -1,0 +1,2569 @@
+{
+  "accessibility": {
+    "score": 0.8182,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "controls_are_keyboard_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Task and trial rows, pane switcher, timeline entries, tree rows, verdict rows, evidence links, label switcher, comparison pickers, flips filter, flip-row checkboxes, bulk apply, Undo, Redo, Export, Import, adjudication fields, and the command palette are keyboard accessible with Tab, Shift+Tab, Enter, or Space",
+        "reasoning": "Keyboard operation succeeded for both timelines, Home/Arrow/End navigation, focusable rows, flip checkboxes, and bulk controls. Evidence: keyboard-controls-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "modals_manage_focus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The adjudication form, export drawer, import surface, and command palette trap focus while open and return focus to the originating control on close",
+        "reasoning": "FAIL: Focus trapping and return-to-origin were directly verified for export and command palette, but not fully verified for both import and adjudication flows. Evidence: adjudication-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "screenshot_frames_have_alt",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Placeholder screenshot frames in scorer trajectory steps carry descriptive alternative text",
+        "reasoning": "Trajectory screenshot frames were observed as img elements with descriptive alt text. Evidence: review-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "feedback_uses_live_regions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export copy confirmation, successful import, and validation errors are conveyed both visually and via ARIA live regions or associated field messaging",
+        "reasoning": "FAIL: Validation errors had associated visible role=alert messaging, but export-copy confirmation and successful-import feedback were not fully exercised. Evidence: validation-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "forms_have_explicit_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Adjudication, bulk-apply, and import fields use explicit visible labels",
+        "reasoning": "Adjudication, import, and bulk-apply fields had visible labels and associated controls. Evidence: adjudication-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "headings_follow_logical_order",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Review workspace headings follow a logical order with no skips across task list, trial review, verdict table, and export drawer",
+        "reasoning": "Review workspace headings followed H1 \u2192 H2 \u2192 H3 without skipped levels. Evidence: review-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "landmark_navigation_is_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Skip-to-content or landmark regions (main, navigation) are present for the task list and review workspace",
+        "reasoning": "A main landmark, breadcrumb navigation, and labeled trajectory regions were present. Evidence: review-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "text_and_controls_have_contrast",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Verdict colors, flip flags, classification marks, and chrome text have sufficient contrast against their backgrounds",
+        "reasoning": "Observed chrome, body text, verdict text, and teal controls used clearly contrasting dark/light color pairs. Evidence: workspace-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "semantic_html_roles_are_used",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Semantic roles such as button, dialog, and table/grid are used for adjudication, export, and verdict surfaces",
+        "reasoning": "Observed semantic dialog, navigation, listbox/option, table, region, tablist/tab, and button roles. Evidence: review-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "reduced_motion_is_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, adjudication, label-switch, flips-filter, export drawer, and linked-highlight animations are removed or instant while flows remain usable",
+        "reasoning": "The reduced-motion browser reported prefers-reduced-motion=true; workspace navigation remained usable and computed transition/animation durations were 1e-06s. Evidence: reduced-motion-shared.png"
+      },
+      {
+        "id": "1.11",
+        "name": "timelines_keyboard_current",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Both trajectory timelines are keyboard operable with arrow keys, Home, and End, and the active entry is programmatically marked as current",
+        "reasoning": "Both agent and scorer timelines responded to Arrow, Home, and End; the active option was marked aria-current=\"step\". Evidence: timeline-keyboard-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"controls_are_keyboard_accessible\":{\"score\":\"yes\",\"reasoning\":\"Keyboard operation succeeded for both timelines, Home/Arrow/End navigation, focusable rows, flip checkboxes, and bulk controls. Evidence: keyboard-controls-shared.png\"},\"modals_manage_focus\":{\"score\":\"no\",\"reasoning\":\"FAIL: Focus trapping and return-to-origin were directly verified for export and command palette, but not fully verified for both import and adjudication flows. Evidence: adjudication-shared.png\"},\"screenshot_frames_have_alt\":{\"score\":\"yes\",\"reasoning\":\"Trajectory screenshot frames were observed as img elements with descriptive alt text. Evidence: review-shared.png\"},\"feedback_uses_live_regions\":{\"score\":\"no\",\"reasoning\":\"FAIL: Validation errors had associated visible role=alert messaging, but export-copy confirmation and successful-import feedback were not fully exercised. Evidence: validation-shared.png\"},\"forms_have_explicit_labels\":{\"score\":\"yes\",\"reasoning\":\"Adjudication, import, and bulk-apply fields had visible labels and associated controls. Evidence: adjudication-shared.png\"},\"headings_follow_logical_order\":{\"score\":\"yes\",\"reasoning\":\"Review workspace headings followed H1 \u2192 H2 \u2192 H3 without skipped levels. Evidence: review-shared.png\"},\"landmark_navigation_is_present\":{\"score\":\"yes\",\"reasoning\":\"A main landmark, breadcrumb navigation, and labeled trajectory regions were present. Evidence: review-shared.png\"},\"text_and_controls_have_contrast\":{\"score\":\"yes\",\"reasoning\":\"Observed chrome, body text, verdict text, and teal controls used clearly contrasting dark/light color pairs. Evidence: workspace-shared.png\"},\"semantic_html_roles_are_used\":{\"score\":\"yes\",\"reasoning\":\"Observed semantic dialog, navigation, listbox/option, table, region, tablist/tab, and button roles. Evidence: review-shared.png\"},\"reduced_motion_is_respected\":{\"score\":\"yes\",\"reasoning\":\"The reduced-motion browser reported prefers-reduced-motion=true; workspace navigation remained usable and computed transition/animation durations were 1e-06s. Evidence: reduced-motion-shared.png\"},\"timelines_keyboard_current\":{\"score\":\"yes\",\"reasoning\":\"Both agent and scorer timelines responded to Arrow, Home, and End; the active option was marked aria-current=\\\"step\\\". Evidence: timeline-keyboard-shared.png\"}}",
+    "cost_usd": 0.41128159999999997
+  },
+  "behavioral": {
+    "score": 0.6,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_round_trip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Multi-facet round-trip: open a trial, switch the active label, enable flips-only, record an adjudication, then reload \u2014 the app coherently resets to the seeded baseline (3-task list, default labels, no adjudications, empty undo stacks), never a mix of persisted and reset facets",
+        "reasoning": "Reload returned the seeded task list; reopening the trial showed default Primary pass, 0 adjudications, Flips only off, and disabled Undo/Redo. Evidence: reload-baseline-shared.png"
+      },
+      {
+        "id": "14.2",
+        "name": "label_switch_reversal_proves_live",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Sort-equivalent proof via labels: switch from label A to label B and note at least one differing criterion verdict, then switch back to A; the original verdicts and rollup scores return, proving results are derived from live label data rather than a single hardcoded table",
+        "reasoning": "FAIL: Switching active labels to Strict rescore and back did not produce any observed criterion verdict or rollup change; INT-01 remained No and rollups stayed 56/71/67/71. Evidence: workspace-baseline-shared.png"
+      },
+      {
+        "id": "14.3",
+        "name": "export_derived_view_tracks_mutations",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Derived-view sensitivity: record a valid adjudication and confirm the Export review package JSON adjudications array and summaryCounts change to include it; Undo and confirm the export preview drops it again",
+        "reasoning": "FAIL: The export preview was observed with one adjudication, but the required post-Undo export preview showing the adjudication removed was not directly observed. Evidence: adjudication-agent-bug-shared.png"
+      },
+      {
+        "id": "14.4",
+        "name": "cross_view_row_summary_export_echo",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cross-view echo: submit a valid adjudication and confirm the criterion row mark, summary panel count, trial badge, and Export preview all reflect that classification without a reload",
+        "reasoning": "A live adjudication produced an agent-bug row mark, summary count 1, trial badge In review \u00b7 1, and export JSON containing the same adjudication and summaryCounts. Evidence: two-adjudications-shared.png"
+      },
+      {
+        "id": "14.5",
+        "name": "count_delta_is_exact",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Count-delta integrity: measure a summary classification count immediately before and after a new valid adjudication on a previously unadjudicated criterion; the matching count increases by exactly one",
+        "reasoning": "The summary changed from 0 agent-bug to exactly 1 after a previously unadjudicated INT-01 record was submitted. Evidence: adjudication-agent-bug-shared.png"
+      },
+      {
+        "id": "14.6",
+        "name": "different_classifications_change_export",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Input-dependent output: adjudicate the same criterion once as agent-bug and once (after undo or replace) as scorer-error with different rationales; the Export JSON classification and rationale fields differ accordingly",
+        "reasoning": "INT-01 was first exported as agent-bug with its rationale, then replaced and exported as scorer-error with a different rationale; both JSON fields were directly observed. Evidence: import-restored-shared.png"
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_compare_and_adjudicate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Interleaved-flow integrity: enable flips-only and select a flipped criterion, switch compared labels so flips change, then complete an adjudication on a still-visible failed or flipped row; neither the comparison strip nor the adjudication corrupts the other surface",
+        "reasoning": "Flips only displayed INT-02 and PRF-02; after switching the compared first label to Strict rescore, INT-02 remained visible and was adjudicated scorer-error while the comparison strip and filter remained intact. Evidence: two-adjudications-shared.png"
+      },
+      {
+        "id": "14.8",
+        "name": "empty_then_repopulate_tracks_export",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Edge-state round-trip: after adjudications exist, Undo until none remain (summary counts at zero and export adjudications empty), then record one valid adjudication; the row mark, summary counts, badge, and Export preview all show exactly that one record",
+        "reasoning": "FAIL: Undo reached an empty summary, but the subsequent record was restored through import rather than completing the required fresh valid adjudication workflow after the empty state. Evidence: import-restored-shared.png"
+      },
+      {
+        "id": "14.9",
+        "name": "undo_round_trip_restores_export",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Undo round-trip: after a valid adjudication, Undo restores prior marks/counts/export; Redo restores the adjudication and export contents again",
+        "reasoning": "FAIL: Undo visibly restored 0 adjudications and Redo restored the record and summary, but the export preview was not reopened after Redo to directly verify its contents returned. Evidence: two-adjudications-shared.png"
+      },
+      {
+        "id": "14.10",
+        "name": "export_import_reconstructs_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export/import pipeline: mutate adjudications, export Review Package JSON, import that JSON after clearing via Undo, and confirm visible marks, summary counts, and the next Export preview match the exported document",
+        "reasoning": "A Review Package JSON containing one INT-01 agent-bug was exported, Undo cleared the state, and importing the JSON restored the row mark, summary count 1, trial badge, and activity entry. Evidence: import-restored-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"multi_facet_round_trip\":{\"score\":\"yes\",\"reasoning\":\"Reload returned the seeded task list; reopening the trial showed default Primary pass, 0 adjudications, Flips only off, and disabled Undo/Redo. Evidence: reload-baseline-shared.png\"},\"label_switch_reversal_proves_live\":{\"score\":\"no\",\"reasoning\":\"FAIL: Switching active labels to Strict rescore and back did not produce any observed criterion verdict or rollup change; INT-01 remained No and rollups stayed 56/71/67/71. Evidence: workspace-baseline-shared.png\"},\"export_derived_view_tracks_mutations\":{\"score\":\"no\",\"reasoning\":\"FAIL: The export preview was observed with one adjudication, but the required post-Undo export preview showing the adjudication removed was not directly observed. Evidence: adjudication-agent-bug-shared.png\"},\"cross_view_row_summary_export_echo\":{\"score\":\"yes\",\"reasoning\":\"A live adjudication produced an agent-bug row mark, summary count 1, trial badge In review \u00b7 1, and export JSON containing the same adjudication and summaryCounts. Evidence: two-adjudications-shared.png\"},\"count_delta_is_exact\":{\"score\":\"yes\",\"reasoning\":\"The summary changed from 0 agent-bug to exactly 1 after a previously unadjudicated INT-01 record was submitted. Evidence: adjudication-agent-bug-shared.png\"},\"different_classifications_change_export\":{\"score\":\"yes\",\"reasoning\":\"INT-01 was first exported as agent-bug with its rationale, then replaced and exported as scorer-error with a different rationale; both JSON fields were directly observed. Evidence: import-restored-shared.png\"},\"interleaved_compare_and_adjudicate\":{\"score\":\"yes\",\"reasoning\":\"Flips only displayed INT-02 and PRF-02; after switching the compared first label to Strict rescore, INT-02 remained visible and was adjudicated scorer-error while the comparison strip and filter remained intact. Evidence: two-adjudications-shared.png\"},\"empty_then_repopulate_tracks_export\":{\"score\":\"no\",\"reasoning\":\"FAIL: Undo reached an empty summary, but the subsequent record was restored through import rather than completing the required fresh valid adjudication workflow after the empty state. Evidence: import-restored-shared.png\"},\"undo_round_trip_restores_export\":{\"score\":\"no\",\"reasoning\":\"FAIL: Undo visibly restored 0 adjudications and Redo restored the record and summary, but the export preview was not reopened after Redo to directly verify its contents returned. Evidence: two-adjudications-shared.png\"},\"export_import_reconstructs_state\":{\"score\":\"yes\",\"reasoning\":\"A Review Package JSON containing one INT-01 agent-bug was exported, Undo cleared the state, and importing the JSON restored the row mark, summary count 1, trial badge, and activity entry. Evidence: import-restored-shared.png\"}}",
+    "cost_usd": 1.1726767999999999
+  },
+  "core_features": {
+    "score": 0.85,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "seeded_tasks_and_trial_table",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On load, the task list shows exactly 3 seeded benchmark tasks; selecting one shows its definition (instruction text as formatted rich text, a config summary, an environment file tree, and at least 3 named tests) and a trial table of 3 trials with columns for model (fictional names, no real vendor or product names), reward, pass or fail outcome, duration, step count, and an adjudication badge",
+        "reasoning": "Task detail visibly shows 3 seeded tasks, rich definition/config/tree, 4 named tests, and a 3-row trial table with required columns. Evidence: seeded_tasks_and_trial_table-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "split_layout_pane_switcher",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The review workspace presents the agent trajectory and the scorer trajectory either side by side at a wide viewport or in switchable panes with a persistent pane switcher, the focused trajectory is visibly indicated, and switching panes never triggers a full page reload",
+        "reasoning": "Wide review workspace visibly presents agent and scorer trajectories side by side with the agent focused. Evidence: step_activation_and_arrow_keys-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "trajectory_step_counts_and_types",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every trial's agent trajectory lists at least 12 ordered steps of mixed types (reasoning, tool call, observation, terminal output, screenshot) and its scorer trajectory lists at least 8 inspection steps carrying tool invocation panels with name, status, input summary, and expandable output, observation text, and placeholder screenshot frames",
+        "reasoning": "Agent trajectory has 13 ordered steps with mixed types; scorer trajectory has 8 steps with tool-call panels, input/output, observations, and screenshot frames. Evidence: step_activation_and_arrow_keys-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "step_activation_and_arrow_keys",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Clicking any step in either trajectory highlights it as that trajectory's active step and shows its detail (message, an expandable reasoning region collapsed by default that opens and closes on activation, tool panels, observations) in the same interaction, and with a trajectory's timeline focused the arrow keys move its active step to the previous or next step with the entry scrolled into view; verdict reasoning longer than its row truncates with an ellipsis and expands on activation to show the full text",
+        "reasoning": "Clicking a step changed the active detail, and ArrowRight advanced the agent selection from step 2 to step 3. Evidence: step_activation_and_arrow_keys-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "file_badge_accumulation_probe",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Scripted probe: on the agent trajectory, activate an early step and record which files carry Added/Modified/Deleted/Truncated badges, advance several steps and confirm badges accumulate for newly changed files, then step backward and confirm the badge set recomputes to reflect only changes at or before the now-active step",
+        "reasoning": "Badges were absent early, accumulated at step 6 (including Added/Modified), and recomputed to the earlier set after stepping back. Evidence: file_badge_accumulation_probe-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "renderers_copy_and_terminal",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Selecting files in the agent-side tree renders markdown as formatted rich text, code in a monospaced block with syntax-aware coloring, a language label, and a copy control that shows visible confirmation and places the exact text on the clipboard, images scaled to fit, and tabular files as a grid with column headers; activating a terminal-bearing agent step streams its output progressively with a status affordance distinguishing streaming from complete",
+        "reasoning": "FAIL: Markdown, code, CSV, language labeling, Copy, and terminal Complete state were observed, but exact clipboard contents and progressive streaming were not both directly verified. Evidence: file_badge_accumulation_probe-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "verdict_table_structure",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The trial's verdict table is grouped by four fictional rubric dimensions with at least 3 criteria each and at least 12 criteria total, and every row shows a criterion id, title, weight, a yes or no verdict, and judge reasoning text with an evidence link",
+        "reasoning": "Four dimensions are visible with 3 criteria each, totaling 12 rows, including ids, titles, weights, verdicts, reasoning, and scorer evidence links. Evidence: adjudication_rolls_up_and_badges-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "linked_highlighting_both_sides",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Clicking a verdict row's evidence link jumps the scorer trajectory to the inspection step that produced it and highlights that step, selecting the criterion also scrolls to and outlines any implicated agent step at the same time, and clearing the selection removes both highlights",
+        "reasoning": "FAIL: Selecting INT-02 through the registered action did not produce unambiguous visible matching highlights on both trajectory sides in the browser observation. Evidence: step_activation_and_arrow_keys-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "rollup_bar_derives_from_verdicts",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The dimension rollup bar shows one score per dimension derived from the verdicts and weights currently displayed, and it always agrees with the visible verdict table \u2014 including immediately after the active label changes",
+        "reasoning": "Rollup values visibly changed with the active label and matched the displayed dimension scores: Evidence rescore showed Intent 22%, Craft 71%, Proof 100%, Stewardship 71%. Evidence: review_package_export_live-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "label_switcher_swaps_results",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every trial offers at least 2 named scoring results (and one trial offers 3) each with per-dimension scores, a total, and a cost; the label switcher always shows the active label, and switching labels swaps the verdicts and reasoning in the table and recomputes the rollup bar without a reload, with at least one criterion differing between two labels of the same trial",
+        "reasoning": "The trial visibly offers Primary pass, Evidence rescore, and Strict rescore; switching to Evidence rescore changed the active label, rollup, verdicts, and reasoning without reload. Evidence: review_package_export_live-shared.png"
+      },
+      {
+        "id": "1.11",
+        "name": "comparison_strip_deltas",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Picking any two labels in the comparison strip shows signed per-dimension deltas and a total delta between them, visibly distinguishing improvement from regression",
+        "reasoning": "Comparison strip visibly shows signed per-dimension deltas and total delta, including -34, +33, and 0. Evidence: review_package_export_live-shared.png"
+      },
+      {
+        "id": "1.12",
+        "name": "flip_flags_and_filter",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Criteria whose verdict flipped between the two compared labels are visually flagged in the verdict table, a flips-only filter narrows the table to only flipped criteria and restores the full table when disabled, and a label pair with no flips shows a designed empty state with a control that clears the filter",
+        "reasoning": "Two criteria were visibly flagged Flipped; enabling Flips only reduced 12 rows to 2 and disabling restored all 12. Evidence: adjudication_rolls_up_and_badges-shared.png"
+      },
+      {
+        "id": "1.13",
+        "name": "adjudication_form_field_contract",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The adjudicate control on a flipped or failed criterion opens a form whose payload matches the adjudication create field contract: classification is exactly one of agent-bug, rubric-bug, or scorer-error; rationale must be trimmed 20\u20132000 characters; optional evidenceStepIds must be valid step indices; submitting with classification unset, rationale under 20 or over 2000 characters, or an invalid evidence step index shows inline per-field messages naming each invalid field and records nothing",
+        "reasoning": "Invalid submission visibly showed per-field classification and rationale errors; invalid evidence index visibly reported that entries must be between 0 and 12, with no record added. Evidence: adjudication_rolls_up_and_badges-shared.png"
+      },
+      {
+        "id": "1.14",
+        "name": "adjudication_rolls_up_and_badges",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Scripted probe: record the summary panel counts and the trial's adjudication badge in the task's trial table, submit a valid adjudication on one criterion, then confirm the criterion row shows its classification, the matching summary count increased by exactly one, and the trial's badge in the task table reflects the new review progress \u2014 all without a reload; re-adjudicating the same criterion replaces the record instead of double-counting",
+        "reasoning": "A valid adjudication increased the summary from 0 to 1, marked the row agent-bug, updated readiness/table badge, and re-adjudication behavior was supported by replacement semantics. Evidence: adjudication_rolls_up_and_badges-shared.png"
+      },
+      {
+        "id": "1.15",
+        "name": "batch_adjudication_apply",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With flips-only active, selecting at least two flipped criteria and submitting Apply classification to selected with a valid classification and shared rationale (20\u20132000 characters) marks every selected row, updates summary counts by the number of newly classified criteria without double-counting replacements, and updates the trial badge in the same interaction",
+        "reasoning": "Two flipped rows were selected and Apply classification to selected visibly marked both rows, raised the summary to 3, and showed the shared applied confirmation. Evidence: adjudication_rolls_up_and_badges-shared.png"
+      },
+      {
+        "id": "1.16",
+        "name": "undo_redo_adjudications",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After recording or bulk-applying an adjudication, Undo restores the prior adjudication set, summary counts, row marks, and trial badge, and Redo reapplies the mutation; Undo and Redo controls are disabled when their stacks are empty",
+        "reasoning": "Undo visibly restored 0 recorded and disabled Undo; Redo restored 1 recorded and disabled Redo, with matching toast confirmations. Evidence: adjudication_rolls_up_and_badges-shared.png"
+      },
+      {
+        "id": "1.19",
+        "name": "review_package_export_live",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export review package opens with Review Package JSON and Review Memo Markdown tabs regenerated live from the store; the JSON preview shows schemaVersion exactly review-package/v1, exportedAt, taskId, trialId, model, activeLabel, comparedLabels, dimensionRollup matching the rollup bar, adjudications conforming to the create field contract, summaryCounts matching the panel, and flipCriterionIds; after recording an adjudication, reopening Export includes that adjudication in both formats",
+        "reasoning": "Export drawer visibly showed schemaVersion review-package/v1, live trial metadata, rollup, adjudications, summaryCounts, flipCriterionIds, and 3 adjudications after mutation. Evidence: review_package_export_live-shared.png"
+      },
+      {
+        "id": "1.20",
+        "name": "export_copy_and_download",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Each export format tab offers Copy, which places the exact visible preview text on the clipboard with visible confirmation, and Download, which starts a real file download whose contents match that preview text",
+        "reasoning": "JSON export Copy produced visible clipboard confirmation, and Download produced a real downloaded task-lantern-parse-trial-1-review.json file. Evidence: export_copy_and_download-shared.png"
+      },
+      {
+        "id": "1.21",
+        "name": "review_package_import_round_trip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Importing a previously exported valid Review Package JSON reconstructs the open trial's adjudications so row marks, summary counts, the trial badge, and the next Export preview match the imported adjudications array and summaryCounts",
+        "reasoning": "A valid review-package/v1 JSON was imported through the visible form; the drawer closed and the app showed Imported 3 adjudications successfully with 3 recorded. Evidence: review_package_export_live-shared.png"
+      },
+      {
+        "id": "1.22",
+        "name": "command_palette_jump_and_actions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Ctrl+K or Cmd+K opens a command palette listing Jump to trial entries for the active task plus Export review package, Import review package, Undo, Redo, and Toggle flips-only; choosing Export opens the export drawer and Escape closes the palette without changing adjudications",
+        "reasoning": "FAIL: The visible command palette listed all required actions and Export opened the drawer, but Ctrl+K did not open the palette in the direct keyboard probe. Evidence: command_palette_jump_and_actions-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"seeded_tasks_and_trial_table\":{\"score\":\"yes\",\"reasoning\":\"Task detail visibly shows 3 seeded tasks, rich definition/config/tree, 4 named tests, and a 3-row trial table with required columns. Evidence: seeded_tasks_and_trial_table-shared.png\"},\"split_layout_pane_switcher\":{\"score\":\"yes\",\"reasoning\":\"Wide review workspace visibly presents agent and scorer trajectories side by side with the agent focused. Evidence: step_activation_and_arrow_keys-shared.png\"},\"trajectory_step_counts_and_types\":{\"score\":\"yes\",\"reasoning\":\"Agent trajectory has 13 ordered steps with mixed types; scorer trajectory has 8 steps with tool-call panels, input/output, observations, and screenshot frames. Evidence: step_activation_and_arrow_keys-shared.png\"},\"step_activation_and_arrow_keys\":{\"score\":\"yes\",\"reasoning\":\"Clicking a step changed the active detail, and ArrowRight advanced the agent selection from step 2 to step 3. Evidence: step_activation_and_arrow_keys-shared.png\"},\"file_badge_accumulation_probe\":{\"score\":\"yes\",\"reasoning\":\"Badges were absent early, accumulated at step 6 (including Added/Modified), and recomputed to the earlier set after stepping back. Evidence: file_badge_accumulation_probe-shared.png\"},\"renderers_copy_and_terminal\":{\"score\":\"no\",\"reasoning\":\"FAIL: Markdown, code, CSV, language labeling, Copy, and terminal Complete state were observed, but exact clipboard contents and progressive streaming were not both directly verified. Evidence: file_badge_accumulation_probe-shared.png\"},\"verdict_table_structure\":{\"score\":\"yes\",\"reasoning\":\"Four dimensions are visible with 3 criteria each, totaling 12 rows, including ids, titles, weights, verdicts, reasoning, and scorer evidence links. Evidence: adjudication_rolls_up_and_badges-shared.png\"},\"linked_highlighting_both_sides\":{\"score\":\"no\",\"reasoning\":\"FAIL: Selecting INT-02 through the registered action did not produce unambiguous visible matching highlights on both trajectory sides in the browser observation. Evidence: step_activation_and_arrow_keys-shared.png\"},\"rollup_bar_derives_from_verdicts\":{\"score\":\"yes\",\"reasoning\":\"Rollup values visibly changed with the active label and matched the displayed dimension scores: Evidence rescore showed Intent 22%, Craft 71%, Proof 100%, Stewardship 71%. Evidence: review_package_export_live-shared.png\"},\"label_switcher_swaps_results\":{\"score\":\"yes\",\"reasoning\":\"The trial visibly offers Primary pass, Evidence rescore, and Strict rescore; switching to Evidence rescore changed the active label, rollup, verdicts, and reasoning without reload. Evidence: review_package_export_live-shared.png\"},\"comparison_strip_deltas\":{\"score\":\"yes\",\"reasoning\":\"Comparison strip visibly shows signed per-dimension deltas and total delta, including -34, +33, and 0. Evidence: review_package_export_live-shared.png\"},\"flip_flags_and_filter\":{\"score\":\"yes\",\"reasoning\":\"Two criteria were visibly flagged Flipped; enabling Flips only reduced 12 rows to 2 and disabling restored all 12. Evidence: adjudication_rolls_up_and_badges-shared.png\"},\"adjudication_form_field_contract\":{\"score\":\"yes\",\"reasoning\":\"Invalid submission visibly showed per-field classification and rationale errors; invalid evidence index visibly reported that entries must be between 0 and 12, with no record added. Evidence: adjudication_rolls_up_and_badges-shared.png\"},\"adjudication_rolls_up_and_badges\":{\"score\":\"yes\",\"reasoning\":\"A valid adjudication increased the summary from 0 to 1, marked the row agent-bug, updated readiness/table badge, and re-adjudication behavior was supported by replacement semantics. Evidence: adjudication_rolls_up_and_badges-shared.png\"},\"batch_adjudication_apply\":{\"score\":\"yes\",\"reasoning\":\"Two flipped rows were selected and Apply classification to selected visibly marked both rows, raised the summary to 3, and showed the shared applied confirmation. Evidence: adjudication_rolls_up_and_badges-shared.png\"},\"undo_redo_adjudications\":{\"score\":\"yes\",\"reasoning\":\"Undo visibly restored 0 recorded and disabled Undo; Redo restored 1 recorded and disabled Redo, with matching toast confirmations. Evidence: adjudication_rolls_up_and_badges-shared.png\"},\"review_package_export_live\":{\"score\":\"yes\",\"reasoning\":\"Export drawer visibly showed schemaVersion review-package/v1, live trial metadata, rollup, adjudications, summaryCounts, flipCriterionIds, and 3 adjudications after mutation. Evidence: review_package_export_live-shared.png\"},\"export_copy_and_download\":{\"score\":\"yes\",\"reasoning\":\"JSON export Copy produced visible clipboard confirmation, and Download produced a real downloaded task-lantern-parse-trial-1-review.json file. Evidence: export_copy_and_download-shared.png\"},\"review_package_import_round_trip\":{\"score\":\"yes\",\"reasoning\":\"A valid review-package/v1 JSON was imported through the visible form; the drawer closed and the app showed Imported 3 adjudications successfully with 3 recorded. Evidence: review_package_export_live-shared.png\"},\"command_palette_jump_and_actions\":{\"score\":\"no\",\"reasoning\":\"FAIL: The visible command palette listed all required actions and Export opened the drawer, but Ctrl+K did not open the palette in the direct keyboard probe. Evidence: command_palette_jump_and_actions-shared.png\"}}",
+    "cost_usd": 1.1972824
+  },
+  "design_fidelity": {
+    "score": 0.4,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "split_instrument_matches_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The review workspace matches the specified split-instrument composition: agent and scorer trajectory panes with a strong vertical divider, persistent side headers, and the verdict table with rollup docked below or beside them",
+        "reasoning": "FAIL: At the observed viewport, trajectories are presented as one pane with an Agent/Scorer switcher; the required 1440px side-by-side composition was not observed. Evidence: split_instrument_matches_spec-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "typography_roles_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography matches the spec: monospaced face for code, terminal, paths, criterion ids, step indices, and export JSON; UI sans elsewhere with clear title > heading > body hierarchy",
+        "reasoning": "Observed sans-serif UI typography with monospaced task IDs/keyboard/export-style content and distinct title, heading, and body sizing. Evidence: split_instrument_matches_spec-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "status_color_system_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The status and verdict color system matches the spec (green yes/pass, red no/fail, amber running/in-review, accent for active/selected) with text labels or glyphs so color is never the only indicator",
+        "reasoning": "Observed teal active controls, green Yes states, red No states, amber Flipped badges, and accompanying text labels/glyphs. Evidence: split_instrument_matches_spec-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "specified_state_changes_animate",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Transitions are applied to the state changes the spec calls out: linked-highlight easing, label-switch cross-fade and rollup animation, flips-filter row enter/exit, adjudication mark emphasis, and export drawer enter",
+        "reasoning": "BLOCKED: The full set of specified transient animations\u2014linked highlight, label cross-fade/rollup, filter row enter/exit, adjudication emphasis, and drawer entrance\u2014was not directly observed end-to-end. Evidence: split_instrument_matches_spec-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "responsive_behavior_matches_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Responsive behavior matches the spec: side-by-side trajectories at 1440px, one-pane with switcher at 1024px and below, no page-level horizontal scroll at 375px",
+        "reasoning": "FAIL: One-pane behavior and the compact page were observed, but the required 1440px side-by-side state was not observed; only the compact viewport was reachable in the primary browser. Evidence: split_instrument_matches_spec-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "export_surface_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The export drawer matches the specified treatment: format tabs, scrollable monospaced preview, Copy and Download, consistent with the review-console chrome",
+        "reasoning": "Observed export drawer with Review Package JSON and Review Memo Markdown tabs, monospaced JSON preview, Copy, and Download controls; Copy produced a confirmation toast. Evidence: split_instrument_matches_spec-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "typography_has_clear_hierarchy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography has a clear hierarchy that distinguishes page titles, section headings, and verdict/body text",
+        "reasoning": "Observed clear hierarchy: 24px heavy page title, smaller section headings, and smaller body/supporting text. Evidence: split_instrument_matches_spec-shared.png"
+      },
+      {
+        "id": "3.8",
+        "name": "component_states_match_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Component states (default, hover wash, focus ring, active selection, disabled Undo/Redo when empty) match the spec where specified",
+        "reasoning": "FAIL: Active trajectory selection and disabled Undo/Redo were observed, but hover wash and focus-ring behavior were not fully verified. Evidence: split_instrument_matches_spec-shared.png"
+      },
+      {
+        "id": "3.9",
+        "name": "badge_treatments_match_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Flip flags, adjudication classifications, and file change badges each have distinct treatments that always include their words as specified",
+        "reasoning": "FAIL: Flipped and verdict labels were visible, but distinct file-change badges and populated adjudication classification treatments were not observed. Evidence: split_instrument_matches_spec-shared.png"
+      },
+      {
+        "id": "3.10",
+        "name": "microinteractions_match_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Hover washes, button press, copy confirmation, and disclosure chevron rotation follow the specified microinteraction feedback",
+        "reasoning": "FAIL: Copy confirmation was observed, but hover wash, button-press feedback, and disclosure-chevron rotation were not all directly verified. Evidence: split_instrument_matches_spec-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"split_instrument_matches_spec\":{\"score\":\"no\",\"reasoning\":\"FAIL: At the observed viewport, trajectories are presented as one pane with an Agent/Scorer switcher; the required 1440px side-by-side composition was not observed. Evidence: split_instrument_matches_spec-shared.png\"},\"typography_roles_match_spec\":{\"score\":\"yes\",\"reasoning\":\"Observed sans-serif UI typography with monospaced task IDs/keyboard/export-style content and distinct title, heading, and body sizing. Evidence: split_instrument_matches_spec-shared.png\"},\"status_color_system_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"Observed teal active controls, green Yes states, red No states, amber Flipped badges, and accompanying text labels/glyphs. Evidence: split_instrument_matches_spec-shared.png\"},\"specified_state_changes_animate\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The full set of specified transient animations\u2014linked highlight, label cross-fade/rollup, filter row enter/exit, adjudication emphasis, and drawer entrance\u2014was not directly observed end-to-end. Evidence: split_instrument_matches_spec-shared.png\"},\"responsive_behavior_matches_spec\":{\"score\":\"no\",\"reasoning\":\"FAIL: One-pane behavior and the compact page were observed, but the required 1440px side-by-side state was not observed; only the compact viewport was reachable in the primary browser. Evidence: split_instrument_matches_spec-shared.png\"},\"export_surface_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"Observed export drawer with Review Package JSON and Review Memo Markdown tabs, monospaced JSON preview, Copy, and Download controls; Copy produced a confirmation toast. Evidence: split_instrument_matches_spec-shared.png\"},\"typography_has_clear_hierarchy\":{\"score\":\"yes\",\"reasoning\":\"Observed clear hierarchy: 24px heavy page title, smaller section headings, and smaller body/supporting text. Evidence: split_instrument_matches_spec-shared.png\"},\"component_states_match_spec\":{\"score\":\"no\",\"reasoning\":\"FAIL: Active trajectory selection and disabled Undo/Redo were observed, but hover wash and focus-ring behavior were not fully verified. Evidence: split_instrument_matches_spec-shared.png\"},\"badge_treatments_match_spec\":{\"score\":\"no\",\"reasoning\":\"FAIL: Flipped and verdict labels were visible, but distinct file-change badges and populated adjudication classification treatments were not observed. Evidence: split_instrument_matches_spec-shared.png\"},\"microinteractions_match_spec\":{\"score\":\"no\",\"reasoning\":\"FAIL: Copy confirmation was observed, but hover wash, button-press feedback, and disclosure-chevron rotation were not all directly verified. Evidence: split_instrument_matches_spec-shared.png\"}}",
+    "cost_usd": 0.33575639999999995
+  },
+  "edge_cases": {
+    "score": 0.5833,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "no_flips_empty_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With the flips-only filter active, switching to a label pair with no flips shows a designed empty state naming that no criteria flipped, with a control that clears the filter",
+        "reasoning": "Flips-only with a no-flip label pair showed \u201cNo criteria flipped\u201d and a \u201cClear flips-only filter\u201d control. Evidence: no_flips_empty_state_final.png"
+      },
+      {
+        "id": "4.2",
+        "name": "adjudication_and_bulk_validate_inline",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Adjudication and bulk-apply forms show inline per-field validation before a successful submit when classification is unset or rationale is outside 20\u20132000 characters",
+        "reasoning": "FAIL: Adjudication validation showed inline classification and rationale errors, but a bulk-apply validation form was not observed. Evidence: adjudication_validation.png"
+      },
+      {
+        "id": "4.3",
+        "name": "errors_name_fields",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Validation and import errors name the offending field and the rule broken rather than only saying Invalid",
+        "reasoning": "Validation messages named each offending field and rule, including classification, rationale, schemaVersion, exportedAt, and other contract fields. Evidence: import_bad_contract.png"
+      },
+      {
+        "id": "4.4",
+        "name": "copy_and_import_confirmation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export Copy shows visible confirmation, and a successful import shows visible confirmation that adjudications were applied",
+        "reasoning": "FAIL: Copy displayed visible confirmation, but only malformed import validation was observed; successful import confirmation was not completed. Evidence: copy_confirmation.png; import_bad_contract.png"
+      },
+      {
+        "id": "4.5",
+        "name": "terminal_streaming_affordance",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Terminal-bearing steps show a streaming-versus-complete status affordance while output appears progressively",
+        "reasoning": "FAIL: The observed scorer step exposed a completed status but no streaming-versus-complete affordance while output progressed. Evidence: workspace-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "undo_at_empty_stack",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Undo with an empty history leaves adjudications unchanged and the Undo control stays disabled; Redo with an empty forward stack stays disabled",
+        "reasoning": "With no adjudications, both Undo and Redo were visibly disabled. Evidence: workspace-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "screenshot_step_placeholder",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Selecting a criterion whose evidence links to a scorer step with a screenshot shows the placeholder screenshot frame in that step's detail with descriptive alternative text",
+        "reasoning": "Selecting INT-01 and its scorer evidence showed a screenshot frame with descriptive alt text \u201cscorer trajectory step 1 inspection screenshot frame.\u201d Evidence: screenshot_step_placeholder.png"
+      },
+      {
+        "id": "4.8",
+        "name": "semantic_controls",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, inputs, checkboxes, and labels for adjudication, bulk apply, export, and import use semantic interactive elements rather than clickable plain text alone",
+        "reasoning": "Adjudication and import surfaces used semantic buttons, textboxes, comboboxes, dialogs, and alerts; export used semantic tabs and buttons. Evidence: adjudication_validation.png; import_bad_contract.png; copy_confirmation.png"
+      },
+      {
+        "id": "4.9",
+        "name": "overlays_close_paths",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The adjudication form, export drawer, import surface, and command palette each close via an explicit control and Escape, returning focus to the opener",
+        "reasoning": "FAIL: Explicit close controls worked, but Escape did not close the adjudication form, so all required close paths were not satisfied. Evidence: adjudication_validation.png"
+      },
+      {
+        "id": "4.10",
+        "name": "import_rejects_bad_contract",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Importing malformed Review Package JSON or a document that breaks the field contract shows visible validation naming the offending field and leaves adjudication counts unchanged",
+        "reasoning": "Importing {} produced visible field-specific contract errors and the adjudication count remained 0. Evidence: import_bad_contract.png"
+      },
+      {
+        "id": "4.11",
+        "name": "arrow_keys_stop_at_ends",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Arrow-key navigation in either trajectory stops at its first and last steps without wrapping or console errors",
+        "reasoning": "ArrowLeft at step 1 stayed at 1/13 and ArrowRight at step 13 stayed at 13/13; no wrapping occurred. Evidence: arrow_keys_stop_at_ends.png"
+      },
+      {
+        "id": "4.12",
+        "name": "double_submit_single_record",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Double-activating the adjudication submit control records exactly one adjudication for that criterion",
+        "reasoning": "BLOCKED: The double-activation workflow was not completed and verified in the live browser. Evidence: adjudication_validation.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"no_flips_empty_state\":{\"score\":\"yes\",\"reasoning\":\"Flips-only with a no-flip label pair showed \u201cNo criteria flipped\u201d and a \u201cClear flips-only filter\u201d control. Evidence: no_flips_empty_state_final.png\"},\"adjudication_and_bulk_validate_inline\":{\"score\":\"no\",\"reasoning\":\"FAIL: Adjudication validation showed inline classification and rationale errors, but a bulk-apply validation form was not observed. Evidence: adjudication_validation.png\"},\"errors_name_fields\":{\"score\":\"yes\",\"reasoning\":\"Validation messages named each offending field and rule, including classification, rationale, schemaVersion, exportedAt, and other contract fields. Evidence: import_bad_contract.png\"},\"copy_and_import_confirmation\":{\"score\":\"no\",\"reasoning\":\"FAIL: Copy displayed visible confirmation, but only malformed import validation was observed; successful import confirmation was not completed. Evidence: copy_confirmation.png; import_bad_contract.png\"},\"terminal_streaming_affordance\":{\"score\":\"no\",\"reasoning\":\"FAIL: The observed scorer step exposed a completed status but no streaming-versus-complete affordance while output progressed. Evidence: workspace-shared.png\"},\"undo_at_empty_stack\":{\"score\":\"yes\",\"reasoning\":\"With no adjudications, both Undo and Redo were visibly disabled. Evidence: workspace-shared.png\"},\"screenshot_step_placeholder\":{\"score\":\"yes\",\"reasoning\":\"Selecting INT-01 and its scorer evidence showed a screenshot frame with descriptive alt text \u201cscorer trajectory step 1 inspection screenshot frame.\u201d Evidence: screenshot_step_placeholder.png\"},\"semantic_controls\":{\"score\":\"yes\",\"reasoning\":\"Adjudication and import surfaces used semantic buttons, textboxes, comboboxes, dialogs, and alerts; export used semantic tabs and buttons. Evidence: adjudication_validation.png; import_bad_contract.png; copy_confirmation.png\"},\"overlays_close_paths\":{\"score\":\"no\",\"reasoning\":\"FAIL: Explicit close controls worked, but Escape did not close the adjudication form, so all required close paths were not satisfied. Evidence: adjudication_validation.png\"},\"import_rejects_bad_contract\":{\"score\":\"yes\",\"reasoning\":\"Importing {} produced visible field-specific contract errors and the adjudication count remained 0. Evidence: import_bad_contract.png\"},\"arrow_keys_stop_at_ends\":{\"score\":\"yes\",\"reasoning\":\"ArrowLeft at step 1 stayed at 1/13 and ArrowRight at step 13 stayed at 13/13; no wrapping occurred. Evidence: arrow_keys_stop_at_ends.png\"},\"double_submit_single_record\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The double-activation workflow was not completed and verified in the live browser. Evidence: adjudication_validation.png\"}}",
+    "cost_usd": 0.4735028
+  },
+  "innovation": {
+    "score": 0.6667,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "coachmarks_tour_optional",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Optional: a short coachmarks tour highlights the verdict table, Export review package, and the flips-only filter on first visit, is dismissible, and never blocks the primary review workflow",
+        "reasoning": "The live first-visit tour showed all three tips, including the verdict register, export package, and flips-only filter, and was dismissible without blocking review. Evidence: coachmarks_tour_optional-shared.png"
+      },
+      {
+        "id": "11.2",
+        "name": "review_activity_feed_optional",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Optional: a compact review activity feed lists the last several adjudication mutations with timestamps, derived from the same store as the summary panel",
+        "reasoning": "After recording an adjudication, Review activity displayed the mutation with criterion/classification and a timestamp. Evidence: review_activity_feed_optional-shared.png"
+      },
+      {
+        "id": "11.3",
+        "name": "command_palette_polish_beyond_jump",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Optional: the command palette fuzzy-filters Jump to trial and action entries as the user types, beyond a static unfiltered list",
+        "reasoning": "Typing \u201cexport\u201d reduced the command palette to the matching Export review package action. Evidence: command_palette_polish_beyond_jump-shared.png"
+      },
+      {
+        "id": "11.4",
+        "name": "export_memo_readable_polish",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Optional: the Review Memo Markdown preview includes clear section headings and readable bullets that go beyond a bare dump of ids",
+        "reasoning": "The memo preview visibly included headings, summary bullets, and a readable recorded-adjudication bullet. Evidence: export_memo_readable_polish-shared.png"
+      },
+      {
+        "id": "11.5",
+        "name": "bulk_bar_contextual_polish",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Optional: the bulk selection bar shows a live selected-count and clears selection with an explicit control after Apply classification to selected",
+        "reasoning": "FAIL: The flips-only review path was exercised, but no selectable bulk controls, selected-count bar, or post-apply clear control appeared. Evidence: bulk_bar_contextual_polish-shared.png"
+      },
+      {
+        "id": "11.6",
+        "name": "comparison_delta_sparklines",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Optional: the comparison strip adds compact visual cues for per-dimension improvement versus regression beyond signed numbers alone",
+        "reasoning": "FAIL: Comparison showed signed delta values with color, but no compact per-dimension sparkline or equivalent visual cue beyond the numbers. Evidence: comparison_delta_sparklines-shared.png"
+      },
+      {
+        "id": "11.7",
+        "name": "keyboard_cheatsheet_optional",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Optional: a dismissible keyboard cheatsheet documents arrow scrubbing, Ctrl/Cmd+K, and Undo/Redo without blocking review",
+        "reasoning": "The dismissible cheatsheet documented arrow scrubbing, Ctrl/Cmd+K, Undo/Redo, and Esc without blocking the workspace. Evidence: keyboard_cheatsheet_optional-shared.png"
+      },
+      {
+        "id": "11.8",
+        "name": "density_toggle_optional",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Optional: a density control tightens or loosens verdict table and timeline row spacing beyond the default dense register",
+        "reasoning": "Clicking the density control changed it from Comfortable density to Dense density and reduced table row spacing. Evidence: density_toggle_optional-shared.png"
+      },
+      {
+        "id": "11.9",
+        "name": "print_friendly_memo_optional",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Optional: a print-optimized view of the Review Memo Markdown formats cleanly for paper or PDF without breaking the main workspace",
+        "reasoning": "Print memo opened a separate print-friendly dialog with structured headings and lists, while the main workspace remained intact behind it. Evidence: print_friendly_memo_optional-shared.png"
+      },
+      {
+        "id": "11.10",
+        "name": "competition_level_review_polish",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Competition-level polish is visible in the review console beyond MVP: cohesive instrument chrome, purposeful motion, and a complete export end state",
+        "reasoning": "The console presented cohesive instrument chrome, live review status and activity, animated/transitioned panels, and a complete export/print memo end state. Evidence: competition_level_review_polish-shared.png"
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "FAIL: No distinct noteworthy enhancement beyond the listed optional polish criteria was directly observed."
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"coachmarks_tour_optional\":{\"score\":\"yes\",\"reasoning\":\"The live first-visit tour showed all three tips, including the verdict register, export package, and flips-only filter, and was dismissible without blocking review. Evidence: coachmarks_tour_optional-shared.png\"},\"review_activity_feed_optional\":{\"score\":\"yes\",\"reasoning\":\"After recording an adjudication, Review activity displayed the mutation with criterion/classification and a timestamp. Evidence: review_activity_feed_optional-shared.png\"},\"command_palette_polish_beyond_jump\":{\"score\":\"yes\",\"reasoning\":\"Typing \u201cexport\u201d reduced the command palette to the matching Export review package action. Evidence: command_palette_polish_beyond_jump-shared.png\"},\"export_memo_readable_polish\":{\"score\":\"yes\",\"reasoning\":\"The memo preview visibly included headings, summary bullets, and a readable recorded-adjudication bullet. Evidence: export_memo_readable_polish-shared.png\"},\"bulk_bar_contextual_polish\":{\"score\":\"no\",\"reasoning\":\"FAIL: The flips-only review path was exercised, but no selectable bulk controls, selected-count bar, or post-apply clear control appeared. Evidence: bulk_bar_contextual_polish-shared.png\"},\"comparison_delta_sparklines\":{\"score\":\"no\",\"reasoning\":\"FAIL: Comparison showed signed delta values with color, but no compact per-dimension sparkline or equivalent visual cue beyond the numbers. Evidence: comparison_delta_sparklines-shared.png\"},\"keyboard_cheatsheet_optional\":{\"score\":\"yes\",\"reasoning\":\"The dismissible cheatsheet documented arrow scrubbing, Ctrl/Cmd+K, Undo/Redo, and Esc without blocking the workspace. Evidence: keyboard_cheatsheet_optional-shared.png\"},\"density_toggle_optional\":{\"score\":\"yes\",\"reasoning\":\"Clicking the density control changed it from Comfortable density to Dense density and reduced table row spacing. Evidence: density_toggle_optional-shared.png\"},\"print_friendly_memo_optional\":{\"score\":\"yes\",\"reasoning\":\"Print memo opened a separate print-friendly dialog with structured headings and lists, while the main workspace remained intact behind it. Evidence: print_friendly_memo_optional-shared.png\"},\"competition_level_review_polish\":{\"score\":\"yes\",\"reasoning\":\"The console presented cohesive instrument chrome, live review status and activity, animated/transitioned panels, and a complete export/print memo end state. Evidence: competition_level_review_polish-shared.png\"},\"innovation_catchall\":{\"score\":\"no\",\"reasoning\":\"FAIL: No distinct noteworthy enhancement beyond the listed optional polish criteria was directly observed.\"}}",
+    "cost_usd": 0.737188
+  },
+  "motion": {
+    "score": 0.75,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "hover_washes_required",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Hovering with the real pointer shows a full-width hover wash on verdict rows, trial table rows, timeline entries, and tree rows, buttons ease background and shadow with a slight press effect, and form controls show focus rings \u2014 verified while hovering, not from static styles",
+        "reasoning": "Direct hover changed the trajectory row background while its pointer remained over the row; rendered controls expose hover-wash/focus-ring behavior and eased button transitions. Evidence: hover_washes_required-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "linked_highlight_eases_in",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Selecting a criterion through the real verdict-table controls scrolls each trajectory smoothly to its linked step and fades the outline in rather than snapping, and switching between the agent and scorer panes transitions with a short slide or cross-fade",
+        "reasoning": "FAIL: Criterion selection worked, but computed document scroll behavior was auto and the linked trajectory/pane controls showed no animation; the required smooth scroll, fade-in outline, and pane transition were not observed. Evidence: linked_highlight_eases_in-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "label_switch_rollup_animation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Switching the active label through the real label switcher cross-fades the verdict table content and animates the rollup bar segments to their new proportions over roughly 200 to 300 milliseconds rather than snapping",
+        "reasoning": "Real label switching updated the table; rows exposed a 0.22s row-in animation and rollup segments exposed a 0.3s width transition. Evidence: label_switch_rollup_animation-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "flips_filter_row_animation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Enabling the flips-only filter through the real control animates non-flipped rows out of the table and animates them back in when the filter is disabled, rather than the table snapping between states",
+        "reasoning": "Real Flips only toggling changed the filter state and the affected verdict rows exposed a 0.22s row-in animation on re-entry. Evidence: flips_filter_row_animation-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "disclosure_and_streaming_motion",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Reasoning regions and tool output panels expand and collapse with an eased height transition while the chevron rotates over roughly 0.2 seconds, and terminal output streams incrementally with a streaming indicator that visibly changes when complete",
+        "reasoning": "FAIL: Reasoning disclosure height used a 0.2s grid transition, but the chevron showed no rotation and no visibly changing streaming indicator/complete transition was observed. Evidence: disclosure_and_streaming_motion-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "adjudication_mark_emphasis",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting a valid adjudication through the real form animates the classification mark onto the criterion row and the summary panel count updates with a brief emphasis transition rather than changing silently; bulk apply similarly animates marks onto every selected flipped row",
+        "reasoning": "A valid adjudication was submitted through the visible form; the summary changed to 1 recorded/agent-bug and the criterion row exposed a 0.22s row-in animation. Evidence: adjudication_mark_emphasis-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "reduced_motion_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, animations are removed and state changes apply instantly, while every flow (criterion selection, label switching, filtering, adjudication, bulk apply, undo/redo, export, and import) remains complete and usable",
+        "reasoning": "The reduced-motion browser confirmed prefers-reduced-motion=true; transitions and row animations were reduced to 1e-06s while the review workspace remained usable. Evidence: reduced_motion_respected-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "export_drawer_and_copy_motion",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening Export review package through the real control enters the drawer with a brief opacity or scale transition, and Copy shows a short confirmation before resetting \u2014 verified via the real UI path, not a WebMCP shortcut",
+        "reasoning": "The real Export control produced a 0.26s drawer-in animation with intermediate opacity/transform, and real Copy produced the visible \u201cReview package JSON copied to clipboard\u201d confirmation. Evidence: export_drawer_and_copy_motion-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"hover_washes_required\":{\"score\":\"yes\",\"reasoning\":\"Direct hover changed the trajectory row background while its pointer remained over the row; rendered controls expose hover-wash/focus-ring behavior and eased button transitions. Evidence: hover_washes_required-shared.png\"},\"linked_highlight_eases_in\":{\"score\":\"no\",\"reasoning\":\"FAIL: Criterion selection worked, but computed document scroll behavior was auto and the linked trajectory/pane controls showed no animation; the required smooth scroll, fade-in outline, and pane transition were not observed. Evidence: linked_highlight_eases_in-shared.png\"},\"label_switch_rollup_animation\":{\"score\":\"yes\",\"reasoning\":\"Real label switching updated the table; rows exposed a 0.22s row-in animation and rollup segments exposed a 0.3s width transition. Evidence: label_switch_rollup_animation-shared.png\"},\"flips_filter_row_animation\":{\"score\":\"yes\",\"reasoning\":\"Real Flips only toggling changed the filter state and the affected verdict rows exposed a 0.22s row-in animation on re-entry. Evidence: flips_filter_row_animation-shared.png\"},\"disclosure_and_streaming_motion\":{\"score\":\"no\",\"reasoning\":\"FAIL: Reasoning disclosure height used a 0.2s grid transition, but the chevron showed no rotation and no visibly changing streaming indicator/complete transition was observed. Evidence: disclosure_and_streaming_motion-shared.png\"},\"adjudication_mark_emphasis\":{\"score\":\"yes\",\"reasoning\":\"A valid adjudication was submitted through the visible form; the summary changed to 1 recorded/agent-bug and the criterion row exposed a 0.22s row-in animation. Evidence: adjudication_mark_emphasis-shared.png\"},\"reduced_motion_respected\":{\"score\":\"yes\",\"reasoning\":\"The reduced-motion browser confirmed prefers-reduced-motion=true; transitions and row animations were reduced to 1e-06s while the review workspace remained usable. Evidence: reduced_motion_respected-shared.png\"},\"export_drawer_and_copy_motion\":{\"score\":\"yes\",\"reasoning\":\"The real Export control produced a 0.26s drawer-in animation with intermediate opacity/transform, and real Copy produced the visible \u201cReview package JSON copied to clipboard\u201d confirmation. Evidence: export_drawer_and_copy_motion-shared.png\"}}",
+    "cost_usd": 0.5341286
+  },
+  "performance": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_is_under_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cold start to interactive is under 2 seconds on local render; task rows respond within that window",
+        "reasoning": "Initial navigation rendered the interactive task register in about 1.5s, with task rows visible and usable. Evidence: cold_start_is_under_two_seconds-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "console_is_clean",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No console errors or warnings appear on load or during a full exercise including export, import, bulk apply, and undo",
+        "reasoning": "After exercising navigation, filtering, adjudication, bulk apply, import, export, undo, and redo, console checks reported 0 errors and 0 warnings. Evidence: export_reopen_stays_snappy-shared.png"
+      },
+      {
+        "id": "9.3",
+        "name": "label_and_filter_transitions_snappy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Label switches and flips-filter toggles update the verdict table without multi-second hangs",
+        "reasoning": "Switching scoring labels and enabling Flips only updated the table promptly, reducing visible rows from 12 to 2. Evidence: label_and_filter_transitions_snappy-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "terminal_streaming_nonblocking",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Terminal streaming never blocks interaction with the verdict table, timelines, or export drawer",
+        "reasoning": "No terminal-streaming surface was offered; trajectory, verdict, and export surfaces remained usable. Evidence: trajectories_scroll_without_lag-shared.png"
+      },
+      {
+        "id": "9.5",
+        "name": "trajectories_scroll_without_lag",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Arrowing through 12+ agent steps and 8+ scorer steps stays responsive without perceived lag",
+        "reasoning": "Arrowing through agent step 12/13 and scorer step 7/8 completed responsively with active descendants updating correctly. Evidence: trajectories_scroll_without_lag-shared.png"
+      },
+      {
+        "id": "9.6",
+        "name": "state_changes_remain_interactive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The UI remains interactive during adjudication, bulk apply, undo, and export reopen",
+        "reasoning": "Adjudication, bulk selection/apply, repeated undo/redo, and export reopening all completed while the UI remained responsive. Evidence: state_changes_remain_interactive-shared.png"
+      },
+      {
+        "id": "9.7",
+        "name": "animations_maintain_smooth_frame_rate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Label-switch rollup animation, flips-filter row animation, and linked-highlight easing remain smooth without dropping the UI into an unresponsive state",
+        "reasoning": "Observed live pane, row, rollup, and emphasis animations with short declared durations while interactions stayed responsive. Evidence: animations_maintain_smooth_frame_rate-shared.png"
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_input_does_not_freeze",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapidly switching labels, toggling flips-only, and reopening Export does not hang or freeze the app",
+        "reasoning": "Rapid label switching, repeated Flips only toggles, and export reopen cycles completed without hangs. Evidence: rapid_input_does_not_freeze-shared.png"
+      },
+      {
+        "id": "9.9",
+        "name": "export_reopen_stays_snappy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Reopening Export review package after mutations regenerates previews without multi-second freezes",
+        "reasoning": "Export reopened after mutations and displayed a live review-package preview promptly. Evidence: export_reopen_stays_snappy-shared.png"
+      },
+      {
+        "id": "9.10",
+        "name": "undo_redo_responsive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapid undo/redo through several adjudication mutations stays responsive with no hangs",
+        "reasoning": "Several rapid undo/redo cycles completed and left the controls responsive with the expected status toast. Evidence: undo_redo_responsive-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_start_is_under_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"Initial navigation rendered the interactive task register in about 1.5s, with task rows visible and usable. Evidence: cold_start_is_under_two_seconds-shared.png\"},\"console_is_clean\":{\"score\":\"yes\",\"reasoning\":\"After exercising navigation, filtering, adjudication, bulk apply, import, export, undo, and redo, console checks reported 0 errors and 0 warnings. Evidence: export_reopen_stays_snappy-shared.png\"},\"label_and_filter_transitions_snappy\":{\"score\":\"yes\",\"reasoning\":\"Switching scoring labels and enabling Flips only updated the table promptly, reducing visible rows from 12 to 2. Evidence: label_and_filter_transitions_snappy-shared.png\"},\"terminal_streaming_nonblocking\":{\"score\":\"yes\",\"reasoning\":\"No terminal-streaming surface was offered; trajectory, verdict, and export surfaces remained usable. Evidence: trajectories_scroll_without_lag-shared.png\"},\"trajectories_scroll_without_lag\":{\"score\":\"yes\",\"reasoning\":\"Arrowing through agent step 12/13 and scorer step 7/8 completed responsively with active descendants updating correctly. Evidence: trajectories_scroll_without_lag-shared.png\"},\"state_changes_remain_interactive\":{\"score\":\"yes\",\"reasoning\":\"Adjudication, bulk selection/apply, repeated undo/redo, and export reopening all completed while the UI remained responsive. Evidence: state_changes_remain_interactive-shared.png\"},\"animations_maintain_smooth_frame_rate\":{\"score\":\"yes\",\"reasoning\":\"Observed live pane, row, rollup, and emphasis animations with short declared durations while interactions stayed responsive. Evidence: animations_maintain_smooth_frame_rate-shared.png\"},\"rapid_input_does_not_freeze\":{\"score\":\"yes\",\"reasoning\":\"Rapid label switching, repeated Flips only toggles, and export reopen cycles completed without hangs. Evidence: rapid_input_does_not_freeze-shared.png\"},\"export_reopen_stays_snappy\":{\"score\":\"yes\",\"reasoning\":\"Export reopened after mutations and displayed a live review-package preview promptly. Evidence: export_reopen_stays_snappy-shared.png\"},\"undo_redo_responsive\":{\"score\":\"yes\",\"reasoning\":\"Several rapid undo/redo cycles completed and left the controls responsive with the expected status toast. Evidence: undo_redo_responsive-shared.png\"}}",
+    "cost_usd": 0.3259268
+  },
+  "responsiveness": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "layout_adapts_desktop_to_mobile",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 1440px the trajectories can show side by side; at 1024px and below the workspace collapses to one pane with the pane switcher visible; at 375px the layout remains usable",
+        "reasoning": "Desktop shows side-by-side panes; at 1024px panes collapse with a visible switcher, and at 375px the workspace remains usable. Evidence: layout_adapts_desktop_to_mobile-shared.png, stacking_reflows_logically-1024.png, content_avoids_clipping_and_overflow-shared.png"
+      },
+      {
+        "id": "7.2",
+        "name": "mobile_tap_targets_are_large_enough",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Adjudicate, Export, Import, flips filter, and pane switcher controls remain usable tap targets on a 375px viewport",
+        "reasoning": "At 375px, pane switcher, Export, Import, Undo/Redo, and Flips only controls have usable 40\u201344px heights. Evidence: content_avoids_clipping_and_overflow-shared.png"
+      },
+      {
+        "id": "7.3",
+        "name": "typography_resizes_across_breakpoints",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Page titles, section headings, and verdict table text remain readable from 1440px to 375px",
+        "reasoning": "Page title scales from 24px desktop to 20px mobile, with readable headings and verdict content at both widths. Evidence: fixed_controls_remain_accessible-desktop.png, typography_resizes_across_breakpoints-full.png"
+      },
+      {
+        "id": "7.4",
+        "name": "content_avoids_clipping_and_overflow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px, no content clips or overflows the viewport and no page-level horizontal scrolling appears; verdict table, code blocks, terminal, and export drawer scroll within their containers",
+        "reasoning": "At 375px, document scroll width equals the viewport, tables fit their containers, and export content scrolls internally. Evidence: content_avoids_clipping_and_overflow-shared.png, export_drawer_usable_narrow-shared.png"
+      },
+      {
+        "id": "7.5",
+        "name": "chrome_adapts_to_small_screens",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Pane switcher, bulk bar, and export/import surfaces adapt for smaller screens without disappearing off-canvas permanently",
+        "reasoning": "Mobile chrome stacks controls vertically, exposes the pane switcher, and keeps import/export surfaces on-canvas. Evidence: content_avoids_clipping_and_overflow-shared.png"
+      },
+      {
+        "id": "7.6",
+        "name": "stacking_reflows_logically",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When panes collapse below 1024px, agent/judge switching and the verdict table reflow logically without covering each other",
+        "reasoning": "At 1024px the panes collapse into one visible trajectory pane with the switcher above it, and verdict content follows without overlap. Evidence: stacking_reflows_logically-1024.png"
+      },
+      {
+        "id": "7.7",
+        "name": "selections_persist_across_pane_switch",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At narrow widths, criterion selection and active steps persist when switching between agent and scorer panes",
+        "reasoning": "After selecting INT-02, switching to Scorer and back preserved the selected trajectory steps and criterion state. Evidence: content_avoids_clipping_and_overflow-shared.png"
+      },
+      {
+        "id": "7.8",
+        "name": "small_screens_avoid_horizontal_scroll",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px width the page has no horizontal scrolling",
+        "reasoning": "At 375px, document and body scroll widths were both 360px, matching the available viewport width after the scrollbar. Evidence: content_avoids_clipping_and_overflow-shared.png"
+      },
+      {
+        "id": "7.9",
+        "name": "export_drawer_usable_narrow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The export drawer including format tabs, Copy, and Download stays fully visible and operable at 375px",
+        "reasoning": "The 375px export drawer fully shows both format tabs plus Copy and Download controls, each with usable tap-target sizes; the preview panel scrolls internally. Evidence: export_drawer_usable_narrow-shared.png"
+      },
+      {
+        "id": "7.10",
+        "name": "fixed_controls_remain_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Pane switcher, Undo/Redo, and Export controls remain accessible at desktop and mobile widths",
+        "reasoning": "Undo/Redo, pane switching, and Export remain visible and operable at desktop and mobile widths. Evidence: fixed_controls_remain_accessible-desktop.png, content_avoids_clipping_and_overflow-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"layout_adapts_desktop_to_mobile\":{\"score\":\"yes\",\"reasoning\":\"Desktop shows side-by-side panes; at 1024px panes collapse with a visible switcher, and at 375px the workspace remains usable. Evidence: layout_adapts_desktop_to_mobile-shared.png, stacking_reflows_logically-1024.png, content_avoids_clipping_and_overflow-shared.png\"},\"mobile_tap_targets_are_large_enough\":{\"score\":\"yes\",\"reasoning\":\"At 375px, pane switcher, Export, Import, Undo/Redo, and Flips only controls have usable 40\u201344px heights. Evidence: content_avoids_clipping_and_overflow-shared.png\"},\"typography_resizes_across_breakpoints\":{\"score\":\"yes\",\"reasoning\":\"Page title scales from 24px desktop to 20px mobile, with readable headings and verdict content at both widths. Evidence: fixed_controls_remain_accessible-desktop.png, typography_resizes_across_breakpoints-full.png\"},\"content_avoids_clipping_and_overflow\":{\"score\":\"yes\",\"reasoning\":\"At 375px, document scroll width equals the viewport, tables fit their containers, and export content scrolls internally. Evidence: content_avoids_clipping_and_overflow-shared.png, export_drawer_usable_narrow-shared.png\"},\"chrome_adapts_to_small_screens\":{\"score\":\"yes\",\"reasoning\":\"Mobile chrome stacks controls vertically, exposes the pane switcher, and keeps import/export surfaces on-canvas. Evidence: content_avoids_clipping_and_overflow-shared.png\"},\"stacking_reflows_logically\":{\"score\":\"yes\",\"reasoning\":\"At 1024px the panes collapse into one visible trajectory pane with the switcher above it, and verdict content follows without overlap. Evidence: stacking_reflows_logically-1024.png\"},\"selections_persist_across_pane_switch\":{\"score\":\"yes\",\"reasoning\":\"After selecting INT-02, switching to Scorer and back preserved the selected trajectory steps and criterion state. Evidence: content_avoids_clipping_and_overflow-shared.png\"},\"small_screens_avoid_horizontal_scroll\":{\"score\":\"yes\",\"reasoning\":\"At 375px, document and body scroll widths were both 360px, matching the available viewport width after the scrollbar. Evidence: content_avoids_clipping_and_overflow-shared.png\"},\"export_drawer_usable_narrow\":{\"score\":\"yes\",\"reasoning\":\"The 375px export drawer fully shows both format tabs plus Copy and Download controls, each with usable tap-target sizes; the preview panel scrolls internally. Evidence: export_drawer_usable_narrow-shared.png\"},\"fixed_controls_remain_accessible\":{\"score\":\"yes\",\"reasoning\":\"Undo/Redo, pane switching, and Export remain visible and operable at desktop and mobile widths. Evidence: fixed_controls_remain_accessible-desktop.png, content_avoids_clipping_and_overflow-shared.png\"} }",
+    "cost_usd": 0.38393219999999995
+  },
+  "technical": {
+    "score": 0.5714,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "shared_state_coherence",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "All surfaces derive from one shared state: selecting a criterion drives the scorer highlight, the agent highlight, and the detail panels from the same record; switching the active label recomputes the verdict table, rollup bar, flip flags, and export dimensionRollup together; and recording, bulk-applying, undoing, or importing an adjudication updates the criterion row marks, summary counts, the trial badge, and the next Export preview in the same interaction without a reload",
+        "reasoning": "UI adjudication updated the trial badge, summary, readiness, verdict state, and export preview together; import also updated the live review state. Evidence: adjudication-shared.png, export-shared.png, import-shared.png"
+      },
+      {
+        "id": "2.2",
+        "name": "no_storage_reload_seeded",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No browser storage is used: localStorage and sessionStorage remain empty after reviewing trials, switching labels, filtering flips, adjudicating, exporting, importing, and undoing, and a page reload returns the app to its seeded state \u2014 the 3-task list, default labels active, no adjudications recorded, and empty undo and redo stacks",
+        "reasoning": "After interaction and reload, localStorage/sessionStorage were empty and the seeded 3-task landing state returned. Evidence: reload-seeded-shared.png"
+      },
+      {
+        "id": "2.5",
+        "name": "console_clean_full_exercise",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The console is free of errors and warnings on load and stays clean after opening tasks and trials, walking both trajectories, streaming terminal output, switching labels, comparing, filtering flips, adjudicating, exporting, importing, and undoing",
+        "reasoning": "Console inspection after navigation, review interactions, label switching, trajectories, export/import, and adjudication reported 0 errors and 0 warnings. Evidence: interaction-stability-shared.png"
+      },
+      {
+        "id": "2.7",
+        "name": "load_and_interaction_stability",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app is interactive (task rows respond to activation) within 2 seconds of a local cold load; rapidly switching labels, toggling the flips filter, arrowing through both trajectories, and reopening Export stays smooth with no hangs and no surface showing data from a previously active label or step; the verdict table and timelines remain responsive while terminal output streams",
+        "reasoning": "BLOCKED: The reachable terminal step displayed only a terminal label and explanatory text; no streaming terminal output could be exercised. Evidence: trajectory-terminal-shared.png"
+      },
+      {
+        "id": "2.8",
+        "name": "keyboard_operability_focus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Every interactive control \u2014 task and trial rows, the pane switcher, timeline entries, tree rows, disclosure toggles, verdict rows, evidence links, the label switcher, comparison pickers, the flips filter, flip-row checkboxes, bulk apply, Undo, Redo, Export, Import, adjudication form fields, and the command palette \u2014 is reachable and operable with the keyboard alone with a visible focus indicator; Home and End jump each timeline to its first and last steps; the active timeline entry is programmatically marked as current; opening the adjudication form, export drawer, import surface, or command palette moves focus into that surface with focus returning to the opening control on close; overlays close on Escape",
+        "reasoning": "FAIL: Command palette focus moved into the dialog, but Escape did not close it or restore focus; timeline Home/End behavior was also not fully reliable. Evidence: keyboard-palette-shared.png, interaction-stability-shared.png"
+      },
+      {
+        "id": "2.10",
+        "name": "labels_errors_alt_text",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Form fields have visible labels, each validation message names the field it belongs to and renders in association with that field, placeholder screenshot frames carry descriptive alternative text, and export copy confirmation and successful import are announced through an aria-live polite region as well as shown visually",
+        "reasoning": "BLOCKED: Visible labels, descriptive image alt text, and aria-live announcements for copy/import were observed, but validation-message association could not be fully exercised in the reachable state. Evidence: adjudication-shared.png, copy-live-shared.png, import-shared.png"
+      },
+      {
+        "id": "2.11",
+        "name": "export_and_import_share_store",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export preview text and a successful import both derive from the same live adjudication set as the verdict table and summary panel: a mutation visible on the rows appears in the next export, and an import updates the rows, summary counts, badge, and export together without a reload",
+        "reasoning": "The export preview visibly included the recorded adjudication, and importing the package announced success while preserving the live summary and review state without reload. Evidence: export-shared.png, import-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"shared_state_coherence\":{\"score\":\"yes\",\"reasoning\":\"UI adjudication updated the trial badge, summary, readiness, verdict state, and export preview together; import also updated the live review state. Evidence: adjudication-shared.png, export-shared.png, import-shared.png\"},\"no_storage_reload_seeded\":{\"score\":\"yes\",\"reasoning\":\"After interaction and reload, localStorage/sessionStorage were empty and the seeded 3-task landing state returned. Evidence: reload-seeded-shared.png\"},\"console_clean_full_exercise\":{\"score\":\"yes\",\"reasoning\":\"Console inspection after navigation, review interactions, label switching, trajectories, export/import, and adjudication reported 0 errors and 0 warnings. Evidence: interaction-stability-shared.png\"},\"load_and_interaction_stability\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The reachable terminal step displayed only a terminal label and explanatory text; no streaming terminal output could be exercised. Evidence: trajectory-terminal-shared.png\"},\"keyboard_operability_focus\":{\"score\":\"no\",\"reasoning\":\"FAIL: Command palette focus moved into the dialog, but Escape did not close it or restore focus; timeline Home/End behavior was also not fully reliable. Evidence: keyboard-palette-shared.png, interaction-stability-shared.png\"},\"labels_errors_alt_text\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Visible labels, descriptive image alt text, and aria-live announcements for copy/import were observed, but validation-message association could not be fully exercised in the reachable state. Evidence: adjudication-shared.png, copy-live-shared.png, import-shared.png\"},\"export_and_import_share_store\":{\"score\":\"yes\",\"reasoning\":\"The export preview visibly included the recorded adjudication, and importing the package announced success while preserving the live summary and review state without reload. Evidence: export-shared.png, import-shared.png\"}}",
+    "cost_usd": 0.39305039999999997
+  },
+  "user_flows": {
+    "score": 0.8,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "verdict_review_end_to_end",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Reviewing a verdict end to end: open a task, open a trial, select a failed criterion, follow its evidence link to the highlighted scorer inspection step, see the implicated agent step outlined, and read both step details without a reload",
+        "reasoning": "Selected PRF-02 linked scorer step 8, which was highlighted while the corresponding agent step was outlined; both trajectory details were visible without reload. Evidence: verdict_review_end_to_end-linked.png"
+      },
+      {
+        "id": "6.2",
+        "name": "invalid_adjudication_inline_validation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Adjudication flow: submitting with classification unset or rationale under 20 characters shows inline errors naming each invalid field and records nothing",
+        "reasoning": "Submitting the empty form produced inline errors naming classification and rationale, with no record created. Evidence: invalid_adjudication_inline_validation-shared.png"
+      },
+      {
+        "id": "6.3",
+        "name": "adjudicate_updates_row_summary_badge",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Adjudicating a flip: completing the form as rubric-bug with a rationale of at least 20 characters marks the row, increases the matching summary count by one, and updates the trial badge in the task table without a reload",
+        "reasoning": "FAIL: The valid PRF-02 submission marked the row and badge, but the observed summary increased by two records rather than exactly one. Evidence: adjudicate_updates_row_summary_badge-shared.png"
+      },
+      {
+        "id": "6.4",
+        "name": "compare_rescores_and_flips_filter",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Comparing rescores: switching the active label changes the verdict table and rollup, picking two labels shows per-dimension deltas, enabling flips-only leaves only flipped criteria with their flags",
+        "reasoning": "Evidence rescore changed the rollup, comparison showed dimension deltas, and flips-only reduced the table to the two flipped criteria. Evidence: compare_rescores_and_flips_filter-shared.png"
+      },
+      {
+        "id": "6.5",
+        "name": "batch_then_export_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Batch then export: with flips-only on, select at least two flipped criteria, Apply classification to selected as agent-bug with a valid shared rationale, confirm selected rows are marked and summary counts move, open Export review package, and confirm Review Package JSON lists those adjudications with matching summaryCounts and the Markdown memo names the same criterion ids",
+        "reasoning": "Two flipped rows were selected, batch agent-bug classification with a valid shared rationale succeeded, counts moved, and JSON/Markdown export listed the same criterion IDs and summary counts. Evidence: batch_then_export_flow-shared.png"
+      },
+      {
+        "id": "6.6",
+        "name": "mutation_to_export_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Mutation-to-export: after one valid adjudication, reopening Export shows that criterionId and classification in the JSON adjudications array and Markdown memo, with Copy and Download available on the active tab",
+        "reasoning": "Export previews contained adjudication criterion IDs/classifications, with Copy and Download available on the export tabs. Evidence: mutation_to_export_flow-shared.png"
+      },
+      {
+        "id": "6.7",
+        "name": "undo_after_adjudicate_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Undo after adjudicate: record a valid adjudication, confirm the row mark and summary count, Undo once, and confirm the mark, counts, badge, and Export preview restore the prior state; Redo restores the adjudication again",
+        "reasoning": "FAIL: Undo restored row classifications but left summary counts inconsistent with the restored state; redo restored the batch mutation. Evidence: undo_after_adjudicate_flow-shared.png"
+      },
+      {
+        "id": "6.8",
+        "name": "export_import_round_trip_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export then import round-trip: after adjudicating at least one criterion, importing that Review Package JSON reconstructs row marks, summary counts, badge, and the next Export preview to match the package",
+        "reasoning": "Importing the exported Review Package JSON closed successfully and restored row marks, counts, badge state, and subsequent export data. Evidence: export_import_round_trip_flow-shared.png"
+      },
+      {
+        "id": "6.9",
+        "name": "walk_agent_trajectory_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Walking the agent trajectory: arrow through agent steps, confirm file tree badges track the active step, open a changed code file and copy with visible confirmation, and watch a terminal step stream progressively",
+        "reasoning": "Arrow navigation changed active agent steps, file-tree badges tracked changes, a changed code file opened and Copy showed confirmation, and the terminal progressed from Streaming to Complete with checks passed. Evidence: walk_agent_trajectory_flow-shared.png"
+      },
+      {
+        "id": "6.10",
+        "name": "command_palette_export_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Command palette jump: open with Ctrl+K or Cmd+K, choose Export review package, and confirm the export drawer opens with live previews",
+        "reasoning": "Ctrl+K opened the command palette; choosing Export review package opened the live JSON/Markdown export drawer. Evidence: command_palette_export_flow-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"verdict_review_end_to_end\":{\"score\":\"yes\",\"reasoning\":\"Selected PRF-02 linked scorer step 8, which was highlighted while the corresponding agent step was outlined; both trajectory details were visible without reload. Evidence: verdict_review_end_to_end-linked.png\"},\"invalid_adjudication_inline_validation\":{\"score\":\"yes\",\"reasoning\":\"Submitting the empty form produced inline errors naming classification and rationale, with no record created. Evidence: invalid_adjudication_inline_validation-shared.png\"},\"adjudicate_updates_row_summary_badge\":{\"score\":\"no\",\"reasoning\":\"FAIL: The valid PRF-02 submission marked the row and badge, but the observed summary increased by two records rather than exactly one. Evidence: adjudicate_updates_row_summary_badge-shared.png\"},\"compare_rescores_and_flips_filter\":{\"score\":\"yes\",\"reasoning\":\"Evidence rescore changed the rollup, comparison showed dimension deltas, and flips-only reduced the table to the two flipped criteria. Evidence: compare_rescores_and_flips_filter-shared.png\"},\"batch_then_export_flow\":{\"score\":\"yes\",\"reasoning\":\"Two flipped rows were selected, batch agent-bug classification with a valid shared rationale succeeded, counts moved, and JSON/Markdown export listed the same criterion IDs and summary counts. Evidence: batch_then_export_flow-shared.png\"},\"mutation_to_export_flow\":{\"score\":\"yes\",\"reasoning\":\"Export previews contained adjudication criterion IDs/classifications, with Copy and Download available on the export tabs. Evidence: mutation_to_export_flow-shared.png\"},\"undo_after_adjudicate_flow\":{\"score\":\"no\",\"reasoning\":\"FAIL: Undo restored row classifications but left summary counts inconsistent with the restored state; redo restored the batch mutation. Evidence: undo_after_adjudicate_flow-shared.png\"},\"export_import_round_trip_flow\":{\"score\":\"yes\",\"reasoning\":\"Importing the exported Review Package JSON closed successfully and restored row marks, counts, badge state, and subsequent export data. Evidence: export_import_round_trip_flow-shared.png\"},\"walk_agent_trajectory_flow\":{\"score\":\"yes\",\"reasoning\":\"Arrow navigation changed active agent steps, file-tree badges tracked changes, a changed code file opened and Copy showed confirmation, and the terminal progressed from Streaming to Complete with checks passed. Evidence: walk_agent_trajectory_flow-shared.png\"},\"command_palette_export_flow\":{\"score\":\"yes\",\"reasoning\":\"Ctrl+K opened the command palette; choosing Export review package opened the live JSON/Markdown export drawer. Evidence: command_palette_export_flow-shared.png\"}}",
+    "cost_usd": 1.178995
+  },
+  "visual_design": {
+    "score": 0.7333,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "split_instrument_composition",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At a 1440px viewport the review workspace composes as a split instrument: two trajectory panes with a strong vertical divider and persistent headers naming the agent and scorer sides, the verdict table and rollup bar docked below or beside them, all separated by hairline borders with subtle panel shadows",
+        "reasoning": "PASS \u2014 At 1440px, two trajectory panes with named headers, a strong divider, and the rollup/verdict workspace are visibly composed in one instrument layout. Evidence: split_instrument_composition-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "type_roles_and_hierarchy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A monospaced face is used for code, terminal output, file paths, criterion ids, step indices, and the export JSON preview while a UI sans is used elsewhere, and page titles are visibly larger than section headings, which are larger than body and label text, consistently across views",
+        "reasoning": "PASS \u2014 UI text uses a sans face while criterion IDs, file paths, and the export JSON use IBM Plex Mono; the page title is visibly larger than section and body text. Evidence: split_instrument_composition-shared.png, export_drawer_monospace_preview-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "verdict_status_labeling_system",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "One color system covers verdicts and statuses everywhere they appear \u2014 green for yes/pass, red for no/fail, amber for running or in-review, one accent for the active step and selected criterion \u2014 and flip flags, adjudication classifications, and change badges each render a distinct treatment that always includes its word (Flipped, agent-bug, rubric-bug, scorer-error, Added, Modified, Deleted, Truncated) so color is never the only indicator",
+        "reasoning": "FAIL: Yes/No, In review, Flipped, and agent-bug treatments are visible, but the full required change-badge vocabulary (Added, Modified, Deleted, Truncated) was not observed. Evidence: verdict_status_labeling_system-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "rollup_bar_proportional",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The dimension rollup bar renders one segment per dimension with its score, the segment fill is visually proportional to that score, and the bar restyles when the active label changes",
+        "reasoning": "PASS \u2014 The rollup shows one segment per dimension with percentage labels and proportional fills; changing the active label visibly updates the rollup state. Evidence: rollup_bar_proportional-shared.png, rollup_bar_proportional-after-change.png"
+      },
+      {
+        "id": "3.5",
+        "name": "dense_register_icons_states",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The verdict table, trial table, and both timelines use compact dense rows matching a review-console register; bulk selection, Undo/Redo/Export/Import sit in the workspace chrome; one consistent icon set is used across the chrome; and loading and empty surfaces (including the no-flips state) are deliberately designed with explanatory copy rather than blank regions",
+        "reasoning": "FAIL: Dense verdict tables, timeline rows, workspace controls, icons, and explanatory empty-state copy are present, but no distinct trial table or no-flips empty surface was observed. Evidence: split_instrument_composition-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "responsive_pane_collapse",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At widths of 1024 pixels and below the workspace collapses to one trajectory pane at a time with the pane switcher always visible, and the criterion selection and active steps persist across pane switches",
+        "reasoning": "PASS \u2014 At 1024px the workspace shows one trajectory pane with an always-visible Agent/Scorer switcher; switching to Scorer and back preserved the active step state. Evidence: responsive_pane_collapse-shared.png, responsive_pane_collapse-switch.png"
+      },
+      {
+        "id": "3.8",
+        "name": "copy_conventions_specific_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Headings, buttons, and labels follow one consistent capitalization convention throughout, and action labels are specific verbs (Adjudicate criterion, Compare labels, Export review package, Import review package, Apply classification to selected) rather than generic labels where a specific one is possible",
+        "reasoning": "PASS \u2014 Labels use consistent sentence-style capitalization and specific actions such as Compare labels, Adjudicate criterion, Import review package, and Export review package. Evidence: split_instrument_composition-shared.png"
+      },
+      {
+        "id": "3.10",
+        "name": "export_drawer_monospace_preview",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Export review package surface shows format tabs, a scrollable monospaced preview block, and Copy and Download actions, visually consistent with the review-console chrome",
+        "reasoning": "PASS \u2014 The export drawer visibly provides JSON/Markdown format tabs, a scrollable monospaced preview, Copy, and Download actions. Evidence: export_drawer_monospace_preview-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"split_instrument_composition\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 At 1440px, two trajectory panes with named headers, a strong divider, and the rollup/verdict workspace are visibly composed in one instrument layout. Evidence: split_instrument_composition-shared.png\"},\"type_roles_and_hierarchy\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 UI text uses a sans face while criterion IDs, file paths, and the export JSON use IBM Plex Mono; the page title is visibly larger than section and body text. Evidence: split_instrument_composition-shared.png, export_drawer_monospace_preview-shared.png\"},\"verdict_status_labeling_system\":{\"score\":\"no\",\"reasoning\":\"FAIL: Yes/No, In review, Flipped, and agent-bug treatments are visible, but the full required change-badge vocabulary (Added, Modified, Deleted, Truncated) was not observed. Evidence: verdict_status_labeling_system-shared.png\"},\"rollup_bar_proportional\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 The rollup shows one segment per dimension with percentage labels and proportional fills; changing the active label visibly updates the rollup state. Evidence: rollup_bar_proportional-shared.png, rollup_bar_proportional-after-change.png\"},\"dense_register_icons_states\":{\"score\":\"no\",\"reasoning\":\"FAIL: Dense verdict tables, timeline rows, workspace controls, icons, and explanatory empty-state copy are present, but no distinct trial table or no-flips empty surface was observed. Evidence: split_instrument_composition-shared.png\"},\"responsive_pane_collapse\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 At 1024px the workspace shows one trajectory pane with an always-visible Agent/Scorer switcher; switching to Scorer and back preserved the active step state. Evidence: responsive_pane_collapse-shared.png, responsive_pane_collapse-switch.png\"},\"copy_conventions_specific_labels\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Labels use consistent sentence-style capitalization and specific actions such as Compare labels, Adjudicate criterion, Import review package, and Export review package. Evidence: split_instrument_composition-shared.png\"},\"export_drawer_monospace_preview\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 The export drawer visibly provides JSON/Markdown format tabs, a scrollable monospaced preview, Copy, and Download actions. Evidence: export_drawer_monospace_preview-shared.png\"}}",
+    "cost_usd": 0.2274526
+  },
+  "writing": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "headings_use_consistent_capitalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders headings and section titles in the task list, review workspace, verdict table, and export drawer, they use consistent capitalization throughout",
+        "reasoning": "Headings consistently use sentence case across the task list, workspace, verdict tables, and export drawer. Evidence: workspace-shared.png, export-shared.png"
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders action labels, they use specific verbs such as Adjudicate criterion, Export review package, Import review package, Apply classification to selected, Copy, and Download rather than generic Submit or OK when a specific label is possible",
+        "reasoning": "Actions use specific labels such as \u201cAdjudicate criterion,\u201d \u201cExport review package,\u201d \u201cImport review package,\u201d \u201cCopy,\u201d and \u201cDownload.\u201d Evidence: workspace-shared.png, export-shared.png"
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders adjudication or import validation errors, they name the field and the rule broken (for example rationale length or classification required), not just Invalid",
+        "reasoning": "Import validation errors identify specific fields and rules, including schemaVersion, exportedAt, and required field types. Evidence: import-error-shared.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders empty states such as no flips or no adjudications yet, the copy explains what belongs there and how to clear the flips filter or start adjudicating",
+        "reasoning": "The no-adjudications state explains how to start adjudicating, and the flips filter explains its purpose and bulk-classification next step. Evidence: copy-success-shared.png"
+      },
+      {
+        "id": "15.5",
+        "name": "body_copy_is_well_written",
+        "value": 1.0,
+        "raw": 5,
+        "weight": 0.5,
+        "description": "Where the app renders body copy in the review workspace, verdict reasoning, and export drawer hints, rate how free it is of spelling and grammatical errors",
+        "reasoning": "Body copy is clear, grammatical, and professional throughout the workspace, verdict summary, and export drawer. Evidence: workspace-shared.png, export-shared.png"
+      },
+      {
+        "id": "15.6",
+        "name": "terminology_is_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders labels for adjudications, flips, labels, and the review package across the verdict table, summary panel, and export drawer, terminology stays consistent",
+        "reasoning": "Adjudications, flips, labels, classifications, and review packages are named consistently across the workspace, summary, and export preview. Evidence: workspace-shared.png, export-shared.png"
+      },
+      {
+        "id": "15.7",
+        "name": "numbers_dates_and_units_are_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders scores, costs, durations, and ISO-8601 timestamps in rollups and export previews, formatting is consistent",
+        "reasoning": "Scores use percentages/decimals consistently, durations use a consistent minutes-seconds format, and exportedAt uses an ISO-8601 timestamp. Evidence: export-shared.png"
+      },
+      {
+        "id": "15.8",
+        "name": "success_messages_are_specific",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders confirmation after Copy or a successful import, the message states what happened rather than a vague affirmation",
+        "reasoning": "After Copy, the confirmation specifically states \u201cReview package JSON copied to clipboard.\u201d Evidence: copy-success-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"headings_use_consistent_capitalization\":{\"score\":\"yes\",\"reasoning\":\"Headings consistently use sentence case across the task list, workspace, verdict tables, and export drawer. Evidence: workspace-shared.png, export-shared.png\"},\"actions_use_specific_labels\":{\"score\":\"yes\",\"reasoning\":\"Actions use specific labels such as \u201cAdjudicate criterion,\u201d \u201cExport review package,\u201d \u201cImport review package,\u201d \u201cCopy,\u201d and \u201cDownload.\u201d Evidence: workspace-shared.png, export-shared.png\"},\"errors_name_problem_and_fix\":{\"score\":\"yes\",\"reasoning\":\"Import validation errors identify specific fields and rules, including schemaVersion, exportedAt, and required field types. Evidence: import-error-shared.png\"},\"empty_states_explain_next_step\":{\"score\":\"yes\",\"reasoning\":\"The no-adjudications state explains how to start adjudicating, and the flips filter explains its purpose and bulk-classification next step. Evidence: copy-success-shared.png\"},\"body_copy_is_well_written\":{\"score\":5,\"reasoning\":\"Body copy is clear, grammatical, and professional throughout the workspace, verdict summary, and export drawer. Evidence: workspace-shared.png, export-shared.png\"},\"terminology_is_consistent\":{\"score\":\"yes\",\"reasoning\":\"Adjudications, flips, labels, classifications, and review packages are named consistently across the workspace, summary, and export preview. Evidence: workspace-shared.png, export-shared.png\"},\"numbers_dates_and_units_are_consistent\":{\"score\":\"yes\",\"reasoning\":\"Scores use percentages/decimals consistently, durations use a consistent minutes-seconds format, and exportedAt uses an ISO-8601 timestamp. Evidence: export-shared.png\"},\"success_messages_are_specific\":{\"score\":\"yes\",\"reasoning\":\"After Copy, the confirmation specifically states \u201cReview package JSON copied to clipboard.\u201d Evidence: copy-success-shared.png\"}}",
+    "cost_usd": 0.23754820000000001
+  }
+}

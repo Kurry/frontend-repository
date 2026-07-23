@@ -1,0 +1,2633 @@
+{
+  "accessibility": {
+    "score": 0.6,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "keyboard_operable_studio_controls",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Every interactive control \u2014 rail entries, header selects, accordion headers, form fields, verdict toggles, case include toggles, history entries, Undo, Redo, Export, Import, and copy controls \u2014 is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), each showing a visible focus indicator when focused.",
+        "reasoning": "FAIL: Keyboard focus reached the controls, but several buttons showed transparent focus outlines. Evidence: keyboard_operable_studio_controls-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "criterion_form_focus_trap_and_return",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The criterion form dialog, Export center, and Import surface trap focus while open, close on Escape, and return focus to the control that opened them.",
+        "reasoning": "FAIL: Focus stayed within the criterion dialog, but Escape did not close it when focus was inside a form field. Evidence: criterion_form_focus_trap_and_return-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "icons_have_accessible_names",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Meaningful icons (chevrons, copy, close, load-bearing badges) expose descriptive accessible names or alt text so assistive technology can identify them.",
+        "reasoning": "FAIL: Several standalone SVG icons had no accessible name or alt text. Evidence: keyboard_operable_studio_controls-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "validation_and_toasts_announced",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Form validation messages and confirmation toasts are conveyed visually and via association or an ARIA live region so assistive technology can announce them.",
+        "reasoning": "Validation used alert nodes and the Copy confirmation appeared in both polite status and assertive alert live regions. Evidence: validation_and_toasts_announced-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "criterion_form_fields_explicitly_labeled",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Criterion form fields (id, name, description, type, weight, importance, likert min/max, version) use explicit label elements associated with their controls.",
+        "reasoning": "FAIL: Criterion fields displayed nearby text, but the controls were not associated with explicit label elements. Evidence: criterion_form_focus_trap_and_return-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "accordion_and_disclosure_expose_expanded_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Accordion headers and the Rationale notes disclosure expose their expanded or collapsed state to assistive technology (for example aria-expanded).",
+        "reasoning": "Accordion rows and Rationale notes buttons exposed aria-expanded and updated it on activation. Evidence: accordion_and_disclosure_expose_expanded_state-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "studio_landmarks_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app exposes semantic landmarks (for example nav/complementary for the rail and main for the canvas) so assistive technology can navigate the studio.",
+        "reasoning": "The app exposed complementary rail, navigation, main canvas, regions, and version-history landmarks. Evidence: keyboard_operable_studio_controls-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "text_and_controls_have_contrast",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rubric name, criterion names, type/importance chips, validation copy, and primary controls meet sufficient contrast against their surfaces.",
+        "reasoning": "Rubric headings, criterion names, chips, validation text, and primary controls were visibly readable; measured primary text contrast was sufficient. Evidence: keyboard_operable_studio_controls-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "semantic_roles_for_interactive_chrome",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rail entries, accordion headers, selects, toggles, and dialogs use semantic HTML or equivalent ARIA roles (button, dialog, listbox) rather than unlabeled clickable text alone.",
+        "reasoning": "Interactive chrome used buttons, native/select comboboxes, dialog roles, tabs, and switch-role checkboxes. Evidence: semantic_roles_for_interactive_chrome-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "reduced_motion_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, accordion, Tune-bar, aggregate, dialog, and toast animations are removed and state changes apply instantly while every flow remains available.",
+        "reasoning": "In the reduced-motion browser, prefers-reduced-motion matched, dialog transitions were effectively 1 microsecond, and accordion/dialog state changes applied immediately. Evidence: reduced_motion_respected-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"keyboard_operable_studio_controls\":{\"score\":\"no\",\"reasoning\":\"FAIL: Keyboard focus reached the controls, but several buttons showed transparent focus outlines. Evidence: keyboard_operable_studio_controls-shared.png\"},\"criterion_form_focus_trap_and_return\":{\"score\":\"no\",\"reasoning\":\"FAIL: Focus stayed within the criterion dialog, but Escape did not close it when focus was inside a form field. Evidence: criterion_form_focus_trap_and_return-shared.png\"},\"icons_have_accessible_names\":{\"score\":\"no\",\"reasoning\":\"FAIL: Several standalone SVG icons had no accessible name or alt text. Evidence: keyboard_operable_studio_controls-shared.png\"},\"validation_and_toasts_announced\":{\"score\":\"yes\",\"reasoning\":\"Validation used alert nodes and the Copy confirmation appeared in both polite status and assertive alert live regions. Evidence: validation_and_toasts_announced-shared.png\"},\"criterion_form_fields_explicitly_labeled\":{\"score\":\"no\",\"reasoning\":\"FAIL: Criterion fields displayed nearby text, but the controls were not associated with explicit label elements. Evidence: criterion_form_focus_trap_and_return-shared.png\"},\"accordion_and_disclosure_expose_expanded_state\":{\"score\":\"yes\",\"reasoning\":\"Accordion rows and Rationale notes buttons exposed aria-expanded and updated it on activation. Evidence: accordion_and_disclosure_expose_expanded_state-shared.png\"},\"studio_landmarks_present\":{\"score\":\"yes\",\"reasoning\":\"The app exposed complementary rail, navigation, main canvas, regions, and version-history landmarks. Evidence: keyboard_operable_studio_controls-shared.png\"},\"text_and_controls_have_contrast\":{\"score\":\"yes\",\"reasoning\":\"Rubric headings, criterion names, chips, validation text, and primary controls were visibly readable; measured primary text contrast was sufficient. Evidence: keyboard_operable_studio_controls-shared.png\"},\"semantic_roles_for_interactive_chrome\":{\"score\":\"yes\",\"reasoning\":\"Interactive chrome used buttons, native/select comboboxes, dialog roles, tabs, and switch-role checkboxes. Evidence: semantic_roles_for_interactive_chrome-shared.png\"},\"reduced_motion_respected\":{\"score\":\"yes\",\"reasoning\":\"In the reduced-motion browser, prefers-reduced-motion matched, dialog transitions were effectively 1 microsecond, and accordion/dialog state changes applied immediately. Evidence: reduced_motion_respected-shared.png\"}}",
+    "cost_usd": 0.4120226
+  },
+  "behavioral": {
+    "score": 0.5455,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_reload_resets_to_seed",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Starting from seed: add a valid criterion, switch to Tune and exclude one labelled case, flip a preview verdict, and change aggregation mode; then reload. Confirm every facet coherently resets to the seeded baseline \u2014 exactly 4 rubrics at seeded versions, Response Quality open, seeded history present, and no surviving custom criterion or toggled case \u2014 never a mix of surviving and reverted facets.",
+        "reasoning": "Reload restored 6 seeded criteria, v2.1.0, and the seeded baseline after custom edits, tune exclusions, threshold changes, and aggregation changes. Evidence: multi_facet_reload_resets_to_seed-shared.png"
+      },
+      {
+        "id": "14.2",
+        "name": "aggregation_mode_reversal_proves_live_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Selection-reversal proof (genre stand-in for sort reversal): in the sample submission panel set a mixed pass/fail pattern, note the weighted-mean aggregate, switch aggregation mode to all-pass and note the different aggregate (0 percent when any fail), then switch back to weighted mean. Confirm the original weighted-mean aggregate returns \u2014 proving the score is derived from live verdicts and mode, not two hardcoded snapshots.",
+        "reasoning": "FAIL: Weighted mean produced 57% initially and verdict chips changed results, but the required mixed-verdict \u2192 all-pass 0% \u2192 weighted-mean return sequence was not fully observed. Evidence: different_verdicts_change_aggregate-shared.png"
+      },
+      {
+        "id": "14.3",
+        "name": "tune_derived_view_responds_to_includes",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Derived-view sensitivity: in Tune, note precision/recall/F1 and the summary strip, exclude two labelled cases, then change a likert pass threshold so seeded case scores straddle it. Confirm bars and summary change meaningfully for each input rather than redrawing identically regardless of toggles/threshold.",
+        "reasoning": "Excluding case-01 and case-02 changed inclusion from 12/12 to 10/12 and changed precision, recall, F1, confusion values, and the clarity threshold result. Evidence: tune_derived_view_responds_to_includes-shared.png"
+      },
+      {
+        "id": "14.4",
+        "name": "criterion_edit_echoes_across_surfaces",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Cross-view echo: after a version-gated save that changes a criterion name or weight, without reload confirm the accordion row, header rollup (criteria count / load-bearing count / weight sum), Tune bars for that criterion, preview panel row, and Export center structured-text / rubric-json / package-json previews all reflect the same updated values.",
+        "reasoning": "FAIL: The edited criterion name was observed in the criteria row, version rollup, Tune content, and export JSON, but the preview row was not directly verified in the same completed workflow. Evidence: criterion_edit_echoes_across_surfaces-shared.png"
+      },
+      {
+        "id": "14.5",
+        "name": "add_criterion_count_delta_exact",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Count-delta integrity: measure the header criteria count, submit one valid Add criterion form, and re-measure immediately \u2014 the count increases by exactly one (no off-by-one, no lagging counter), and exactly one new accordion row appears.",
+        "reasoning": "Adding one valid criterion changed the header from 6 to 7 and produced exactly one new accordion row, session-test. Evidence: add_criterion_count_delta_exact-shared.png"
+      },
+      {
+        "id": "14.6",
+        "name": "different_verdicts_change_aggregate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Input-dependent output: with aggregation mode set to weighted mean, apply the All fail chip and note the aggregate, then apply the All pass chip. Confirm the two outcomes differ (0 percent vs 100 percent class outcomes) rather than byte-identical aggregates.",
+        "reasoning": "All fail produced 0% under weighted mean and All pass produced 100%, directly demonstrating input-dependent aggregate output. Evidence: different_verdicts_change_aggregate-shared.png"
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_add_and_tune_flows",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Interleaved-flow integrity: open Add criterion and fill some fields without submitting, switch to Tune and toggle one case include, then return and finish submitting a valid new criterion; confirm exactly one new row appears, the Tune include toggle persisted for that session, and neither flow corrupted the other's state.",
+        "reasoning": "BLOCKED: The interleaved unsaved Add form workflow was not completed and verified through the visible UI. Evidence: add_criterion_count_delta_exact-shared.png"
+      },
+      {
+        "id": "14.8",
+        "name": "empty_then_repopulate_criteria",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edge-state round-trip: delete every criterion (each with major bump) until the criteria empty state appears and Tune/preview show empty states, then add two valid criteria with required bumps; confirm empty states clear, both rows appear, and header rollup tracks through both transitions.",
+        "reasoning": "All six criteria were deleted with major bumps; the criteria count reached 0, Tune showed no criteria to tune, Preview showed no verdicts to preview, and two valid criteria repopulated the studio with count 2. Evidence: empty_then_repopulate_criteria-shared.png"
+      },
+      {
+        "id": "14.9",
+        "name": "export_pipeline_contains_session_work",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Full-pipeline end state: add a valid CriterionUpsert, open Export center, confirm structured text plus rubric JSON (schemaVersion rubric-document-v1) and package JSON (schemaVersion rubric-package-v1, library Rubric Studio) include the new criterion id/name; delete that criterion with a major bump and confirm the next export omits it \u2014 proving artifacts compile live from the store.",
+        "reasoning": "FAIL: Export was directly observed containing a newly added criterion and live schema fields, but the same criterion's completed delete-then-export omission check was not fully verified. Evidence: export_pipeline_contains_session_work-shared.png"
+      },
+      {
+        "id": "14.10",
+        "name": "import_export_round_trip_reconstructs",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export a RubricPackage after a create, note rubrics length and a criterion id, diverge the studio, Import the package, and confirm rail counts, opened criteria, and a fresh export reconstruct to match the imported document without a reload.",
+        "reasoning": "BLOCKED: The package import, divergence, import reconstruction, and fresh-export comparison workflow was not completed in the live browser. Evidence: export_pipeline_contains_session_work-shared.png"
+      },
+      {
+        "id": "14.11",
+        "name": "undo_round_trip_restores_prior_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Undo round-trip: add a valid criterion (or flip a preview verdict), Undo once and confirm the prior criteria count or aggregate returns on every surface that showed the mutation, then Redo and confirm the mutation returns identically.",
+        "reasoning": "Undo restored the prior criterion name, and redo restored the edited name and threshold; the mutation was observed returning on the Tune surface. Evidence: undo_round_trip_restores_prior_state-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"multi_facet_reload_resets_to_seed\":{\"score\":\"yes\",\"reasoning\":\"Reload restored 6 seeded criteria, v2.1.0, and the seeded baseline after custom edits, tune exclusions, threshold changes, and aggregation changes. Evidence: multi_facet_reload_resets_to_seed-shared.png\"},\"aggregation_mode_reversal_proves_live_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: Weighted mean produced 57% initially and verdict chips changed results, but the required mixed-verdict \u2192 all-pass 0% \u2192 weighted-mean return sequence was not fully observed. Evidence: different_verdicts_change_aggregate-shared.png\"},\"tune_derived_view_responds_to_includes\":{\"score\":\"yes\",\"reasoning\":\"Excluding case-01 and case-02 changed inclusion from 12/12 to 10/12 and changed precision, recall, F1, confusion values, and the clarity threshold result. Evidence: tune_derived_view_responds_to_includes-shared.png\"},\"criterion_edit_echoes_across_surfaces\":{\"score\":\"no\",\"reasoning\":\"FAIL: The edited criterion name was observed in the criteria row, version rollup, Tune content, and export JSON, but the preview row was not directly verified in the same completed workflow. Evidence: criterion_edit_echoes_across_surfaces-shared.png\"},\"add_criterion_count_delta_exact\":{\"score\":\"yes\",\"reasoning\":\"Adding one valid criterion changed the header from 6 to 7 and produced exactly one new accordion row, session-test. Evidence: add_criterion_count_delta_exact-shared.png\"},\"different_verdicts_change_aggregate\":{\"score\":\"yes\",\"reasoning\":\"All fail produced 0% under weighted mean and All pass produced 100%, directly demonstrating input-dependent aggregate output. Evidence: different_verdicts_change_aggregate-shared.png\"},\"interleaved_add_and_tune_flows\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The interleaved unsaved Add form workflow was not completed and verified through the visible UI. Evidence: add_criterion_count_delta_exact-shared.png\"},\"empty_then_repopulate_criteria\":{\"score\":\"yes\",\"reasoning\":\"All six criteria were deleted with major bumps; the criteria count reached 0, Tune showed no criteria to tune, Preview showed no verdicts to preview, and two valid criteria repopulated the studio with count 2. Evidence: empty_then_repopulate_criteria-shared.png\"},\"export_pipeline_contains_session_work\":{\"score\":\"no\",\"reasoning\":\"FAIL: Export was directly observed containing a newly added criterion and live schema fields, but the same criterion's completed delete-then-export omission check was not fully verified. Evidence: export_pipeline_contains_session_work-shared.png\"},\"import_export_round_trip_reconstructs\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The package import, divergence, import reconstruction, and fresh-export comparison workflow was not completed in the live browser. Evidence: export_pipeline_contains_session_work-shared.png\"},\"undo_round_trip_restores_prior_state\":{\"score\":\"yes\",\"reasoning\":\"Undo restored the prior criterion name, and redo restored the edited name and threshold; the mutation was observed returning on the Tune surface. Evidence: undo_round_trip_restores_prior_state-shared.png\"}}",
+    "cost_usd": 0.6585913999999999
+  },
+  "core_features": {
+    "score": 0.55,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "seeded_rubric_rail_walkthrough",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On first load the left rail lists exactly 4 seeded rubric files \u2014 Response Quality, Code Review Depth, Safety Screening, and Summarization Fidelity \u2014 each entry showing the rubric name, a semantic-version badge (three dot-separated numbers), and a criteria count; the default open rubric (Response Quality) shows at least 6 criteria and each other rubric, when opened, shows at least 4",
+        "reasoning": "The initial browser view showed exactly four seeded rubrics with names, semantic versions, and counts; Response Quality had 6 criteria and the others had 4\u20135. Evidence: seeded_rubric_rail_walkthrough-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "header_card_selects_and_rollup",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The opened rubric's header card shows the rubric name, its current semantic version, an arbiter model select offering exactly quartz-arbiter-2, sable-jury-9, and cinder-panel-1, an aggregation mode select offering exactly weighted mean, required-pass, and all-pass, and a derived rollup line with total criteria count, load-bearing count (weight 3 or more), and weight sum; changing either select updates the header without a page reload",
+        "reasoning": "The header visibly showed both selects, rollup metrics, and live changes to arbiter model and aggregation mode without reload. Evidence: header_card_selects_and_rollup-updated.png"
+      },
+      {
+        "id": "1.3",
+        "name": "criterion_accordion_anatomy",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Each collapsed criterion row shows an id, a name, a type badge reading binary or likert with min and max values, a weight value, and an importance label (must have or nice to have); expanding the row with a click reveals the full multiline description and a Rationale notes disclosure that expands on activation and stays open for that criterion while the app remains open",
+        "reasoning": "FAIL: Criterion rows and expanded descriptions were observed, but the required rationale disclosure staying open was not completed and verified. Evidence: criterion_accordion_anatomy-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "load_bearing_accent_on_heavy_weights",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every criterion whose weight is 3 or higher renders with a distinct load-bearing accent treatment (accent border or badge) that criteria with lower weights visibly lack, and editing a criterion's weight across the 3 boundary adds or removes the accent accordingly",
+        "reasoning": "Heavy criteria visibly used the distinct load-bearing treatment while lower-weight criteria did not. Evidence: header_card_selects_and_rollup-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "add_criterion_count_delta",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting the Add criterion form with a valid CriterionUpsert payload (unique id matching lowercase letters/digits/hyphens, name 1-80, description 1-2000, type binary or likert with likertMin/likertMax when likert, weight 0.5-5 in 0.5 steps, importance must-have or nice-to-have) appends exactly one new accordion row showing those values and increases the header criteria count by exactly one, measured immediately before and after the submit",
+        "reasoning": "A valid added criterion appeared as a new row and the header/rail count increased from 6 to 7. Evidence: add_criterion_count_delta-after.png"
+      },
+      {
+        "id": "1.6",
+        "name": "criterion_form_inline_validation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting the criterion form with an empty name or description, a duplicate id, an id that violates the allowed pattern, a weight outside 0.5-5, an importance outside must-have|nice-to-have, or a likert range where min is not less than max shows inline per-field messages naming the offending fields, keeps the submit control disabled until all required fields are valid, and adds no criterion (the criteria count is unchanged)",
+        "reasoning": "The Add criterion dialog immediately showed per-field required messages and a disabled submit control for empty fields. Evidence: add_criterion_count_delta-after.png"
+      },
+      {
+        "id": "1.7",
+        "name": "minor_bump_gate_on_description_edit",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After editing a criterion's description or type, the save control is disabled and an inline explanation states that at least a minor version bump is required; entering a version with the middle number increased (and third number reset) enables save, and saving applies the edit",
+        "reasoning": "FAIL: The description edit opened a minor-bump gate with save disabled, but the correct minor bump and successful save were not completed. Evidence: wrong_bump_names_violation_kind-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "wrong_bump_names_violation_kind",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Attempting to save a description/type change with only a patch bump shows a violation message containing the phrase minor bump required, and attempting to save a criterion deletion with only a minor or patch bump shows major bump required; in both cases the rubric, its version badge, and its history remain unchanged",
+        "reasoning": "A description change with a patch bump displayed \u201cminor bump required,\u201d and deletion displayed \u201cmajor bump required,\u201d while the document remained unchanged. Evidence: wrong_bump_names_violation_kind-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "delete_requires_major_bump",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Deleting a criterion asks for confirmation, then blocks save with an inline major-bump explanation until the version's first number is increased with the others reset; after a correct major bump and save, the criteria count decreases by exactly one and the rail badge shows the new major version",
+        "reasoning": "Deletion confirmation, disabled save for an invalid bump, valid 3.0.0 major bump, count decrease, updated rail badge, and successful deletion were all observed. Evidence: delete_requires_major_bump-after.png"
+      },
+      {
+        "id": "1.10",
+        "name": "save_appends_history_entry",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Saving a correctly bumped change appends exactly one new entry at the top of the version history panel showing the new version number, a timestamp, and a one-line summary naming the changed criterion, and the rail entry's version badge updates to match \u2014 all without a reload",
+        "reasoning": "The completed deletion added a newest v3.0.0 history entry with timestamp and criterion summary, and updated the rail badge without reload. Evidence: delete_requires_major_bump-after.png"
+      },
+      {
+        "id": "1.11",
+        "name": "history_entry_opens_diff_view",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Selecting a version history entry opens a read-only diff-style view where added criteria appear in a green-tinted added treatment, removed criteria in a red-tinted treatment with struck-through text, and changed criteria in an amber-tinted treatment showing before and after values; a Close or Back control returns to the editable criteria list",
+        "reasoning": "FAIL: A changed-entry diff view opened and showed before/after values, but added and removed visual treatments were not fully verified. Evidence: history_entry_opens_diff_view-shared.png"
+      },
+      {
+        "id": "1.12",
+        "name": "tune_toggle_recomputes_metrics",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Scripted probe: in the Tune view, record one criterion's precision, recall, and F1 numbers, toggle two labelled cases off and confirm the bars and numbers change along with the summary strip's included-case count and macro averages, then toggle them back on and confirm the original values are restored exactly; additionally, changing a likert criterion's pass threshold recomputes that criterion's bars to different values when seeded case scores straddle the threshold",
+        "reasoning": "FAIL: Toggling two labelled cases changed included count and macro metrics and restoring returned the original values, but threshold recomputation was not verified. Evidence: tune_toggle_recomputes_metrics-shared.png"
+      },
+      {
+        "id": "1.14",
+        "name": "aggregate_honors_mode_and_verdicts",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Scripted probe: in the sample submission panel set a mix of pass and fail verdicts and record the weighted-mean aggregate; switch the aggregation mode to all-pass and confirm the aggregate drops to 0 percent; apply the All pass suggestion chip and confirm the aggregate reads 100 percent; flip a single verdict off under weighted mean and confirm the aggregate decreases by that criterion's weight share",
+        "reasoning": "FAIL: All-pass mode visibly changed the aggregate from 0% to 100%, but the weighted-mean mix and single-verdict weight-share probe were not completed. Evidence: aggregate_honors_mode_and_verdicts-all-pass.png"
+      },
+      {
+        "id": "1.15",
+        "name": "export_center_reflects_live_rubric",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export center opens with three live-derived format tabs (structured text, rubric JSON, package JSON); after adding a new criterion, re-opening export includes that criterion's id and name in all three previews; Copy places exactly the displayed text on the clipboard with visible confirmation, and Download triggers a real file download",
+        "reasoning": "FAIL: Live structured/rubric/package previews were observed, but copy confirmation and real download behavior were not completed. Evidence: rubric_package_json_field_contract-shared.png"
+      },
+      {
+        "id": "1.16",
+        "name": "rubric_document_json_field_contract",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The rubric JSON preview visibly includes schemaVersion exactly rubric-document-v1 plus name, version, arbiterModel (one of quartz-arbiter-2, sable-jury-9, cinder-panel-1), aggregationMode (one of weighted-mean, required-pass, all-pass), and a criteria array whose objects carry CriterionUpsert fields (id, name, description, type, weight, importance, and likertMin/likertMax when type is likert)",
+        "reasoning": "The visible Rubric JSON preview contained rubric-document-v1, name, version, arbiterModel, aggregationMode, criteria, and CriterionUpsert fields including likert bounds. Evidence: rubric_document_json_field_contract-visible.png"
+      },
+      {
+        "id": "1.17",
+        "name": "rubric_package_json_field_contract",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The package JSON preview visibly includes schemaVersion exactly rubric-package-v1, library exactly Rubric Studio, rubrics as an array of RubricDocument objects in rail order, and generatedAt as an ISO-8601 datetime ending in Z",
+        "reasoning": "The visible package preview contained rubric-package-v1, library Rubric Studio, rubrics array, and an ISO timestamp ending in Z. Evidence: rubric_package_json_field_contract-shared.png"
+      },
+      {
+        "id": "1.18",
+        "name": "import_package_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After exporting a package that includes a session-added criterion, diverging the studio, then Importing that package JSON, the rail membership, versions, and criteria reconstruct to match the imported document without a reload, and a fresh export reflects the restored collection",
+        "reasoning": "BLOCKED: The package import round-trip workflow was not completed and verified in the live browser. Evidence: rubric_package_json_field_contract-shared.png"
+      },
+      {
+        "id": "1.19",
+        "name": "undo_redo_restores_mutations",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After adding a valid criterion or flipping a preview verdict, Undo restores the prior criteria count or aggregate everywhere it appears (accordion/header/Tune/preview), Redo reapplies the mutation, and both controls are disabled when their stacks are empty",
+        "reasoning": "BLOCKED: The complete Undo/Redo mutation-and-restoration workflow was not exercised. Evidence: add_criterion_count_delta-after.png"
+      },
+      {
+        "id": "1.20",
+        "name": "patch_bump_gate_on_name_weight_or_importance_edit",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Editing an existing criterion changes only its name, weight, or importance in the prefilled CriterionUpsert form; save stays disabled until the rubric version's third number is increased, then the patch-bumped save updates that same row, the header rollups when weight crosses a boundary, the rail version badge, and exactly one newest history entry without creating a duplicate criterion.",
+        "reasoning": "BLOCKED: A name/weight/importance edit followed by a patch bump and save was not completed. Evidence: header_card_selects_and_rollup-shared.png"
+      },
+      {
+        "id": "1.21",
+        "name": "seeded_history_has_three_newest_first_entries",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On first load, Response Quality's version history contains at least 3 entries ordered newest first, and every visible entry shows a semantic version, timestamp, and one-line per-change summary.",
+        "reasoning": "The initial Response Quality history visibly contained at least three entries ordered newest first, each with semantic version, timestamp, and summary. Evidence: seeded_rubric_rail_walkthrough-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"seeded_rubric_rail_walkthrough\":{\"score\":\"yes\",\"reasoning\":\"The initial browser view showed exactly four seeded rubrics with names, semantic versions, and counts; Response Quality had 6 criteria and the others had 4\u20135. Evidence: seeded_rubric_rail_walkthrough-shared.png\"},\"header_card_selects_and_rollup\":{\"score\":\"yes\",\"reasoning\":\"The header visibly showed both selects, rollup metrics, and live changes to arbiter model and aggregation mode without reload. Evidence: header_card_selects_and_rollup-updated.png\"},\"criterion_accordion_anatomy\":{\"score\":\"no\",\"reasoning\":\"FAIL: Criterion rows and expanded descriptions were observed, but the required rationale disclosure staying open was not completed and verified. Evidence: criterion_accordion_anatomy-shared.png\"},\"load_bearing_accent_on_heavy_weights\":{\"score\":\"yes\",\"reasoning\":\"Heavy criteria visibly used the distinct load-bearing treatment while lower-weight criteria did not. Evidence: header_card_selects_and_rollup-shared.png\"},\"add_criterion_count_delta\":{\"score\":\"yes\",\"reasoning\":\"A valid added criterion appeared as a new row and the header/rail count increased from 6 to 7. Evidence: add_criterion_count_delta-after.png\"},\"criterion_form_inline_validation\":{\"score\":\"yes\",\"reasoning\":\"The Add criterion dialog immediately showed per-field required messages and a disabled submit control for empty fields. Evidence: add_criterion_count_delta-after.png\"},\"minor_bump_gate_on_description_edit\":{\"score\":\"no\",\"reasoning\":\"FAIL: The description edit opened a minor-bump gate with save disabled, but the correct minor bump and successful save were not completed. Evidence: wrong_bump_names_violation_kind-shared.png\"},\"wrong_bump_names_violation_kind\":{\"score\":\"yes\",\"reasoning\":\"A description change with a patch bump displayed \u201cminor bump required,\u201d and deletion displayed \u201cmajor bump required,\u201d while the document remained unchanged. Evidence: wrong_bump_names_violation_kind-shared.png\"},\"delete_requires_major_bump\":{\"score\":\"yes\",\"reasoning\":\"Deletion confirmation, disabled save for an invalid bump, valid 3.0.0 major bump, count decrease, updated rail badge, and successful deletion were all observed. Evidence: delete_requires_major_bump-after.png\"},\"save_appends_history_entry\":{\"score\":\"yes\",\"reasoning\":\"The completed deletion added a newest v3.0.0 history entry with timestamp and criterion summary, and updated the rail badge without reload. Evidence: delete_requires_major_bump-after.png\"},\"history_entry_opens_diff_view\":{\"score\":\"no\",\"reasoning\":\"FAIL: A changed-entry diff view opened and showed before/after values, but added and removed visual treatments were not fully verified. Evidence: history_entry_opens_diff_view-shared.png\"},\"tune_toggle_recomputes_metrics\":{\"score\":\"no\",\"reasoning\":\"FAIL: Toggling two labelled cases changed included count and macro metrics and restoring returned the original values, but threshold recomputation was not verified. Evidence: tune_toggle_recomputes_metrics-shared.png\"},\"aggregate_honors_mode_and_verdicts\":{\"score\":\"no\",\"reasoning\":\"FAIL: All-pass mode visibly changed the aggregate from 0% to 100%, but the weighted-mean mix and single-verdict weight-share probe were not completed. Evidence: aggregate_honors_mode_and_verdicts-all-pass.png\"},\"export_center_reflects_live_rubric\":{\"score\":\"no\",\"reasoning\":\"FAIL: Live structured/rubric/package previews were observed, but copy confirmation and real download behavior were not completed. Evidence: rubric_package_json_field_contract-shared.png\"},\"rubric_document_json_field_contract\":{\"score\":\"yes\",\"reasoning\":\"The visible Rubric JSON preview contained rubric-document-v1, name, version, arbiterModel, aggregationMode, criteria, and CriterionUpsert fields including likert bounds. Evidence: rubric_document_json_field_contract-visible.png\"},\"rubric_package_json_field_contract\":{\"score\":\"yes\",\"reasoning\":\"The visible package preview contained rubric-package-v1, library Rubric Studio, rubrics array, and an ISO timestamp ending in Z. Evidence: rubric_package_json_field_contract-shared.png\"},\"import_package_round_trip\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The package import round-trip workflow was not completed and verified in the live browser. Evidence: rubric_package_json_field_contract-shared.png\"},\"undo_redo_restores_mutations\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The complete Undo/Redo mutation-and-restoration workflow was not exercised. Evidence: add_criterion_count_delta-after.png\"},\"patch_bump_gate_on_name_weight_or_importance_edit\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A name/weight/importance edit followed by a patch bump and save was not completed. Evidence: header_card_selects_and_rollup-shared.png\"},\"seeded_history_has_three_newest_first_entries\":{\"score\":\"yes\",\"reasoning\":\"The initial Response Quality history visibly contained at least three entries ordered newest first, each with semantic version, timestamp, and summary. Evidence: seeded_rubric_rail_walkthrough-shared.png\"}}",
+    "cost_usd": 0.7910951999999999
+  },
+  "design_fidelity": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "spacing_matches_studio_scale",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 1440px, spacing among the fixed-width left rail, header card, criteria list, and history panel follows a consistent rhythm matching the visual_design composition \u2014 no arbitrary one-off gaps that collapse the three regions together.",
+        "reasoning": "yes \u2014 Desktop view shows a fixed rail, separated header card, criteria surface, and distinct history panel with consistent spacing. Evidence: studio-initial-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "typography_hierarchy_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography matches the spec hierarchy: the rubric name is visibly larger than section headings, which are larger than criterion names, which are larger than body and metadata text; Export center preview text uses a monospaced face distinct from the UI face.",
+        "reasoning": "yes \u2014 Rubric name, headings, criterion labels, and metadata form a clear scale; export preview visibly uses monospaced text. Evidence: studio-initial-shared.png, export-center-375-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "desktop_composition_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 1440px the layout matches the specified studio composition: fixed-width left rail, main canvas with header card above criteria, and history as a distinct right-hand or below-header surface separated by hairline borders or elevation \u2014 not a single undifferentiated stack.",
+        "reasoning": "yes \u2014 At 1440px the fixed left rail, header card, criteria canvas, and separate history panel are clearly distinct. Evidence: studio-initial-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "specified_state_changes_have_motion",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "State changes the spec calls out \u2014 accordion expand/collapse, criterion row animate-in/out, Tune bar width easing, aggregate score transition, form dialog enter/exit (~200\u2013300ms), toast slide-in \u2014 show the specified transitions rather than hard cuts (verified via real UI controls).",
+        "reasoning": "yes \u2014 Real accordion interaction expanded the criterion into a larger panel, and computed styles showed a 0.2s transition; mode/content changes also rendered as distinct surfaces. Evidence: specified-state-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "responsive_behavior_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 1024px and below the rail collapses behind a toggle overlay; at 375px Tune bars and diff view stack and the export code block scrolls in-container \u2014 matching the responsiveness spec rather than leaving a broken desktop layout.",
+        "reasoning": "yes \u2014 At 1024px the rail collapses behind a menu toggle; at 375px Tune content stacks and the export preview scrolls within its container. Evidence: responsive-1024-shared.png, responsive-375-shared.png, export-center-375-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "chips_and_controls_styled_not_browser_default",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Type badges (binary, likert with range), importance labels, header selects, toggles, and primary buttons use the studio chip/control treatments from the spec rather than unstyled browser defaults.",
+        "reasoning": "yes \u2014 Badges, weights, importance labels, selects, toggles, and primary buttons use custom chip and control styling. Evidence: studio-initial-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "clear_hierarchy_rail_header_criteria",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography hierarchy clearly distinguishes rail entry names, the opened rubric name in the header, criterion names, and body/metadata text.",
+        "reasoning": "yes \u2014 Rail entries, the large open-rubric header, criterion names, and metadata/body text are visibly differentiated. Evidence: studio-initial-shared.png"
+      },
+      {
+        "id": "3.8",
+        "name": "component_states_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, selects, toggles, and form fields show distinct default, hover, focus (visible ring), disabled, and error treatments; the disabled save control is visibly muted next to its inline explanation.",
+        "reasoning": "yes \u2014 The add-criterion dialog visibly shows focused, invalid/error, disabled, and default treatments, including muted disabled save and inline validation messages. Evidence: component-states-shared.png"
+      },
+      {
+        "id": "3.9",
+        "name": "dual_accent_and_diff_treatments",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "One accent marks selection and primary actions; a second, visually distinct load-bearing accent marks weight-3-or-higher criteria and the load-bearing rollup count (different hues); diff view uses green-tinted added, red-tinted removed with strikethrough, and amber-tinted changed treatments readable against their tints.",
+        "reasoning": "yes \u2014 Purple marks selection/actions, orange marks load-bearing criteria, and diff states visibly use green added, red strikethrough removed, and amber changed treatments. Evidence: diff-added-shared.png, diff-removed-shared.png, diff-view-final-shared.png"
+      },
+      {
+        "id": "3.10",
+        "name": "microinteractions_match_spec_duration",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Hover wash on rail/criteria/history rows, chip lift, and form focus rings follow the motion spec's short easing rather than instantaneous or multi-second default browser feedback (verified via real pointer/keyboard focus).",
+        "reasoning": "yes \u2014 Real hover was exercised on a rail row; controls expose short easing transitions, including 0.18s hover and 0.15s transform timing, and the form focus ring is visible. Evidence: component-states-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"spacing_matches_studio_scale\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Desktop view shows a fixed rail, separated header card, criteria surface, and distinct history panel with consistent spacing. Evidence: studio-initial-shared.png\"},\"typography_hierarchy_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Rubric name, headings, criterion labels, and metadata form a clear scale; export preview visibly uses monospaced text. Evidence: studio-initial-shared.png, export-center-375-shared.png\"},\"desktop_composition_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 At 1440px the fixed left rail, header card, criteria canvas, and separate history panel are clearly distinct. Evidence: studio-initial-shared.png\"},\"specified_state_changes_have_motion\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Real accordion interaction expanded the criterion into a larger panel, and computed styles showed a 0.2s transition; mode/content changes also rendered as distinct surfaces. Evidence: specified-state-shared.png\"},\"responsive_behavior_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 At 1024px the rail collapses behind a menu toggle; at 375px Tune content stacks and the export preview scrolls within its container. Evidence: responsive-1024-shared.png, responsive-375-shared.png, export-center-375-shared.png\"},\"chips_and_controls_styled_not_browser_default\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Badges, weights, importance labels, selects, toggles, and primary buttons use custom chip and control styling. Evidence: studio-initial-shared.png\"},\"clear_hierarchy_rail_header_criteria\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Rail entries, the large open-rubric header, criterion names, and metadata/body text are visibly differentiated. Evidence: studio-initial-shared.png\"},\"component_states_match_spec\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 The add-criterion dialog visibly shows focused, invalid/error, disabled, and default treatments, including muted disabled save and inline validation messages. Evidence: component-states-shared.png\"},\"dual_accent_and_diff_treatments\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Purple marks selection/actions, orange marks load-bearing criteria, and diff states visibly use green added, red strikethrough removed, and amber changed treatments. Evidence: diff-added-shared.png, diff-removed-shared.png, diff-view-final-shared.png\"},\"microinteractions_match_spec_duration\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Real hover was exercised on a rail row; controls expose short easing transitions, including 0.18s hover and 0.15s transform timing, and the form focus ring is visible. Evidence: component-states-shared.png\"} }",
+    "cost_usd": 0.4164006
+  },
+  "edge_cases": {
+    "score": 0.8462,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "empty_criteria_tune_preview_states",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After deleting all criteria from a rubric (each with its major bump), the criteria list shows an empty state naming what belongs there and offering Add criterion, and the Tune view and preview panel show their own empty states instead of broken bars.",
+        "reasoning": "yes \u2014 After deleting all six criteria, Criteria shows \u201cNo criteria yet,\u201d Tune shows \u201cNo criteria to tune,\u201d and Preview shows \u201cNo verdicts to preview.\u201d Evidence: empty-criteria-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "empty_name_description_inline_before_submit",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Submitting the criterion form with an empty name or description, an id that violates the allowed pattern, a weight outside 0.5-5, or an importance outside must-have|nice-to-have shows inline messages naming those fields before a successful add, and no criterion is added \u2014 the criteria count is unchanged.",
+        "reasoning": "FAIL: The form displayed inline required-field messages, but an attempted invalid submission resulted in an added criterion, so the no-add requirement was not satisfied. Evidence: initial-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "validation_names_field_not_bare_invalid",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Criterion-form, version-bump, and import validation copy names the offending field or violation kind (for example name, description, id, schemaVersion, library, minor bump required, major bump required) rather than only saying Invalid.",
+        "reasoning": "yes \u2014 Validation names fields and violations explicitly, including ID, Name, Description, schemaVersion, and version bump requirements. Evidence: criterion-form-escape.png"
+      },
+      {
+        "id": "4.4",
+        "name": "save_delete_copy_show_confirmation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After a successful version-gated save, a confirmed delete save, or activating Export copy, a confirmation toast or visible confirmation appears.",
+        "reasoning": "yes \u2014 Successful deletion showed a status confirmation, and Export Copy showed \u201cCopied to clipboard. Package JSON.\u201d Evidence: copy-confirmation.png"
+      },
+      {
+        "id": "4.5",
+        "name": "pending_bump_feedback_before_save",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When a pending edit requires a minor or major bump, the save control stays disabled and an inline explanation of the required bump kind is visible before any save attempt.",
+        "reasoning": "yes \u2014 The version gate showed \u201cminor bump required,\u201d an explanation, and a disabled Save change control before a valid version was entered. Evidence: initial-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "delete_asks_confirmation_cancel_safe",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Deleting a criterion asks for confirmation; choosing Cancel on the confirmation or Cancel on a pending version bump leaves the rubric, its version, and its history unchanged.",
+        "reasoning": "yes \u2014 Delete opened a confirmation dialog with Cancel; canceling left the criterion and version unchanged. Evidence: initial-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "version_gate_explains_required_bump",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Editing description/type shows an inline explanation that a minor bump is required, and deleting shows an inline explanation that a major bump is required \u2014 so the version gate is guided in-app.",
+        "reasoning": "yes \u2014 Editing description displayed \u201cminor bump required\u201d; deletion displayed \u201cmajor bump required\u201d with explanations. Evidence: initial-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "studio_controls_use_semantic_tags",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rail entries, header selects, accordion headers, Add criterion, verdict toggles, case include toggles, history entries, and copy use semantic button/input/label elements or equivalent accessible roles rather than unlabeled decorative wrappers.",
+        "reasoning": "yes \u2014 Rail entries, selects, accordion headers, Add criterion, switches, history entries, and Copy were exposed as buttons, comboboxes, switches, tabs, or other accessible roles. Evidence: initial-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "criterion_form_close_paths",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The criterion form dialog closes via Cancel and Escape, returning to the canvas without applying changes or requiring a reload.",
+        "reasoning": "FAIL: Cancel closed the form, but pressing Escape while the criterion dialog was open did not close it. Evidence: criterion-form-escape.png"
+      },
+      {
+        "id": "4.10",
+        "name": "exclude_all_cases_shows_tune_empty_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Excluding every labelled case in the Tune view shows an empty state in place of the bars rather than NaN, Infinity, or zero-division artifacts, and the summary strip reflects zero included cases.",
+        "reasoning": "yes \u2014 Excluding all 12 cases produced \u201c0 / 12,\u201d \u201c0 included,\u201d em-dash metrics, and \u201cNo criteria to tune,\u201d with no numeric artifacts. Evidence: empty-criteria-shared.png"
+      },
+      {
+        "id": "4.11",
+        "name": "import_rejects_nonconforming_package",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Importing malformed JSON or parseable JSON that fails the RubricPackage field contract (schemaVersion not rubric-package-v1, library not Rubric Studio, missing rubrics/generatedAt, or invalid CriterionUpsert) leaves the rubric collection unchanged and shows a visible error naming the offending field or that the package is invalid.",
+        "reasoning": "yes \u2014 Malformed JSON showed a parse error; \u201c{}\u201d showed \u201cschemaVersion must be rubric-package-v1,\u201d while the rubric collection remained unchanged. Evidence: initial-shared.png"
+      },
+      {
+        "id": "4.12",
+        "name": "undo_redo_disabled_when_stacks_empty",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With an empty undo history, Undo is disabled; with an empty redo stack, Redo is disabled \u2014 neither control silently no-ops while appearing enabled.",
+        "reasoning": "yes \u2014 On fresh load both Undo and Redo were visibly disabled. Evidence: initial-shared.png"
+      },
+      {
+        "id": "4.13",
+        "name": "export_empty_criteria_still_shows_schema_keys",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After deleting all criteria (each with major bump), Export center still opens and shows artifacts that include schemaVersion rubric-document-v1 / rubric-package-v1 and the required keys rather than crashing; Download and Copy remain available.",
+        "reasoning": "yes \u2014 Export center opened with empty criteria and Package JSON visibly included rubric-package-v1, rubric-document-v1, library, rubrics, and generatedAt; Copy and Download remained available. Evidence: copy-confirmation.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"empty_criteria_tune_preview_states\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 After deleting all six criteria, Criteria shows \u201cNo criteria yet,\u201d Tune shows \u201cNo criteria to tune,\u201d and Preview shows \u201cNo verdicts to preview.\u201d Evidence: empty-criteria-shared.png\"},\"empty_name_description_inline_before_submit\":{\"score\":\"no\",\"reasoning\":\"FAIL: The form displayed inline required-field messages, but an attempted invalid submission resulted in an added criterion, so the no-add requirement was not satisfied. Evidence: initial-shared.png\"},\"validation_names_field_not_bare_invalid\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Validation names fields and violations explicitly, including ID, Name, Description, schemaVersion, and version bump requirements. Evidence: criterion-form-escape.png\"},\"save_delete_copy_show_confirmation\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Successful deletion showed a status confirmation, and Export Copy showed \u201cCopied to clipboard. Package JSON.\u201d Evidence: copy-confirmation.png\"},\"pending_bump_feedback_before_save\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 The version gate showed \u201cminor bump required,\u201d an explanation, and a disabled Save change control before a valid version was entered. Evidence: initial-shared.png\"},\"delete_asks_confirmation_cancel_safe\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Delete opened a confirmation dialog with Cancel; canceling left the criterion and version unchanged. Evidence: initial-shared.png\"},\"version_gate_explains_required_bump\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Editing description displayed \u201cminor bump required\u201d; deletion displayed \u201cmajor bump required\u201d with explanations. Evidence: initial-shared.png\"},\"studio_controls_use_semantic_tags\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Rail entries, selects, accordion headers, Add criterion, switches, history entries, and Copy were exposed as buttons, comboboxes, switches, tabs, or other accessible roles. Evidence: initial-shared.png\"},\"criterion_form_close_paths\":{\"score\":\"no\",\"reasoning\":\"FAIL: Cancel closed the form, but pressing Escape while the criterion dialog was open did not close it. Evidence: criterion-form-escape.png\"},\"exclude_all_cases_shows_tune_empty_state\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Excluding all 12 cases produced \u201c0 / 12,\u201d \u201c0 included,\u201d em-dash metrics, and \u201cNo criteria to tune,\u201d with no numeric artifacts. Evidence: empty-criteria-shared.png\"},\"import_rejects_nonconforming_package\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Malformed JSON showed a parse error; \u201c{}\u201d showed \u201cschemaVersion must be rubric-package-v1,\u201d while the rubric collection remained unchanged. Evidence: initial-shared.png\"},\"undo_redo_disabled_when_stacks_empty\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 On fresh load both Undo and Redo were visibly disabled. Evidence: initial-shared.png\"},\"export_empty_criteria_still_shows_schema_keys\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Export center opened with empty criteria and Package JSON visibly included rubric-package-v1, rubric-document-v1, library, rubrics, and generatedAt; Copy and Download remained available. Evidence: copy-confirmation.png\"}}",
+    "cost_usd": 0.5923256
+  },
+  "innovation": {
+    "score": 0.6667,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "version_gate_delight_beyond_minimum",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Beyond the required disabled save and bump explanation, the version gate includes an extra delightful cue (for example a bump-kind chip, animated version field highlight, or suggested next version) that remains browser-observable (bonus).",
+        "reasoning": "The live version gate shows a MINOR chip and a suggested next version (2.2.0) alongside the disabled save state. Evidence: version-gate-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.2",
+        "name": "diff_storytelling_beyond_basic_tints",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "The history diff view offers advanced motion or storytelling beyond basic green/red/amber tints \u2014 for example coordinated before/after wipes or staggered row reveals \u2014 verified through real history selection (bonus).",
+        "reasoning": "FAIL: History selection shows a conventional static Before/After diff with no coordinated wipes, staggered reveals, or advanced motion observed. Evidence: history-diff-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.3",
+        "name": "guided_first_run_for_rubric_studio",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "A brief guided first-run or coachmark flow introduces the rail, version gate, Tune view, and Export center without blocking the tool (bonus beyond required empty-state copy).",
+        "reasoning": "The real first-run tour progressed through Rail, Version-gated editing, Tune view, and Export center steps without blocking authoring. Evidence: desktop-initial-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.4",
+        "name": "tune_graphic_extra_usability",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "An interactive graphic beyond the required precision/recall/F1 bars \u2014 for example a confusion-matrix mini-view or threshold histogram \u2014 adds usability while staying local and browser-observable (bonus).",
+        "reasoning": "Tune view visibly includes confusion-matrix mini-views for each criterion in addition to precision, recall, and F1. Evidence: tune-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.5",
+        "name": "keyboard_power_shortcuts_beyond_basics",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Beyond basic Tab/Enter operability, the studio supports a power shortcut such as keyboard add-criterion, quick rail jump, or slash-style command for switching Tune/preview (bonus).",
+        "reasoning": "The live keyboard-shortcuts dialog lists power shortcuts including N to add a criterion, C/T/P view switching, E export, and numeric rail jumps. Evidence: shortcuts-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.6",
+        "name": "session_personalization_beyond_requirements",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Within the in-memory session, the app offers a small personalization beyond requirements (for example remembering last opened view or last aggregation mode until reload) without using browser storage APIs (bonus).",
+        "reasoning": "FAIL: After switching to Tune, opening another rubric returned to Criteria rather than retaining the last view; no session personalization was observed. Evidence: session-personalization-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.7",
+        "name": "branded_studio_narrative_polish",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "The rail, header card, and criteria canvas read as a cohesive branded evaluation-studio narrative rather than generic unstyled CRUD (bonus execution quality).",
+        "reasoning": "The desktop UI presents a cohesive Rubric Studio identity across the branded rail, workspace header, tour card, rubric card, criteria canvas, and history panel. Evidence: desktop-initial-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.8",
+        "name": "load_bearing_accent_craft_beyond_badge",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Load-bearing accent craft goes beyond a bare badge \u2014 cohesive accent treatment across weight-3+ rows, rollup count, and related chips without inventing a conflicting second product (bonus).",
+        "reasoning": "Load-bearing criteria use a consistent orange accent on row edges and weight chips, with matching load-bearing count treatment in the rubric summary. Evidence: desktop-initial-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.9",
+        "name": "local_platform_enhancement",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "A genre-appropriate local enhancement (for example high-quality local fonts or offline-capable app shell assets) is visible without CDN dependence (bonus).",
+        "reasoning": "The rendered app visibly uses distinctive local-looking typography, and browser-observed font resources load from localhost node_modules paths rather than a CDN. Evidence: desktop-initial-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.10",
+        "name": "competition_level_rubric_studio_feel",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "The overall studio feels competition-grade: version-gated editing, Tune sensitivity, weighted-total preview, undo/redo, and Export center package polish read as a professional rubric instrument rather than a wired demo (bonus).",
+        "reasoning": "The live studio combines the version gate, Tune metrics and confusion matrices, weighted-total preview, undo/redo controls, and a multi-format Export center with live package preview. Evidence: version-gate-shared.png",
+        "optional": true
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "FAIL: No additional noteworthy enhancement outside the rubric\u2019s already-covered tour, tune, keyboard, export, branding, and preview capabilities was observed. Evidence: export-center-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"version_gate_delight_beyond_minimum\":{\"score\":\"yes\",\"reasoning\":\"The live version gate shows a MINOR chip and a suggested next version (2.2.0) alongside the disabled save state. Evidence: version-gate-shared.png\"},\"diff_storytelling_beyond_basic_tints\":{\"score\":\"no\",\"reasoning\":\"FAIL: History selection shows a conventional static Before/After diff with no coordinated wipes, staggered reveals, or advanced motion observed. Evidence: history-diff-shared.png\"},\"guided_first_run_for_rubric_studio\":{\"score\":\"yes\",\"reasoning\":\"The real first-run tour progressed through Rail, Version-gated editing, Tune view, and Export center steps without blocking authoring. Evidence: desktop-initial-shared.png\"},\"tune_graphic_extra_usability\":{\"score\":\"yes\",\"reasoning\":\"Tune view visibly includes confusion-matrix mini-views for each criterion in addition to precision, recall, and F1. Evidence: tune-shared.png\"},\"keyboard_power_shortcuts_beyond_basics\":{\"score\":\"yes\",\"reasoning\":\"The live keyboard-shortcuts dialog lists power shortcuts including N to add a criterion, C/T/P view switching, E export, and numeric rail jumps. Evidence: shortcuts-shared.png\"},\"session_personalization_beyond_requirements\":{\"score\":\"no\",\"reasoning\":\"FAIL: After switching to Tune, opening another rubric returned to Criteria rather than retaining the last view; no session personalization was observed. Evidence: session-personalization-shared.png\"},\"branded_studio_narrative_polish\":{\"score\":\"yes\",\"reasoning\":\"The desktop UI presents a cohesive Rubric Studio identity across the branded rail, workspace header, tour card, rubric card, criteria canvas, and history panel. Evidence: desktop-initial-shared.png\"},\"load_bearing_accent_craft_beyond_badge\":{\"score\":\"yes\",\"reasoning\":\"Load-bearing criteria use a consistent orange accent on row edges and weight chips, with matching load-bearing count treatment in the rubric summary. Evidence: desktop-initial-shared.png\"},\"local_platform_enhancement\":{\"score\":\"yes\",\"reasoning\":\"The rendered app visibly uses distinctive local-looking typography, and browser-observed font resources load from localhost node_modules paths rather than a CDN. Evidence: desktop-initial-shared.png\"},\"competition_level_rubric_studio_feel\":{\"score\":\"yes\",\"reasoning\":\"The live studio combines the version gate, Tune metrics and confusion matrices, weighted-total preview, undo/redo controls, and a multi-format Export center with live package preview. Evidence: version-gate-shared.png\"},\"innovation_catchall\":{\"score\":\"no\",\"reasoning\":\"FAIL: No additional noteworthy enhancement outside the rubric\u2019s already-covered tour, tune, keyboard, export, branding, and preview capabilities was observed. Evidence: export-center-shared.png\"}}",
+    "cost_usd": 0.24191059999999998
+  },
+  "motion": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "hover_system_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "While actually hovering with the pointer, buttons ease background and shadow with a slight press effect on activation, rail entries, criterion rows, and history entries take a full-width hover wash, chips lift subtly, and form controls show focus rings \u2014 verified via computed styles while the hover is held",
+        "reasoning": "Hovered rail entry changed its background wash; computed styles also showed transitions for background, shadow, transform, and focus-related properties. Evidence: hover_system_present-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "accordion_animates_with_chevron",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Clicking a criterion accordion header animates the row open with a height transition while its chevron rotates, and clicking again animates it closed; the Rationale notes disclosure animates the same way at its own level \u2014 driven through the real click path, not a state shortcut",
+        "reasoning": "Opening the criterion row produced an expanded state, rotated chevron, and a 0.28s height/max-height transition on the content; the nested Rationale disclosure was present. Evidence: accordion_animates_with_chevron-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "list_add_remove_animate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting the Add criterion form through the UI animates the new row into the list, and completing a delete-with-major-bump animates the removed row out rather than snapping the list",
+        "reasoning": "Submitting Add criterion created the row with a 0.5s row-in animation; deleting a criterion through the major-version confirmation removed it and updated the count/version. Evidence: list_add_remove_animate-shared.png, list_add_remove_animate-delete.png"
+      },
+      {
+        "id": "3.4",
+        "name": "tune_bars_ease_to_new_values",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Toggling a labelled case or moving a threshold with the real controls animates the affected precision/recall/F1 bars easing to their new widths rather than jumping instantly, and flipping a verdict toggle or switching the aggregation mode animates the preview aggregate's change (count-up or eased transition) instead of a hard swap",
+        "reasoning": "Toggling Include case-01 changed the metrics and bar widths; affected bars exposed a 0.5s cubic-bezier width transition. Evidence: tune_bars_ease_to_new_values-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "dialog_enter_exit_timed",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The criterion form dialog enters and exits with a short opacity and scale transition of roughly 200 to 300 milliseconds when opened and closed via its real controls; Export center and Import surfaces enter and exit with a short opacity transition; the diff view transitions in without a full page repaint",
+        "reasoning": "Criterion, Export center, and Import dialogs exposed 0.25s opacity/transform transitions; the diff view appeared with a 0.25s surface-in animation. Evidence: dialog_enter_exit_timed-shared.png, dialog_enter_exit_timed-import.png, dialog_enter_exit_timed-diff.png"
+      },
+      {
+        "id": "3.7",
+        "name": "toasts_slide_and_dismiss",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After a save, delete, or copy action performed through the UI, a toast slides in, remains readable, and auto-dismisses with a fade",
+        "reasoning": "Copy produced a readable toast with a 0.3s opacity/transform transition, and it was absent after waiting 3 seconds. Evidence: toasts_slide_and_dismiss-shared.png"
+      },
+      {
+        "id": "3.8",
+        "name": "reduced_motion_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion enabled, accordion, list, bar, dialog, Export center, and toast animations are removed or reduced to instant state changes while every flow (add, edit, delete, tune, preview, export, import, undo) remains fully available",
+        "reasoning": "In the reduced-motion browser, prefers-reduced-motion matched true; accordion and dialog transitions were reduced to 1e-06s while the visible add, tune, preview, export, import, and undo controls remained available. Evidence: reduced_motion_respected-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"hover_system_present\":{\"score\":\"yes\",\"reasoning\":\"Hovered rail entry changed its background wash; computed styles also showed transitions for background, shadow, transform, and focus-related properties. Evidence: hover_system_present-shared.png\"},\"accordion_animates_with_chevron\":{\"score\":\"yes\",\"reasoning\":\"Opening the criterion row produced an expanded state, rotated chevron, and a 0.28s height/max-height transition on the content; the nested Rationale disclosure was present. Evidence: accordion_animates_with_chevron-shared.png\"},\"list_add_remove_animate\":{\"score\":\"yes\",\"reasoning\":\"Submitting Add criterion created the row with a 0.5s row-in animation; deleting a criterion through the major-version confirmation removed it and updated the count/version. Evidence: list_add_remove_animate-shared.png, list_add_remove_animate-delete.png\"},\"tune_bars_ease_to_new_values\":{\"score\":\"yes\",\"reasoning\":\"Toggling Include case-01 changed the metrics and bar widths; affected bars exposed a 0.5s cubic-bezier width transition. Evidence: tune_bars_ease_to_new_values-shared.png\"},\"dialog_enter_exit_timed\":{\"score\":\"yes\",\"reasoning\":\"Criterion, Export center, and Import dialogs exposed 0.25s opacity/transform transitions; the diff view appeared with a 0.25s surface-in animation. Evidence: dialog_enter_exit_timed-shared.png, dialog_enter_exit_timed-import.png, dialog_enter_exit_timed-diff.png\"},\"toasts_slide_and_dismiss\":{\"score\":\"yes\",\"reasoning\":\"Copy produced a readable toast with a 0.3s opacity/transform transition, and it was absent after waiting 3 seconds. Evidence: toasts_slide_and_dismiss-shared.png\"},\"reduced_motion_respected\":{\"score\":\"yes\",\"reasoning\":\"In the reduced-motion browser, prefers-reduced-motion matched true; accordion and dialog transitions were reduced to 1e-06s while the visible add, tune, preview, export, import, and undo controls remained available. Evidence: reduced_motion_respected-shared.png\"}}",
+    "cost_usd": 0.37347579999999997
+  },
+  "performance": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_under_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On a local cold load the rubric studio becomes interactive within 2 seconds, with the 4 seeded rubrics listed and Response Quality opened.",
+        "reasoning": "Loaded interactive Rubric Studio with Response Quality and 4 seeded rubrics visible. Evidence: cold_start_under_two_seconds-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "console_clean_during_full_exercise",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No console errors or warnings appear during a full exercise: opening rubrics, adding/editing/deleting criteria with version bumps, using Tune toggles and thresholds, flipping preview verdicts, exporting, importing, undoing/redoing, and viewing history diffs.",
+        "reasoning": "After exercising rubric switching, Tune/Preview, rapid verdicts, and repeated exports, console inspection showed 0 errors and 0 warnings. Evidence: export_panel_stays_responsive-shared.png"
+      },
+      {
+        "id": "9.3",
+        "name": "tune_and_aggregate_recompute_under_100ms",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Toggling a labelled-case include or a preview verdict recomputes Tune bars or the aggregate score with UI response in under 100ms (perceived immediate).",
+        "reasoning": "Case inclusion and verdict toggles updated counts and aggregate immediately during interaction. Evidence: rapid_verdict_toggling_never_hangs-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "shell_visible_while_settling",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "While the app settles after first paint, the left rail and main canvas remain visible rather than a blank white screen with no controls.",
+        "reasoning": "Fresh desktop load showed both the rubric library rail and main canvas present with meaningful UI. Evidence: shell_visible_while_settling-shared.png"
+      },
+      {
+        "id": "9.5",
+        "name": "seeded_criteria_list_scrolls_without_lag",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With the default Response Quality rubric open (at least 6 criteria) and at least 10 labelled cases in Tune, scrolling the criteria list and case list shows no perceived lag.",
+        "reasoning": "Tune view rendered 12 labelled cases and 6 criteria with responsive interaction and no observed lag. Evidence: seeded_criteria_list_scrolls_without_lag-shared.png"
+      },
+      {
+        "id": "9.6",
+        "name": "ui_interactive_during_recompute",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "During Tune-bar width easing or aggregate score animation, case toggles, verdict toggles, and header selects remain interactive \u2014 the UI does not freeze until transitions finish.",
+        "reasoning": "Case switches and repeated verdict controls remained interactive while metrics and aggregate values updated. Evidence: rapid_verdict_toggling_never_hangs-shared.png"
+      },
+      {
+        "id": "9.7",
+        "name": "tune_bar_animation_holds_stable_frame_rate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Driven through real case toggles or threshold moves, Tune bar width easing maintains a smooth frame rate without visible hitching.",
+        "reasoning": "Real case toggling updated Tune metrics; bar elements exposed a 0.5s width easing transition and no hitch was observed. Evidence: tune_bar_animation_holds_stable_frame_rate-shared.png"
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_verdict_toggling_never_hangs",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapid repeated verdict toggling (at least five flips in quick succession, including All pass / All fail chips) keeps the UI responsive with no hangs and leaves toggles and aggregate in agreement.",
+        "reasoning": "Performed six rapid verdict/chip toggles; the UI remained responsive and left switches and the aggregate score in agreement. Evidence: rapid_verdict_toggling_never_hangs-shared.png"
+      },
+      {
+        "id": "9.9",
+        "name": "extended_session_stays_stable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "An extended session of opening all 4 rubrics, switching Tune/preview, and exporting repeatedly shows no runaway memory growth or progressive slowdown that freezes the UI.",
+        "reasoning": "Opened all 4 rubrics, switched Tune/Preview repeatedly, and exported all formats multiple times without freezing or progressive slowdown. Evidence: export_panel_stays_responsive-shared.png"
+      },
+      {
+        "id": "9.10",
+        "name": "export_panel_stays_responsive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening Export center and switching among structured text, rubric JSON, and package JSON keeps the studio interactive; the monospaced previews appear without a multi-second blank hang, and Copy/Download remain responsive.",
+        "reasoning": "Export center displayed structured text, rubric JSON, and package JSON previews with character counts plus responsive Copy and Download controls. Evidence: export_panel_stays_responsive-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_start_under_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"Loaded interactive Rubric Studio with Response Quality and 4 seeded rubrics visible. Evidence: cold_start_under_two_seconds-shared.png\"},\"console_clean_during_full_exercise\":{\"score\":\"yes\",\"reasoning\":\"After exercising rubric switching, Tune/Preview, rapid verdicts, and repeated exports, console inspection showed 0 errors and 0 warnings. Evidence: export_panel_stays_responsive-shared.png\"},\"tune_and_aggregate_recompute_under_100ms\":{\"score\":\"yes\",\"reasoning\":\"Case inclusion and verdict toggles updated counts and aggregate immediately during interaction. Evidence: rapid_verdict_toggling_never_hangs-shared.png\"},\"shell_visible_while_settling\":{\"score\":\"yes\",\"reasoning\":\"Fresh desktop load showed both the rubric library rail and main canvas present with meaningful UI. Evidence: shell_visible_while_settling-shared.png\"},\"seeded_criteria_list_scrolls_without_lag\":{\"score\":\"yes\",\"reasoning\":\"Tune view rendered 12 labelled cases and 6 criteria with responsive interaction and no observed lag. Evidence: seeded_criteria_list_scrolls_without_lag-shared.png\"},\"ui_interactive_during_recompute\":{\"score\":\"yes\",\"reasoning\":\"Case switches and repeated verdict controls remained interactive while metrics and aggregate values updated. Evidence: rapid_verdict_toggling_never_hangs-shared.png\"},\"tune_bar_animation_holds_stable_frame_rate\":{\"score\":\"yes\",\"reasoning\":\"Real case toggling updated Tune metrics; bar elements exposed a 0.5s width easing transition and no hitch was observed. Evidence: tune_bar_animation_holds_stable_frame_rate-shared.png\"},\"rapid_verdict_toggling_never_hangs\":{\"score\":\"yes\",\"reasoning\":\"Performed six rapid verdict/chip toggles; the UI remained responsive and left switches and the aggregate score in agreement. Evidence: rapid_verdict_toggling_never_hangs-shared.png\"},\"extended_session_stays_stable\":{\"score\":\"yes\",\"reasoning\":\"Opened all 4 rubrics, switched Tune/Preview repeatedly, and exported all formats multiple times without freezing or progressive slowdown. Evidence: export_panel_stays_responsive-shared.png\"},\"export_panel_stays_responsive\":{\"score\":\"yes\",\"reasoning\":\"Export center displayed structured text, rubric JSON, and package JSON previews with character counts plus responsive Copy and Download controls. Evidence: export_panel_stays_responsive-shared.png\"}}",
+    "cost_usd": 0.1830276
+  },
+  "responsiveness": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "layout_adapts_1440_to_375",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Resizing from 1440px desktop to 375px mobile keeps a usable rubric studio: rail (or its toggle), header card, and criteria/Tune/preview canvas remain present and operable at both widths.",
+        "reasoning": "Desktop rail/canvas and mobile toggle/header/canvas are present and usable. Evidence: layout_adapts_1440_to_375-desktop.png; layout_adapts_1440_to_375-mobile.png"
+      },
+      {
+        "id": "7.2",
+        "name": "mobile_tap_targets_adequate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px width, rail toggle, accordion headers, Add criterion, verdict toggles, case include toggles, history entries, Undo, Redo, Export, Import, and copy present tap targets at least 44px in at least one dimension.",
+        "reasoning": "Measured mobile controls are at least 44px in one dimension; accordion rows are 100px high, verdict switches 52\u00d748px, and header actions 44px high. Evidence: mobile_controls_tappable-open-rail.png"
+      },
+      {
+        "id": "7.3",
+        "name": "typography_readable_both_widths",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rubric name, section headings, criterion names, and metadata remain legible at both 1440px and 375px \u2014 type scales or reflows without becoming unreadably small on mobile.",
+        "reasoning": "Rubric and criterion headings remain legible; mobile criterion names measured at 13.76px and rubric heading at 24.8px. Evidence: layout_adapts_1440_to_375-desktop.png; layout_adapts_1440_to_375-mobile.png"
+      },
+      {
+        "id": "7.4",
+        "name": "no_clip_or_overflow_at_375",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px width, no content clips or overflows the viewport; the Tune bars and diff view reflow to stacked layouts and Export center code blocks scroll within their own containers; Undo, Redo, Export, and Import remain fully visible and operable.",
+        "reasoning": "At 375px, page scroll width measured 360\u2013375px with no page-level overflow; content stacks and the Export dialog stays within the viewport. Evidence: fixed_chrome_remains_accessible-export-dialog.png"
+      },
+      {
+        "id": "7.5",
+        "name": "rail_collapses_at_1024",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At widths of 1024px and below the left rail collapses behind a toggle control that opens it as an overlay; at desktop widths the rail is open by default.",
+        "reasoning": "At 1024px the rail measured offscreen at x\u2248\u2212286px while the open-library toggle remained visible; desktop screenshot shows the rail open. Evidence: rail_collapses_at_1024.png"
+      },
+      {
+        "id": "7.6",
+        "name": "narrow_stack_order_stays_usable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px width, header card, criteria/Tune/preview content, and history reflow into a logical stacking order without covering each other into an unusable pile.",
+        "reasoning": "At 375px the header, rubric content, view tabs, criteria/tune content, and history occupy sequential non-overlapping blocks. Evidence: tune_bars_and_code_block_reflow-tune-metrics.png"
+      },
+      {
+        "id": "7.7",
+        "name": "mobile_controls_tappable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px width, tap/click activation works on the rail toggle, rail entries (when overlay open), accordion headers, case toggles, verdict toggles, and Export.",
+        "reasoning": "Real clicks successfully opened the rail, selected a rail entry, expanded a criterion, toggled a verdict, switched views, and opened Export. Evidence: mobile_controls_tappable-open-rail.png; fixed_chrome_remains_accessible-export-dialog.png"
+      },
+      {
+        "id": "7.8",
+        "name": "no_horizontal_scroll_at_375",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px width the page does not produce page-level horizontal scrolling.",
+        "reasoning": "Read-only measurement at 375px reported document scrollWidth no greater than the viewport client width. Evidence: fixed_chrome_remains_accessible-export-dialog.png"
+      },
+      {
+        "id": "7.9",
+        "name": "tune_bars_and_code_block_reflow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px width, Tune precision/recall/F1 bars and the export monospaced code block size responsively \u2014 bars stack or shrink to fit, and the code block scrolls inside its container rather than forcing page overflow.",
+        "reasoning": "Tune metrics reflow into a 2\u00d72 mobile grid, case toggles remain visible, and Export code is contained in an overflow-auto code panel. Evidence: tune_bars_and_code_block_reflow-tune-metrics.png; fixed_chrome_remains_accessible-export-dialog.png"
+      },
+      {
+        "id": "7.10",
+        "name": "fixed_chrome_remains_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Fixed or sticky studio chrome (rail toggle, header actions, Export) remains reachable at 375px and does not permanently obscure the criteria list or form dialogs.",
+        "reasoning": "At 375px the header actions remain visible and the Export dialog is fully reachable, with close, format tabs, Copy, Download, and internally scrolling preview visible. Evidence: fixed_chrome_remains_accessible-export-dialog.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"layout_adapts_1440_to_375\":{\"score\":\"yes\",\"reasoning\":\"Desktop rail/canvas and mobile toggle/header/canvas are present and usable. Evidence: layout_adapts_1440_to_375-desktop.png; layout_adapts_1440_to_375-mobile.png\"},\"mobile_tap_targets_adequate\":{\"score\":\"yes\",\"reasoning\":\"Measured mobile controls are at least 44px in one dimension; accordion rows are 100px high, verdict switches 52\u00d748px, and header actions 44px high. Evidence: mobile_controls_tappable-open-rail.png\"},\"typography_readable_both_widths\":{\"score\":\"yes\",\"reasoning\":\"Rubric and criterion headings remain legible; mobile criterion names measured at 13.76px and rubric heading at 24.8px. Evidence: layout_adapts_1440_to_375-desktop.png; layout_adapts_1440_to_375-mobile.png\"},\"no_clip_or_overflow_at_375\":{\"score\":\"yes\",\"reasoning\":\"At 375px, page scroll width measured 360\u2013375px with no page-level overflow; content stacks and the Export dialog stays within the viewport. Evidence: fixed_chrome_remains_accessible-export-dialog.png\"},\"rail_collapses_at_1024\":{\"score\":\"yes\",\"reasoning\":\"At 1024px the rail measured offscreen at x\u2248\u2212286px while the open-library toggle remained visible; desktop screenshot shows the rail open. Evidence: rail_collapses_at_1024.png\"},\"narrow_stack_order_stays_usable\":{\"score\":\"yes\",\"reasoning\":\"At 375px the header, rubric content, view tabs, criteria/tune content, and history occupy sequential non-overlapping blocks. Evidence: tune_bars_and_code_block_reflow-tune-metrics.png\"},\"mobile_controls_tappable\":{\"score\":\"yes\",\"reasoning\":\"Real clicks successfully opened the rail, selected a rail entry, expanded a criterion, toggled a verdict, switched views, and opened Export. Evidence: mobile_controls_tappable-open-rail.png; fixed_chrome_remains_accessible-export-dialog.png\"},\"no_horizontal_scroll_at_375\":{\"score\":\"yes\",\"reasoning\":\"Read-only measurement at 375px reported document scrollWidth no greater than the viewport client width. Evidence: fixed_chrome_remains_accessible-export-dialog.png\"},\"tune_bars_and_code_block_reflow\":{\"score\":\"yes\",\"reasoning\":\"Tune metrics reflow into a 2\u00d72 mobile grid, case toggles remain visible, and Export code is contained in an overflow-auto code panel. Evidence: tune_bars_and_code_block_reflow-tune-metrics.png; fixed_chrome_remains_accessible-export-dialog.png\"},\"fixed_chrome_remains_accessible\":{\"score\":\"yes\",\"reasoning\":\"At 375px the header actions remain visible and the Export dialog is fully reachable, with close, format tabs, Copy, Download, and internally scrolling preview visible. Evidence: fixed_chrome_remains_accessible-export-dialog.png\"}}",
+    "cost_usd": 0.46262499999999995
+  },
+  "technical": {
+    "score": 0.3636,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "shared_state_coherence",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "All surfaces derive from one shared collection: a saved criterion edit, add, or delete is immediately reflected in the accordion list, header rollups, rail badge and counts, Tune bars, preview panel, and Export center structured-text / rubric-json / package-json previews without a reload, and no surface shows stale data another surface already updated",
+        "reasoning": "FAIL: Adding a criterion updated the rail, header totals, list, and package export, but Tune bars and preview were not re-verified after the mutation. Evidence: session_add.png"
+      },
+      {
+        "id": "4.2",
+        "name": "no_storage_reload_seeded",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "localStorage and sessionStorage remain empty after adding, editing, and deleting criteria, saving version bumps, toggling cases and verdicts, exporting, importing, and undoing, and a page reload returns the app to its seeded baseline",
+        "reasoning": "BLOCKED: Storage was observed empty and reload restored the seeded six-criterion baseline, but the full edit/delete/version-bump/undo workflow was not completed. Evidence: reload_seeded.png"
+      },
+      {
+        "id": "4.3",
+        "name": "console_clean_full_exercise",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The console is free of errors, warnings, and unhandled promise rejections on load and stays clean through adding, editing, deleting, version-gated saves, diff viewing, tuning, preview toggling, export, import, and undo/redo",
+        "reasoning": "BLOCKED: Console showed zero errors and warnings during the exercised paths, but the complete required workflow including undo/redo and all mutation paths was not completed. Evidence: shared_initial.png"
+      },
+      {
+        "id": "4.4",
+        "name": "cold_load_interactive_2s",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive (rail entries and header selects respond) within 2 seconds of a local cold load",
+        "reasoning": "The cold local load rendered the rail and header controls promptly and they were interactable. Evidence: shared_initial.png"
+      },
+      {
+        "id": "4.5",
+        "name": "rapid_input_stability",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Under rapid repeated input (fast verdict toggling, quick case toggles, rapid rubric switching), the UI stays responsive with no hangs, and derived numbers and Export center previews settle to values consistent with the final input state",
+        "reasoning": "Three rapid verdict toggles completed without hanging; the preview settled to the expected final verdict and aggregate score. Evidence: rapid_preview.png"
+      },
+      {
+        "id": "4.6",
+        "name": "keyboard_operability_focus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Every interactive control \u2014 rail entries, header selects, accordion headers, disclosures, form fields, verdict and case toggles, history entries, Undo, Redo, Export, Import, and copy controls \u2014 is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), showing a visible focus indicator at each stop",
+        "reasoning": "BLOCKED: Some controls were observed with keyboard focus, but every listed control was not independently verified for keyboard operation and focus indication. Evidence: validation_dialog.png"
+      },
+      {
+        "id": "4.7",
+        "name": "dialog_focus_trap_escape",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The criterion form dialog, Export center, and Import surface trap focus while open, close on the Escape key, and return keyboard focus to the control that opened them; accordion headers and disclosures expose an expanded or collapsed state attribute to the accessibility tree",
+        "reasoning": "FAIL: Import closed on Escape and returned focus, but the criterion form remained open after Escape; therefore the required dialog behavior is not satisfied. Evidence: validation_dialog.png"
+      },
+      {
+        "id": "4.8",
+        "name": "labels_and_error_association",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Every form field has a visible label, and each validation message (criterion, version bump, import) names the field it belongs to and is programmatically associated with that field",
+        "reasoning": "FAIL: Visible labels and required-field errors were present, but the observed Weight validation error lacked a verified aria-describedby association. Evidence: validation_dialog.png"
+      },
+      {
+        "id": "4.9",
+        "name": "api_shaped_validation_rejects_invalid_payloads",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Invalid CriterionUpsert submissions (empty required fields, duplicate id, likert min not less than max, weight outside 0.5-5, importance outside must-have|nice-to-have) and non-conforming Import packages are rejected with visible per-field or package errors and leave the collection unchanged",
+        "reasoning": "FAIL: Required-field, duplicate-ID, out-of-range-weight, and empty-import validation were observed, but likert-range and invalid-importance cases were not completed. Evidence: validation_dialog.png"
+      },
+      {
+        "id": "4.10",
+        "name": "end_state_export_is_portable_persistence",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After session mutations, Download or Copy of package JSON yields a RubricPackage that includes schemaVersion rubric-package-v1, library Rubric Studio, and the session's criteria; good-app persistence is this portable package plus MCP reads \u2014 browser storage stays unused",
+        "reasoning": "Package JSON visibly contained schemaVersion rubric-package-v1, library Rubric Studio, and the session-added criterion. Evidence: session_add.png"
+      },
+      {
+        "id": "4.11",
+        "name": "only_fictional_arbiter_names_rendered",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Across the arbiter selector, seeded rubric metadata, Tune view, preview, history, and export previews, model or arbiter names are limited to quartz-arbiter-2, sable-jury-9, and cinder-panel-1; no real product, company, or model name is rendered anywhere in the UI.",
+        "reasoning": "Observed arbiter names were limited to quartz-arbiter-2, sable-jury-9, and cinder-panel-1 across the UI and package preview. Evidence: session_add.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"shared_state_coherence\":{\"score\":\"no\",\"reasoning\":\"FAIL: Adding a criterion updated the rail, header totals, list, and package export, but Tune bars and preview were not re-verified after the mutation. Evidence: session_add.png\"},\"no_storage_reload_seeded\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Storage was observed empty and reload restored the seeded six-criterion baseline, but the full edit/delete/version-bump/undo workflow was not completed. Evidence: reload_seeded.png\"},\"console_clean_full_exercise\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Console showed zero errors and warnings during the exercised paths, but the complete required workflow including undo/redo and all mutation paths was not completed. Evidence: shared_initial.png\"},\"cold_load_interactive_2s\":{\"score\":\"yes\",\"reasoning\":\"The cold local load rendered the rail and header controls promptly and they were interactable. Evidence: shared_initial.png\"},\"rapid_input_stability\":{\"score\":\"yes\",\"reasoning\":\"Three rapid verdict toggles completed without hanging; the preview settled to the expected final verdict and aggregate score. Evidence: rapid_preview.png\"},\"keyboard_operability_focus\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Some controls were observed with keyboard focus, but every listed control was not independently verified for keyboard operation and focus indication. Evidence: validation_dialog.png\"},\"dialog_focus_trap_escape\":{\"score\":\"no\",\"reasoning\":\"FAIL: Import closed on Escape and returned focus, but the criterion form remained open after Escape; therefore the required dialog behavior is not satisfied. Evidence: validation_dialog.png\"},\"labels_and_error_association\":{\"score\":\"no\",\"reasoning\":\"FAIL: Visible labels and required-field errors were present, but the observed Weight validation error lacked a verified aria-describedby association. Evidence: validation_dialog.png\"},\"api_shaped_validation_rejects_invalid_payloads\":{\"score\":\"no\",\"reasoning\":\"FAIL: Required-field, duplicate-ID, out-of-range-weight, and empty-import validation were observed, but likert-range and invalid-importance cases were not completed. Evidence: validation_dialog.png\"},\"end_state_export_is_portable_persistence\":{\"score\":\"yes\",\"reasoning\":\"Package JSON visibly contained schemaVersion rubric-package-v1, library Rubric Studio, and the session-added criterion. Evidence: session_add.png\"},\"only_fictional_arbiter_names_rendered\":{\"score\":\"yes\",\"reasoning\":\"Observed arbiter names were limited to quartz-arbiter-2, sable-jury-9, and cinder-panel-1 across the UI and package preview. Evidence: session_add.png\"}}",
+    "cost_usd": 0.3834612
+  },
+  "user_flows": {
+    "score": 0.6154,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "add_criterion_updates_all_surfaces",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create flow: opening Add criterion, submitting a valid form appends exactly one new accordion row, increases the header criteria count by one, and the new criterion appears in the Tune view and sample-submission panel without a page reload.",
+        "reasoning": "Valid create added exactly one row, changed the count from 6 to 7, and the new criterion appeared in Criteria, Tune, and Preview without reload. Evidence: add_criterion_updates_all_surfaces-shared.png"
+      },
+      {
+        "id": "6.2",
+        "name": "invalid_add_shows_inline_validation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create flow: submitting the criterion form with an empty name or description shows immediate inline messages naming those fields, adds no criterion, and leaves the header criteria count unchanged.",
+        "reasoning": "Empty Add dialog showed inline ID, Name, and Description required messages; the Add button was disabled and the count stayed at 6. Evidence: invalid_add_shows_inline_validation-shared.png"
+      },
+      {
+        "id": "6.3",
+        "name": "version_gated_description_edit_end_to_end",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Version-gated edit end to end: on the default Response Quality rubric, edit one criterion's description, observe save disabled with the minor-bump explanation, enter a version that only increases the patch number and observe the violation message naming minor bump required, then enter a correct minor bump and save \u2014 the rail badge shows the new version, exactly one new history entry appears at the top naming that criterion, and selecting it shows the description marked as changed with before and after values, all without a reload.",
+        "reasoning": "FAIL: Edit dialog accepted a changed description and exposed version continuation, but the required minor-bump violation, successful save, new history entry, and diff verification were not completed. Evidence: criterion_form_and_diff_overlays-shared.png"
+      },
+      {
+        "id": "6.4",
+        "name": "delete_with_major_bump_end_to_end",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Delete with major bump: delete a criterion, confirm, observe the major-bump explanation, enter a correct major bump and save \u2014 the criteria count decreases by exactly one, the rail badge shows the major version, and the new history entry's diff view shows that criterion in the red-tinted removed treatment with struck-through text.",
+        "reasoning": "BLOCKED: The complete delete/confirm/major-version/diff workflow was not exercised. Evidence: reload_recovers_to_seeded_studio-shared.png"
+      },
+      {
+        "id": "6.5",
+        "name": "criteria_tune_preview_switch_retains_rubric",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "View/mode switch: switching among criteria, Tune, and preview modes on the opened rubric changes the canvas without a reload and keeps the same active rubric, header selects, and criteria set.",
+        "reasoning": "Criteria, Tune, and Preview were switched live; Response Quality, its version, and its criterion set remained active. Evidence: criteria_tune_preview_switch_retains_rubric-shared.png"
+      },
+      {
+        "id": "6.6",
+        "name": "last_delete_reveals_criteria_empty_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Edge: after deleting all criteria from a rubric (each with its major bump), the criteria list shows a clear empty state naming what belongs there and offering Add criterion, and Tune and preview show their own empty states instead of broken bars.",
+        "reasoning": "BLOCKED: Deleting all criteria and verifying the three empty states was not exercised. Evidence: reload_recovers_to_seeded_studio-shared.png"
+      },
+      {
+        "id": "6.7",
+        "name": "tune_case_toggles_update_bars_and_summary",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Tune sensitivity: in the Tune view, note one criterion's F1 value, exclude two labelled cases and observe the precision/recall/F1 bars and summary strip change, then re-include them and observe the original values restored exactly.",
+        "reasoning": "Excluding labelled cases 01 and 02 changed the clarity F1 from 0.74 to 0.67 and summary values; re-including both restored 12/12, Macro F1 0.60, and clarity F1 0.74 exactly. Evidence: tune_case_toggles_update_bars_and_summary-shared.png"
+      },
+      {
+        "id": "6.8",
+        "name": "rail_collapse_preserves_open_rubric",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At widths of 1024px and below the left rail collapses behind a toggle; opening the overlay, selecting a different seeded rubric, and closing the overlay keeps that rubric open in the canvas with workflow continuity.",
+        "reasoning": "FAIL: At 1024px the rail remained open and the close control was outside the viewport, so the overlay-selection-continuity workflow could not complete. Evidence: rail_collapse_preserves_open_rubric-shared.png"
+      },
+      {
+        "id": "6.9",
+        "name": "criterion_form_and_diff_overlays",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Overlays: the Add/Edit criterion form dialog opens for create/edit and closes via Cancel or Escape without changing the rubric; selecting a history entry opens the read-only diff view and Close/Back returns to the editable criteria list.",
+        "reasoning": "Add/Edit criterion dialogs opened; Escape closed the edit form without saving, and a history entry opened a read-only diff with before/after descriptions. Evidence: criterion_form_and_diff_overlays-shared.png"
+      },
+      {
+        "id": "6.10",
+        "name": "reload_recovers_to_seeded_studio",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Recovery: after editing views, toggles, or pending form state, a page reload returns the app to its seeded state \u2014 exactly 4 rubrics at seeded versions, Response Quality open by default, and all seeded history entries present \u2014 with no dead end requiring a second reload.",
+        "reasoning": "Reload returned to Response Quality with 4 rubrics, seeded versions, 6 criteria, and all four seeded history entries. Evidence: reload_recovers_to_seeded_studio-shared.png"
+      },
+      {
+        "id": "6.11",
+        "name": "export_session_flow_to_artifact",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export session flow: add a valid criterion, open Export center, confirm structured text, rubric JSON (schemaVersion rubric-document-v1 with name/version/arbiterModel/aggregationMode/criteria), and package JSON (schemaVersion rubric-package-v1, library Rubric Studio, rubrics, generatedAt) include that criterion, then Download or Copy the active format.",
+        "reasoning": "After creating a criterion, Structured text, rubric JSON with rubric-document-v1 fields, and package JSON with rubric-package-v1/library/rubrics/generatedAt visibly included it; Download produced rubric-package.json. Evidence: export_session_flow_to_artifact-shared.png"
+      },
+      {
+        "id": "6.12",
+        "name": "import_round_trip_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Import round-trip flow: export the package after a create, diverge the studio, Import the JSON, and confirm rail counts, opened criteria, and a fresh export reconstruct to match the imported package without a reload.",
+        "reasoning": "After diverging to Code Review Depth, importing the downloaded package restored Response Quality with 7 criteria and seeded history, and a fresh export remained available with the imported criterion. Evidence: import_round_trip_flow-shared.png"
+      },
+      {
+        "id": "6.13",
+        "name": "undo_round_trip_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Undo round-trip: add a valid criterion or flip a preview verdict, Undo and confirm the prior criteria count or aggregate returns on accordion/header/Tune/preview, then Redo and confirm the mutation returns.",
+        "reasoning": "FAIL: Add, Undo, and Redo correctly changed the header/list count between 7 and 8 and Tune/Preview showed the added criterion on redo, but the full required prior-state verification across all specified surfaces after Undo was not completed. Evidence: undo_round_trip_flow-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"add_criterion_updates_all_surfaces\":{\"score\":\"yes\",\"reasoning\":\"Valid create added exactly one row, changed the count from 6 to 7, and the new criterion appeared in Criteria, Tune, and Preview without reload. Evidence: add_criterion_updates_all_surfaces-shared.png\"},\"invalid_add_shows_inline_validation\":{\"score\":\"yes\",\"reasoning\":\"Empty Add dialog showed inline ID, Name, and Description required messages; the Add button was disabled and the count stayed at 6. Evidence: invalid_add_shows_inline_validation-shared.png\"},\"version_gated_description_edit_end_to_end\":{\"score\":\"no\",\"reasoning\":\"FAIL: Edit dialog accepted a changed description and exposed version continuation, but the required minor-bump violation, successful save, new history entry, and diff verification were not completed. Evidence: criterion_form_and_diff_overlays-shared.png\"},\"delete_with_major_bump_end_to_end\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The complete delete/confirm/major-version/diff workflow was not exercised. Evidence: reload_recovers_to_seeded_studio-shared.png\"},\"criteria_tune_preview_switch_retains_rubric\":{\"score\":\"yes\",\"reasoning\":\"Criteria, Tune, and Preview were switched live; Response Quality, its version, and its criterion set remained active. Evidence: criteria_tune_preview_switch_retains_rubric-shared.png\"},\"last_delete_reveals_criteria_empty_state\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Deleting all criteria and verifying the three empty states was not exercised. Evidence: reload_recovers_to_seeded_studio-shared.png\"},\"tune_case_toggles_update_bars_and_summary\":{\"score\":\"yes\",\"reasoning\":\"Excluding labelled cases 01 and 02 changed the clarity F1 from 0.74 to 0.67 and summary values; re-including both restored 12/12, Macro F1 0.60, and clarity F1 0.74 exactly. Evidence: tune_case_toggles_update_bars_and_summary-shared.png\"},\"rail_collapse_preserves_open_rubric\":{\"score\":\"no\",\"reasoning\":\"FAIL: At 1024px the rail remained open and the close control was outside the viewport, so the overlay-selection-continuity workflow could not complete. Evidence: rail_collapse_preserves_open_rubric-shared.png\"},\"criterion_form_and_diff_overlays\":{\"score\":\"yes\",\"reasoning\":\"Add/Edit criterion dialogs opened; Escape closed the edit form without saving, and a history entry opened a read-only diff with before/after descriptions. Evidence: criterion_form_and_diff_overlays-shared.png\"},\"reload_recovers_to_seeded_studio\":{\"score\":\"yes\",\"reasoning\":\"Reload returned to Response Quality with 4 rubrics, seeded versions, 6 criteria, and all four seeded history entries. Evidence: reload_recovers_to_seeded_studio-shared.png\"},\"export_session_flow_to_artifact\":{\"score\":\"yes\",\"reasoning\":\"After creating a criterion, Structured text, rubric JSON with rubric-document-v1 fields, and package JSON with rubric-package-v1/library/rubrics/generatedAt visibly included it; Download produced rubric-package.json. Evidence: export_session_flow_to_artifact-shared.png\"},\"import_round_trip_flow\":{\"score\":\"yes\",\"reasoning\":\"After diverging to Code Review Depth, importing the downloaded package restored Response Quality with 7 criteria and seeded history, and a fresh export remained available with the imported criterion. Evidence: import_round_trip_flow-shared.png\"},\"undo_round_trip_flow\":{\"score\":\"no\",\"reasoning\":\"FAIL: Add, Undo, and Redo correctly changed the header/list count between 7 and 8 and Tune/Preview showed the added criterion on redo, but the full required prior-state verification across all specified surfaces after Undo was not completed. Evidence: undo_round_trip_flow-shared.png\"}}",
+    "cost_usd": 1.2571432
+  },
+  "visual_design": {
+    "score": 0.7143,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "studio_regions_separated",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 1440px width the app composes as a fixed-width left rail, a main canvas with the header card above the criteria list, and a distinct version history surface, with the regions separated by hairline borders or elevation rather than running together, and spacing following a consistent rhythm across rail entries, criterion rows, history entries, and Tune bars with no crowded or orphaned regions",
+        "reasoning": "Desktop view visibly separates the fixed rail, main canvas, criteria list, and version-history card with borders, cards, and consistent spacing. Evidence: studio_regions_separated-shared.png"
+      },
+      {
+        "id": "2.2",
+        "name": "dual_accent_discipline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "One accent color consistently marks selection and primary actions while a second, visibly different hue marks load-bearing criteria (weight 3 or more) and the load-bearing rollup count; type badges (binary vs likert with range) and importance labels render as visually distinct chip treatments consistent across every criterion row; the two accents are distinguishable side by side and applied consistently across rail, list, Tune, and preview surfaces",
+        "reasoning": "Selection/primary actions use purple, while load-bearing criteria and rollup use orange; type and importance badges are visibly distinct and consistent. Evidence: studio_regions_separated-shared.png"
+      },
+      {
+        "id": "2.4",
+        "name": "diff_color_language_consistent",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "In the diff view, added entries carry a green-tinted treatment, removed entries a red-tinted treatment with strikethrough, and changed entries an amber-tinted treatment with before and after values, each also carrying a non-color label or icon, and all text stays readable against its tint",
+        "reasoning": "FAIL: The live diff view showed only a Changed entry with before/after text; added green and removed red/strikethrough entries were not observed. Evidence: diff_color_language_consistent-shared.png"
+      },
+      {
+        "id": "2.5",
+        "name": "typography_hierarchy_clear",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The rubric name is visibly larger than section headings, which are larger than criterion names, which are larger than body and metadata text, consistently across views; Export center previews render in a monospaced face distinct from the UI face",
+        "reasoning": "The rubric title is visibly larger than section and criterion headings, with smaller metadata; the export preview is rendered in a distinct monospace style. Evidence: studio_regions_separated-shared.png; export_center_format_tabs_visible-shared.png"
+      },
+      {
+        "id": "2.6",
+        "name": "component_state_treatments",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Buttons, selects, toggles, and form fields show distinct default, hover, focus (visible ring), disabled, and error treatments; the gated save control in its disabled state is visibly muted and sits adjacent to its inline explanation; Undo and Redo appear visibly disabled when their stacks are empty",
+        "reasoning": "FAIL: Disabled Undo/Redo and the muted gated save with inline explanation were observed, but complete distinct default, hover, focus, and error treatments were not directly demonstrated. Evidence: component_state_treatments-shared.png; component_state_treatments-focus-error-shared.png"
+      },
+      {
+        "id": "2.7",
+        "name": "export_center_format_tabs_visible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export center presents format tabs for structured text, rubric JSON, and package JSON with a monospace code preview plus Copy and Download; Import sits as a clear companion control",
+        "reasoning": "Export center visibly provides Structured text, Rubric JSON, and Package JSON tabs, a monospace live preview, Copy, Download, and companion Import controls. Evidence: export_center_format_tabs_visible-shared.png"
+      },
+      {
+        "id": "2.8",
+        "name": "responsive_reflow_clean",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 1024px the left rail collapses behind a toggle that opens it as an overlay, and at 375px width no content clips or overflows the viewport, no page-level horizontal scrolling appears, the Tune bars and diff view reflow to stacked layouts, and Export center code blocks scroll within their own containers",
+        "reasoning": "At 1024px the rail collapses behind an Open rubric library toggle and appears as an overlay; at 375px content remains within the viewport, Tune and diff content stack, and the export code container has overflow-x:auto while body width remains 375px. Evidence: responsive_reflow_clean-1024.png; responsive_reflow_clean-375.png; responsive_reflow_clean-diff-375.png; responsive_reflow_clean-tune-375.png; responsive_reflow_clean-export-375.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"studio_regions_separated\":{\"score\":\"yes\",\"reasoning\":\"Desktop view visibly separates the fixed rail, main canvas, criteria list, and version-history card with borders, cards, and consistent spacing. Evidence: studio_regions_separated-shared.png\"},\"dual_accent_discipline\":{\"score\":\"yes\",\"reasoning\":\"Selection/primary actions use purple, while load-bearing criteria and rollup use orange; type and importance badges are visibly distinct and consistent. Evidence: studio_regions_separated-shared.png\"},\"diff_color_language_consistent\":{\"score\":\"no\",\"reasoning\":\"FAIL: The live diff view showed only a Changed entry with before/after text; added green and removed red/strikethrough entries were not observed. Evidence: diff_color_language_consistent-shared.png\"},\"typography_hierarchy_clear\":{\"score\":\"yes\",\"reasoning\":\"The rubric title is visibly larger than section and criterion headings, with smaller metadata; the export preview is rendered in a distinct monospace style. Evidence: studio_regions_separated-shared.png; export_center_format_tabs_visible-shared.png\"},\"component_state_treatments\":{\"score\":\"no\",\"reasoning\":\"FAIL: Disabled Undo/Redo and the muted gated save with inline explanation were observed, but complete distinct default, hover, focus, and error treatments were not directly demonstrated. Evidence: component_state_treatments-shared.png; component_state_treatments-focus-error-shared.png\"},\"export_center_format_tabs_visible\":{\"score\":\"yes\",\"reasoning\":\"Export center visibly provides Structured text, Rubric JSON, and Package JSON tabs, a monospace live preview, Copy, Download, and companion Import controls. Evidence: export_center_format_tabs_visible-shared.png\"},\"responsive_reflow_clean\":{\"score\":\"yes\",\"reasoning\":\"At 1024px the rail collapses behind an Open rubric library toggle and appears as an overlay; at 375px content remains within the viewport, Tune and diff content stack, and the export code container has overflow-x:auto while body width remains 375px. Evidence: responsive_reflow_clean-1024.png; responsive_reflow_clean-375.png; responsive_reflow_clean-diff-375.png; responsive_reflow_clean-tune-375.png; responsive_reflow_clean-export-375.png\"}}",
+    "cost_usd": 0.21035979999999999
+  },
+  "writing": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "consistent_capitalization_studio_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders headings and section titles (rubric name, Tune, Export, Import, Rationale notes, history summaries), they use one consistent capitalization convention throughout.",
+        "reasoning": "Headings and section titles consistently use sentence-style capitalization, with uppercase reserved for eyebrow labels. Evidence: rationale-expanded.png"
+      },
+      {
+        "id": "15.2",
+        "name": "specific_verbs_on_actions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders button or action labels, they use specific labels such as Add criterion, Export, Import, Undo, Redo, and Copy rather than generic Submit/OK when a specific label is possible.",
+        "reasoning": "Observed specific action labels including Add criterion, Edit criterion, Delete, Undo, Redo, Import, Export, Copy, and Download. Evidence: export-modal.png"
+      },
+      {
+        "id": "15.3",
+        "name": "validation_names_problem_and_fix",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders criterion-form, version-bump, or import validation messages, they name the field or violation kind (name, description, id, schemaVersion, library, minor bump required, major bump required) and the fix, not only a bare rejection like Invalid.",
+        "reasoning": "Validation identifies specific fields and fixes, including \u201cID is required,\u201d \u201cName is required,\u201d \u201cDescription is required,\u201d and \u201cPackage JSON is required; paste an exported package.\u201d Evidence: criterion-add-form.png, import-view.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders empty states for an empty criteria list, empty Tune case set, or empty preview panel, the copy explains what belongs there and how to add or include content.",
+        "reasoning": "No empty-state surfaces were rendered in the observed Criteria, Tune, or Preview views; those views contained their relevant content, so the conditional criterion passes vacuously. Evidence: criteria-initial.png, tune-view.png, preview-view.png"
+      },
+      {
+        "id": "15.5",
+        "name": "studio_copy_is_well_written",
+        "value": 1.0,
+        "raw": 5,
+        "weight": 0.5,
+        "description": "Where the app renders body copy (criterion descriptions, Rationale notes, history summaries, empty-state text), rate how free the text is of spelling and grammatical errors.",
+        "reasoning": "Observed body copy is grammatical, clear, and professional across criteria guidance, rationale text, history summaries, and view descriptions. Evidence: rationale-expanded.png"
+      },
+      {
+        "id": "15.6",
+        "name": "terminology_consistent_across_surfaces",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders labels for the same concept in multiple places (criterion vs criteria, must have vs nice to have, weighted mean / required-pass / all-pass), terminology stays consistent rather than inventing conflicting names.",
+        "reasoning": "The app consistently distinguishes criterion/criteria, must-have/nice-to-have, and weighted-mean terminology across the criteria, Tune, Preview, and history surfaces. Evidence: preview-view.png"
+      },
+      {
+        "id": "15.7",
+        "name": "version_and_metric_formatting_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders semantic versions, weights, and Tune precision/recall/F1 numbers, formatting is consistent across the rail badge, header, history entries, and bars (same decimal style and version shape).",
+        "reasoning": "Versions consistently use three-part semantic forms such as v2.1.0; weights use decimal formatting, and Tune precision/recall/F1 values consistently use two decimals. Evidence: tune-view.png, criteria-initial.png"
+      },
+      {
+        "id": "15.8",
+        "name": "success_messages_are_specific",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders confirmation feedback after save, delete, or copy, the copy states what happened rather than a vague affirmation alone.",
+        "reasoning": "Copy feedback explicitly states \u201cCopied to clipboard\u201d and identifies the format as \u201cStructured text.\u201d Evidence: copy-feedback.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"consistent_capitalization_studio_labels\":{\"score\":\"yes\",\"reasoning\":\"Headings and section titles consistently use sentence-style capitalization, with uppercase reserved for eyebrow labels. Evidence: rationale-expanded.png\"},\"specific_verbs_on_actions\":{\"score\":\"yes\",\"reasoning\":\"Observed specific action labels including Add criterion, Edit criterion, Delete, Undo, Redo, Import, Export, Copy, and Download. Evidence: export-modal.png\"},\"validation_names_problem_and_fix\":{\"score\":\"yes\",\"reasoning\":\"Validation identifies specific fields and fixes, including \u201cID is required,\u201d \u201cName is required,\u201d \u201cDescription is required,\u201d and \u201cPackage JSON is required; paste an exported package.\u201d Evidence: criterion-add-form.png, import-view.png\"},\"empty_states_explain_next_step\":{\"score\":\"yes\",\"reasoning\":\"No empty-state surfaces were rendered in the observed Criteria, Tune, or Preview views; those views contained their relevant content, so the conditional criterion passes vacuously. Evidence: criteria-initial.png, tune-view.png, preview-view.png\"},\"studio_copy_is_well_written\":{\"score\":5,\"reasoning\":\"Observed body copy is grammatical, clear, and professional across criteria guidance, rationale text, history summaries, and view descriptions. Evidence: rationale-expanded.png\"},\"terminology_consistent_across_surfaces\":{\"score\":\"yes\",\"reasoning\":\"The app consistently distinguishes criterion/criteria, must-have/nice-to-have, and weighted-mean terminology across the criteria, Tune, Preview, and history surfaces. Evidence: preview-view.png\"},\"version_and_metric_formatting_consistent\":{\"score\":\"yes\",\"reasoning\":\"Versions consistently use three-part semantic forms such as v2.1.0; weights use decimal formatting, and Tune precision/recall/F1 values consistently use two decimals. Evidence: tune-view.png, criteria-initial.png\"},\"success_messages_are_specific\":{\"score\":\"yes\",\"reasoning\":\"Copy feedback explicitly states \u201cCopied to clipboard\u201d and identifies the format as \u201cStructured text.\u201d Evidence: copy-feedback.png\"}}",
+    "cost_usd": 0.2441214
+  }
+}

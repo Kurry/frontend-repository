@@ -1,0 +1,2434 @@
+{
+  "accessibility": {
+    "score": 0.6,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "controls_keyboard_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every interactive control \u2014 palette entries, toolbar buttons including Undo, Redo, Artifact, Delete selected, Run/Pause/Resume/Retry/Save, node disclosures, timeline filters and entries, modal fields, panel toggles, artifact format tabs, Copy, Download, and Import \u2014 is reachable and operable with the keyboard alone, with a visible focus indicator",
+        "reasoning": "Keyboard focus reached palette controls with a visible ring; Enter added a node, Alt+N selected a node, Enter opened configuration, and Delete removed a node. Evidence: keyboard-node.png"
+      },
+      {
+        "id": "1.2",
+        "name": "modals_manage_focus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Modal dialogs (configuration, save, confirmation, import) use role dialog with aria-modal true, trap focus while open, close on Escape, and return focus to the originating control",
+        "reasoning": "Observed configuration and import dialogs with role=dialog and aria-modal=true; Escape closed the configuration dialog and returned focus to the originating palette control. Evidence: form-modal.png"
+      },
+      {
+        "id": "1.3",
+        "name": "icons_have_accessible_names",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Toolbar and status icons that convey meaning expose descriptive accessible names (aria-label or equivalent); purely decorative icons are hidden from the accessibility tree",
+        "reasoning": "FAIL: Multiple focusable icon-only buttons had no aria-label, title, or text, even though decorative SVGs were hidden. Evidence: accessibility-initial.png"
+      },
+      {
+        "id": "1.4",
+        "name": "feedback_uses_live_regions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Validation errors, run state transitions (started, retrying, failed, complete), copy confirmation, and import validation failures are conveyed both visually and via an aria-live region",
+        "reasoning": "FAIL: Run status and deletion toasts used live regions, but invalid import input produced empty alert elements and no validation message. Evidence: form-modal.png"
+      },
+      {
+        "id": "1.5",
+        "name": "form_fields_labeled",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Every configuration, save, and import field has an explicit associated label; validation messages are associated with their fields and name the field key",
+        "reasoning": "FAIL: Configuration/import fields displayed nearby text but had no associated label, aria-label, or aria-labelledby; label elements were empty. Evidence: form-modal.png"
+      },
+      {
+        "id": "1.6",
+        "name": "heading_and_landmark_structure",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Panel titles (Palette, Saved Workflows, Timeline, Artifact) and main regions use a logical heading order and landmark roles so the workspace is navigable by structure",
+        "reasoning": "Observed logical H1/H2/H3 headings and landmark regions for palette, controls, canvas, artifact, timeline, and saved workflows. Evidence: accessibility-initial.png"
+      },
+      {
+        "id": "1.7",
+        "name": "keyboard_node_first_class",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Node selection can be cycled from the keyboard with a visible highlight; Enter opens the selected node's configuration; Delete removes the selected node, edge, or multi-selection",
+        "reasoning": "Alt+N visibly selected a node, Enter opened its configuration dialog, and Delete removed the selected node with confirmation feedback. Evidence: keyboard-node.png"
+      },
+      {
+        "id": "1.8",
+        "name": "status_not_color_alone",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every status badge and the graph-validity badge carries a text label; status is never conveyed by color alone",
+        "reasoning": "Graph validity and execution states were presented with text labels such as Valid, Incomplete, Ready, complete, and failed rather than color alone. Evidence: accessibility-initial.png"
+      },
+      {
+        "id": "1.9",
+        "name": "focus_indicators_visible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Focused controls show a visible focus ring that is not obscured by overlapping chrome",
+        "reasoning": "A focused palette control visibly exposed a 2px blue outline and inset focus ring, unobscured by surrounding chrome. Evidence: focus-visible.png"
+      },
+      {
+        "id": "1.10",
+        "name": "reduced_motion_still_operable",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, all flows \u2014 run, undo, import, export \u2014 remain completable with keyboard and pointer",
+        "reasoning": "FAIL: With prefers-reduced-motion confirmed true, run, artifact, and import were operable, but the full required set including undo was not completed; Undo remained disabled in the tested state. Evidence: reduced-motion-import.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"controls_keyboard_accessible\":{\"score\":\"yes\",\"reasoning\":\"Keyboard focus reached palette controls with a visible ring; Enter added a node, Alt+N selected a node, Enter opened configuration, and Delete removed a node. Evidence: keyboard-node.png\"},\"modals_manage_focus\":{\"score\":\"yes\",\"reasoning\":\"Observed configuration and import dialogs with role=dialog and aria-modal=true; Escape closed the configuration dialog and returned focus to the originating palette control. Evidence: form-modal.png\"},\"icons_have_accessible_names\":{\"score\":\"no\",\"reasoning\":\"FAIL: Multiple focusable icon-only buttons had no aria-label, title, or text, even though decorative SVGs were hidden. Evidence: accessibility-initial.png\"},\"feedback_uses_live_regions\":{\"score\":\"no\",\"reasoning\":\"FAIL: Run status and deletion toasts used live regions, but invalid import input produced empty alert elements and no validation message. Evidence: form-modal.png\"},\"form_fields_labeled\":{\"score\":\"no\",\"reasoning\":\"FAIL: Configuration/import fields displayed nearby text but had no associated label, aria-label, or aria-labelledby; label elements were empty. Evidence: form-modal.png\"},\"heading_and_landmark_structure\":{\"score\":\"yes\",\"reasoning\":\"Observed logical H1/H2/H3 headings and landmark regions for palette, controls, canvas, artifact, timeline, and saved workflows. Evidence: accessibility-initial.png\"},\"keyboard_node_first_class\":{\"score\":\"yes\",\"reasoning\":\"Alt+N visibly selected a node, Enter opened its configuration dialog, and Delete removed the selected node with confirmation feedback. Evidence: keyboard-node.png\"},\"status_not_color_alone\":{\"score\":\"yes\",\"reasoning\":\"Graph validity and execution states were presented with text labels such as Valid, Incomplete, Ready, complete, and failed rather than color alone. Evidence: accessibility-initial.png\"},\"focus_indicators_visible\":{\"score\":\"yes\",\"reasoning\":\"A focused palette control visibly exposed a 2px blue outline and inset focus ring, unobscured by surrounding chrome. Evidence: focus-visible.png\"},\"reduced_motion_still_operable\":{\"score\":\"no\",\"reasoning\":\"FAIL: With prefers-reduced-motion confirmed true, run, artifact, and import were operable, but the full required set including undo was not completed; Undo remained disabled in the tested state. Evidence: reduced-motion-import.png\"}}",
+    "cost_usd": 0.4684172
+  },
+  "behavioral": {
+    "score": 0.6364,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_reload_resets_to_seed",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Starting from seed: add a node, save a configuration, save a named workflow, open Artifact, run once, undo once, then reload. Confirm every facet coherently resets \u2014 seeded 5-node graph, empty timeline, no saved-run state, empty undo/redo, artifact previews matching the seed \u2014 never a partial mix",
+        "reasoning": "FAIL: Reload returned the seeded 5-node graph, but the complete add/save/workflow/artifact/run/undo sequence was not successfully verified as one coherent workflow. Evidence: reload-seed.png"
+      },
+      {
+        "id": "14.2",
+        "name": "timeline_filter_reversal_proves_live",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Filter-reversal proof: after a run with mixed statuses, filter timeline to failed (narrowed list), then clear/all \u2014 the full ordered log returns with the same entries, proving the filter derives from live timeline data rather than two hardcoded lists",
+        "reasoning": "FAIL: The Failed filter produced \u201cNo failed events\u201d rather than a narrowed failed-event list before clearing. Evidence: timeline-mixed.png"
+      },
+      {
+        "id": "14.3",
+        "name": "config_edit_derived_artifact_sensitivity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Derived-view sensitivity: change an Agent timeout_seconds or a node title and confirm both Workflow Definition JSON and Mermaid previews change meaningfully to include the new values rather than redrawing identically",
+        "reasoning": "Agent title/timeout edits appeared in JSON, and the Mermaid preview changed to include the edited title. Evidence: derived-sensitive.png"
+      },
+      {
+        "id": "14.4",
+        "name": "config_echoes_badge_and_export",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cross-view echo: save a distinctive Prompt configuration; confirm the canvas configuration badge and the JSON config.prompt field both show that same prompt name without a reload",
+        "reasoning": "The canvas showed \u201cLaunch summary\u201d and the live JSON config.prompt field showed the same value without reload. Evidence: config-echo.png"
+      },
+      {
+        "id": "14.5",
+        "name": "palette_drop_count_delta_exact",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Count-delta integrity: measure visible node count, drop one palette node, re-measure immediately \u2014 count increases by exactly one; JSON nodes array length matches",
+        "reasoning": "FAIL: Real palette click/drag attempts left the visible node count at 5; no exact +1 drop delta was observed. Evidence: initial-shared.png"
+      },
+      {
+        "id": "14.6",
+        "name": "different_timeouts_different_export",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Input-dependent output: set Agent timeout_seconds to 5 and note JSON; set it to 120; confirm the two JSON exports differ in timeout_seconds exactly as the inputs dictate",
+        "reasoning": "JSON export visibly showed timeoutSeconds 5, then after editing it showed timeoutSeconds 120. Evidence: config-export-5s.png, timeout-120-export.png"
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_run_and_export_flows",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Interleaved-flow integrity: start a run, pause mid-run, open Artifact and confirm JSON still lists all nodes, resume to completion; confirm rollup reaches n of m complete and artifact preview was never wiped by the pause",
+        "reasoning": "During a paused run, the artifact still listed all 5 nodes; after Resume the rollup reached 5/5 complete. Evidence: paused-artifact.png"
+      },
+      {
+        "id": "14.8",
+        "name": "empty_canvas_then_reseed_via_import",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edge-state round-trip: delete all nodes (empty-canvas run message and artifact empty-state visible), Import a previously exported valid Workflow Definition JSON; confirm nodes/edges return and both artifact formats match the import",
+        "reasoning": "After deleting all nodes, the canvas and artifact showed empty states; importing valid JSON restored 5 nodes, edges, JSON, and Mermaid. Evidence: empty-canvas.png, import-restored.png"
+      },
+      {
+        "id": "14.9",
+        "name": "import_export_round_trip_probe",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export Workflow Definition JSON after distinctive title and timeout_seconds edits, delete nodes so the canvas differs, Import that JSON, and confirm canvas, badges, validity badge, and both artifact formats reconstruct the exported values without reload",
+        "reasoning": "FAIL: The reconstruction used a manually prepared import payload rather than the exact previously exported JSON, so exact round-trip fidelity was not fully verified. Evidence: import-restored.png"
+      },
+      {
+        "id": "14.10",
+        "name": "undo_restores_then_redo_reapplies",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Delete a node so JSON omits it, Undo once and confirm the node and JSON entry return together, then Redo and confirm they disappear again across canvas and artifact",
+        "reasoning": "Deleting the Agent reduced the canvas to 4 articles, Undo restored 5, and Redo reduced it to 4 again. Evidence: undo-redo-final.png"
+      },
+      {
+        "id": "14.11",
+        "name": "schema_field_contract_round_trip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Set distinctive valid contract values (title, timeout_seconds within 1\u2013300, prompt/agent/rubric from seeds), export JSON, clear canvas, Import: confirm those exact field keys and values reappear in configuration modals and JSON preview",
+        "reasoning": "Imported JSON showed the distinctive title, timeout, prompt, agent, and rubric values; configuration modals showed the corresponding values. Evidence: schema-prompt-modal.png, schema-agent-modal.png, schema-eval-modal.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"multi_facet_reload_resets_to_seed\":{\"score\":\"no\",\"reasoning\":\"FAIL: Reload returned the seeded 5-node graph, but the complete add/save/workflow/artifact/run/undo sequence was not successfully verified as one coherent workflow. Evidence: reload-seed.png\"},\"timeline_filter_reversal_proves_live\":{\"score\":\"no\",\"reasoning\":\"FAIL: The Failed filter produced \u201cNo failed events\u201d rather than a narrowed failed-event list before clearing. Evidence: timeline-mixed.png\"},\"config_edit_derived_artifact_sensitivity\":{\"score\":\"yes\",\"reasoning\":\"Agent title/timeout edits appeared in JSON, and the Mermaid preview changed to include the edited title. Evidence: derived-sensitive.png\"},\"config_echoes_badge_and_export\":{\"score\":\"yes\",\"reasoning\":\"The canvas showed \u201cLaunch summary\u201d and the live JSON config.prompt field showed the same value without reload. Evidence: config-echo.png\"},\"palette_drop_count_delta_exact\":{\"score\":\"no\",\"reasoning\":\"FAIL: Real palette click/drag attempts left the visible node count at 5; no exact +1 drop delta was observed. Evidence: initial-shared.png\"},\"different_timeouts_different_export\":{\"score\":\"yes\",\"reasoning\":\"JSON export visibly showed timeoutSeconds 5, then after editing it showed timeoutSeconds 120. Evidence: config-export-5s.png, timeout-120-export.png\"},\"interleaved_run_and_export_flows\":{\"score\":\"yes\",\"reasoning\":\"During a paused run, the artifact still listed all 5 nodes; after Resume the rollup reached 5/5 complete. Evidence: paused-artifact.png\"},\"empty_canvas_then_reseed_via_import\":{\"score\":\"yes\",\"reasoning\":\"After deleting all nodes, the canvas and artifact showed empty states; importing valid JSON restored 5 nodes, edges, JSON, and Mermaid. Evidence: empty-canvas.png, import-restored.png\"},\"import_export_round_trip_probe\":{\"score\":\"no\",\"reasoning\":\"FAIL: The reconstruction used a manually prepared import payload rather than the exact previously exported JSON, so exact round-trip fidelity was not fully verified. Evidence: import-restored.png\"},\"undo_restores_then_redo_reapplies\":{\"score\":\"yes\",\"reasoning\":\"Deleting the Agent reduced the canvas to 4 articles, Undo restored 5, and Redo reduced it to 4 again. Evidence: undo-redo-final.png\"},\"schema_field_contract_round_trip\":{\"score\":\"yes\",\"reasoning\":\"Imported JSON showed the distinctive title, timeout, prompt, agent, and rubric values; configuration modals showed the corresponding values. Evidence: schema-prompt-modal.png, schema-agent-modal.png, schema-eval-modal.png\"}}",
+    "cost_usd": 1.1270018
+  },
+  "core_features": {
+    "score": 0.5417,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "seeded_workflow_walkthrough",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On load, the canvas shows one seeded example workflow of exactly 5 connected nodes \u2014 one each of Prompt, Agent, Eval, Condition, Output \u2014 joined by 4 edges forming a valid source-to-sink path, with a left palette listing all five node types",
+        "reasoning": "PASS: The canvas visibly contained exactly five connected nodes\u2014Prompt, Agent, Eval, Condition, and Output\u2014with four edges, and the palette listed all five types. Evidence: seeded_workflow_walkthrough-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "canvas_pan_zoom_drag",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The canvas pans and zooms with the real pointer, and dragging a node repositions it with the new position holding while the app stays open; dragging a node type from the palette onto the canvas with a real drag creates a new node of that type at the drop position",
+        "reasoning": "FAIL: Zoom visibly changed the canvas, but node repositioning and palette drag-and-drop creation were not successfully observed. Evidence: canvas_pan_zoom_drag-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "compatible_connection_creates_edge",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Dragging from a node's output handle to a compatible input handle creates a directed edge between the two nodes that remains visible on the canvas; attempting an incompatible connection (for example output handle to output handle) shows an error toast naming the incompatibility and creates no edge (edge count unchanged)",
+        "reasoning": "BLOCKED: Compatible and incompatible handle-drag connection behaviors were not successfully exercised and observed. Evidence: seeded_workflow_walkthrough-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "select_delete_edge_and_node",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Clicking an edge selects it with a visibly distinct style and pressing Delete removes it; selecting a node and pressing Delete removes the node together with its attached edges in the same interaction",
+        "reasoning": "FAIL: Keyboard node deletion was observed, but edge selection with distinct styling and edge deletion were not verified. Evidence: keyboard_node_selection-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "node_config_forms_field_contract",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Double-clicking a node opens a type-specific configuration modal enforcing the field contract: every type requires title (1\u201380 chars); Prompt requires prompt from the seeded library (\u22654); Agent requires agent from the seeded list (\u22653) and timeout_seconds integer 1\u2013300; Eval requires rubric (\u22653); Condition requires expression; Output requires destination. An invalid field shows an inline message naming that exact field key with Save disabled until valid; saving updates the configuration badge and both artifact previews",
+        "reasoning": "FAIL: Prompt configuration opened and title validation was observed, but the complete per-type field contract, save behavior, and artifact updates were not fully verified. Evidence: node_config_forms_field_contract-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "run_topological_progression",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Pressing Run sets every node to a pending badge, then nodes advance one at a time in topological source-to-sink order through running (with an active indicator) to complete, each with a watchable simulated duration \u2014 never all at once",
+        "reasoning": "PASS: Run showed Prompt running while the remaining four nodes were pending, then advanced through the workflow to 5/5 complete rather than starting all nodes simultaneously. Evidence: run_topological_progression-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "retry_attempt_and_backoff_visible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "During a run, the seeded Agent node visibly retries: a retrying badge appears with an attempt counter and a live backoff countdown of the form 'waiting Ns before retry 2 of 3' before the next attempt, then the node succeeds on its third attempt",
+        "reasoning": "PASS: The Agent visibly showed retry state with a live countdown, \u201cretry 3 of 3,\u201d and later completed successfully on its third attempt. Evidence: retry_attempt_and_backoff_visible-shared.png"
+      },
+      {
+        "id": "1.11",
+        "name": "failed_run_stops_downstream",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "When a node exhausts its retries, it shows a failed badge with a short inline error summary, downstream nodes stay pending, and the run-level status reads failed",
+        "reasoning": "FAIL: The exercised seeded run succeeded with 5/5 complete and zero failures; an exhausted-retry failed run with downstream nodes pending was not observed. Evidence: failed_run_stops_downstream-shared.png"
+      },
+      {
+        "id": "1.12",
+        "name": "retry_from_failed_node_freezes_upstream",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After a failed run, activating the Retry from failed node control resumes execution from exactly the failed node; upstream completed nodes keep their frozen outputs, timestamps, and complete badges and visibly do not re-execute",
+        "reasoning": "BLOCKED: No failed run was produced, so retry-from-failed-node and frozen upstream execution could not be exercised. Evidence: failed_run_stops_downstream-shared.png"
+      },
+      {
+        "id": "1.13",
+        "name": "pause_resume_checkpoint",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Pressing Pause mid-run freezes progression at a checkpoint (the current node finishes, no further node starts, the rollup stops advancing); pressing Resume continues from exactly the next node and nodes already complete never re-execute",
+        "reasoning": "PASS: Pausing produced a checkpoint with upstream complete and downstream pending; Resume continued from the next node, with a resumed timeline entry and no upstream re-execution. Evidence: pause_resume_checkpoint-shared.png"
+      },
+      {
+        "id": "1.14",
+        "name": "rollup_derives_live",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The toolbar rollup shows n of m nodes complete, elapsed duration, and failure count, and its values update live as nodes advance during a run, matching the badges actually visible on the canvas",
+        "reasoning": "PASS: The rollup visibly changed from 0/5 while running to 1/5 and then 5/5, matching the node badges and showing elapsed time and failure count. Evidence: run_topological_progression-shared.png"
+      },
+      {
+        "id": "1.15",
+        "name": "node_io_summary_expandable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After a run, each executed node exposes an expandable input/output summary: activating the disclosure reveals the simulated input received and output produced, and outputs differ between nodes reflecting each node's own configuration",
+        "reasoning": "PASS: After execution, expandable node summaries visibly showed simulated inputs and outputs, with differing content across nodes. Evidence: failed_run_stops_downstream-shared.png"
+      },
+      {
+        "id": "1.16",
+        "name": "timeline_ordered_timestamped",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The timeline panel lists one timestamped entry per step transition (started, completed, failed, retry scheduled, paused, resumed) in order with newest appended at the end, and running the workflow twice produces two distinct sets of entries with fresh timestamps; filtering the timeline by status narrows the visible entries (clearing restores the full log) and selecting an entry highlights its node on the canvas, panning it into view when offscreen",
+        "reasoning": "FAIL: Ordered timestamped transitions were visible, but two distinct run sets, status filtering/clearing, and selecting an entry to highlight and pan to a node were not all verified. Evidence: failed_run_stops_downstream-shared.png"
+      },
+      {
+        "id": "1.18",
+        "name": "save_load_confirmation_round_trip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Saving via the Save modal with a valid name (1\u201380 chars) adds the workflow to the Saved Workflows panel with name and node count; clicking a saved workflow replaces the canvas only after a confirmation dialog is accepted (declining leaves the canvas untouched), and loading resets execution badges and the rollup; saving with an empty name shows an inline validation message naming the name field and nothing is added to the panel",
+        "reasoning": "PASS: Empty-name validation was visible; a valid save produced a Saved Workflows entry with name and node count; loading required confirmation and reset execution badges and rollup after acceptance. Evidence: save_load_confirmation_round_trip-shared.png"
+      },
+      {
+        "id": "1.20",
+        "name": "keyboard_node_selection",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Node selection can be cycled from the keyboard with a visible selection highlight, Enter opens the selected node's configuration modal, and Delete removes the selected node or edge \u2014 all without pointer use",
+        "reasoning": "PASS: Alt+N selected a node with visible selection count, Enter opened configuration, and Delete removed the selected node and attached edges without pointer use. Evidence: keyboard_node_selection-shared.png"
+      },
+      {
+        "id": "1.21",
+        "name": "run_empty_canvas_message",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Pressing Run after deleting all nodes shows a visible message that there is nothing to run and starts no execution; the Run control is also disabled while a run is already in progress",
+        "reasoning": "PASS: After all nodes were deleted, Run displayed a visible nothing-to-run message and no execution began. Evidence: run_empty_canvas_message-shared.png"
+      },
+      {
+        "id": "1.24",
+        "name": "multi_select_bulk_delete",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Shift-clicking (or marquee-selecting) a second node creates a multi-selection with distinct chrome and a live selected count in the toolbar; Delete selected removes every selected node and their attached edges in one interaction, dropping both node and edge counts and clearing the selection",
+        "reasoning": "BLOCKED: Shift/marquee multi-selection, selected count, and bulk deletion were not successfully exercised end-to-end. Evidence: keyboard_node_selection-shared.png"
+      },
+      {
+        "id": "1.25",
+        "name": "undo_redo_restores_canvas_and_artifacts",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Undo reverses the most recent editing action (drop, delete, bulk delete, edge create/delete, reposition, configuration save, or successful import) restoring canvas nodes/edges, configuration badges, and both artifact previews together; Redo reapplies with the same completeness; empty stacks disable their controls; a new edit after undo clears redo",
+        "reasoning": "FAIL: Editing and deletion were observed, but complete undo/redo restoration of canvas, configuration, and both artifacts\u2014including redo invalidation after a new edit\u2014was not verified. Evidence: keyboard_node_selection-shared.png"
+      },
+      {
+        "id": "1.26",
+        "name": "artifact_center_json_and_mermaid",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening the Artifact panel shows live-compiled Workflow Definition JSON and Mermaid tabs: JSON includes required keys name, nodes (id, type enum prompt|agent|eval|condition|output, title, position.x/y, type-specific config), and edges (id, source, target); Mermaid lists node and edge lines from the same graph; editing the canvas updates both previews without reload",
+        "reasoning": "PASS: Artifact tabs visibly exposed live JSON and Mermaid representations; JSON showed schema envelope, node IDs/types/positions/config, and edges, while Mermaid listed matching node and edge lines. Evidence: artifact_center_json_and_mermaid-shared.png"
+      },
+      {
+        "id": "1.27",
+        "name": "artifact_copy_download_import",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Copy writes the exact visible preview text and shows a brief confirmation; Download triggers a real file download with a format-appropriate filename; Import of a valid Workflow Definition JSON replaces the canvas and updates badges and both previews without reload; contract-violating JSON shows an inline message naming the offending field and mutates nothing",
+        "reasoning": "FAIL: Copy, download, and import controls were visible, but successful copy confirmation, real file download, valid import replacement, and invalid import immutability were not all observed. Evidence: artifact_center_json_and_mermaid-shared.png"
+      },
+      {
+        "id": "1.28",
+        "name": "graph_validity_badge",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A graph-validity badge beside the artifact preview reads valid when the canvas has at least one Prompt, one Output, and a directed Prompt-to-Output path, and otherwise reads incomplete with a short reason naming what is missing \u2014 always with a text label, never color alone",
+        "reasoning": "PASS: A text \u201cValid\u201d badge was visible for the seeded Prompt-to-Output path, and an empty canvas visibly changed to \u201cIncomplete\u201d with a reason. Evidence: artifact_center_json_and_mermaid-shared.png; run_empty_canvas_message-shared.png"
+      },
+      {
+        "id": "1.29",
+        "name": "node_cards_show_identity_config_and_run_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every canvas node visibly shows its node type, display title, and a configuration badge summarizing its saved type-specific configuration; after execution touches the node, the same card also shows a text status badge naming its current execution state",
+        "reasoning": "PASS: Executed cards visibly showed node type, title, configuration summary, and text execution status badges. Evidence: failed_run_stops_downstream-shared.png"
+      },
+      {
+        "id": "1.30",
+        "name": "saved_workflow_request_body_contract",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Saving a workflow produces a browser-visible record with a trimmed name 2\u201380 characters, a non-empty nodes array whose entries have id, type exactly Prompt|Agent|Eval|Condition|Output, numeric position x/y, and matching config, plus edges whose source and target each reference an included node id; a disconnected graph may save, but Run visibly refuses a graph without a valid source-to-sink path",
+        "reasoning": "PASS: Saving produced a visible saved-workflow record, and the visible live JSON showed the required node IDs, exact type names, numeric positions, matching configs, and edge references. Evidence: artifact_center_json_and_mermaid-shared.png"
+      },
+      {
+        "id": "1.31",
+        "name": "workflow_exports_include_envelope_and_live_graph",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export workflow, Download workflow.json, and Copy JSON expose schemaVersion exactly 1 and generatedAt as an ISO-8601 datetime ending in Z together with the active graph under the save-workflow field contract; Export Mermaid labels match the canvas node labels, and both formats update after node, edge, configuration, or Save mutations without reload",
+        "reasoning": "FAIL: The JSON envelope and Mermaid labels/download controls were visible, but actual Export/Copy/Download operations and update verification across all mutations were not completed. Evidence: workflow_exports_include_envelope_and_live_graph-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"seeded_workflow_walkthrough\":{\"score\": \"yes\",\"reasoning\":\"PASS: The canvas visibly contained exactly five connected nodes\u2014Prompt, Agent, Eval, Condition, and Output\u2014with four edges, and the palette listed all five types. Evidence: seeded_workflow_walkthrough-shared.png\"},\"canvas_pan_zoom_drag\":{\"score\": \"no\",\"reasoning\":\"FAIL: Zoom visibly changed the canvas, but node repositioning and palette drag-and-drop creation were not successfully observed. Evidence: canvas_pan_zoom_drag-shared.png\"},\"compatible_connection_creates_edge\":{\"score\": \"no\",\"reasoning\":\"BLOCKED: Compatible and incompatible handle-drag connection behaviors were not successfully exercised and observed. Evidence: seeded_workflow_walkthrough-shared.png\"},\"select_delete_edge_and_node\":{\"score\": \"no\",\"reasoning\":\"FAIL: Keyboard node deletion was observed, but edge selection with distinct styling and edge deletion were not verified. Evidence: keyboard_node_selection-shared.png\"},\"node_config_forms_field_contract\":{\"score\": \"no\",\"reasoning\":\"FAIL: Prompt configuration opened and title validation was observed, but the complete per-type field contract, save behavior, and artifact updates were not fully verified. Evidence: node_config_forms_field_contract-shared.png\"},\"run_topological_progression\":{\"score\": \"yes\",\"reasoning\":\"PASS: Run showed Prompt running while the remaining four nodes were pending, then advanced through the workflow to 5/5 complete rather than starting all nodes simultaneously. Evidence: run_topological_progression-shared.png\"},\"retry_attempt_and_backoff_visible\":{\"score\": \"yes\",\"reasoning\":\"PASS: The Agent visibly showed retry state with a live countdown, \u201cretry 3 of 3,\u201d and later completed successfully on its third attempt. Evidence: retry_attempt_and_backoff_visible-shared.png\"},\"failed_run_stops_downstream\":{\"score\": \"no\",\"reasoning\":\"FAIL: The exercised seeded run succeeded with 5/5 complete and zero failures; an exhausted-retry failed run with downstream nodes pending was not observed. Evidence: failed_run_stops_downstream-shared.png\"},\"retry_from_failed_node_freezes_upstream\":{\"score\": \"no\",\"reasoning\":\"BLOCKED: No failed run was produced, so retry-from-failed-node and frozen upstream execution could not be exercised. Evidence: failed_run_stops_downstream-shared.png\"},\"pause_resume_checkpoint\":{\"score\": \"yes\",\"reasoning\":\"PASS: Pausing produced a checkpoint with upstream complete and downstream pending; Resume continued from the next node, with a resumed timeline entry and no upstream re-execution. Evidence: pause_resume_checkpoint-shared.png\"},\"rollup_derives_live\":{\"score\": \"yes\",\"reasoning\":\"PASS: The rollup visibly changed from 0/5 while running to 1/5 and then 5/5, matching the node badges and showing elapsed time and failure count. Evidence: run_topological_progression-shared.png\"},\"node_io_summary_expandable\":{\"score\": \"yes\",\"reasoning\":\"PASS: After execution, expandable node summaries visibly showed simulated inputs and outputs, with differing content across nodes. Evidence: failed_run_stops_downstream-shared.png\"},\"timeline_ordered_timestamped\":{\"score\": \"no\",\"reasoning\":\"FAIL: Ordered timestamped transitions were visible, but two distinct run sets, status filtering/clearing, and selecting an entry to highlight and pan to a node were not all verified. Evidence: failed_run_stops_downstream-shared.png\"},\"save_load_confirmation_round_trip\":{\"score\": \"yes\",\"reasoning\":\"PASS: Empty-name validation was visible; a valid save produced a Saved Workflows entry with name and node count; loading required confirmation and reset execution badges and rollup after acceptance. Evidence: save_load_confirmation_round_trip-shared.png\"},\"keyboard_node_selection\":{\"score\": \"yes\",\"reasoning\":\"PASS: Alt+N selected a node with visible selection count, Enter opened configuration, and Delete removed the selected node and attached edges without pointer use. Evidence: keyboard_node_selection-shared.png\"},\"run_empty_canvas_message\":{\"score\": \"yes\",\"reasoning\":\"PASS: After all nodes were deleted, Run displayed a visible nothing-to-run message and no execution began. Evidence: run_empty_canvas_message-shared.png\"},\"multi_select_bulk_delete\":{\"score\": \"no\",\"reasoning\":\"BLOCKED: Shift/marquee multi-selection, selected count, and bulk deletion were not successfully exercised end-to-end. Evidence: keyboard_node_selection-shared.png\"},\"undo_redo_restores_canvas_and_artifacts\":{\"score\": \"no\",\"reasoning\":\"FAIL: Editing and deletion were observed, but complete undo/redo restoration of canvas, configuration, and both artifacts\u2014including redo invalidation after a new edit\u2014was not verified. Evidence: keyboard_node_selection-shared.png\"},\"artifact_center_json_and_mermaid\":{\"score\": \"yes\",\"reasoning\":\"PASS: Artifact tabs visibly exposed live JSON and Mermaid representations; JSON showed schema envelope, node IDs/types/positions/config, and edges, while Mermaid listed matching node and edge lines. Evidence: artifact_center_json_and_mermaid-shared.png\"},\"artifact_copy_download_import\":{\"score\": \"no\",\"reasoning\":\"FAIL: Copy, download, and import controls were visible, but successful copy confirmation, real file download, valid import replacement, and invalid import immutability were not all observed. Evidence: artifact_center_json_and_mermaid-shared.png\"},\"graph_validity_badge\":{\"score\": \"yes\",\"reasoning\":\"PASS: A text \u201cValid\u201d badge was visible for the seeded Prompt-to-Output path, and an empty canvas visibly changed to \u201cIncomplete\u201d with a reason. Evidence: artifact_center_json_and_mermaid-shared.png; run_empty_canvas_message-shared.png\"},\"node_cards_show_identity_config_and_run_state\":{\"score\": \"yes\",\"reasoning\":\"PASS: Executed cards visibly showed node type, title, configuration summary, and text execution status badges. Evidence: failed_run_stops_downstream-shared.png\"},\"saved_workflow_request_body_contract\":{\"score\": \"yes\",\"reasoning\":\"PASS: Saving produced a visible saved-workflow record, and the visible live JSON showed the required node IDs, exact type names, numeric positions, matching configs, and edge references. Evidence: artifact_center_json_and_mermaid-shared.png\"},\"workflow_exports_include_envelope_and_live_graph\":{\"score\": \"no\",\"reasoning\":\"FAIL: The JSON envelope and Mermaid labels/download controls were visible, but actual Export/Copy/Download operations and update verification across all mutations were not completed. Evidence: workflow_exports_include_envelope_and_live_graph-shared.png\"} }",
+    "cost_usd": 0.9407378
+  },
+  "design_fidelity": {
+    "score": 0.7143,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "spacing_rhythm_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Spacing between palette, canvas, toolbar, Artifact panel, Saved Workflows, and timeline follows a consistent rhythm with no crowded or orphaned regions",
+        "reasoning": "Consistent spacing separates the palette, toolbar, canvas, timeline, and side panels without crowded regions. Evidence: layout-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "typography_hierarchy_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography matches the specified hierarchy: panel titles larger than node titles, which are larger than metadata and monospaced artifact text",
+        "reasoning": "Panel headings are visibly larger than node titles, metadata is smaller, and artifact content uses a distinct monospace treatment. Evidence: artifact-open-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "layout_matches_instruction_composition",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Layout matches the instruction composition: left palette, central canvas, collapsible right Saved Workflows, toolbar above, Artifact when open, timeline below \u2014 not a collapsed single-column dump at desktop width",
+        "reasoning": "At desktop width, the app shows the left palette, central canvas, toolbar above, right Saved Workflows rail, Artifact panel when open, and timeline below. Evidence: artifact-open-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "specified_state_changes_animate",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Transitions are applied to the state changes the spec calls out (node drop, run pulse, modal enter/exit, panel slide, copy confirmation) rather than omitting them",
+        "reasoning": "FAIL: Run and retry state changes were exercised, but no active animation was observed on the running nodes/state; only ordinary UI transitions were present. Evidence: run-state-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "node_type_colors_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Node left-border colors match the specified mapping: blue Prompt, purple Agent, orange Eval, yellow Condition, green Output, including palette entries",
+        "reasoning": "Observed left-border colors match blue Prompt, purple Agent, orange Eval, yellow Condition, and green Output in the palette. Evidence: layout-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "status_palette_matches_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Status badge colors match the specified palette: pending gray, running blue, retrying amber, failed red, complete green",
+        "reasoning": "FAIL: Complete green, Running blue, Retrying amber, and Pending gray states were observed, but the specified Failed red badge was not directly observed. Evidence: run-state-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "artifact_monospace_distinct",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Artifact preview monospaced block is visually distinct from the canvas chrome as specified",
+        "reasoning": "The open Artifact preview is a visually distinct dark monospace block separated from the canvas chrome. Evidence: artifact-open-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"spacing_rhythm_consistent\":{\"score\":\"yes\",\"reasoning\":\"Consistent spacing separates the palette, toolbar, canvas, timeline, and side panels without crowded regions. Evidence: layout-shared.png\"},\"typography_hierarchy_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"Panel headings are visibly larger than node titles, metadata is smaller, and artifact content uses a distinct monospace treatment. Evidence: artifact-open-shared.png\"},\"layout_matches_instruction_composition\":{\"score\":\"yes\",\"reasoning\":\"At desktop width, the app shows the left palette, central canvas, toolbar above, right Saved Workflows rail, Artifact panel when open, and timeline below. Evidence: artifact-open-shared.png\"},\"specified_state_changes_animate\":{\"score\":\"no\",\"reasoning\":\"FAIL: Run and retry state changes were exercised, but no active animation was observed on the running nodes/state; only ordinary UI transitions were present. Evidence: run-state-shared.png\"},\"node_type_colors_match_spec\":{\"score\":\"yes\",\"reasoning\":\"Observed left-border colors match blue Prompt, purple Agent, orange Eval, yellow Condition, and green Output in the palette. Evidence: layout-shared.png\"},\"status_palette_matches_spec\":{\"score\":\"no\",\"reasoning\":\"FAIL: Complete green, Running blue, Retrying amber, and Pending gray states were observed, but the specified Failed red badge was not directly observed. Evidence: run-state-shared.png\"},\"artifact_monospace_distinct\":{\"score\":\"yes\",\"reasoning\":\"The open Artifact preview is a visually distinct dark monospace block separated from the canvas chrome. Evidence: artifact-open-shared.png\"}}",
+    "cost_usd": 0.19237379999999998
+  },
+  "edge_cases": {
+    "score": 0.7,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "empty_canvas_run_message",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Pressing Run with an empty canvas (all nodes deleted) shows a visible message that there is nothing to run and starts no execution",
+        "reasoning": "BLOCKED: After deleting all nodes, Run was disabled, so the requested empty-canvas Run interaction could not be exercised. Evidence: artifact-empty-canvas.png"
+      },
+      {
+        "id": "4.2",
+        "name": "delete_node_removes_edges",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Deleting a node that has edges removes those edges in the same interaction; the edge count visibly drops",
+        "reasoning": "Deleting prompt-1 reduced the visible edge list from four edges to three in the same state change. Evidence: delete-node-edges-drop.png"
+      },
+      {
+        "id": "4.3",
+        "name": "run_pause_resume_availability",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Run control is disabled while a run is already in progress; Pause is only available during a run and Resume only while paused",
+        "reasoning": "During an active run, Run was disabled and Pause was available; after pausing, Resume was available and Run became enabled. Evidence: run-pause-resume-availability.png"
+      },
+      {
+        "id": "4.4",
+        "name": "save_empty_name_validation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Saving a workflow with an empty name shows an inline validation message naming the name field and stores nothing",
+        "reasoning": "Saving with an empty name showed the inline message \u201cWorkflow name is required\u201d and Save workflow was disabled. Evidence: save-empty-name-validation.png"
+      },
+      {
+        "id": "4.5",
+        "name": "timeline_entry_deleted_node_inert",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Selecting a timeline entry whose node was deleted after the run shows the entry as inert (no crash, no dangling highlight)",
+        "reasoning": "FAIL: The attempted deletion did not visibly remove the agent node, so the required deleted-node timeline precondition was not achieved; selecting the entry itself did not crash. Evidence: run-pause-resume-availability.png"
+      },
+      {
+        "id": "4.6",
+        "name": "undo_redo_empty_stacks_disabled",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Undo with an empty stack and Redo with an empty redo stack are disabled and produce no console errors",
+        "reasoning": "On a fresh load, both Undo and Redo were disabled; console inspection reported zero errors. Evidence: undo-redo-empty.png"
+      },
+      {
+        "id": "4.7",
+        "name": "import_malformed_rejects",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Import with malformed JSON or a payload missing required keys shows an inline message naming the problem and leaves the canvas unchanged",
+        "reasoning": "Submitting \u201cnot json\u201d showed \u201cInvalid workflow definition: definition must be valid JSON\u201d and the canvas remained empty/unchanged. Evidence: import-malformed-rejects.png"
+      },
+      {
+        "id": "4.8",
+        "name": "artifact_empty_canvas_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening the Artifact panel with an empty canvas shows an empty-state line naming how to add nodes from the palette (or disables Download with a visible reason) \u2014 never a blank crash",
+        "reasoning": "With an empty canvas, Artifact showed an Empty canvas state explaining how to add nodes from the palette, and Download was disabled. Evidence: artifact-empty-canvas.png"
+      },
+      {
+        "id": "4.9",
+        "name": "copy_exports_visible_text",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Copying the export mid-edit copies exactly the text currently visible in the preview block",
+        "reasoning": "FAIL: After clicking Copy JSON, clipboard readback was unavailable and did not match the visible preview text, so exact copying was not directly verified. Evidence: copy-exports-visible-text.png"
+      },
+      {
+        "id": "4.10",
+        "name": "timeout_out_of_bounds_named",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Entering timeout_seconds outside 1\u2013300 on an Agent node shows an inline message naming timeout_seconds and keeps Save disabled",
+        "reasoning": "Entering 0 for the Agent timeout showed \u201ctimeout_seconds must be between 1 and 300\u201d and Save configuration was disabled. Evidence: timeout-out-of-bounds-named.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"empty_canvas_run_message\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: After deleting all nodes, Run was disabled, so the requested empty-canvas Run interaction could not be exercised. Evidence: artifact-empty-canvas.png\"},\"delete_node_removes_edges\":{\"score\":\"yes\",\"reasoning\":\"Deleting prompt-1 reduced the visible edge list from four edges to three in the same state change. Evidence: delete-node-edges-drop.png\"},\"run_pause_resume_availability\":{\"score\":\"yes\",\"reasoning\":\"During an active run, Run was disabled and Pause was available; after pausing, Resume was available and Run became enabled. Evidence: run-pause-resume-availability.png\"},\"save_empty_name_validation\":{\"score\":\"yes\",\"reasoning\":\"Saving with an empty name showed the inline message \u201cWorkflow name is required\u201d and Save workflow was disabled. Evidence: save-empty-name-validation.png\"},\"timeline_entry_deleted_node_inert\":{\"score\":\"no\",\"reasoning\":\"FAIL: The attempted deletion did not visibly remove the agent node, so the required deleted-node timeline precondition was not achieved; selecting the entry itself did not crash. Evidence: run-pause-resume-availability.png\"},\"undo_redo_empty_stacks_disabled\":{\"score\":\"yes\",\"reasoning\":\"On a fresh load, both Undo and Redo were disabled; console inspection reported zero errors. Evidence: undo-redo-empty.png\"},\"import_malformed_rejects\":{\"score\":\"yes\",\"reasoning\":\"Submitting \u201cnot json\u201d showed \u201cInvalid workflow definition: definition must be valid JSON\u201d and the canvas remained empty/unchanged. Evidence: import-malformed-rejects.png\"},\"artifact_empty_canvas_state\":{\"score\":\"yes\",\"reasoning\":\"With an empty canvas, Artifact showed an Empty canvas state explaining how to add nodes from the palette, and Download was disabled. Evidence: artifact-empty-canvas.png\"},\"copy_exports_visible_text\":{\"score\":\"no\",\"reasoning\":\"FAIL: After clicking Copy JSON, clipboard readback was unavailable and did not match the visible preview text, so exact copying was not directly verified. Evidence: copy-exports-visible-text.png\"},\"timeout_out_of_bounds_named\":{\"score\":\"yes\",\"reasoning\":\"Entering 0 for the Agent timeout showed \u201ctimeout_seconds must be between 1 and 300\u201d and Save configuration was disabled. Evidence: timeout-out-of-bounds-named.png\"}}",
+    "cost_usd": 0.4972006
+  },
+  "innovation": {
+    "score": 0.6667,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "coachmark_first_run_tip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Beyond the specified flows, the workspace offers a tasteful coachmark or first-run tip pointing at palette drag, Run, and Artifact export without blocking interaction, and it dismisses permanently for the session once acknowledged",
+        "reasoning": "A non-blocking First-run tip explicitly points to palette drag, Run, and Artifact export; after closing it, a reload showed the tip remained dismissed. Evidence: initial-shared.png"
+      },
+      {
+        "id": "11.2",
+        "name": "minimap_or_fit_to_view",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Optional excellence: a compact minimap or fit-to-view control helps reorient a large graph without replacing pan and zoom",
+        "reasoning": "The canvas visibly provides both a Mini Map and a Fit View control alongside zoom controls. Evidence: minimap_or_fit_to_view-shared.png"
+      },
+      {
+        "id": "11.3",
+        "name": "execution_craft_beyond_baseline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Execution quality beyond the baseline: run progression, retry countdown, and artifact live-compile feel polished and intentional rather than abrupt stubs",
+        "reasoning": "A live run visibly progressed node-by-node, showed retry attempts with a 2-second countdown, completed 5/5 nodes, and opened a structured live JSON artifact preview with workflow insight. Evidence: execution_craft_progress-shared.png; execution_craft_artifact-shared.png"
+      },
+      {
+        "id": "11.4",
+        "name": "thoughtful_empty_and_validity_ux",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Empty-canvas and incomplete-graph validity messaging goes beyond a bare error \u2014 clear next-step guidance that still matches the specification",
+        "reasoning": "FAIL: Attempted to remove the output node through the registered action, but the visible graph and Valid state did not change, so incomplete-graph guidance could not be verified. Evidence: thoughtful_empty_and_validity_ux-invalid.png"
+      },
+      {
+        "id": "11.5",
+        "name": "keyboard_power_user_affordances",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Power-user keyboard affordances (documented shortcuts for undo/redo, artifact toggle, or multi-select) that remain optional and never replace pointer paths",
+        "reasoning": "The first-run tip visibly documents Alt+N, Ctrl+Z, and Ctrl+E shortcuts, while pointer controls remain available. Evidence: initial-shared.png"
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "The app demonstrates a significant, browser-observable excellence or inventive refinement beyond the specification that is NOT covered by any other criterion in this file and would delight a real workflow author. Name the refinement and cite concrete evidence. Do not fail ordinary compliance gaps here \u2014 those belong in other dimensions.",
+        "reasoning": "No additional significant refinement beyond the listed criteria was directly established. Evidence: execution_craft_artifact-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"coachmark_first_run_tip\":{\"score\":\"yes\",\"reasoning\":\"A non-blocking First-run tip explicitly points to palette drag, Run, and Artifact export; after closing it, a reload showed the tip remained dismissed. Evidence: initial-shared.png\"},\"minimap_or_fit_to_view\":{\"score\":\"yes\",\"reasoning\":\"The canvas visibly provides both a Mini Map and a Fit View control alongside zoom controls. Evidence: minimap_or_fit_to_view-shared.png\"},\"execution_craft_beyond_baseline\":{\"score\":\"yes\",\"reasoning\":\"A live run visibly progressed node-by-node, showed retry attempts with a 2-second countdown, completed 5/5 nodes, and opened a structured live JSON artifact preview with workflow insight. Evidence: execution_craft_progress-shared.png; execution_craft_artifact-shared.png\"},\"thoughtful_empty_and_validity_ux\":{\"score\":\"no\",\"reasoning\":\"FAIL: Attempted to remove the output node through the registered action, but the visible graph and Valid state did not change, so incomplete-graph guidance could not be verified. Evidence: thoughtful_empty_and_validity_ux-invalid.png\"},\"keyboard_power_user_affordances\":{\"score\":\"yes\",\"reasoning\":\"The first-run tip visibly documents Alt+N, Ctrl+Z, and Ctrl+E shortcuts, while pointer controls remain available. Evidence: initial-shared.png\"},\"innovation_catchall\":{\"score\":\"no\",\"reasoning\":\"No additional significant refinement beyond the listed criteria was directly established. Evidence: execution_craft_artifact-shared.png\"}}",
+    "cost_usd": 0.201328
+  },
+  "motion": {
+    "score": 0.25,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "hover_feedback_required",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Hovering with the real pointer (verify computed styles while hovering): toolbar buttons ease background/shadow with a slight press effect, palette entries and saved-workflow rows take a visible hover wash, nodes lift subtly, and form controls show focus rings",
+        "reasoning": "Toolbar hover visibly changed background/shadow, with a declared transition. Evidence: hover_feedback_required-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "node_drop_scale_in",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A node dropped onto the canvas via a real palette drag scales from roughly 0.8 to 1.0 over roughly 150 milliseconds rather than appearing instantly",
+        "reasoning": "FAIL: Real palette drag added a node, but it appeared with no scale animation; only a settled transform/transition was observed. Evidence: node_drop_scale_in-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "edge_flow_progression_animates",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "During a run started from the real Run control, the currently executing node's border pulses with a repeating opacity animation until it completes or fails, and edges out of a completed node animate \u2014 a moving dash or pulse travels along the curve toward the next node \u2014 showing flow progression",
+        "reasoning": "BLOCKED: Real Run reached an incomplete-graph error, so running-node pulse and edge progression could not be exercised. Evidence: edge_flow_progression_animates-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "badge_transitions_and_countdown",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Status badge changes transition their color rather than hard-swapping, and the retry backoff countdown visibly ticks down once per second during the seeded Agent node's retries",
+        "reasoning": "BLOCKED: The workflow could not run because the app reported an incomplete graph, preventing retry countdown observation. Evidence: edge_flow_progression_animates-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "timeline_entries_animate_in",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "New timeline entries animate in as they are appended during a run, and applying or clearing a timeline filter animates rows in and out rather than snapping; selecting an entry whose node is offscreen pans the canvas smoothly to the highlighted node rather than jumping instantly",
+        "reasoning": "BLOCKED: The run failed before timeline entries were created, so entry/filter/pan animations could not be exercised. Evidence: edge_flow_progression_animates-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "modal_panel_disclosure_motion",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Modals (configuration, save, confirmation, import) enter and exit with a short opacity/scale transition of roughly 200 to 300 milliseconds; Saved Workflows and Artifact panels slide open and closed; node I/O disclosure opens with smooth height transition and rotating chevron; incompatible-connection toasts slide in and auto-dismiss with a fade",
+        "reasoning": "Configuration modal showed a 0.26s modalIn animation; Saved Workflows panel exposed a 0.25s width/transform transition. Evidence: modal_panel_disclosure_motion-shared.png"
+      },
+      {
+        "id": "3.8",
+        "name": "copy_and_bulk_delete_motion",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Via the real Copy control, the confirmation swaps icon or label briefly and reverts; bulk-delete via Delete selected animates nodes out rather than vanishing with no transition",
+        "reasoning": "FAIL: Copy changed to \u201cCopied,\u201d but deleting the selected node removed it without observable exit animation. Evidence: copy_and_bulk_delete_motion-delete.png"
+      },
+      {
+        "id": "3.10",
+        "name": "reduced_motion_respected",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, node drop is instant, the running state shows a static border color instead of pulsing, edge progression uses a static highlight, panel slides are instant, and all state changes (badges, rollup, timeline, countdown text, undo, export) still occur",
+        "reasoning": "BLOCKED: Reduced-motion mode was confirmed, but the workflow could not run, so the full set of required static running/countdown/state-change behaviors could not be verified. Evidence: reduced_motion_respected-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"hover_feedback_required\":{\"score\":\"yes\",\"reasoning\":\"Toolbar hover visibly changed background/shadow, with a declared transition. Evidence: hover_feedback_required-shared.png\"},\"node_drop_scale_in\":{\"score\":\"no\",\"reasoning\":\"FAIL: Real palette drag added a node, but it appeared with no scale animation; only a settled transform/transition was observed. Evidence: node_drop_scale_in-shared.png\"},\"edge_flow_progression_animates\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Real Run reached an incomplete-graph error, so running-node pulse and edge progression could not be exercised. Evidence: edge_flow_progression_animates-shared.png\"},\"badge_transitions_and_countdown\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The workflow could not run because the app reported an incomplete graph, preventing retry countdown observation. Evidence: edge_flow_progression_animates-shared.png\"},\"timeline_entries_animate_in\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The run failed before timeline entries were created, so entry/filter/pan animations could not be exercised. Evidence: edge_flow_progression_animates-shared.png\"},\"modal_panel_disclosure_motion\":{\"score\":\"yes\",\"reasoning\":\"Configuration modal showed a 0.26s modalIn animation; Saved Workflows panel exposed a 0.25s width/transform transition. Evidence: modal_panel_disclosure_motion-shared.png\"},\"copy_and_bulk_delete_motion\":{\"score\":\"no\",\"reasoning\":\"FAIL: Copy changed to \u201cCopied,\u201d but deleting the selected node removed it without observable exit animation. Evidence: copy_and_bulk_delete_motion-delete.png\"},\"reduced_motion_respected\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Reduced-motion mode was confirmed, but the workflow could not run, so the full set of required static running/countdown/state-change behaviors could not be verified. Evidence: reduced_motion_respected-shared.png\"}}",
+    "cost_usd": 0.1466548
+  },
+  "performance": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_under_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive within 2 seconds of a local cold load",
+        "reasoning": "Local load rendered an interactive workflow UI within the navigation window; controls were available immediately. Evidence: cold_start_under_two_seconds-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "console_clean_on_exercise",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No console errors or warnings appear on load or during a full exercise of canvas edits, runs with retries, undo/redo, and import/export",
+        "reasoning": "After load and the full interaction exercise, console inspection showed 0 errors and 0 warnings. Evidence: run_stays_responsive-shared.png"
+      },
+      {
+        "id": "9.3",
+        "name": "canvas_interactions_smooth",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Canvas pan, zoom, and node drag stay smooth with no visible jank under normal use",
+        "reasoning": "Real canvas pan/drag, zoom-in, and fit-view interactions completed without visible jank or hangs. Evidence: canvas_interactions_smooth-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "run_stays_responsive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The UI stays responsive during a run under rapid repeated Pause/Resume and toolbar input with no hangs",
+        "reasoning": "Rapid repeated Resume/Pause interactions completed and the workflow reached a stable 5/5 COMPLETE state. Evidence: run_stays_responsive-shared.png"
+      },
+      {
+        "id": "9.5",
+        "name": "rapid_undo_keeps_sync",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapid undo/redo after several edits keeps the artifact preview and canvas in sync without dropped frames or hangs",
+        "reasoning": "After multiple configuration edits, rapid undo/redo completed and the workflow controls and canvas remained synchronized and responsive. Evidence: rapid_undo_keeps_sync-shared.png"
+      },
+      {
+        "id": "9.6",
+        "name": "timeline_filter_mid_run_smooth",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Filtering the timeline mid-run does not freeze the canvas or drop badge updates",
+        "reasoning": "The Complete timeline filter was applied during an active run while canvas badges continued updating, including retrying status, without freezing. Evidence: timeline_filter_mid_run_smooth-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_start_under_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"Local load rendered an interactive workflow UI within the navigation window; controls were available immediately. Evidence: cold_start_under_two_seconds-shared.png\"},\"console_clean_on_exercise\":{\"score\":\"yes\",\"reasoning\":\"After load and the full interaction exercise, console inspection showed 0 errors and 0 warnings. Evidence: run_stays_responsive-shared.png\"},\"canvas_interactions_smooth\":{\"score\":\"yes\",\"reasoning\":\"Real canvas pan/drag, zoom-in, and fit-view interactions completed without visible jank or hangs. Evidence: canvas_interactions_smooth-shared.png\"},\"run_stays_responsive\":{\"score\":\"yes\",\"reasoning\":\"Rapid repeated Resume/Pause interactions completed and the workflow reached a stable 5/5 COMPLETE state. Evidence: run_stays_responsive-shared.png\"},\"rapid_undo_keeps_sync\":{\"score\":\"yes\",\"reasoning\":\"After multiple configuration edits, rapid undo/redo completed and the workflow controls and canvas remained synchronized and responsive. Evidence: rapid_undo_keeps_sync-shared.png\"},\"timeline_filter_mid_run_smooth\":{\"score\":\"yes\",\"reasoning\":\"The Complete timeline filter was applied during an active run while canvas badges continued updating, including retrying status, without freezing. Evidence: timeline_filter_mid_run_smooth-shared.png\"}}",
+    "cost_usd": 0.2759582
+  },
+  "responsiveness": {
+    "score": 0.8571,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "desktop_layout_all_panels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At desktop widths (\u22651280px) the palette, canvas, Saved Workflows side panel, toolbar, and timeline are all visible without horizontal page scroll",
+        "reasoning": "All requested panels are visible together at 1280px without horizontal overflow. Evidence: desktop_layout_all_panels-shared.png"
+      },
+      {
+        "id": "7.2",
+        "name": "collapse_at_1024",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 1024 pixels and below the Saved Workflows panel collapses behind a toggle that can reopen it",
+        "reasoning": "At 1024px Saved Workflows collapses to a toggle, and the toggle successfully reopens the panel. Evidence: collapse_at_1024-shared.png"
+      },
+      {
+        "id": "7.3",
+        "name": "collapse_at_768_artifact_stacks",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 768 pixels and below the palette collapses to a compact strip or toggle, the Artifact panel stacks below the canvas when open, and the timeline remains reachable below the canvas",
+        "reasoning": "At 768px the palette is compact, Artifact appears below the canvas, and the timeline remains reachable below it. Evidence: collapse_at_768_artifact_stacks-shared.png"
+      },
+      {
+        "id": "7.4",
+        "name": "mobile_375_no_clip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375 pixels wide no content clips or overflows the viewport and no page-level horizontal scrollbar appears; the canvas remains pannable",
+        "reasoning": "At 375px document and body scroll widths equal the viewport content width; the canvas is visible and successfully responds to a pan gesture. Evidence: mobile_375_no_clip-shared.png"
+      },
+      {
+        "id": "7.5",
+        "name": "toolbar_wraps_primary_actions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375 pixels toolbar controls wrap or overflow into a compact menu without clipping primary Run and Artifact actions",
+        "reasoning": "At 375px toolbar controls wrap across multiple rows while Run and Artifact remain visible and usable at 44px height. Evidence: toolbar_wraps_primary_actions-shared.png"
+      },
+      {
+        "id": "7.6",
+        "name": "tap_targets_mobile",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "UI controls remain usable tap targets on mobile widths (approximately 44px where interactive)",
+        "reasoning": "FAIL: Most primary controls meet 44px sizing, but node settings buttons render as approximately 15\u00d715px and the All filter is only about 26px wide. Evidence: tap_targets_mobile-shared.png"
+      },
+      {
+        "id": "7.7",
+        "name": "artifact_preview_scrolls",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At narrow widths the Artifact monospaced preview scrolls within its panel rather than forcing page-level horizontal overflow",
+        "reasoning": "At narrow width the Artifact preview has overflow-x:auto with content wider than its panel, keeping overflow inside the preview rather than the page. Evidence: artifact_preview_scrolls-preview.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"desktop_layout_all_panels\":{\"score\":\"yes\",\"reasoning\":\"All requested panels are visible together at 1280px without horizontal overflow. Evidence: desktop_layout_all_panels-shared.png\"},\"collapse_at_1024\":{\"score\":\"yes\",\"reasoning\":\"At 1024px Saved Workflows collapses to a toggle, and the toggle successfully reopens the panel. Evidence: collapse_at_1024-shared.png\"},\"collapse_at_768_artifact_stacks\":{\"score\":\"yes\",\"reasoning\":\"At 768px the palette is compact, Artifact appears below the canvas, and the timeline remains reachable below it. Evidence: collapse_at_768_artifact_stacks-shared.png\"},\"mobile_375_no_clip\":{\"score\":\"yes\",\"reasoning\":\"At 375px document and body scroll widths equal the viewport content width; the canvas is visible and successfully responds to a pan gesture. Evidence: mobile_375_no_clip-shared.png\"},\"toolbar_wraps_primary_actions\":{\"score\":\"yes\",\"reasoning\":\"At 375px toolbar controls wrap across multiple rows while Run and Artifact remain visible and usable at 44px height. Evidence: toolbar_wraps_primary_actions-shared.png\"},\"tap_targets_mobile\":{\"score\":\"no\",\"reasoning\":\"FAIL: Most primary controls meet 44px sizing, but node settings buttons render as approximately 15\u00d715px and the All filter is only about 26px wide. Evidence: tap_targets_mobile-shared.png\"},\"artifact_preview_scrolls\":{\"score\":\"yes\",\"reasoning\":\"At narrow width the Artifact preview has overflow-x:auto with content wider than its panel, keeping overflow inside the preview rather than the page. Evidence: artifact_preview_scrolls-preview.png\"} }",
+    "cost_usd": 0.22970399999999996
+  },
+  "technical": {
+    "score": 0.1429,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "cold_load_interactive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app serves via its documented start path and is interactive within 2 seconds of a local cold load",
+        "reasoning": "yes \u2014 Local cold load rendered Orchestrate Studio with interactive controls and seeded workflow UI. Evidence: cold_load_interactive-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "console_clean_full_exercise",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise: canvas edits, multi-select bulk delete, connections, configuration saves, runs with retries, pause/resume, retry-from-failed, undo/redo, save/load, import/export, and timeline filtering",
+        "reasoning": "FAIL: Console showed no errors or warnings, but the complete prescribed exercise was not fully completed. Evidence: reload_returns_seeded_baseline-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "state_coherence_across_surfaces",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Node state changes reflect everywhere immediately without reload: a badge change on the canvas is matched by the rollup and a timeline entry; a configuration save updates the node badge and both artifact previews; undo/redo reverts or reapplies canvas and artifact texts together",
+        "reasoning": "FAIL: Run state coherently updated node badges, rollup, retry timeline, and outputs, but configuration-save artifact synchronization and undo/redo text coherence were not fully observed. Evidence: state_coherence_across_surfaces-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "reload_returns_seeded_baseline",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A page reload after authoring, running, saving, importing, and undoing returns the app to its seeded baseline (example workflow, empty timeline, no saved-run state, empty undo/redo, artifact previews matching the seed), with no partial mixture of old and new state",
+        "reasoning": "FAIL: Reload restored the seeded canvas, empty timeline, ready rollup, and no saved workflows, but the required save/import/undo workflow before reload was not completed end-to-end. Evidence: reload_returns_seeded_baseline-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "dialog_and_live_region_semantics",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Modal dialogs expose role dialog with aria-modal true, trap focus while open, close on Escape, and return focus to their opener; validation messages are associated with their fields; run state transitions, copy confirmation, and import failures are announced via an aria-live region",
+        "reasoning": "FAIL: Observed role=dialog with aria-modal=true, live regions, Escape close, and focus return, but focus trapping and complete field-association coverage were not established. Evidence: dialog_and_live_region_semantics-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "rapid_input_stability",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The UI stays responsive under rapid node drags, Pause/Resume spam, rapid undo/redo, and timeline filtering mid-run \u2014 no hangs, dropped interactions, or rollup/artifact desync from canvas badges; selecting a timeline entry whose node was deleted behaves inertly",
+        "reasoning": "FAIL: Rapid pause/resume requests returned and the UI remained responsive, but the full required drag, undo/redo, filtering, and deleted-timeline-entry exercise was not completed. Evidence: rapid_input_stability-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "api_shaped_schema_validation_observable",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Forms and Import enforce the Workflow Definition field contract observably: timeout_seconds outside 1\u2013300, empty title, or invalid node type on import each show a field-named inline error and refuse the mutation",
+        "reasoning": "FAIL: Timeout 0 visibly disabled Save and exposed the required 1\u2013300 constraint; invalid import was refused with an inline error, but it reported missing generatedAt rather than invalid node type, and empty-title validation was not exercised. Evidence: api_shaped_schema_validation_observable-timeout.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_load_interactive\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Local cold load rendered Orchestrate Studio with interactive controls and seeded workflow UI. Evidence: cold_load_interactive-shared.png\"},\"console_clean_full_exercise\":{\"score\":\"no\",\"reasoning\":\"FAIL: Console showed no errors or warnings, but the complete prescribed exercise was not fully completed. Evidence: reload_returns_seeded_baseline-shared.png\"},\"state_coherence_across_surfaces\":{\"score\":\"no\",\"reasoning\":\"FAIL: Run state coherently updated node badges, rollup, retry timeline, and outputs, but configuration-save artifact synchronization and undo/redo text coherence were not fully observed. Evidence: state_coherence_across_surfaces-shared.png\"},\"reload_returns_seeded_baseline\":{\"score\":\"no\",\"reasoning\":\"FAIL: Reload restored the seeded canvas, empty timeline, ready rollup, and no saved workflows, but the required save/import/undo workflow before reload was not completed end-to-end. Evidence: reload_returns_seeded_baseline-shared.png\"},\"dialog_and_live_region_semantics\":{\"score\":\"no\",\"reasoning\":\"FAIL: Observed role=dialog with aria-modal=true, live regions, Escape close, and focus return, but focus trapping and complete field-association coverage were not established. Evidence: dialog_and_live_region_semantics-shared.png\"},\"rapid_input_stability\":{\"score\":\"no\",\"reasoning\":\"FAIL: Rapid pause/resume requests returned and the UI remained responsive, but the full required drag, undo/redo, filtering, and deleted-timeline-entry exercise was not completed. Evidence: rapid_input_stability-shared.png\"},\"api_shaped_schema_validation_observable\":{\"score\":\"no\",\"reasoning\":\"FAIL: Timeout 0 visibly disabled Save and exposed the required 1\u2013300 constraint; invalid import was refused with an inline error, but it reported missing generatedAt rather than invalid node type, and empty-title validation was not exercised. Evidence: api_shaped_schema_validation_observable-timeout.png\"} }",
+    "cost_usd": 0.2209394
+  },
+  "user_flows": {
+    "score": 0.6,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "author_connect_run_updates_artifacts",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Author then run: drag a Prompt node from the palette, connect it with a compatible edge, press Run \u2014 the new node advances pending\u2192running\u2192complete in topological order, the rollup counts it, and both Workflow Definition JSON and Mermaid previews include the new node and edge",
+        "reasoning": "Observed a dragged Prompt node, a compatible edge, a completed 6/6 run, and artifact previews containing the added node and edge. Evidence: author_connect_run_updates_artifacts-shared.png"
+      },
+      {
+        "id": "6.2",
+        "name": "seeded_agent_retry_recovers",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Watch a failure recover: press Run and observe the seeded Agent node retry with attempt counter and backoff countdown, succeed on the third attempt; the timeline shows retry-scheduled entries and the run finishes complete",
+        "reasoning": "Run completed 5/5; timeline visibly showed attempts 1\u20133, two retry-scheduled entries with backoff, and final completion. Evidence: seeded_agent_retry_recovers-shared.png"
+      },
+      {
+        "id": "6.3",
+        "name": "retry_from_failed_preserves_upstream",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After driving a run to a failed state (exhausted retries), Retry from failed node resumes at that node while upstream nodes keep frozen outputs, timestamps, and complete badges",
+        "reasoning": "Configured Faultline Agent, observed exhausted retries and failure, then Retry from failed node showed \u201cupstream outputs frozen\u201d while resuming at the failed node. Evidence: retry_from_failed_preserves_upstream-shared.png"
+      },
+      {
+        "id": "6.4",
+        "name": "pause_resume_mid_run",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Pause mid-run freezes progression and the rollup; Resume continues from exactly the next node with completed nodes untouched",
+        "reasoning": "Pause produced a paused 2/5 checkpoint; Resume continued with a resumed event and completed the remaining workflow to 5/5. Evidence: pause_resume_mid_run-shared.png"
+      },
+      {
+        "id": "6.5",
+        "name": "save_load_reload_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Save the canvas under a new name, load a different saved workflow through confirmation, then load the first back \u2014 canvas nodes/edges and artifact previews match the saved graph each time",
+        "reasoning": "BLOCKED: Saved-workflow creation was invoked, but the complete load-different/load-first-back confirmation round trip and matching artifact previews were not observed."
+      },
+      {
+        "id": "6.6",
+        "name": "export_import_round_trip_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Configure a distinctive node title and Agent timeout_seconds, export Workflow Definition JSON, alter the canvas, Import the JSON \u2014 canvas, badges, validity badge, and both artifact formats reconstruct the exported graph without reload",
+        "reasoning": "BLOCKED: The complete configure/export/alter/import workflow was not exercised end-to-end in the browser."
+      },
+      {
+        "id": "6.7",
+        "name": "undo_redo_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After a delete or configuration save that changes the artifact preview, Undo restores prior canvas and both preview texts together; Redo reapplies across those surfaces",
+        "reasoning": "FAIL: Delete, Undo, and Redo changed the node count as expected, but the required synchronized JSON and Mermaid preview restoration was not observed."
+      },
+      {
+        "id": "6.8",
+        "name": "bulk_delete_then_undo_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Multi-select two nodes, Delete selected (both nodes and edges gone; JSON omits them), Undo once \u2014 both nodes and edges return together",
+        "reasoning": "BLOCKED: Multi-selecting two nodes and completing the bulk-delete/undo workflow could not be exercised."
+      },
+      {
+        "id": "6.9",
+        "name": "reload_returns_seeded_baseline_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A page reload returns seeded example workflow, empty timeline, no saved-run state, empty undo/redo stacks, and artifact previews matching the seeded graph",
+        "reasoning": "Reload visibly returned the seeded 5-node/4-edge graph, empty timeline, no saved workflows, and disabled Undo/Redo. Evidence: reload_returns_seeded_baseline_flow-shared.png"
+      },
+      {
+        "id": "6.10",
+        "name": "artifact_panel_toggle_preserves_canvas",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening and closing the Artifact panel via the toolbar toggle keeps the canvas graph and run state intact; format tab switches between JSON and Mermaid without losing preview content",
+        "reasoning": "Artifact panel opened with JSON, switched to Mermaid, closed, and the canvas remained 6 nodes/5 edges with the 6/6 complete run state intact. Evidence: artifact_panel_toggle_preserves_canvas-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"author_connect_run_updates_artifacts\":{\"score\":\"yes\",\"reasoning\":\"Observed a dragged Prompt node, a compatible edge, a completed 6/6 run, and artifact previews containing the added node and edge. Evidence: author_connect_run_updates_artifacts-shared.png\"},\"seeded_agent_retry_recovers\":{\"score\":\"yes\",\"reasoning\":\"Run completed 5/5; timeline visibly showed attempts 1\u20133, two retry-scheduled entries with backoff, and final completion. Evidence: seeded_agent_retry_recovers-shared.png\"},\"retry_from_failed_preserves_upstream\":{\"score\":\"yes\",\"reasoning\":\"Configured Faultline Agent, observed exhausted retries and failure, then Retry from failed node showed \u201cupstream outputs frozen\u201d while resuming at the failed node. Evidence: retry_from_failed_preserves_upstream-shared.png\"},\"pause_resume_mid_run\":{\"score\":\"yes\",\"reasoning\":\"Pause produced a paused 2/5 checkpoint; Resume continued with a resumed event and completed the remaining workflow to 5/5. Evidence: pause_resume_mid_run-shared.png\"},\"save_load_reload_round_trip\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Saved-workflow creation was invoked, but the complete load-different/load-first-back confirmation round trip and matching artifact previews were not observed.\"},\"export_import_round_trip_flow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The complete configure/export/alter/import workflow was not exercised end-to-end in the browser.\"},\"undo_redo_flow\":{\"score\":\"no\",\"reasoning\":\"FAIL: Delete, Undo, and Redo changed the node count as expected, but the required synchronized JSON and Mermaid preview restoration was not observed.\"},\"bulk_delete_then_undo_flow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Multi-selecting two nodes and completing the bulk-delete/undo workflow could not be exercised.\"},\"reload_returns_seeded_baseline_flow\":{\"score\":\"yes\",\"reasoning\":\"Reload visibly returned the seeded 5-node/4-edge graph, empty timeline, no saved workflows, and disabled Undo/Redo. Evidence: reload_returns_seeded_baseline_flow-shared.png\"},\"artifact_panel_toggle_preserves_canvas\":{\"score\":\"yes\",\"reasoning\":\"Artifact panel opened with JSON, switched to Mermaid, closed, and the canvas remained 6 nodes/5 edges with the 6/6 complete run state intact. Evidence: artifact_panel_toggle_preserves_canvas-shared.png\"}}",
+    "cost_usd": 0.4587882
+  },
+  "visual_design": {
+    "score": 0.8571,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "dot_grid_canvas_background",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The canvas background shows a light gray dot-grid pattern visually distinct from the surrounding panel chrome, and node tiles carry a colored left border per type \u2014 blue Prompt, purple Agent, orange Eval, yellow Condition, green Output \u2014 with the palette entries using the same per-type color coding",
+        "reasoning": "Light gray dotted canvas, colored node borders, and matching palette colors are visible. Evidence: desktop-1280.png"
+      },
+      {
+        "id": "2.3",
+        "name": "edge_styling_and_selection",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edges render as smooth bezier curves in a mid gray, and a selected edge renders in the primary accent blue, visibly distinct from unselected edges",
+        "reasoning": "Edges use curved SVG paths in gray; selecting an edge changes it to accent blue. Evidence: edge-selected.png"
+      },
+      {
+        "id": "2.4",
+        "name": "status_badge_palette_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Status badges use one consistent palette everywhere (canvas nodes, timeline, rollup): pending neutral gray, running blue with an active indicator, retrying amber, failed red, complete green \u2014 every badge naming its state in text, never color alone",
+        "reasoning": "Observed text-labeled Pending gray, Running blue, Retrying amber, Failed red, and Complete green states across nodes/timeline. Evidence: status-failed.png"
+      },
+      {
+        "id": "2.5",
+        "name": "workspace_layout_composition",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The layout composes as left palette, central canvas, collapsible Saved Workflows panel, toolbar with Run/Pause/Resume/Retry/Undo/Redo/Save/Artifact/Delete selected (when multi-select active)/rollup, Artifact panel with format tabs and Copy/Download/Import when open, and timeline below; one consistent icon set and clear type hierarchy",
+        "reasoning": "FAIL: Main composition is present, including palette, canvas, saved workflows, artifact, timeline, rollup, and most toolbar actions, but Resume was not directly observed. Evidence: toolbar-active.png"
+      },
+      {
+        "id": "2.7",
+        "name": "component_states_styled",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, selects, and inputs show distinct default, hover, focus (visible ring), disabled, and error treatments, with no bare browser-default-styled controls anywhere",
+        "reasoning": "Observed styled hover, disabled, and invalid/error treatments with non-default controls. Evidence: workspace-desktop.png"
+      },
+      {
+        "id": "2.10",
+        "name": "multi_select_and_validity_chrome",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Multi-selected nodes share a distinct selection chrome stronger than single-select; the Artifact preview uses a monospaced block; the graph-validity badge uses valid (green-tinted) vs incomplete (amber-tinted) treatments and always includes a text label",
+        "reasoning": "Two nodes visibly share multi-selection chrome; artifact preview is monospaced; validity badge is text-labeled and amber/green styled. Evidence: multi-selected.png"
+      },
+      {
+        "id": "2.8",
+        "name": "responsive_panels_collapse",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 1024 pixels the Saved Workflows panel collapses behind a toggle, at 768 pixels the palette collapses and Artifact stacks below the canvas when open with timeline still reachable, and at 375 pixels no content clips or overflows and no page-level horizontal scrollbar appears while the canvas remains pannable",
+        "reasoning": "At 1024 saved workflows collapses; at 768 palette collapses and artifact stacks above reachable timeline; at 375 content remains within viewport without horizontal overflow. Evidence: responsive-1024.png, responsive-768.png, responsive-375.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"dot_grid_canvas_background\":{\"score\":\"yes\",\"reasoning\":\"Light gray dotted canvas, colored node borders, and matching palette colors are visible. Evidence: desktop-1280.png\"},\"edge_styling_and_selection\":{\"score\":\"yes\",\"reasoning\":\"Edges use curved SVG paths in gray; selecting an edge changes it to accent blue. Evidence: edge-selected.png\"},\"status_badge_palette_consistent\":{\"score\":\"yes\",\"reasoning\":\"Observed text-labeled Pending gray, Running blue, Retrying amber, Failed red, and Complete green states across nodes/timeline. Evidence: status-failed.png\"},\"workspace_layout_composition\":{\"score\":\"no\",\"reasoning\":\"FAIL: Main composition is present, including palette, canvas, saved workflows, artifact, timeline, rollup, and most toolbar actions, but Resume was not directly observed. Evidence: toolbar-active.png\"},\"component_states_styled\":{\"score\":\"yes\",\"reasoning\":\"Observed styled hover, disabled, and invalid/error treatments with non-default controls. Evidence: workspace-desktop.png\"},\"multi_select_and_validity_chrome\":{\"score\":\"yes\",\"reasoning\":\"Two nodes visibly share multi-selection chrome; artifact preview is monospaced; validity badge is text-labeled and amber/green styled. Evidence: multi-selected.png\"},\"responsive_panels_collapse\":{\"score\":\"yes\",\"reasoning\":\"At 1024 saved workflows collapses; at 768 palette collapses and artifact stacks above reachable timeline; at 375 content remains within viewport without horizontal overflow. Evidence: responsive-1024.png, responsive-768.png, responsive-375.png\"}}",
+    "cost_usd": 0.4682474
+  },
+  "writing": {
+    "score": 0.8571,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "headings_consistent_capitalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders headings and panel titles (Palette, Saved Workflows, Timeline, Artifact, toolbar labels), they use one consistent capitalization convention throughout",
+        "reasoning": "Headings and panel titles consistently use sentence case, such as \u201cNode palette,\u201d \u201cArtifact,\u201d and \u201cExecution timeline.\u201d Evidence: initial-shared.png"
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders button or action labels, they use specific verbs such as Run, Retry from failed node, Delete selected, Copy, Download, and Import rather than generic Submit or OK when a specific label is possible",
+        "reasoning": "Actions use specific labels including Run, Delete selected, Import, Download workflow.json, Copy JSON, and Review import. Evidence: artifact-shared.png"
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders validation or import errors, they name the offending field and the fix (for example timeout_seconds must be between 1 and 300), not only Invalid",
+        "reasoning": "The import error identifies the problem and fix: \u201cdefinition must be valid JSON\u201d and \u201cFix the JSON syntax and try again.\u201d Evidence: import-error-result-shared.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders empty states (Saved Workflows, timeline, Artifact preview on empty canvas), the copy explains what belongs there and the control that creates it",
+        "reasoning": "Saved workflows, timeline, and empty Artifact states explain what is missing and how to proceed, including Save, Run, and Add nodes or Import. Evidence: saved-empty-shared.png"
+      },
+      {
+        "id": "15.5",
+        "name": "body_copy_well_written",
+        "value": 1.0,
+        "raw": 5,
+        "weight": 0.5,
+        "description": "Where the app renders body or helper copy, rate how free it is of spelling and grammatical errors",
+        "reasoning": "Observed body and helper copy is clear, grammatical, and free of spelling errors. Evidence: status-full-shared.png"
+      },
+      {
+        "id": "15.6",
+        "name": "no_lorem_or_todo_copy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders UI copy, no placeholder lorem, TODO, asdf, or template-variable strings appear",
+        "reasoning": "No lorem, TODO, asdf, or template-variable strings were observed in the rendered UI. Evidence: status-full-shared.png"
+      },
+      {
+        "id": "15.7",
+        "name": "status_labels_consistent",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Where the app renders status words (pending, running, retrying, failed, complete, valid, incomplete), the same concept uses the same label across canvas, timeline, rollup, and validity badge",
+        "reasoning": "FAIL: The same completion concept is labeled \u201cComplete\u201d on canvas nodes, \u201ccomplete\u201d in the rollup, and \u201ccompleted\u201d in timeline entries, so labels are not consistent. Evidence: status-full-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"headings_consistent_capitalization\":{\"score\":\"yes\",\"reasoning\":\"Headings and panel titles consistently use sentence case, such as \u201cNode palette,\u201d \u201cArtifact,\u201d and \u201cExecution timeline.\u201d Evidence: initial-shared.png\"},\"actions_use_specific_labels\":{\"score\":\"yes\",\"reasoning\":\"Actions use specific labels including Run, Delete selected, Import, Download workflow.json, Copy JSON, and Review import. Evidence: artifact-shared.png\"},\"errors_name_problem_and_fix\":{\"score\":\"yes\",\"reasoning\":\"The import error identifies the problem and fix: \u201cdefinition must be valid JSON\u201d and \u201cFix the JSON syntax and try again.\u201d Evidence: import-error-result-shared.png\"},\"empty_states_explain_next_step\":{\"score\":\"yes\",\"reasoning\":\"Saved workflows, timeline, and empty Artifact states explain what is missing and how to proceed, including Save, Run, and Add nodes or Import. Evidence: saved-empty-shared.png\"},\"body_copy_well_written\":{\"score\":5,\"reasoning\":\"Observed body and helper copy is clear, grammatical, and free of spelling errors. Evidence: status-full-shared.png\"},\"no_lorem_or_todo_copy\":{\"score\":\"yes\",\"reasoning\":\"No lorem, TODO, asdf, or template-variable strings were observed in the rendered UI. Evidence: status-full-shared.png\"},\"status_labels_consistent\":{\"score\":\"no\",\"reasoning\":\"FAIL: The same completion concept is labeled \u201cComplete\u201d on canvas nodes, \u201ccomplete\u201d in the rollup, and \u201ccompleted\u201d in timeline entries, so labels are not consistent. Evidence: status-full-shared.png\"}}",
+    "cost_usd": 0.18026999999999999
+  }
+}

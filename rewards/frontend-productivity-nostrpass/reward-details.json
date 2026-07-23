@@ -1,0 +1,3106 @@
+{
+  "accessibility": {
+    "score": 0.5217,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "controls_are_keyboard_accessible",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Nav items, Select, Rename, Delete, reveal/hide, Copy npub, permission toggles, form fields, theme switch, Undo, Redo, Export vault, and Import vault are reachable and operable with the keyboard alone",
+        "reasoning": "FAIL: Native controls are generally tabbable, but complete keyboard-only operation across all required workflows was not directly verified. Evidence: desktop-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "modals_manage_focus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Delete and import confirmation dialogs move focus inside while open, close on Escape without applying, and return focus to the opener",
+        "reasoning": "FAIL: Delete dialog focus worked, but the rotate-keys dialog opened with focus remaining on the invoking Rotate keys button instead of moving inside. Evidence: rotation-dialog-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "images_and_icons_have_alt_text",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Icon-only controls expose accessible names; decorative icons are hidden from assistive technology",
+        "reasoning": "FAIL: Icon SVGs were present without aria-hidden or accessible titles; icon-only controls were not consistently backed by decorative-icon semantics. Evidence: initial-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "feedback_uses_live_regions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Validation messages, import errors, and copy/export confirmations are announced via a polite live region as well as shown visually",
+        "reasoning": "BLOCKED: Polite live regions exist, but the complete validation, import-error, and copy/export-confirmation workflows could not all be exercised and verified. Evidence: initial-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "forms_have_explicit_labels",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Create, rename, and import fields have visible labels associated with their inputs",
+        "reasoning": "FAIL: Create and import fields had visible associated labels, but the visible rename text input had no associated label. Evidence: desktop-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "headings_follow_logical_order",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "View headings follow a logical order without skipping levels",
+        "reasoning": "The rendered views use H1 for the view title and H2 for subordinate sections without skipped levels. Evidence: permissions-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "landmark_navigation_is_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sidebar navigation and main content use landmark roles or semantic nav/main regions",
+        "reasoning": "The page visibly uses complementary sidebar, nav, and main landmark regions. Evidence: desktop-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "text_and_controls_have_contrast",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Text keeps readable contrast in both light and dark themes, including badge and pill text",
+        "reasoning": "Rendered dark and light theme screenshots show readable text and control contrast, including badges and pills. Evidence: desktop-shared.png; light-theme-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "semantic_html_roles_are_used",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Permission toggles expose switch semantics; buttons and links use appropriate roles",
+        "reasoning": "Navigation and content use semantic nav/main regions, actions use native buttons, and permission controls expose role=switch with aria-checked. Evidence: permissions-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "reduced_motion_is_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, entrance and toggle animations are removed while features remain usable",
+        "reasoning": "In the reduced-motion browser, prefers-reduced-motion matched true and transition/animation durations were reduced to 1e-05s; settings and theme controls remained usable. Evidence: reduced-motion-shared.png"
+      },
+      {
+        "id": "1.11",
+        "name": "matrix_switches_named_identity_and_app",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Each All-identities matrix cell is a real switch whose accessible name names both its identity and its application, and Grant all/Revoke all controls are keyboard operable",
+        "reasoning": "All matrix cells were real role=switch controls, keyboard tabbable, and named with both application and identity, while Grant all/Revoke all were native tabbable buttons. Evidence: permissions-shared.png"
+      },
+      {
+        "id": "1.12",
+        "name": "rotation_dialog_manages_focus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "The rotate-keys confirmation opens as a dialog: focus moves in while open, Escape closes without rotating, and focus returns to the invoking control",
+        "reasoning": "FAIL: The rotate-keys dialog opened, but focus remained on the invoking Rotate keys control rather than moving inside the dialog. Evidence: rotation-dialog-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"controls_are_keyboard_accessible\":{\"score\":\"no\",\"reasoning\":\"FAIL: Native controls are generally tabbable, but complete keyboard-only operation across all required workflows was not directly verified. Evidence: desktop-shared.png\"},\"modals_manage_focus\":{\"score\":\"no\",\"reasoning\":\"FAIL: Delete dialog focus worked, but the rotate-keys dialog opened with focus remaining on the invoking Rotate keys button instead of moving inside. Evidence: rotation-dialog-shared.png\"},\"images_and_icons_have_alt_text\":{\"score\":\"no\",\"reasoning\":\"FAIL: Icon SVGs were present without aria-hidden or accessible titles; icon-only controls were not consistently backed by decorative-icon semantics. Evidence: initial-shared.png\"},\"feedback_uses_live_regions\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Polite live regions exist, but the complete validation, import-error, and copy/export-confirmation workflows could not all be exercised and verified. Evidence: initial-shared.png\"},\"forms_have_explicit_labels\":{\"score\":\"no\",\"reasoning\":\"FAIL: Create and import fields had visible associated labels, but the visible rename text input had no associated label. Evidence: desktop-shared.png\"},\"headings_follow_logical_order\":{\"score\":\"yes\",\"reasoning\":\"The rendered views use H1 for the view title and H2 for subordinate sections without skipped levels. Evidence: permissions-shared.png\"},\"landmark_navigation_is_present\":{\"score\":\"yes\",\"reasoning\":\"The page visibly uses complementary sidebar, nav, and main landmark regions. Evidence: desktop-shared.png\"},\"text_and_controls_have_contrast\":{\"score\":\"yes\",\"reasoning\":\"Rendered dark and light theme screenshots show readable text and control contrast, including badges and pills. Evidence: desktop-shared.png; light-theme-shared.png\"},\"semantic_html_roles_are_used\":{\"score\":\"yes\",\"reasoning\":\"Navigation and content use semantic nav/main regions, actions use native buttons, and permission controls expose role=switch with aria-checked. Evidence: permissions-shared.png\"},\"reduced_motion_is_respected\":{\"score\":\"yes\",\"reasoning\":\"In the reduced-motion browser, prefers-reduced-motion matched true and transition/animation durations were reduced to 1e-05s; settings and theme controls remained usable. Evidence: reduced-motion-shared.png\"},\"matrix_switches_named_identity_and_app\":{\"score\":\"yes\",\"reasoning\":\"All matrix cells were real role=switch controls, keyboard tabbable, and named with both application and identity, while Grant all/Revoke all were native tabbable buttons. Evidence: permissions-shared.png\"},\"rotation_dialog_manages_focus\":{\"score\":\"no\",\"reasoning\":\"FAIL: The rotate-keys dialog opened, but focus remained on the invoking Rotate keys control rather than moving inside the dialog. Evidence: rotation-dialog-shared.png\"}}",
+    "cost_usd": 0.4555565999999999
+  },
+  "behavioral": {
+    "score": 0.6923,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_round_trip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Multi-facet round-trip: create an identity, toggle a grant, switch theme, then reload \u2014 all facets coherently reset to the seeded baseline (seeded identities, original active identity, original grants, seeded theme), never a mix of session and seed state",
+        "reasoning": "Reload returned to seeded identities, Personal active, original grants, and dark theme. Evidence: multi_facet_round_trip-shared.png"
+      },
+      {
+        "id": "14.2",
+        "name": "sort_reversal_proves_live_data",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sort-reversal proof: set Identities sort to Label A\u2013Z, note order, then Label Z\u2013A; the card order reverses relative to ascending, proving sort is derived from live data",
+        "reasoning": "Ascending showed Personal then Work; descending visibly reversed the card order. Evidence: sort_reversal_proves_live_data-shared.png"
+      },
+      {
+        "id": "14.3",
+        "name": "derived_view_responds_to_input",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Derived-view sensitivity: toggle a permission grant and confirm the dashboard connected-app tile and Export vault JSON grants change meaningfully rather than staying identical",
+        "reasoning": "Toggling Damus changed the active dashboard pill and the export JSON grant from false to true. Evidence: derived_view_responds_to_input-shared.png"
+      },
+      {
+        "id": "14.4",
+        "name": "cross_view_echo_without_reload",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cross-view echo: rename the active identity and confirm the new label appears on the Identities card, the dashboard nickname, and the Export vault JSON without reload",
+        "reasoning": "Renaming Delta to Renamed appeared immediately on the identity card, dashboard nickname, and export JSON. Evidence: cross_view_echo_without_reload-shared.png"
+      },
+      {
+        "id": "14.5",
+        "name": "count_delta_is_exact",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Count-delta integrity: measure the identity-count tile immediately before and after a valid create; the delta is exactly one",
+        "reasoning": "The identity tile increased from 2 to 3 after one valid create. Evidence: different_inputs_change_outcomes-shared.png"
+      },
+      {
+        "id": "14.6",
+        "name": "different_inputs_change_outcomes",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Input-dependent output: create two identities with different labels and confirm both cards show distinct labels and distinct npubs, and both appear distinctly in the export preview",
+        "reasoning": "Created A and B; both cards showed distinct labels and distinct npubs, and the export preview contained both. Evidence: different_inputs_change_outcomes-shared.png"
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_flows_preserve_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Interleaved-flow integrity: start create on Identities, switch to Permissions and toggle a grant, return and finish create \u2014 the grant change remains and the new identity appears without corrupting either flow",
+        "reasoning": "FAIL: Starting create, switching to Permissions, changing a grant, and returning to Identities lost the unfinished create form; the new identity was not created. Evidence: different_inputs_change_outcomes-shared.png"
+      },
+      {
+        "id": "14.8",
+        "name": "export_import_edge_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Edge-state round-trip: mutate the vault, export JSON, import it after confirmation \u2014 surfaces match the mutated vault; then reload and confirm return to seeded baseline",
+        "reasoning": "BLOCKED: The complete mutated-vault export, confirmed import, and reload verification workflow was not successfully exercised. Evidence: cross_view_echo_without_reload-shared.png"
+      },
+      {
+        "id": "14.9",
+        "name": "undo_round_trip_after_create",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Undo round-trip: create an identity, confirm count and export include it, Undo \u2014 count, cards, and export match the pre-create state",
+        "reasoning": "Created UndoMe, observed it in the identity list, then Undo removed it and restored the prior list/count state. Evidence: different_inputs_change_outcomes-shared.png"
+      },
+      {
+        "id": "14.10",
+        "name": "export_pipeline_contains_session_work",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Full-pipeline probe: create an identity and toggle one grant, then open Export vault \u2014 the JSON text contains the new label/npub/nsec and the updated grant boolean",
+        "reasoning": "After creating Delta and granting Damus, the export JSON contained Delta's label, npub, nsec, and damus:true. Evidence: cross_view_echo_without_reload-shared.png"
+      },
+      {
+        "id": "14.11",
+        "name": "rotation_undo_exact_value_probe",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Exact-value rotation probe: note the active identity's full npub text, rotate and confirm; the dashboard and Export vault show a different npub; Undo; the dashboard npub and the export preview match the noted string exactly, character for character",
+        "reasoning": "FAIL: Confirmed rotation did not change the displayed npub; the dashboard remained on the original value and console errors appeared. Evidence: cross_view_echo_without_reload-shared.png"
+      },
+      {
+        "id": "14.12",
+        "name": "bulk_grant_matrix_probe",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Bulk matrix probe: with at least three identities, note each identity's grant for one application, activate Grant all in that column; every cell in the column shows granted and the active identity's dashboard pill matches; a single Undo returns every identity to its noted prior state",
+        "reasoning": "With three identities, Grant all for Damus checked every Damus cell, and one Undo restored the prior matrix values. Evidence: derived_view_responds_to_input-shared.png"
+      },
+      {
+        "id": "14.13",
+        "name": "backup_delete_reimport_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Backup round-trip: export a backup of one identity (note its npub), delete that identity, then import the backup JSON; the identity returns with the same label, npub, nsec, and grants, the count returns to its prior value, and the vault export contains it again",
+        "reasoning": "BLOCKED: The backup export, delete, confirmed reimport, and exact identity restoration workflow was not successfully exercised. Evidence: multi_facet_round_trip-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"multi_facet_round_trip\":{\"score\":\"yes\",\"reasoning\":\"Reload returned to seeded identities, Personal active, original grants, and dark theme. Evidence: multi_facet_round_trip-shared.png\"},\"sort_reversal_proves_live_data\":{\"score\":\"yes\",\"reasoning\":\"Ascending showed Personal then Work; descending visibly reversed the card order. Evidence: sort_reversal_proves_live_data-shared.png\"},\"derived_view_responds_to_input\":{\"score\":\"yes\",\"reasoning\":\"Toggling Damus changed the active dashboard pill and the export JSON grant from false to true. Evidence: derived_view_responds_to_input-shared.png\"},\"cross_view_echo_without_reload\":{\"score\":\"yes\",\"reasoning\":\"Renaming Delta to Renamed appeared immediately on the identity card, dashboard nickname, and export JSON. Evidence: cross_view_echo_without_reload-shared.png\"},\"count_delta_is_exact\":{\"score\":\"yes\",\"reasoning\":\"The identity tile increased from 2 to 3 after one valid create. Evidence: different_inputs_change_outcomes-shared.png\"},\"different_inputs_change_outcomes\":{\"score\":\"yes\",\"reasoning\":\"Created A and B; both cards showed distinct labels and distinct npubs, and the export preview contained both. Evidence: different_inputs_change_outcomes-shared.png\"},\"interleaved_flows_preserve_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: Starting create, switching to Permissions, changing a grant, and returning to Identities lost the unfinished create form; the new identity was not created. Evidence: different_inputs_change_outcomes-shared.png\"},\"export_import_edge_round_trip\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The complete mutated-vault export, confirmed import, and reload verification workflow was not successfully exercised. Evidence: cross_view_echo_without_reload-shared.png\"},\"undo_round_trip_after_create\":{\"score\":\"yes\",\"reasoning\":\"Created UndoMe, observed it in the identity list, then Undo removed it and restored the prior list/count state. Evidence: different_inputs_change_outcomes-shared.png\"},\"export_pipeline_contains_session_work\":{\"score\":\"yes\",\"reasoning\":\"After creating Delta and granting Damus, the export JSON contained Delta's label, npub, nsec, and damus:true. Evidence: cross_view_echo_without_reload-shared.png\"},\"rotation_undo_exact_value_probe\":{\"score\":\"no\",\"reasoning\":\"FAIL: Confirmed rotation did not change the displayed npub; the dashboard remained on the original value and console errors appeared. Evidence: cross_view_echo_without_reload-shared.png\"},\"bulk_grant_matrix_probe\":{\"score\":\"yes\",\"reasoning\":\"With three identities, Grant all for Damus checked every Damus cell, and one Undo restored the prior matrix values. Evidence: derived_view_responds_to_input-shared.png\"},\"backup_delete_reimport_round_trip\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The backup export, delete, confirmed reimport, and exact identity restoration workflow was not successfully exercised. Evidence: multi_facet_round_trip-shared.png\"}}",
+    "cost_usd": 0.5020966
+  },
+  "core_features": {
+    "score": 0.7473,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "dashboard_shows_active_identity_keys",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On load, the dashboard view shows an active identity nickname, a public key rendered as an npub1-prefixed string, and a masked private key surface (no raw dashboard/starter placeholder content)",
+        "reasoning": "Dashboard showed active nickname, npub1 key, and masked nsec. Evidence: dashboard_shows_active_identity_keys-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "seeded_identities_distinct_npubs",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On load, the Identities view lists at least 2 seeded identity cards, each with a distinct npub",
+        "reasoning": "Identities view showed Personal and Work with distinct npubs. Evidence: seeded_identities_distinct_npubs-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "reload_resets_to_seeded_in_memory_baseline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After creating an identity, toggling a permission, and switching theme, a full page reload returns the app to the seeded baseline (seeded identities, original active identity, original grants, seeded theme) rather than keeping session mutations",
+        "reasoning": "After mutations and reload, the app returned to two seeded identities, Personal active, original grants, and baseline theme. Evidence: reload_resets_to_seeded_in_memory_baseline-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "valid_create_adds_distinct_identity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When the create-identity form is submitted with a valid label (trimmed, 1 to 40 characters), a new identity card appears, the identity count increases by 1, and the new identity's npub differs from every existing identity's npub",
+        "reasoning": "Creating Alpha increased the count from 2 to 3 and produced a distinct npub. Evidence: valid_create_adds_distinct_identity-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "empty_label_rejected_inline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When the create-identity form is submitted with an empty or whitespace-only label, a visible validation message naming the label field appears and the identity count does not increase",
+        "reasoning": "Whitespace input showed inline \u201cLabel cannot be whitespace only\u201d and the submit remained disabled. Evidence: valid_create_adds_distinct_identity-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "cancel_create_leaves_collection_unchanged",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When the create-identity form is cancelled, no new identity is added and the form closes",
+        "reasoning": "Cancel closed the create form without adding a card. Evidence: seeded_identities_distinct_npubs-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "created_identity_becomes_active",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After a newly created identity is added, it becomes the active identity and its data appears on the dashboard",
+        "reasoning": "After creation, Alpha was active and shown on the dashboard. Evidence: valid_create_adds_distinct_identity-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "permission_toggle_scoped_to_active_identity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When an application's permission toggle is switched for the active identity, only that application's grant for that identity changes; the other three applications' grants for the same identity remain as they were",
+        "reasoning": "Toggling Alpha\u2019s Damus grant changed only Damus; Snort, Coracle, and Iris remained revoked. Evidence: valid_create_adds_distinct_identity-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "select_updates_dashboard_npub",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After switching the active identity to a second seeded identity, the dashboard's displayed npub changes to the second identity's own key",
+        "reasoning": "Selecting Work changed the dashboard nickname and npub to Work\u2019s own values. Evidence: dashboard_shows_active_identity_keys-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "permissions_view_follows_active_identity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After switching identities, the Permissions view shows the second identity's own grants, not the grants that were toggled while the first identity was active",
+        "reasoning": "Permissions view updated its editor and matrix to the selected identity\u2019s grants. Evidence: seeded_identities_distinct_npubs-shared.png"
+      },
+      {
+        "id": "1.11",
+        "name": "reveal_toggles_nsec_mask",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When the reveal-key control is clicked, the masked nsec surface is replaced by a real nsec1-prefixed string for the active identity; clicking it again re-masks it",
+        "reasoning": "Reveal changed the surface to a real nsec1 string and the control changed to Hide key. Evidence: reveal_toggles_nsec_mask-shared.png"
+      },
+      {
+        "id": "1.12",
+        "name": "audit_log_records_actions_newest_first",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Audit log view lists at least one seeded entry on load and gains a new entry, shown first, after creating an identity, switching identities, or toggling a permission",
+        "reasoning": "Audit log contained a seeded entry and newly created, permission, theme, and export actions appeared newest first. Evidence: export_vault_json_live_from_store-shared.png"
+      },
+      {
+        "id": "1.13",
+        "name": "theme_switch_without_reload",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When the theme control in Settings is clicked, the app surface switches between light and dark without a full page reload",
+        "reasoning": "Settings switched between dark and light immediately through the visible control. Evidence: reload_resets_to_seeded_in_memory_baseline-shared.png"
+      },
+      {
+        "id": "1.14",
+        "name": "hover_feedback_on_interactive_chrome",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Hovering interactive chrome (nav items, buttons, identity cards, permission toggle) shows a visible hover feedback wash",
+        "reasoning": "Hovered Dashboard changed computed background from transparent to a visible wash."
+      },
+      {
+        "id": "1.15",
+        "name": "webmcp_identity_tools_drive_ui",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Calling window.webmcp_list_tools() returns registered tools including identity create, select, update, delete, and toggle tools plus artifact export/import/copy tools; invoking the permission toggle tool for the active identity and one named app changes that same toggle's visible state in the Permissions view",
+        "reasoning": "FAIL: Tool listing exposed the required tool names, but invoking the toggle with the live identity id returned \u201cUnknown identity id,\u201d so the required WebMCP-driven visible state change was not completed."
+      },
+      {
+        "id": "1.16",
+        "name": "label_over_40_chars_rejected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting create or rename with a label longer than 40 characters shows an inline validation message naming the label field and does not change the identity collection",
+        "reasoning": "A 41-character create label showed inline \u201cLabel cannot exceed 40 characters\u201d and Generate keypair stayed disabled."
+      },
+      {
+        "id": "1.17",
+        "name": "rename_updates_card_dashboard_and_export",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Renaming an identity with a valid label updates that identity's card nickname, the dashboard nickname when it is active, and the matching label in the Export vault JSON preview",
+        "reasoning": "Renamed Alpha to Renamed; the card, dashboard, and export JSON preview reflected Renamed. Evidence: export_vault_json_live_from_store-shared.png"
+      },
+      {
+        "id": "1.18",
+        "name": "delete_with_confirm_removes_identity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Confirming Delete on a non-sole identity removes exactly that card, decreases the identity-count stat tile by exactly one, and removes that identity from the Export vault JSON preview; cancelling leaves the collection unchanged",
+        "reasoning": "Confirmed deletion removed Work; cancellation first left it unchanged."
+      },
+      {
+        "id": "1.19",
+        "name": "cannot_delete_last_identity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When only one identity remains, Delete is blocked (disabled control or visible message) and the identity count does not change",
+        "reasoning": "With one identity remaining, Delete was disabled and \u201cAt least one identity must remain\u201d was visible."
+      },
+      {
+        "id": "1.20",
+        "name": "new_identity_grants_all_false",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A newly created identity shows all four application grants as Revoked (false) on the dashboard pills and in the Export vault JSON grants object",
+        "reasoning": "New Alpha\u2019s dashboard pills and export JSON showed all four grants false. Evidence: valid_create_adds_distinct_identity-shared.png"
+      },
+      {
+        "id": "1.21",
+        "name": "search_filters_identity_cards",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typing in the Identities search field narrows the card grid to identities whose nickname or npub contains the query; clearing the field restores every identity card exactly",
+        "reasoning": "Searching Personal narrowed the grid to Personal; clearing restored all cards."
+      },
+      {
+        "id": "1.22",
+        "name": "sort_label_reverses_card_order",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Switching Identities sort from Label A\u2013Z to Label Z\u2013A reverses the visible card order relative to the prior sort",
+        "reasoning": "Switching from Label A\u2013Z to Label Z\u2013A reversed the visible card order."
+      },
+      {
+        "id": "1.23",
+        "name": "undo_redo_restore_mutations",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After creating an identity, Undo removes it and restores the prior count and export preview; Redo re-applies the create; after a new mutation following undo, Redo is disabled",
+        "reasoning": "Undo removed the newly created Double identity and Redo restored it; bulk and rotation mutations also exposed working undo/redo controls."
+      },
+      {
+        "id": "1.24",
+        "name": "export_vault_json_live_from_store",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening Export vault shows a monospaced JSON preview with version exactly nostrpass-vault-v1, activeLabel, theme light or dark, and an identities array whose entries include label, npub1-prefixed npub, nsec1-prefixed nsec, and grants with damus/snort/coracle/iris booleans; after creating an identity or toggling a grant, reopening or refreshing the preview includes that session mutation",
+        "reasoning": "Export preview showed nostrpass-vault-v1, activeLabel, theme, identities, npub/nsec fields, and all four grant booleans. Evidence: export_vault_json_live_from_store-shared.png"
+      },
+      {
+        "id": "1.25",
+        "name": "export_copy_and_download_controls",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export vault offers Copy and Download controls; activating Copy shows a brief copied confirmation",
+        "reasoning": "Export vault provided Copy and Download, and Copy produced a confirmation."
+      },
+      {
+        "id": "1.26",
+        "name": "import_round_trip_restores_vault",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After mutating the vault, importing the exported vault JSON (after confirmation) restores identities, active identity, grants, and theme so dashboard, Identities, Permissions, and the export preview match the pre-export mutated state",
+        "reasoning": "BLOCKED: I did not complete a valid export-then-confirm-import round trip and verify all restored views."
+      },
+      {
+        "id": "1.27",
+        "name": "no_outbound_navigation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No control anywhere in the app performs outbound navigation (no working external links, no window navigation away from the app)",
+        "reasoning": "The app remained at localhost:3000; DOM inspection found no outbound links and all observed controls were in-app."
+      },
+      {
+        "id": "1.28",
+        "name": "copy_npub_shows_confirmation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Activating Copy npub on the dashboard shows a brief copied confirmation",
+        "reasoning": "Copy npub produced a visible Copied notification."
+      },
+      {
+        "id": "1.31",
+        "name": "create_and_export_flow_chain",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Scripted flow: note the identity-count stat tile and Identities card count, submit the create-identity form with a valid label, and confirm \u2014 without any reload \u2014 that exactly one new card appears, the identity-count stat tile increased by exactly one, the dashboard shows the new identity's nickname and a freshly generated npub as active, a creation entry sits at the top of the Audit log, and the Export vault JSON preview includes that identity's label, npub, nsec, and all-false grants",
+        "reasoning": "FAIL: Creation, active selection, and export were observed, but the complete specified chain was not verified atomically with the creation audit entry at the top."
+      },
+      {
+        "id": "1.32",
+        "name": "permission_toggle_flow_chain",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Scripted flow: in the Permissions view toggle one application's grant for the active identity, then confirm \u2014 without a reload \u2014 that the dashboard's pill badge for that app flipped between Granted and Revoked, the connected-app stat tile changed by exactly one in the matching direction, a grant/revoke entry sits at the top of the Audit log, and the Export vault JSON preview's grants for that identity reflect the new boolean",
+        "reasoning": "Toggling Alpha\u2019s Damus grant changed the dashboard pill and connected-app count, added an audit entry, and export JSON showed damus:true."
+      },
+      {
+        "id": "1.33",
+        "name": "identity_switch_flow_chain",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Scripted flow: from the Identities view select a second seeded identity and confirm \u2014 without a reload \u2014 that the dashboard's nickname, npub, and per-application pill badges all show that identity's own data, the Permissions view shows that identity's own grants rather than the previously active identity's, a selection entry sits at the top of the Audit log, and Export vault activeLabel matches that identity's label",
+        "reasoning": "FAIL: Dashboard and Permissions updated on selection, but the complete chain was not verified with the selection audit entry and export activeLabel in the same observation."
+      },
+      {
+        "id": "1.34",
+        "name": "double_submit_creates_exactly_one",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapidly double-activating the create-identity submit control creates exactly one identity: the card count and the identity-count stat tile each increase by exactly one, not two",
+        "reasoning": "Rapid double activation of Generate keypair produced exactly one Double card and one count increase."
+      },
+      {
+        "id": "1.35",
+        "name": "reveal_state_not_carried_across_identities",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Revealing one identity's nsec does not reveal any other identity's nsec, and after switching the active identity the dashboard's private-key surface for the new identity is masked rather than inheriting the previous identity's revealed state",
+        "reasoning": "FAIL: After revealing one identity, another identity\u2019s card displayed a raw nsec while browsing identities, indicating reveal state leakage."
+      },
+      {
+        "id": "1.36",
+        "name": "long_label_contained_in_card",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Creating an identity with a label of exactly 40 characters keeps the card layout intact: the label truncates or wraps within its card without overlapping the npub text or neighbouring cards",
+        "reasoning": "BLOCKED: An exactly-40-character label was not successfully created and visually inspected."
+      },
+      {
+        "id": "1.37",
+        "name": "submit_disabled_until_label_valid",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "While the create-identity label field is empty or whitespace-only, an inline validation message naming the label field appears on interaction and the submit control stays disabled; entering a valid label enables submit",
+        "reasoning": "Whitespace input showed validation and disabled Generate keypair; valid input enabled submission and created an identity."
+      },
+      {
+        "id": "1.38",
+        "name": "import_rejects_nonconforming_vault",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Importing malformed vault JSON or a vault missing required fields (wrong version, empty identities, invalid label bounds, npub/nsec prefix, grants keys, or theme enum) shows an inline error naming the import field and leaves identity count and labels unchanged",
+        "reasoning": "Importing {} showed inline field-specific validation: \u201cversion: Vault version must be nostrpass-vault-v1,\u201d with Restore vault disabled."
+      },
+      {
+        "id": "1.41",
+        "name": "rotate_keys_generates_fresh_pair",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Activating Rotate keys on an identity and confirming the dialog replaces exactly that identity's npub and nsec with fresh, well-formed bech32 values distinct from its prior pair and from every other identity's, while its label and all four grants are unchanged",
+        "reasoning": "Confirmed rotation replaced the identity\u2019s npub with a fresh distinct npub while the label and grants remained unchanged."
+      },
+      {
+        "id": "1.42",
+        "name": "rotation_audit_entry_shows_old_and_new_npub",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A confirmed rotation adds an entry at the top of the Audit log naming the identity and showing shortened forms of both the old and the new npub",
+        "reasoning": "BLOCKED: Rotation succeeded, but I did not directly observe the audit entry containing both shortened old and new npubs."
+      },
+      {
+        "id": "1.43",
+        "name": "rotation_undo_restores_prior_keys",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After a confirmed rotation, Undo restores exactly the prior npub and nsec on the dashboard, the identity card, and the Export vault preview, and Redo reapplies the rotated pair",
+        "reasoning": "FAIL: Undo restored the prior key pair, but the required rotation-specific Redo verification was not completed."
+      },
+      {
+        "id": "1.44",
+        "name": "permissions_matrix_renders_all_identities",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Permissions view renders an All identities matrix with one row per identity, one switch cell per application (damus, snort, coracle, iris), and each cell matching that identity's actual grant; toggling a cell updates the same grant the per-identity toggle would",
+        "reasoning": "Permissions rendered one row per identity and four switch cells per row, matching visible grants."
+      },
+      {
+        "id": "1.45",
+        "name": "grant_all_applies_across_identities",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Activating Grant all in an application's matrix column sets that application's grant for every identity in one action, updates every affected cell and pill together, and records one audit entry naming the application and the number of identities changed",
+        "reasoning": "FAIL: Grant all updated every Coracle switch and pill, but the required audit entry naming the application and number changed was not directly observed."
+      },
+      {
+        "id": "1.46",
+        "name": "bulk_action_is_single_undo_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A single Undo after Grant all or Revoke all restores every identity's prior grant for that application, and Redo reapplies the bulk change",
+        "reasoning": "Undo reverted the bulk Coracle grant across all identities and Redo reapplied it."
+      },
+      {
+        "id": "1.47",
+        "name": "backup_export_single_identity_json",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export backup opens a surface with a monospaced Key Backup JSON preview containing version exactly nostrpass-backup-v1, exportedAt, and that identity's actual label, npub, nsec, and four grant booleans, with Copy (confirmation) and Download controls and a QR-style tile labelled as a placeholder",
+        "reasoning": "Backup dialog showed nostrpass-backup-v1, exportedAt, actual identity fields, four grants, Copy, Download, and Placeholder QR tile."
+      },
+      {
+        "id": "1.48",
+        "name": "backup_import_adds_identity",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Importing a valid Key Backup JSON whose npub matches no existing identity adds it as a new card, increases the identity count by exactly one, records an audit entry, and is reversible with Undo",
+        "reasoning": "BLOCKED: A valid single-identity backup import was not completed."
+      },
+      {
+        "id": "1.49",
+        "name": "backup_conflict_or_bad_schema_rejected",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Importing a Key Backup whose npub matches an existing identity, or one failing the field contract (wrong version, bad npub1/nsec1 prefix, label bounds, missing grants keys), shows an inline error naming the conflict or offending field and changes nothing",
+        "reasoning": "BLOCKED: Backup conflict and malformed-backup cases were not exercised."
+      },
+      {
+        "id": "1.50",
+        "name": "audit_filter_narrows_by_type",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Choosing an action type in the Audit log filter narrows the list to entries of that type without mutating the log, and returning to All restores every entry in the same order",
+        "reasoning": "BLOCKED: The filter was changed to Permission changed, but the narrowed result list and restoration to All were not directly observed."
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"dashboard_shows_active_identity_keys\":{\"score\":\"yes\",\"reasoning\":\"Dashboard showed active nickname, npub1 key, and masked nsec. Evidence: dashboard_shows_active_identity_keys-shared.png\"},\"seeded_identities_distinct_npubs\":{\"score\":\"yes\",\"reasoning\":\"Identities view showed Personal and Work with distinct npubs. Evidence: seeded_identities_distinct_npubs-shared.png\"},\"reload_resets_to_seeded_in_memory_baseline\":{\"score\":\"yes\",\"reasoning\":\"After mutations and reload, the app returned to two seeded identities, Personal active, original grants, and baseline theme. Evidence: reload_resets_to_seeded_in_memory_baseline-shared.png\"},\"valid_create_adds_distinct_identity\":{\"score\":\"yes\",\"reasoning\":\"Creating Alpha increased the count from 2 to 3 and produced a distinct npub. Evidence: valid_create_adds_distinct_identity-shared.png\"},\"empty_label_rejected_inline\":{\"score\":\"yes\",\"reasoning\":\"Whitespace input showed inline \u201cLabel cannot be whitespace only\u201d and the submit remained disabled. Evidence: valid_create_adds_distinct_identity-shared.png\"},\"cancel_create_leaves_collection_unchanged\":{\"score\":\"yes\",\"reasoning\":\"Cancel closed the create form without adding a card. Evidence: seeded_identities_distinct_npubs-shared.png\"},\"created_identity_becomes_active\":{\"score\":\"yes\",\"reasoning\":\"After creation, Alpha was active and shown on the dashboard. Evidence: valid_create_adds_distinct_identity-shared.png\"},\"permission_toggle_scoped_to_active_identity\":{\"score\":\"yes\",\"reasoning\":\"Toggling Alpha\u2019s Damus grant changed only Damus; Snort, Coracle, and Iris remained revoked. Evidence: valid_create_adds_distinct_identity-shared.png\"},\"select_updates_dashboard_npub\":{\"score\":\"yes\",\"reasoning\":\"Selecting Work changed the dashboard nickname and npub to Work\u2019s own values. Evidence: dashboard_shows_active_identity_keys-shared.png\"},\"permissions_view_follows_active_identity\":{\"score\":\"yes\",\"reasoning\":\"Permissions view updated its editor and matrix to the selected identity\u2019s grants. Evidence: seeded_identities_distinct_npubs-shared.png\"},\"reveal_toggles_nsec_mask\":{\"score\":\"yes\",\"reasoning\":\"Reveal changed the surface to a real nsec1 string and the control changed to Hide key. Evidence: reveal_toggles_nsec_mask-shared.png\"},\"audit_log_records_actions_newest_first\":{\"score\":\"yes\",\"reasoning\":\"Audit log contained a seeded entry and newly created, permission, theme, and export actions appeared newest first. Evidence: export_vault_json_live_from_store-shared.png\"},\"theme_switch_without_reload\":{\"score\":\"yes\",\"reasoning\":\"Settings switched between dark and light immediately through the visible control. Evidence: reload_resets_to_seeded_in_memory_baseline-shared.png\"},\"hover_feedback_on_interactive_chrome\":{\"score\":\"yes\",\"reasoning\":\"Hovered Dashboard changed computed background from transparent to a visible wash.\"},\"webmcp_identity_tools_drive_ui\":{\"score\":\"no\",\"reasoning\":\"FAIL: Tool listing exposed the required tool names, but invoking the toggle with the live identity id returned \u201cUnknown identity id,\u201d so the required WebMCP-driven visible state change was not completed.\"},\"label_over_40_chars_rejected\":{\"score\":\"yes\",\"reasoning\":\"A 41-character create label showed inline \u201cLabel cannot exceed 40 characters\u201d and Generate keypair stayed disabled.\"},\"rename_updates_card_dashboard_and_export\":{\"score\":\"yes\",\"reasoning\":\"Renamed Alpha to Renamed; the card, dashboard, and export JSON preview reflected Renamed. Evidence: export_vault_json_live_from_store-shared.png\"},\"delete_with_confirm_removes_identity\":{\"score\":\"yes\",\"reasoning\":\"Confirmed deletion removed Work; cancellation first left it unchanged.\"},\"cannot_delete_last_identity\":{\"score\":\"yes\",\"reasoning\":\"With one identity remaining, Delete was disabled and \u201cAt least one identity must remain\u201d was visible.\"},\"new_identity_grants_all_false\":{\"score\":\"yes\",\"reasoning\":\"New Alpha\u2019s dashboard pills and export JSON showed all four grants false. Evidence: valid_create_adds_distinct_identity-shared.png\"},\"search_filters_identity_cards\":{\"score\":\"yes\",\"reasoning\":\"Searching Personal narrowed the grid to Personal; clearing restored all cards.\"},\"sort_label_reverses_card_order\":{\"score\":\"yes\",\"reasoning\":\"Switching from Label A\u2013Z to Label Z\u2013A reversed the visible card order.\"},\"undo_redo_restore_mutations\":{\"score\":\"yes\",\"reasoning\":\"Undo removed the newly created Double identity and Redo restored it; bulk and rotation mutations also exposed working undo/redo controls.\"},\"export_vault_json_live_from_store\":{\"score\":\"yes\",\"reasoning\":\"Export preview showed nostrpass-vault-v1, activeLabel, theme, identities, npub/nsec fields, and all four grant booleans. Evidence: export_vault_json_live_from_store-shared.png\"},\"export_copy_and_download_controls\":{\"score\":\"yes\",\"reasoning\":\"Export vault provided Copy and Download, and Copy produced a confirmation.\"},\"import_round_trip_restores_vault\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: I did not complete a valid export-then-confirm-import round trip and verify all restored views.\"},\"no_outbound_navigation\":{\"score\":\"yes\",\"reasoning\":\"The app remained at localhost:3000; DOM inspection found no outbound links and all observed controls were in-app.\"},\"copy_npub_shows_confirmation\":{\"score\":\"yes\",\"reasoning\":\"Copy npub produced a visible Copied notification.\"},\"create_and_export_flow_chain\":{\"score\":\"no\",\"reasoning\":\"FAIL: Creation, active selection, and export were observed, but the complete specified chain was not verified atomically with the creation audit entry at the top.\"},\"permission_toggle_flow_chain\":{\"score\":\"yes\",\"reasoning\":\"Toggling Alpha\u2019s Damus grant changed the dashboard pill and connected-app count, added an audit entry, and export JSON showed damus:true.\"},\"identity_switch_flow_chain\":{\"score\":\"no\",\"reasoning\":\"FAIL: Dashboard and Permissions updated on selection, but the complete chain was not verified with the selection audit entry and export activeLabel in the same observation.\"},\"double_submit_creates_exactly_one\":{\"score\":\"yes\",\"reasoning\":\"Rapid double activation of Generate keypair produced exactly one Double card and one count increase.\"},\"reveal_state_not_carried_across_identities\":{\"score\":\"no\",\"reasoning\":\"FAIL: After revealing one identity, another identity\u2019s card displayed a raw nsec while browsing identities, indicating reveal state leakage.\"},\"long_label_contained_in_card\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: An exactly-40-character label was not successfully created and visually inspected.\"},\"submit_disabled_until_label_valid\":{\"score\":\"yes\",\"reasoning\":\"Whitespace input showed validation and disabled Generate keypair; valid input enabled submission and created an identity.\"},\"import_rejects_nonconforming_vault\":{\"score\":\"yes\",\"reasoning\":\"Importing {} showed inline field-specific validation: \u201cversion: Vault version must be nostrpass-vault-v1,\u201d with Restore vault disabled.\"},\"rotate_keys_generates_fresh_pair\":{\"score\":\"yes\",\"reasoning\":\"Confirmed rotation replaced the identity\u2019s npub with a fresh distinct npub while the label and grants remained unchanged.\"},\"rotation_audit_entry_shows_old_and_new_npub\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Rotation succeeded, but I did not directly observe the audit entry containing both shortened old and new npubs.\"},\"rotation_undo_restores_prior_keys\":{\"score\":\"no\",\"reasoning\":\"FAIL: Undo restored the prior key pair, but the required rotation-specific Redo verification was not completed.\"},\"permissions_matrix_renders_all_identities\":{\"score\":\"yes\",\"reasoning\":\"Permissions rendered one row per identity and four switch cells per row, matching visible grants.\"},\"grant_all_applies_across_identities\":{\"score\":\"no\",\"reasoning\":\"FAIL: Grant all updated every Coracle switch and pill, but the required audit entry naming the application and number changed was not directly observed.\"},\"bulk_action_is_single_undo_step\":{\"score\":\"yes\",\"reasoning\":\"Undo reverted the bulk Coracle grant across all identities and Redo reapplied it.\"},\"backup_export_single_identity_json\":{\"score\":\"yes\",\"reasoning\":\"Backup dialog showed nostrpass-backup-v1, exportedAt, actual identity fields, four grants, Copy, Download, and Placeholder QR tile.\"},\"backup_import_adds_identity\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A valid single-identity backup import was not completed.\"},\"backup_conflict_or_bad_schema_rejected\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Backup conflict and malformed-backup cases were not exercised.\"},\"audit_filter_narrows_by_type\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The filter was changed to Permission changed, but the narrowed result list and restoration to All were not directly observed.\"}}",
+    "cost_usd": 1.1588961999999998
+  },
+  "design_fidelity": {
+    "score": 0.8,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "spacing_and_sizing_follow_scale",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sidebar, identity card, and Identities grid spacing follow a consistent rhythm matching the reference shell",
+        "reasoning": "Consistent 16/32px spacing rhythm is visible across the desktop sidebar, identity card, and summary/grid surfaces. Evidence: layout-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "typography_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Monospace keys and sans UI type match the reference treatment for cryptographic versus chrome text",
+        "reasoning": "UI chrome uses sans-serif text while public keys are visibly monospaced. Evidence: layout-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "layout_matches_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Left sidebar plus main content layout matches the reference overview structure at desktop width",
+        "reasoning": "Desktop view clearly uses a fixed left sidebar with the main content area aligned to its right. Evidence: layout-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "specified_state_changes_animate",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Specified state changes (theme, reveal, card entrance, toasts) animate in line with the reference behavior",
+        "reasoning": "FAIL: Theme switching was exercised, but the observed result showed only the settled state; no direct evidence of the specified reveal/card/toast animation behavior was observed. Evidence: theme-light-shared.png, theme-toast-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "responsive_behavior_matches_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sidebar collapse and Identities grid reflow match the reference responsive behavior",
+        "reasoning": "At 700px the sidebar collapses behind an Open navigation control and the two identity cards reflow from two columns into a vertical stack. Evidence: identities-mobile-shared.png, responsive-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "control_styling_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Permission switches, pills, and buttons match the reference control styling rather than unstyled browser defaults",
+        "reasoning": "Buttons, permission pills, search/sort controls, and navigation controls are consistently styled with borders, radii, fills, and focus/active treatments rather than browser defaults. Evidence: identities-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "typography_has_clear_hierarchy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Vault brand, view titles, and card nicknames show clear hierarchy as in the reference",
+        "reasoning": "Brand, page titles, subtitles, identity labels, and key text have visibly distinct sizes, weights, and treatments. Evidence: layout-shared.png"
+      },
+      {
+        "id": "3.8",
+        "name": "component_states_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Active nav, active identity card, and Granted/Revoked pills match the reference state treatments",
+        "reasoning": "Active navigation is highlighted, the active identity is marked, and Granted/Revoked pills use distinct visual treatments. Evidence: layout-shared.png, identities-shared.png"
+      },
+      {
+        "id": "3.9",
+        "name": "surface_treatments_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Light and dark surfaces match the reference shell treatments for backgrounds and borders",
+        "reasoning": "Both dark and light themes were directly observed with contrasting page backgrounds, card surfaces, and subtle borders. Evidence: layout-shared.png, theme-light-shared.png"
+      },
+      {
+        "id": "3.10",
+        "name": "microinteractions_match_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Hover wash and toast microinteractions match the reference intent",
+        "reasoning": "FAIL: Theme switching produced the expected state change, but no toast was visible, and the required hover wash could not be fully exercised and compared against a resting state. Evidence: theme-toast-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"spacing_and_sizing_follow_scale\":{\"score\":\"yes\",\"reasoning\":\"Consistent 16/32px spacing rhythm is visible across the desktop sidebar, identity card, and summary/grid surfaces. Evidence: layout-shared.png\"},\"typography_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"UI chrome uses sans-serif text while public keys are visibly monospaced. Evidence: layout-shared.png\"},\"layout_matches_reference\":{\"score\":\"yes\",\"reasoning\":\"Desktop view clearly uses a fixed left sidebar with the main content area aligned to its right. Evidence: layout-shared.png\"},\"specified_state_changes_animate\":{\"score\":\"no\",\"reasoning\":\"FAIL: Theme switching was exercised, but the observed result showed only the settled state; no direct evidence of the specified reveal/card/toast animation behavior was observed. Evidence: theme-light-shared.png, theme-toast-shared.png\"},\"responsive_behavior_matches_reference\":{\"score\":\"yes\",\"reasoning\":\"At 700px the sidebar collapses behind an Open navigation control and the two identity cards reflow from two columns into a vertical stack. Evidence: identities-mobile-shared.png, responsive-shared.png\"},\"control_styling_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"Buttons, permission pills, search/sort controls, and navigation controls are consistently styled with borders, radii, fills, and focus/active treatments rather than browser defaults. Evidence: identities-shared.png\"},\"typography_has_clear_hierarchy\":{\"score\":\"yes\",\"reasoning\":\"Brand, page titles, subtitles, identity labels, and key text have visibly distinct sizes, weights, and treatments. Evidence: layout-shared.png\"},\"component_states_match_spec\":{\"score\":\"yes\",\"reasoning\":\"Active navigation is highlighted, the active identity is marked, and Granted/Revoked pills use distinct visual treatments. Evidence: layout-shared.png, identities-shared.png\"},\"surface_treatments_match_spec\":{\"score\":\"yes\",\"reasoning\":\"Both dark and light themes were directly observed with contrasting page backgrounds, card surfaces, and subtle borders. Evidence: layout-shared.png, theme-light-shared.png\"},\"microinteractions_match_spec\":{\"score\":\"no\",\"reasoning\":\"FAIL: Theme switching produced the expected state change, but no toast was visible, and the required hover wash could not be fully exercised and compared against a resting state. Evidence: theme-toast-shared.png\"}}",
+    "cost_usd": 0.1507506
+  },
+  "edge_cases": {
+    "score": 0.8286,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "search_empty_state_is_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When Identities search matches nothing, an empty state explaining no matches is shown with a way to clear the search",
+        "reasoning": "No-match search showed an explanatory empty state and a Clear search button. Evidence: search_empty_state_is_present-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "forms_validate_inline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create and rename validate the label field inline before submit for empty, whitespace-only, and over-40-character values",
+        "reasoning": "Create and rename showed inline errors for whitespace-only and over-40-character labels. Evidence: forms_validate_inline-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "errors_are_actionable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Validation and import errors name the offending field and the fix rather than only saying Invalid",
+        "reasoning": "Errors named the field and corrective action, including version and npub conflict guidance. Evidence: import_rejects_bad_schema-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "actions_show_confirmation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Create, permission toggle, copy, export, and import show visible success feedback such as a toast",
+        "reasoning": "FAIL: Create, permission, copy, and export showed feedback, but successful import confirmation was not completed and observed. Evidence: actions_show_confirmation-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "import_shows_error_not_hang",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A non-conforming vault import shows an inline error promptly rather than hanging without feedback",
+        "reasoning": "Invalid vault JSON promptly displayed an inline version error and disabled Restore vault. Evidence: import_rejects_bad_schema-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "destructive_actions_support_undo_or_cancel",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Delete and import require confirmation with a cancel path, and Undo reverses create/rename/delete/toggle/import mutations",
+        "reasoning": "FAIL: Delete and import had cancel paths and bulk permission had Undo, but the complete required Undo coverage for create, rename, delete, toggle, and import was not observed. Evidence: destructive_actions_support_undo_or_cancel-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "reveal_and_copy_have_clear_affordance",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Reveal/hide and Copy npub controls have clear labels reflecting their action",
+        "reasoning": "Controls were explicitly labeled Reveal nsec/Reveal key and Copy npub. Evidence: reveal_not_carried_across_identities-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "controls_use_semantic_tags",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, inputs, switches, and labels use semantic interactive elements",
+        "reasoning": "Observed buttons, textboxes/searchbox, switches, comboboxes, labels, and dialog controls used semantic interactive elements. Evidence: controls-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "modal_supports_close_paths",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Delete and import confirmation dialogs close via cancel/Escape without applying the action",
+        "reasoning": "Delete and import confirmation dialogs exposed Cancel, and Escape closed the import confirmation without applying it. Evidence: modal_supports_close_paths-shared.png"
+      },
+      {
+        "id": "4.10",
+        "name": "double_submit_creates_one",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Double-activating create submit adds exactly one identity",
+        "reasoning": "Double-activating create produced exactly one Once identity card and one success notification. Evidence: double_submit_creates_one-shared.png"
+      },
+      {
+        "id": "4.11",
+        "name": "reveal_not_carried_across_identities",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Revealing one identity's nsec does not reveal another's after switching active identity",
+        "reasoning": "After revealing Double and switching to Personal, Double remained revealed while Personal remained masked. Evidence: reveal_not_carried_across_identities-shared.png"
+      },
+      {
+        "id": "4.12",
+        "name": "last_identity_delete_blocked",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Attempting to delete the sole remaining identity leaves the collection unchanged with a visible explanation",
+        "reasoning": "With one identity remaining, Delete was disabled and the visible explanation said at least one identity must remain. Evidence: last_identity_delete_blocked-shared.png"
+      },
+      {
+        "id": "4.13",
+        "name": "import_rejects_bad_schema",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Import of vault JSON with wrong version, empty identities, invalid label, bad npub/nsec prefix, incomplete grants, or invalid theme shows a field-named error and mutates nothing",
+        "reasoning": "FAIL: Wrong-version import was rejected with a field-named error, but all specified bad-schema variants were not exercised. Evidence: import_rejects_bad_schema-shared.png"
+      },
+      {
+        "id": "4.14",
+        "name": "long_label_layout_holds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A 40-character label truncates or wraps inside its card without overlapping the npub or neighbouring cards",
+        "reasoning": "A 40-character label fit within its card; the npub and neighboring content remained separated without overlap. Evidence: long_label_layout_holds-shared.png"
+      },
+      {
+        "id": "4.15",
+        "name": "rotation_cancel_changes_nothing",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cancelling the rotate-keys confirmation leaves the identity's npub and nsec unchanged and records no audit entry",
+        "reasoning": "Rotate keys presented a confirmation dialog; cancel left the displayed npub unchanged and no key-rotated audit entry appeared. Evidence: rotation_cancel_changes_nothing-shared.png"
+      },
+      {
+        "id": "4.16",
+        "name": "backup_npub_conflict_rejected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Importing a Key Backup whose npub matches an existing identity shows an inline error naming the npub conflict and leaves the identity count, cards, and grants unchanged",
+        "reasoning": "Importing a backup with the existing npub showed an inline npub conflict and left the identity count and displayed grants unchanged. Evidence: backup_npub_conflict_rejected-shared.png"
+      },
+      {
+        "id": "4.17",
+        "name": "grant_all_idempotent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Activating Grant all when every identity already has that application granted leaves every cell granted (nothing flips to revoked), and a following Undo restores the state that preceded the bulk action",
+        "reasoning": "Grant all on already-granted Damus left all Damus cells granted; Undo restored the prior state. Evidence: grant_all_idempotent-shared.png"
+      },
+      {
+        "id": "4.18",
+        "name": "audit_filter_empty_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Filtering the Audit log to a type with no recorded entries shows an empty state naming the filter, and clearing the filter restores the full list",
+        "reasoning": "Filtering to Vault imported showed a named empty state, and clearing the filter restored the full seven-entry list. Evidence: audit_filter_empty_state-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"search_empty_state_is_present\":{\"score\":\"yes\",\"reasoning\":\"No-match search showed an explanatory empty state and a Clear search button. Evidence: search_empty_state_is_present-shared.png\"},\"forms_validate_inline\":{\"score\":\"yes\",\"reasoning\":\"Create and rename showed inline errors for whitespace-only and over-40-character labels. Evidence: forms_validate_inline-shared.png\"},\"errors_are_actionable\":{\"score\":\"yes\",\"reasoning\":\"Errors named the field and corrective action, including version and npub conflict guidance. Evidence: import_rejects_bad_schema-shared.png\"},\"actions_show_confirmation\":{\"score\":\"no\",\"reasoning\":\"FAIL: Create, permission, copy, and export showed feedback, but successful import confirmation was not completed and observed. Evidence: actions_show_confirmation-shared.png\"},\"import_shows_error_not_hang\":{\"score\":\"yes\",\"reasoning\":\"Invalid vault JSON promptly displayed an inline version error and disabled Restore vault. Evidence: import_rejects_bad_schema-shared.png\"},\"destructive_actions_support_undo_or_cancel\":{\"score\":\"no\",\"reasoning\":\"FAIL: Delete and import had cancel paths and bulk permission had Undo, but the complete required Undo coverage for create, rename, delete, toggle, and import was not observed. Evidence: destructive_actions_support_undo_or_cancel-shared.png\"},\"reveal_and_copy_have_clear_affordance\":{\"score\":\"yes\",\"reasoning\":\"Controls were explicitly labeled Reveal nsec/Reveal key and Copy npub. Evidence: reveal_not_carried_across_identities-shared.png\"},\"controls_use_semantic_tags\":{\"score\":\"yes\",\"reasoning\":\"Observed buttons, textboxes/searchbox, switches, comboboxes, labels, and dialog controls used semantic interactive elements. Evidence: controls-shared.png\"},\"modal_supports_close_paths\":{\"score\":\"yes\",\"reasoning\":\"Delete and import confirmation dialogs exposed Cancel, and Escape closed the import confirmation without applying it. Evidence: modal_supports_close_paths-shared.png\"},\"double_submit_creates_one\":{\"score\":\"yes\",\"reasoning\":\"Double-activating create produced exactly one Once identity card and one success notification. Evidence: double_submit_creates_one-shared.png\"},\"reveal_not_carried_across_identities\":{\"score\":\"yes\",\"reasoning\":\"After revealing Double and switching to Personal, Double remained revealed while Personal remained masked. Evidence: reveal_not_carried_across_identities-shared.png\"},\"last_identity_delete_blocked\":{\"score\":\"yes\",\"reasoning\":\"With one identity remaining, Delete was disabled and the visible explanation said at least one identity must remain. Evidence: last_identity_delete_blocked-shared.png\"},\"import_rejects_bad_schema\":{\"score\":\"no\",\"reasoning\":\"FAIL: Wrong-version import was rejected with a field-named error, but all specified bad-schema variants were not exercised. Evidence: import_rejects_bad_schema-shared.png\"},\"long_label_layout_holds\":{\"score\":\"yes\",\"reasoning\":\"A 40-character label fit within its card; the npub and neighboring content remained separated without overlap. Evidence: long_label_layout_holds-shared.png\"},\"rotation_cancel_changes_nothing\":{\"score\":\"yes\",\"reasoning\":\"Rotate keys presented a confirmation dialog; cancel left the displayed npub unchanged and no key-rotated audit entry appeared. Evidence: rotation_cancel_changes_nothing-shared.png\"},\"backup_npub_conflict_rejected\":{\"score\":\"yes\",\"reasoning\":\"Importing a backup with the existing npub showed an inline npub conflict and left the identity count and displayed grants unchanged. Evidence: backup_npub_conflict_rejected-shared.png\"},\"grant_all_idempotent\":{\"score\":\"yes\",\"reasoning\":\"Grant all on already-granted Damus left all Damus cells granted; Undo restored the prior state. Evidence: grant_all_idempotent-shared.png\"},\"audit_filter_empty_state\":{\"score\":\"yes\",\"reasoning\":\"Filtering to Vault imported showed a named empty state, and clearing the filter restored the full seven-entry list. Evidence: audit_filter_empty_state-shared.png\"}}",
+    "cost_usd": 0.7386126
+  },
+  "innovation": {
+    "score": 0.1429,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "vault_export_is_operator_ready",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Beyond a preview-only demo, the Export vault JSON is a complete operator-ready artifact with version, activeLabel, theme, and full identity records including grants",
+        "reasoning": "PASS \u2014 Export preview visibly contains version, activeLabel, theme, and complete identity records with npub, nsec, and grants. Evidence: vault-export-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.2",
+        "name": "undo_covers_vault_mutations",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Undo/redo covers create, rename, delete, select, permission toggle, and import with enabled/disabled states that match stack availability",
+        "reasoning": "FAIL: Undo was enabled after mutations, but the full required coverage across create, rename, delete, select, permission toggle, and import was not directly verified. Evidence: identities-search-sort.png",
+        "optional": true
+      },
+      {
+        "id": "11.3",
+        "name": "import_schema_guard_is_thorough",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Import rejection covers version, identity bounds, npub/nsec prefixes, grants keys, and theme enum with field-named errors",
+        "reasoning": "FAIL: Visible UI confirmed a field-named version error, but the other required validation cases were not all visibly exercised end-to-end. Evidence: import-version-error.png",
+        "optional": true
+      },
+      {
+        "id": "11.4",
+        "name": "copy_npub_and_search_sort_polish",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Copy npub confirmation plus Identities search and label sort feel like a finished key manager rather than a bare CRUD list",
+        "reasoning": "FAIL: Search and label sorting were present, but identity cards showed no visible Copy npub control or confirmation. Evidence: identities-search-sort.png",
+        "optional": true
+      },
+      {
+        "id": "11.5",
+        "name": "audit_covers_vault_lifecycle",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Audit log entries cover export and import actions in addition to create/select/permission events, giving an operator-readable trail (bonus)",
+        "reasoning": "FAIL: Selecting Audit log left the Settings view rendered, so audit entries for lifecycle actions could not be observed. Evidence: audit-lifecycle.png",
+        "optional": true
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "No noteworthy browser-observable enhancement beyond the specified features was directly verified."
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"vault_export_is_operator_ready\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Export preview visibly contains version, activeLabel, theme, and complete identity records with npub, nsec, and grants. Evidence: vault-export-shared.png\"},\"undo_covers_vault_mutations\":{\"score\":\"no\",\"reasoning\":\"FAIL: Undo was enabled after mutations, but the full required coverage across create, rename, delete, select, permission toggle, and import was not directly verified. Evidence: identities-search-sort.png\"},\"import_schema_guard_is_thorough\":{\"score\":\"no\",\"reasoning\":\"FAIL: Visible UI confirmed a field-named version error, but the other required validation cases were not all visibly exercised end-to-end. Evidence: import-version-error.png\"},\"copy_npub_and_search_sort_polish\":{\"score\":\"no\",\"reasoning\":\"FAIL: Search and label sorting were present, but identity cards showed no visible Copy npub control or confirmation. Evidence: identities-search-sort.png\"},\"audit_covers_vault_lifecycle\":{\"score\":\"no\",\"reasoning\":\"FAIL: Selecting Audit log left the Settings view rendered, so audit entries for lifecycle actions could not be observed. Evidence: audit-lifecycle.png\"},\"innovation_catchall\":{\"score\":\"no\",\"reasoning\":\"No noteworthy browser-observable enhancement beyond the specified features was directly verified.\"}}",
+    "cost_usd": 0.15221459999999998
+  },
+  "motion": {
+    "score": 0.8636,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "hover_feedback_wash_required",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Interactive chrome (nav items, buttons, identity cards, toggles) shows a hover feedback wash with background/border/shadow easing plus a slight lift",
+        "reasoning": "PASS: Hovering Dashboard changed background and transform while a 0.15s transition was present. Evidence: hover_feedback_wash_required-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "theme_switch_recolors_immediately",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The theme switch recolors backgrounds, text, and borders across the shell immediately with no flash of unstyled content",
+        "reasoning": "PASS: Real theme click changed the Settings shell from dark to light immediately, including backgrounds, borders, and text. Evidence: theme_switch_recolors_immediately-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "reveal_requires_real_click",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The reveal-key control swaps masked dots for the real nsec only on a real UI click and swaps back on a second click",
+        "reasoning": "PASS: Real clicks revealed the nsec and a second click restored masked dots. Evidence: reveal_requires_real_click-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "identity_switch_without_reload",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Selecting a different identity transitions dashboard keys and permission badges without a full page reload",
+        "reasoning": "PASS: Creating/selecting an identity updated the dashboard identity, npub, permissions, and counters without navigation or reload. Evidence: identity_switch_without_reload-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "permission_toggle_handle_animates",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The permission toggle switch animates its handle between revoked (left) and granted (right) when clicked",
+        "reasoning": "PASS: A real permission click moved the handle from x=1023 to x=1043 and exposed a 0.15s transform transition. Evidence: permission_toggle_handle_animates-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "new_card_entrance_animation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A newly created identity card animates into the grid over roughly 150 to 300 milliseconds rather than appearing instantly",
+        "reasoning": "PASS: The newly created card exposed a 0.2s card-in animation. Evidence: new_card_entrance_animation-ui.png"
+      },
+      {
+        "id": "4.7",
+        "name": "audit_entry_entrance_animation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "New Audit log entries animate in at the top when an action is recorded while the view is visible",
+        "reasoning": "BLOCKED: The Audit view rendered, but no reachable control could record a new action while that view remained visible; the attempted state-tool action did not add a live entry. Evidence: audit_entry_entrance_animation-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "toast_slide_and_dismiss",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create, permission, copy, export, and import toasts slide in, remain readable, and auto-dismiss with a fade",
+        "reasoning": "PASS: Permission toast was readable, used a 0.3s toast-slide animation, and disappeared after the auto-dismiss interval. Evidence: toast_slide_and_dismiss-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "export_drawer_and_dialogs_transition",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Export vault drawer slides in; delete and import confirmations enter and exit with a brief transition",
+        "reasoning": "PASS: Export drawer used a 0.22s drawer-in animation; import and delete confirmation dialogs used 0.22s dialog-in transitions and were opened/closed through the UI. Evidence: export_drawer_and_dialogs_transition-shared.png"
+      },
+      {
+        "id": "4.10",
+        "name": "reduced_motion_removes_animations",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, entrance and toggle animations are removed and state changes apply instantly while features remain usable",
+        "reasoning": "PASS: Reduced-motion browser matched prefers-reduced-motion and reduced animations/transitions to 1e-05s while theme switching remained usable. Evidence: reduced_motion_removes_animations-shared.png"
+      },
+      {
+        "id": "4.11",
+        "name": "bulk_switches_animate_together",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Activating Grant all or Revoke all animates every affected matrix switch handle in the same moment rather than leaving some cells snapping later or not moving",
+        "reasoning": "PASS: Grant all checked every affected matrix switch and all sampled handles exposed the same 0.15s transition. Evidence: bulk_switches_animate_together-shared.png"
+      },
+      {
+        "id": "4.12",
+        "name": "rotation_crossfades_key_surfaces",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "After confirming a rotation via the real dialog, the dashboard's npub and nsec surfaces transition to the new values with a brief crossfade rather than snapping",
+        "reasoning": "FAIL: The real rotation confirmation dialog could not be completed because its Rotate button remained unstable and timed out; npub/nsec values did not change and no crossfade was observed. Evidence: rotation_crossfades_key_surfaces-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"hover_feedback_wash_required\":{\"score\":\"yes\",\"reasoning\":\"PASS: Hovering Dashboard changed background and transform while a 0.15s transition was present. Evidence: hover_feedback_wash_required-shared.png\"},\"theme_switch_recolors_immediately\":{\"score\":\"yes\",\"reasoning\":\"PASS: Real theme click changed the Settings shell from dark to light immediately, including backgrounds, borders, and text. Evidence: theme_switch_recolors_immediately-shared.png\"},\"reveal_requires_real_click\":{\"score\":\"yes\",\"reasoning\":\"PASS: Real clicks revealed the nsec and a second click restored masked dots. Evidence: reveal_requires_real_click-shared.png\"},\"identity_switch_without_reload\":{\"score\":\"yes\",\"reasoning\":\"PASS: Creating/selecting an identity updated the dashboard identity, npub, permissions, and counters without navigation or reload. Evidence: identity_switch_without_reload-shared.png\"},\"permission_toggle_handle_animates\":{\"score\":\"yes\",\"reasoning\":\"PASS: A real permission click moved the handle from x=1023 to x=1043 and exposed a 0.15s transform transition. Evidence: permission_toggle_handle_animates-shared.png\"},\"new_card_entrance_animation\":{\"score\":\"yes\",\"reasoning\":\"PASS: The newly created card exposed a 0.2s card-in animation. Evidence: new_card_entrance_animation-ui.png\"},\"audit_entry_entrance_animation\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The Audit view rendered, but no reachable control could record a new action while that view remained visible; the attempted state-tool action did not add a live entry. Evidence: audit_entry_entrance_animation-shared.png\"},\"toast_slide_and_dismiss\":{\"score\":\"yes\",\"reasoning\":\"PASS: Permission toast was readable, used a 0.3s toast-slide animation, and disappeared after the auto-dismiss interval. Evidence: toast_slide_and_dismiss-shared.png\"},\"export_drawer_and_dialogs_transition\":{\"score\":\"yes\",\"reasoning\":\"PASS: Export drawer used a 0.22s drawer-in animation; import and delete confirmation dialogs used 0.22s dialog-in transitions and were opened/closed through the UI. Evidence: export_drawer_and_dialogs_transition-shared.png\"},\"reduced_motion_removes_animations\":{\"score\":\"yes\",\"reasoning\":\"PASS: Reduced-motion browser matched prefers-reduced-motion and reduced animations/transitions to 1e-05s while theme switching remained usable. Evidence: reduced_motion_removes_animations-shared.png\"},\"bulk_switches_animate_together\":{\"score\":\"yes\",\"reasoning\":\"PASS: Grant all checked every affected matrix switch and all sampled handles exposed the same 0.15s transition. Evidence: bulk_switches_animate_together-shared.png\"},\"rotation_crossfades_key_surfaces\":{\"score\":\"no\",\"reasoning\":\"FAIL: The real rotation confirmation dialog could not be completed because its Rotate button remained unstable and timed out; npub/nsec values did not change and no crossfade was observed. Evidence: rotation_crossfades_key_surfaces-shared.png\"}}",
+    "cost_usd": 0.498154
+  },
+  "performance": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_is_under_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive within 2 seconds of a local cold load",
+        "reasoning": "PASS \u2014 local navigation returned a complete, interactive Dashboard in about 1.1s. Evidence: cold_start_is_under_two_seconds-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "console_is_clean",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No console errors or warnings appear during create, rename, delete, select, toggle, reveal, copy, export, import, theme switch, undo, redo, or reload",
+        "reasoning": "PASS \u2014 after create, select, toggle, reveal, export, failed import, theme switch, undo/redo, and reload, console reported 0 errors and 0 warnings. Evidence: rapid_input_does_not_freeze-shared.png"
+      },
+      {
+        "id": "9.3",
+        "name": "transitions_respond_under_100ms",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "View switches and permission toggles update the UI promptly without multi-second lag",
+        "reasoning": "PASS \u2014 Dashboard, Identities, Permissions, Settings, and Export views updated promptly after interaction, with no visible lag. Evidence: state_changes_remain_interactive-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "export_preview_stays_responsive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening Export vault and regenerating the JSON preview after mutations stays responsive",
+        "reasoning": "PASS \u2014 Export vault opened and displayed regenerated JSON containing the current identity and permission state while the UI remained responsive. Evidence: export_preview_stays_responsive-shared.png"
+      },
+      {
+        "id": "9.5",
+        "name": "identity_grid_renders_without_lag",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Identities grid with seeded plus newly created cards renders without visible lag",
+        "reasoning": "PASS \u2014 Identities view rendered three cards with labels, controls, and key metadata without visible lag. Evidence: identity_grid_renders_without_lag-shared.png"
+      },
+      {
+        "id": "9.6",
+        "name": "state_changes_remain_interactive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapid identity switches and permission toggles leave the UI interactive",
+        "reasoning": "PASS \u2014 Multiple permission toggles updated immediately and rapid identity/view interactions remained usable. Evidence: state_changes_remain_interactive-shared.png"
+      },
+      {
+        "id": "9.7",
+        "name": "animations_maintain_smooth_frame_rate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Card entrance and toast animations do not visibly stutter under normal use",
+        "reasoning": "PASS \u2014 Card rendering and notification/transition interactions showed no visible stutter during normal use. Evidence: export_preview_stays_responsive-shared.png"
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_input_does_not_freeze",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Quickly toggling permissions or undoing and redoing produces no hangs or mixed-identity states",
+        "reasoning": "PASS \u2014 Eight rapid permission toggles completed with document.readyState complete, 16 switches present, and consistent final state. Evidence: rapid_input_does_not_freeze-shared.png"
+      },
+      {
+        "id": "9.10",
+        "name": "import_error_path_stays_responsive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rejecting a bad import remains responsive and does not freeze the UI",
+        "reasoning": "PASS \u2014 Invalid vault import was rejected with a validation error while the page remained complete and interactive. Evidence: import_error_path_stays_responsive-shared.png"
+      },
+      {
+        "id": "9.11",
+        "name": "bulk_apply_has_no_partial_states",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A bulk Grant all or Revoke all across every identity applies as one immediate visible update with no per-row lag or partially applied intermediate states left on screen",
+        "reasoning": "PASS \u2014 Grant all updated the relevant permission across the identity matrix in one immediate observed state change, with no partial intermediate UI left. Evidence: bulk_apply_has_no_partial_states-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_start_is_under_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 local navigation returned a complete, interactive Dashboard in about 1.1s. Evidence: cold_start_is_under_two_seconds-shared.png\"},\"console_is_clean\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 after create, select, toggle, reveal, export, failed import, theme switch, undo/redo, and reload, console reported 0 errors and 0 warnings. Evidence: rapid_input_does_not_freeze-shared.png\"},\"transitions_respond_under_100ms\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Dashboard, Identities, Permissions, Settings, and Export views updated promptly after interaction, with no visible lag. Evidence: state_changes_remain_interactive-shared.png\"},\"export_preview_stays_responsive\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Export vault opened and displayed regenerated JSON containing the current identity and permission state while the UI remained responsive. Evidence: export_preview_stays_responsive-shared.png\"},\"identity_grid_renders_without_lag\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Identities view rendered three cards with labels, controls, and key metadata without visible lag. Evidence: identity_grid_renders_without_lag-shared.png\"},\"state_changes_remain_interactive\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Multiple permission toggles updated immediately and rapid identity/view interactions remained usable. Evidence: state_changes_remain_interactive-shared.png\"},\"animations_maintain_smooth_frame_rate\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Card rendering and notification/transition interactions showed no visible stutter during normal use. Evidence: export_preview_stays_responsive-shared.png\"},\"rapid_input_does_not_freeze\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Eight rapid permission toggles completed with document.readyState complete, 16 switches present, and consistent final state. Evidence: rapid_input_does_not_freeze-shared.png\"},\"import_error_path_stays_responsive\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Invalid vault import was rejected with a validation error while the page remained complete and interactive. Evidence: import_error_path_stays_responsive-shared.png\"},\"bulk_apply_has_no_partial_states\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Grant all updated the relevant permission across the identity matrix in one immediate observed state change, with no partial intermediate UI left. Evidence: bulk_apply_has_no_partial_states-shared.png\"}}",
+    "cost_usd": 0.19317679999999998
+  },
+  "responsiveness": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "layout_adapts_desktop_to_mobile",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At widths of 768px and below the sidebar collapses to compact nav; at desktop widths the sidebar is open by default",
+        "reasoning": "Sidebar is open at desktop and collapses behind an Open navigation control at 375px. Evidence: mobile-nav-shared.png"
+      },
+      {
+        "id": "7.2",
+        "name": "mobile_tap_targets_are_large_enough",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Primary controls remain large enough to activate at 375px width",
+        "reasoning": "The mobile navigation toggle is 36\u00d736px and primary buttons are approximately 34\u201340px high. Evidence: small-dashboard-shared.png"
+      },
+      {
+        "id": "7.3",
+        "name": "typography_resizes_across_breakpoints",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Titles and key labels remain legible from desktop down to 375px",
+        "reasoning": "Dashboard/Identities headings remain legible at 24px on mobile and desktop, with readable button labels. Evidence: desktop-layout-shared.png"
+      },
+      {
+        "id": "7.4",
+        "name": "content_avoids_clipping_and_overflow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No content clips or overflows the viewport at 375px; npub/nsec and vault JSON wrap or truncate within surfaces",
+        "reasoning": "At 375px, dashboard content and the export JSON remain within their surfaces; viewport scroll width does not exceed the viewport. Evidence: export-drawer-mobile-shared.png"
+      },
+      {
+        "id": "7.5",
+        "name": "chrome_adapts_to_small_screens",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Compact navigation still reaches Dashboard, Identities, Permissions, Audit log, and Settings",
+        "reasoning": "Opening compact navigation visibly exposes Dashboard, Identities, Permissions, Audit log, Settings, and Export vault. Evidence: mobile-nav-shared.png"
+      },
+      {
+        "id": "7.6",
+        "name": "identities_grid_reflows",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Identities grid reflows from multiple columns at desktop to a single column at 375px",
+        "reasoning": "Identities render as two columns at desktop and stacked full-width cards at 375px. Evidence: identities-desktop-shared.png and identities-mobile-shared.png"
+      },
+      {
+        "id": "7.7",
+        "name": "export_drawer_usable_on_narrow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export vault drawer remains usable at 375px without forcing page-level horizontal scroll",
+        "reasoning": "The Export vault dialog fits the 375px viewport, provides visible Close/export/import controls, and does not create page-level horizontal overflow. Evidence: export-drawer-mobile-shared.png"
+      },
+      {
+        "id": "7.8",
+        "name": "small_screens_avoid_horizontal_scroll",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No page-level horizontal scrolling appears at 375px width",
+        "reasoning": "At 375px, document and body scroll widths equal the viewport width; no page-level horizontal overflow is present. Evidence: matrix-mobile-clean-shared.png"
+      },
+      {
+        "id": "7.9",
+        "name": "stat_tiles_reflow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Dashboard stat tiles reflow or stack without overlapping at narrow widths",
+        "reasoning": "Dashboard stat tiles stack vertically on the narrow layout without overlap. Evidence: small-dashboard-shared.png"
+      },
+      {
+        "id": "7.10",
+        "name": "fixed_controls_remain_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sidebar toggle and primary actions remain reachable when the viewport is narrow",
+        "reasoning": "The compact navigation toggle remains fixed and visible at the top-left, while dashboard primary actions remain within the viewport. Evidence: small-dashboard-shared.png"
+      },
+      {
+        "id": "7.11",
+        "name": "matrix_scrolls_inside_panel_at_375",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "At 375 pixel width the All identities matrix scrolls inside its own panel rather than forcing page-level horizontal overflow",
+        "reasoning": "The All-identities matrix is wider than its container but sits inside an overflow-x-auto panel; page scroll width remains 375px. Evidence: matrix-mobile-clean-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"layout_adapts_desktop_to_mobile\":{\"score\":\"yes\",\"reasoning\":\"Sidebar is open at desktop and collapses behind an Open navigation control at 375px. Evidence: mobile-nav-shared.png\"},\"mobile_tap_targets_are_large_enough\":{\"score\":\"yes\",\"reasoning\":\"The mobile navigation toggle is 36\u00d736px and primary buttons are approximately 34\u201340px high. Evidence: small-dashboard-shared.png\"},\"typography_resizes_across_breakpoints\":{\"score\":\"yes\",\"reasoning\":\"Dashboard/Identities headings remain legible at 24px on mobile and desktop, with readable button labels. Evidence: desktop-layout-shared.png\"},\"content_avoids_clipping_and_overflow\":{\"score\":\"yes\",\"reasoning\":\"At 375px, dashboard content and the export JSON remain within their surfaces; viewport scroll width does not exceed the viewport. Evidence: export-drawer-mobile-shared.png\"},\"chrome_adapts_to_small_screens\":{\"score\":\"yes\",\"reasoning\":\"Opening compact navigation visibly exposes Dashboard, Identities, Permissions, Audit log, Settings, and Export vault. Evidence: mobile-nav-shared.png\"},\"identities_grid_reflows\":{\"score\":\"yes\",\"reasoning\":\"Identities render as two columns at desktop and stacked full-width cards at 375px. Evidence: identities-desktop-shared.png and identities-mobile-shared.png\"},\"export_drawer_usable_on_narrow\":{\"score\":\"yes\",\"reasoning\":\"The Export vault dialog fits the 375px viewport, provides visible Close/export/import controls, and does not create page-level horizontal overflow. Evidence: export-drawer-mobile-shared.png\"},\"small_screens_avoid_horizontal_scroll\":{\"score\":\"yes\",\"reasoning\":\"At 375px, document and body scroll widths equal the viewport width; no page-level horizontal overflow is present. Evidence: matrix-mobile-clean-shared.png\"},\"stat_tiles_reflow\":{\"score\":\"yes\",\"reasoning\":\"Dashboard stat tiles stack vertically on the narrow layout without overlap. Evidence: small-dashboard-shared.png\"},\"fixed_controls_remain_accessible\":{\"score\":\"yes\",\"reasoning\":\"The compact navigation toggle remains fixed and visible at the top-left, while dashboard primary actions remain within the viewport. Evidence: small-dashboard-shared.png\"},\"matrix_scrolls_inside_panel_at_375\":{\"score\":\"yes\",\"reasoning\":\"The All-identities matrix is wider than its container but sits inside an overflow-x-auto panel; page scroll width remains 375px. Evidence: matrix-mobile-clean-shared.png\"} }",
+    "cost_usd": 0.18908060000000002
+  },
+  "technical": {
+    "score": 0.5769,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "browser_storage_stays_empty_after_exercise",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After creating an identity, toggling a permission, switching theme, exporting, and importing, localStorage and sessionStorage remain empty (in-memory good-app rule)",
+        "reasoning": "Storage reads remained empty during the exercised create/toggle/theme/export/import workflow. Evidence: reload-baseline.png"
+      },
+      {
+        "id": "2.2",
+        "name": "keys_are_real_bech32",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Public and private keys are real bech32-encoded values (npub1.../nsec1... prefixes with well-formed bodies), not placeholder or truncated strings",
+        "reasoning": "Observed well-formed npub1 and nsec1 values after revealing the private key. Evidence: keys-shared.png"
+      },
+      {
+        "id": "2.3",
+        "name": "cross_view_state_updates_without_reload",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A change made in one view (e.g. toggling a permission in Permissions) is immediately reflected in every other view that shows the same data (Dashboard's granted-app badges and Export vault JSON grants) without a reload",
+        "reasoning": "FAIL: Dashboard and Permissions reflected the toggled Snort grant, but the export preview later showed a conflicting vault state. Evidence: toggle-dashboard.png"
+      },
+      {
+        "id": "2.4",
+        "name": "webmcp_lists_identity_and_artifact_tools",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "window.webmcp_list_tools() returns a non-empty tool list including identity create/select/update/delete/toggle tools and artifact export/import/copy tools",
+        "reasoning": "webmcp_list_tools returned identity create/select/update/delete/toggle and artifact export/import/copy tools. Evidence: reload-baseline.png"
+      },
+      {
+        "id": "2.5",
+        "name": "webmcp_toggle_matches_ui",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Invoking the application-permission toggle tool via window.webmcp_invoke_tool for the active identity and one named app changes the same visible toggle state the UI control would change",
+        "reasoning": "Invoking the permission toggle granted Snort, and the visible Dashboard immediately showed Snort: Granted. Evidence: toggle-dashboard.png"
+      },
+      {
+        "id": "2.6",
+        "name": "console_clean_through_full_exercise",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "No console errors or unhandled page errors occur during load, identity creation, rename, delete, selection, permission toggling, key reveal, copy, export, import, theme switching, undo, redo, or reload",
+        "reasoning": "BLOCKED: The complete required exercise could not be completed because the confirmed key-rotation control remained unstable and unclickable; console errors were absent in the exercised portions. Evidence: reload-baseline.png"
+      },
+      {
+        "id": "2.7",
+        "name": "assets_load_without_http_errors",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "All app assets (script, stylesheet, icon) load without 4xx/5xx responses",
+        "reasoning": "Observed document, JavaScript, and stylesheet requests all returning HTTP 200 with no 4xx/5xx asset responses. Evidence: reload-baseline.png",
+        "optional": true
+      },
+      {
+        "id": "2.12",
+        "name": "keyboard_operable_with_visible_focus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Every interactive control (nav items, Select, Rename, Delete, reveal/hide, Copy npub, permission toggles, form fields, theme switch, Undo, Redo, Export vault, Import vault) is reachable and operable with the keyboard alone, and the focused control shows a visible focus indicator",
+        "reasoning": "FAIL: A focused navigation button showed a visible focus ring, but the full set of required controls was not successfully exercised end-to-end, including the unstable rotation flow. Evidence: reload-baseline.png"
+      },
+      {
+        "id": "2.13",
+        "name": "toggle_and_reveal_expose_state_to_assistive_tech",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Permission toggles expose their on/off state to assistive technology as real switch controls (e.g. role switch with a current checked state), and the reveal/hide control's accessible name reflects whether the key is currently revealed or hidden",
+        "reasoning": "Permission controls were exposed as role=switch with aria-checked values, and reveal/hide accessible names changed between states. Evidence: permissions-shared.png"
+      },
+      {
+        "id": "2.14",
+        "name": "validation_announced_via_live_region",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "The create-identity, rename, and import validation messages are exposed through a polite ARIA live region in addition to being shown visually",
+        "reasoning": "FAIL: Create and rename whitespace validation appeared in polite live regions, but import validation was not fully exercised and verified. Evidence: permissions-shared.png"
+      },
+      {
+        "id": "2.15",
+        "name": "interactive_within_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On a local cold load, the app renders and becomes interactive within 2 seconds",
+        "reasoning": "The local page rendered with meaningful controls and became interactive during the initial navigation well within two seconds. Evidence: reload-baseline.png"
+      },
+      {
+        "id": "2.16",
+        "name": "rapid_input_stays_coherent",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Rapidly toggling permissions, switching identities, and undoing/redoing in quick succession produces no hangs, dropped updates, or mixed-identity states \u2014 the dashboard, Permissions view, Audit log, and export preview all settle on one coherent vault state",
+        "reasoning": "FAIL: The WebMCP export preview and visible Dashboard diverged in active identity, identity count, and grants after rapid state changes, so one coherent vault state was not maintained. Evidence: reload-baseline.png"
+      },
+      {
+        "id": "2.18",
+        "name": "reload_returns_seeded_baseline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A page reload after session mutations returns the seeded identities, original active identity, original grants, and seeded theme with empty undo/redo stacks",
+        "reasoning": "After reload, the app returned to two seeded identities, Personal active, original grants, dark theme, and disabled empty Undo/Redo stacks. Evidence: reload-baseline.png"
+      },
+      {
+        "id": "2.20",
+        "name": "rotated_keys_are_fresh_bech32",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After a confirmed rotation, the identity's npub and nsec are well-formed bech32 values (npub1/nsec1 prefixes) distinct from its prior pair and from every other identity's keys",
+        "reasoning": "FAIL: Key rotation confirmation was reached, but the Rotate control remained unstable and could not be activated, so fresh distinct keys were not observed. Evidence: reload-baseline.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"browser_storage_stays_empty_after_exercise\":{\"score\":\"yes\",\"reasoning\":\"Storage reads remained empty during the exercised create/toggle/theme/export/import workflow. Evidence: reload-baseline.png\"},\"keys_are_real_bech32\":{\"score\":\"yes\",\"reasoning\":\"Observed well-formed npub1 and nsec1 values after revealing the private key. Evidence: keys-shared.png\"},\"cross_view_state_updates_without_reload\":{\"score\":\"no\",\"reasoning\":\"FAIL: Dashboard and Permissions reflected the toggled Snort grant, but the export preview later showed a conflicting vault state. Evidence: toggle-dashboard.png\"},\"webmcp_lists_identity_and_artifact_tools\":{\"score\":\"yes\",\"reasoning\":\"webmcp_list_tools returned identity create/select/update/delete/toggle and artifact export/import/copy tools. Evidence: reload-baseline.png\"},\"webmcp_toggle_matches_ui\":{\"score\":\"yes\",\"reasoning\":\"Invoking the permission toggle granted Snort, and the visible Dashboard immediately showed Snort: Granted. Evidence: toggle-dashboard.png\"},\"console_clean_through_full_exercise\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The complete required exercise could not be completed because the confirmed key-rotation control remained unstable and unclickable; console errors were absent in the exercised portions. Evidence: reload-baseline.png\"},\"assets_load_without_http_errors\":{\"score\":\"yes\",\"reasoning\":\"Observed document, JavaScript, and stylesheet requests all returning HTTP 200 with no 4xx/5xx asset responses. Evidence: reload-baseline.png\"},\"keyboard_operable_with_visible_focus\":{\"score\":\"no\",\"reasoning\":\"FAIL: A focused navigation button showed a visible focus ring, but the full set of required controls was not successfully exercised end-to-end, including the unstable rotation flow. Evidence: reload-baseline.png\"},\"toggle_and_reveal_expose_state_to_assistive_tech\":{\"score\":\"yes\",\"reasoning\":\"Permission controls were exposed as role=switch with aria-checked values, and reveal/hide accessible names changed between states. Evidence: permissions-shared.png\"},\"validation_announced_via_live_region\":{\"score\":\"no\",\"reasoning\":\"FAIL: Create and rename whitespace validation appeared in polite live regions, but import validation was not fully exercised and verified. Evidence: permissions-shared.png\"},\"interactive_within_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"The local page rendered with meaningful controls and became interactive during the initial navigation well within two seconds. Evidence: reload-baseline.png\"},\"rapid_input_stays_coherent\":{\"score\":\"no\",\"reasoning\":\"FAIL: The WebMCP export preview and visible Dashboard diverged in active identity, identity count, and grants after rapid state changes, so one coherent vault state was not maintained. Evidence: reload-baseline.png\"},\"reload_returns_seeded_baseline\":{\"score\":\"yes\",\"reasoning\":\"After reload, the app returned to two seeded identities, Personal active, original grants, dark theme, and disabled empty Undo/Redo stacks. Evidence: reload-baseline.png\"},\"rotated_keys_are_fresh_bech32\":{\"score\":\"no\",\"reasoning\":\"FAIL: Key rotation confirmation was reached, but the Rotate control remained unstable and could not be activated, so fresh distinct keys were not observed. Evidence: reload-baseline.png\"}}",
+    "cost_usd": 0.3257778
+  },
+  "user_flows": {
+    "score": 0.375,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "create_flow_updates_all_surfaces",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create flow: submitting a valid identity label adds a card, increments the identity-count tile by one, activates the new identity on the dashboard, and includes it in the Export vault JSON preview",
+        "reasoning": "Created an identity; the new active card appeared, the dashboard count increased, and the export preview contained the created identity. Evidence: rename_flow_updates_related_displays-shared.png"
+      },
+      {
+        "id": "6.2",
+        "name": "invalid_create_shows_inline_validation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Create flow: empty, whitespace-only, or over-40-character labels trigger inline validation naming the label field and add no identity",
+        "reasoning": "FAIL: Whitespace-only input showed inline validation, but empty and over-40-character cases were not fully exercised. Evidence: failed_import_recovers_without_reload-shared.png"
+      },
+      {
+        "id": "6.3",
+        "name": "rename_flow_updates_related_displays",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Rename flow: a valid rename updates the card label, the dashboard nickname when active, and the matching label in the Export vault JSON preview without a reload",
+        "reasoning": "FAIL: The card and export preview updated after rename, but the active dashboard nickname was not directly verified in the same completed flow. Evidence: export_rename_shared.png"
+      },
+      {
+        "id": "6.4",
+        "name": "delete_flow_updates_all_surfaces",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Delete flow: confirming delete on a non-sole identity removes the card, decreases the identity count by one, and drops the identity from the export preview",
+        "reasoning": "FAIL: Deletion removed the card and showed success, but the updated count and export preview were not both directly verified afterward. Evidence: delete_and_import_dialogs_support_cancel-shared.png"
+      },
+      {
+        "id": "6.5",
+        "name": "view_switch_retains_vault_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "View switch: navigating Dashboard, Identities, Permissions, Audit log, and Settings retains the same active identity, grants, and export-preview vault contents",
+        "reasoning": "FAIL: Navigation tools returned destinations inconsistently; the full five-view retention flow could not be verified. Evidence: view_switch_retains_vault_state-shared.png"
+      },
+      {
+        "id": "6.6",
+        "name": "search_empty_state_and_clear",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edge: a search that matches no identities shows an empty state with a clear-search control that restores every card",
+        "reasoning": "A nonmatching search showed an empty state with Clear search; clicking it restored the identity cards. Evidence: search_empty_state_and_clear-shared.png"
+      },
+      {
+        "id": "6.7",
+        "name": "search_and_sort_update_grid",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Search and sort: search narrows cards and Label A\u2013Z versus Label Z\u2013A reverses order from the live collection",
+        "reasoning": "Search narrowed the live collection and Label Z\u2013A visibly reversed the card order. Evidence: search_and_sort_update_grid-shared.png"
+      },
+      {
+        "id": "6.8",
+        "name": "sidebar_collapse_preserves_workflow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At 768px and below the sidebar collapses to a compact nav that still reaches all five destinations without losing the active identity",
+        "reasoning": "FAIL: At viewport width 768, the sidebar remained a full 224px sidebar instead of collapsing to compact navigation. Evidence: sidebar_collapse_preserves_workflow-shared.png"
+      },
+      {
+        "id": "6.9",
+        "name": "delete_and_import_dialogs_support_cancel",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Delete and import confirmations can be cancelled without mutating identities, grants, theme, or the export preview",
+        "reasoning": "Delete confirmation exposed Cancel and cancellation preserved the cards; the import drawer exposed Close without mutation. Evidence: delete_and_import_dialogs_support_cancel-shared.png"
+      },
+      {
+        "id": "6.10",
+        "name": "failed_import_recovers_without_reload",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Recovery: a rejected import shows a field-named error and leaves the vault usable without a reload",
+        "reasoning": "Invalid vault text produced the field-named error \u201cvault import: Paste valid Vault JSON.\u201d while the underlying identities view remained usable. Evidence: failed_import_recovers_without_reload-shared.png"
+      },
+      {
+        "id": "6.11",
+        "name": "export_import_round_trip_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export then import round-trip: after a create or grant toggle, importing the exported vault JSON restores dashboard, Identities, Permissions, theme, and export preview to the pre-export mutated state including version nostrpass-vault-v1",
+        "reasoning": "Export preview visibly used version nostrpass-vault-v1; after importing the mutated vault, the dashboard showed the restored active identity, dark theme state, and Iris grant. Evidence: export_import_round_trip_flow-shared.png"
+      },
+      {
+        "id": "6.12",
+        "name": "undo_after_rename_or_delete_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Rename then Undo restores the prior label on card, dashboard, and export preview; delete then Undo restores the identity with the same npub and grants",
+        "reasoning": "FAIL: Card-level rename undo and delete undo were observed, but the required dashboard/export/grant surfaces were not all verified after undo. Evidence: rotation_flow_chain-shared.png"
+      },
+      {
+        "id": "6.13",
+        "name": "rotation_flow_chain",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Rotation flow: note the active npub, Rotate keys, confirm; dashboard npub and nsec change, the vault export shows the new npub, and the top audit entry names the rotation with shortened old and new npubs; Undo restores the noted npub everywhere; Redo reapplies the rotation",
+        "reasoning": "FAIL: Rotation changed the card npub, the audit entry recorded shortened old/new npubs, and Undo/Redo worked, but dashboard nsec and export-preview restoration were not fully verified. Evidence: rotation_flow_chain-shared.png"
+      },
+      {
+        "id": "6.14",
+        "name": "bulk_grant_flow_chain",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Bulk grant flow: with at least three identities, Grant all in one application's column flips that application to granted for every identity, updates the active identity's dashboard pill and connected-app tile, and records one audit entry naming the application and count; one Undo restores every prior grant",
+        "reasoning": "FAIL: Grant all visibly checked Coracle for all identities and the audit entry recorded a count, but dashboard connected-app tile and complete Undo restoration were not both verified. Evidence: bulk_grant_flow_chain-shared.png"
+      },
+      {
+        "id": "6.15",
+        "name": "backup_round_trip_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Backup flow: Export backup for a non-active identity, Copy or Download the JSON, delete that identity, then Import backup with the same JSON; the identity card returns with identical label, npub, nsec, and grants and the identity count is restored",
+        "reasoning": "FAIL: Backup export and import controls were observed, but the complete copy/delete/import restoration workflow was not completed. Evidence: delete_and_import_dialogs_support_cancel-shared.png"
+      },
+      {
+        "id": "6.16",
+        "name": "audit_filter_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Audit filter flow: after at least one permission toggle and one rotation, filtering the Audit log to the rotation type shows only rotation entries, and returning to All restores the full list in the same order",
+        "reasoning": "FAIL: Applying the rotation filter returned success, but the visible audit list remained on All entries rather than showing only rotation entries. Evidence: audit_filter_flow-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"create_flow_updates_all_surfaces\":{\"score\":\"yes\",\"reasoning\":\"Created an identity; the new active card appeared, the dashboard count increased, and the export preview contained the created identity. Evidence: rename_flow_updates_related_displays-shared.png\"},\"invalid_create_shows_inline_validation\":{\"score\":\"no\",\"reasoning\":\"FAIL: Whitespace-only input showed inline validation, but empty and over-40-character cases were not fully exercised. Evidence: failed_import_recovers_without_reload-shared.png\"},\"rename_flow_updates_related_displays\":{\"score\":\"no\",\"reasoning\":\"FAIL: The card and export preview updated after rename, but the active dashboard nickname was not directly verified in the same completed flow. Evidence: export_rename_shared.png\"},\"delete_flow_updates_all_surfaces\":{\"score\":\"no\",\"reasoning\":\"FAIL: Deletion removed the card and showed success, but the updated count and export preview were not both directly verified afterward. Evidence: delete_and_import_dialogs_support_cancel-shared.png\"},\"view_switch_retains_vault_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: Navigation tools returned destinations inconsistently; the full five-view retention flow could not be verified. Evidence: view_switch_retains_vault_state-shared.png\"},\"search_empty_state_and_clear\":{\"score\":\"yes\",\"reasoning\":\"A nonmatching search showed an empty state with Clear search; clicking it restored the identity cards. Evidence: search_empty_state_and_clear-shared.png\"},\"search_and_sort_update_grid\":{\"score\":\"yes\",\"reasoning\":\"Search narrowed the live collection and Label Z\u2013A visibly reversed the card order. Evidence: search_and_sort_update_grid-shared.png\"},\"sidebar_collapse_preserves_workflow\":{\"score\":\"no\",\"reasoning\":\"FAIL: At viewport width 768, the sidebar remained a full 224px sidebar instead of collapsing to compact navigation. Evidence: sidebar_collapse_preserves_workflow-shared.png\"},\"delete_and_import_dialogs_support_cancel\":{\"score\":\"yes\",\"reasoning\":\"Delete confirmation exposed Cancel and cancellation preserved the cards; the import drawer exposed Close without mutation. Evidence: delete_and_import_dialogs_support_cancel-shared.png\"},\"failed_import_recovers_without_reload\":{\"score\":\"yes\",\"reasoning\":\"Invalid vault text produced the field-named error \u201cvault import: Paste valid Vault JSON.\u201d while the underlying identities view remained usable. Evidence: failed_import_recovers_without_reload-shared.png\"},\"export_import_round_trip_flow\":{\"score\":\"yes\",\"reasoning\":\"Export preview visibly used version nostrpass-vault-v1; after importing the mutated vault, the dashboard showed the restored active identity, dark theme state, and Iris grant. Evidence: export_import_round_trip_flow-shared.png\"},\"undo_after_rename_or_delete_flow\":{\"score\":\"no\",\"reasoning\":\"FAIL: Card-level rename undo and delete undo were observed, but the required dashboard/export/grant surfaces were not all verified after undo. Evidence: rotation_flow_chain-shared.png\"},\"rotation_flow_chain\":{\"score\":\"no\",\"reasoning\":\"FAIL: Rotation changed the card npub, the audit entry recorded shortened old/new npubs, and Undo/Redo worked, but dashboard nsec and export-preview restoration were not fully verified. Evidence: rotation_flow_chain-shared.png\"},\"bulk_grant_flow_chain\":{\"score\":\"no\",\"reasoning\":\"FAIL: Grant all visibly checked Coracle for all identities and the audit entry recorded a count, but dashboard connected-app tile and complete Undo restoration were not both verified. Evidence: bulk_grant_flow_chain-shared.png\"},\"backup_round_trip_flow\":{\"score\":\"no\",\"reasoning\":\"FAIL: Backup export and import controls were observed, but the complete copy/delete/import restoration workflow was not completed. Evidence: delete_and_import_dialogs_support_cancel-shared.png\"},\"audit_filter_flow\":{\"score\":\"no\",\"reasoning\":\"FAIL: Applying the rotation filter returned success, but the visible audit list remained on All entries rather than showing only rotation entries. Evidence: audit_filter_flow-shared.png\"}}",
+    "cost_usd": 0.7908322
+  },
+  "visual_design": {
+    "score": 0.8788,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "sidebar_shell_with_vault_brand",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A persistent left sidebar holds a small vault brand mark and a vertical navigation list of Dashboard, Identities, Permissions, Audit log, and Settings with the active item visually distinct",
+        "reasoning": "Persistent sidebar with key brand mark, required navigation, and distinct active item observed. Evidence: sidebar_shell_with_vault_brand-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "consistent_icon_set",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Navigation items, stat tiles, and permission rows each carry icons from one consistent icon set with no mixed icon styles across views",
+        "reasoning": "FAIL: Navigation and permission/stat surfaces do not consistently carry icons; only limited controls show icons. Evidence: sidebar_shell_with_vault_brand-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "dashboard_identity_card_anatomy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The dashboard renders a single identity card with Active identity label, nickname, Key ready badge, monospace public-key surface with Copy npub, monospace masked private-key surface with reveal/hide, and Granted/Revoked pill badges for the four apps",
+        "reasoning": "Dashboard visibly includes the active identity card, key labels/surfaces, copy/reveal controls, readiness badge, and four permission pills. Evidence: sidebar_shell_with_vault_brand-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "stat_tiles_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Below the identity card, three compact stat tiles show identity count, connected-app count, and audit-entry count",
+        "reasoning": "Three compact tiles visibly show identities, connected apps, and audit entries. Evidence: sidebar_shell_with_vault_brand-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "identities_grid_and_toolbar",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Identities view shows a responsive card grid with search, sort, Undo/Redo, and Export vault controls; the active card is highlighted with an Active badge",
+        "reasoning": "Identities view visibly provides search, sort, card grid, active badge, undo/redo, and export controls. Evidence: identities_grid_and_toolbar-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "permissions_panel_rows",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Permissions view shows a panel naming the active identity with one row per application including a switch-style toggle",
+        "reasoning": "Permissions view visibly names Personal and shows one switch row for each application. Evidence: permissions_panel_rows-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "audit_entries_show_timestamps",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Audit log entries render reverse-chronologically with timestamps",
+        "reasoning": "Audit log visibly shows an entry with a timestamp and reverse-chronological activity presentation. Evidence: export_drawer_monospace_preview-shared.png"
+      },
+      {
+        "id": "3.8",
+        "name": "export_drawer_monospace_preview",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Export vault drawer shows a monospaced JSON preview with Copy, Download, and Import vault controls",
+        "reasoning": "Export drawer visibly contains monospaced JSON preview plus Copy, Download, Export vault, and Import vault controls. Evidence: export_drawer_monospace_preview-shared.png"
+      },
+      {
+        "id": "3.9",
+        "name": "both_themes_fully_styled",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Dark and light theme surfaces are both fully styled for backgrounds, text, borders, and badges",
+        "reasoning": "Directly observed styled dark and light surfaces with backgrounds, text, borders, and badges/controls. Evidence: both_themes_fully_styled-light.png; both_themes_fully_styled-dark.png"
+      },
+      {
+        "id": "3.10",
+        "name": "monospace_for_keys_and_export",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Monospace type is used for npub/nsec surfaces and the vault JSON preview; other UI uses the default sans type",
+        "reasoning": "Computed styles show npub surfaces using a monospace family, while UI controls/headings use sans-serif; export preview is visibly monospaced. Evidence: export_drawer_monospace_preview-shared.png"
+      },
+      {
+        "id": "3.11",
+        "name": "control_state_treatments_both_themes",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, inputs, and toggles show distinct default, hover, focus (visible ring), and disabled treatments in both themes",
+        "reasoning": "Observed distinct disabled controls, hover styling, visible focus-ring classes, and styled default controls across light and dark themes. Evidence: both_themes_fully_styled-light.png; both_themes_fully_styled-dark.png"
+      },
+      {
+        "id": "3.12",
+        "name": "typography_has_clear_hierarchy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography shows a clear hierarchy: vault brand and view titles larger than card nicknames, which are larger than meta and key labels",
+        "reasoning": "Visible typography establishes larger brand/view headings, medium identity names, and smaller metadata/key labels. Evidence: sidebar_shell_with_vault_brand-shared.png"
+      },
+      {
+        "id": "3.13",
+        "name": "sidebar_collapses_on_mobile",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At 768px and below the sidebar collapses to a compact navigation control",
+        "reasoning": "FAIL: At the required 768px width the full 224px sidebar remained visible instead of collapsing; compact navigation appeared only at narrower width. Evidence: sidebar_collapses_on_mobile-shared.png"
+      },
+      {
+        "id": "3.14",
+        "name": "identities_grid_single_column_at_375",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px width the Identities grid is a single column",
+        "reasoning": "At 375px the identity cards visibly stack in a single column. Evidence: identities_grid_single_column_at_375-shared.png"
+      },
+      {
+        "id": "3.17",
+        "name": "permissions_matrix_table_anatomy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The All identities matrix renders as a table with one nickname-labelled row per identity, one column per application, switch cells at every intersection, and Grant all and Revoke all controls in the column headers; when wider than its panel it scrolls inside the panel",
+        "reasoning": "Visible matrix table has nickname rows, one column per application, switch cells at intersections, and Grant all/Revoke all header controls. Evidence: permissions_panel_rows-shared.png"
+      },
+      {
+        "id": "3.18",
+        "name": "rotate_control_on_cards_and_dashboard",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Each identity card and the dashboard carry a Rotate keys control alongside Select, Rename, and Delete, opening a confirmation dialog that names the identity",
+        "reasoning": "Identity cards and dashboard visibly expose Rotate keys alongside related controls; confirmation dialogs name Work and Personal respectively. Evidence: rotate_control_on_cards_and_dashboard-shared.png; rotate_control_on_cards_and_dashboard-dashboard.png"
+      },
+      {
+        "id": "3.19",
+        "name": "backup_surface_with_qr_placeholder",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "The Export backup surface pairs a monospaced single-identity JSON preview with Copy and Download and a square QR-style tile visibly labelled as a placeholder",
+        "reasoning": "Backup drawer visibly pairs single-identity monospaced JSON with Copy/Download and a square tile labeled Placeholder QR tile. Evidence: backup_surface_with_qr_placeholder-shared.png"
+      },
+      {
+        "id": "3.20",
+        "name": "audit_filter_control_in_toolbar",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "The Audit log toolbar carries an action-type filter control offering All plus one choice per recorded action type",
+        "reasoning": "Audit toolbar visibly contains an Action type combobox with All and action-type choices including the recorded Key rotated type. Evidence: export_drawer_monospace_preview-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"sidebar_shell_with_vault_brand\":{\"score\":\"yes\",\"reasoning\":\"Persistent sidebar with key brand mark, required navigation, and distinct active item observed. Evidence: sidebar_shell_with_vault_brand-shared.png\"},\"consistent_icon_set\":{\"score\":\"no\",\"reasoning\":\"FAIL: Navigation and permission/stat surfaces do not consistently carry icons; only limited controls show icons. Evidence: sidebar_shell_with_vault_brand-shared.png\"},\"dashboard_identity_card_anatomy\":{\"score\":\"yes\",\"reasoning\":\"Dashboard visibly includes the active identity card, key labels/surfaces, copy/reveal controls, readiness badge, and four permission pills. Evidence: sidebar_shell_with_vault_brand-shared.png\"},\"stat_tiles_present\":{\"score\":\"yes\",\"reasoning\":\"Three compact tiles visibly show identities, connected apps, and audit entries. Evidence: sidebar_shell_with_vault_brand-shared.png\"},\"identities_grid_and_toolbar\":{\"score\":\"yes\",\"reasoning\":\"Identities view visibly provides search, sort, card grid, active badge, undo/redo, and export controls. Evidence: identities_grid_and_toolbar-shared.png\"},\"permissions_panel_rows\":{\"score\":\"yes\",\"reasoning\":\"Permissions view visibly names Personal and shows one switch row for each application. Evidence: permissions_panel_rows-shared.png\"},\"audit_entries_show_timestamps\":{\"score\":\"yes\",\"reasoning\":\"Audit log visibly shows an entry with a timestamp and reverse-chronological activity presentation. Evidence: export_drawer_monospace_preview-shared.png\"},\"export_drawer_monospace_preview\":{\"score\":\"yes\",\"reasoning\":\"Export drawer visibly contains monospaced JSON preview plus Copy, Download, Export vault, and Import vault controls. Evidence: export_drawer_monospace_preview-shared.png\"},\"both_themes_fully_styled\":{\"score\":\"yes\",\"reasoning\":\"Directly observed styled dark and light surfaces with backgrounds, text, borders, and badges/controls. Evidence: both_themes_fully_styled-light.png; both_themes_fully_styled-dark.png\"},\"monospace_for_keys_and_export\":{\"score\":\"yes\",\"reasoning\":\"Computed styles show npub surfaces using a monospace family, while UI controls/headings use sans-serif; export preview is visibly monospaced. Evidence: export_drawer_monospace_preview-shared.png\"},\"control_state_treatments_both_themes\":{\"score\":\"yes\",\"reasoning\":\"Observed distinct disabled controls, hover styling, visible focus-ring classes, and styled default controls across light and dark themes. Evidence: both_themes_fully_styled-light.png; both_themes_fully_styled-dark.png\"},\"typography_has_clear_hierarchy\":{\"score\":\"yes\",\"reasoning\":\"Visible typography establishes larger brand/view headings, medium identity names, and smaller metadata/key labels. Evidence: sidebar_shell_with_vault_brand-shared.png\"},\"sidebar_collapses_on_mobile\":{\"score\":\"no\",\"reasoning\":\"FAIL: At the required 768px width the full 224px sidebar remained visible instead of collapsing; compact navigation appeared only at narrower width. Evidence: sidebar_collapses_on_mobile-shared.png\"},\"identities_grid_single_column_at_375\":{\"score\":\"yes\",\"reasoning\":\"At 375px the identity cards visibly stack in a single column. Evidence: identities_grid_single_column_at_375-shared.png\"},\"permissions_matrix_table_anatomy\":{\"score\":\"yes\",\"reasoning\":\"Visible matrix table has nickname rows, one column per application, switch cells at intersections, and Grant all/Revoke all header controls. Evidence: permissions_panel_rows-shared.png\"},\"rotate_control_on_cards_and_dashboard\":{\"score\":\"yes\",\"reasoning\":\"Identity cards and dashboard visibly expose Rotate keys alongside related controls; confirmation dialogs name Work and Personal respectively. Evidence: rotate_control_on_cards_and_dashboard-shared.png; rotate_control_on_cards_and_dashboard-dashboard.png\"},\"backup_surface_with_qr_placeholder\":{\"score\":\"yes\",\"reasoning\":\"Backup drawer visibly pairs single-identity monospaced JSON with Copy/Download and a square tile labeled Placeholder QR tile. Evidence: backup_surface_with_qr_placeholder-shared.png\"},\"audit_filter_control_in_toolbar\":{\"score\":\"yes\",\"reasoning\":\"Audit toolbar visibly contains an Action type combobox with All and action-type choices including the recorded Key rotated type. Evidence: export_drawer_monospace_preview-shared.png\"}}",
+    "cost_usd": 0.3891434
+  },
+  "writing": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "headings_use_consistent_capitalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders headings and nav labels, capitalization is consistent across Dashboard, Identities, Permissions, Audit log, and Settings",
+        "reasoning": "Dashboard, Identities, Permissions, Audit log, and Settings use consistent sentence-style capitalization. Evidence: headings_use_consistent_capitalization-shared.png"
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders actions, labels use specific verbs such as Select, Rename, Delete, Export vault, Import vault, and Copy npub rather than generic OK",
+        "reasoning": "Actions use specific labels such as Select, Rename, Delete, Export vault, Import vault, and Copy npub. Evidence: actions_use_specific_labels-shared.png"
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders validation or import errors, messages name the offending field and the fix",
+        "reasoning": "The import validation message identifies the issue and fix: \u201cvault import: Paste valid Vault JSON.\u201d Evidence: errors_name_problem_and_fix-shared.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders a no-match search empty state, copy explains that no identities match and how to clear the search",
+        "reasoning": "The no-match state says no identities match and instructs the user to clear the search field. Evidence: empty_states_explain_next_step-shared.png"
+      },
+      {
+        "id": "15.5",
+        "name": "body_copy_is_well_written",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders permission descriptions and audit lines, copy is complete phrases without lorem placeholder text",
+        "reasoning": "Permission descriptions and audit entries are complete, readable phrases without placeholder text. Evidence: body_copy_is_well_written-shared.png"
+      },
+      {
+        "id": "15.6",
+        "name": "terminology_is_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app names identities, npub, nsec, and grants, terminology stays consistent across views",
+        "reasoning": "The app consistently uses identity, npub, nsec, and grants terminology across the dashboard, identities, permissions, and export surfaces. Evidence: headings_use_consistent_capitalization-shared.png"
+      },
+      {
+        "id": "15.7",
+        "name": "success_messages_are_specific",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders toasts after create, copy, export, or import, messages are specific to the action",
+        "reasoning": "Observed specific feedback includes \u201cIdentity created successfully,\u201d \u201cVault JSON copied to clipboard,\u201d and \u201cOpening vault export drawer\u2026\u201d. Evidence: success_messages_are_specific-shared.png"
+      },
+      {
+        "id": "15.8",
+        "name": "audit_entries_name_action_and_identity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders audit entries, each names the action and the identity; rotation entries include shortened old and new npubs and bulk entries name the application and the number of identities changed.",
+        "reasoning": "Audit entries name actions and identities, including created identity entries and \u201cVault ready for Personal.\u201d No rotation or bulk entries were rendered. Evidence: audit_entries_name_action_and_identity-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"headings_use_consistent_capitalization\":{\"score\":\"yes\",\"reasoning\":\"Dashboard, Identities, Permissions, Audit log, and Settings use consistent sentence-style capitalization. Evidence: headings_use_consistent_capitalization-shared.png\"},\"actions_use_specific_labels\":{\"score\":\"yes\",\"reasoning\":\"Actions use specific labels such as Select, Rename, Delete, Export vault, Import vault, and Copy npub. Evidence: actions_use_specific_labels-shared.png\"},\"errors_name_problem_and_fix\":{\"score\":\"yes\",\"reasoning\":\"The import validation message identifies the issue and fix: \u201cvault import: Paste valid Vault JSON.\u201d Evidence: errors_name_problem_and_fix-shared.png\"},\"empty_states_explain_next_step\":{\"score\":\"yes\",\"reasoning\":\"The no-match state says no identities match and instructs the user to clear the search field. Evidence: empty_states_explain_next_step-shared.png\"},\"body_copy_is_well_written\":{\"score\":\"yes\",\"reasoning\":\"Permission descriptions and audit entries are complete, readable phrases without placeholder text. Evidence: body_copy_is_well_written-shared.png\"},\"terminology_is_consistent\":{\"score\":\"yes\",\"reasoning\":\"The app consistently uses identity, npub, nsec, and grants terminology across the dashboard, identities, permissions, and export surfaces. Evidence: headings_use_consistent_capitalization-shared.png\"},\"success_messages_are_specific\":{\"score\":\"yes\",\"reasoning\":\"Observed specific feedback includes \u201cIdentity created successfully,\u201d \u201cVault JSON copied to clipboard,\u201d and \u201cOpening vault export drawer\u2026\u201d. Evidence: success_messages_are_specific-shared.png\"},\"audit_entries_name_action_and_identity\":{\"score\":\"yes\",\"reasoning\":\"Audit entries name actions and identities, including created identity entries and \u201cVault ready for Personal.\u201d No rotation or bulk entries were rendered. Evidence: audit_entries_name_action_and_identity-shared.png\"}}",
+    "cost_usd": 0.142653
+  }
+}

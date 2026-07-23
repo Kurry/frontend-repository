@@ -1,0 +1,3015 @@
+{
+  "accessibility": {
+    "score": 0.9091,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "studio_controls_keyboard_operable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every interactive control \u2014 Preview/Components/Saved Themes/Export tabs, Phone/Tablet/Desktop toggles, Palette accordion rows, tool fields, editor actions (Copy, Undo, Redo, Save), Export Download/Copy/Import, command palette results, and saved-theme card Load/Delete \u2014 is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), each showing a visible focus indicator when focused.",
+        "reasoning": "Keyboard-focusable tabs, toggles, accordions, fields, and editor controls are rendered as semantic controls; a palette accordion toggled with Space and showed a visible focus outline. Evidence: studio-controls-keyboard-operable-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "tutorial_and_theme_form_dialogs_manage_focus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Tutorial modal, the theme create/rename forms, and the command palette use role dialog with aria-modal true, trap focus while open, close on Escape, and return focus to the control that opened them.",
+        "reasoning": "FAIL: Tutorial and command-palette dialogs exposed role=dialog and focus, but Escape did not close them; theme create/rename dialogs exposed aria-modal=\"false\". Evidence: tutorial-and-theme-form-dialogs-manage-focus-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "chrome_icons_have_accessible_names",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Meaningful header icons (GitHub, Material logo mark, and similar action icons) expose descriptive accessible names or alt text so assistive technology can identify them.",
+        "reasoning": "Header GitHub and Material logo images exposed accessible names, and action buttons had descriptive labels. Evidence: workspace-landmarks-present-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "validation_and_status_announced_live",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Validation and status messages (invalid name, duplicate name, invalid #RRGGBB field paths, fontSize/borderRadius bounds, Type\u2194palette.type cross-field errors, invalid options, save status, import field errors, WCAG Fail labels) are shown visually and announced via an aria-live polite region.",
+        "reasoning": "An empty theme form visibly showed \u201cTheme name is required,\u201d and the same message appeared in a role=status aria-live=\"polite\" region. Evidence: validation-and-status-announced-live-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "theme_name_field_explicitly_labeled",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Theme create and rename name fields use an explicit label element associated with the control.",
+        "reasoning": "Both create and rename dialogs contained a label with for matching the theme-name input id. Evidence: theme-name-field-explicitly-labeled-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "palette_accordions_expose_expanded_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Palette accordion rows expose their expanded/collapsed state to assistive technology and toggle with Enter or Space.",
+        "reasoning": "Palette rows exposed aria-expanded true/false and the secondary row toggled via Space. Evidence: workspace-landmarks-present-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "workspace_landmarks_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app exposes semantic landmarks (for example nav or tablist for the main tabs and main for the Preview/Components/Saved Themes/Export workspace) so assistive technology can navigate the studio.",
+        "reasoning": "The app exposed banner, tablist, and main landmarks for the studio workspace. Evidence: workspace-landmarks-present-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "shell_and_tool_contrast",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Dark-shell labels, tab text, tool-panel titles, and primary controls meet sufficient contrast against their near-black or indigo-accented surfaces.",
+        "reasoning": "Rendered dark-shell labels, tabs, tool titles, and primary controls were visibly legible with strong contrast. Evidence: workspace-landmarks-present-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "tabs_and_device_toggles_keyboard_semantics",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Main tabs and Phone/Tablet/Desktop toggles are keyboard-operable with button/tab semantics and a visible selected/active state exposed to assistive technology.",
+        "reasoning": "Main tabs exposed tab/aria-selected semantics, while device toggles were buttons with pressed state; controls were keyboard-focusable. Evidence: workspace-landmarks-present-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "reduced_motion_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, tab indicator slides, accordion expand/collapse, theme-card enter/exit, modal opacity/scale, and toast slide/fade are removed or reduced to instant state changes while every flow remains completable.",
+        "reasoning": "In the reduced-motion browser, prefers-reduced-motion matched true and transitions/animations were reduced to approximately 0.00001s; the tutorial dialog remained completable. Evidence: reduced-motion-respected-shared.png"
+      },
+      {
+        "id": "1.11",
+        "name": "compare_and_colorblind_state_not_color_only",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Color-blindness mode and Before/After compare expose their selected state to assistive technology with text or ARIA state, not by color alone.",
+        "reasoning": "Before/After exposed button pressed state, and Vision exposed a labeled combobox with a selected option. Evidence: workspace-landmarks-present-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"studio_controls_keyboard_operable\":{\"score\":\"yes\",\"reasoning\":\"Keyboard-focusable tabs, toggles, accordions, fields, and editor controls are rendered as semantic controls; a palette accordion toggled with Space and showed a visible focus outline. Evidence: studio-controls-keyboard-operable-shared.png\"},\"tutorial_and_theme_form_dialogs_manage_focus\":{\"score\":\"no\",\"reasoning\":\"FAIL: Tutorial and command-palette dialogs exposed role=dialog and focus, but Escape did not close them; theme create/rename dialogs exposed aria-modal=\\\"false\\\". Evidence: tutorial-and-theme-form-dialogs-manage-focus-shared.png\"},\"chrome_icons_have_accessible_names\":{\"score\":\"yes\",\"reasoning\":\"Header GitHub and Material logo images exposed accessible names, and action buttons had descriptive labels. Evidence: workspace-landmarks-present-shared.png\"},\"validation_and_status_announced_live\":{\"score\":\"yes\",\"reasoning\":\"An empty theme form visibly showed \u201cTheme name is required,\u201d and the same message appeared in a role=status aria-live=\\\"polite\\\" region. Evidence: validation-and-status-announced-live-shared.png\"},\"theme_name_field_explicitly_labeled\":{\"score\":\"yes\",\"reasoning\":\"Both create and rename dialogs contained a label with for matching the theme-name input id. Evidence: theme-name-field-explicitly-labeled-shared.png\"},\"palette_accordions_expose_expanded_state\":{\"score\":\"yes\",\"reasoning\":\"Palette rows exposed aria-expanded true/false and the secondary row toggled via Space. Evidence: workspace-landmarks-present-shared.png\"},\"workspace_landmarks_present\":{\"score\":\"yes\",\"reasoning\":\"The app exposed banner, tablist, and main landmarks for the studio workspace. Evidence: workspace-landmarks-present-shared.png\"},\"shell_and_tool_contrast\":{\"score\":\"yes\",\"reasoning\":\"Rendered dark-shell labels, tabs, tool titles, and primary controls were visibly legible with strong contrast. Evidence: workspace-landmarks-present-shared.png\"},\"tabs_and_device_toggles_keyboard_semantics\":{\"score\":\"yes\",\"reasoning\":\"Main tabs exposed tab/aria-selected semantics, while device toggles were buttons with pressed state; controls were keyboard-focusable. Evidence: workspace-landmarks-present-shared.png\"},\"reduced_motion_respected\":{\"score\":\"yes\",\"reasoning\":\"In the reduced-motion browser, prefers-reduced-motion matched true and transitions/animations were reduced to approximately 0.00001s; the tutorial dialog remained completable. Evidence: reduced-motion-respected-shared.png\"},\"compare_and_colorblind_state_not_color_only\":{\"score\":\"yes\",\"reasoning\":\"Before/After exposed button pressed state, and Vision exposed a labeled combobox with a selected option. Evidence: workspace-landmarks-present-shared.png\"}}",
+    "cost_usd": 0.408255
+  },
+  "behavioral": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_reload_resets_to_seed",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Starting from seed: create a new saved theme, edit primary main to a distinct hex, switch the main tab to Components, and toggle Type to Dark; then reload. Confirm every facet coherently resets to the seeded baseline \u2014 at least three seeded themes, default theme active, Preview tab, light type, and no unsaved edits \u2014 never a mix of surviving and reverted facets.",
+        "reasoning": "Reload reset the app to Default Theme, Preview, Light, #1976d2, three seeded cards, and no unsaved state. Evidence: multi_facet_reload_saved_themes.png; multi_facet_reload_resets_to_seed_final.png"
+      },
+      {
+        "id": "14.2",
+        "name": "light_dark_reversal_proves_live_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Type-toggle reversal proof (genre stand-in for sort reversal): toggle Type to Dark and note preview background/paper/text/divider plus editor source, toggle back to Light and note the different surfaces/source, then toggle Dark again. Confirm Dark's surfaces return identically \u2014 proving preview and editor are derived from live theme options, not two hardcoded snapshots.",
+        "reasoning": "Real Light/Dark toggles changed preview surfaces and editor source; toggling Dark again restored the same dark values. Evidence: light_dark_reversal_proves_live_state.png"
+      },
+      {
+        "id": "14.3",
+        "name": "palette_edit_derived_preview_sensitivity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Derived-view sensitivity: change primary main to a clearly different hex, then change secondary main. Confirm the framed sample site and editor ThemeOptions source change meaningfully for each input rather than redrawing an identical surface regardless of edits.",
+        "reasoning": "Changing primary to #123456 and secondary to #654321 updated their fields, source, and rendered preview colors. Evidence: palette_edit_derived_preview_sensitivity.png"
+      },
+      {
+        "id": "14.4",
+        "name": "palette_edit_echoes_in_editor_and_saved_card",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cross-view echo: edit primary main in the Palette tool; without reload confirm the editor source hex, the framed sample site's primary surfaces, the Export JSON/CSS text, and \u2014 after Save \u2014 the active Saved Themes card swatch all reflect the new color.",
+        "reasoning": "The edited palette color appeared in the editor/source and preview, export output tracked it, and saving produced a matching card swatch. Evidence: palette_edit_echoes_in_editor_and_saved_card.png; palette_edit_saved_card.png"
+      },
+      {
+        "id": "14.5",
+        "name": "create_theme_count_delta_exact",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Count-delta integrity: measure the Saved Themes card count, create one valid new theme via New Theme, and re-measure immediately \u2014 the count increases by exactly one (no off-by-one, no lagging counter).",
+        "reasoning": "The saved-theme count increased from three seeded cards to exactly four after one create operation. Evidence: create_theme_count_delta_exact.png"
+      },
+      {
+        "id": "14.6",
+        "name": "different_palette_edits_different_outcomes",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Input-dependent output: set primary main to color A and note preview/editor; then set primary main to a clearly different color B. Confirm the two outcomes differ in the ways the inputs dictate (not byte-identical preview/editor states).",
+        "reasoning": "Primary edits #123456 and #abcdef produced different source text, contrast values, and preview colors. Evidence: palette_edit_derived_preview_sensitivity.png"
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_create_and_tab_flows",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Interleaved-flow integrity: open New Theme and enter a name without submitting, switch the main tab to Components, then return and submit a different valid name to finish creating one theme; confirm exactly one new Saved Themes card appears, the tab switch persisted, and neither flow corrupted the other's state.",
+        "reasoning": "A partially filled New Theme dialog survived switching to Components and back; submitting a different valid name created exactly one card and closed the dialog. Evidence: interleaved_create_and_tab_flows.png"
+      },
+      {
+        "id": "14.8",
+        "name": "empty_then_repopulate_saved_themes",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edge-state round-trip: delete every saved theme (empty-state message visible), then create two new themes; confirm the empty state clears, both new cards appear, and editor/preview track the loaded active theme.",
+        "reasoning": "Deleting all cards visibly produced \u201cNo saved themes yet\u201d; two subsequent real form submissions cleared the empty state and produced Rep One and Rep Two cards, with Rep Two active. Evidence: empty_saved_themes_final.png; empty_then_repopulate_saved_themes.png"
+      },
+      {
+        "id": "14.9",
+        "name": "export_contains_session_hex_after_edit",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Input-dependent export artifact: set primary main to color A and note the Export JSON text, then set primary main to a clearly different color B. Confirm the two Export JSON (and CSS) previews differ by carrying each session's hex \u2014 not an identical static artifact.",
+        "reasoning": "Export JSON/CSS changed between sessions containing #224466 and #cc8844 rather than remaining static. Evidence: export_contains_session_hex_after_edit_A.png; export_contains_session_hex_after_edit_B.png"
+      },
+      {
+        "id": "14.10",
+        "name": "import_export_round_trip_restores_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Round-trip probe: edit primary main to a distinct #RRGGBB hex and shape.borderRadius to a distinct in-range value, note palette.type plus typography.fontSize in the Export JSON, copy that JSON text, change the color, radius, and fontSize away, then Import the JSON. Confirm editor fields, Type toggle, preview surfaces, and Export text all restore the imported hex, type, fontSize, and borderRadius without a reload.",
+        "reasoning": "After changing away, the real Import ThemeOptions workflow restored #0f9d58, dark type, fontSize 18, borderRadius 12, editor source, and preview; the app reported that editor, tools, preview, and export were updated. Evidence: import_export_round_trip_restores_state_final.png"
+      },
+      {
+        "id": "14.11",
+        "name": "undo_restores_export_text",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Undo artifact coherence: after a Palette edit that changes Export text, Undo restores the previous Export preview text together with tool field, editor source, and preview.",
+        "reasoning": "A real Palette edit changed source/export-derived state; Undo restored the prior #0f9d58 value and corresponding source/preview state. Evidence: undo_restores_export_text.png; undo_restores_export_text_export.png"
+      },
+      {
+        "id": "14.12",
+        "name": "export_json_fields_track_font_size_edit",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Input-dependent schema fields: change typography.fontSize within 8\u201324 and shape.borderRadius within 0\u201324 to different values and confirm the Export ThemeOptions JSON preview's fontSize and borderRadius values update to match without a reload, with palette.type still agreeing with the Type toggle.",
+        "reasoning": "Export JSON visibly reported fontSize 18 and borderRadius 12 after editing those controls, while palette type remained dark and matched the toggle. Evidence: export_json_fields_track_font_size_edit.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"multi_facet_reload_resets_to_seed\":{\"score\":\"yes\",\"reasoning\":\"Reload reset the app to Default Theme, Preview, Light, #1976d2, three seeded cards, and no unsaved state. Evidence: multi_facet_reload_saved_themes.png; multi_facet_reload_resets_to_seed_final.png\"},\"light_dark_reversal_proves_live_state\":{\"score\":\"yes\",\"reasoning\":\"Real Light/Dark toggles changed preview surfaces and editor source; toggling Dark again restored the same dark values. Evidence: light_dark_reversal_proves_live_state.png\"},\"palette_edit_derived_preview_sensitivity\":{\"score\":\"yes\",\"reasoning\":\"Changing primary to #123456 and secondary to #654321 updated their fields, source, and rendered preview colors. Evidence: palette_edit_derived_preview_sensitivity.png\"},\"palette_edit_echoes_in_editor_and_saved_card\":{\"score\":\"yes\",\"reasoning\":\"The edited palette color appeared in the editor/source and preview, export output tracked it, and saving produced a matching card swatch. Evidence: palette_edit_echoes_in_editor_and_saved_card.png; palette_edit_saved_card.png\"},\"create_theme_count_delta_exact\":{\"score\":\"yes\",\"reasoning\":\"The saved-theme count increased from three seeded cards to exactly four after one create operation. Evidence: create_theme_count_delta_exact.png\"},\"different_palette_edits_different_outcomes\":{\"score\":\"yes\",\"reasoning\":\"Primary edits #123456 and #abcdef produced different source text, contrast values, and preview colors. Evidence: palette_edit_derived_preview_sensitivity.png\"},\"interleaved_create_and_tab_flows\":{\"score\":\"yes\",\"reasoning\":\"A partially filled New Theme dialog survived switching to Components and back; submitting a different valid name created exactly one card and closed the dialog. Evidence: interleaved_create_and_tab_flows.png\"},\"empty_then_repopulate_saved_themes\":{\"score\":\"yes\",\"reasoning\":\"Deleting all cards visibly produced \u201cNo saved themes yet\u201d; two subsequent real form submissions cleared the empty state and produced Rep One and Rep Two cards, with Rep Two active. Evidence: empty_saved_themes_final.png; empty_then_repopulate_saved_themes.png\"},\"export_contains_session_hex_after_edit\":{\"score\":\"yes\",\"reasoning\":\"Export JSON/CSS changed between sessions containing #224466 and #cc8844 rather than remaining static. Evidence: export_contains_session_hex_after_edit_A.png; export_contains_session_hex_after_edit_B.png\"},\"import_export_round_trip_restores_state\":{\"score\":\"yes\",\"reasoning\":\"After changing away, the real Import ThemeOptions workflow restored #0f9d58, dark type, fontSize 18, borderRadius 12, editor source, and preview; the app reported that editor, tools, preview, and export were updated. Evidence: import_export_round_trip_restores_state_final.png\"},\"undo_restores_export_text\":{\"score\":\"yes\",\"reasoning\":\"A real Palette edit changed source/export-derived state; Undo restored the prior #0f9d58 value and corresponding source/preview state. Evidence: undo_restores_export_text.png; undo_restores_export_text_export.png\"},\"export_json_fields_track_font_size_edit\":{\"score\":\"yes\",\"reasoning\":\"Export JSON visibly reported fontSize 18 and borderRadius 12 after editing those controls, while palette type remained dark and matched the toggle. Evidence: export_json_fields_track_font_size_edit.png\"} }",
+    "cost_usd": 0.6649914
+  },
+  "core_features": {
+    "score": 0.5432,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "seeded_themes_visible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On load, Saved Themes (or the saved list after opening that tab) shows at least 3 seeded theme rows with names visible",
+        "reasoning": "Three seeded rows\u2014Default Theme, Dark Starter, and Forest\u2014were visible. Evidence: seeded_themes_visible-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "create_named_theme_visible",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After creating a saved theme named 'Harbor Indigo' with valid required fields, the text 'Harbor Indigo' is visible under Saved Themes",
+        "reasoning": "FAIL: The create form accepted typing but did not create Harbor Indigo; the seeded list remained unchanged. Evidence: create_named_theme_visible-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "create_three_count_delta",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After adding 3 new saved themes on top of the seed set, Saved Themes shows exactly 3 more rows than the initial seeded count",
+        "reasoning": "FAIL: Three create attempts did not produce three additional visible rows. Evidence: create_three_count_delta-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "load_theme_applies_options",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After loading a saved theme, the Preview surfaces and/or Monaco editor reflect that theme's options",
+        "reasoning": "Loading Dark Starter produced a visible loaded status, dark editor source, and preview state. Evidence: load_theme_applies_options-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "rename_theme_updates_name",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After editing a saved theme name to 'Evening Paper', the text 'Evening Paper' is visible and the previous name is not",
+        "reasoning": "FAIL: Rename submission did not replace Forest with Evening Paper. Evidence: rename_theme_updates_name-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "delete_theme_removes_name",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After deleting a saved theme, that theme name is no longer visible under Saved Themes",
+        "reasoning": "Confirming deletion removed Forest and showed a deletion status. Evidence: delete_theme_removes_name-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "empty_state_after_last_delete",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After deleting all saved themes, an empty state message with a way to create a new theme is visible in the Saved Themes region",
+        "reasoning": "BLOCKED: The workflow deleting every saved theme was not completed."
+      },
+      {
+        "id": "1.8",
+        "name": "empty_name_create_rejected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After submitting create with an empty required theme name, the saved themes count does not increase and a visible inline validation message names the name field",
+        "reasoning": "Opening New Theme immediately showed a named inline Theme name error and disabled Create Theme control. Evidence: create_named_theme_visible-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "light_dark_toggle_recolors",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After toggling Light/Dark palette Type, preview surfaces recolor without full page navigation",
+        "reasoning": "FAIL: The attempted palette toggle did not produce a clearly verified recolor transition."
+      },
+      {
+        "id": "1.10",
+        "name": "tab_switch_no_navigation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After switching from Preview to Saved Themes, Components, or Export, the main canvas shows the other mode without full page navigation",
+        "reasoning": "Preview, Components, Saved Themes, and Export switched in place while the URL remained unchanged. Evidence: components_gallery_search_filters-shared.png"
+      },
+      {
+        "id": "1.11",
+        "name": "device_toggle_reframes",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After switching among Phone / Tablet / Desktop device frames, the preview chrome reframes without leaving the page",
+        "reasoning": "Phone, Tablet, and Desktop controls changed the framed preview; Phone visibly reduced the frame to roughly 375px. Evidence: device_toggle_reframes-shared.png"
+      },
+      {
+        "id": "1.13",
+        "name": "palette_edit_save_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Changing the primary main color in the Palette tool recolors the sample site's primary surfaces immediately, rewrites the ThemeOptions source in the editor to the new hex, and flips the save status to unsaved; after activating Save, the status returns to saved and the active theme's card under Saved Themes shows the updated swatch without a reload",
+        "reasoning": "BLOCKED: A complete primary-color edit, save, and swatch verification flow was not completed."
+      },
+      {
+        "id": "1.17",
+        "name": "saved_theme_crud_shared_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Saved themes collection supports create, edit, and delete with list rows and derived counts updating from shared application state",
+        "reasoning": "FAIL: Delete worked, but create and rename did not update the shared visible collection."
+      },
+      {
+        "id": "1.19",
+        "name": "saved_theme_search_filter",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typing a query into the saved-themes search filters the visible cards to matching names, a query matching no theme names shows an empty result state, and clearing the query restores the full card set",
+        "reasoning": "Typing Dark showed only Dark Starter; typing zzz showed a no-match state; clearing restored the cards. Evidence: saved_theme_search_filter-shared.png"
+      },
+      {
+        "id": "1.23",
+        "name": "editor_bisync_invalid_status",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Monaco editor stays bi-synced with the tool panels: editing a Palette color rewrites the ThemeOptions source, editing valid source updates the tools and preview, and invalid source surfaces an invalid-options status instead of applying while the preview keeps rendering the last valid theme",
+        "reasoning": "BLOCKED: The full editor edit/valid edit/invalid edit bi-sync workflow was not completed."
+      },
+      {
+        "id": "1.24",
+        "name": "palette_accordion_intent_fields",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Palette tool lists expandable accordion rows including a Light/Dark Type toggle (palette.type light or dark), Background, Text, Divider, and the six intent colors (primary, secondary, error, warning, info, success), each intent expanding to main / light / dark / contrastText fields that accept six-digit hex with a leading hash and stay live with the editor",
+        "reasoning": "Palette showed Light/Dark type controls, Background/Text, all six intent rows, expandable main/light/dark/contrastText fields, and hex inputs. Evidence: palette_accordion_intent_fields-shared.png"
+      },
+      {
+        "id": "1.25",
+        "name": "fonts_add_remove_roboto_protected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Fonts tool adds a Google font by name, rejects a duplicate family with visible feedback and no duplicate list entry, removes a font, and keeps the base Roboto family protected from removal (its remove control absent or disabled)",
+        "reasoning": "Open Sans was added, duplicate addition showed visible feedback without a duplicate, and Roboto was visibly protected while Open Sans had a remove control. Evidence: fonts_add_remove_roboto_protected-after.png"
+      },
+      {
+        "id": "1.26",
+        "name": "components_gallery_search_filters",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Components panel renders a searchable gallery of roughly two dozen themed component demos that filters as the search text changes, with a filterable drawer nav that jumps to a section via same-document anchors only",
+        "reasoning": "FAIL: The gallery and anchor drawer navigation were visible, but the complete searchable filter workflow was not fully verified."
+      },
+      {
+        "id": "1.27",
+        "name": "device_widths_and_templates",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "The Preview device toggles Phone / Tablet / Desktop reframe the sample chrome to roughly 375px / 768px / full width, and the frame cycles through at least six named sample templates",
+        "reasoning": "Preview exposed Phone/Tablet/Desktop frames and six named templates: Instructions, Sign Up, Dashboard, Blog, Pricing, and Checkout. Evidence: device_toggle_reframes-shared.png",
+        "optional": true
+      },
+      {
+        "id": "1.29",
+        "name": "header_chrome_tutorial_modal",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The header shows the product title Material-UI Theme Creator, an inert version chip, and a Tutorial control that opens an in-page modal; activating the GitHub icon leaves the page where it is",
+        "reasoning": "Header showed the required title, version chip, Tutorial, and inert GitHub control; Tutorial opened an in-page Studio tour dialog. Evidence: header_chrome_tutorial_modal-shared.png"
+      },
+      {
+        "id": "1.30",
+        "name": "copy_theme_code_toast",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The editor actions row offers Editor Settings (toggling the editor color theme), Undo, Redo, and Save with status text, and activating Copy theme code shows a confirmation toast",
+        "reasoning": "Editor actions showed Settings, Copy theme code, Undo, Redo, Save, and status text; copying produced confirmation statuses. Evidence: copy_theme_code_toast-shared.png"
+      },
+      {
+        "id": "1.31",
+        "name": "undo_redo_roundtrip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After a tool edit, activating Undo restores the previous value in the tool field, the ThemeOptions editor source, and the preview together; activating Redo reapplies the edit across all three surfaces",
+        "reasoning": "After a Harmonics edit, Undo and Redo were both exercised and the controls changed state across the round trip. Evidence: undo_redo_roundtrip-shared.png"
+      },
+      {
+        "id": "1.32",
+        "name": "typography_font_size_bounded",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Typography tool sets typography.fontFamily from the loaded fonts and typography.fontSize as an integer from 8 through 24 inclusive; shape.borderRadius is a number from 0 through 24 inclusive kept live with the editor; entering a size outside 8 through 24 or a borderRadius outside 0 through 24 is rejected or clamped with visible feedback naming the fontSize or borderRadius field instead of being applied verbatim",
+        "reasoning": "Typography exposed font family, font size min/max 8\u201324, and border radius min/max 0\u201324; entering 30 produced a visible typography.fontSize validation error. Evidence: typography_font_size_bounded-after.png"
+      },
+      {
+        "id": "1.33",
+        "name": "snippet_preset_applies_toast",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Activating a Snippets preset (e.g. Dense spacing, Rounded shapes, or Button casing) visibly patches the ThemeOptions source \u2014 Rounded shapes updates shape.borderRadius within 0\u201324 \u2014 and shows a confirmation toast",
+        "reasoning": "Applying Rounded shapes produced Unsaved status and visible \u201cRounded shapes applied\u201d confirmation. Evidence: snippet_preset_applies_toast-after.png"
+      },
+      {
+        "id": "1.34",
+        "name": "create_theme_flow_chain",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Activating New Theme and submitting a valid name closes the form, increases the saved-themes card count by exactly one measured immediately around the submit, shows the new card with its swatches and meta line, and loading that new card immediately rewrites the editor source and recolors the framed sample site without a reload",
+        "reasoning": "FAIL: New Theme submission did not create a card, so the complete chain could not complete."
+      },
+      {
+        "id": "1.35",
+        "name": "light_dark_cross_panel_roundtrip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Toggling Type to Dark recolors the preview background, paper, text, and divider surfaces and updates the editor source; switching to the Components panel shows the same dark surfaces across the component demos, and toggling back to Light restores the light surfaces on every panel without a document navigation",
+        "reasoning": "FAIL: A complete dark/light cross-panel round trip was not successfully verified."
+      },
+      {
+        "id": "1.36",
+        "name": "delete_loaded_theme_clears_active",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After loading a theme and then confirming its delete, its card is removed, the card count decreases by exactly one measured around the delete, and no card is marked active until another theme is loaded",
+        "reasoning": "BLOCKED: A loaded theme was not the theme deleted in the verified delete workflow."
+      },
+      {
+        "id": "1.37",
+        "name": "reload_restores_seeded_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After creating a theme and editing palette values, a page reload returns the app to its seeded state: the seeded themes are listed, the default theme is active, and the unsaved edits and created theme from before the reload are gone",
+        "reasoning": "BLOCKED: Reload showed seeded state, but the required prior successful create and palette edit preconditions were not achieved."
+      },
+      {
+        "id": "1.38",
+        "name": "submit_disabled_until_valid_name",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "In the theme create and rename forms, the name field shows a per-field inline error naming the field when it is empty and the submit control stays disabled until the name is valid",
+        "reasoning": "FAIL: Create validation was observed, but the complete create-and-rename submit behavior was not verified."
+      },
+      {
+        "id": "1.39",
+        "name": "load_resets_dirty_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Loading a saved theme resets the save status to saved and clears the pending dirty/undo state, shown by the status text immediately after the load",
+        "reasoning": "Loading Dark Starter showed All changes saved and disabled Undo/Redo immediately afterward. Evidence: load_theme_applies_options-shared.png"
+      },
+      {
+        "id": "1.40",
+        "name": "export_panel_live_json_css",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Export panel shows live-compiled ThemeOptions JSON and CSS variables format tabs; after changing primary main to a distinct #RRGGBB hex and shape.borderRadius to a distinct value within 0\u201324, both previews update to include those values without a reload, and the JSON preview also shows palette.type, typography.fontFamily, typography.fontSize, and shape.borderRadius field names with the session's values",
+        "reasoning": "FAIL: JSON and CSS export were visible and live for borderRadius, but the required distinct primary edit was not completed."
+      },
+      {
+        "id": "1.41",
+        "name": "export_download_and_copy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export offers Download JSON, Download CSS, and Copy export: Download triggers a real file download of the visible format text, and Copy writes that exact visible text to the clipboard with a confirmation toast",
+        "reasoning": "Download CSS produced a real downloaded file, and Copy export showed Export copied confirmation. Evidence: export_download_and_copy-shared.png"
+      },
+      {
+        "id": "1.42",
+        "name": "import_themeoptions_applies",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Import ThemeOptions with a valid declared-theme JSON payload (name \u226464 chars, palette.type light|dark, intent main/light/dark/contrastText #RRGGBB channels, typography.fontFamily, typography.fontSize 8-24, shape.borderRadius 0-24, Type\u2194palette.type cross-field) replaces editor, tools, Type toggle, and preview with those options and flips save status to unsaved; a malformed or contract-invalid payload shows a visible error naming the offending field and leaves the current theme unchanged",
+        "reasoning": "FAIL: The import action returned success through setup tooling, but the visible editor, tools, toggle, and preview did not change."
+      },
+      {
+        "id": "1.43",
+        "name": "wcag_contrast_readout_live",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Each Palette intent color row shows a live WCAG contrast readout for main versus contrastText labeled Pass AA, Pass AAA, or Fail; changing either color recomputes the label immediately",
+        "reasoning": "FAIL: Contrast labels were visible, but changing both colors and verifying immediate recomputation was not completed."
+      },
+      {
+        "id": "1.44",
+        "name": "harmonics_apply_secondary",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Activating a Harmonics suggestion (Analogous, Complementary, or Triadic) derived from primary main writes a derived hex into secondary main, rewrites the editor source, and recolors the preview without a reload",
+        "reasoning": "Complementary produced a visible confirmation and rewrote secondary main to derived #f9bf90 in the editor source. Evidence: harmonics_apply_secondary-shared.png"
+      },
+      {
+        "id": "1.45",
+        "name": "color_blindness_preview_filter",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Choosing Protanopia, Deuteranopia, or Tritanopia on the Preview chrome applies an SVG filter overlay to the framed sample site only; choosing None removes the filter \u2014 both without reload",
+        "reasoning": "Selecting Protanopia applied an observed SVG filter url(#cb-protanopia) to the framed preview. Evidence: color_blindness_preview_filter-shared.png"
+      },
+      {
+        "id": "1.46",
+        "name": "before_after_compare_toggle",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Before / After compare toggles the framed sample between the current ThemeOptions and the last saved snapshot of the active theme while the editor and tool panels keep showing the current editable options",
+        "reasoning": "Before became pressed and the preview status changed to \u201cBefore \u2014 last saved snapshot.\u201d Evidence: before_after_compare_toggle-shared.png"
+      },
+      {
+        "id": "1.47",
+        "name": "theme_versions_save_restore",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Save version with a valid name adds exactly one snapshot under Versions; Restore on a selected snapshot writes those options into editor, tools, and preview and marks the theme unsaved; an empty version name adds nothing and shows an inline error naming the name field",
+        "reasoning": "Saving First draft added exactly one version; Restore produced \u201cVersion First draft restored \u2014 theme marked unsaved.\u201d Evidence: theme_versions_save_restore-after.png"
+      },
+      {
+        "id": "1.48",
+        "name": "command_palette_fuzzy_jump",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Pressing Ctrl+K (Cmd+K on macOS) opens a command palette; typing fuzzy-matches tabs, tools, saved themes, or templates; Enter on a highlighted theme result loads that theme and closes the palette; Escape returns focus",
+        "reasoning": "Ctrl+K opened the command palette with tabs/tools/themes/templates; searching dark and pressing Enter closed it and showed Theme Dark Starter loaded. Evidence: command_palette_fuzzy_jump-after.png"
+      },
+      {
+        "id": "1.49",
+        "name": "theme_name_uniqueness_enforced",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Submitting New Theme or rename with a name that already exists on another saved theme (after trim), or a name longer than 64 characters, leaves the card count unchanged and shows an inline validation message naming the name field; a successful create writes a would-be request body whose palette.type matches the current Type toggle",
+        "reasoning": "BLOCKED: Duplicate/overlong create and rename submissions were not successfully exercised."
+      },
+      {
+        "id": "1.50",
+        "name": "intent_hex_format_validated",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Entering a non-#RRGGBB value into an intent color channel such as primary.main, or a shape.borderRadius outside 0 through 24, shows an inline error naming that field path and does not update the editor source, preview, or Export text",
+        "reasoning": "BLOCKED: Invalid intent hex input was not exercised; only typography range validation was observed."
+      },
+      {
+        "id": "1.51",
+        "name": "export_json_enumerates_themeoptions_fields",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The ThemeOptions JSON export preview enumerates name, palette.type (light or dark), each of primary/secondary/error/warning/info/success with main/light/dark/contrastText #RRGGBB values, typography.fontFamily, typography.fontSize, and shape.borderRadius as visible field names and values, with palette.type agreeing with the Type toggle (cross-field)",
+        "reasoning": "JSON export visibly enumerated name, palette.type, all six intent groups and channels, typography fields, and shape.borderRadius. Evidence: export_panel_live_json_css-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"seeded_themes_visible\":{\"score\":\"yes\",\"reasoning\":\"Three seeded rows\u2014Default Theme, Dark Starter, and Forest\u2014were visible. Evidence: seeded_themes_visible-shared.png\"},\"create_named_theme_visible\":{\"score\":\"no\",\"reasoning\":\"FAIL: The create form accepted typing but did not create Harbor Indigo; the seeded list remained unchanged. Evidence: create_named_theme_visible-shared.png\"},\"create_three_count_delta\":{\"score\":\"no\",\"reasoning\":\"FAIL: Three create attempts did not produce three additional visible rows. Evidence: create_three_count_delta-shared.png\"},\"load_theme_applies_options\":{\"score\":\"yes\",\"reasoning\":\"Loading Dark Starter produced a visible loaded status, dark editor source, and preview state. Evidence: load_theme_applies_options-shared.png\"},\"rename_theme_updates_name\":{\"score\":\"no\",\"reasoning\":\"FAIL: Rename submission did not replace Forest with Evening Paper. Evidence: rename_theme_updates_name-shared.png\"},\"delete_theme_removes_name\":{\"score\":\"yes\",\"reasoning\":\"Confirming deletion removed Forest and showed a deletion status. Evidence: delete_theme_removes_name-shared.png\"},\"empty_state_after_last_delete\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The workflow deleting every saved theme was not completed.\"},\"empty_name_create_rejected\":{\"score\":\"yes\",\"reasoning\":\"Opening New Theme immediately showed a named inline Theme name error and disabled Create Theme control. Evidence: create_named_theme_visible-shared.png\"},\"light_dark_toggle_recolors\":{\"score\":\"no\",\"reasoning\":\"FAIL: The attempted palette toggle did not produce a clearly verified recolor transition.\"},\"tab_switch_no_navigation\":{\"score\":\"yes\",\"reasoning\":\"Preview, Components, Saved Themes, and Export switched in place while the URL remained unchanged. Evidence: components_gallery_search_filters-shared.png\"},\"device_toggle_reframes\":{\"score\":\"yes\",\"reasoning\":\"Phone, Tablet, and Desktop controls changed the framed preview; Phone visibly reduced the frame to roughly 375px. Evidence: device_toggle_reframes-shared.png\"},\"palette_edit_save_flow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A complete primary-color edit, save, and swatch verification flow was not completed.\"},\"saved_theme_crud_shared_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: Delete worked, but create and rename did not update the shared visible collection.\"},\"saved_theme_search_filter\":{\"score\":\"yes\",\"reasoning\":\"Typing Dark showed only Dark Starter; typing zzz showed a no-match state; clearing restored the cards. Evidence: saved_theme_search_filter-shared.png\"},\"editor_bisync_invalid_status\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The full editor edit/valid edit/invalid edit bi-sync workflow was not completed.\"},\"palette_accordion_intent_fields\":{\"score\":\"yes\",\"reasoning\":\"Palette showed Light/Dark type controls, Background/Text, all six intent rows, expandable main/light/dark/contrastText fields, and hex inputs. Evidence: palette_accordion_intent_fields-shared.png\"},\"fonts_add_remove_roboto_protected\":{\"score\":\"yes\",\"reasoning\":\"Open Sans was added, duplicate addition showed visible feedback without a duplicate, and Roboto was visibly protected while Open Sans had a remove control. Evidence: fonts_add_remove_roboto_protected-after.png\"},\"components_gallery_search_filters\":{\"score\":\"no\",\"reasoning\":\"FAIL: The gallery and anchor drawer navigation were visible, but the complete searchable filter workflow was not fully verified.\"},\"device_widths_and_templates\":{\"score\":\"yes\",\"reasoning\":\"Preview exposed Phone/Tablet/Desktop frames and six named templates: Instructions, Sign Up, Dashboard, Blog, Pricing, and Checkout. Evidence: device_toggle_reframes-shared.png\"},\"header_chrome_tutorial_modal\":{\"score\":\"yes\",\"reasoning\":\"Header showed the required title, version chip, Tutorial, and inert GitHub control; Tutorial opened an in-page Studio tour dialog. Evidence: header_chrome_tutorial_modal-shared.png\"},\"copy_theme_code_toast\":{\"score\":\"yes\",\"reasoning\":\"Editor actions showed Settings, Copy theme code, Undo, Redo, Save, and status text; copying produced confirmation statuses. Evidence: copy_theme_code_toast-shared.png\"},\"undo_redo_roundtrip\":{\"score\":\"yes\",\"reasoning\":\"After a Harmonics edit, Undo and Redo were both exercised and the controls changed state across the round trip. Evidence: undo_redo_roundtrip-shared.png\"},\"typography_font_size_bounded\":{\"score\":\"yes\",\"reasoning\":\"Typography exposed font family, font size min/max 8\u201324, and border radius min/max 0\u201324; entering 30 produced a visible typography.fontSize validation error. Evidence: typography_font_size_bounded-after.png\"},\"snippet_preset_applies_toast\":{\"score\":\"yes\",\"reasoning\":\"Applying Rounded shapes produced Unsaved status and visible \u201cRounded shapes applied\u201d confirmation. Evidence: snippet_preset_applies_toast-after.png\"},\"create_theme_flow_chain\":{\"score\":\"no\",\"reasoning\":\"FAIL: New Theme submission did not create a card, so the complete chain could not complete.\"},\"light_dark_cross_panel_roundtrip\":{\"score\":\"no\",\"reasoning\":\"FAIL: A complete dark/light cross-panel round trip was not successfully verified.\"},\"delete_loaded_theme_clears_active\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A loaded theme was not the theme deleted in the verified delete workflow.\"},\"reload_restores_seeded_state\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Reload showed seeded state, but the required prior successful create and palette edit preconditions were not achieved.\"},\"submit_disabled_until_valid_name\":{\"score\":\"no\",\"reasoning\":\"FAIL: Create validation was observed, but the complete create-and-rename submit behavior was not verified.\"},\"load_resets_dirty_state\":{\"score\":\"yes\",\"reasoning\":\"Loading Dark Starter showed All changes saved and disabled Undo/Redo immediately afterward. Evidence: load_theme_applies_options-shared.png\"},\"export_panel_live_json_css\":{\"score\":\"no\",\"reasoning\":\"FAIL: JSON and CSS export were visible and live for borderRadius, but the required distinct primary edit was not completed.\"},\"export_download_and_copy\":{\"score\":\"yes\",\"reasoning\":\"Download CSS produced a real downloaded file, and Copy export showed Export copied confirmation. Evidence: export_download_and_copy-shared.png\"},\"import_themeoptions_applies\":{\"score\":\"no\",\"reasoning\":\"FAIL: The import action returned success through setup tooling, but the visible editor, tools, toggle, and preview did not change.\"},\"wcag_contrast_readout_live\":{\"score\":\"no\",\"reasoning\":\"FAIL: Contrast labels were visible, but changing both colors and verifying immediate recomputation was not completed.\"},\"harmonics_apply_secondary\":{\"score\":\"yes\",\"reasoning\":\"Complementary produced a visible confirmation and rewrote secondary main to derived #f9bf90 in the editor source. Evidence: harmonics_apply_secondary-shared.png\"},\"color_blindness_preview_filter\":{\"score\":\"yes\",\"reasoning\":\"Selecting Protanopia applied an observed SVG filter url(#cb-protanopia) to the framed preview. Evidence: color_blindness_preview_filter-shared.png\"},\"before_after_compare_toggle\":{\"score\":\"yes\",\"reasoning\":\"Before became pressed and the preview status changed to \u201cBefore \u2014 last saved snapshot.\u201d Evidence: before_after_compare_toggle-shared.png\"},\"theme_versions_save_restore\":{\"score\":\"yes\",\"reasoning\":\"Saving First draft added exactly one version; Restore produced \u201cVersion First draft restored \u2014 theme marked unsaved.\u201d Evidence: theme_versions_save_restore-after.png\"},\"command_palette_fuzzy_jump\":{\"score\":\"yes\",\"reasoning\":\"Ctrl+K opened the command palette with tabs/tools/themes/templates; searching dark and pressing Enter closed it and showed Theme Dark Starter loaded. Evidence: command_palette_fuzzy_jump-after.png\"},\"theme_name_uniqueness_enforced\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Duplicate/overlong create and rename submissions were not successfully exercised.\"},\"intent_hex_format_validated\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Invalid intent hex input was not exercised; only typography range validation was observed.\"},\"export_json_enumerates_themeoptions_fields\":{\"score\":\"yes\",\"reasoning\":\"JSON export visibly enumerated name, palette.type, all six intent groups and channels, typography fields, and shape.borderRadius. Evidence: export_panel_live_json_css-shared.png\"}}",
+    "cost_usd": 0.8431498
+  },
+  "design_fidelity": {
+    "score": 0.8182,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "spacing_matches_studio_tool_density",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 1440px, spacing among the header lockup, four-tab bar, Preview device frame, and editor/tool stack follows a consistent dense-studio scale matching the reference screenshots \u2014 no arbitrary one-off gaps that break the composition.",
+        "reasoning": "Desktop screenshot shows a dense, consistent studio scale across header, four-tab bar, preview frame, and right-side editor/tool stack. Evidence: desktop-composition-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "typography_matches_roboto_material_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Studio chrome and tool labels use Roboto (or the bundled Material typeface) consistent with the reference; sample-site and component-demo text follows the active theme options \u2014 not a default system UI stack for chrome.",
+        "reasoning": "Computed body font is Roboto, Helvetica, Arial, sans-serif, and the rendered chrome visibly uses the expected Material-style typography. Evidence: desktop-composition-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "desktop_composition_matches_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 1440px the layout matches the reference composition within a small tolerance: dark header with Material-UI Theme Creator lockup above the main tab bar (Preview / Components / Saved Themes, plus Export as instructed); Preview shows device frame beside editor/tool stack \u2014 a full-viewport tool studio, not a marketing landing.",
+        "reasoning": "At 1440px, the dark studio header and four tabs are present, with the preview area beside the editor/tool stack. Evidence: desktop-composition-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "specified_state_changes_have_motion",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "State changes the spec calls out \u2014 main-tab indicator slide, Palette accordion expand/collapse, new/deleted saved-theme card enter/exit, Tutorial and theme-form modal opacity/scale (~200\u2013300ms), and action toasts \u2014 show the specified transitions rather than hard cuts (verified via real UI controls).",
+        "reasoning": "FAIL: Real tab and Tutorial interactions exposed transition durations, but the complete set of specified accordion, saved-card enter/exit, modal transient, and toast transitions was not directly verified end-to-end. Evidence: tutorial-modal-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "responsive_behavior_matches_reference_patterns",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 1280px+ the Preview panel keeps device frame and editor/tool stack side by side as in the reference; below ~1024px those regions stack vertically while tools stay reachable, matching the instructed responsive pattern.",
+        "reasoning": "At 1440px preview and tools are side by side; at 900px they stack vertically while remaining reachable. Evidence: desktop-composition-shared.png, responsive-900-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "studio_controls_styled_not_browser_default",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Tabs, accordions, dialogs, selects, buttons, and toasts use Material-studio treatments from the spec rather than unstyled browser defaults.",
+        "reasoning": "Tabs, segmented controls, editor actions, accordions, dialogs, and export controls use styled dark Material-studio treatments rather than browser defaults. Evidence: desktop-composition-shared.png, export-surface-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "clear_hierarchy_header_tabs_tools",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography hierarchy clearly distinguishes the product title Material-UI Theme Creator, the four-tab bar labels, denser tool-panel titles (Palette / Fonts / Typography / Snippets), and preview/sample copy.",
+        "reasoning": "The product title, tab labels, tool titles, and preview/sample content have clearly differentiated visual hierarchy. Evidence: desktop-composition-shared.png"
+      },
+      {
+        "id": "3.8",
+        "name": "component_states_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, inputs, and accordion controls show distinct default, hover, focus (visible ring), and disabled treatments as specified.",
+        "reasoning": "Observed hover wash/color change on the Save button, visible keyboard focus ring on Export, and distinct disabled styling on Redo. Evidence: desktop-composition-shared.png"
+      },
+      {
+        "id": "3.9",
+        "name": "surfaces_recolor_from_live_theme_options",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sample sites and component demos recolor from the live ThemeOptions (via CSS variables or equivalent live tokens): palette/typography edits are reflected across every preview surface as in the reference.",
+        "reasoning": "After a live palette update through the app action surface, the preview recolored to purple/orange and the generated theme text reflected the new values. Evidence: live-theme-preview-shared.png"
+      },
+      {
+        "id": "3.10",
+        "name": "microinteraction_timing_matches_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Hover brightness/wash on buttons, accordion summaries, and saved-theme rows; modal opacity/scale (~200\u2013300ms); and toast slide/fade follow the specified microinteraction timing when driven through real controls.",
+        "reasoning": "FAIL: Hover wash and modal transition durations were observed, but toast slide/fade timing and every required microinteraction were not directly verified. Evidence: tutorial-modal-shared.png"
+      },
+      {
+        "id": "3.11",
+        "name": "export_surface_present_in_studio_chrome",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 1440px the Export tab is present in the main tab bar and opens a dense artifact preview surface consistent with the instructed studio chrome (text wins over screenshots where they conflict).",
+        "reasoning": "At 1440px the Export tab is present and opens a dense JSON/CSS artifact workspace with import and copy/download actions. Evidence: export-surface-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"spacing_matches_studio_tool_density\":{\"score\":\"yes\",\"reasoning\":\"Desktop screenshot shows a dense, consistent studio scale across header, four-tab bar, preview frame, and right-side editor/tool stack. Evidence: desktop-composition-shared.png\"},\"typography_matches_roboto_material_spec\":{\"score\":\"yes\",\"reasoning\":\"Computed body font is Roboto, Helvetica, Arial, sans-serif, and the rendered chrome visibly uses the expected Material-style typography. Evidence: desktop-composition-shared.png\"},\"desktop_composition_matches_reference\":{\"score\":\"yes\",\"reasoning\":\"At 1440px, the dark studio header and four tabs are present, with the preview area beside the editor/tool stack. Evidence: desktop-composition-shared.png\"},\"specified_state_changes_have_motion\":{\"score\":\"no\",\"reasoning\":\"FAIL: Real tab and Tutorial interactions exposed transition durations, but the complete set of specified accordion, saved-card enter/exit, modal transient, and toast transitions was not directly verified end-to-end. Evidence: tutorial-modal-shared.png\"},\"responsive_behavior_matches_reference_patterns\":{\"score\":\"yes\",\"reasoning\":\"At 1440px preview and tools are side by side; at 900px they stack vertically while remaining reachable. Evidence: desktop-composition-shared.png, responsive-900-shared.png\"},\"studio_controls_styled_not_browser_default\":{\"score\":\"yes\",\"reasoning\":\"Tabs, segmented controls, editor actions, accordions, dialogs, and export controls use styled dark Material-studio treatments rather than browser defaults. Evidence: desktop-composition-shared.png, export-surface-shared.png\"},\"clear_hierarchy_header_tabs_tools\":{\"score\":\"yes\",\"reasoning\":\"The product title, tab labels, tool titles, and preview/sample content have clearly differentiated visual hierarchy. Evidence: desktop-composition-shared.png\"},\"component_states_match_spec\":{\"score\":\"yes\",\"reasoning\":\"Observed hover wash/color change on the Save button, visible keyboard focus ring on Export, and distinct disabled styling on Redo. Evidence: desktop-composition-shared.png\"},\"surfaces_recolor_from_live_theme_options\":{\"score\":\"yes\",\"reasoning\":\"After a live palette update through the app action surface, the preview recolored to purple/orange and the generated theme text reflected the new values. Evidence: live-theme-preview-shared.png\"},\"microinteraction_timing_matches_spec\":{\"score\":\"no\",\"reasoning\":\"FAIL: Hover wash and modal transition durations were observed, but toast slide/fade timing and every required microinteraction were not directly verified. Evidence: tutorial-modal-shared.png\"},\"export_surface_present_in_studio_chrome\":{\"score\":\"yes\",\"reasoning\":\"At 1440px the Export tab is present and opens a dense JSON/CSS artifact workspace with import and copy/download actions. Evidence: export-surface-shared.png\"}}",
+    "cost_usd": 0.2585498
+  },
+  "edge_cases": {
+    "score": 0.7778,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "empty_saved_themes_after_delete_all",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After deleting every saved theme, Saved Themes shows an empty state with a message and a way to create a new theme.",
+        "reasoning": "All saved cards were deleted; Saved Themes visibly showed \u201cNo saved themes yet\u201d and a New Theme button. Evidence: empty-saved-themes-final.png"
+      },
+      {
+        "id": "4.2",
+        "name": "empty_name_inline_validation_blocks_submit",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting the theme create or rename form with an empty name shows a visible inline validation message naming the name field, the submit control stays disabled or rejects the submit, and the saved-themes card count is unchanged.",
+        "reasoning": "Empty theme creation and rename inputs showed visible \u201cTheme name is required\u201d validation; create/rename controls were disabled and the card collection was unchanged. Evidence: empty-theme-validation.png"
+      },
+      {
+        "id": "4.3",
+        "name": "validation_names_field_and_fix",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Theme-name validation copy names the name field and the fix rather than only saying 'Invalid'.",
+        "reasoning": "Validation explicitly named Theme name and gave the corrective action. Evidence: empty-theme-validation.png"
+      },
+      {
+        "id": "4.4",
+        "name": "copy_save_snippet_toasts_confirm",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Copy theme code, Save, and applying a Snippets preset each show a visible confirmation toast that slides in, remains readable, and auto-dismisses.",
+        "reasoning": "FAIL: Copy, Save, and Snippets each showed confirmations, but the required slide-in and auto-dismiss behavior was not fully observed for all three. Evidence: copy-toast.png"
+      },
+      {
+        "id": "4.5",
+        "name": "invalid_source_keeps_last_valid_preview",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Editing the theme source into invalid options surfaces an invalid-options status, applies nothing, and the preview keeps rendering the last valid theme.",
+        "reasoning": "Editing the source to an invalid color produced \u201cInvalid ThemeOptions \u2014 nothing applied, preview keeps the last valid theme,\u201d while the visible editor/preview remained on the prior valid theme. Evidence: invalid-source.png"
+      },
+      {
+        "id": "4.6",
+        "name": "roboto_protected_from_removal",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The base Roboto family cannot be removed: its remove control is absent or disabled, and the fonts list always contains Roboto.",
+        "reasoning": "Fonts visibly contained Roboto with a lock/protected label and no remove control. Evidence: duplicate-font.png"
+      },
+      {
+        "id": "4.7",
+        "name": "duplicate_font_rejected_with_feedback",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Adding a font whose family name is already loaded is rejected with visible feedback and does not add a duplicate entry to the fonts list.",
+        "reasoning": "Adding Roboto again showed visible duplicate feedback and the list still contained only one Roboto entry. Evidence: duplicate-font.png"
+      },
+      {
+        "id": "4.8",
+        "name": "theme_controls_use_semantic_tags",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Theme create/rename fields, New Theme, Load/Delete on cards, Copy/Undo/Redo/Save, and Palette accordion controls use semantic button/input/label elements rather than unlabeled decorative wrappers.",
+        "reasoning": "Observed theme controls were exposed as semantic buttons, tabs, textboxes, radios, comboboxes, and labeled fields rather than decorative wrappers. Evidence: semantics-shared.png; empty-theme-validation.png"
+      },
+      {
+        "id": "4.9",
+        "name": "tutorial_and_theme_form_close_paths",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Tutorial modal and theme create/rename overlays close via an explicit close control and Escape, returning to the workspace without a reload.",
+        "reasoning": "FAIL: Tutorial closed with its explicit close button, but pressing Escape left the Tutorial dialog open; the required close-path set was not satisfied. Evidence: tutorial-open.png"
+      },
+      {
+        "id": "4.10",
+        "name": "font_size_out_of_range_rejected_or_clamped",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A typography.fontSize outside 8 through 24, or a shape.borderRadius outside 0 through 24, is rejected or clamped with visible feedback naming the fontSize or borderRadius field instead of being applied verbatim.",
+        "reasoning": "Entering 30 for Base Font Size produced visible validation naming typography.fontSize and did not apply the value. Evidence: font-size-range.png"
+      },
+      {
+        "id": "4.11",
+        "name": "malformed_import_keeps_theme",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Importing ThemeOptions JSON that omits a required intent channel, sets palette.type outside light|dark, uses fontSize outside 8 through 24, uses borderRadius outside 0 through 24, or breaks the Type\u2194palette.type cross-field rule shows a visible error naming the offending field, changes no editor/preview/Export state, and leaves the saved-themes card count unchanged.",
+        "reasoning": "FAIL: A malformed import was rejected with a palette.primary error, but the visible saved-theme collection changed and gained Ocean Studio, so the required unchanged state was not preserved. Evidence: empty-saved-themes.png"
+      },
+      {
+        "id": "4.12",
+        "name": "empty_version_name_rejected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Saving a version with an empty name adds no snapshot, leaves the Versions count unchanged, and shows an inline validation message naming the name field.",
+        "reasoning": "Saving with an empty Version name showed inline \u201cVersion name is required\u201d validation and the page still showed no versions saved. Evidence: empty-version-error.png"
+      },
+      {
+        "id": "4.13",
+        "name": "double_copy_export_single_confirmation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Double-activating Copy export or Download produces exactly one clipboard write or download with a single confirmation \u2014 not a stuck or duplicated toast storm.",
+        "reasoning": "Double-activating Copy export produced one visible \u201cExport copied\u201d confirmation status rather than duplicated confirmations. Evidence: double-copy-export.png"
+      },
+      {
+        "id": "4.14",
+        "name": "duplicate_theme_name_rejected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting create or rename with a name that already exists on another saved theme (after trim) leaves the collection unchanged and shows an inline validation message naming the name field.",
+        "reasoning": "Renaming to the existing Default Theme name showed \u201cTheme name must be unique\u201d and kept the collection unchanged. Evidence: empty-rename-validation.png"
+      },
+      {
+        "id": "4.15",
+        "name": "non_hex_intent_channel_rejected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Entering a non-#RRGGBB value into an intent color channel (e.g. primary.main), or a shape.borderRadius outside 0 through 24, shows an inline error naming that field path and does not update editor source, preview, or Export text.",
+        "reasoning": "Entering \u201coops\u201d into primary.main showed the inline field-specific error \u201cpalette.primary.main must be a #RRGGBB color\u201d; the displayed valid palette value remained unchanged. Evidence: nonhex-intent.png"
+      },
+      {
+        "id": "4.16",
+        "name": "unparseable_import_payload_rejected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Importing unparseable JSON (not an object) shows a visible payload error and leaves editor, tools, preview, save status, and Export text unchanged.",
+        "reasoning": "Importing \u201cnot json\u201d showed a visible JSON parse error and left the export artifact unchanged. Evidence: unparseable-import.png"
+      },
+      {
+        "id": "4.17",
+        "name": "command_palette_empty_query_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A command palette query that matches no tabs, tools, themes, templates, or gallery sections shows an empty result state; pressing Escape closes the palette and returns focus to the control that opened it.",
+        "reasoning": "FAIL: An unmatched query showed the required empty state, but Escape left focus on the hidden Search commands field instead of returning focus to the opening Commands control. Evidence: command-empty.png"
+      },
+      {
+        "id": "4.18",
+        "name": "color_blindness_modes_nondestructive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Color-blindness modes never permanently alter theme options: after choosing Protanopia and then None, the framed sample renders the same unfiltered colors that match the live editor options, and the editor source and Export text carry no filter-induced changes.",
+        "reasoning": "Protanopia was selected and then reset to None; the live Vision control returned to None and the editor\u2019s displayed theme values remained unchanged. Evidence: colorblind-none.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"empty_saved_themes_after_delete_all\":{\"score\":\"yes\",\"reasoning\":\"All saved cards were deleted; Saved Themes visibly showed \u201cNo saved themes yet\u201d and a New Theme button. Evidence: empty-saved-themes-final.png\"},\"empty_name_inline_validation_blocks_submit\":{\"score\":\"yes\",\"reasoning\":\"Empty theme creation and rename inputs showed visible \u201cTheme name is required\u201d validation; create/rename controls were disabled and the card collection was unchanged. Evidence: empty-theme-validation.png\"},\"validation_names_field_and_fix\":{\"score\":\"yes\",\"reasoning\":\"Validation explicitly named Theme name and gave the corrective action. Evidence: empty-theme-validation.png\"},\"copy_save_snippet_toasts_confirm\":{\"score\":\"no\",\"reasoning\":\"FAIL: Copy, Save, and Snippets each showed confirmations, but the required slide-in and auto-dismiss behavior was not fully observed for all three. Evidence: copy-toast.png\"},\"invalid_source_keeps_last_valid_preview\":{\"score\":\"yes\",\"reasoning\":\"Editing the source to an invalid color produced \u201cInvalid ThemeOptions \u2014 nothing applied, preview keeps the last valid theme,\u201d while the visible editor/preview remained on the prior valid theme. Evidence: invalid-source.png\"},\"roboto_protected_from_removal\":{\"score\":\"yes\",\"reasoning\":\"Fonts visibly contained Roboto with a lock/protected label and no remove control. Evidence: duplicate-font.png\"},\"duplicate_font_rejected_with_feedback\":{\"score\":\"yes\",\"reasoning\":\"Adding Roboto again showed visible duplicate feedback and the list still contained only one Roboto entry. Evidence: duplicate-font.png\"},\"theme_controls_use_semantic_tags\":{\"score\":\"yes\",\"reasoning\":\"Observed theme controls were exposed as semantic buttons, tabs, textboxes, radios, comboboxes, and labeled fields rather than decorative wrappers. Evidence: semantics-shared.png; empty-theme-validation.png\"},\"tutorial_and_theme_form_close_paths\":{\"score\":\"no\",\"reasoning\":\"FAIL: Tutorial closed with its explicit close button, but pressing Escape left the Tutorial dialog open; the required close-path set was not satisfied. Evidence: tutorial-open.png\"},\"font_size_out_of_range_rejected_or_clamped\":{\"score\":\"yes\",\"reasoning\":\"Entering 30 for Base Font Size produced visible validation naming typography.fontSize and did not apply the value. Evidence: font-size-range.png\"},\"malformed_import_keeps_theme\":{\"score\":\"no\",\"reasoning\":\"FAIL: A malformed import was rejected with a palette.primary error, but the visible saved-theme collection changed and gained Ocean Studio, so the required unchanged state was not preserved. Evidence: empty-saved-themes.png\"},\"empty_version_name_rejected\":{\"score\":\"yes\",\"reasoning\":\"Saving with an empty Version name showed inline \u201cVersion name is required\u201d validation and the page still showed no versions saved. Evidence: empty-version-error.png\"},\"double_copy_export_single_confirmation\":{\"score\":\"yes\",\"reasoning\":\"Double-activating Copy export produced one visible \u201cExport copied\u201d confirmation status rather than duplicated confirmations. Evidence: double-copy-export.png\"},\"duplicate_theme_name_rejected\":{\"score\":\"yes\",\"reasoning\":\"Renaming to the existing Default Theme name showed \u201cTheme name must be unique\u201d and kept the collection unchanged. Evidence: empty-rename-validation.png\"},\"non_hex_intent_channel_rejected\":{\"score\":\"yes\",\"reasoning\":\"Entering \u201coops\u201d into primary.main showed the inline field-specific error \u201cpalette.primary.main must be a #RRGGBB color\u201d; the displayed valid palette value remained unchanged. Evidence: nonhex-intent.png\"},\"unparseable_import_payload_rejected\":{\"score\":\"yes\",\"reasoning\":\"Importing \u201cnot json\u201d showed a visible JSON parse error and left the export artifact unchanged. Evidence: unparseable-import.png\"},\"command_palette_empty_query_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: An unmatched query showed the required empty state, but Escape left focus on the hidden Search commands field instead of returning focus to the opening Commands control. Evidence: command-empty.png\"},\"color_blindness_modes_nondestructive\":{\"score\":\"yes\",\"reasoning\":\"Protanopia was selected and then reset to None; the live Vision control returned to None and the editor\u2019s displayed theme values remained unchanged. Evidence: colorblind-none.png\"}}",
+    "cost_usd": 0.6800998
+  },
+  "innovation": {
+    "score": 0.7692,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "palette_swatch_delight_beyond_minimum",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Beyond required live color fields, Palette intent rows include an extra delightful microinteraction on change (for example a richer swatch pulse or coordinated preview flash) that remains browser-observable (bonus).",
+        "reasoning": "Observed a real hex edit trigger a swatch-pulse animation and WCAG settle animations. Evidence: palette_swatch_delight_beyond_minimum-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.2",
+        "name": "sample_template_storytelling_beyond_cycle",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "The device-framed sample site offers an advanced transition or storytelling beat beyond basic template swaps \u2014 for example coordinated section staggers when switching templates \u2014 verified through real template controls (bonus).",
+        "reasoning": "FAIL: Template switching was exercised; only a basic fade-in/content swap was observed, not a coordinated storytelling transition. Evidence: sample_template_storytelling_beyond_cycle-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.3",
+        "name": "tutorial_guided_first_run_polish",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "The Tutorial modal includes a brief guided first-run or coachmark sequence that introduces Preview tools, Palette, Saved Themes, and Export without blocking the studio (bonus beyond a single static help dialog).",
+        "reasoning": "Observed a four-step guided tour covering Preview tools, Palette, Saved Themes, and Export, completed through Next controls. Evidence: tutorial_guided_steps.png",
+        "optional": true
+      },
+      {
+        "id": "11.4",
+        "name": "contrast_or_palette_aid_extra_usability",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Beyond the required WCAG Pass AA / Pass AAA / Fail readout, an extra interactive graphic \u2014 for example a contrast ratio numeric or pairing chart \u2014 adds usability while staying local and browser-observable (bonus).",
+        "reasoning": "Observed an interactive Contrast pairing visualizer with numeric ratios and Pass/Fail readouts beyond the WCAG status labels. Evidence: branded_studio_narrative_polish-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.5",
+        "name": "alternate_color_input_beyond_fields",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Beyond basic Tab/Enter operability, Palette color editing supports an alternate input such as keyboard nudging of a focused hex value or paste-into-swatch (bonus).",
+        "reasoning": "Focused the primary hex field and pressed ArrowUp; the value changed from #1e88e5 to #1f89e6. Evidence: alternate_color_input_beyond_fields-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.6",
+        "name": "session_personalization_beyond_requirements",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Within the in-memory session, the app offers a small personalization beyond requirements (for example remembering last tool panel or last device frame until reload) without using browser storage APIs (bonus).",
+        "reasoning": "Observed session memory update from Instructions to Sign Up after changing the sample template, with the current device retained. Evidence: sample_template_storytelling_beyond_cycle-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.7",
+        "name": "branded_studio_narrative_polish",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "The Material logo mark, product title Material-UI Theme Creator, version chip, and four-tab studio chrome (Preview / Components / Saved Themes / Export) read as a cohesive branded tool narrative rather than generic unstyled controls (bonus execution quality).",
+        "reasoning": "Observed cohesive Material branding, title/version chip, logo mark, and integrated Preview, Components, Saved Themes, and Export chrome. Evidence: branded_studio_narrative_polish-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.8",
+        "name": "editor_theme_craft_beyond_toggle",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Editor Settings craft goes beyond a bare color-theme toggle \u2014 cohesive tokenized accents across the source pane chrome and status row without inventing a conflicting second product (bonus).",
+        "reasoning": "Observed the editor theme toggle apply coordinated dark source-pane chrome, token accents, and a matching editor-color status toast. Evidence: editor_theme_craft_beyond_toggle-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.9",
+        "name": "local_platform_enhancement",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "A genre-appropriate local enhancement (for example high-quality local Roboto rendering or polished Material Symbols density) is visible without CDN dependence (bonus).",
+        "reasoning": "Observed loaded local Roboto and Material Symbols font resources from localhost and rendered Material Symbols icons. Evidence: branded_studio_narrative_polish-shared.png",
+        "optional": true
+      },
+      {
+        "id": "11.10",
+        "name": "competition_level_theme_studio_feel",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "The overall studio feels competition-grade: bi-synced editor/tools, live device preview density, Export artifact polish, and Saved Themes versions read as a professional Material theme instrument rather than a wired demo (bonus).",
+        "reasoning": "Observed a polished Saved Themes workspace with a saved Launch palette version and a separate export workspace with live JSON, CSS/JSON formats, copy/download actions, and import support. Evidence: saved_versions.png; competition_export.png",
+        "optional": true
+      },
+      {
+        "id": "11.11",
+        "name": "harmonics_preview_flash_delight",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "When a Harmonics suggestion applies, a coordinated preview flash or richer microinteraction beyond the required recolor is browser-observable (bonus).",
+        "reasoning": "Clicked Complementary and directly observed secondary recoloring plus a preview-flash animation lasting 0.85s. Evidence: harmonics_preview_flash_delight-shared.png",
+        "optional": true
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "FAIL: No additional qualifying enhancement was observed beyond the enhancements covered by the other criteria. Evidence: competition_export.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"palette_swatch_delight_beyond_minimum\":{\"score\":\"yes\",\"reasoning\":\"Observed a real hex edit trigger a swatch-pulse animation and WCAG settle animations. Evidence: palette_swatch_delight_beyond_minimum-shared.png\"},\"sample_template_storytelling_beyond_cycle\":{\"score\":\"no\",\"reasoning\":\"FAIL: Template switching was exercised; only a basic fade-in/content swap was observed, not a coordinated storytelling transition. Evidence: sample_template_storytelling_beyond_cycle-shared.png\"},\"tutorial_guided_first_run_polish\":{\"score\":\"yes\",\"reasoning\":\"Observed a four-step guided tour covering Preview tools, Palette, Saved Themes, and Export, completed through Next controls. Evidence: tutorial_guided_steps.png\"},\"contrast_or_palette_aid_extra_usability\":{\"score\":\"yes\",\"reasoning\":\"Observed an interactive Contrast pairing visualizer with numeric ratios and Pass/Fail readouts beyond the WCAG status labels. Evidence: branded_studio_narrative_polish-shared.png\"},\"alternate_color_input_beyond_fields\":{\"score\":\"yes\",\"reasoning\":\"Focused the primary hex field and pressed ArrowUp; the value changed from #1e88e5 to #1f89e6. Evidence: alternate_color_input_beyond_fields-shared.png\"},\"session_personalization_beyond_requirements\":{\"score\":\"yes\",\"reasoning\":\"Observed session memory update from Instructions to Sign Up after changing the sample template, with the current device retained. Evidence: sample_template_storytelling_beyond_cycle-shared.png\"},\"branded_studio_narrative_polish\":{\"score\":\"yes\",\"reasoning\":\"Observed cohesive Material branding, title/version chip, logo mark, and integrated Preview, Components, Saved Themes, and Export chrome. Evidence: branded_studio_narrative_polish-shared.png\"},\"editor_theme_craft_beyond_toggle\":{\"score\":\"yes\",\"reasoning\":\"Observed the editor theme toggle apply coordinated dark source-pane chrome, token accents, and a matching editor-color status toast. Evidence: editor_theme_craft_beyond_toggle-shared.png\"},\"local_platform_enhancement\":{\"score\":\"yes\",\"reasoning\":\"Observed loaded local Roboto and Material Symbols font resources from localhost and rendered Material Symbols icons. Evidence: branded_studio_narrative_polish-shared.png\"},\"competition_level_theme_studio_feel\":{\"score\":\"yes\",\"reasoning\":\"Observed a polished Saved Themes workspace with a saved Launch palette version and a separate export workspace with live JSON, CSS/JSON formats, copy/download actions, and import support. Evidence: saved_versions.png; competition_export.png\"},\"harmonics_preview_flash_delight\":{\"score\":\"yes\",\"reasoning\":\"Clicked Complementary and directly observed secondary recoloring plus a preview-flash animation lasting 0.85s. Evidence: harmonics_preview_flash_delight-shared.png\"},\"innovation_catchall\":{\"score\":\"no\",\"reasoning\":\"FAIL: No additional qualifying enhancement was observed beyond the enhancements covered by the other criteria. Evidence: competition_export.png\"}}",
+    "cost_usd": 0.2526606
+  },
+  "motion": {
+    "score": 0.5625,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "hover_animations_present",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Required hover animations are present: buttons and icon buttons brightness-lift on hover, accordion summaries and saved theme rows take a subtle hover wash, inert link-like controls underline on hover, and tab labels ease opacity/background on hover",
+        "reasoning": "FAIL: Button hover wash and tab transitions were observed, but the full required set of accordion, saved-row, link-underline, and icon-button behaviors was not directly verified. Evidence: hover_animations_present-hover.png"
+      },
+      {
+        "id": "4.2",
+        "name": "tab_switch_keeps_hover",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Tab/mode switches update without full reload and keep hover feedback",
+        "reasoning": "The Components and Preview tabs switched in place, and tab controls exposed eased color/background/opacity transitions. Evidence: tab_indicator_slides-shared.png",
+        "optional": true
+      },
+      {
+        "id": "4.4",
+        "name": "tab_indicator_slides",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The primary-colored main tab indicator slides when switching between Preview, Components, Saved Themes, and Export",
+        "reasoning": "The active indicator is a primary-colored span with a 0.3s ease-in-out transition; its bounds moved between Preview and Components. Evidence: tab_indicator_slides-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "accordion_eased_expand",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Palette accordion rows expand and collapse with a chevron rotation and an eased height transition when clicked via the real accordion control",
+        "reasoning": "The real primary palette accordion collapsed successfully; its region used a 0.28s height transition and its chevron used a 0.28s transform transition. Evidence: accordion_eased_expand-shared.png",
+        "optional": true
+      },
+      {
+        "id": "4.6",
+        "name": "theme_card_enter_exit",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Driven through the real UI controls, a newly created saved-theme card eases in and a deleted card animates out rather than vanishing instantly",
+        "reasoning": "FAIL: A newly created card exposed a 0.3s card-in animation and 0.25s opacity/transform transition, but the deletion animation was not directly observed before removal. Evidence: theme_card_enter_exit-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "modal_scale_fade_transition",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Tutorial, theme-form, and command-palette overlays enter with a short opacity and scale transition of roughly 200 to 300 milliseconds and exit the same way",
+        "reasoning": "The Tutorial dialog used a 0.25s opacity/transform transition on entry, and during real close interaction it remained present mid-fade with reduced opacity. Evidence: modal_scale_fade_transition-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "toast_slide_and_fade",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Action toasts (copy, save, snippet applied, export copied) slide in, remain readable, and auto-dismiss with a fade",
+        "reasoning": "FAIL: Copying theme code produced a readable toast with a 0.25s toast-in animation and translated entry, but auto-dismiss/fade was not directly observed. Evidence: toast_slide_and_fade-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "reduced_motion_flows_completable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, animations are removed and state changes apply instantly while every flow stays completable",
+        "reasoning": "In the reduced-motion browser, prefers-reduced-motion matched true, the Tutorial flow opened normally, and its transition duration was reduced to 0.00001s. Evidence: reduced_motion_flows_completable-shared.png"
+      },
+      {
+        "id": "4.10",
+        "name": "preview_filter_and_compare_ease",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Driven through real Preview chrome controls, color-blindness filter application and Before/After swaps ease the framed sample without a hard cut",
+        "reasoning": "The real Vision control applied Protanopia with a framed-sample filter transition of 0.3s; the real Before control also triggered the preview swap animation. Evidence: preview_filter_and_compare_ease-shared.png"
+      },
+      {
+        "id": "4.11",
+        "name": "harmonics_secondary_swatch_highlight",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Driven through the real Harmonics control, applying Analogous, Complementary, or Triadic briefly highlights the secondary swatch as secondary main updates",
+        "reasoning": "FAIL: Complementary and Analogous controls updated the secondary main value and showed a toast, but no secondary-swatch highlight or highlight animation was observed. Evidence: harmonics_secondary_swatch_highlight-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"hover_animations_present\":{\"score\":\"no\",\"reasoning\":\"FAIL: Button hover wash and tab transitions were observed, but the full required set of accordion, saved-row, link-underline, and icon-button behaviors was not directly verified. Evidence: hover_animations_present-hover.png\"},\"tab_switch_keeps_hover\":{\"score\":\"yes\",\"reasoning\":\"The Components and Preview tabs switched in place, and tab controls exposed eased color/background/opacity transitions. Evidence: tab_indicator_slides-shared.png\"},\"tab_indicator_slides\":{\"score\":\"yes\",\"reasoning\":\"The active indicator is a primary-colored span with a 0.3s ease-in-out transition; its bounds moved between Preview and Components. Evidence: tab_indicator_slides-shared.png\"},\"accordion_eased_expand\":{\"score\":\"yes\",\"reasoning\":\"The real primary palette accordion collapsed successfully; its region used a 0.28s height transition and its chevron used a 0.28s transform transition. Evidence: accordion_eased_expand-shared.png\"},\"theme_card_enter_exit\":{\"score\":\"no\",\"reasoning\":\"FAIL: A newly created card exposed a 0.3s card-in animation and 0.25s opacity/transform transition, but the deletion animation was not directly observed before removal. Evidence: theme_card_enter_exit-shared.png\"},\"modal_scale_fade_transition\":{\"score\":\"yes\",\"reasoning\":\"The Tutorial dialog used a 0.25s opacity/transform transition on entry, and during real close interaction it remained present mid-fade with reduced opacity. Evidence: modal_scale_fade_transition-shared.png\"},\"toast_slide_and_fade\":{\"score\":\"no\",\"reasoning\":\"FAIL: Copying theme code produced a readable toast with a 0.25s toast-in animation and translated entry, but auto-dismiss/fade was not directly observed. Evidence: toast_slide_and_fade-shared.png\"},\"reduced_motion_flows_completable\":{\"score\":\"yes\",\"reasoning\":\"In the reduced-motion browser, prefers-reduced-motion matched true, the Tutorial flow opened normally, and its transition duration was reduced to 0.00001s. Evidence: reduced_motion_flows_completable-shared.png\"},\"preview_filter_and_compare_ease\":{\"score\":\"yes\",\"reasoning\":\"The real Vision control applied Protanopia with a framed-sample filter transition of 0.3s; the real Before control also triggered the preview swap animation. Evidence: preview_filter_and_compare_ease-shared.png\"},\"harmonics_secondary_swatch_highlight\":{\"score\":\"no\",\"reasoning\":\"FAIL: Complementary and Analogous controls updated the secondary main value and showed a toast, but no secondary-swatch highlight or highlight animation was observed. Evidence: harmonics_secondary_swatch_highlight-shared.png\"}}",
+    "cost_usd": 0.29555319999999996
+  },
+  "performance": {
+    "score": 0.9091,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_under_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On a local cold load the Material theme studio becomes interactive within 2 seconds, with the header and main tabs operable.",
+        "reasoning": "Interactive shell loaded in 321ms with header and four main tabs present. Evidence: fresh-layout-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "console_clean_during_full_exercise",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "No console errors or warnings appear during a full exercise: tab switches, palette edits, source edits, theme CRUD, font add/remove, export/import, and command palette.",
+        "reasoning": "FAIL: Console showed 0 warnings/errors, but the full exercise was not completed because import validation failed and source editing was not completed. Evidence: palette-edit-shared.png"
+      },
+      {
+        "id": "9.3",
+        "name": "palette_typography_repaint_under_100ms",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Palette and typography edits repaint the preview and regenerate Export text with UI response in under 100ms (perceived immediate), without visible hangs.",
+        "reasoning": "Repeated palette edits and typography interaction responded immediately with preview, editor source, and export updating. Evidence: palette-edit-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "shell_visible_while_settling",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "While the app settles after first paint, the header lockup and four-tab bar (Preview / Components / Saved Themes / Export) remain visible rather than a blank white screen with no controls.",
+        "reasoning": "Header lockup, four-tab bar, and Preview content remained visible after load. Evidence: cold-shell-shared.png"
+      },
+      {
+        "id": "9.5",
+        "name": "component_gallery_scrolls_without_lag",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With the Components panel showing roughly two dozen themed demos, scrolling the gallery and using the filterable drawer nav shows no perceived lag.",
+        "reasoning": "Gallery displayed 25 themed demos; internal scrolling and drawer filtering completed responsively. Evidence: components-shared.png"
+      },
+      {
+        "id": "9.6",
+        "name": "ui_interactive_during_retheme",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "During preview recolor after a palette edit or Light/Dark toggle, editor actions and tool fields remain interactive \u2014 the UI does not freeze until transitions finish.",
+        "reasoning": "Dark-mode retheme and repeated palette edits completed without freezing editor controls or fields. Evidence: palette-edit-shared.png"
+      },
+      {
+        "id": "9.7",
+        "name": "preview_retheme_holds_stable_frame_rate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Driven through real Palette controls, preview recolor maintains a smooth frame rate without visible hitching during continuous edits.",
+        "reasoning": "Five rapid palette recolors produced no visible hitching or stalled preview updates. Evidence: palette-edit-shared.png"
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_palette_edits_never_hang",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapid repeated palette or typography input keeps the UI responsive with no hangs and leaves preview, editor source, and tool fields in agreement.",
+        "reasoning": "Rapid repeated edits left the color field, preview, source, and generated export aligned at #673ab7 with no hang. Evidence: palette-edit-shared.png"
+      },
+      {
+        "id": "9.9",
+        "name": "extended_studio_session_stable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After an extended session of many palette edits, tab switches, creates, and deletes, the tab remains responsive without runaway memory growth that freezes the UI.",
+        "reasoning": "After many tab switches, palette edits, font add/remove operations, export, command filtering, and theme actions, the app remained responsive. Evidence: command-palette-shared.png"
+      },
+      {
+        "id": "9.10",
+        "name": "no_layout_jumps_after_first_paint",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After first paint no visible layout jumps occur; header, tabs, and Preview regions hold their space as the app settles.",
+        "reasoning": "Repeated post-load measurements held stable tab and main-region bounds, with no visible layout jump. Evidence: fresh-layout-shared.png"
+      },
+      {
+        "id": "9.11",
+        "name": "command_palette_filter_no_lag",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Command palette filtering updates the result list without perceptible lag as the user types fuzzy queries across tabs, tools, and theme names.",
+        "reasoning": "Command palette opened and fuzzy filtering updated results immediately, including a seven-result palette query. Evidence: command-palette-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_start_under_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"Interactive shell loaded in 321ms with header and four main tabs present. Evidence: fresh-layout-shared.png\"},\"console_clean_during_full_exercise\":{\"score\":\"no\",\"reasoning\":\"FAIL: Console showed 0 warnings/errors, but the full exercise was not completed because import validation failed and source editing was not completed. Evidence: palette-edit-shared.png\"},\"palette_typography_repaint_under_100ms\":{\"score\":\"yes\",\"reasoning\":\"Repeated palette edits and typography interaction responded immediately with preview, editor source, and export updating. Evidence: palette-edit-shared.png\"},\"shell_visible_while_settling\":{\"score\":\"yes\",\"reasoning\":\"Header lockup, four-tab bar, and Preview content remained visible after load. Evidence: cold-shell-shared.png\"},\"component_gallery_scrolls_without_lag\":{\"score\":\"yes\",\"reasoning\":\"Gallery displayed 25 themed demos; internal scrolling and drawer filtering completed responsively. Evidence: components-shared.png\"},\"ui_interactive_during_retheme\":{\"score\":\"yes\",\"reasoning\":\"Dark-mode retheme and repeated palette edits completed without freezing editor controls or fields. Evidence: palette-edit-shared.png\"},\"preview_retheme_holds_stable_frame_rate\":{\"score\":\"yes\",\"reasoning\":\"Five rapid palette recolors produced no visible hitching or stalled preview updates. Evidence: palette-edit-shared.png\"},\"rapid_palette_edits_never_hang\":{\"score\":\"yes\",\"reasoning\":\"Rapid repeated edits left the color field, preview, source, and generated export aligned at #673ab7 with no hang. Evidence: palette-edit-shared.png\"},\"extended_studio_session_stable\":{\"score\":\"yes\",\"reasoning\":\"After many tab switches, palette edits, font add/remove operations, export, command filtering, and theme actions, the app remained responsive. Evidence: command-palette-shared.png\"},\"no_layout_jumps_after_first_paint\":{\"score\":\"yes\",\"reasoning\":\"Repeated post-load measurements held stable tab and main-region bounds, with no visible layout jump. Evidence: fresh-layout-shared.png\"},\"command_palette_filter_no_lag\":{\"score\":\"yes\",\"reasoning\":\"Command palette opened and fuzzy filtering updated results immediately, including a seven-result palette query. Evidence: command-palette-shared.png\"}}",
+    "cost_usd": 0.488282
+  },
+  "responsiveness": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "layout_adapts_1280_to_narrow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Resizing from 1280px+ desktop to 768px keeps a usable theme studio: header, main tabs, and Preview/Components/Saved Themes content remain present and operable at both widths.",
+        "reasoning": "Header, tabs, Preview, Components, and Saved Themes remain present and usable at 1280px and 768px. Evidence: preview-1280-shared.png, preview-768-shared.png"
+      },
+      {
+        "id": "7.2",
+        "name": "narrow_tap_targets_adequate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 768px width, main tabs, device toggles, New Theme, Load/Delete, and editor actions present tap targets at least 44px in at least one dimension.",
+        "reasoning": "At 768px, tabs, device toggles, New Theme, Load/Delete, and editor actions are at least 44px in one dimension. Evidence: narrow-controls-768-shared.png"
+      },
+      {
+        "id": "7.3",
+        "name": "typography_readable_both_widths",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Header title, tab labels, and tool-panel titles remain legible at both 1280px and 768px \u2014 type scales or reflows without becoming unreadably small at the narrower width.",
+        "reasoning": "Header, tab labels, and panel headings remain clearly legible at both widths. Evidence: preview-1280-shared.png, preview-768-shared.png"
+      },
+      {
+        "id": "7.4",
+        "name": "no_clip_or_overflow_at_768",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 768px width, Preview regions, tool panels, and Saved Themes cards never clip or overflow the viewport; no horizontal viewport scrolling appears.",
+        "reasoning": "Rendered regions fit within the 768px viewport; measured document and body scroll widths were 768px with no horizontal overflow. Evidence: components-768-shared.png"
+      },
+      {
+        "id": "7.5",
+        "name": "preview_stacks_below_1024",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Below roughly 1024px the Preview panel stacks its device-frame and editor/tool regions vertically and every tool panel remains reachable.",
+        "reasoning": "At 768px, the device preview, editor, and tool panels are arranged vertically and remain reachable by scrolling. Evidence: preview-768-shared.png"
+      },
+      {
+        "id": "7.6",
+        "name": "narrow_stack_order_stays_usable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 768px width, Preview frame, editor/tools, and tab content reflow into a logical stacking order without covering each other into an unusable pile.",
+        "reasoning": "Preview appears first, followed by editor controls and theme tools in a coherent vertical order without horizontal overlap. Evidence: preview-768-shared.png"
+      },
+      {
+        "id": "7.7",
+        "name": "narrow_controls_tappable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 768px width, tap/click activation works on main tabs, Phone/Tablet/Desktop toggles, Palette accordion rows, and Saved Themes Load/Delete.",
+        "reasoning": "Real clicks activated tabs, Phone frame, Palette accordion, Saved Themes Load, and Delete workflows successfully. Evidence: narrow-controls-768-shared.png, saved-delete-768-shared.png"
+      },
+      {
+        "id": "7.8",
+        "name": "no_horizontal_scroll_at_768",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 768px width the page does not produce horizontal scrolling.",
+        "reasoning": "At 768px, documentElement and body scroll widths both measured 768px, equal to the viewport width. Evidence: components-768-shared.png"
+      },
+      {
+        "id": "7.9",
+        "name": "device_frame_and_component_gallery_scale",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The device-framed sample site and the Components gallery scale with the viewport rather than staying a fixed overflowing size.",
+        "reasoning": "The preview and component gallery reflow to fit the viewport; the 768px component content is narrower beside its navigation and the preview remains within 753px. Evidence: components-768-shared.png, preview-768-shared.png"
+      },
+      {
+        "id": "7.10",
+        "name": "overlays_remain_operable_at_narrow_widths",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Tutorial modal, theme create/rename forms, and the command palette stay fully visible and operable at 768px rather than rendering off-screen.",
+        "reasoning": "Tutorial, New Theme, Rename Theme, and Command palette dialogs were observed fully within the 768px viewport with usable controls. Evidence: tutorial-768-shared.png, new-theme-768-shared.png, rename-theme-768-shared.png, command-palette-768-shared.png"
+      },
+      {
+        "id": "7.11",
+        "name": "export_and_versions_operable_at_768",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 768px width, the Export preview block with JSON/CSS tabs and the Versions list remain fully visible and operable rather than rendering off-screen.",
+        "reasoning": "At 768px, JSON/CSS export tabs and the CSS preview/actions fit the viewport width and CSS activation worked; Saved Themes Versions controls also fit when present. Evidence: export-css-768-shared.png, saved-delete-768-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"layout_adapts_1280_to_narrow\":{\"score\":\"yes\",\"reasoning\":\"Header, tabs, Preview, Components, and Saved Themes remain present and usable at 1280px and 768px. Evidence: preview-1280-shared.png, preview-768-shared.png\"},\"narrow_tap_targets_adequate\":{\"score\":\"yes\",\"reasoning\":\"At 768px, tabs, device toggles, New Theme, Load/Delete, and editor actions are at least 44px in one dimension. Evidence: narrow-controls-768-shared.png\"},\"typography_readable_both_widths\":{\"score\":\"yes\",\"reasoning\":\"Header, tab labels, and panel headings remain clearly legible at both widths. Evidence: preview-1280-shared.png, preview-768-shared.png\"},\"no_clip_or_overflow_at_768\":{\"score\":\"yes\",\"reasoning\":\"Rendered regions fit within the 768px viewport; measured document and body scroll widths were 768px with no horizontal overflow. Evidence: components-768-shared.png\"},\"preview_stacks_below_1024\":{\"score\":\"yes\",\"reasoning\":\"At 768px, the device preview, editor, and tool panels are arranged vertically and remain reachable by scrolling. Evidence: preview-768-shared.png\"},\"narrow_stack_order_stays_usable\":{\"score\":\"yes\",\"reasoning\":\"Preview appears first, followed by editor controls and theme tools in a coherent vertical order without horizontal overlap. Evidence: preview-768-shared.png\"},\"narrow_controls_tappable\":{\"score\":\"yes\",\"reasoning\":\"Real clicks activated tabs, Phone frame, Palette accordion, Saved Themes Load, and Delete workflows successfully. Evidence: narrow-controls-768-shared.png, saved-delete-768-shared.png\"},\"no_horizontal_scroll_at_768\":{\"score\":\"yes\",\"reasoning\":\"At 768px, documentElement and body scroll widths both measured 768px, equal to the viewport width. Evidence: components-768-shared.png\"},\"device_frame_and_component_gallery_scale\":{\"score\":\"yes\",\"reasoning\":\"The preview and component gallery reflow to fit the viewport; the 768px component content is narrower beside its navigation and the preview remains within 753px. Evidence: components-768-shared.png, preview-768-shared.png\"},\"overlays_remain_operable_at_narrow_widths\":{\"score\":\"yes\",\"reasoning\":\"Tutorial, New Theme, Rename Theme, and Command palette dialogs were observed fully within the 768px viewport with usable controls. Evidence: tutorial-768-shared.png, new-theme-768-shared.png, rename-theme-768-shared.png, command-palette-768-shared.png\"},\"export_and_versions_operable_at_768\":{\"score\":\"yes\",\"reasoning\":\"At 768px, JSON/CSS export tabs and the CSS preview/actions fit the viewport width and CSS activation worked; Saved Themes Versions controls also fit when present. Evidence: export-css-768-shared.png, saved-delete-768-shared.png\"} }",
+    "cost_usd": 0.2495238
+  },
+  "technical": {
+    "score": 0.8095,
+    "criteria": [
+      {
+        "id": "2.2",
+        "name": "cold_load_interactive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive within 2 seconds of a local cold load",
+        "reasoning": "Loaded and became interactive within the observed 2-second window; Tutorial opened successfully. Evidence: cold_load_interactive-shared.png"
+      },
+      {
+        "id": "2.4",
+        "name": "console_clean_full_exercise",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The browser console stays free of errors and warnings during a full exercise of the app (tab switches, palette edits, source edits, theme create/rename/delete, font add/remove, export/import, command palette)",
+        "reasoning": "After exercising tabs, palette edits, import/export, command palette, and theme workflows, console reported 0 errors and 0 warnings. Evidence: console_clean_full_exercise-shared.png"
+      },
+      {
+        "id": "2.5",
+        "name": "keyboard_operable_focus_visible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every interactive control - tabs, device toggles, accordion rows, tool fields, card actions - is reachable and operable with the keyboard alone, with a visible focus indicator",
+        "reasoning": "Keyboard interaction toggled an accordion, Escape closed overlays, and focused controls exposed a visible outline. Evidence: keyboard_operable_focus_visible-shared.png"
+      },
+      {
+        "id": "2.6",
+        "name": "modal_dialog_semantics",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Tutorial modal and the theme create/rename forms use role dialog with aria-modal true, trap focus while open, close on Escape, and return focus to the control that opened them",
+        "reasoning": "FAIL: Tutorial used role=dialog with aria-modal=true, focus return, and Escape close, but the Rename Theme dialog exposed aria-modal=false. Evidence: modal_dialog_semantics-rename.png"
+      },
+      {
+        "id": "2.7",
+        "name": "accordion_state_exposed",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Palette accordion rows expose their expanded/collapsed state to assistive technology (e.g. aria-expanded) and toggle with Enter or Space",
+        "reasoning": "Palette rows exposed aria-expanded and the secondary row toggled with Space. Evidence: accordion_state_exposed-shared.png"
+      },
+      {
+        "id": "2.8",
+        "name": "status_messages_aria_live",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Validation and status messages (invalid name, duplicate name, invalid #RRGGBB field paths, fontSize/borderRadius bounds, Type\u2194palette.type cross-field errors, invalid options, save status, import field errors) are announced via an aria-live polite region as well as shown visually",
+        "reasoning": "An invalid color produced a visible validation message and the same message appeared in an aria-live polite region; save/import statuses were also live. Evidence: status_messages_aria_live-shared.png"
+      },
+      {
+        "id": "2.9",
+        "name": "rapid_input_stays_responsive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Palette and typography edits repaint the preview without visible hangs, and the UI stays responsive under rapid repeated input",
+        "reasoning": "Five rapid palette fills completed without hanging and the final value was immediately reflected as #56789a. Evidence: rapid_input_stays_responsive-shared.png"
+      },
+      {
+        "id": "2.11",
+        "name": "document_title_matches",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "After load and settle, the browser document title reads 'Material UI Theme Creator'",
+        "reasoning": "The settled document title was exactly \u201cMaterial UI Theme Creator.\u201d Evidence: cold_load_interactive-shared.png"
+      },
+      {
+        "id": "2.12",
+        "name": "export_derived_from_shared_options",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After a Palette or Light/Dark edit, the Export JSON and CSS text update from the same shared ThemeOptions the editor and preview show \u2014 not a disconnected static string",
+        "reasoning": "After changing primary.main to #abcdef, the live JSON export showed the same #abcdef value. Evidence: export_derived_from_shared_options-export.png"
+      },
+      {
+        "id": "2.13",
+        "name": "import_replaces_shared_theme_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A successful Import ThemeOptions replaces the shared editor/preview/tool state so Monaco source, Palette fields, and Export text all agree without a reload",
+        "reasoning": "FAIL: A valid UI import updated Palette fields, selected Dark, live status, and Export JSON, but the visible Monaco source did not expose the imported values, so full end-to-end agreement was not observed. Evidence: import_replaces_shared_theme_state-preview.png"
+      },
+      {
+        "id": "2.14",
+        "name": "export_import_share_themeoptions_schema",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After a valid Import of ThemeOptions JSON, the Export JSON preview re-enumerates the same ThemeOptions field contract (name, palette.type, intent #RRGGBB channels, typography.fontFamily, typography.fontSize, shape.borderRadius, Type\u2194palette.type cross-field) with the imported values \u2014 form, export, and import share one schema",
+        "reasoning": "Valid import re-enumerated the ThemeOptions contract in Export JSON, including name, palette channels/type, typography values, shape, and spacing with imported values. Evidence: import_replaces_shared_theme_state-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_load_interactive\":{\"score\":\"yes\",\"reasoning\":\"Loaded and became interactive within the observed 2-second window; Tutorial opened successfully. Evidence: cold_load_interactive-shared.png\"},\"console_clean_full_exercise\":{\"score\":\"yes\",\"reasoning\":\"After exercising tabs, palette edits, import/export, command palette, and theme workflows, console reported 0 errors and 0 warnings. Evidence: console_clean_full_exercise-shared.png\"},\"keyboard_operable_focus_visible\":{\"score\":\"yes\",\"reasoning\":\"Keyboard interaction toggled an accordion, Escape closed overlays, and focused controls exposed a visible outline. Evidence: keyboard_operable_focus_visible-shared.png\"},\"modal_dialog_semantics\":{\"score\":\"no\",\"reasoning\":\"FAIL: Tutorial used role=dialog with aria-modal=true, focus return, and Escape close, but the Rename Theme dialog exposed aria-modal=false. Evidence: modal_dialog_semantics-rename.png\"},\"accordion_state_exposed\":{\"score\":\"yes\",\"reasoning\":\"Palette rows exposed aria-expanded and the secondary row toggled with Space. Evidence: accordion_state_exposed-shared.png\"},\"status_messages_aria_live\":{\"score\":\"yes\",\"reasoning\":\"An invalid color produced a visible validation message and the same message appeared in an aria-live polite region; save/import statuses were also live. Evidence: status_messages_aria_live-shared.png\"},\"rapid_input_stays_responsive\":{\"score\":\"yes\",\"reasoning\":\"Five rapid palette fills completed without hanging and the final value was immediately reflected as #56789a. Evidence: rapid_input_stays_responsive-shared.png\"},\"document_title_matches\":{\"score\":\"yes\",\"reasoning\":\"The settled document title was exactly \u201cMaterial UI Theme Creator.\u201d Evidence: cold_load_interactive-shared.png\"},\"export_derived_from_shared_options\":{\"score\":\"yes\",\"reasoning\":\"After changing primary.main to #abcdef, the live JSON export showed the same #abcdef value. Evidence: export_derived_from_shared_options-export.png\"},\"import_replaces_shared_theme_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: A valid UI import updated Palette fields, selected Dark, live status, and Export JSON, but the visible Monaco source did not expose the imported values, so full end-to-end agreement was not observed. Evidence: import_replaces_shared_theme_state-preview.png\"},\"export_import_share_themeoptions_schema\":{\"score\":\"yes\",\"reasoning\":\"Valid import re-enumerated the ThemeOptions contract in Export JSON, including name, palette channels/type, typography values, shape, and spacing with imported values. Evidence: import_replaces_shared_theme_state-shared.png\"}}",
+    "cost_usd": 0.31672559999999994
+  },
+  "user_flows": {
+    "score": 0.9286,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "create_saved_theme_updates_all_surfaces",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create flow: activating New Theme and submitting a valid name closes the form, increases the saved-themes card count by exactly one, shows the new card with swatches and meta line, and loading that card immediately rewrites the editor source and recolors the framed sample site without a reload.",
+        "reasoning": "Created Alpha Test; the saved-theme count increased and its card became active. Evidence: create_saved_theme_updates_all_surfaces-shared.png"
+      },
+      {
+        "id": "6.2",
+        "name": "invalid_theme_name_inline_validation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create/rename flow: submitting an empty name shows an immediate inline validation message naming the name field, submit stays disabled or rejects, and the card count is unchanged.",
+        "reasoning": "Empty submission immediately showed \u201cTheme name is required\u201d and Create Theme remained disabled. Evidence: invalid_theme_name_inline_validation-shared.png"
+      },
+      {
+        "id": "6.3",
+        "name": "palette_edit_save_updates_all_surfaces",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edit flow: changing the primary main color in the Palette tool recolors the sample site's primary surfaces immediately, rewrites the ThemeOptions source to the new hex, flips save status to unsaved, recomputes that intent's WCAG contrast label, and updates the Export panel's JSON and CSS text to include the new hex; after activating Save, status returns to saved and the active theme's Saved Themes card shows the updated swatch without a reload.",
+        "reasoning": "Editing primary.main produced a new hex in the editor/tool, changed contrast status, marked the workspace Unsaved, and Save returned it to saved state. Evidence: undo_redo_round_trip_across_surfaces-shared.png"
+      },
+      {
+        "id": "6.4",
+        "name": "delete_loaded_theme_clears_active",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Delete flow: confirming delete of the loaded theme removes its card, decreases the card count by exactly one, and clears the active-theme marker so no card is marked active until another theme is loaded.",
+        "reasoning": "Deleting the active Unique Theme removed its card and left the remaining cards without an Active marker. Evidence: delete_loaded_theme_clears_active-shared.png"
+      },
+      {
+        "id": "6.5",
+        "name": "light_dark_round_trip_across_panels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Light/Dark round-trip: toggling Type to Dark recolors preview background, paper, text, and divider surfaces and updates the editor source; switching to Components shows the same dark surfaces across demos; toggling back to Light restores light surfaces on every panel without a document navigation.",
+        "reasoning": "Dark mode changed the editor and Components demos, and switching back to Light restored the light state without navigation. Evidence: light_dark_round_trip_across_panels-shared.png"
+      },
+      {
+        "id": "6.6",
+        "name": "last_delete_reveals_empty_saved_themes",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edge: after deleting every saved theme, Saved Themes shows a clear empty state with a message and a way to create a new theme.",
+        "reasoning": "After deleting all seeded cards, the page showed \u201cNo saved themes yet\u201d plus New Theme actions. Evidence: last_delete_reveals_empty_saved_themes-shared.png"
+      },
+      {
+        "id": "6.7",
+        "name": "search_filters_saved_theme_cards",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Search/filter flow: typing a query over saved theme names recomputes the visible cards from the collection; clearing the query restores the full card set.",
+        "reasoning": "Searching Forest reduced the collection to the Forest card; clearing the query restored the full collection. Evidence: search_filters_saved_theme_cards-shared.png"
+      },
+      {
+        "id": "6.8",
+        "name": "undo_redo_round_trip_across_surfaces",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Undo round-trip: after a tool edit, activating Undo restores the previous value in the tool field, the editor source, the preview, and the Export preview text together; activating Redo reapplies the edit across all four surfaces.",
+        "reasoning": "Undo restored #123456 across the editor/tool state and enabled Redo; Redo reapplied the edited value. Evidence: undo_redo_round_trip_across_surfaces-shared.png"
+      },
+      {
+        "id": "6.9",
+        "name": "tutorial_and_theme_form_overlays",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Overlays: Tutorial opens an in-page modal that can be dismissed; theme create/rename forms open, validate, and close without trapping the user \u2014 Close/Escape returns to the workspace.",
+        "reasoning": "Tutorial opened as an in-page dialog and the theme form opened with validation; Escape/close returned to the workspace. Evidence: tutorial_and_theme_form_overlays-shared.png"
+      },
+      {
+        "id": "6.10",
+        "name": "reload_returns_seeded_baseline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Recovery/reload: a page reload returns the app to its seeded state \u2014 at least three seeded themes listed, the default theme active, and any unsaved edits from before the reload gone \u2014 with no dead end requiring a second reload.",
+        "reasoning": "Reload returned to three seeded themes, Default Theme active, light palette, and saved status with prior edits gone. Evidence: reload_returns_seeded_baseline-shared.png"
+      },
+      {
+        "id": "6.11",
+        "name": "export_import_round_trip_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export then import: after editing primary main to a distinct #RRGGBB hex and shape.borderRadius to a distinct in-range value, open Export and confirm the ThemeOptions JSON preview contains that hex under primary.main along with palette.type, typography.fontFamily, typography.fontSize, and shape.borderRadius; after changing the color and radius away, Import that same payload \u2014 editor, tools, Type toggle, preview, and Export text all return to the imported options including that hex and borderRadius without a reload.",
+        "reasoning": "FAIL: Export was observable, but the required distinct color-and-radius edit followed by importing the same payload was not fully completed and verified end-to-end. Evidence: version_save_restore_flow-shared.png"
+      },
+      {
+        "id": "6.12",
+        "name": "command_palette_loads_theme_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Command palette jump: open with Ctrl+K, type part of a seeded theme name, press Enter on the highlighted theme result \u2014 that theme loads into editor and preview and the palette closes.",
+        "reasoning": "Ctrl+K opened the command palette; searching Forest and pressing Enter closed it and loaded Forest into the editor and preview. Evidence: command_palette_loads_theme_flow-shared.png"
+      },
+      {
+        "id": "6.13",
+        "name": "version_save_restore_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Version restore: after editing palette values, Save version with a valid name adds one snapshot; editing again then Restoring the snapshot returns editor, tools, preview, and Export text to the snapshotted options.",
+        "reasoning": "Saving Snapshot One created a version; after another edit, Restore returned the exported ThemeOptions to the snapshot value and showed the restore status. Evidence: version_save_restore_flow-shared.png"
+      },
+      {
+        "id": "6.14",
+        "name": "duplicate_name_create_then_unique_succeeds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Schema validation on create: attempting New Theme with a duplicate of a seeded theme name leaves the card count unchanged and shows an inline error naming the name field; submitting a unique valid name then succeeds and increases the count by exactly one.",
+        "reasoning": "Duplicate Default Theme was rejected with a uniqueness error and unchanged card count; Unique Theme then created successfully. Evidence: duplicate_name_create_then_unique_succeeds-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"create_saved_theme_updates_all_surfaces\":{\"score\":\"yes\",\"reasoning\":\"Created Alpha Test; the saved-theme count increased and its card became active. Evidence: create_saved_theme_updates_all_surfaces-shared.png\"},\"invalid_theme_name_inline_validation\":{\"score\":\"yes\",\"reasoning\":\"Empty submission immediately showed \u201cTheme name is required\u201d and Create Theme remained disabled. Evidence: invalid_theme_name_inline_validation-shared.png\"},\"palette_edit_save_updates_all_surfaces\":{\"score\":\"yes\",\"reasoning\":\"Editing primary.main produced a new hex in the editor/tool, changed contrast status, marked the workspace Unsaved, and Save returned it to saved state. Evidence: undo_redo_round_trip_across_surfaces-shared.png\"},\"delete_loaded_theme_clears_active\":{\"score\":\"yes\",\"reasoning\":\"Deleting the active Unique Theme removed its card and left the remaining cards without an Active marker. Evidence: delete_loaded_theme_clears_active-shared.png\"},\"light_dark_round_trip_across_panels\":{\"score\":\"yes\",\"reasoning\":\"Dark mode changed the editor and Components demos, and switching back to Light restored the light state without navigation. Evidence: light_dark_round_trip_across_panels-shared.png\"},\"last_delete_reveals_empty_saved_themes\":{\"score\":\"yes\",\"reasoning\":\"After deleting all seeded cards, the page showed \u201cNo saved themes yet\u201d plus New Theme actions. Evidence: last_delete_reveals_empty_saved_themes-shared.png\"},\"search_filters_saved_theme_cards\":{\"score\":\"yes\",\"reasoning\":\"Searching Forest reduced the collection to the Forest card; clearing the query restored the full collection. Evidence: search_filters_saved_theme_cards-shared.png\"},\"undo_redo_round_trip_across_surfaces\":{\"score\":\"yes\",\"reasoning\":\"Undo restored #123456 across the editor/tool state and enabled Redo; Redo reapplied the edited value. Evidence: undo_redo_round_trip_across_surfaces-shared.png\"},\"tutorial_and_theme_form_overlays\":{\"score\":\"yes\",\"reasoning\":\"Tutorial opened as an in-page dialog and the theme form opened with validation; Escape/close returned to the workspace. Evidence: tutorial_and_theme_form_overlays-shared.png\"},\"reload_returns_seeded_baseline\":{\"score\":\"yes\",\"reasoning\":\"Reload returned to three seeded themes, Default Theme active, light palette, and saved status with prior edits gone. Evidence: reload_returns_seeded_baseline-shared.png\"},\"export_import_round_trip_flow\":{\"score\":\"no\",\"reasoning\":\"FAIL: Export was observable, but the required distinct color-and-radius edit followed by importing the same payload was not fully completed and verified end-to-end. Evidence: version_save_restore_flow-shared.png\"},\"command_palette_loads_theme_flow\":{\"score\":\"yes\",\"reasoning\":\"Ctrl+K opened the command palette; searching Forest and pressing Enter closed it and loaded Forest into the editor and preview. Evidence: command_palette_loads_theme_flow-shared.png\"},\"version_save_restore_flow\":{\"score\":\"yes\",\"reasoning\":\"Saving Snapshot One created a version; after another edit, Restore returned the exported ThemeOptions to the snapshot value and showed the restore status. Evidence: version_save_restore_flow-shared.png\"},\"duplicate_name_create_then_unique_succeeds\":{\"score\":\"yes\",\"reasoning\":\"Duplicate Default Theme was rejected with a uniqueness error and unchanged card count; Unique Theme then created successfully. Evidence: duplicate_name_create_then_unique_succeeds-shared.png\"}}",
+    "cost_usd": 0.6414779999999999
+  },
+  "visual_design": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "dark_studio_shell_lockup",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Dark studio shell with near-black surfaces, light shell text, an indigo/Material primary accent, Roboto type, and Material iconography; the header brand lockup with a cyan Material logo mark sits above the four-tab bar (Preview / Components / Saved Themes / Export), and the layout keeps full-viewport tool density rather than a marketing landing",
+        "reasoning": "Dark full-viewport studio shell, light text, cyan logo mark, four tabs, indigo accents, and Roboto were directly observed. Evidence: dark_studio_shell_lockup-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "empty_saved_themes_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Empty Saved Themes state is visually present when the collection is empty",
+        "reasoning": "After deleting all saved themes through the live UI, the page showed \u201cNo saved themes yet\u201d with explanatory empty-state copy and New Theme action. Evidence: empty_saved_themes_state-final.png"
+      },
+      {
+        "id": "3.4",
+        "name": "theme_card_swatches_actions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Saved theme cards are dense, preview each theme's swatches (e.g. primary / secondary / paper) with a type-and-updated meta line and load/delete controls, and mark the active theme",
+        "reasoning": "Saved theme cards visibly showed multiple swatches, type/updated metadata, Load/Rename/Delete controls, and an Active badge. Evidence: theme_card_swatches_actions-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "preview_split_regions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Preview tab places the device toggles and framed sample site on one side and the code editor above stacked Palette / Fonts / Typography / Snippets tool panels on the other, with a bottom tool-nav switching panels",
+        "reasoning": "Preview visibly showed the framed sample site and device controls on the left, with code editor and Palette/tool stack on the right plus bottom tool navigation. Evidence: preview_split_regions-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "previews_recolor_from_theme",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sample sites and component demos recolor from the live ThemeOptions, so a palette or typography edit is reflected across every preview surface",
+        "reasoning": "After updating the live palette to #ff00aa and #00cc88 via the app action, the preview surfaces visibly changed to pink/teal and the editor reflected the new values. Evidence: previews_recolor_from_theme-settled.png"
+      },
+      {
+        "id": "3.7",
+        "name": "component_state_treatments",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, inputs, and accordion controls show distinct default, hover, focus (visible ring), and disabled treatments",
+        "reasoning": "Components view visibly showed distinct button variants including disabled; real hover changed computed styling, and real focus produced a visible focus shadow/ring. Evidence: component_state_treatments-focus.png"
+      },
+      {
+        "id": "3.8",
+        "name": "desktop_side_by_side_layout",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At desktop widths of 1280 pixels and above, the Preview panel shows the device frame and the editor/tool stack side by side as in the reference layout",
+        "reasoning": "At confirmed 1440px width, device preview and editor/tool stack were arranged side by side. Evidence: preview_split_regions-shared.png"
+      },
+      {
+        "id": "3.9",
+        "name": "stacked_layout_below_1024",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Below roughly 1024 pixels the Preview panel stacks its regions vertically with every tool panel still reachable",
+        "reasoning": "At confirmed 900px width, measured preview regions stacked vertically and the tool region remained reachable below. Evidence: stacked_layout_below_1024-shared.png"
+      },
+      {
+        "id": "3.11",
+        "name": "export_panel_dense_tool_surface",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export mode shows a monospaced live preview block with JSON / CSS format tabs, Download and Copy controls, and an Import ThemeOptions affordance as a dense tool surface \u2014 not a marketing CTA card",
+        "reasoning": "Export view visibly contained monospaced JSON, JSON/CSS tabs, Download and Copy controls, and an Import ThemeOptions panel. Evidence: export_panel_dense_tool_surface-shared.png"
+      },
+      {
+        "id": "3.12",
+        "name": "wcag_and_harmonics_compact_meta",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "WCAG contrast labels and harmonic suggestion chips read as compact meta beside Palette fields, not large promo cards competing with the editor",
+        "reasoning": "Palette inspection showed compact Pass AA/Fail contrast labels beside palette rows and compact harmonic suggestion labels/chips in the palette tool surface. Evidence: preview_split_regions-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"dark_studio_shell_lockup\":{\"score\":\"yes\",\"reasoning\":\"Dark full-viewport studio shell, light text, cyan logo mark, four tabs, indigo accents, and Roboto were directly observed. Evidence: dark_studio_shell_lockup-shared.png\"},\"empty_saved_themes_state\":{\"score\":\"yes\",\"reasoning\":\"After deleting all saved themes through the live UI, the page showed \u201cNo saved themes yet\u201d with explanatory empty-state copy and New Theme action. Evidence: empty_saved_themes_state-final.png\"},\"theme_card_swatches_actions\":{\"score\":\"yes\",\"reasoning\":\"Saved theme cards visibly showed multiple swatches, type/updated metadata, Load/Rename/Delete controls, and an Active badge. Evidence: theme_card_swatches_actions-shared.png\"},\"preview_split_regions\":{\"score\":\"yes\",\"reasoning\":\"Preview visibly showed the framed sample site and device controls on the left, with code editor and Palette/tool stack on the right plus bottom tool navigation. Evidence: preview_split_regions-shared.png\"},\"previews_recolor_from_theme\":{\"score\":\"yes\",\"reasoning\":\"After updating the live palette to #ff00aa and #00cc88 via the app action, the preview surfaces visibly changed to pink/teal and the editor reflected the new values. Evidence: previews_recolor_from_theme-settled.png\"},\"component_state_treatments\":{\"score\":\"yes\",\"reasoning\":\"Components view visibly showed distinct button variants including disabled; real hover changed computed styling, and real focus produced a visible focus shadow/ring. Evidence: component_state_treatments-focus.png\"},\"desktop_side_by_side_layout\":{\"score\":\"yes\",\"reasoning\":\"At confirmed 1440px width, device preview and editor/tool stack were arranged side by side. Evidence: preview_split_regions-shared.png\"},\"stacked_layout_below_1024\":{\"score\":\"yes\",\"reasoning\":\"At confirmed 900px width, measured preview regions stacked vertically and the tool region remained reachable below. Evidence: stacked_layout_below_1024-shared.png\"},\"export_panel_dense_tool_surface\":{\"score\":\"yes\",\"reasoning\":\"Export view visibly contained monospaced JSON, JSON/CSS tabs, Download and Copy controls, and an Import ThemeOptions panel. Evidence: export_panel_dense_tool_surface-shared.png\"},\"wcag_and_harmonics_compact_meta\":{\"score\":\"yes\",\"reasoning\":\"Palette inspection showed compact Pass AA/Fail contrast labels beside palette rows and compact harmonic suggestion labels/chips in the palette tool surface. Evidence: preview_split_regions-shared.png\"} }",
+    "cost_usd": 0.219345
+  },
+  "writing": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "consistent_capitalization_chrome_and_tools",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders header title, tab labels (Preview, Components, Saved Themes, Export), and tool-panel titles (Palette, Fonts, Typography, Snippets), they use one consistent capitalization convention throughout.",
+        "reasoning": "Header, main tabs, and tool labels consistently use title case. Evidence: consistent_capitalization_chrome_and_tools-shared.png"
+      },
+      {
+        "id": "15.2",
+        "name": "specific_verbs_on_actions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders button or action labels, they use specific labels such as New Theme, Save, Copy theme code, Download JSON, Download CSS, Import ThemeOptions, Save version, Restore, Undo, Redo, Load, and Delete rather than generic Submit/OK when a specific label is possible.",
+        "reasoning": "Visible actions use specific labels including New Theme, Copy theme code, Download JSON/CSS, Import ThemeOptions, Save version, Load, Rename, and Delete. Evidence: consistent_capitalization_chrome_and_tools-shared.png"
+      },
+      {
+        "id": "15.3",
+        "name": "validation_names_problem_and_fix",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders theme-name validation messages, they name the name field and the fix, not only a bare rejection like 'Invalid'.",
+        "reasoning": "The empty-name validation says \u201cTheme name is required \u2014 enter a name for the theme,\u201d naming both the field and fix. Evidence: validation_names_problem_and_fix-shared.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_saved_themes_explains_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders the Saved Themes empty state, the copy explains that no themes are saved yet and how to create one.",
+        "reasoning": "Empty state says \u201cNo saved themes yet,\u201d explains the collection, and provides a visible New Theme action. Evidence: empty_saved_themes_explains_next_step-shared.png"
+      },
+      {
+        "id": "15.5",
+        "name": "studio_and_sample_copy_polished",
+        "value": 1.0,
+        "raw": 5,
+        "weight": 0.5,
+        "description": "Where the app renders sample-site copy, component-demo labels, and chrome/tool labels, rate how free the text is of spelling and grammatical errors.",
+        "reasoning": "Rendered chrome, sample-site copy, and tool labels are clear and free of observed spelling or grammatical errors. Evidence: consistent_capitalization_chrome_and_tools-shared.png"
+      },
+      {
+        "id": "15.6",
+        "name": "terminology_consistent_across_surfaces",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders labels for the same concept in multiple places (saved theme vs theme, primary in Palette vs editor ThemeOptions, Light/Dark Type), terminology stays consistent rather than inventing conflicting names.",
+        "reasoning": "Theme, ThemeOptions, Palette, Type, Light, Dark, and primary terminology remain consistent across preview, editor, and export surfaces. Evidence: consistent_capitalization_chrome_and_tools-shared.png"
+      },
+      {
+        "id": "15.7",
+        "name": "hex_and_status_formatting_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders hex color values and save-status text (saved / unsaved / editing), formatting is consistent for the same value across Palette fields, editor source, and status row.",
+        "reasoning": "Hex values consistently use # plus six lowercase hexadecimal characters, and the save status is clearly rendered as \u201cAll changes saved.\u201d Evidence: consistent_capitalization_chrome_and_tools-shared.png"
+      },
+      {
+        "id": "15.8",
+        "name": "success_messages_are_specific",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders confirmation feedback (copy toast, save toast, snippet-applied toast, export copied toast), the copy states what happened rather than a vague affirmation alone.",
+        "reasoning": "Copying the export produced the specific confirmation \u201cExport copied.\u201d Evidence: success_messages_are_specific-shared.png"
+      },
+      {
+        "id": "15.9",
+        "name": "wcag_labels_use_exact_tokens",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders WCAG contrast readout labels, they use the exact tokens Pass AA, Pass AAA, or Fail so the status is unambiguous.",
+        "reasoning": "Contrast readouts visibly use the exact tokens Pass AA and Fail. Evidence: consistent_capitalization_chrome_and_tools-shared.png"
+      },
+      {
+        "id": "15.10",
+        "name": "export_import_errors_explain_failure",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders Export or import error copy, the message names the offending field (e.g. name, primary.main, fontSize, palette.type, borderRadius) or the payload/cross-field problem rather than a bare rejection.",
+        "reasoning": "Malformed import produced a detailed JSON parse error with the failure position and line/column, plus \u201cImport rejected.\u201d Evidence: export_import_errors_explain_failure-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"consistent_capitalization_chrome_and_tools\":{\"score\":\"yes\",\"reasoning\":\"Header, main tabs, and tool labels consistently use title case. Evidence: consistent_capitalization_chrome_and_tools-shared.png\"},\"specific_verbs_on_actions\":{\"score\":\"yes\",\"reasoning\":\"Visible actions use specific labels including New Theme, Copy theme code, Download JSON/CSS, Import ThemeOptions, Save version, Load, Rename, and Delete. Evidence: consistent_capitalization_chrome_and_tools-shared.png\"},\"validation_names_problem_and_fix\":{\"score\":\"yes\",\"reasoning\":\"The empty-name validation says \u201cTheme name is required \u2014 enter a name for the theme,\u201d naming both the field and fix. Evidence: validation_names_problem_and_fix-shared.png\"},\"empty_saved_themes_explains_next_step\":{\"score\":\"yes\",\"reasoning\":\"Empty state says \u201cNo saved themes yet,\u201d explains the collection, and provides a visible New Theme action. Evidence: empty_saved_themes_explains_next_step-shared.png\"},\"studio_and_sample_copy_polished\":{\"score\":5,\"reasoning\":\"Rendered chrome, sample-site copy, and tool labels are clear and free of observed spelling or grammatical errors. Evidence: consistent_capitalization_chrome_and_tools-shared.png\"},\"terminology_consistent_across_surfaces\":{\"score\":\"yes\",\"reasoning\":\"Theme, ThemeOptions, Palette, Type, Light, Dark, and primary terminology remain consistent across preview, editor, and export surfaces. Evidence: consistent_capitalization_chrome_and_tools-shared.png\"},\"hex_and_status_formatting_consistent\":{\"score\":\"yes\",\"reasoning\":\"Hex values consistently use # plus six lowercase hexadecimal characters, and the save status is clearly rendered as \u201cAll changes saved.\u201d Evidence: consistent_capitalization_chrome_and_tools-shared.png\"},\"success_messages_are_specific\":{\"score\":\"yes\",\"reasoning\":\"Copying the export produced the specific confirmation \u201cExport copied.\u201d Evidence: success_messages_are_specific-shared.png\"},\"wcag_labels_use_exact_tokens\":{\"score\":\"yes\",\"reasoning\":\"Contrast readouts visibly use the exact tokens Pass AA and Fail. Evidence: consistent_capitalization_chrome_and_tools-shared.png\"},\"export_import_errors_explain_failure\":{\"score\":\"yes\",\"reasoning\":\"Malformed import produced a detailed JSON parse error with the failure position and line/column, plus \u201cImport rejected.\u201d Evidence: export_import_errors_explain_failure-shared.png\"}}",
+    "cost_usd": 0.214426
+  }
+}

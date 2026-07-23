@@ -1,0 +1,311 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@theme {
+  --ridge-radius-module: 1.5rem;
+  --ridge-radius-control: 0.5rem;
+
+  --color-void: #000000;
+  --color-surface: #111111;
+  --color-ink: #1e3a8a; /* Cobalt/Ink */
+  --color-accent: #e11d48; /* Ember/Alpine Red */
+  --color-accent-hover: #f43f5e;
+}
+
+:root {
+  --ridge-radius-module: 1.5rem;
+  --ridge-radius-control: 0.5rem;
+  --color-void: #000000;
+  --color-surface: #111111;
+  --color-ink: #1e3a8a;
+  --color-accent: #e11d48;
+}
+
+/* ---- Bundled open-license display + body faces (no CDN) ---- */
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('/fonts/space-grotesk-latin-wght-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/dm-sans-latin-wght-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+html { scroll-behavior: auto; }
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background-color: var(--color-void);
+  color: inherit;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6, .display-font, .chapter-title {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+}
+
+/* Instruction-mandated all-caps chapter titles (expressive display face).
+   The convention: chapter display titles render ALL CAPS; nav labels, manager
+   labels, and CTAs use Title Case — applied uniformly across the app. */
+.chapter-title { text-transform: uppercase; }
+
+/* Visible focus indicator on every interactive control (keyboard operability). */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ---- Pre-entrance hidden state ----
+   An inline head script adds .entrance-pending before first paint (unless
+   prefers-reduced-motion), so a fresh load paints the chrome, bento cells, and
+   hero plane in their pre-entrance state even before the React islands hydrate.
+   MotionManager removes the class the moment GSAP owns these styles inline. */
+html.entrance-pending #chrome { transform: translateY(-100%); }
+html.entrance-pending .bento-mission,
+html.entrance-pending .bento-clock,
+html.entrance-pending .hero-plane { clip-path: inset(100% 0 0 0); }
+
+/* ---- Lenis smooth-scroll host styles (recommended by the library) ---- */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+
+.notch-br {
+  border-bottom-right-radius: var(--ridge-radius-module);
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+.notch-br-lg {
+  border-bottom-right-radius: 3rem;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+/* ---- Why Ridge progressive sticky pile (desktop only) ---- */
+.sticky-title,
+.why-card { position: static; }
+
+:root[data-theme="light"] .why-card--neutral {
+  background-color: rgb(247 247 245 / 0.94);
+  color: #101114;
+}
+
+:root[data-theme="dark"] .why-card--neutral {
+  background-color: rgb(32 33 36 / 0.96);
+  color: #f8fafc;
+}
+
+@media (min-width: 768px) {
+  .sticky-title {
+    position: sticky;
+    top: 96px;
+    z-index: 10;
+  }
+
+  .why-card {
+    position: sticky;
+    top: calc(176px + var(--i, 0) * 32px);
+    z-index: calc(var(--i, 0) + 1);
+  }
+}
+
+/* ---- Get started trio rise (below lg only), per-card stagger via transition-delay ---- */
+@media (max-width: 1023px) {
+  .trio-card {
+    transform: translateY(50%);
+    opacity: 0;
+    transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition-delay: calc(2s + var(--i, 0) * 0.4s);
+  }
+  #trio.trio-in .trio-card {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ---- Events Manager row enter / exit ---- */
+@keyframes ridge-row-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+tbody tr.row-enter { animation: ridge-row-in 0.32s cubic-bezier(0.16, 0.84, 0.44, 1) both; }
+tbody tr.row-exit {
+  opacity: 0;
+  transform: translateX(24px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* ---- Bulk action bar entrance ---- */
+@keyframes ridge-bulk-in {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.bulk-bar-in { animation: ridge-bulk-in 0.28s cubic-bezier(0.16, 0.84, 0.44, 1) both; }
+
+/* ---- Overlay (palette / export / manager / form) enter & exit ---- */
+@keyframes ridge-overlay-in {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes ridge-overlay-out {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to   { opacity: 0; transform: scale(0.96) translateY(8px); }
+}
+.overlay-in  { animation: ridge-overlay-in 0.24s cubic-bezier(0.16, 0.84, 0.44, 1) both; }
+.overlay-out { animation: ridge-overlay-out 0.2s ease-in both; }
+
+@keyframes ridge-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ridge-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
+.backdrop-in  { animation: ridge-backdrop-in 0.24s ease both; }
+.backdrop-out { animation: ridge-backdrop-out 0.2s ease both; }
+
+/* ---- Mega menu drawer slide ---- */
+@keyframes ridge-drawer-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes ridge-drawer-out { from { transform: translateX(0); } to { transform: translateX(100%); } }
+.drawer-in  { animation: ridge-drawer-in 0.3s cubic-bezier(0.16, 0.84, 0.44, 1) both; }
+.drawer-out { animation: ridge-drawer-out 0.24s ease-in both; }
+
+/* ---- Contact success rise ---- */
+@keyframes ridge-success-in { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
+.success-in { animation: ridge-success-in 0.4s cubic-bezier(0.16, 0.84, 0.44, 1) both; }
+
+/* ---- Command palette active row ---- */
+.palette-row[aria-selected="true"] {
+  background-color: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  color: var(--color-accent);
+  box-shadow: inset 3px 0 0 var(--color-accent);
+  font-weight: 600;
+}
+
+/* ---- Reduced motion: kill all signature motion, smooth scroll, and entrance offsets ---- */
+@media (prefers-reduced-motion: reduce) {
+  html, body { scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+  .sticky-title, .why-card { position: static !important; top: auto !important; }
+  .trio-card { transform: none !important; opacity: 1 !important; }
+  .load-target { transform: none !important; clip-path: none !important; opacity: 1 !important; }
+}
+
+/* Theme tokens intentionally override DaisyUI's semantic defaults. */
+:root[data-theme="light"] {
+  --color-void: #050505;
+  --color-surface: #f4f4f2;
+  --color-ink: #173b72;
+  --color-accent: #d92d35;
+  --color-accent-hover: #ef454c;
+  --color-primary: #c6232e;
+  --color-primary-content: #ffffff;
+  --color-accent-content: #ffffff;
+  --color-neutral: #18181b;
+  --color-neutral-content: #ffffff;
+  --color-base-100: #f4f4f2;
+  --color-base-content: #101114;
+  color: #f8fafc;
+}
+:root[data-theme="dark"] {
+  --color-void: #000000;
+  --color-surface: #151515;
+  --color-ink: #244d8f;
+  --color-accent: #ff6b67;
+  --color-accent-hover: #ff8983;
+  --color-primary: #d92d35;
+  --color-primary-content: #ffffff;
+  --color-accent-content: #111111;
+  --color-neutral: #27272a;
+  --color-neutral-content: #ffffff;
+  --color-base-100: #151515;
+  --color-base-content: #f8fafc;
+  color: #f8fafc;
+}
+
+:root[data-theme="light"] body {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+:root[data-theme="dark"] body {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+:root[data-theme="light"] .surface-copy { color: #101114; }
+:root[data-theme="light"] .void-copy,
+:root[data-theme="light"] .on-dark-plane,
+:root[data-theme="light"] .ink { color: #f8fafc; }
+:root[data-theme="dark"] .surface-copy,
+:root[data-theme="dark"] .void-copy { color: #f8fafc; }
+
+.why-media {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 24%, transparent), transparent 58%),
+    repeating-linear-gradient(90deg, color-mix(in srgb, currentColor 8%, transparent) 0 1px, transparent 1px 22px),
+    color-mix(in srgb, var(--color-ink) 24%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.panel-in { animation: ridge-row-in 0.24s cubic-bezier(0.16, 0.84, 0.44, 1) both; }
+
+.void {
+  background-color: var(--color-void);
+  min-height: 100vh;
+}
+
+:root[data-theme="light"] .void { color: #f8fafc; }
+:root[data-theme="dark"] .void { color: #f8fafc; }
+
+
+/* --- Microinteractions --- */
+.why-card {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.why-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -10px rgba(0,0,0,0.15);
+}
+.events-card {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.events-card:hover {
+  transform: translateY(-4px);
+}
+tr[data-event-row], li[data-event-row] {
+  transition: background-color 0.2s ease;
+}
+tr[data-event-row]:hover, li[data-event-row]:hover {
+  background-color: color-mix(in srgb, var(--color-ink) 10%, transparent);
+}
+/* Notched CTA: brighten + slight lift + arrow nudge, all eased (never a snap). */
+.cta {
+  transition: filter 0.25s ease, transform 0.25s cubic-bezier(0.16, 0.84, 0.44, 1);
+}
+.cta svg {
+  transition: transform 0.25s cubic-bezier(0.16, 0.84, 0.44, 1);
+}
+.cta:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+}
+.cta:hover svg {
+  transform: translateX(4px);
+}
+/* Theme toggle: rotate/fade icon swap on each theme change. */
+@keyframes ridge-theme-icon {
+  from { transform: rotate(-90deg) scale(0.6); opacity: 0; }
+  to   { transform: rotate(0deg) scale(1); opacity: 1; }
+}
+.theme-icon-swap { display: inline-flex; animation: ridge-theme-icon 0.3s cubic-bezier(0.16, 0.84, 0.44, 1) both; }
