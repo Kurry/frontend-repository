@@ -101,6 +101,7 @@ export const useCalibrationStore = defineStore('calibration', {
     varianceRows(state) {
       const visibleModels = this.activeModels
       const visibleHarnesses = this.activeHarnesses
+      if (!visibleModels.length || !visibleHarnesses.length) return []
       return state.tasks
         .filter((task) => this.activeCategories.includes(task.category))
         .map((task) => {
@@ -311,6 +312,7 @@ export const useCalibrationStore = defineStore('calibration', {
       this.filters = { model: [], harness: [], taskCategory: [] }
       this.filterSearch = { model: '', harness: '', taskCategory: '' }
       this.sanitizeSelection()
+      this.ui.paletteOpen = false // Make sure palette closes
     },
     sanitizeSelection() {
       const divergent = new Set(this.divergentRows.map((row) => row.task))
@@ -378,6 +380,7 @@ export const useCalibrationStore = defineStore('calibration', {
       this.checkpoint()
       this.baseline = { cells: this.models.flatMap((model) => this.harnesses.map((harness) => ({ model, harness, mean: this.heatmapMean(model, harness) }))) }
       this.showToast('Baseline pinned from current cell means')
+      this.ui.paletteOpen = false // Make sure palette closes
     },
     clearBaseline() {
       if (!this.baseline) return
