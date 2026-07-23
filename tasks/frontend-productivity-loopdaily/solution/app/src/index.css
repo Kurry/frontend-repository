@@ -184,6 +184,19 @@ h4 {
   border-radius: 8px;
   border: 1px solid #eef2f1;
   transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.18s ease, opacity 0.18s ease;
+  /* Entrance: a newly created habit animates into the list rather than
+     appearing instantly (runs once per DOM insertion). */
+  animation: cardIn 0.3s ease-out;
+}
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 .habit-row:hover {
   box-shadow: 0 6px 18px rgba(27, 36, 48, 0.08);
@@ -217,9 +230,15 @@ h4 {
 .stepper-btn:active:not(:disabled) {
   transform: scale(0.9);
 }
-.stepper-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+.stepper-btn-limit {
+  /* At the floor/ceiling the stepper stays clickable (a tap is a visible
+     no-op — the store clamps), but reads dimmed. */
+  opacity: 0.45;
+}
+
+/* ---- Stepper progress bar: CSS-transitioned width ---- */
+.progress-fill {
+  transition: width 0.3s ease, background-color 0.2s ease;
 }
 
 /* ---- Drag affordances (pointer-driven) ---- */
@@ -235,8 +254,20 @@ h4 {
 .drag-handle:active {
   cursor: grabbing;
 }
+.habit-drag-wrapper {
+  transition: transform 0.18s ease;
+}
 [data-dragging="true"] {
   z-index: 20;
+}
+/* Lift affordance while the pointer drag is active. */
+.habit-drag-lifted {
+  transform: scale(1.02);
+  z-index: 30;
+}
+.habit-drag-lifted .habit-row {
+  box-shadow: 0 14px 32px rgba(27, 36, 48, 0.18);
+  border-color: #0f9d74;
 }
 
 /* ---- Animations ---- */
@@ -303,6 +334,23 @@ h4 {
   white-space: nowrap;
   transform: translate(-50%, -100%);
   transition: opacity 0.12s ease;
+}
+
+/* ---- Toasts: explicit slide/fade-in so the motion is both visible and
+   measurable as a computed CSS animation on [data-sonner-toast]. ---- */
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+[data-sonner-toast] {
+  animation: toastIn 0.32s cubic-bezier(0.21, 1.02, 0.73, 1);
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 /* ---- Scrollbar ---- */

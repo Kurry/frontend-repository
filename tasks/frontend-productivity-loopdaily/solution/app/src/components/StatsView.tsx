@@ -87,28 +87,28 @@ export default function StatsView({ onBack }: StatsViewProps) {
             <path d="M13 4l-6 6 6 6" />
           </svg>
         </button>
-        <h2 className="text-xl font-bold text-[#1B2430]">Stats Dashboard</h2>
+        <h2 className="text-xl font-bold text-[#1B2430]">Stats dashboard</h2>
       </div>
 
       {/* Summary cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-[#F4F7F6] rounded-lg p-4 text-center">
           <div className="text-3xl font-bold text-[#0F9D74]">{activeStreakCount}</div>
-          <div className="text-xs text-[#64748B] mt-1">Active Streaks</div>
+          <div className="text-xs text-[#64748B] mt-1">Active streaks</div>
         </div>
         <div className="bg-[#F4F7F6] rounded-lg p-4 text-center">
           <div className="text-3xl font-bold text-[#FFB020]">{longestEver}</div>
-          <div className="text-xs text-[#64748B] mt-1">Longest Streak Ever</div>
+          <div className="text-xs text-[#64748B] mt-1">Longest streak ever</div>
         </div>
         <div className="bg-[#F4F7F6] rounded-lg p-4 text-center">
           <div className="text-3xl font-bold text-[#0F9D74]">{totalMonthCompletions}</div>
-          <div className="text-xs text-[#64748B] mt-1">{monthLabel} Completions</div>
+          <div className="text-xs text-[#64748B] mt-1">{monthLabel} completions</div>
         </div>
       </div>
 
       {/* Trend Chart */}
       <div className="mb-6">
-        <h3 className="text-base font-bold text-[#1B2430] mb-3">Completions Trend (Last 14 Days)</h3>
+        <h3 className="text-xl font-bold text-[#1B2430] mb-3">Completions trend (last 14 days)</h3>
         <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -133,7 +133,7 @@ export default function StatsView({ onBack }: StatsViewProps) {
       {/* Per-habit breakdown */}
       {habitStats.length > 0 && (
         <div>
-          <h3 className="text-base font-bold text-[#1B2430] mb-3">Per-Habit Breakdown</h3>
+          <h3 className="text-xl font-bold text-[#1B2430] mb-3">Per-habit breakdown</h3>
           <div className="space-y-2">
             {habitStats.map(({ habit, streak, best, monthCount }) => (
               <div key={habit.id} className="flex items-center justify-between py-2 px-3 bg-[#F4F7F6] rounded-lg">

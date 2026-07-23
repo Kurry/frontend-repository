@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAtom } from "jotai";
-import { Reorder, useDragControls } from "motion/react";
 import {
   habitsAtom,
   activeFilterAtom,
@@ -17,57 +16,6 @@ import ImportExport from "./components/ImportExport";
 import RecoveryBanner from "./components/RecoveryBanner";
 import { Toaster, toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { Habit } from "./types";
-
-function SortableHabit({
-  habit,
-  onOpenHeatmap,
-  onDragSettled,
-}: {
-  habit: Habit;
-  onOpenHeatmap: (id: string) => void;
-  onDragSettled: () => void;
-}) {
-  const dragControls = useDragControls();
-  return (
-    <Reorder.Item
-      as="div"
-      value={habit.id}
-      dragListener={false}
-      dragControls={dragControls}
-      whileDrag={{
-        scale: 1.02,
-        boxShadow: "0 14px 32px rgba(27,36,48,0.18)",
-        zIndex: 30,
-      }}
-      transition={{ type: "spring", stiffness: 420, damping: 36 }}
-      className="relative outline-none"
-      data-dragging="false"
-      onDragStart={() => {
-        const el = document.querySelector(`[data-habit-id="${habit.id}"]`)?.closest("[data-dragging]");
-        el?.setAttribute("data-dragging", "true");
-      }}
-      onDragEnd={() => {
-        const el = document.querySelector(`[data-habit-id="${habit.id}"]`)?.closest("[data-dragging]");
-        el?.setAttribute("data-dragging", "false");
-        onDragSettled();
-      }}
-    >
-      <HabitCard habit={habit} dragControls={dragControls} onOpenHeatmap={onOpenHeatmap} />
-    </Reorder.Item>
-  );
-}
-
-function PausedHabit({
-  habit,
-  onOpenHeatmap,
-}: {
-  habit: Habit;
-  onOpenHeatmap: (id: string) => void;
-}) {
-  const dragControls = useDragControls();
-  return <HabitCard habit={habit} dragControls={dragControls} onOpenHeatmap={onOpenHeatmap} />;
-}
 
 export default function App() {
   const [habits] = useAtom(habitsAtom);
@@ -79,9 +27,12 @@ export default function App() {
   const [heatmapHabitId, setHeatmapHabitId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [orderIds, setOrderIds] = useState<string[]>([]);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
   const committedKey = useRef("");
   const orderIdsRef = useRef(orderIds);
   orderIdsRef.current = orderIds;
+  const listRef = useRef<HTMLDivElement | null>(null);
+  const dragRef = useRef<{ id: string; pointerId: number } | null>(null);
 
   const sortedHabits = useMemo(
     () => [...habits].sort((a, b) => a.order - b.order),
@@ -98,6 +49,7 @@ export default function App() {
     const ids = activeHabits.map((h) => h.id);
     setOrderIds(ids);
     committedKey.current = ids.join("|");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeKey]);
 
   const changeView = useCallback(
@@ -118,7 +70,7 @@ export default function App() {
 
   const goHome = useCallback(() => changeView("habits"), [changeView]);
 
-  const settleReorder = useCallback(() => {
+  const commitOrder = useCallback(() => {
     const ids = orderIdsRef.current;
     const key = ids.join("|");
     if (!key || key === committedKey.current) return;
@@ -126,6 +78,82 @@ export default function App() {
     reorderByIds(ids);
     toast.info("Habits reordered");
   }, [reorderByIds]);
+
+  // --- Pointer-driven drag reorder ----------------------------------------
+  // Deliberately implemented on raw pointer events so that every pointermove
+  // (even a single large jump) recomputes the insertion slot: the dragged card
+  // is placed at the index derived from the pointer's Y against the midpoints
+  // of the other cards, and the surrounding cards settle via CSS transitions.
+  const computeDropIndex = useCallback(
+    (clientY: number, excludeId: string): number => {
+      const list = listRef.current;
+      if (!list) return 0;
+      const others = Array.from(
+        list.querySelectorAll<HTMLElement>("[data-habit-wrapper]")
+      ).filter((el) => el.dataset.habitWrapper !== excludeId);
+      let index = 0;
+      for (const el of others) {
+        const rect = el.getBoundingClientRect();
+        if (clientY > rect.top + rect.height / 2) index += 1;
+      }
+      return index;
+    },
+    []
+  );
+
+  const handleDragPointerDown = useCallback(
+    (e: React.PointerEvent, habitId: string) => {
+      e.preventDefault();
+      dragRef.current = { id: habitId, pointerId: e.pointerId };
+      setDraggingId(habitId);
+
+      const onMove = (ev: PointerEvent) => {
+        const drag = dragRef.current;
+        if (!drag) return;
+        const ids = orderIdsRef.current;
+        const from = ids.indexOf(drag.id);
+        if (from === -1) return;
+        const to = computeDropIndex(ev.clientY, drag.id);
+        if (to === from) return;
+        const next = [...ids];
+        next.splice(from, 1);
+        next.splice(to, 0, drag.id);
+        setOrderIds(next);
+      };
+
+      const finish = () => {
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", finish);
+        window.removeEventListener("pointercancel", finish);
+        dragRef.current = null;
+        setDraggingId(null);
+        commitOrder();
+      };
+
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", finish);
+      window.addEventListener("pointercancel", finish);
+    },
+    [commitOrder, computeDropIndex]
+  );
+
+  // Keyboard fallback on the same drag handle: ArrowUp/ArrowDown move the
+  // habit one slot and commit immediately.
+  const handleMoveByKey = useCallback(
+    (habitId: string, direction: -1 | 1) => {
+      const ids = orderIdsRef.current;
+      const from = ids.indexOf(habitId);
+      const to = from + direction;
+      if (from === -1 || to < 0 || to >= ids.length) return;
+      const next = [...ids];
+      next.splice(from, 1);
+      next.splice(to, 0, habitId);
+      setOrderIds(next);
+      orderIdsRef.current = next;
+      commitOrder();
+    },
+    [commitOrder]
+  );
 
   const showCoach = !uiPrefs.coachDismissed && habits.length === 0 && view === "habits";
 
@@ -189,10 +217,10 @@ export default function App() {
           >
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-base font-bold text-[#1B2430]">Quick tour</h2>
+                <h2 className="text-xl font-bold text-[#1B2430]">Quick tour</h2>
                 <ol className="mt-2 space-y-1.5 text-sm text-[#64748B] list-decimal list-inside">
                   <li>
-                    Tap <strong className="text-[#1B2430]">New Habit</strong> (or Create habit) to add your first loop.
+                    Tap <strong className="text-[#1B2430]">Create habit</strong> to add your first habit.
                   </li>
                   <li>
                     Use <strong className="text-[#1B2430]">category chips</strong> to filter once you have categories.
@@ -231,7 +259,7 @@ export default function App() {
                   <span className="text-5xl mb-4 block" aria-hidden="true">
                     🌱
                   </span>
-                  <h3 className="text-lg font-bold text-[#1B2430] mb-2">No habits yet</h3>
+                  <h3 className="text-xl font-bold text-[#1B2430] mb-2">No habits yet</h3>
                   <p className="text-sm text-[#64748B] mb-6 max-w-xs mx-auto">
                     Start building good habits! Create your first habit to begin tracking your daily
                     progress.
@@ -248,35 +276,38 @@ export default function App() {
               )
             ) : (
               <>
-                <Reorder.Group
-                  as="div"
-                  axis="y"
-                  values={orderIds}
-                  onReorder={setOrderIds}
-                  className="space-y-2"
-                >
+                <div ref={listRef} className="space-y-2" data-habit-list>
                   {orderIds.map((id) => {
                     const habit = activeHabits.find((h) => h.id === id);
                     if (!habit) return null;
                     return (
-                      <SortableHabit
+                      <div
                         key={habit.id}
-                        habit={habit}
-                        onOpenHeatmap={openHeatmap}
-                        onDragSettled={settleReorder}
-                      />
+                        data-habit-wrapper={habit.id}
+                        data-dragging={draggingId === habit.id}
+                        className={`habit-drag-wrapper relative ${
+                          draggingId === habit.id ? "habit-drag-lifted" : ""
+                        }`}
+                      >
+                        <HabitCard
+                          habit={habit}
+                          onOpenHeatmap={openHeatmap}
+                          onDragHandlePointerDown={handleDragPointerDown}
+                          onMoveByKey={handleMoveByKey}
+                        />
+                      </div>
                     );
                   })}
-                </Reorder.Group>
+                </div>
 
                 {pausedHabits.length > 0 && (
                   <div className="mt-6">
                     <h3 className="text-sm font-semibold text-[#64748B] mb-2 px-1">
-                      Paused Habits ({pausedHabits.length})
+                      Paused habits ({pausedHabits.length})
                     </h3>
                     <div className="space-y-2">
                       {pausedHabits.map((habit) => (
-                        <PausedHabit
+                        <HabitCard
                           key={habit.id}
                           habit={habit}
                           onOpenHeatmap={openHeatmap}
@@ -296,7 +327,7 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => setShowForm(true)}
-                    className="w-full min-h-12 py-3 border-2 border-dashed border-[#E2E8F0] rounded-[8px] text-sm font-medium text-[#475569] hover:border-[#0F9D74] hover:text-[#0F9D74] transition-colors"
+                    className="w-full min-h-12 py-3 border-2 border-dashed border-[#E2E8F0] rounded-[8px] text-sm font-medium text-[#475569] hover:border-[#0F9D74] hover:text-[#0F9D74] hover:bg-[#F0FAF6] transition-all"
                     data-action="open-habit-form"
                   >
                     + New habit
@@ -316,7 +347,7 @@ export default function App() {
         {view === "import" && <ImportExport />}
       </main>
 
-      <Toaster position="bottom-center" />
+      <Toaster position="top-right" />
     </div>
   );
 }

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
 import { motion, useReducedMotion } from "motion/react";
-import type { DragControls } from "motion/react";
 import confetti from "canvas-confetti";
 import {
   DotsSixVertical,
@@ -29,8 +28,11 @@ import Modal from "./ui/modal";
 
 interface HabitCardProps {
   habit: Habit;
-  dragControls: DragControls;
   onOpenHeatmap: (id: string) => void;
+  /** Pointer-down on the drag handle starts a pointer-driven reorder drag. */
+  onDragHandlePointerDown?: (e: React.PointerEvent, habitId: string) => void;
+  /** ArrowUp/ArrowDown on the drag handle moves the habit one slot. */
+  onMoveByKey?: (habitId: string, direction: -1 | 1) => void;
 }
 
 const fireConfetti = (element: HTMLElement | null, tier: "bright" | "gold") => {
@@ -48,7 +50,7 @@ const fireConfetti = (element: HTMLElement | null, tier: "bright" | "gold") => {
   }, 140);
 };
 
-export default function HabitCard({ habit, dragControls, onOpenHeatmap }: HabitCardProps) {
+export default function HabitCard({ habit, onOpenHeatmap, onDragHandlePointerDown, onMoveByKey }: HabitCardProps) {
   const [, updateHabit] = useAtom(updateHabitAtom);
   const [, toggleComplete] = useAtom(toggleCompletionAtom);
   const [, stepComplete] = useAtom(stepCompletionAtom);
@@ -175,13 +177,24 @@ export default function HabitCard({ habit, dragControls, onOpenHeatmap }: HabitC
       >
         <div className="p-3 md:p-4">
           <div className="flex items-center gap-2">
-            {/* Drag handle (pointer-driven via framer DragControls) */}
+            {/* Drag handle: pointer drag reorders; ArrowUp/ArrowDown also move the habit */}
             <button
               type="button"
               className="drag-handle rounded-[8px] p-1"
-              aria-label={`Drag to reorder ${habit.name}`}
+              aria-label={`Drag to reorder ${habit.name}. Press arrow up or arrow down to move it.`}
               title="Drag to reorder"
-              onPointerDown={(e) => dragControls.start(e)}
+              onPointerDown={(e) => onDragHandlePointerDown?.(e, habit.id)}
+              onKeyDown={(e) => {
+                if (e.key === "ArrowUp") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onMoveByKey?.(habit.id, -1);
+                } else if (e.key === "ArrowDown") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onMoveByKey?.(habit.id, 1);
+                }
+              }}
               data-action="drag-handle"
             >
               <DotsSixVertical size={18} weight="bold" aria-hidden="true" />
@@ -317,42 +330,44 @@ export default function HabitCard({ habit, dragControls, onOpenHeatmap }: HabitC
                 </button>
               ) : (
                 <div className="flex items-center gap-2">
+                  {/* The steppers stay enabled at their bounds: a minus tap at zero
+                      and a plus tap at target are visible no-ops (the store clamps),
+                      so rapid repeated taps never dead-end on a disabled control. */}
                   <button
                     type="button"
                     onClick={() => handleStep(-1)}
-                    disabled={count <= 0}
                     aria-label="Decrease count by one"
                     data-action="step-dec"
-                    className="stepper-btn inline-flex items-center justify-center rounded-[8px] border border-[#E2E8F0] bg-[#FFFFFF] text-[#1B2430] hover:border-[#EF4444] hover:text-[#EF4444]"
+                    className={`stepper-btn inline-flex items-center justify-center rounded-[8px] border border-[#E2E8F0] bg-[#FFFFFF] text-[#1B2430] hover:border-[#EF4444] hover:text-[#EF4444] ${
+                      count <= 0 ? "stepper-btn-limit" : ""
+                    }`}
                   >
                     <Minus size={16} weight="bold" aria-hidden="true" />
                   </button>
-                  <div className="flex min-w-[60px] flex-col items-center">
-                    <motion.span
+                  <div className="flex min-w-[64px] flex-col items-center">
+                    <span
                       key={count}
-                      initial={{ scale: prefersReduced ? 1 : 1.18 }}
-                      animate={{ scale: 1 }}
-                      transition={{ duration: 0.28, ease: "easeOut" }}
-                      className={`text-sm font-bold tabular-nums ${done ? "text-[#0F9D74]" : "text-[#1B2430]"}`}
+                      className={`frac-pop text-sm font-bold tabular-nums ${done ? "text-[#0F9D74]" : "text-[#1B2430]"}`}
+                      data-fraction
                     >
                       {count}/{habit.targetCount}
-                    </motion.span>
-                    <div className="mt-1 h-1.5 w-14 overflow-hidden rounded-[8px] bg-[#E2E8F0]">
-                      <motion.div
-                        className={`h-full rounded-[8px] ${done ? "bg-[#0F9D74]" : "bg-[#0F9D74]/60"}`}
-                        initial={false}
-                        animate={{ width: `${Math.min(100, fraction * 100)}%` }}
-                        transition={{ duration: 0.3, ease: "easeOut" }}
+                    </span>
+                    <div className="mt-1 h-2 w-16 overflow-hidden rounded-[8px] bg-[#E2E8F0]">
+                      <div
+                        className={`progress-fill h-full rounded-[8px] ${done ? "bg-[#0F9D74]" : "bg-[#0F9D74]/60"}`}
+                        style={{ width: `${Math.min(100, fraction * 100)}%` }}
+                        data-progress-bar
                       />
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => handleStep(1)}
-                    disabled={count >= habit.targetCount}
                     aria-label="Increase count by one"
                     data-action="step-inc"
-                    className="stepper-btn inline-flex items-center justify-center rounded-[8px] bg-[#0F9D74] text-white hover:bg-[#0B7D5C]"
+                    className={`stepper-btn inline-flex items-center justify-center rounded-[8px] bg-[#0F9D74] text-white hover:bg-[#0B7D5C] ${
+                      count >= habit.targetCount ? "stepper-btn-limit" : ""
+                    }`}
                   >
                     <Plus size={16} weight="bold" aria-hidden="true" />
                   </button>

@@ -498,24 +498,74 @@ export const importDataAtom = atom(null, (get, set, data: unknown): ImportResult
   }
 
   const current = get(appStateAtom);
-  saveToStorage(BACKUP_STORAGE_KEY, current);
-
   set(appStateAtom, {
     ...normalized,
     activeCategoryFilter: (data as AppState).activeCategoryFilter,
   });
+  // Keep the pre-import state as the retained snapshot (the appStateAtom write
+  // above syncs backup to the new state, so re-save the previous one after).
+  saveToStorage(BACKUP_STORAGE_KEY, current);
   return { success: true, errors: [], habitCount: normalized.habits.length, categoryCount: normalized.categories.length };
 });
 
-export const importMalformedDataAtom = atom(null, (get, set, data: unknown) => {
+export interface SoftRecoveryResult {
+  success: boolean;
+  habitCount: number;
+  categoryCount: number;
+  skippedCount: number;
+  repairedCount: number;
+  /** Human-readable notes naming each skipped or repaired entry/field. */
+  notes: string[];
+}
+
+export const importMalformedDataAtom = atom(null, (get, set, data: unknown): SoftRecoveryResult => {
+  const notes: string[] = [];
+  let skippedCount = 0;
+  let repairedCount = 0;
+
+  if (data && typeof data === "object") {
+    const obj = data as Record<string, unknown>;
+    (Array.isArray(obj.habits) ? obj.habits : []).forEach((h, i) => {
+      if (!h || typeof h !== "object") {
+        skippedCount += 1;
+        notes.push(`habits[${i}] was not an object — skipped`);
+        return;
+      }
+      const rec = h as Record<string, unknown>;
+      const repairs: string[] = [];
+      if (typeof rec.name !== "string" || !rec.name.trim()) repairs.push("name");
+      if (rec.completions !== undefined && (typeof rec.completions !== "object" || rec.completions === null || Array.isArray(rec.completions))) repairs.push("completions");
+      if (rec.targetType !== "once" && rec.targetType !== "count") repairs.push("targetType");
+      if (repairs.length) {
+        repairedCount += 1;
+        notes.push(`habits[${i}] had invalid ${repairs.join(", ")} — repaired`);
+      }
+    });
+    (Array.isArray(obj.categories) ? obj.categories : []).forEach((c, i) => {
+      if (!c || typeof c !== "object") {
+        skippedCount += 1;
+        notes.push(`categories[${i}] was not an object — skipped`);
+      }
+    });
+  }
+
   const normalized = normalizeImportedData(data);
   if (!normalized) {
-    return { success: false, habitCount: 0, categoryCount: 0 };
+    return { success: false, habitCount: 0, categoryCount: 0, skippedCount, repairedCount, notes };
   }
   const current = get(appStateAtom);
-  saveToStorage(BACKUP_STORAGE_KEY, current);
   set(appStateAtom, normalized);
-  return { success: true, habitCount: normalized.habits.length, categoryCount: normalized.categories.length };
+  // Retain the pre-recovery state as the Retry snapshot: the appStateAtom
+  // write syncs backup to the recovered state, so re-save the previous one.
+  saveToStorage(BACKUP_STORAGE_KEY, current);
+  return {
+    success: true,
+    habitCount: normalized.habits.length,
+    categoryCount: normalized.categories.length,
+    skippedCount,
+    repairedCount,
+    notes,
+  };
 });
 
 export const retryRecoveryAtom = atom(null, (get, set) => {
