@@ -1,0 +1,27 @@
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "interleave_scope_edits_dispatch"
+description = "Interleave scope edits, dispatch, a delivery delay, and a partial handoff. Verify that the actual history, lineage, counts, and files correctly record all interleaved events without losing state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "perform_a_series_of"
+description = "Perform a series of actions, then export the state. Reset the application and import the exported file. Verify that the state round-trips exactly, restoring all authored and derived state (regenerated timestamps are allowed)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "attempt_to_perform_an"
+description = "Attempt to perform an undo action after a task has been dispatched. Verify that the undo is blocked or appropriately restricted to pre-dispatch phases."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "after_an_import_the"
+description = "After an import, the system has silently shared or overwritten the previous session's state in memory rather than performing an atomic reset and load."
+type = "binary"
+negate = true
+weight = 1.0

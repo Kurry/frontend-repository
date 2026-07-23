@@ -1,0 +1,33 @@
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "without_using_a_pointer"
+description = "Without using a pointer device, use the keyboard to navigate the spatial tree, select loci, and schedule work on the timeline. Verify that focus is visible and values match the pointer flow."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "open_the_branch_approval"
+description = "Open the branch approval dialog or any modal using the keyboard. Verify that keyboard focus is trapped within the modal and returns to the triggering element upon closing."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "trigger_a_notification_error"
+description = "Trigger a notification, error state, or completion of an action. Verify that an `aria-live` region announces the exact outcome or error text."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "verify_that_all_form"
+description = "Verify that all form fields (e.g., finding details, inventory quantities) have explicit `<label>` elements associated with them."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "the_application_relies_solely"
+description = "The application relies solely on color to convey the status of a locus (e.g., only using red for finding, green for ready, with no text or icon indicator)."
+type = "binary"
+negate = true
+weight = 1.0

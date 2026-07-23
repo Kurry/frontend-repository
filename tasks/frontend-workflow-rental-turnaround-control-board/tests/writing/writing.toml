@@ -1,0 +1,20 @@
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "trigger_a_locusevidencetask_or"
+description = "Trigger a locus/evidence/task or inventory conflict. Verify that the error copy names the exact room, fixture, finding, task, lot, key, or prerequisite involved."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "when_an_error_occurs"
+description = "When an error occurs during an action, verify that the error message clearly states the specific rule violated and suggests a concrete recovery action."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "review_the_field_labels"
+description = "Review the field labels and button text across the app. Verify they use clear, consistent terminology without placeholder jargon."
+type = "binary"
+weight = 1.0

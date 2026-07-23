@@ -1,0 +1,32 @@
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "resize_the_browser_to"
+description = "Resize the browser to a 375px mobile viewport. Verify that the room and fixture cards are fully usable and do not cause horizontal page-level overflow."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "at_a_375px_viewport"
+description = "At a 375px viewport, verify that all interactive targets (buttons, list items, sliders) have a computed height and width of at least 44px."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "at_a_375px_viewport"
+description = "At a 375px viewport, navigate through the evidence sheet, day/worker schedule, and custody stepper. Verify that the full canonical workflow can be completed without missing actions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "resize_the_browser_to"
+description = "Resize the browser to a 768px tablet viewport. Verify that the interface uses synchronized panes and utilizes the screen space effectively without overlapping."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "resize_the_browser_to"
+description = "Resize the browser to 1440px desktop. Verify that the floorplan, evidence, timeline, and inventory views are linked effectively and visible together."
+type = "binary"
+weight = 1.0

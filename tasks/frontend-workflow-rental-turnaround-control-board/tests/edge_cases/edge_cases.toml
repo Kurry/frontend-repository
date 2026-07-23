@@ -1,0 +1,46 @@
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "attempt_to_import_an"
+description = "Attempt to import an invalid configuration file with a corrupted manifest or missing fields. Verify that the import is rejected atomically with zero state mutation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cancel_a_work_block"
+description = "Cancel a work block drag or form edit midway. Verify that the UI restores the complete prior snapshot, including selection, viewport, filters, and history anchor, leaving no extra events."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "rapidly_click_the_record"
+description = "Rapidly click the 'Record Finding' or 'Retry Dispatch' button multiple times. Verify that exactly one record or attempt is appended and the system ignores the duplicate event."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "enter_an_exactboundary_value"
+description = "Enter an exact-boundary value for a bounded field (e.g., minimum duration, maximum quantity). Verify the value is accepted. Enter a just-outside value and verify it is rejected with a clear error identifying the rule."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "create_a_dependency_cycle"
+description = "Create a dependency cycle between two or more work blocks. Verify that the cycle is detected, remains as a preview, and blocks readiness."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "a_locus_marked_ready"
+description = "A locus marked ready has an open blocking finding. Verify this invalid state is not permitted, as readiness must strictly derive from findings and verification."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "after_an_approval_the"
+description = "After an approval, the system fails to mark the approval stale when a related finding is edited."
+type = "binary"
+negate = true
+weight = 1.0

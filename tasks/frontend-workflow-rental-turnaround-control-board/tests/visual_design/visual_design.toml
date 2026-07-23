@@ -1,0 +1,32 @@
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "inspect_the_floorplan_svg"
+description = "Inspect the floorplan SVG. Verify that uninspected, finding, work, and verified states are visually distinct and legible."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "select_a_locus_verify"
+description = "Select a locus. Verify that selected and linked items (across floorplan, evidence ledger, timeline, and resources) are visibly highlighted or grouped."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "inspect_the_inventory_and"
+description = "Inspect the inventory and custody views. Verify that reserved, issued, consumed, checked-out, and returned states have distinct visual indicators."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "inspect_the_branch_approval"
+description = "Inspect the branch approval and handoff views. Verify that branch, stale, partial, and ready states are clearly distinguishable from one another."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "verify_that_all_text"
+description = "Verify that all text, including error messages and status indicators, passes sufficient color contrast rules."
+type = "binary"
+weight = 1.0
