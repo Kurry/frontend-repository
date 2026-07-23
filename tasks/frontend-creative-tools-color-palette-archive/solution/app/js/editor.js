@@ -14,6 +14,7 @@ let draft = null;
 let panelEl = null;
 let invokerEl = null;
 let overlayEntry = null;
+let eventsBound = false;
 
 export function isEditorOpen() {
   return overlayEntry !== null;
@@ -213,9 +214,9 @@ function renderSwatchRows() {
           value="${escapeHtml(hex)}" placeholder="#000000" maxlength="7" spellcheck="false" autocomplete="off">
         <em class="swatch-row__name">${escapeHtml(name)}</em>
         <span class="swatch-row__btns">
-          <button type="button" class="ed-mini-btn js-move" data-index="${i}" data-dir="-1" ${i === 0 ? 'disabled' : ''} aria-label="Move swatch ${i + 1} up">↑</button>
-          <button type="button" class="ed-mini-btn js-move" data-index="${i}" data-dir="1" ${i === draft.swatches.length - 1 ? 'disabled' : ''} aria-label="Move swatch ${i + 1} down">↓</button>
-          <button type="button" class="ed-mini-btn js-remove-swatch" data-index="${i}" aria-label="Remove swatch ${i + 1}">✕</button>
+          <button type="button" class="ed-mini-btn js-move" data-index="${i}" data-dir="-1" ${i === 0 ? 'disabled' : ''} aria-label="Move swatch ${i + 1} up"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg></button>
+          <button type="button" class="ed-mini-btn js-move" data-index="${i}" data-dir="1" ${i === draft.swatches.length - 1 ? 'disabled' : ''} aria-label="Move swatch ${i + 1} down"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg></button>
+          <button type="button" class="ed-mini-btn js-remove-swatch" data-index="${i}" aria-label="Remove swatch ${i + 1}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
         </span>
       </li>`;
     })
@@ -300,6 +301,8 @@ function renderHarmony() {
 // ---------- events ------------------------------------------------------------------------------
 
 function bindEditorEvents() {
+  if (eventsBound) return;
+  eventsBound = true;
   const panel = panelEl;
   panel.addEventListener('input', onEditorInput);
   panel.addEventListener('click', onEditorClick);
