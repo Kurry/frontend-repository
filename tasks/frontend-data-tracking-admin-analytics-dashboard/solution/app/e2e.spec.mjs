@@ -408,6 +408,15 @@ test('regression Users CSV import requires the exact interoperable header', asyn
 
 const readKpis = (page) => page.locator('.kpi-strip .k-val').allTextContents().then((values) => values.map(Number));
 const visibleRows = (page) => page.locator('table.tbl tbody tr');
+const alternateStatus = { Active: 'Suspended', Invited: 'Suspended', Suspended: 'Active' };
+const statusKpiIndex = { Active: 1, Suspended: 3 };
+
+async function tabUntilFocused(page, locator, attempts = 150) {
+  for (let i = 0; i < attempts; i += 1) {
+    await page.keyboard.press('Tab');
+    if (await locator.evaluate((el) => document.activeElement === el)) return;
+  }
+}
 
 async function fillCreateForm(page, firstName = 'Nora', lastName = 'Quinn', email = 'nora.quinn@example.com') {
   await page.getByLabel(/^First Name/).fill(firstName);
@@ -446,8 +455,7 @@ test('remaining criteria: header search, popovers, density, edit prefill, hover 
   const nav = page.getByRole('button', { name: 'Users', exact: true });
   const before = await nav.evaluate((el) => getComputedStyle(el).backgroundColor);
   await nav.hover();
-  await page.waitForTimeout(220);
-  expect(await nav.evaluate((el) => getComputedStyle(el).backgroundColor)).not.toBe(before);
+  await expect.poll(() => nav.evaluate((el) => getComputedStyle(el).backgroundColor)).not.toBe(before);
   await page.getByRole('button', { name: /^Edit Katherine/ }).click();
   await expect(page.getByLabel(/^First Name/)).toHaveValue('Katherine');
   await expect(page.getByLabel(/^Last Name/)).toHaveValue('Johnson');
@@ -506,14 +514,14 @@ test('remaining criteria: status/filter, bulk-three KPI delta, delete selection 
   const rows = names.map((name) => page.locator('tbody tr').filter({ hasText: name }));
   const statuses = await Promise.all(rows.map((row) => row.locator('.badge-success, .badge-warning, .badge-error').innerText()));
   const sourceStatus = statuses[0];
-  const targetStatus = sourceStatus === 'Suspended' ? 'Active' : 'Suspended';
+  const targetStatus = alternateStatus[sourceStatus];
   const before = await readKpis(page);
   for (const name of names) await page.getByRole('checkbox', { name: `Select ${name}` }).check();
   await page.getByRole('combobox', { name: 'Change status for selected' }).selectOption(targetStatus);
   for (const row of rows) await expect(row).toContainText(targetStatus);
   const after = await readKpis(page);
-  const sourceIndex = sourceStatus === 'Active' ? 1 : 3;
-  const targetIndex = targetStatus === 'Active' ? 1 : 3;
+  const sourceIndex = statusKpiIndex[sourceStatus];
+  const targetIndex = statusKpiIndex[targetStatus];
   expect(after[sourceIndex]).toBe(before[sourceIndex] - statuses.filter((v) => v === sourceStatus).length);
   expect(after[targetIndex]).toBe(before[targetIndex] + statuses.filter((v) => v !== targetStatus).length);
   await expect(page.locator('.toast').filter({ hasText: 'Status Changed' })).toBeVisible();
@@ -580,7 +588,7 @@ test('remaining criteria: toast lifetime, motion markers, keyboard focus and mob
   await hamburger.click();
   await page.getByRole('button', { name: 'All Users' }).click();
   await expect(page.getByRole('heading', { name: 'All Users' })).toBeVisible();
-  await page.getByRole('checkbox', { name: 'Toggle light and dark theme' }).check({ force: true });
+  await page.locator('.theme-toggle').click();
   await page.getByRole('button', { name: 'Open navigation' }).click();
   await page.getByRole('button', { name: 'Dashboard' }).click();
   await page.getByRole('button', { name: 'Open navigation' }).click();
@@ -591,12 +599,11 @@ test('remaining criteria: toast lifetime, motion markers, keyboard focus and mob
   const toast = page.locator('.toast[data-motion="slide-autodismiss"]').filter({ hasText: 'User Added' });
   await expect(toast).toBeVisible();
   await expect(toast).toHaveCSS('transform', /matrix|none/);
-  await page.waitForTimeout(4100);
-  await expect(toast).toHaveCount(0);
+  await expect(toast).toHaveCount(0, { timeout: 5000 });
 
   const exportButton = page.getByRole('button', { name: 'Open export drawer' });
   await page.locator('body').click({ position: { x: 1, y: 1 } });
-  for (let i = 0; i < 150 && !await exportButton.evaluate((el) => document.activeElement === el); i += 1) await page.keyboard.press('Tab');
+  await tabUntilFocused(page, exportButton);
   await expect(exportButton).toBeFocused();
   expect(await exportButton.evaluate((el) => el.matches(':focus-visible'))).toBe(true);
   await page.keyboard.press('Enter');
