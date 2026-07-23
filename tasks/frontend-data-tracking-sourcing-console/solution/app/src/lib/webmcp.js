@@ -1,4 +1,4 @@
-import { BANDS, LICENSES, STATUSES, REASONS, rejectionSchema, pinSchema, randomCommit, samplePack } from './state.svelte.js';
+import { BANDS, LANGUAGES, LICENSES, STATUSES, REASONS, rejectionSchema, pinSchema, randomCommit, samplePack } from './state.svelte.js';
 
 const objectSchema = (properties = {}, required = []) => ({ type:'object', properties, required, additionalProperties:false });
 const stringEnum = (values) => ({ type:'string', enum:values });
@@ -16,9 +16,13 @@ export function registerWebMCP(app, ui) {
   });
   add('browse_search','Search candidate repository names.',objectSchema({query:{type:'string',maxLength:100}},['query']),({query}) => { app.activeView='candidates'; app.filters.search=query; app.selectedIds=[]; return {ok:true,visibleCount:app.visibleCandidates.length}; });
   add('browse_apply_filter','Apply one bounded candidate filter.',objectSchema({filter:stringEnum(filters),value:{type:'string',maxLength:80}},['filter','value']),({filter,value}) => {
-    const valid = filter==='difficulty-band' ? BANDS.includes(value) : filter==='license' ? LICENSES.includes(value) : filter==='status' ? STATUSES.includes(value) : true;
-    if(!valid)return {ok:false,error:`Invalid ${filter} value.`};
-    const key={language:'language','difficulty-band':'band',license:'license',status:'status','name-search':'search'}[filter]; app.filters[key]=value; app.activeView='candidates'; app.selectedIds=[]; return {ok:true,visibleCount:app.visibleCandidates.length};
+    // Normalize bounded tokens case-insensitively so the applied value always
+    // matches a visible select option — an unmatched value would leave the
+    // filter control blank while silently emptying the table.
+    let normalized=value;
+    if(filter==='language'){ normalized=LANGUAGES.find((item)=>item.toLowerCase()===String(value).toLowerCase()); if(!normalized)return {ok:false,error:'Invalid language value.'}; }
+    else if(filter!=='name-search'){ normalized=String(value).toLowerCase(); const domain=filter==='difficulty-band'?BANDS:filter==='license'?LICENSES:STATUSES; if(!domain.includes(normalized))return {ok:false,error:`Invalid ${filter} value.`}; }
+    const key={language:'language','difficulty-band':'band',license:'license',status:'status','name-search':'search'}[filter]; app.filters[key]=normalized; app.activeView='candidates'; app.selectedIds=[]; return {ok:true,visibleCount:app.visibleCandidates.length};
   });
   add('browse_clear_filter','Clear one candidate filter or all filters.',objectSchema({filter:{type:'string',enum:['all',...filters]}}),({filter='all'}) => {
     if(filter==='all')app.clearFilters(); else { const key={language:'language','difficulty-band':'band',license:'license',status:'status','name-search':'search'}[filter]; app.filters[key]=''; app.selectedIds=[]; } return {ok:true,visibleCount:app.visibleCandidates.length};

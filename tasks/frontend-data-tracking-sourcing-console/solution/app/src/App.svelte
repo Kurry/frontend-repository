@@ -60,6 +60,7 @@
   let modalCard = $state(null);
   let panelCard = $state(null);
   let paletteCard = $state(null);
+  let deferredPin = $state(null);
 
   const importFormSchema = z.object({ raw:z.string().min(1,'JSON field: paste a sourcing pack or choose the sample.').superRefine((raw,ctx) => {
     let data; try { data=JSON.parse(raw); } catch { ctx.addIssue({code:'custom',message:'JSON field: enter valid JSON.'}); return; }
@@ -162,8 +163,15 @@
   function toggleVisibleSelection() {
     const all=app.visibleCandidates.length>0 && app.visibleCandidates.every((candidate)=>app.selectedIds.includes(candidate.id)); app.selectAllVisible(!all);
   }
-  function switchView(view) { app.activeView=view; app.queueOpen=false; app.mobileMenu=false; }
-  function sortLabel(key) { return app.sort.key===key ? (app.sort.direction==='asc'?'ascending':'descending') : 'none'; }
+  function switchView(view) {
+    if (app.modal?.type==='pin') { deferredPin={...app.modal}; app.modal=null; }
+    app.activeView=view; app.queueOpen=false; app.mobileMenu=false;
+  }
+  function resumeDeferredPin() {
+    if (!deferredPin) return;
+    modalReturnFocus=document.activeElement; app.modal=deferredPin; deferredPin=null; focusDialog(()=>modalCard);
+  }
+  function sortLabel(key) { return app.sort.key===key ? (app.sort.direction==='asc'?'ascending':'descending') : undefined; }
   async function copyText(text,label) {
     try { await navigator.clipboard.writeText(text); copied=label; app.notify(`${label} copied to the clipboard.`); setTimeout(()=>copied='',1800); }
     catch { app.notify('Copy was blocked by the browser.','warning'); }
@@ -194,7 +202,7 @@
   function choosePalette(code) {
     const candidate=app.find(app.focusedId) || app.find(app.selectedIds[0]); closePalette();
     if(['candidates','quota','timeline','build-queue'].includes(code)) switchView(code);
-    else if(code==='fetch') app.fetchMore(reduced?60:800);
+    else if(code==='fetch') app.fetchMore(reduced?60:1000);
     else if(code==='export'||code==='import') setTimeout(()=>openPanel(code), reduced?0:260);
     else if(code==='help') setTimeout(()=>openHelp(), reduced?0:260);
     else if(candidate) setTimeout(()=>statusAction(candidate,code), reduced?0:260);
@@ -263,6 +271,7 @@
           <button class="btn-soft icon-btn" onclick={()=>app.undo()} disabled={!app.undoStack.length} aria-label="Undo" title="Undo (Ctrl/Command-Z)"><IconArrowBackUp size={17}/></button>
           <button class="btn-soft icon-btn" onclick={()=>app.redo()} disabled={!app.redoStack.length} aria-label="Redo" title="Redo (Ctrl/Command-Shift-Z)"><IconRotateClockwise size={17}/></button>
         </div>
+        {#if deferredPin}<button class="btn-soft" onclick={resumeDeferredPin} aria-label="Resume pending pin"><IconPin size={16}/>Pending pin</button>{/if}
         <button class="btn-soft desktop-actions" onclick={()=>openPanel('import')}><IconDatabaseImport size={16}/>Import</button>
         <button class="btn-soft desktop-actions" onclick={()=>openPanel('export')}><IconFileExport size={16}/>Export pack</button>
         <button class="btn-soft icon-btn desktop-actions" onclick={openHelp} aria-label="Keyboard shortcuts" title="Keyboard shortcuts"><IconKeyboard size={17}/></button>
@@ -286,7 +295,7 @@
         <section aria-labelledby="candidates-title">
           <div class="mb-4 flex flex-wrap items-end justify-between gap-3">
             <div><div class="eyebrow">Repository intake</div><h1 id="candidates-title" class="mt-1 text-2xl font-semibold tracking-tight lg:text-3xl">Candidate workbench</h1><p class="mt-1 text-sm text-[#8ea6bc]">Score, guard, and freeze benchmark-ready repositories.</p></div>
-            <button class="btn-soft btn-primary" onclick={()=>app.fetchMore(reduced?60:800)} disabled={app.fetchState.running}><IconSparkles size={17}/>{app.fetchState.running?'Sourcing in progress…':'Fetch more candidates'}</button>
+            <button class="btn-soft btn-primary" onclick={()=>app.fetchMore(reduced?60:1000)} disabled={app.fetchState.running}><IconSparkles size={17}/>{app.fetchState.running?'Sourcing in progress…':'Fetch more candidates'}</button>
           </div>
 
           {#if !coachDismissed}
@@ -314,7 +323,7 @@
           {#if app.fetchState.running || app.fetchState.steps.some((step)=>step==='complete')}
             <div class="surface mb-4 flex flex-wrap items-center gap-4 p-3" aria-label="Fetch more candidates progress">
               <div class="mr-2"><div class="text-xs font-semibold">Sourcing run {app.fetchState.runs+1}</div><div class="text-[11px] text-[#87a0b6]">Six distinct repositories per run</div></div>
-              {#each stepNames as name,index (name)}<div class="flex items-center gap-2"><span class="progress-dot {app.fetchState.steps[index]}"></span><span class="text-xs">{name}</span><span class="text-[10px] uppercase text-[#7891a8]">{app.fetchState.steps[index]}</span></div>{/each}
+              {#each stepNames as name,index (name)}<div class="flex items-center gap-2">{#if app.fetchState.steps[index]==='running'}<IconLoader2 class="spin text-[#55d6be]" size={12}/>{:else}<span class="progress-dot {app.fetchState.steps[index]}"></span>{/if}<span class="text-xs">{name}</span><span class="text-[10px] uppercase text-[#7891a8]">{app.fetchState.steps[index]}</span></div>{/each}
             </div>
           {/if}
 
@@ -463,7 +472,7 @@
     <ol class="space-y-2" aria-label="Ordered build queue">
       {#each app.queueEntries() as entry,index (entry.candidate.id)}
         <li class="queue-entry" class:opacity-60={dragId===entry.candidate.id}
-          animate:flip={{duration:D(260)}} in:fly={{x:24,duration:D(240)}} out:fly={{x:24,duration:D(200)}}>
+          animate:flip={{duration:D(300)}} in:fly={{x:24,duration:D(300)}} out:fly={{x:24,duration:D(260)}}>
           <button type="button" class="flex w-full items-start gap-2 text-left"
             aria-label={`Queue position ${entry.position}: ${entry.candidate.name}. Press Alt+ArrowUp or Alt+ArrowDown to move it.`}
             draggable="true" ondragstart={()=>dragId=entry.candidate.id} ondragover={(event)=>event.preventDefault()} ondrop={(event)=>queueDrop(event,index)}
@@ -483,7 +492,7 @@
 {/if}
 
 {#if app.selectedCount>0}
-  <div class="bulk-tray" transition:fly={{y:50,duration:D(220)}} aria-label="Bulk action tray"><span class="mr-auto text-sm font-semibold"><span class="mr-2 rounded-full bg-[#55d6be] px-2 py-1 text-xs text-[#071714]">{app.selectedCount}</span>selected</span><button class="btn-soft" onclick={()=>app.bulk('score')}>Bulk Score</button><button class="btn-soft btn-primary" onclick={()=>app.bulk('select')}>Bulk Select</button><button class="btn-soft btn-danger" onclick={()=>openReject([...app.selectedIds],true)}>Bulk Reject</button><button class="btn-soft icon-btn" onclick={()=>app.selectedIds=[]} aria-label="Clear selection"><IconX size={16}/></button></div>
+  <div class="bulk-tray" transition:fly={{y:50,duration:D(260)}} aria-label="Bulk action tray"><span class="mr-auto text-sm font-semibold"><span class="mr-2 rounded-full bg-[#55d6be] px-2 py-1 text-xs text-[#071714]">{app.selectedCount}</span>selected</span><button class="btn-soft" onclick={()=>app.bulk('score')}>Bulk Score</button><button class="btn-soft btn-primary group relative" onclick={()=>app.bulk('select')}>Bulk Select<div class="absolute bottom-full mb-2 hidden group-hover:block w-max max-w-xs bg-[#0f2439] border border-[#2a4159] p-2 text-[10px] text-left text-[#b5c7d8] whitespace-pre shadow-lg z-50 rounded" aria-label="Diff preview">{app.bulkDiff('selected')}</div></button><button class="btn-soft btn-danger group relative" onclick={()=>openReject([...app.selectedIds],true)}>Bulk Reject<div class="absolute bottom-full mb-2 hidden group-hover:block w-max max-w-xs bg-[#0f2439] border border-[#2a4159] p-2 text-[10px] text-left text-[#b5c7d8] whitespace-pre shadow-lg z-50 rounded" aria-label="Diff preview">{app.bulkDiff('rejected')}</div></button><button class="btn-soft icon-btn" onclick={()=>app.selectedIds=[]} aria-label="Clear selection"><IconX size={16}/></button></div>
 {/if}
 
 {#if app.modal?.type==='reject'}

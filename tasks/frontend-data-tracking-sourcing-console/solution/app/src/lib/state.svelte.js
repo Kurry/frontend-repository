@@ -14,7 +14,7 @@ const candidateSchema = z.object({
   name: z.string().regex(/^[^/]+\/[^/]+$/, 'Candidate name field must use org/repo.'),
   language: z.string(), stars: z.number().int().nonnegative(),
   difficulty: z.number().min(0).max(10), category: z.string(), clusterId: z.string(),
-  license: z.enum(LICENSES), status: z.enum(STATUSES),
+  license: z.enum(LICENSES, { errorMap: () => ({ message: 'Invalid license' }) }), status: z.enum(STATUSES, { errorMap: () => ({ message: 'Invalid status' }) }),
   rejectionReason: z.enum(REASONS).optional(),
   commit: z.string().regex(/^[0-9a-f]{12}$/, 'Candidate commit field must be 12 lowercase hex characters.').optional(),
   notes: z.string().max(200, 'Candidate notes field must be at most 200 characters.').optional(),
@@ -43,9 +43,9 @@ const seedRows = [
   ['northloom/thread-cache','Rust',6200,7.6,'Storage','cl-aurora','weak-copyleft','scored'],
   ['emberforge/cinder-cli','Go',3910,3.2,'CLI','cl-cinder','permissive','candidate'],
   ['emberforge/flint-schema','TypeScript',7120,5.8,'Validation','cl-flint','strong-copyleft','scored'],
-  ['quietmesa/dune-index','Elixir',4860,5.4,'Indexing','cl-dune','permissive','selected'],
-  ['silversprig/moss-router','Elixir',3375,4.8,'Routing','cl-moss','permissive','selected'],
-  ['hollowpeak/ridge-worker','Python',9840,2.8,'Workers','cl-ridge','weak-copyleft','selected'],
+  ['quietmesa/dune-index','Elixir',4860,5.4,'Indexing','cl-dune','permissive','pinned',undefined,'a3f29b7c14de'],
+  ['silversprig/moss-router','Elixir',3375,4.8,'Routing','cl-moss','permissive','queued',undefined,'5c7e1f90b3a2'],
+  ['hollowpeak/ridge-worker','Python',9840,2.8,'Workers','cl-ridge','weak-copyleft','queued',undefined,'9d804e2b61af'],
   ['tidefoundry/brine-map','Python',5230,3.6,'Data','cl-brine','unlicensed','selected'],
   ['opalharbor/keel-test','Python',2900,1.7,'Testing','cl-keel','permissive','selected'],
   ['copperfield/wren-query','Kotlin',11800,8.3,'Query','cl-wren','strong-copyleft','scored'],
@@ -73,16 +73,26 @@ const seedRows = [
 ];
 
 function makeCandidate(row) {
-  const [name, language, stars, difficulty, category, clusterId, license, status, rejectionReason] = row;
-  return { id: crypto.randomUUID(), name, language, stars, difficulty, category, clusterId, license, status, rejectionReason, commit: '', notes: '', guardMessage: '', fresh: false };
+  const [name, language, stars, difficulty, category, clusterId, license, status, rejectionReason, commit] = row;
+  return { id: fnvHex(name), name, language, stars, difficulty, category, clusterId, license, status, rejectionReason, commit: commit ?? '', notes: '', guardMessage: '', fresh: false };
 }
+
+// Seeded build-queue order (fixed, so every reload restores the identical
+// baseline): both entries are seeded 'queued' rows with frozen commits, giving
+// the queue panel two reorderable entries out of the box.
+const SEED_QUEUE_NAMES = ['hollowpeak/ridge-worker', 'silversprig/moss-router'];
 
 export const QUOTA_TARGETS = Object.fromEntries(LANGUAGES.flatMap((language) => BANDS.map((band) => [`${language}:${band}`, band === 'hard' ? 1 : 2])));
 QUOTA_TARGETS['Python:easy'] = 1;
 QUOTA_TARGETS['Elixir:medium'] = 1;
 
 const initialTimeline = [
-  { at: new Date(Date.now() - 7200000).toISOString(), name: 'Seed review', fromStatus: 'candidate', toStatus: 'scored' }
+  { at: '2026-07-22T00:00:00.000Z', name: 'Seed review', fromStatus: 'candidate', toStatus: 'scored' },
+  { at: '2026-07-22T00:04:00.000Z', name: 'quietmesa/dune-index', fromStatus: 'selected', toStatus: 'pinned' },
+  { at: '2026-07-22T00:05:00.000Z', name: 'hollowpeak/ridge-worker', fromStatus: 'selected', toStatus: 'pinned' },
+  { at: '2026-07-22T00:06:00.000Z', name: 'hollowpeak/ridge-worker', fromStatus: 'pinned', toStatus: 'queued' },
+  { at: '2026-07-22T00:07:00.000Z', name: 'silversprig/moss-router', fromStatus: 'selected', toStatus: 'pinned' },
+  { at: '2026-07-22T00:08:00.000Z', name: 'silversprig/moss-router', fromStatus: 'pinned', toStatus: 'queued' }
 ];
 
 // Runes wrap collections in reactive proxies; JSON copying captures the plain
@@ -110,7 +120,7 @@ const TRANSITION_TYPES = {
 
 class AppState {
   candidates = $state(seedRows.map(makeCandidate));
-  queue = $state([]);
+  queue = $state(SEED_QUEUE_NAMES.map((name) => fnvHex(name)));
   timeline = $state(deepCopy(initialTimeline));
   filters = $state({ language: '', band: '', license: '', status: '', search: '' });
   sort = $state({ key: 'name', direction: 'asc' });
@@ -142,7 +152,7 @@ class AppState {
     const { key, direction } = this.sort;
     return [...rows].sort((a,b) => {
       const av = a[key], bv = b[key];
-      const comparison = typeof av === 'string' ? av.localeCompare(bv) : av - bv;
+      const comparison = typeof av === 'string' ? av.localeCompare(bv) : (av - bv || a.name.localeCompare(b.name));
       return direction === 'asc' ? comparison : -comparison;
     });
   }
@@ -316,7 +326,7 @@ class AppState {
     const orgs = ['sunnyanvil','marblefox','cobaltpond','hazelrocket','tinyprairie','lilacbeacon'];
     const repos = ['spark-reader','vein-store','ripple-task','grove-codec','orbit-check','plume-shell'];
     const next = orgs.map((org,i) => makeCandidate([`${org}${run}/${repos[i]}-${run}`, LANGUAGES[(i+run)%LANGUAGES.length], 1200+run*311+i*727, Number((1.2+((i*1.63+run)%8.5)).toFixed(1)), ['Parsing','Storage','Workers','Encoding','Testing','CLI'][i], `cl-run${run}-${i+1}`, LICENSES[(i+run)%4], i%3===0?'scored':'candidate']));
-    next.forEach((candidate) => candidate.fresh = true); this.candidates.push(...next);
+    next.forEach((candidate) => candidate.fresh = true); this.candidates = [...this.candidates, ...next];
     this.timeline.push({ at: new Date().toISOString(), name: `Sourcing run ${run}`, fromStatus: 'candidate', toStatus: 'scored' });
     this.fetchState.running = false; this.recordFill();
     this.notify(`Sourcing run ${run} complete — 6 candidates added.`); setTimeout(() => next.forEach((candidate) => candidate.fresh = false), 900);
@@ -363,6 +373,13 @@ class AppState {
     if (older.pack.quotaFillPercent !== newer.pack.quotaFillPercent) lines.push(`Quota fill: ${older.pack.quotaFillPercent}% → ${newer.pack.quotaFillPercent}%`);
     return { older, newer, lines: lines.length ? lines : ['No differences between the last two snapshots.'] };
   }
+  bulkDiff(targetStatus) {
+    if (this.selectedIds.length === 0) return null;
+    return this.selectedIds.map(id => {
+      const c = this.find(id);
+      return `${c.name}: ${c.status} → ${targetStatus}`;
+    }).join('\n');
+  }
   importDiff(raw) {
     let data; try { data = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch { return null; }
     const parsed = packSchema.safeParse(data); if (!parsed.success) return null;
@@ -401,7 +418,7 @@ class AppState {
   }
   importPack(raw) {
     let data; try { data = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch { return { ok:false,error:'JSON field: enter a valid JSON document.' }; }
-    const parsed = packSchema.safeParse(data); if (!parsed.success) { const issue = parsed.error.issues[0]; const field = issue.path.join('.') || 'document'; return { ok:false,error:`${field} field: ${issue.message}` }; }
+    const parsed = packSchema.safeParse(data); if (!parsed.success) { const issue = parsed.error.issues[0]; const field = issue.path[issue.path.length-1] || 'document'; return { ok:false,error:`${field} field: ${issue.message}` }; }
     const incoming = parsed.data;
     const result = this.transact(() => {
       const existingByName = new Map(this.candidates.map((c) => [c.name,c]));
