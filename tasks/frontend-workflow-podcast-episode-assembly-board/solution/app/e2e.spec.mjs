@@ -166,7 +166,7 @@ test('4.6 te_6 keyboard-only editing, navigation, approval review, render, and e
   await enterWorkspace(page);
   await page.getByTitle(/Select Clip 1/).first().focus();
   await page.keyboard.press('Enter');
-  const start = page.getByLabel('Episode start (ms)');
+  const start = page.locator('#desktop-f-start');
   const before = Number(await start.inputValue());
   await page.keyboard.press('ArrowRight');
   await expect(start).toHaveValue(String(before + 10));
@@ -190,7 +190,7 @@ test('4.7 te_7 UI and WebMCP share ids, milliseconds, checksums, history, and ar
     object_type: 'timeline-instance', id: 'inst-1', property: 'start-ms', value: 1230,
   });
   expect(changed.ok).toBe(true);
-  await expect(page.getByLabel('Episode start (ms)')).toHaveValue('1230');
+  await expect(page.locator('#desktop-f-start')).toHaveValue('1230');
 
   const preview = await invokeTool(page, 'editor.preview');
   expect(preview.ok).toBe(true);
