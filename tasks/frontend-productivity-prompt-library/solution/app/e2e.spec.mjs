@@ -695,12 +695,10 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
 
   test('9.3 transitions_respond_under_100ms', async ({ page }) => {
     await openApp(page);
-    const elapsed = await page.getByRole('button', { name: /Switch to dark theme/ }).evaluate(async (button) => {
-      const start = performance.now();
-      button.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-      while (!document.querySelector('.app-shell--dark')) await new Promise(requestAnimationFrame);
-      return performance.now() - start;
-    });
+    const start = Date.now();
+    await page.getByRole('button', { name: /Switch to dark theme/ }).click();
+    await expect(page.locator('.app-shell')).toHaveClass(/app-shell--dark/);
+    const elapsed = Date.now() - start;
     expect(elapsed).toBeLessThan(100);
   });
 
@@ -713,12 +711,10 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
 
   test('9.5 large_collections_render_without_lag', async ({ page }) => {
     await openApp(page);
-    const elapsed = await page.getByRole('button', { name: 'Load 120 sample prompts' }).evaluate(async (button) => {
-      const start = performance.now();
-      button.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-      while (!document.body.innerText.includes('136 prompts')) await new Promise(requestAnimationFrame);
-      return performance.now() - start;
-    });
+    const start = Date.now();
+    await page.getByRole('button', { name: 'Load 120 sample prompts' }).click();
+    await expect(page.locator('.prompt-count')).toContainText('136 prompts');
+    const elapsed = Date.now() - start;
     expect(elapsed).toBeLessThan(500);
     await expect(page.locator(ROWS)).toHaveCount(136);
   });
