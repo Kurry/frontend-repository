@@ -147,7 +147,8 @@ test('4.5 te_5 mobile reflow retains source, edit, lineage, approval, render, an
   await page.getByRole('button', { name: 'Timeline' }).click();
   await expect(page.getByLabel('Timeline mini-map')).toBeVisible();
 
-  await page.getByTitle(/Select Clip 1/).first().click();
+  await page.getByTitle(/Select Clip 1/).first().focus();
+  await page.keyboard.press('Enter');
   await expect(page.getByRole('region', { name: 'Selected clip editor' })).toBeVisible();
   await expect(page.getByLabel('Episode start (ms)')).toBeVisible();
   await expect(page.getByRole('region', { name: 'Approval and render stepper' })).toBeVisible();
@@ -168,8 +169,9 @@ test('4.6 te_6 keyboard-only editing, navigation, approval review, render, and e
   const before = Number(await start.inputValue());
   await page.keyboard.press('ArrowRight');
   await expect(start).toHaveValue(String(before + 10));
+  const countBeforeSplit = (await invokeTool(page, 'editor.preview')).instances;
   await page.keyboard.press('s');
-  await expect(page.getByText('Undo available')).toBeVisible();
+  expect((await invokeTool(page, 'editor.preview')).instances).toBe(countBeforeSplit + 1);
 
   await page.keyboard.press('Alt+6');
   await expect(page.getByText('Rights Review').first()).toBeVisible();
@@ -191,7 +193,7 @@ test('4.7 te_7 UI and WebMCP share ids, milliseconds, checksums, history, and ar
 
   const preview = await invokeTool(page, 'editor.preview');
   expect(preview.ok).toBe(true);
-  expect(preview.checksum).toMatch(/^cut-/);
+  expect(preview.checksum).toMatch(/^[0-9a-f]{8}$/);
   expect(preview.history.some(entry => entry.detail.includes('inst-1'))).toBe(true);
 
   const exported = await invokeTool(page, 'artifact.export', { format: 'timeline-svg' });
