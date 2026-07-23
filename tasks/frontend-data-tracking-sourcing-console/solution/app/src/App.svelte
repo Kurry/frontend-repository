@@ -163,7 +163,7 @@
     const all=app.visibleCandidates.length>0 && app.visibleCandidates.every((candidate)=>app.selectedIds.includes(candidate.id)); app.selectAllVisible(!all);
   }
   function switchView(view) { app.activeView=view; app.queueOpen=false; app.mobileMenu=false; }
-  function sortLabel(key) { return app.sort.key===key ? (app.sort.direction==='asc'?'ascending':'descending') : 'none'; }
+  function sortLabel(key) { return app.sort.key===key ? (app.sort.direction==='asc'?'ascending':'descending') : undefined; }
   async function copyText(text,label) {
     try { await navigator.clipboard.writeText(text); copied=label; app.notify(`${label} copied to the clipboard.`); setTimeout(()=>copied='',1800); }
     catch { app.notify('Copy was blocked by the browser.','warning'); }
@@ -314,7 +314,7 @@
           {#if app.fetchState.running || app.fetchState.steps.some((step)=>step==='complete')}
             <div class="surface mb-4 flex flex-wrap items-center gap-4 p-3" aria-label="Fetch more candidates progress">
               <div class="mr-2"><div class="text-xs font-semibold">Sourcing run {app.fetchState.runs+1}</div><div class="text-[11px] text-[#87a0b6]">Six distinct repositories per run</div></div>
-              {#each stepNames as name,index (name)}<div class="flex items-center gap-2"><span class="progress-dot {app.fetchState.steps[index]}"></span><span class="text-xs">{name}</span><span class="text-[10px] uppercase text-[#7891a8]">{app.fetchState.steps[index]}</span></div>{/each}
+              {#each stepNames as name,index (name)}<div class="flex items-center gap-2">{#if app.fetchState.steps[index]==='running'}<IconLoader2 class="spin text-[#55d6be]" size={12}/>{:else}<span class="progress-dot {app.fetchState.steps[index]}"></span>{/if}<span class="text-xs">{name}</span><span class="text-[10px] uppercase text-[#7891a8]">{app.fetchState.steps[index]}</span></div>{/each}
             </div>
           {/if}
 
@@ -483,7 +483,7 @@
 {/if}
 
 {#if app.selectedCount>0}
-  <div class="bulk-tray" transition:fly={{y:50,duration:D(220)}} aria-label="Bulk action tray"><span class="mr-auto text-sm font-semibold"><span class="mr-2 rounded-full bg-[#55d6be] px-2 py-1 text-xs text-[#071714]">{app.selectedCount}</span>selected</span><button class="btn-soft" onclick={()=>app.bulk('score')}>Bulk Score</button><button class="btn-soft btn-primary" onclick={()=>app.bulk('select')}>Bulk Select</button><button class="btn-soft btn-danger" onclick={()=>openReject([...app.selectedIds],true)}>Bulk Reject</button><button class="btn-soft icon-btn" onclick={()=>app.selectedIds=[]} aria-label="Clear selection"><IconX size={16}/></button></div>
+  <div class="bulk-tray" transition:fly={{y:50,duration:D(220)}} aria-label="Bulk action tray"><span class="mr-auto text-sm font-semibold"><span class="mr-2 rounded-full bg-[#55d6be] px-2 py-1 text-xs text-[#071714]">{app.selectedCount}</span>selected</span><button class="btn-soft" onclick={()=>app.bulk('score')}>Bulk Score</button><button class="btn-soft btn-primary group relative" onclick={()=>app.bulk('select')}>Bulk Select<div class="absolute bottom-full mb-2 hidden group-hover:block w-max max-w-xs bg-[#0f2439] border border-[#2a4159] p-2 text-[10px] text-left text-[#b5c7d8] whitespace-pre shadow-lg z-50 rounded" aria-label="Diff preview">{app.bulkDiff('selected')}</div></button><button class="btn-soft btn-danger group relative" onclick={()=>openReject([...app.selectedIds],true)}>Bulk Reject<div class="absolute bottom-full mb-2 hidden group-hover:block w-max max-w-xs bg-[#0f2439] border border-[#2a4159] p-2 text-[10px] text-left text-[#b5c7d8] whitespace-pre shadow-lg z-50 rounded" aria-label="Diff preview">{app.bulkDiff('rejected')}</div></button><button class="btn-soft icon-btn" onclick={()=>app.selectedIds=[]} aria-label="Clear selection"><IconX size={16}/></button></div>
 {/if}
 
 {#if app.modal?.type==='reject'}
