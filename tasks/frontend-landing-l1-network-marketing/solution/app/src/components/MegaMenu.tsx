@@ -26,10 +26,12 @@ export default function MegaMenu() {
   const requestClose = () => {
     if (closing) return;
     setClosing(true);
-    focusHamburger();
     window.setTimeout(() => {
       $megaMenuOpen.set(false);
       setClosing(false);
+      // Restore after the drawer unmounts. Focusing during a backdrop
+      // mousedown is immediately overwritten by the browser's click focus.
+      window.requestAnimationFrame(focusHamburger);
     }, 220);
   };
 

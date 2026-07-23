@@ -156,9 +156,9 @@ export default function ExportCatalog() {
                 <button aria-label="Copy catalog JSON" className="btn btn-sm btn-ghost gap-2 text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => copyText(jsonPayload, setCopiedJson, 'Export JSON')}>
                   <Copy size={16} /> {copiedJson ? 'Copied' : 'Copy'}
                 </button>
-                <a href={`data:application/json;charset=utf-8,${encodeURIComponent(jsonPayload)}`} download="ridge-catalog.json" aria-label="Download catalog JSON" className="btn btn-sm btn-primary gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => announce('Downloaded ridge-catalog.json.')}>
+                <button type="button" aria-label="Download catalog JSON" className="btn btn-sm btn-primary gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => downloadFile(jsonPayload, 'ridge-catalog.json', 'application/json')}>
                   <Download size={16} /> Export JSON
-                </a>
+                </button>
               </div>
             </div>
             <div className="surface-copy flex-1 bg-surface border border-current/10 rounded-lg p-4 overflow-auto text-sm font-mono whitespace-pre opacity-90" aria-label="JSON preview">

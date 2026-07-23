@@ -73,6 +73,14 @@ export default function EventsManager() {
     featured: events.filter(e => e.status === 'featured').length,
     past: events.filter(e => e.status === 'past').length,
   };
+  const catalogPulse = useMemo(() => {
+    const cities = new Set(events.map(event => event.city.trim()).filter(Boolean)).size;
+    const next = events
+      .filter(event => event.status !== 'past')
+      .slice()
+      .sort((a, b) => a.date.localeCompare(b.date))[0];
+    return { cities, next };
+  }, [events]);
 
   const handleToggleSort = (field: 'date' | 'title') => {
     if (sort.by === field) {
@@ -179,6 +187,11 @@ export default function EventsManager() {
             <span className="badge badge-accent">Featured: {stats.featured}</span>
             <span className="badge">Past: {stats.past}</span>
           </div>
+        </div>
+
+        <div className="px-4 py-2 border-b border-white/10 bg-ink/10 text-xs flex flex-wrap gap-x-5 gap-y-1" aria-label="Catalog pulse">
+          <span><strong>Catalog pulse:</strong> {catalogPulse.cities} active {catalogPulse.cities === 1 ? 'city' : 'cities'}</span>
+          <span>{catalogPulse.next ? `Next: ${catalogPulse.next.title} on ${formatEventDate(catalogPulse.next.date)}` : 'No upcoming event scheduled'}</span>
         </div>
 
         {/* Animated bulk action bar — mounts with an entrance when selection is non-empty */}
