@@ -9,11 +9,13 @@ import Button from 'primevue/button'
 import { SemverSchema } from '../schemas'
 import { nextVersion, requiredVersion, useStudioStore } from '../store'
 import { useFocusTrap } from '../focus-trap'
+import { useDialogEscape } from '../composables/useDialogEscape'
 
 const props = defineProps({ open: Boolean })
 const emit = defineEmits(['close', 'apply'])
 const store = useStudioStore()
 useFocusTrap(computed(() => props.open))
+useDialogEscape(props, emit)
 const schema = toTypedSchema(z.object({ version: SemverSchema }))
 const { defineField, errors, meta, handleSubmit, resetForm, validate } = useForm({ validationSchema: schema, initialValues: { version: '' }, validateOnMount: true })
 const [version, versionAttrs] = defineField('version', { validateOnModelUpdate: true })

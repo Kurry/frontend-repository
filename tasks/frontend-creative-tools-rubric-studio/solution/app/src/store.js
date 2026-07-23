@@ -215,12 +215,12 @@ export const useStudioStore = defineStore('studio', () => {
   }
   function setModel(value) {
     if (!['quartz-arbiter-2', 'sable-jury-9', 'cinder-panel-1'].includes(value) || activeRubric.value.arbiterModel === value) return false
-    commit('Change arbiter model', () => { activeRubric.value.arbiterModel = value })
+    commit('Change arbiter model', () => { const r = rubrics.value.find(x => x.slug === activeSlug.value); if(r) r.arbiterModel = value })
     return true
   }
   function setAggregation(value) {
     if (!['weighted-mean', 'required-pass', 'all-pass'].includes(value) || activeRubric.value.aggregationMode === value) return false
-    commit('Change aggregation mode', () => { activeRubric.value.aggregationMode = value })
+    commit('Change aggregation mode', () => { const r = rubrics.value.find(x => x.slug === activeSlug.value); if(r) r.aggregationMode = value })
     return true
   }
   function addCriterion(payload) {
@@ -230,7 +230,7 @@ export const useStudioStore = defineStore('studio', () => {
     payload = validated.data
     if (activeRubric.value.criteria.some((item) => item.id === payload.id)) return { ok: false, message: 'ID is already in use' }
     commit(`Add ${payload.id}`, () => {
-      activeRubric.value.criteria.push(clone(payload))
+      const r = rubrics.value.find(x => x.slug === activeSlug.value); if(r) r.criteria.push(clone(payload))
       verdicts.value[activeSlug.value][payload.id] = true
       if (payload.type === 'likert') thresholds.value[activeSlug.value][payload.id] = Math.ceil((payload.likertMin + payload.likertMax) / 2)
     })
@@ -265,8 +265,10 @@ export const useStudioStore = defineStore('studio', () => {
     if (ui.versionCommitBusy && !allowBusyCommit) return { ok: false, message: 'Pending change is already being applied' }
     const pending = pendingChange.value
     if (!pending || !requiredVersion(pending.kind, activeRubric.value.version, version)) return { ok: false, message: `${pending?.kind || 'version'} bump required` }
+    const targetRubric = rubrics.value.find((rubric) => rubric.slug === activeSlug.value)
+    if (!targetRubric) return { ok: false, message: 'The active rubric is no longer available' }
     commit(`${pending.action} ${pending.criterionId}`, () => {
-      const rubric = activeRubric.value
+      const rubric = targetRubric
       if (pending.action === 'edit') {
         const index = rubric.criteria.findIndex((item) => item.id === pending.criterionId)
         const previousThreshold = thresholds.value[activeSlug.value][pending.criterionId]

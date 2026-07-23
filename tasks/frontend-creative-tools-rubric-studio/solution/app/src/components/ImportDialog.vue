@@ -8,12 +8,14 @@ import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
 import { useStudioStore } from '../store'
 import { useFocusTrap } from '../focus-trap'
+import { useDialogEscape } from '../composables/useDialogEscape'
 import { RubricPackageSchema, formatZodError } from '../schemas'
 
 const props = defineProps({ open: Boolean })
 const emit = defineEmits(['close', 'imported'])
 const store = useStudioStore()
 useFocusTrap(computed(() => props.open))
+useDialogEscape(props, emit)
 const packageError = ref('')
 const packageSourceSchema = z.string().trim().min(1, 'Package JSON is required; paste an exported package').superRefine((source, ctx) => {
   if (!source) return

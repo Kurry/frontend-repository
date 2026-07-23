@@ -5,11 +5,13 @@ import Button from 'primevue/button'
 import { PhCopy as Copy, PhCheck as Check, PhDownloadSimple as DownloadSimple } from '@phosphor-icons/vue'
 import { useStudioStore } from '../store'
 import { useFocusTrap } from '../focus-trap'
+import { useDialogEscape } from '../composables/useDialogEscape'
 
 const props = defineProps({ open: Boolean })
 const emit = defineEmits(['close', 'copied'])
 const store = useStudioStore()
 useFocusTrap(computed(() => props.open))
+useDialogEscape(props, emit)
 const copied = ref(false)
 const tabs = [
   { value: 'structured-text', label: 'Structured text', filename: 'rubric.txt', mime: 'text/plain' },
@@ -55,9 +57,9 @@ function downloadPreview() {
       </div>
       <div class="export-actions">
         <Button :label="copied ? 'Copied' : 'Copy'" severity="secondary" outlined @click="copyPreview">
-          <template #icon><Check v-if="copied" :size="17" weight="bold" /><Copy v-else :size="17" /></template>
+          <template #icon><Check v-if="copied" :size="17" weight="bold" aria-hidden="true" /><Copy v-else :size="17" aria-hidden="true" /></template>
         </Button>
-        <Button label="Download" @click="downloadPreview"><template #icon><DownloadSimple :size="17" /></template></Button>
+        <Button label="Download" @click="downloadPreview"><template #icon><DownloadSimple :size="17" aria-hidden="true" /></template></Button>
       </div>
     </div>
     <div class="preview-meta">
