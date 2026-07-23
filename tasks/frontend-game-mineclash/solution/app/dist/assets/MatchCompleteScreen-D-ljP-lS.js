@@ -1,1 +1,0 @@
-import{_ as o}from"./preload-helper-CVfkMyKi.js";import{y as _,L as t}from"./core.min-DVALGa4Q.js";const s=_(t(()=>o(()=>import("./MatchCompleteScreen.tsx_MatchCompleteScreen_component_k7s0bu4aUyo-CN45y-TT.js"),[]),"s_k7s0bu4aUyo")),a=_(t(()=>o(()=>import("./MatchCompleteScreen.tsx_ScoreBadge_component_uDtgd0ueDpk-Dad8ISjN.js"),[]),"s_uDtgd0ueDpk"));export{s as M,a as S};

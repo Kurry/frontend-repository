@@ -23,9 +23,11 @@ coverage/
 .turbo/
 .next/
 .nuxt/
+.svelte-kit/
 dist/
 build/
 out/
+storybook-static/
 *.tsbuildinfo
 
 # Package manager / tooling
@@ -70,8 +72,18 @@ venv/
 
 /.harden-locks
 
-# Built oracle output — rebuilt by verify:build, never committed
+# Built oracle output — rebuilt by verify:build (and, for the screenshot
+# capture harness, on demand), never committed. The general dist/build/out/
+# .next/.nuxt/.svelte-kit/storybook-static patterns above already cover
+# these; the explicit rules below are a scoped safety net so a stray
+# `git add -f` under an oracle app can't re-commit build output.
 tasks/*/solution/app/dist/
+tasks/*/solution/app/build/
+tasks/*/solution/app/out/
+tasks/*/solution/app/.next/
+tasks/*/solution/app/.nuxt/
+tasks/*/solution/app/.svelte-kit/
+tasks/*/solution/app/storybook-static/
 
 # Stray dev/QA captures at oracle app roots (reference screenshots live in
 # tasks/*/environment/reference-screenshots/, which stays tracked)
