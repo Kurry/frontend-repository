@@ -39,7 +39,7 @@
       ["The user and app settings", "Click the user icon to reveal three tabs. Storyboards manages all storyboards, Settings customizes appearance and functionality, and Account adjusts account preferences. Each tab provides tools to control appearance and manage the account.", "insert", 26, "./assets/scenes/scene-04.webp"],
       ["Tile, list, or slide mode", "Control how scenes are displayed. Tile mode views scenes as a grid, list mode shows scene details in a vertical list, and slide mode displays one scene at a time. Refine these options further in Settings.", "wide", 21, "./assets/scenes/scene-05.webp"],
       ["Three-dot menu actions", "Hover over any image to reveal the three-dot menu for quick actions. Replace the image, add or edit the description, or reorder, duplicate, or delete scenes. The same menu exposes every per-scene control.", "pov", 25, "./assets/scenes/scene-06.webp"],
-      ["Add scene options", "The Add Scene button offers flexible options. Add Scene immediately adds a single scene, while the dropdown lets you import images to upload multiple scenes or change the sort order with precision.", "medium", 23, "./assets/scenes/scene-07.webp"],
+      ["Add Scene options", "The Add Scene button offers flexible options. Add Scene immediately adds a single scene, while the dropdown lets you import images to upload multiple scenes or change the sort order with precision.", "medium", 23, "./assets/scenes/scene-07.webp"],
       ["Help and support", "Keep learning and check out the next demo, Create Your First Storyboard. For answers to common questions visit the FAQ, or contact the support team for help with anything else along the way.", "close-up", 22, "./assets/scenes/scene-08.webp"],
     ];
     let i = 0;
@@ -259,18 +259,22 @@
       // trailing placeholders are part of scenes already (img:null). Add Scene control:
       html += '<div class="add-scene-column"><div class="add-scene-wrap"><div class="add-scene-group">' +
               '<button type="button" class="add-scene" data-act="add" aria-label="Add Scene">Add Scene</button>' +
-              '<button type="button" class="add-scene-dropdown" data-act="add" aria-label="Add scene options"><span class="icon icon-chevron-down" aria-hidden="true"></span></button>' +
+              '<button type="button" class="add-scene-dropdown" data-act="add" aria-label="Add Scene options"><span class="icon icon-chevron-down" aria-hidden="true"></span></button>' +
               '</div></div></div>';
     }
     grid.innerHTML = html;
 
-    if (firstGridRender && !reduceMotion()) {
-      grid.querySelectorAll("[data-card]").forEach((el, index) => {
+    grid.querySelectorAll("[data-card]").forEach((el, index) => {
+      const id = el.getAttribute("data-card");
+      if (firstGridRender && !reduceMotion()) {
         el.classList.add("is-initial-enter");
         el.style.setProperty("--enter-delay", Math.min(index * 55, 440) + "ms");
-      });
-    }
+      } else if (enteringIds.has(id) && !reduceMotion()) {
+        el.classList.add("is-initial-enter");
+      }
+    });
     firstGridRender = false;
+    enteringIds.clear();
 
     // entrance animation
     if (!reduceMotion()) {
@@ -389,7 +393,7 @@
       const last = store.lastEditedId === s.id ? " is-lastedit" : "";
       const ph = !s.img ? " is-ph" : "";
       const inner = s.img
-        ? '<img src="' + esc(s.img) + '" alt="">'
+        ? '<img src="' + esc(s.img) + '" alt="' + esc(s.alt || s.title) + '">'
         : '<span class="icon icon-camera" aria-hidden="true"></span>';
       html += '<button type="button" class="film-thumb' + (isActive ? " is-active" : "") + last + ph + '" data-film="' + s.id + '" role="listitem" aria-label="Go to scene ' + order + ': ' + esc(s.title) + '">' + inner + '<span class="film-num">' + order + '</span></button>';
     });
@@ -407,7 +411,7 @@
     const scene = { id: newId(), title: clean.title, body: clean.body, duration: clean.duration, shotType: clean.shotType, img: null, alt: "Storyboard scene illustration" };
     store.scenes.push(scene);
     store.selection = new Set();
-    store.lastEditedId = scene.id;
+    store.lastEditedId = scene.id; sessionStorage.setItem("sb_last_id", scene.id);
     enteringIds = new Set([scene.id]);
     if (store.viewMode === "slide") store.slideIndex = filteredScenes().length; // will clamp in render to last visible
     render(true);
@@ -422,7 +426,7 @@
     if (!s) return null;
     pushHistory();
     Object.assign(s, patch);
-    store.lastEditedId = id;
+    store.lastEditedId = id; sessionStorage.setItem("sb_last_id", id);
     render(true);
     if (!opts.silent) { toast("Scene updated"); announce("Scene updated. Total duration " + totalDuration() + " seconds."); }
     maybeExportCoach();
@@ -437,7 +441,7 @@
       pushHistory();
       store.scenes.splice(idx, 1);
       store.selection.delete(id);
-      if (store.lastEditedId === id) store.lastEditedId = null;
+      if (store.lastEditedId === id) store.lastEditedId = window._lastActiveScene || null;
       render(true);
       if (!opts.silent) { toast("Scene deleted"); announce("Scene deleted. Total duration " + totalDuration() + " seconds."); }
     };
@@ -472,7 +476,7 @@
       store.scenes = store.scenes.filter((s) => !store.selection.has(s.id));
       const n = ids.length;
       store.selection = new Set();
-      if (store.lastEditedId && ids.includes(store.lastEditedId)) store.lastEditedId = null;
+      if (store.lastEditedId && ids.includes(store.lastEditedId)) store.lastEditedId = window._lastActiveScene || null;
       render(true);
       toast(n + " scenes deleted");
       announce(n + " scenes deleted. Total duration " + totalDuration() + " seconds.");
@@ -553,8 +557,15 @@
     store.scenes = ordered.map((s) => ({ id: String(s.id), title: s.title, body: s.body, duration: s.duration, shotType: s.shotType, img: null, alt: "Imported storyboard scene illustration" }));
     store.viewMode = doc.viewMode;
     store.selection = new Set();
-    store.slideIndex = 0;
-    store.lastEditedId = null;
+    store.search = "";
+    store.shotFilter = "all";
+    store.slideIdx = 0;
+
+    // apply viewMode in DOM immediately
+    document.querySelectorAll(".view-btn").forEach((btn) => {
+      btn.setAttribute("aria-pressed", btn.getAttribute("data-mode") === store.viewMode ? "true" : "false");
+    });
+
     render(true);
   }
 
@@ -621,7 +632,7 @@
           '</select><div class="field-error" id="err-shotType" role="alert"></div></div>' +
         '</div>' +
       '</div>' +
-      '<div class="dialog-foot"><button type="button" class="btn" data-close>Cancel</button>' +
+      '<div class="dialog-foot"><div id="form-status" aria-live="polite" class="sr-only"></div><button type="button" class="btn" data-close>Cancel</button>' +
       '<button type="button" class="btn btn-primary" id="scene-submit">' + (editing ? "Save changes" : "Add scene") + '</button></div>';
 
     openDialog(html);
@@ -649,7 +660,7 @@
     function refresh() {
       const res = validateSceneFields(getVals());
       showErrors(res);
-      form.querySelector("#scene-submit").disabled = !res.valid;
+      form.querySelector("#scene-submit").disabled = false;
       return res;
     }
     form.querySelectorAll("[data-field],#f-title,#f-body").forEach((inp) => {
@@ -658,10 +669,15 @@
       inp.addEventListener("blur", () => { touched[k] = true; refresh(); });
     });
     refresh();
-    form.querySelector("#scene-submit").addEventListener("click", () => {
+        form.querySelector("#scene-submit").addEventListener("click", () => {
       Object.keys(touched).forEach((k) => (touched[k] = true));
       const res = refresh();
-      if (!res.valid) return;
+      if (!res.valid) {
+          const firstErr = Object.values(res.errors).find(Boolean);
+          form.querySelector("#form-status").textContent = "Validation error: " + firstErr;
+          return;
+      }
+      form.querySelector("#form-status").textContent = "";
       if (editing) updateScene(scene.id, { title: res.clean.title, body: res.clean.body, duration: res.clean.duration, shotType: res.clean.shotType });
       else addScene(res.clean);
       closeDialog();
@@ -682,7 +698,7 @@
       '<div class="dialog-head"><h2 class="dialog-title" id="dialog-title">' + esc(title) + '</h2>' +
       '<button type="button" class="dialog-close" data-close aria-label="Cancel"><span class="icon icon-x" aria-hidden="true"></span></button></div>' +
       '<div class="dialog-body"><p class="confirm-text">' + esc(text) + '</p></div>' +
-      '<div class="dialog-foot"><button type="button" class="btn" data-close>Cancel</button>' +
+      '<div class="dialog-foot"><div id="form-status" aria-live="polite" class="sr-only"></div><button type="button" class="btn" data-close>Cancel</button>' +
       '<button type="button" class="btn btn-danger" id="confirm-ok">' + esc(confirmLabel) + '</button></div>';
     openDialog(html);
     dialog.querySelector("#confirm-ok").addEventListener("click", () => { closeDialog(); onConfirm(); });
@@ -862,20 +878,22 @@
         '<textarea id="imp-area" class="import-area thin-scrollbar" placeholder="Paste a Storyboard JSON document here" spellcheck="false"></textarea>' +
         '<div class="import-status" id="imp-status" role="alert" aria-live="polite"></div>' +
       '</div>' +
-      '<div class="dialog-foot"><button type="button" class="btn" data-close>Cancel</button>' +
+      '<div class="dialog-foot"><div id="form-status" aria-live="polite" class="sr-only"></div><button type="button" class="btn" data-close>Cancel</button>' +
       '<button type="button" class="btn btn-primary" id="imp-ok" disabled>Import</button></div>';
     openDialog(html, { wide: true });
     const area = dialog.querySelector("#imp-area");
     const status = dialog.querySelector("#imp-status");
     const okBtn = dialog.querySelector("#imp-ok");
-    function check() {
+    okBtn.disabled = false;
+    function check(isSubmit) {
       const raw = area.value.trim();
-      if (!raw) { status.textContent = ""; status.className = "import-status"; okBtn.disabled = true; return null; }
+      if (!raw) { status.textContent = "Please provide storyboard JSON to import."; status.className = "import-status error"; if (isSubmit === true) announce("Import error: Please provide storyboard JSON to import."); return null; }
       let parsed;
-      try { parsed = JSON.parse(raw); } catch (e) { status.textContent = "Invalid JSON: " + e.message + " Fix the JSON syntax and try again."; status.className = "import-status error"; okBtn.disabled = true; announce("Import error: invalid JSON."); return null; }
+      try { parsed = JSON.parse(raw); } catch (e) { status.textContent = "Invalid JSON: " + e.message + " Fix the JSON syntax and try again."; status.className = "import-status error"; if (isSubmit === true) announce("Import error: invalid JSON."); return null; }
       const v = validateDocument(parsed);
-      if (v.error) { status.textContent = v.error; status.className = "import-status error"; okBtn.disabled = true; announce("Import error: " + v.error); return null; }
-      status.textContent = "Valid Storyboard document with " + parsed.scenes.length + " scene" + (parsed.scenes.length === 1 ? "" : "s") + ". Ready to import."; status.className = "import-status ok"; okBtn.disabled = false;
+      if (v.error) { status.textContent = v.error; status.className = "import-status error"; if (isSubmit === true) announce("Import error: " + v.error); return null; }
+      status.textContent = "Valid Storyboard document with " + parsed.scenes.length + " scene" + (parsed.scenes.length === 1 ? "" : "s") + ". Ready to import."; status.className = "import-status ok";
+      if (isSubmit === true) announce("Ready to import.");
       return parsed;
     }
     area.addEventListener("input", check);
@@ -887,7 +905,7 @@
       rd.onload = () => { area.value = String(rd.result || ""); check(); };
       rd.readAsText(f);
     });
-    okBtn.addEventListener("click", () => { const doc = check(); if (!doc) return; applyDocument(doc); closeDialog(); toast("Storyboard imported"); announce("Storyboard imported. Total duration " + totalDuration() + " seconds."); });
+    okBtn.addEventListener("click", () => { const doc = check(true); if (!doc) return; applyDocument(doc); closeDialog(); toast("Storyboard imported"); announce("Storyboard imported. Total duration " + totalDuration() + " seconds."); });
     check();
   }
 
@@ -899,7 +917,11 @@
     const visible = filteredScenes();
     if (!visible.length) return;
     store.presenter = { open: true, index: 0, remainingMs: visible[0].duration * 1000, paused: false, finished: false, startedAt: 0, elapsedBefore: 0 };
+    presenterEl.style.opacity = "0";
     presenterEl.hidden = false;
+    // trigger reflow
+    void presenterEl.offsetWidth;
+    presenterEl.style.opacity = "1";
     document.body.style.overflow = "hidden";
     renderPresenter();
     startTimer();
@@ -916,7 +938,10 @@
       const elapsed = p.elapsedBefore + (now - p.startedAt);
       p.remainingMs = Math.max(0, (presenterVisible()[p.index].duration * 1000) - elapsed);
       updateCountdown();
-      if (p.remainingMs <= 0) { advancePresenter(1, true); return; }
+      if (p.remainingMs <= 0) {
+          advancePresenter(1, true);
+          return;
+      }
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
@@ -957,6 +982,12 @@
     if (!card) return;
     if (reduceMotion()) { renderPresenterStage(); return; }
     card.classList.add("slide-anim");
+    setTimeout(() => {
+        renderPresenterStage();
+        card.classList.remove("slide-anim");
+    }, 150);
+  }
+    card.classList.add("slide-anim");
     renderPresenterStage();
     requestAnimationFrame(() => requestAnimationFrame(() => card.classList.remove("slide-anim")));
   }
@@ -982,12 +1013,16 @@
   function exitPresenter() {
     cancelAnimationFrame(rafId);
     store.presenter.open = false;
-    presenterEl.hidden = true;
-    presenterEl.innerHTML = "";
-    document.body.style.overflow = "";
-    render(false);
-    const btn = $("#present-btn"); if (btn) btn.focus();
-    announce("Exited presentation.");
+    presenterEl.style.opacity = "0";
+    setTimeout(() => {
+        presenterEl.hidden = true;
+        presenterEl.style.opacity = "1";
+        presenterEl.innerHTML = "";
+        document.body.style.overflow = "";
+        render(false);
+        const btn = $("#present-btn"); if (btn) btn.focus();
+        announce("Exited presentation.");
+    }, 240);
   }
   function renderPresenter() {
     const visible = presenterVisible();
@@ -995,6 +1030,27 @@
     if (p.finished) {
       const total = totalDurationOf(visible);
       const longest = visible.reduce((m, s) => (Number(s.duration) || 0) > (Number(m.duration) || 0) ? s : m, visible[0] || { duration: 0, title: "" });
+      presenterEl.innerHTML =
+        '<div class="presenter-top"><span class="presenter-progress-readout">Rehearsal complete</span>' +
+        '<button type="button" class="pres-btn" data-p="exit"><span class="icon icon-exit" aria-hidden="true"></span>Exit</button></div>' +
+        '<div class="presenter-stage"><div class="presenter-finished"><h2>That’s a wrap</h2>' +
+        '<ul class="rehearsal"><li><span>Scenes presented</span><b>' + visible.length + '</b></li>' +
+        '<li><span>Total duration</span><b>' + total + 's</b></li>' +
+        '<li><span>Longest scene</span><b>' + esc(longest.title) + ' (' + longest.duration + 's)</b></li></ul>' +
+        '<div class="presenter-controls" style="padding:0"><button type="button" class="pres-btn primary" data-p="restart"><span class="icon icon-redo" aria-hidden="true"></span>Restart</button>' +
+        '<button type="button" class="pres-btn" data-p="exit">Exit</button></div></div></div>';
+      wirePresenter();
+      return;
+    }
+    presenterEl.innerHTML =
+      '<div class="presenter-top"><span class="presenter-progress-readout" id="pres-readout"></span>' +
+      '<button type="button" class="pres-btn" data-p="exit"><span class="icon icon-exit" aria-hidden="true"></span>End presentation</button></div>' +
+      '<div class="presenter-stage"><div class="presenter-card" id="pres-card"></div></div>' +
+      '<div class="presenter-controls" id="pres-controls"></div>';
+    renderPresenterStage();
+    renderPresenterControls();
+    wirePresenter();
+  });
       presenterEl.innerHTML =
         '<div class="presenter-top"><span class="presenter-progress-readout">Rehearsal complete</span>' +
         '<button type="button" class="pres-btn" data-p="exit"><span class="icon icon-exit" aria-hidden="true"></span>Exit</button></div>' +
@@ -1237,7 +1293,7 @@
     const t = e.target.closest("[data-film]");
     if (!t) return;
     const id = t.getAttribute("data-film");
-    store.lastEditedId = id;
+    store.lastEditedId = id; sessionStorage.setItem("sb_last_id", id);
     if (store.viewMode === "slide") {
       const visible = filteredScenes();
       const idx = visible.findIndex((s) => s.id === id);
@@ -1335,7 +1391,7 @@
       case "form_submit": {
         const r = validateSceneFields({ title: args.title, body: args.body, duration: args.duration, shotType: shotFromArgs(args) });
         if (!r.valid) return { ok: false, errors: r.errors };
-        const s = addScene(r.clean, { silent: true });
+        const s = addScene(r.clean, { silent: false });
         closeDialog();
         return { ok: true, created: s.id, total: store.scenes.length, totalDuration: totalDuration() };
       }
@@ -1345,7 +1401,7 @@
       case "entity_create": {
         const r = validateSceneFields({ title: args.title, body: args.body, duration: args.duration, shotType: shotFromArgs(args) });
         if (!r.valid) return { ok: false, errors: r.errors };
-        const s = addScene(r.clean, { silent: true });
+        const s = addScene(r.clean, { silent: false });
         return { ok: true, id: s.id, total: store.scenes.length, totalDuration: totalDuration() };
       }
       case "entity_select": { toggleSelect(args.id); return { ok: true, selected: store.selection.has(args.id), selectionCount: store.selection.size }; }
