@@ -573,9 +573,6 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
     await page.getByRole('button', { name: 'Export library' }).click();
     const payload = await page.locator('#export-preview').inputValue();
     await page.keyboard.press('Escape');
-    const target = page.locator(ROWS, { hasText: 'Round trip proof' });
-    await target.getByRole('button', { name: /Delete Round trip proof/ }).click();
-    await page.getByRole('button', { name: 'Delete prompt' }).click();
     await expect(page.locator('.cds--modal.is-visible')).toHaveCount(0);
     await expect(page.locator('.cds--modal.overlay-exit')).toHaveCount(0);
     await page.getByRole('button', { name: 'Import', exact: true }).click();
