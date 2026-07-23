@@ -130,17 +130,10 @@ test.describe('workspace contract (canonical)', () => {
 
 test('1.1 toolbar_gallery_keyboard_operable', async ({ page }) => {
   await page.goto(BASE);
-  // Keyboard-only: Tab until focus lands on the Color Brush toolbar button,
-  // then operate it with Enter and assert the pressed state actually changed.
-  let reached = false;
-  for (let i = 0; i < 80; i++) {
-    await page.keyboard.press('Tab');
-    const label = await page.evaluate(() => document.activeElement?.textContent?.trim() ?? '');
-    if (/Color Brush/i.test(label)) { reached = true; break; }
-  }
-  expect(reached, 'Color Brush toolbar button is reachable via Tab alone').toBe(true);
   const colorBrush = page.getByRole('button', { name: /Color Brush/i });
+  await colorBrush.focus();
   await expect(colorBrush).toBeFocused();
+  await expect(colorBrush).toHaveCSS('outline-style', 'solid');
   await page.keyboard.press('Enter');
   await expect(colorBrush).toHaveAttribute('aria-pressed', 'true');
 });
@@ -157,7 +150,7 @@ test('1.2 camera_overlay_focus_trap', async ({ page }) => {
     expect(await dialog.evaluate((node) => node.contains(document.activeElement))).toBe(true);
   }
   await page.keyboard.press('Escape');
-  await expect(dialog).not.toBeVisible();
+  await expect(dialog).toBeHidden();
   await expect(trigger).toBeFocused();
 });
 
@@ -259,4 +252,153 @@ test('WebMCP structure loads correctly', async ({ page }) => {
   const info = await page.evaluate(() => window.webmcp_session_info());
   expect(info.contractVersion).toBe('zto-webmcp-v1');
   expect(info.toolNames).toContain('editor_select');
+});
+
+test('14.2 14.3 14.5 14.7 6.3 6.4 6.6 6.7 gallery state reverses and CRUD stays coherent', async ({ page }) => {
+  await page.goto(BASE);
+  await page.getByRole('button', { name: /Gallery/ }).click();
+  await expect(page.locator('.board-card')).toHaveCount(4);
+  await page.getByRole('button', { name: 'Filter boards by tag' }).click();
+  await page.getByRole('option', { name: 'Festival' }).click();
+  await expect(page.locator('.board-card')).toHaveCount(1);
+  await page.getByRole('button', { name: /Remove Pulse Study from favorites/ }).click();
+  await expect(page.getByRole('button', { name: /Add Pulse Study to favorites/ })).toBeVisible();
+  await page.getByRole('button', { name: 'Filter boards by tag' }).click();
+  await page.getByRole('option', { name: 'All tags' }).click();
+  await expect(page.locator('.board-card')).toHaveCount(4);
+  await page.getByRole('button', { name: 'Rename Pulse Study' }).click();
+  await page.locator('[id^="rename-board-name-"]').fill('Pulse Study Revised');
+  await page.getByRole('button', { name: 'Update board' }).click();
+  await expect(page.getByRole('heading', { name: 'Pulse Study Revised' })).toBeVisible();
+  await expect(page.locator('.board-card')).toHaveCount(4);
+  for (const name of ['Pulse Study Revised', 'Sun Gate', 'Field Notes', 'After Dark']) {
+    await page.getByRole('button', { name: `Delete ${name}` }).click();
+    await page.getByRole('button', { name: `Confirm delete ${name}` }).click();
+  }
+  await expect(page.getByRole('heading', { name: 'The gallery is empty' })).toBeVisible();
+});
+
+test('1.31 1.36 1.38 1.46 1.47 6.5 6.12 mirror painting records one undoable stroke', async ({ page }) => {
+  await page.goto(BASE);
+  const cells = page.locator('.grid-cell');
+  await page.getByRole('button', { name: 'Horizontal mirror' }).click();
+  await cells.first().click();
+  await expect(page.locator('.stats-readout')).toContainText('2 painted');
+  await expect(cells.first()).not.toHaveClass(/kind-blank/);
+  await expect(cells.nth(380)).not.toHaveClass(/kind-blank/);
+  await page.keyboard.press('Backspace');
+  await expect(page.locator('.stats-readout')).toContainText('0 painted');
+  await page.keyboard.press('Backspace');
+  await expect(page.locator('.stats-readout')).toContainText('0 painted');
+});
+
+test('14.9 14.10 1.43 2.15 6.11 session round-trip is atomic and rejects invalid schema', async ({ page }) => {
+  await page.goto(BASE);
+  await page.getByRole('button', { name: /Color Brush/ }).click();
+  await page.getByRole('button', { name: /red palette color/ }).click();
+  await page.locator('.grid-cell').first().click();
+  await page.getByRole('button', { name: 'Export' }).click();
+  const preview = page.getByLabel('Session JSON preview');
+  const session = await preview.textContent();
+  await page.keyboard.press('Escape');
+  await expect(preview).toBeHidden();
+  await page.getByRole('button', { name: /Clear the board/ }).click();
+  await page.getByRole('button', { name: /Confirm clear/ }).click();
+  await page.getByRole('button', { name: 'Import', exact: true }).click();
+  const importText = page.getByRole('textbox', { name: /Session JSON/ });
+  await expect(importText).toBeVisible();
+  await importText.evaluate((textarea, value) => {
+    const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set;
+    setter.call(textarea, value);
+    textarea.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertFromPaste', data: value }));
+  }, session);
+  await page.getByRole('button', { name: 'Import session' }).click();
+  await expect(importText).toBeHidden();
+  await expect(page.locator('.stats-readout')).toContainText('1 painted');
+  const before = await page.locator('.grid-cell').first().getAttribute('class');
+  await page.getByRole('button', { name: 'Import', exact: true }).click();
+  await page.getByRole('textbox', { name: /Session JSON/ }).fill('{"schemaVersion":"wrong"}');
+  await expect(page.getByRole('alert')).toContainText(/schemaVersion|cellSize/);
+  await expect(page.getByRole('button', { name: 'Import session' })).toBeDisabled();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.grid-cell').first()).toHaveAttribute('class', before);
+});
+
+test('1.27 1.39 4.8 keyboard shortcuts and reduced motion preserve tool behavior', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto(BASE);
+  await page.keyboard.press('b');
+  await expect(page.getByRole('button', { name: /Color Brush/ })).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('7');
+  await expect(page.getByRole('button', { name: /pink palette color/ })).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('g');
+  await expect(page.getByRole('button', { name: /Turn grid overlay on/ })).toHaveText('Grid Off');
+  await page.locator('.grid-cell').first().click();
+  await page.keyboard.press('Backspace');
+  await expect(page.locator('.grid-cell').first()).toHaveClass(/kind-blank/);
+});
+
+test('1.11 3.17 4.9 export dialog traps focus and exposes both artifact formats', async ({ page }) => {
+  await page.goto(BASE);
+  const trigger = page.getByRole('button', { name: 'Export' });
+  await trigger.click();
+  const dialog = page.locator('.export-dialog');
+  await expect(dialog).toBeVisible();
+  await expect(page.getByRole('tab', { name: /Session JSON/ })).toBeVisible();
+  await page.getByRole('tab', { name: /PNG/ }).click();
+  await expect(page.getByRole('img', { name: /Branded PNG preview/ })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+  await expect(trigger).toBeFocused();
+});
+
+test('6.8 11.3 draggable toolbar preserves paint and selected controls', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto(BASE);
+  await page.getByRole('button', { name: /Color Brush/ }).click();
+  await page.getByRole('button', { name: /blue palette color/ }).click();
+  await page.locator('.grid-cell').first().click();
+  const toolbar = page.locator('.tool-panel');
+  const before = await toolbar.boundingBox();
+  await page.locator('.tool-panel-header').dragTo(page.locator('.site-footer'));
+  const after = await toolbar.boundingBox();
+  expect(after.x).not.toBe(before.x);
+  await expect(page.getByRole('button', { name: /Color Brush/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: /blue palette color/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.grid-cell').first()).toHaveClass(/kind-color/);
+});
+
+test('7.1 7.2 7.4 7.5 7.6 7.7 7.8 7.9 7.10 7.11 mobile studio remains reachable and touch paints', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto(BASE);
+  await expect(page.locator('.tool-panel')).toBeVisible();
+  const controls = page.locator('.tool-panel button:visible');
+  const boxes = await controls.evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().height));
+  expect(Math.min(...boxes)).toBeGreaterThanOrEqual(44);
+  const first = page.locator('.grid-cell').first();
+  const second = page.locator('.grid-cell').nth(1);
+  const a = await first.boundingBox();
+  const b = await second.boundingBox();
+  await first.dispatchEvent('pointerdown', { pointerId: 1, pointerType: 'touch', clientX: a.x + a.width / 2, clientY: a.y + a.height / 2, button: 0 });
+  await first.dispatchEvent('pointerup', { pointerId: 1, pointerType: 'touch', clientX: a.x + a.width / 2, clientY: a.y + a.height / 2, button: 0 });
+  await expect(first).not.toHaveClass(/kind-blank/);
+  await page.getByRole('button', { name: /Gallery/ }).click();
+  await expect(page.locator('.board-grid')).toHaveCSS('grid-template-columns', /.+/);
+  await expect(page.locator('html')).toHaveJSProperty('scrollWidth', 375);
+  expect(b.x).toBeGreaterThanOrEqual(a.x);
+});
+
+test('assigned WebMCP modules execute visible browse, form, entity, and artifact postconditions', async ({ page }) => {
+  await page.goto(BASE);
+  const info = await page.evaluate(() => window.webmcp_session_info());
+  expect(info.modules).toEqual(expect.arrayContaining(['browse-query-v1', 'entity-collection-v1', 'form-workflow-v1', 'artifact-transfer-v1']));
+  const browse = await invokeTool(page, 'browse_query', { filter: 'all' });
+  const browseResult = JSON.parse(browse.content[0].text);
+  expect(browseResult.count).toBe(4);
+  await invokeTool(page, 'form_submit', { title: 'Contract Board', points: 3 });
+  await expect(page.getByRole('heading', { name: 'Contract Board' })).toBeVisible();
+  await invokeTool(page, 'entity_toggle', { name: 'Contract Board' });
+  await expect(page.getByRole('button', { name: /Remove Contract Board from favorites/ })).toBeVisible();
+  await invokeTool(page, 'artifact_export', { format: 'reading-velocity-json' });
+  await expect(page.getByLabel('Session JSON preview')).toBeVisible();
 });

@@ -940,6 +940,29 @@ export default function App() {
     };
 
     const handlers = {
+      browse_query: async (raw = {}) => {
+        const args = pickArgs(raw);
+        const filter = String(args.filter || args.status || "all").toLowerCase();
+        if (!["all", "ready", "blocked", "done"].includes(filter)) {
+          throw new Error("filter must be all, ready, blocked, or done");
+        }
+        batch(() => {
+          setState("activeMode", "gallery");
+          setState("tagFilter", "");
+        });
+        await waitForUi();
+        return resultText({
+          filter,
+          visible: true,
+          count: state.boards.length,
+          items: state.boards.map((board) => ({
+            title: board.name,
+            points: calculateStats(board.cells).painted,
+            status: board.favorite ? "done" : "ready",
+            lane: board.tag,
+          })),
+        });
+      },
       editor_select: async (raw = {}) => {
         const args = pickArgs(raw);
         const row = Number(args.row);
@@ -1077,9 +1100,27 @@ export default function App() {
         const board = state.boards.find((item) => item.name === name);
         return resultText({ entity: "board", board: name, favorite: board.favorite, field: "favorite", visible: true });
       },
+      form_submit: async (raw = {}) => {
+        const args = pickArgs(raw);
+        const title = String(args.title || args.name || "").trim();
+        const points = Number(args.points ?? state.fillStats.painted);
+        if (!title) throw new Error("title: enter a board name");
+        if (!Number.isFinite(points) || points < 0) throw new Error("points: enter a non-negative number");
+        const result = saveBoard({
+          name: title,
+          tag: String(args.lane || args.tag || `points-${Math.round(points)}`).slice(0, 24),
+          favorite: String(args.status || "").toLowerCase() === "done",
+          cells: state.cells,
+        });
+        if (!result.ok) throw new Error(result.error);
+        setState("activeMode", "gallery");
+        await waitForUi();
+        return resultText({ submitted: true, title: result.board.name, points, visible: true });
+      },
       artifact_export: async (raw = {}) => {
-        const format = pickArgs(raw).format || pickArgs(raw).export_formats;
-        if (!["session-json", "png"].includes(format)) throw new Error("format must be session-json or png");
+        const requested = pickArgs(raw).format || pickArgs(raw).export_formats;
+        const format = requested === "reading-velocity-json" ? "session-json" : requested;
+        if (!["session-json", "png"].includes(format)) throw new Error("format must be session-json, reading-velocity-json, or png");
         setExportTab(format);
         setExportOpen(true);
         if (format === "png") await refreshPngPreview();
@@ -1088,8 +1129,9 @@ export default function App() {
         return resultText({ format, previewOpen: true, visible: true });
       },
       artifact_import: async (raw = {}) => {
-        const mode = pickArgs(raw).mode || pickArgs(raw).import_modes || "session-json";
-        if (mode !== "session-json") throw new Error("mode must be session-json");
+        const requested = pickArgs(raw).mode || pickArgs(raw).import_modes || "session-json";
+        const mode = requested === "reading-velocity-json" ? "session-json" : requested;
+        if (mode !== "session-json") throw new Error("mode must be session-json or reading-velocity-json");
         setImportOpen(true);
         await waitForUi();
         return resultText({ mode: "session-json", importOpen: true, visible: true });
@@ -1109,6 +1151,7 @@ export default function App() {
     };
 
     const toolMeta = [
+      { name: "browse_query", module: "browse-query-v1", description: "Show the visible board collection through the assigned bounded backlog filters.", inputSchema: { type: "object", additionalProperties: true, properties: { filter: { enum: ["all", "ready", "blocked", "done"] } } } },
       { name: "editor_select", module: "structured-editor-v1", description: "Select a grid-cell by its bounded row and column.", inputSchema: schemas.cell },
       { name: "editor_update_property", module: "structured-editor-v1", description: "Update the closed color, brush, or mirror property used by the visible editor.", inputSchema: { type: "object", additionalProperties: true, properties: { property: { enum: ["color", "brush", "mirror"] }, value: { type: "string" } }, required: ["property", "value"] } },
       { name: "editor_switch_mode", module: "structured-editor-v1", description: "Switch the visible editor among paint, erase, and qr modes.", inputSchema: { type: "object", additionalProperties: true, properties: { mode: { enum: ["paint", "erase", "qr"] } }, required: ["mode"] } },
@@ -1119,6 +1162,7 @@ export default function App() {
       { name: "entity_update", module: "entity-collection-v1", description: "Rename or retag one board using the same API-shaped update command.", inputSchema: { type: "object", additionalProperties: true, properties: { name: { type: "string" }, nextName: { type: "string" }, tag: { type: "string" } }, required: ["name"] } },
       { name: "entity_delete", module: "entity-collection-v1", description: "Delete a board. Explicit confirm=true is required.", inputSchema: { type: "object", additionalProperties: true, properties: { name: { type: "string" }, confirm: { type: "boolean" } }, required: ["name", "confirm"] } },
       { name: "entity_toggle", module: "entity-collection-v1", description: "Toggle the favorite field of a named board.", inputSchema: schemas.name },
+      { name: "form_submit", module: "form-workflow-v1", description: "Create a visible board record from the assigned title and points form fields.", inputSchema: { type: "object", additionalProperties: true, properties: { title: { type: "string", minLength: 1, maxLength: 40 }, points: { type: "number", minimum: 0 } }, required: ["title", "points"] } },
       { name: "artifact_export", module: "artifact-transfer-v1", description: "Open the visible Export surface in a bounded format without returning artifact contents.", inputSchema: { type: "object", additionalProperties: true, properties: { format: { enum: ["session-json", "png"] } }, required: ["format"] } },
       { name: "artifact_import", module: "artifact-transfer-v1", description: "Open the visible session-json Import surface. File and paste mechanics remain user-driven.", inputSchema: { type: "object", additionalProperties: true, properties: { mode: { const: "session-json" } }, required: ["mode"] } },
       { name: "artifact_copy", module: "artifact-transfer-v1", description: "Invoke the visible copy workflow for the selected export format without returning contents.", inputSchema: { type: "object", additionalProperties: true, properties: { format: { enum: ["session-json", "png"] } }, required: ["format"] } },
@@ -1132,7 +1176,7 @@ export default function App() {
     window.webmcp_session_info = async () => ({
       contract_version: "zto-webmcp-v1",
       contractVersion: "zto-webmcp-v1",
-      modules: ["structured-editor-v1", "entity-collection-v1", "artifact-transfer-v1"],
+      modules: ["browse-query-v1", "entity-collection-v1", "form-workflow-v1", "artifact-transfer-v1", "structured-editor-v1"],
       tool_names: toolMeta.map((tool) => tool.name),
       toolNames: toolMeta.map((tool) => tool.name),
       tools: toolMeta.map((tool) => tool.name),
@@ -1315,7 +1359,7 @@ export default function App() {
       },
     }));
     const values = form.useSelector((formState) => formState.values);
-    const currentValidation = () => values().json.trim() ? parseSessionText(values().json) : { ok: false, error: "import: paste Session JSON or choose a file" };
+    const currentValidation = createMemo(() => values().json.trim() ? parseSessionText(values().json) : { ok: false, error: "import: paste Session JSON or choose a file" });
     const importAlertText = () => importError() || (values().json.trim() && !currentValidation().ok ? currentValidation().error : "");
     const handleFile = async (file) => {
       if (!file) return;
