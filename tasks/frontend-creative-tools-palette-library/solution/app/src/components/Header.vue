@@ -1,7 +1,13 @@
 <template>
   <header class="sticky top-0 z-50 bg-cream/95 backdrop-blur border-b border-rule">
-    <div class="max-w-6xl mx-auto px-4 grid grid-cols-[1fr_auto_1fr] items-center min-h-16">
+    <div class="max-w-6xl mx-auto px-4 grid grid-cols-3 items-center min-h-16">
       <div class="justify-self-start">
+        <p class="font-display text-2xl sm:text-3xl leading-none text-ink select-none whitespace-nowrap">
+          <span class="text-oxblood">The O&amp;A</span> Palette Library
+        </p>
+      </div>
+
+      <div class="justify-self-center">
         <button
           type="button"
           class="inline-flex items-center justify-center min-w-11 min-h-11 px-3 font-mono text-xs tracking-[0.22em] text-ink hover:text-oxblood transition-colors"
@@ -9,13 +15,9 @@
           :aria-expanded="store.menuOpen"
           @click="store.menuOpen = true"
         >
-          MENU
+          Menu
         </button>
       </div>
-
-      <p class="font-display text-2xl sm:text-3xl leading-none text-ink select-none whitespace-nowrap">
-        <span class="text-oxblood">The O&amp;A</span> Palette Library
-      </p>
 
       <div class="justify-self-end">
         <button
@@ -25,7 +27,7 @@
           :aria-expanded="store.cartOpen"
           @click="store.cartOpen = true"
         >
-          CART<span
+          Cart<span
             v-if="cartCount > 0"
             class="ml-1.5 inline-flex items-center justify-center min-w-5 h-5 px-1 rounded-full bg-oxblood text-cream text-[10px] font-bold"
           >{{ cartCount }}</span>
