@@ -108,7 +108,7 @@ function FormulaBar() {
       <label htmlFor="formula" className="mono shrink-0 text-sm font-bold t-brand">ƒx</label>
       <input id="formula" list="formula-suggestions" className="input mono !min-h-8 !py-1 !text-xs flex-1" value={formulaInput}
         aria-invalid={Boolean(formulaResult?.error)} aria-describedby={formulaResult?.error ? 'formula-status' : 'formula-hint'}
-        onChange={(e) => setUi({ formulaInput: e.target.value})}
+        onChange={(e) => setUi({ formulaInput: e.target.value,   })}
         onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); evaluate() } }}
         placeholder="=AVERAGE(score) or =SUM(score, 1:100)" />
       <datalist id="formula-suggestions">
