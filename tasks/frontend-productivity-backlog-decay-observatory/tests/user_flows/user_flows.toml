@@ -1,0 +1,11 @@
+[[criterion]]
+id = "user_flows.full_lifecycle"
+description = "Execute the full task lifecycle: capture, bind context, depend, prioritize, decay/review, triage, schedule/work, archive, revive/follow-up, complete, and export/import. Confirm state transitions smoothly with all artifacts agreeing."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "user_flows.import_restore"
+description = "Export the backlog decision ledger artifact, make local changes, and import the artifact. Confirm that the successful import restores authored and derived state exactly, treating it as an atomic transaction."
+type = "binary"
+weight = 1.0

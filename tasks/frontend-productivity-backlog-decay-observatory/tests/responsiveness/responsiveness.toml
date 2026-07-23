@@ -1,0 +1,11 @@
+[[criterion]]
+id = "responsiveness.mobile_flows"
+description = "Complete the task, evidence, allocation, graph, triage, schedule, and revival flows at 375px viewport width. Confirm all actions are retained with 44-pixel targets and no horizontal overflow."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "responsiveness.desktop_to_mobile_retention"
+description = "Resize the viewport from 1440px to 768px to 375px. Confirm that the exact conserved priority and time-dependent evidence state is preserved across all productivity surfaces."
+type = "binary"
+weight = 1.0

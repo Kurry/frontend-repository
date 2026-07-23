@@ -1,0 +1,25 @@
+[[criterion]]
+id = "edge_cases.priority_overflow"
+description = "Test priority 0, 100, and sum overflow bounds. Confirm that over-allocating is blocked with a visible diagnostic and zero mutation, and fractional tokens state the divisibility rule."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "edge_cases.dependency_cycle_rejection"
+description = "Test dependency cycle and duplicate survivor creation. Confirm that requires/blocking graph cycles are rejected."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "edge_cases.forged_import"
+description = "Attempt to import a ledger with forged priority sum/bounds, graph cycle, or artifact disagreement. The import succeeds or applies a partial mutation instead of being rejected atomically."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "edge_cases.delete_committed"
+description = "Attempt to delete a task that has been committed to a triage/work session. The deletion is permitted despite the task being committed, breaking the append-only events rule."
+type = "binary"
+weight = 1.0
+negate = true

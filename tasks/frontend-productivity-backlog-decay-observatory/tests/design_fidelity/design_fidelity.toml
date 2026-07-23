@@ -1,0 +1,11 @@
+[[criterion]]
+id = "design_fidelity.backlog_semantics"
+description = "Verify priority conservation, dependency graph rules, logical decay and risk, event state machines, WIP limits, split/completion, and CSV/ICS/SVG export formats. Confirm backlog semantics are executed exactly as specified."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "design_fidelity.artifact_content_shape"
+description = "Export the backlog decision ledger. Confirm the canonical re-export changes only exportedAt, and CSV/ICS/SVG remain byte-identical and agree perfectly with the canonical selected state."
+type = "binary"
+weight = 1.0

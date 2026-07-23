@@ -1,0 +1,17 @@
+[[criterion]]
+id = "behavioral.interleave_operations_round_trip"
+description = "Interleave priority edits, time decay, bulk triage, split/merge, work/wait/follow-up, archive/revive, and undo draft-only. Export and import the backlog, and confirm events, points, lineage, and files round-trip exactly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "behavioral.adversarial_orderings"
+description = "Exercise adversarial orderings: canonical edit before/after merge, undo followed by branch, cancel after preview, and import after divergent local edits. Confirm equivalent orders converge and cancelled actions restore the complete prior snapshot."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "behavioral.reload_isolation"
+description = "Reload the app while in the middle of a transient preview, drag, or invalid draft. Confirm the state that the PRD promises to persist survives reload exactly, while transient states do not leak into persistence."
+type = "binary"
+weight = 1.0

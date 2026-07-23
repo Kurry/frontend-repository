@@ -1,0 +1,17 @@
+[[criterion]]
+id = "visual_design.inspect_all_states"
+description = "Inspect fresh, stale, missing, blocked, waiting, duplicate, priority, risk, scheduled, active, paused, complete, archived, and revival states, confirming the hierarchy stays legible in all modes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "visual_design.desktop_layout"
+description = "On desktop width, confirm the layout shows the backlog/risk field, dependency graph, priority allocator, and triage/schedule rail as explicitly distinct surfaces."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "visual_design.mobile_transformation"
+description = "At 375px viewport width, confirm the layout transforms into task/evidence cards, point-allocation sheets, vertical dependency/wait lineage, triage stepper, and day/WIP cards without clipping or overflow."
+type = "binary"
+weight = 1.0

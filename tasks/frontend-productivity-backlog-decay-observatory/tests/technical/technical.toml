@@ -1,0 +1,25 @@
+[[criterion]]
+id = "technical.interleave_ui_actions"
+description = "Interleave UI actions for task/evidence, graph, priority, clock, triage, schedule/work, archive/follow-up, and history. Confirm ids, points, events, checksums, and export files match exactly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "technical.token_conservation_gate"
+description = "Attempt to over-allocate the priority budget beyond 100 points. Confirm it is blocked with a visible diagnostic, zero mutation occurs, and active tokens plus the unallocated reserve always sum to exactly 100."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "technical.decay_logical_time"
+description = "Advance the logical clock without advancing wall time. Confirm freshness/decay and risk field derive deterministically and update exactly, and risk values match identically across all surfaces."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "technical.dependency_graph_cycle"
+description = "Attempt to create a wait cycle. Confirm it is blocked with a named reason and zero mutation occurs."
+type = "binary"
+weight = 1.0
+negate = true

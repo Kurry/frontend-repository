@@ -1,0 +1,17 @@
+[[criterion]]
+id = "motion.causal_endpoints"
+description = "Allocate a token, advance time decay, propagate graph/risk, triage, schedule, archive, revive, and confirm the causal transitions explain the cause with visible endpoints."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "motion.named_durations"
+description = "Move a token via drag and step the decay. Confirm the transition has a duration between 150-300ms with early and settled frame sampling and computed hover deltas."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "motion.reduced_motion"
+description = "Enable the reduced motion toggle (not browser emulation). Allocate a token and advance decay, confirming that before/after points, status, and scores agree with all non-zero CSS transitions removed."
+type = "binary"
+weight = 1.0

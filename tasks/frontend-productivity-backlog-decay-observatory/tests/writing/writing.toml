@@ -1,0 +1,11 @@
+[[criterion]]
+id = "writing.conflict_recovery_copy"
+description = "Trigger every contract, context, graph, priority, triage, WIP, and revival conflict. Confirm the error copy names the exact task, evidence, edge, point, date, decision, or event, and states the required recovery action."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "writing.exact_field_error_copy"
+description = "Submit invalid fields for bounds, enum, format, and uniqueness rules. Confirm error copy identifies the field, rejected value/rule, and correcting the value clears only the corresponding error."
+type = "binary"
+weight = 1.0

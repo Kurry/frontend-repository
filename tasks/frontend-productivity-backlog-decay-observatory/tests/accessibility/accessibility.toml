@@ -1,0 +1,11 @@
+[[criterion]]
+id = "accessibility.keyboard_navigation"
+description = "Bind context, link graph, allocate points, control clock, triage/bulk preview, schedule/work, archive/revive, complete, and export using only the keyboard. Confirm focus and state match pointer interaction exactly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "accessibility.keyboard_canonical_event"
+description = "Execute a pointer manipulation path, then execute the exact equivalent keyboard path. Confirm both converge to one canonical event with identical stable IDs and export bytes."
+type = "binary"
+weight = 1.0

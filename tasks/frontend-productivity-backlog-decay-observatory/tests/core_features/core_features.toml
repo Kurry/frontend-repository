@@ -1,0 +1,41 @@
+[[criterion]]
+id = "core_features.capture_allocate_triage_schedule_archive_export"
+description = "Capture and bind evidence to a task, allocate priority, advance decay, triage, schedule, archive, revive, and export the exact state. Confirm that all artifacts match the canonical state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.token_moves_propagate"
+description = "Move a priority budget token among task nodes and confirm that the dependency graph, age/freshness field, risk bands, WIP lanes, schedule, waiting queue, triage rationale, and artifacts all update together in one transition without requiring further navigation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.waiting_queue_integrity"
+description = "Complete a blocker task and confirm that every waiting task's eligibility is updated in one transition, with the old blocked state gone everywhere."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.broken_wait_state_archived"
+description = "Archive a task that another task is waiting on and confirm the waiting task surfaces a named broken-wait state instead of waiting silently."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.wip_limit_graded"
+description = "Attempt to move a task into a WIP lane beyond its declared limit and confirm it is blocked or flagged with an explicit recorded override naming the violated limit, and WIP counts recompute live."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.triage_rationale_append_only"
+description = "Make a triage decision, then make another decision on the same task. Confirm that the triage rationale is appended and never rewrites prior rationale records, and confirming the outcome updates task state, budget, and queue together."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.archive_revival_history"
+description = "Archive a task, then revive it. Confirm the archiving appends an archive event with a snapshot, and reviving creates a revival record linked to it without rewriting the archived history."
+type = "binary"
+weight = 1.0

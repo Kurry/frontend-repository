@@ -1,0 +1,11 @@
+[[criterion]]
+id = "performance.large_dataset_interactions"
+description = "Operate the app with the deterministic fixture of 100,000 tasks, 500,000 edges/events, and 10,000 triage sessions. Confirm interactions remain responsive under rapid user input."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "performance.stale_risk_cancel"
+description = "Confirm that stale risk calculations or queue work cancel efficiently during rapid interactions, with direct manipulation acknowledged within 100 ms and linked views settled within 500 ms."
+type = "binary"
+weight = 1.0
