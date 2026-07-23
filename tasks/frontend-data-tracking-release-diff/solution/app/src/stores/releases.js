@@ -255,7 +255,7 @@ export const useReleaseStore = defineStore('releases', {
     toast(message, tone = 'success') {
       const id = `${Date.now()}-${Math.random()}`
       this.toasts.push({ id, message, tone })
-      window.setTimeout(() => { this.toasts = this.toasts.filter((toast) => toast.id !== id) }, 3600)
+      window.setTimeout(() => { this.toasts = this.toasts.filter((toast) => toast.id !== id) }, 2000)
     },
     resetCut() {
       if (!this.cutRun.running) this.cutRun = freshCutRun()

@@ -34,34 +34,25 @@ function boundedString(value, label, max = 200) {
 }
 
 function projectFields(args) {
-  const raw = args?.fields;
-  if (raw === undefined) return {};
-  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new Error('fields must be an object');
-  for (const key of Object.keys(raw)) {
-    if (!ENTITY_FIELDS.includes(key)) throw new Error(`Unknown project field: ${key}`);
-  }
-
+  const raw = args?.fields ?? args;
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {};
   const fields = {};
-  if (raw.title !== undefined) fields.name = boundedString(raw.title, 'title', 80);
-  if (raw.summary !== undefined) fields.summary = boundedString(raw.summary, 'summary', 280);
-  if (raw.slug !== undefined) fields.slug = boundedString(raw.slug, 'slug', 48);
-  if (raw.status !== undefined) fields.status = boundedString(raw.status, 'status', 16);
-  if (raw.year !== undefined) {
-    const year = Number(raw.year);
-    if (!Number.isInteger(year)) throw new Error('year must be an integer');
-    fields.year = year;
-  }
-  if (raw.featured !== undefined) {
-    if (raw.featured !== 'true' && raw.featured !== 'false') throw new Error('featured must be true or false');
-    fields.featured = raw.featured === 'true';
-  }
+  if (raw.name !== undefined) fields.name = raw.name;
+  else if (raw.title !== undefined) fields.name = raw.title;
+  if (raw.slug !== undefined) fields.slug = raw.slug;
+  if (raw.summary !== undefined) fields.summary = raw.summary;
+  if (raw.status !== undefined) fields.status = raw.status;
+  if (raw.year !== undefined) fields.year = typeof raw.year === 'string' ? (raw.year === '' ? '' : Number(raw.year)) : raw.year;
+  if (raw.featured !== undefined) fields.featured = typeof raw.featured === 'string' ? raw.featured === 'true' : Boolean(raw.featured);
   if (raw.tags !== undefined) {
-    let tags;
-    try { tags = JSON.parse(raw.tags); }
-    catch { tags = String(raw.tags).split(',').map((tag) => tag.trim()).filter(Boolean); }
-    if (!Array.isArray(tags)) throw new Error('tags must be a JSON list or comma-separated string');
-    fields.tags = tags;
+    if (typeof raw.tags === 'string') {
+      try { fields.tags = JSON.parse(raw.tags); }
+      catch { fields.tags = raw.tags.split(',').map((t) => t.trim()).filter(Boolean); }
+    } else {
+      fields.tags = raw.tags;
+    }
   }
+  if (raw.type !== undefined) fields.type = raw.type;
   return fields;
 }
 

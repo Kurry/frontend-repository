@@ -321,8 +321,8 @@ export default function App() {
     const { rows, cols } = dimensions();
     const row = Math.floor(index / cols);
     const col = index % cols;
-    if (state.mirrorMode === "horizontal") return (rows - 1 - row) * cols + col;
-    if (state.mirrorMode === "vertical") return row * cols + (cols - 1 - col);
+    if (state.mirrorMode === "horizontal") return row * cols + (cols - 1 - col);
+    if (state.mirrorMode === "vertical") return (rows - 1 - row) * cols + col;
     return index;
   }
 
@@ -408,7 +408,10 @@ export default function App() {
   }
 
   function armClear() {
-    if (confirmClear()) { clearBoard(); return; }
+    if (confirmClear()) {
+      clearBoard();
+      return;
+    }
     setConfirmClear(true);
     clearTimeout(clearArmTimer);
     clearArmTimer = setTimeout(() => setConfirmClear(false), 2600);
@@ -484,7 +487,7 @@ export default function App() {
     if (!exists) return false;
     const complete = () => batch(() => {
       const remaining = state.boards.filter((board) => board.name !== name);
-      setState("boards", remaining);
+      setState("boards", () => remaining);
       if (remaining.length === 0 && state.tagFilter) setState("tagFilter", "");
       if (state.selectedBoard === name) setState("selectedBoard", null);
       setDeletingBoard("");
@@ -621,7 +624,7 @@ export default function App() {
       setState("mirrorMode", session.mirrorMode);
       setState("fillStats", { ...session.fillStats });
       setState("cells", cloneCells(session.cells));
-      setState("boards", session.boards.map((board) => ({ ...board, cells: cloneCells(board.cells) })));
+      setState("boards", () => session.boards.map((board) => ({ ...board, cells: cloneCells(board.cells) })));
       setState("history", []);
       setState("sliderLocked", session.fillStats.painted > 0);
       setState("selectedBoard", null);
@@ -1231,7 +1234,7 @@ export default function App() {
     const tagIssue = () => boardTagError(values().tag);
     const valid = () => !nameIssue() && !tagIssue();
     return (
-      <Dialog.Root open={saveMotion.shown()} onOpenChange={(open) => { saveMotion.handleOpenChange(open); if (!open) { setAttempted(false); setFormError(""); } }}>
+      <Dialog.Root modal={true} open={saveMotion.shown()} onOpenChange={(open) => { saveMotion.handleOpenChange(open); if (!open) { setAttempted(false); setFormError(""); } }}>
         <Dialog.Trigger class="action-button save-button" aria-label="Save current board">
           <IconDeviceFloppy size={17} /> Save board
         </Dialog.Trigger>
@@ -1328,7 +1331,7 @@ export default function App() {
       }
     };
     return (
-      <Dialog.Root open={importMotion.shown()} onOpenChange={(open) => { importMotion.handleOpenChange(open); if (!open) { setImportError(""); setAttempted(false); } }}>
+      <Dialog.Root modal={true} open={importMotion.shown()} onOpenChange={(open) => { importMotion.handleOpenChange(open); if (!open) { setImportError(""); setAttempted(false); } }}>
         <Dialog.Trigger class="tool-button secondary-tool"><IconUpload size={16} /> Import</Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Overlay class={`dialog-overlay ${importMotion.closing() ? "is-closing" : ""}`} />
@@ -1378,7 +1381,7 @@ export default function App() {
 
   function ExportDialog() {
     return (
-      <Dialog.Root open={exportMotion.shown()} onOpenChange={(open) => { exportMotion.handleOpenChange(open); if (open && exportTab() === "png") refreshPngPreview(); }}>
+      <Dialog.Root modal={true} open={exportMotion.shown()} onOpenChange={(open) => { exportMotion.handleOpenChange(open); if (open && exportTab() === "png") refreshPngPreview(); }}>
         <Dialog.Trigger class="action-button export-button" onClick={() => setExportTab("session-json")}><span>Export</span><IconArrowRight size={17} /></Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Overlay class={`dialog-overlay ${exportMotion.closing() ? "is-closing" : ""}`} />
@@ -1423,7 +1426,7 @@ export default function App() {
 
   function CameraDialog() {
     return (
-      <Dialog.Root open={cameraMotion.shown()} onOpenChange={(open) => {
+      <Dialog.Root modal={true} open={cameraMotion.shown()} onOpenChange={(open) => {
         cameraMotion.handleOpenChange(open);
         if (open) setTimeout(startCamera, 0);
         else stopCamera();
@@ -1473,7 +1476,7 @@ export default function App() {
     const nameIssue = () => boardNameError(values().name, state.boards, props.board.name);
     const tagIssue = () => boardTagError(values().tag);
     return (
-      <Dialog.Root open={renameMotion.shown()} onOpenChange={renameMotion.handleOpenChange}>
+      <Dialog.Root modal={true} open={renameMotion.shown()} onOpenChange={renameMotion.handleOpenChange}>
         <Dialog.Trigger class="card-icon-button" aria-label={`Rename ${props.board.name}`}><IconPencil size={16} /></Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Overlay class={`dialog-overlay ${renameMotion.closing() ? "is-closing" : ""}`} />
@@ -1683,7 +1686,11 @@ export default function App() {
     createEffect(() => drawThumbnail(thumb, props.board.cells));
     const stats = createMemo(() => calculateStats(props.board.cells));
     const armDelete = () => {
-      if (confirming()) { removeBoard(props.board.name, true); return; }
+      if (confirming()) {
+        clearTimeout(confirmTimer);
+        removeBoard(props.board.name, true);
+        return;
+      }
       setConfirming(true);
       clearTimeout(confirmTimer);
       confirmTimer = setTimeout(() => setConfirming(false), 2600);

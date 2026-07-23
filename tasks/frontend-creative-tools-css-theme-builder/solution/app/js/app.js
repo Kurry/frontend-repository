@@ -956,10 +956,10 @@ function resetToSeed() {
 function onHashChange() {
   const hasPayload = hashHasThemePayload();
   const decoded = readThemeHash();
-  if (hasPayload && !decoded) {
+  if (!hasPayload || (hasPayload && !decoded)) {
     resetToSeed();
     selectTheme(cloneTheme(defaultBuiltin()), { syncHash: false });
-    clearThemeHash();
+    if (hasPayload) clearThemeHash();
     return;
   }
   if (!decoded) return;
@@ -1813,6 +1813,9 @@ function maybeStartTour() {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && !tour.hidden) close();
   });
+  document.addEventListener("pointerdown", (e) => {
+    if (!tour.hidden && !card.contains(e.target)) close();
+  });
   window.addEventListener("resize", position);
 
   setTimeout(() => {
@@ -1836,10 +1839,10 @@ function boot() {
 
     const hasPayload = hashHasThemePayload();
     const decoded = readThemeHash();
-    if (hasPayload && !decoded) {
+    if (!hasPayload || (hasPayload && !decoded)) {
       resetToSeed();
       selectTheme(cloneTheme(defaultBuiltin()), { syncHash: false });
-      clearThemeHash();
+      if (hasPayload) clearThemeHash();
     } else if (decoded) {
       try {
         const theme = seedFromPayload(decoded);

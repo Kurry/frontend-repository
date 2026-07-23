@@ -131,3 +131,26 @@ test('downloaded Scan Index JSON round-trips through the real file importer', as
   await expect(readmeToggle).toBeChecked()
   await expect(page.locator('.repository-row')).toHaveCount(3)
 })
+
+test('innovation criteria expose a live, derived guidance topology', async ({ page }) => {
+  test.setTimeout(30_000)
+  await page.goto('/')
+  const topology = page.getByRole('region', { name: 'Guidance topology' })
+  await expect(topology).toBeVisible()
+  await expect(topology.getByRole('button')).toHaveCount(3)
+  await expect(topology).toContainText('Design system')
+  await expect(topology).toContainText('4/4')
+  await expect(topology.getByText('2 indexed')).toHaveCount(4)
+
+  await topology.getByRole('button', { name: 'Product catalog' }).click()
+  await expect(topology).toContainText('Active fingerprint')
+  await expect(topology).toContainText('Product catalog')
+  await expect(topology).toContainText(/risk index \d+/)
+  await expect(topology).toContainText('Next best action')
+
+  await page.locator('label[for="pattern-readme"]').click()
+  await page.locator('#repository-repo-2').getByRole('button', { name: 'Scan now' }).click()
+  await expect.poll(async () => topology.getByText('Coverage gap').count(), { timeout: 15_000 }).toBe(1)
+  await expect(topology).toContainText('3/4')
+  await expect(topology).toContainText('Restore README files coverage')
+})

@@ -44,7 +44,9 @@ button:disabled { cursor: not-allowed; }
 .mono { font-family: var(--font-mono); }
 .hover-wash { @apply transition-colors duration-150 hover:bg-accent/[0.055]; }
 .scroll-thin { scrollbar-width: thin; scrollbar-color: #b8beb9 transparent; }
-.rich-text h1, .rich-text h2, .rich-text h3 { @apply mt-4 mb-2 font-bold text-ink; }
+.rich-text h1, .rich-text h2, .rich-text h3, .rich-text h4, .rich-text h5 { @apply mt-4 mb-2 font-bold text-ink; }
+.rich-text h3 { font-size: 1.15em; }
+.rich-text h4 { font-size: 1.05em; }
 .rich-text p { @apply mb-3 leading-6 text-[#3f4943]; }
 .rich-text ul { @apply mb-3 list-disc pl-5 text-[#3f4943]; }
 .rich-text code { @apply rounded bg-black/[0.06] px-1 py-0.5 font-mono text-[0.9em]; }
@@ -55,8 +57,10 @@ button:disabled { cursor: not-allowed; }
 .stream-dot { animation: stream-pulse 1s ease-in-out infinite; }
 .linked-step { animation: linked-outline .38s ease-out; }
 @keyframes linked-outline { from { box-shadow: 0 0 0 6px rgb(20 111 100 / .08); } to { box-shadow: 0 0 0 1px rgb(20 111 100 / .45); } }
-.count-pop { animation: count-pop .28s ease-out; }
-@keyframes count-pop { 50% { transform: scale(1.14); } }
+.rollup-segment { transition: width 250ms ease-in-out, background-color 250ms ease-in-out; }
+.readiness-fill { transition: width 300ms cubic-bezier(.2,.8,.2,1); }
+.mark-emphasis { animation: pop-emphasis .3s cubic-bezier(.175, .885, .32, 1.275); }
+@keyframes pop-emphasis { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
 .trajectory-pane { animation: pane-in .2s ease-out; }
 .verdict-crossfade { animation: row-in .24s ease-out; }
 .verdict-crossfade tbody tr { animation: row-in .22s ease-out; }
@@ -92,4 +96,26 @@ button:disabled { cursor: not-allowed; }
 
 @media (max-width: 639px) {
   .app-command-button { display: none !important; }
+  .verdict-table thead { display: none; }
+  .verdict-table,
+  .verdict-table tbody,
+  .verdict-table tr,
+  .verdict-table td { display: block; width: 100%; min-width: 0; }
+  .verdict-table tr { padding: .5rem; }
+  .verdict-table td { display: grid; grid-template-columns: minmax(6.5rem, 36%) minmax(0, 1fr); align-items: center; gap: .5rem; }
+  .verdict-table td:first-child { display: none; }
+  .verdict-table td::before { content: attr(data-label); font-size: .625rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--color-muted); }
+  .verdict-table td[data-label="Scorer reasoning"] { align-items: start; }
+  .verdict-table td[data-label="Scorer reasoning"] p { white-space: normal; overflow: visible; display: block; }
+  .verdict-table td[data-label="Review"] .control { width: 100%; }
+}
+
+@media print {
+  @page { size: letter; margin: .65in; }
+  body { min-width: 0; background: white; color: #111; }
+  body > #root > :not([data-react-aria-top-layer]) { display: none !important; }
+  [data-react-aria-top-layer] { position: static !important; display: block !important; background: white !important; }
+  .print-memo { max-width: none; font: 11pt/1.45 Georgia, "Times New Roman", serif; }
+  .print-memo h1, .print-memo h2, .print-memo h3 { break-after: avoid; }
+  .print-memo p, .print-memo li { orphans: 3; widows: 3; }
 }

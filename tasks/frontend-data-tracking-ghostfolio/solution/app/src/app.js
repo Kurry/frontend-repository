@@ -307,7 +307,7 @@ const money = (n) => {
 };
 const signedMoney = (n) => (n >= 0 ? `+${money(n)}` : money(n));
 function qtyText(n) { return Number.isInteger(n) ? n.toLocaleString('en-US') : String(Number(n.toFixed(6))); }
-function priceText(n) { return `$${Number(n.toFixed(2)).toLocaleString('en-US', { minimumFractionDigits: 0 })}`; }
+function priceText(n) { return `$${Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`; }
 function escapeHtml(str) {
   return String(str).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
@@ -677,7 +677,10 @@ function performanceReport() {
     performance: {
       netWorth: perf.netWorth, totalCostBasis: perf.totalCostBasis, realizedGain: perf.realizedGain,
       unrealizedGain: perf.unrealizedGain, dividendIncome: perf.dividendIncome, totalFees: perf.totalFees,
-      totalReturn: perf.totalReturn
+      totalReturn: perf.totalReturn,
+      "Net worth": perf.netWorth, "Total cost basis": perf.totalCostBasis, "Cost basis": perf.totalCostBasis,
+      "Realized gain": perf.realizedGain, "Unrealized gain": perf.unrealizedGain,
+      "Dividend income": perf.dividendIncome, "Total fees": perf.totalFees, "Total return": perf.totalReturn
     },
     holdings: state.holdings.map((h) => {
       const m = holdingMetrics(h);
@@ -1103,7 +1106,7 @@ function renderDetail() {
   refs.dCurrency.textContent = h.currency;
   refs.dSource.textContent = h.dataSource;
   refs.dValue.textContent = money(m.marketValue);
-  refs.dAvgCost.textContent = priceText(m.avgUnitCost);
+  refs.dAvgCost.textContent = money(m.avgUnitCost);
   refs.dCostBasis.textContent = money(m.costBasis);
   refs.dUnrealized.textContent = signedMoney(m.unrealized);
   refs.dUnrealized.className = `num ${m.unrealized >= 0 ? 'dd-pos' : 'dd-neg'}`;
@@ -1128,7 +1131,8 @@ function renderActivities() {
       `<td class="num">${qtyText(a.quantity)}</td>` +
       `<td class="num">${priceText(a.unitPrice)}</td>` +
       `<td class="num">${priceText(a.fee)}</td>` +
-      `<td>${escapeHtml(a.currency)}</td>`;
+      `<td>${escapeHtml(a.currency)}</td>` +
+      `<td>${escapeHtml(a.dataSource)}</td>`;
     refs.activitiesBody.appendChild(tr);
   }
   refs.activitiesSelectAll.checked = list.length > 0 && list.every((a) => state.activitySel.has(a.id));
@@ -1230,7 +1234,8 @@ function updateHoldingFormValidity() {
   for (const key of HFIELDS) {
     const errEl = refs[`eH_${key}`];
     const field = map[key];
-    if (holdingTouched[key] && v.errors[field]) { errEl.textContent = v.errors[field]; errEl.hidden = false; }
+    const isTouched = holdingTouched[key] || (key === 'name' && Object.values(holdingTouched).some(Boolean));
+    if (isTouched && v.errors[field]) { errEl.textContent = v.errors[field]; errEl.hidden = false; }
     else { errEl.textContent = ''; errEl.hidden = true; }
   }
 }
@@ -1519,7 +1524,7 @@ function grab() {
     activitiesBody: 'activities-body', ledgerEmpty: 'ledger-empty', activitiesSelectAll: 'activities-select-all',
     activitiesTray: 'activities-tray', activitiesTrayCount: 'activities-tray-count', bulkActSource: 'bulk-act-source',
     bulkEditActivities: 'bulk-edit-activities', bulkDeleteActivities: 'bulk-delete-activities',
-    undoBtn: 'undo-btn', exportBtn: 'export-btn', live: 'live-region', toastContainer: 'toast-container',
+    undoBtn: 'undo-btn', importBtn: 'import-btn', exportBtn: 'export-btn', live: 'live-region', toastContainer: 'toast-container',
     drawer: 'export-drawer', drawerOverlay: 'drawer-overlay', drawerClose: 'drawer-close', exportSummary: 'export-summary',
     exportPreview: 'export-preview', copyBtn: 'copy-btn', downloadBtn: 'download-btn', copyConfirm: 'copy-confirm',
     importFile: 'import-file', importError: 'import-error',
@@ -1598,6 +1603,8 @@ function wire() {
 
   refs.undoBtn.addEventListener('click', undo);
   refs.exportBtn.addEventListener('click', openDrawer);
+  if (refs.importBtn) refs.importBtn.addEventListener('click', () => { openDrawer(); if (refs.importFile) refs.importFile.click(); });
+  if (refs.saveHoldingWrap) refs.saveHoldingWrap.addEventListener('click', () => { for (const k of HFIELDS) holdingTouched[k] = true; updateHoldingFormValidity(); });
   refs.drawerClose.addEventListener('click', closeDrawer);
   refs.drawerOverlay.addEventListener('click', closeDrawer);
   for (const t of refs.drawerTabs) t.addEventListener('click', () => setDrawerTab(t.dataset.tab));

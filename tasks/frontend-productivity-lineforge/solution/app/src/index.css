@@ -1063,3 +1063,12 @@ header :focus-visible {
 .board-square:hover {
   filter: brightness(0.96);
 }
+
+/* Toast slide-in animation */
+.toast-enter-active {
+  transition: transform 0.25s ease, opacity 0.25s ease !important;
+}
+.toast-enter-from {
+  transform: translateY(12px) scale(0.95);
+  opacity: 0;
+}

@@ -55,16 +55,17 @@ function FlameGlyph({ tier }: { tier: FlameTier }) {
       </svg>
     );
   }
-  // plain
+  // plain — deliberately all-grey: below the 7-day milestone the flame carries
+  // no #FFB020 milestone accent, so the three tiers read as clearly different.
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style={{ color: "#FFB020" }}>
+    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style={{ color: "#94A3B8" }}>
       <path
         d="M12 3c1.4 2.8 4.4 4 4.4 8A4.4 4.4 0 0 1 12 15.4 4.4 4.4 0 0 1 7.6 11c0-3.2 2.2-4.1 3-6.2.4 1.1 1 1.8 1.4 2.6.6-1.3 0-2.8 0-4.4Z"
         fill="#CBD5E1"
       />
       <path
         d="M12 9.4c.7 1.2 2 1.8 2 3.5a2 2 0 0 1-4 0c0-1.2.9-1.7 1.4-2.7.3.5.5.9.6 1.3.3-.7 0-1.5 0-2.1Z"
-        fill="#FFB020"
+        fill="#94A3B8"
       />
     </svg>
   );

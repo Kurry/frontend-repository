@@ -140,8 +140,8 @@ export function MoveTree() {
             onInput={e => { saveNotes.value = e.target.value; if (saveError.value) saveError.value = ''; }}
             aria-describedby="line-notes-help"
           />
-          <p id="line-name-error" aria-live="polite" class="mt-1 text-sm font-medium field-error" style="min-height: 1.25rem;">
-            {saveError.value || (!nameOk && saveName.value.length > 0 ? 'Name is required — type a name for this line, then select Save' : fieldError || '')}
+          <p id="line-name-error" aria-live="polite" class="mt-1 text-sm font-medium field-error" style="min-height: 1.25rem; color: var(--color-danger);">
+            {saveError.value || (saveName.value.trim() === '' ? 'Line name field is required — type a name for this line, then choose Save' : !nameOk ? 'Name is required — type a name for this line, then choose Save' : fieldError || '')}
           </p>
           <div class="flex gap-2 mt-2">
             <button type="submit" class="btn-primary" disabled={!canSubmit}>Save</button>
@@ -192,7 +192,8 @@ export function MoveTree() {
         {!practicing && ul && ul.moves.length > 0 && (
           <div class="ml-4 mt-2 your-line-branch">
             <div class="flex items-center gap-2 mb-1 flex-wrap">
-              <span class="your-line-label">Your Line</span>
+              <span class="your-line-label font-bold text-[var(--color-primary)]">Your Line</span>
+              <span class="new-line-badge bg-[var(--color-primary)] text-white text-xs px-2 py-0.5 rounded font-semibold">New Line</span>
               <span class="text-sm text-neutral-600">Session only — not part of the bundled tree</span>
             </div>
             <ul class="list-none m-0 p-0">

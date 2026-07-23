@@ -11,7 +11,7 @@ export default function GetStarted() {
   return (
     <section className="get-started chapter py-24 bg-void relative z-20" id="getStarted" aria-label="Get started">
       <div className="container mx-auto px-4">
-        <h2 className="chapter-title text-4xl md:text-5xl font-bold mb-16 tracking-tight">GET STARTED</h2>
+        <h2 className="chapter-title text-4xl md:text-5xl font-bold mb-16 tracking-tight">Get Started</h2>
 
         <div className="trio grid grid-cols-1 sm:grid-cols-3 gap-6" id="trio">
           {steps.map((step, i) => (

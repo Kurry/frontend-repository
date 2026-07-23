@@ -14,6 +14,7 @@ export default function ExportCatalog() {
   const [copiedIcs, setCopiedIcs] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
   const [importSuccess, setImportSuccess] = useState<string | null>(null);
+  const [pasteText, setPasteText] = useState('');
   const [closing, setClosing] = useState(false);
   const firstFocusRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -24,12 +25,12 @@ export default function ExportCatalog() {
   const requestClose = () => {
     if (closing) return;
     setClosing(true);
+    lastFocused.current?.focus({ preventScroll: true });
+    lastFocused.current = null;
     window.setTimeout(() => {
       $exportCatalogOpen.set(false);
       setClosing(false);
-      lastFocused.current?.focus({ preventScroll: true });
-      lastFocused.current = null;
-    }, 160);
+    }, 200);
   };
 
   useEffect(() => {
@@ -94,6 +95,24 @@ export default function ExportCatalog() {
     reader.readAsText(file);
   };
 
+  // Paste-based import path: accepts the same declared-catalog packet without a
+  // file picker, sharing loadCatalog (and its validation/rejection) with the
+  // file path above.
+  const handlePasteImport = () => {
+    const res = loadCatalog(pasteText, 'pasted catalog');
+    if (res.ok) {
+      setImportSuccess('Pasted catalog loaded — events and leads restored.');
+      setImportError(null);
+      setPasteText('');
+      announce('Catalog imported from pasted JSON. Events and leads restored.');
+      setTimeout(() => setImportSuccess(null), 5000);
+    } else {
+      setImportError(res.error || 'Import failed: pasted catalog is not a valid catalog.');
+      setImportSuccess(null);
+      announce(res.error || 'Catalog import failed.');
+    }
+  };
+
   const trapFocus = (e: React.KeyboardEvent) => {
     if (e.key !== 'Tab' || !dialogRef.current) return;
     const f = Array.from(dialogRef.current.querySelectorAll<HTMLElement>('button, input, [tabindex]:not([tabindex="-1"])'))
@@ -137,7 +156,7 @@ export default function ExportCatalog() {
                 <button aria-label="Copy catalog JSON" className="btn btn-sm btn-ghost gap-2 text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => copyText(jsonPayload, setCopiedJson, 'Export JSON')}>
                   <Copy size={16} /> {copiedJson ? 'Copied' : 'Copy'}
                 </button>
-                <button aria-label="Download catalog JSON" className="btn btn-sm btn-primary gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => downloadFile(jsonPayload, 'ridge-catalog.json', 'application/json')}>
+                <button type="button" aria-label="Download catalog JSON" className="btn btn-sm btn-primary gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => downloadFile(jsonPayload, 'ridge-catalog.json', 'application/json')}>
                   <Download size={16} /> Export JSON
                 </button>
               </div>
@@ -155,9 +174,9 @@ export default function ExportCatalog() {
                   <button aria-label="Copy catalog ICS" className="btn btn-sm btn-ghost gap-2 text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => copyText(icsPayload, setCopiedIcs, 'Export ICS')}>
                     <Copy size={16} /> {copiedIcs ? 'Copied' : 'Copy'}
                   </button>
-                  <button aria-label="Download catalog ICS" className="btn btn-sm btn-primary gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => downloadFile(icsPayload, 'ridge-events.ics', 'text/calendar')}>
+                  <a href={`data:text/calendar;charset=utf-8,${encodeURIComponent(icsPayload)}`} download="ridge-events.ics" aria-label="Download catalog ICS" className="btn btn-sm btn-primary gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => announce('Downloaded ridge-events.ics.')}>
                     <Download size={16} /> Export ICS
-                  </button>
+                  </a>
                 </div>
               </div>
               <div className="surface-copy flex-1 bg-surface border border-current/10 rounded-lg p-4 overflow-auto text-sm font-mono whitespace-pre opacity-90" aria-label="ICS preview">
@@ -180,6 +199,23 @@ export default function ExportCatalog() {
                 />
                 <button className="btn btn-outline notch-br gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => fileInputRef.current?.click()}>
                   <UploadSimple size={16} /> Load catalog
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label htmlFor="catalog-paste" className="text-sm font-medium">Or paste catalog JSON</label>
+                <textarea
+                  id="catalog-paste"
+                  className="textarea textarea-bordered w-full h-24 font-mono text-xs notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                  placeholder='Paste a previously exported catalog packet ({"version": 1, ...}) here'
+                  value={pasteText}
+                  onChange={e => setPasteText(e.target.value)}
+                />
+                <button
+                  className="btn btn-outline btn-sm notch-br gap-2 self-start focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                  onClick={handlePasteImport}
+                >
+                  <UploadSimple size={16} /> Load pasted catalog
                 </button>
               </div>
 

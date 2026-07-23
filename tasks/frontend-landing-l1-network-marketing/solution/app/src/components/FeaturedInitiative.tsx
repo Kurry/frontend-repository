@@ -20,7 +20,7 @@ export default function FeaturedInitiative() {
               {featured ? `${featured.city} · ${formatEventDate(featured.date)} · ${featured.category}` : 'Create a featured event to publish it across the landing experience.'}
             </p>
           </div>
-          <button type="button" className="btn btn-primary notch-br gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => $eventsManagerOpen.set(true)}>
+          <button type="button" className="cta btn btn-primary notch-br gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => $eventsManagerOpen.set(true)}>
             Manage initiatives <ArrowRight size={16} aria-hidden="true" />
           </button>
         </div>

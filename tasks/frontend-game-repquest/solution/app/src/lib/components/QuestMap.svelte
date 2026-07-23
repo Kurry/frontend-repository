@@ -56,9 +56,7 @@
     const wpIdx = getCurrentWaypointIndex(quest.state);
     const progress = getProgressToNextWaypoint(quest.state);
 
-    const currentZone = wpIdx >= 0
-      ? zones.find(z => z.id === waypoints[wpIdx].zoneId) || zones[0]
-      : zones[0];
+    const currentZone = quest.currentZone;
 
     // Sky gradient (zone palette)
     const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.6);

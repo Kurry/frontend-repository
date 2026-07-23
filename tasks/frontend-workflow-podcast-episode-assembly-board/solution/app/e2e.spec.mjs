@@ -117,3 +117,151 @@ test.describe('workspace contract (canonical)', () => {
 });
 
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
+
+const enterWorkspace = async (page, width = 1280, height = 900) => {
+  await page.setViewportSize({ width, height });
+  await page.goto(BASE);
+  await page.getByRole('button', { name: 'Skip Tour' }).click();
+};
+
+test('4.4 te_4', async ({ page }) => {
+  await enterWorkspace(page);
+  const tools = await listTools(page);
+  const surface = tools.map(tool => `${tool.name} ${tool.description}`).join('\n').toLowerCase();
+  for (const domain of ['clip', 'timeline', 'transcript', 'citation', 'chapter', 'mix', 'rights', 'approval', 'branch', 'render', 'history', 'transfer', 'reset']) {
+    expect(surface, `WebMCP surface documents ${domain}`).toContain(domain);
+  }
+
+  expect((await invokeTool(page, 'editor.switch_mode', { mode: 'transcript' })).ok).toBe(true);
+  expect((await invokeTool(page, 'editor.add', { object_type: 'branch-cut', name: 'te4-fork' })).ok).toBe(true);
+  expect((await invokeTool(page, 'editor.preview')).history.length).toBeGreaterThan(0);
+  expect((await invokeTool(page, 'artifact.export', { format: 'canonical-json' })).ok).toBe(true);
+  expect((await invokeTool(page, 'session.restart')).ok).toBe(true);
+});
+
+test('4.5 te_5', async ({ page }) => {
+  await enterWorkspace(page, 375, 812);
+  await expect(page.getByRole('button', { name: 'Sources' })).toBeVisible();
+  await page.getByRole('button', { name: 'Sources' }).click();
+  await expect(page.getByRole('button', { name: 'Insert', exact: true }).first()).toBeVisible();
+  await page.getByRole('button', { name: 'Timeline' }).click();
+  await expect(page.getByLabel('Timeline mini-map')).toBeVisible();
+
+  await page.getByTitle(/Select Clip 1/).first().focus();
+  await page.keyboard.press('Enter');
+  const mobileInspector = page.getByRole('region', { name: 'Selected clip editor' }).last();
+  await expect(mobileInspector).toBeVisible();
+  await expect(mobileInspector.getByLabel('Episode start (ms)')).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Approval and render stepper' }).last()).toBeVisible();
+
+  await page.getByRole('button', { name: 'Chapters' }).click();
+  await expect(page.getByText(/Narrative Outline|Chapter Lineage/).first()).toBeVisible();
+  await page.getByRole('button', { name: 'Render' }).first().click();
+  await expect(page.getByText('Render Pipeline')).toBeVisible();
+  await page.getByRole('button', { name: 'Export' }).click();
+  await expect(page.getByRole('button', { name: /Export All/ })).toBeVisible();
+});
+
+test('4.6 te_6', async ({ page }) => {
+  await enterWorkspace(page);
+  await page.getByTitle(/Select Clip 1/).first().focus();
+  await page.keyboard.press('Enter');
+  const start = page.locator('#desktop-f-start');
+  const before = Number(await start.inputValue());
+  await page.keyboard.press('ArrowRight');
+  await expect(start).toHaveValue(String(before + 10));
+  const countBeforeSplit = (await invokeTool(page, 'editor.preview')).instances;
+  await page.keyboard.press('s');
+  expect((await invokeTool(page, 'editor.preview')).instances).toBe(countBeforeSplit + 1);
+
+  await page.keyboard.press('Alt+6');
+  await expect(page.getByText('Rights Review').first()).toBeVisible();
+  await page.keyboard.press('Alt+8');
+  await expect(page.getByText('Render Pipeline')).toBeVisible();
+  await page.keyboard.press('Alt+9');
+  await expect(page.getByRole('button', { name: /Export All/ })).toBeVisible();
+});
+
+test('4.7 te_7', async ({ page }) => {
+  await enterWorkspace(page);
+  const selected = await invokeTool(page, 'entity.select', { id: 'inst-1' });
+  expect(selected.ok).toBe(true);
+  const changed = await invokeTool(page, 'editor.update_property', {
+    object_type: 'timeline-instance', id: 'inst-1', property: 'start-ms', value: 1230,
+  });
+  expect(changed.ok).toBe(true);
+  await expect(page.locator('#desktop-f-start')).toHaveValue('1230');
+
+  const preview = await invokeTool(page, 'editor.preview');
+  expect(preview.ok).toBe(true);
+  expect(preview.checksum).toMatch(/^[0-9a-f]{8}$/);
+  expect(preview.history.some(entry => entry.detail.includes('inst-1'))).toBe(true);
+
+  const exported = await invokeTool(page, 'artifact.export', { format: 'timeline-svg' });
+  expect(exported.ok).toBe(true);
+  expect(exported.formats).toEqual(expect.objectContaining({
+    'canonical-json': expect.any(Number),
+    'edl-csv': expect.any(Number),
+    'transcript-csv': expect.any(Number),
+    webvtt: expect.any(Number),
+    'rss-xml': expect.any(Number),
+    'show-notes-markdown': expect.any(Number),
+    'timeline-svg': expect.any(Number),
+  }));
+  await expect(page.getByRole('button', { name: /Re-Export/ })).toBeVisible();
+});
+
+test('11.2 advanced_motion_mechanics', async ({ page }) => {
+  await enterWorkspace(page);
+  await page.getByRole('button', { name: 'Timeline' }).click();
+  await page.getByRole('button', { name: 'Preview Sweep' }).click();
+  const running = await page.evaluate(() => document.getAnimations().some(animation => animation.playState === 'running'));
+  expect(running).toBe(true);
+});
+
+test('11.9 genre_appropriate_platform_features', async ({ page }) => {
+  await enterWorkspace(page);
+  await expect(page.getByText('Offline Ready')).toBeVisible();
+  expect((await page.request.get(`${BASE}/manifest.webmanifest`)).ok()).toBe(true);
+  expect((await page.request.get(`${BASE}/sw.js`)).ok()).toBe(true);
+  await expect(page.getByRole('button', { name: 'Share' })).toBeVisible();
+});
+
+test('11.10 competition_level_innovation', async ({ page }) => {
+  await enterWorkspace(page);
+  await page.getByRole('button', { name: 'Cut Coach' }).click();
+  await expect(page.getByRole('dialog', { name: 'Cut Coach' })).toContainText('Live Risk Forecast');
+  await expect(page.getByRole('dialog', { name: 'Cut Coach' })).toContainText('Next Best Action');
+});
+
+test('11.n6 helpful_platform_capabilities_ignored', async ({ page }) => {
+  await enterWorkspace(page);
+  await expect(page.getByText('Offline Ready')).toHaveAttribute('title', /service worker/i);
+  await expect(page.getByRole('button', { name: 'Share' })).toHaveAttribute('title', /system share sheet|clipboard/i);
+});
+
+test('11.n9 design_has_no_twist', async ({ page }) => {
+  await enterWorkspace(page);
+  await page.getByRole('button', { name: 'Cut Coach' }).click();
+  const coach = page.getByRole('dialog', { name: 'Cut Coach' });
+  await expect(coach.locator('.bg-gradient-to-r')).toBeVisible();
+  await expect(coach.getByText('One move closer to air.')).toBeVisible();
+});
+
+test('11.n10 effort_stops_at_mvp', async ({ page }) => {
+  await enterWorkspace(page);
+  await expect(page.getByRole('navigation', { name: 'Workspace sections' }).getByRole('button')).toHaveCount(8);
+  await expect(page.getByRole('button', { name: 'Cut Coach' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Voice' })).toBeVisible();
+  await expect(page.getByText('Offline Ready')).toBeVisible();
+});
+
+test('innovation.catchall innovation_catchall', async ({ page }) => {
+  await enterWorkspace(page);
+  await page.getByRole('button', { name: 'Cut Coach' }).click();
+  const coach = page.getByRole('dialog', { name: 'Cut Coach' });
+  await expect(coach).toContainText(/orphaned|bind|Approve|Remove/);
+  await expect(coach).toContainText(/clips/);
+  await expect(coach).toContainText(/orphan cites/);
+  await expect(coach).toContainText(/approvals/);
+});

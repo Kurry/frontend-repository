@@ -4,7 +4,7 @@ import { addHabitAtom, categoriesAtom } from "../store";
 import { EMOJI_PALETTE } from "../types";
 import { toast } from "sonner";
 import { z } from "zod";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const habitSchema = z.object({
@@ -45,6 +45,7 @@ interface HabitFormProps {
 
 export default function HabitForm({ onClose }: HabitFormProps) {
   const formRef = useRef<HTMLDivElement>(null);
+  const submittingRef = useRef(false);
 
   const [, addHabit] = useAtom(addHabitAtom);
   const [categories] = useAtom(categoriesAtom);
@@ -52,7 +53,6 @@ export default function HabitForm({ onClose }: HabitFormProps) {
   const {
     register,
     handleSubmit,
-    control,
     watch,
     setValue,
     reset,
@@ -73,6 +73,14 @@ export default function HabitForm({ onClose }: HabitFormProps) {
   const icon = watch("icon");
 
   const onSubmit = (data: HabitFormValues) => {
+    // Guard against rapid double-activation of the submit control: exactly one
+    // habit may be created per completed submit.
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    window.setTimeout(() => {
+      submittingRef.current = false;
+    }, 600);
+
     addHabit({
       name: data.name,
       icon: data.icon,
@@ -90,30 +98,33 @@ export default function HabitForm({ onClose }: HabitFormProps) {
   };
 
   const onError = () => {
-    formRef.current?.classList.add("shake");
-    setTimeout(() => formRef.current?.classList.remove("shake"), 500);
+    const nodes: (HTMLElement | null)[] = [
+      formRef.current,
+      formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]') ?? null,
+    ];
+    nodes.forEach((n) => n?.classList.add("shake"));
+    setTimeout(() => nodes.forEach((n) => n?.classList.remove("shake")), 700);
   };
 
   return (
     <div ref={formRef} className="bg-[#FFFFFF] rounded-[8px] p-4 md:p-6" data-habit-form>
-      <h2 className="text-lg font-bold text-[#1B2430] mb-4">New Habit</h2>
-      <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-4" data-habit-form-el>
+      <h2 className="text-xl font-bold text-[#1B2430] mb-4">New habit</h2>
+      <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-4" noValidate data-habit-form-el>
         {/* Name */}
         <div>
           <label htmlFor="habit-name" className="block text-sm font-medium text-[#64748B] mb-1">
-            Habit Name
+            Habit name
           </label>
           <input
             id="habit-name"
             type="text"
             {...register("name")}
-            placeholder="e.g. Morning Run"
+            placeholder="e.g. Morning run"
             className={`w-full px-3 py-2 rounded-[8px] border text-sm transition-colors ${
               errors.name
                 ? "border-[#EF4444] bg-red-50"
                 : "border-[#E2E8F0] focus:border-[#0F9D74]"
             } text-[#1B2430] placeholder:text-[#94A3B8] outline-none`}
-            aria-label="Habit name"
             aria-invalid={!!errors.name}
             aria-describedby={errors.name ? "habit-name-error" : undefined}
             data-field="name"
@@ -125,14 +136,16 @@ export default function HabitForm({ onClose }: HabitFormProps) {
           )}
         </div>
 
-        {/* Icon picker */}
-        <div>
-          <label className="block text-sm font-medium text-[#64748B] mb-1">Icon</label>
-          <div className="flex flex-wrap gap-1.5">
+        {/* Icon picker — fieldset/legend gives the group a programmatic label */}
+        <fieldset className="border-0 p-0 m-0" aria-describedby={errors.icon ? "habit-icon-error" : undefined}>
+          <legend className="block text-sm font-medium text-[#64748B] mb-1 p-0">Icon</legend>
+          <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Habit icon">
             {EMOJI_PALETTE.map((e) => (
               <button
                 key={e}
                 type="button"
+                role="radio"
+                aria-checked={icon === e}
                 onClick={() => setValue("icon", e)}
                 className={`w-9 h-9 rounded-[8px] flex items-center justify-center text-lg transition-all ${
                   icon === e
@@ -148,15 +161,15 @@ export default function HabitForm({ onClose }: HabitFormProps) {
             ))}
           </div>
           {errors.icon && (
-            <p className="text-[#EF4444] text-xs mt-1" role="alert">
+            <p id="habit-icon-error" className="text-[#EF4444] text-xs mt-1" role="alert">
               {errors.icon.message}
             </p>
           )}
-        </div>
+        </fieldset>
 
-        {/* Target type */}
-        <div>
-          <label className="block text-sm font-medium text-[#64748B] mb-1">Target</label>
+        {/* Target type — fieldset/legend labels the radio group */}
+        <fieldset className="border-0 p-0 m-0">
+          <legend className="block text-sm font-medium text-[#64748B] mb-1 p-0">Target</legend>
           <div className="flex gap-3 items-center flex-wrap">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -173,7 +186,7 @@ export default function HabitForm({ onClose }: HabitFormProps) {
               />
               <span className="text-sm text-[#1B2430]">Once a day</span>
             </label>
-            <label className="flex items-center gap-2 cursor-center">
+            <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
                 value="count"
@@ -182,27 +195,35 @@ export default function HabitForm({ onClose }: HabitFormProps) {
                 data-field="target-type"
                 data-value="count"
               />
-              <span className="text-sm text-[#1B2430]">Daily count:</span>
-              {targetType === "count" && (
+              <span className="text-sm text-[#1B2430]">Daily count</span>
+            </label>
+            {targetType === "count" && (
+              <span className="flex items-center gap-2">
+                <label htmlFor="habit-target-count" className="text-sm font-medium text-[#64748B]">
+                  Daily target count
+                </label>
                 <input
+                  id="habit-target-count"
                   type="number"
                   min="1"
                   max="100"
                   {...register("targetCount", { valueAsNumber: true })}
-                  className="w-16 px-2 py-1 rounded-[8px] border border-[#E2E8F0] text-sm text-[#1B2430] outline-none focus:border-[#0F9D74]"
-                  aria-label="Daily target count"
+                  className={`w-16 px-2 py-1 rounded-[8px] border text-sm text-[#1B2430] outline-none ${
+                    errors.targetCount ? "border-[#EF4444] bg-red-50" : "border-[#E2E8F0] focus:border-[#0F9D74]"
+                  }`}
+                  aria-invalid={!!errors.targetCount}
                   aria-describedby={errors.targetCount ? "target-count-error" : undefined}
                   data-field="target-count"
                 />
-              )}
-            </label>
+              </span>
+            )}
           </div>
           {errors.targetCount && (
             <p id="target-count-error" className="text-[#EF4444] text-xs mt-1" role="alert">
               {errors.targetCount.message}
             </p>
           )}
-        </div>
+        </fieldset>
 
         {/* Category */}
         <div>
@@ -213,7 +234,6 @@ export default function HabitForm({ onClose }: HabitFormProps) {
             id="habit-category"
             {...register("categoryId")}
             className="w-full px-3 py-2 rounded-[8px] border border-[#E2E8F0] text-sm text-[#1B2430] outline-none focus:border-[#0F9D74] bg-white"
-            aria-label="Category"
             data-field="category"
           >
             <option value="">No category</option>
@@ -233,8 +253,10 @@ export default function HabitForm({ onClose }: HabitFormProps) {
             type="text"
             {...register("reminder")}
             placeholder="e.g. 7:00 AM"
-            className="w-full px-3 py-2 rounded-[8px] border border-[#E2E8F0] text-sm text-[#1B2430] placeholder:text-[#94A3B8] outline-none focus:border-[#0F9D74]"
-            aria-label="Reminder time"
+            className={`w-full px-3 py-2 rounded-[8px] border text-sm text-[#1B2430] placeholder:text-[#94A3B8] outline-none ${
+              errors.reminder ? "border-[#EF4444] bg-red-50" : "border-[#E2E8F0] focus:border-[#0F9D74]"
+            }`}
+            aria-invalid={!!errors.reminder}
             aria-describedby={errors.reminder ? "habit-reminder-error" : undefined}
             data-field="reminder"
           />

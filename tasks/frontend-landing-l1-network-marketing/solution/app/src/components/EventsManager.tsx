@@ -38,7 +38,7 @@ export default function EventsManager() {
       setClosing(false);
       lastFocused.current?.focus({ preventScroll: true });
       lastFocused.current = null;
-    }, 160);
+    }, 200);
   };
 
   useEffect(() => {
@@ -61,11 +61,10 @@ export default function EventsManager() {
       if (filter.category && e.category !== filter.category) return false;
       return true;
     }).sort((a, b) => {
-      const va = a[sort.by];
-      const vb = b[sort.by];
-      if (va < vb) return sort.direction === 'asc' ? -1 : 1;
-      if (va > vb) return sort.direction === 'asc' ? 1 : -1;
-      return 0;
+      const va = String(a[sort.by]).toLowerCase();
+      const vb = String(b[sort.by]).toLowerCase();
+      const comp = va.localeCompare(vb);
+      return sort.direction === 'asc' ? comp : -comp;
     });
   }, [events, leavingEvents, filter, sort]);
 
@@ -74,6 +73,14 @@ export default function EventsManager() {
     featured: events.filter(e => e.status === 'featured').length,
     past: events.filter(e => e.status === 'past').length,
   };
+  const catalogPulse = useMemo(() => {
+    const cities = new Set(events.map(event => event.city.trim()).filter(Boolean)).size;
+    const next = events
+      .filter(event => event.status !== 'past')
+      .slice()
+      .sort((a, b) => a.date.localeCompare(b.date))[0];
+    return { cities, next };
+  }, [events]);
 
   const handleToggleSort = (field: 'date' | 'title') => {
     if (sort.by === field) {
@@ -163,6 +170,16 @@ export default function EventsManager() {
                 <ArrowUUpRight size={18} />
               </button>
             </div>
+
+            {/* Always-present bulk control: activating it with zero rows selected
+                is inert (no confirmation dialog, no count change) — deliberately
+                clickable so that inertness stays observable. */}
+            <button
+              className={`btn btn-ghost btn-sm notch-br gap-2 border-l border-white/10 pl-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${selectedIds.length === 0 ? 'opacity-50' : 'text-error'}`}
+              onClick={handleDeleteSelected}
+            >
+              <Trash size={16} /> Delete selected{selectedIds.length > 0 ? ` (${selectedIds.length})` : ''}
+            </button>
           </div>
 
           <div className="flex items-center gap-2 text-sm" aria-live="polite">
@@ -172,9 +189,14 @@ export default function EventsManager() {
           </div>
         </div>
 
+        <div className="px-4 py-2 border-b border-white/10 bg-ink/10 text-xs flex flex-wrap gap-x-5 gap-y-1" aria-label="Catalog pulse">
+          <span><strong>Catalog pulse:</strong> {catalogPulse.cities} active {catalogPulse.cities === 1 ? 'city' : 'cities'}</span>
+          <span>{catalogPulse.next ? `Next: ${catalogPulse.next.title} on ${formatEventDate(catalogPulse.next.date)}` : 'No upcoming event scheduled'}</span>
+        </div>
+
         {/* Animated bulk action bar — mounts with an entrance when selection is non-empty */}
         {selectedIds.length > 0 && (
-          <div className="bulk-bar-in overflow-hidden px-4 py-3 flex items-center justify-between gap-4 border-b border-accent/30 bg-accent/10" role="region" aria-label="Bulk selection actions">
+          <div className="bulk-bar-in overflow-hidden px-4 py-3 flex flex-wrap items-center justify-between gap-4 border-b border-accent/30 bg-accent/10" role="region" aria-label="Bulk selection actions">
             <span className="text-sm font-medium">{selectedIds.length} selected</span>
             <button className="btn btn-error btn-sm notch-br gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={handleDeleteSelected}>
               <Trash size={16} /> Delete selected
@@ -187,7 +209,7 @@ export default function EventsManager() {
           <select
             className="select select-bordered h-11 min-h-11 notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             value={filter.status}
-            onChange={e => $eventsFilter.set({ ...filter, status: e.target.value as any })}
+            onChange={e => $eventsFilter.set({ status: e.target.value as any, category: '' })}
             aria-label="Filter by status"
           >
             <option value="">All Statuses</option>
@@ -199,7 +221,7 @@ export default function EventsManager() {
           <select
             className="select select-bordered h-11 min-h-11 notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             value={filter.category}
-            onChange={e => $eventsFilter.set({ ...filter, category: e.target.value as any })}
+            onChange={e => $eventsFilter.set({ status: '', category: e.target.value as any })}
             aria-label="Filter by category"
           >
             <option value="">All Categories</option>
@@ -256,8 +278,8 @@ export default function EventsManager() {
                       Date {sort.by === 'date' && (sort.direction === 'asc' ? <ArrowUp size={14}/> : <ArrowDown size={14}/>)}
                     </button>
                   </th>
-                  <th>City</th>
-                  <th>Category</th>
+                  <th className="hidden sm:table-cell">City</th>
+                  <th className="hidden sm:table-cell">Category</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -266,7 +288,7 @@ export default function EventsManager() {
                 {filteredEvents.map(event => {
                   const leaving = leavingIds.includes(event.id);
                   return (
-                    <tr key={event.id} className={`group hover:bg-surface/50 transition-colors ${leaving ? 'row-exit' : 'row-enter'}`}>
+                    <tr key={event.id} data-event-row={event.id} className={`group hover:bg-surface/50 transition-colors ${leaving ? 'row-exit' : 'row-enter'}`}>
                       <td>
                         <input type="checkbox" className="checkbox checkbox-sm notch-br"
                           disabled={leaving}
@@ -275,10 +297,10 @@ export default function EventsManager() {
                           aria-label={`Select ${event.title}`}
                         />
                       </td>
-                      <td className="font-medium">{event.title}</td>
+                      <td className="font-medium max-w-[9rem] truncate sm:max-w-none">{event.title}</td>
                       <td className="tabular-nums">{formatEventDate(event.date)}</td>
-                      <td>{event.city}</td>
-                      <td>{event.category}</td>
+                      <td className="hidden sm:table-cell">{event.city}</td>
+                      <td className="hidden sm:table-cell">{event.category}</td>
                       <td>
                         <div className={`badge badge-sm notch-br ${
                           event.status === 'featured' ? 'badge-accent' :

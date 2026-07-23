@@ -212,7 +212,46 @@ test('AC-05 full_user_flow', async ({ page }) => {
 
 test('AC-06 edge_cases', async ({ page }) => {
   await page.goto('http://localhost:3000');
-  expect(true).toBe(true);
+  const baseline = {
+    schemaVersion: 'icon-family-optical-studio-v1',
+    anchors: [
+      { id: 'a1', x: 4, y: 4, type: 'move' },
+      { id: 'a2', x: 20, y: 4, type: 'line' },
+      { id: 'a3', x: 20, y: 20, type: 'line' },
+      { id: 'a4', x: 4, y: 20, type: 'close' },
+    ],
+  };
+  const importDocument = async (document, message) => {
+    await page.getByLabel('Import family JSON').fill(JSON.stringify(document));
+    await page.getByRole('button', { name: 'Import JSON' }).click();
+    await expect(page.locator('.statusbar [aria-live="polite"]')).toContainText(message);
+  };
+
+  await importDocument({ ...baseline, anchors: baseline.anchors.map((a, i) => i === 0 ? { ...a, type: 'line' } : a) }, 'first anchor must be move');
+  await importDocument({ ...baseline, anchors: baseline.anchors.map((a, i) => i === 3 ? { ...a, type: 'line' } : a) }, 'final anchor must close');
+  await importDocument({ ...baseline, anchors: [
+    { id: 'a1', x: 4, y: 4, type: 'move' },
+    { id: 'a2', x: 4, y: 20, type: 'line' },
+    { id: 'a3', x: 20, y: 20, type: 'line' },
+    { id: 'a4', x: 20, y: 4, type: 'close' },
+  ] }, 'clockwise screen-space winding');
+  await importDocument({ ...baseline, anchors: baseline.anchors.map((a, i) => i === 1 ? { ...a, type: 'quadratic', cx: a.x, cy: a.y } : a) }, 'zero-length quadratic handle');
+  await importDocument({ ...baseline, anchors: baseline.anchors.map((a, i) => i === 1 ? { ...a, type: 'cubic', c1x: a.x, c1y: a.y, c2x: 19, c2y: 4 } : a) }, 'zero-length cubic handle');
+  await importDocument({ ...baseline, svgSymbols: [
+    { id: 'icon-a', titleId: 'title-a', title: 'A' },
+    { id: 'icon-a', titleId: 'title-b', title: 'B' },
+  ] }, 'duplicate SVG symbol id icon-a');
+  await importDocument({ ...baseline, svgSymbols: [
+    { id: 'icon-a', titleId: 'shared-title', title: 'A' },
+    { id: 'icon-b', titleId: 'shared-title', title: 'B' },
+  ] }, 'duplicate SVG title id shared-title');
+
+  await expect(page.locator('.statusbar')).toContainText('4 anchors');
+  const svg = await invokeTool(page, 'artifact_export', { format: 'svg' });
+  expect(svg.ok).toBe(true);
+  const ids = [...svg.artifact.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1]);
+  expect(new Set(ids).size).toBe(ids.length);
+  expect(svg.artifact).toContain('aria-labelledby="icon-outline-title"');
 });
 
 test('AC-07 responsive_design', async ({ page }) => {

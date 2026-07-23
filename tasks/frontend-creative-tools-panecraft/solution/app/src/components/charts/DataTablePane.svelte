@@ -43,7 +43,7 @@
             {#each columns as col}
               {#if col === 'status' && typeof row[col] === 'string'}
                 <td class="px-2 py-1 text-sm font-normal text-[var(--color-text-secondary)] border-b border-[var(--color-border)] whitespace-nowrap">
-                  <span class="inline-block px-1.5 py-0.5 rounded-full text-[10px] font-medium {getStatusBadge(String(row[col]))}">{row[col]}</span>
+                  <span class="inline-block px-1.5 py-0.5 rounded-full text-xs font-semibold {getStatusBadge(String(row[col]))}">{row[col]}</span>
                 </td>
               {:else}
                 <td class="px-2 py-1 text-sm font-normal text-[var(--color-text-secondary)] border-b border-[var(--color-border)] whitespace-nowrap">

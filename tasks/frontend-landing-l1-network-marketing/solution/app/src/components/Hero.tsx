@@ -6,7 +6,7 @@ export default function Hero() {
 
   useEffect(() => {
     const tick = () => {
-      setTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      setTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
     };
     tick();
     const id = setInterval(tick, 1000);

@@ -37,13 +37,13 @@ function TaxonomyForm({ open, editing, onClose, openerRef }) {
     onClose();
   };
   const filteredIcons = iconNames.filter((name) => name.toLowerCase().includes(iconQuery.toLowerCase()));
-  return <ComposedModal open={open} onClose={onClose} size="md" preventCloseOnClickOutside selectorPrimaryFocus="#class-name" launcherButtonRef={openerRef}>
+  return <ComposedModal open={open} onClose={onClose} size="md" preventCloseOnClickOutside selectorPrimaryFocus="#class-name" launcherButtonRef={openerRef} onKeyDown={(e) => { if (e.key === "Escape") onClose(); }}>
     <ModalHeader title={editing ? 'Edit class' : 'New class'} label={editing ? 'Taxonomy class editor' : 'Taxonomy class builder'} closeModal={onClose} />
     <ModalBody hasForm><form id="taxonomy-form" onSubmit={handleSubmit(submit)} className="modal-form">
       <TextInput id="class-name" labelText="Name" invalid={Boolean(errors.name)} invalidText={errors.name?.message} {...register('name')} />
       <div className="form-pair"><TextInput id="class-shortcut" labelText="Keyboard shortcut (1–9)" maxLength={1} invalid={Boolean(errors.shortcut)} invalidText={errors.shortcut?.message} {...register('shortcut')} />
       <Controller name="color" control={control} render={({ field }) => <fieldset className="color-field"><legend>Color</legend><div>{PALETTE.map((color) => <button key={color} type="button" aria-label={`Choose ${color}`} aria-pressed={field.value === color} className={field.value === color ? 'selected' : ''} style={{ background: color }} onClick={() => field.onChange(color)} />)}</div>{errors.color && <p className="field-error">Color: {errors.color.message}</p>}</fieldset>} /></div>
-      <Controller name="icon" control={control} render={({ field }) => <fieldset className="icon-field"><legend>Badge icon</legend><TextInput id="icon-search" labelText="Search icons" hideLabel value={iconQuery} onChange={(e) => setIconQuery(e.target.value)} /><div className="icon-grid">{filteredIcons.map((name) => { const Icon = iconMap[name]; return <button key={name} type="button" className={field.value === name ? 'selected' : ''} aria-label={name} aria-pressed={field.value === name} onClick={() => field.onChange(name)}><Icon size={20} /><span>{name}</span></button>; })}</div>{!filteredIcons.length && <p className="empty-mini">No icons match that search.</p>}{errors.icon && <p className="field-error">Icon: {errors.icon.message}</p>}</fieldset>} />
+      <Controller name="icon" control={control} render={({ field }) => <fieldset className="icon-field"><legend>Badge icon</legend><TextInput id="icon-search" labelText="Search icons" hideLabel value={iconQuery} onChange={(e) => setIconQuery(e.target.value)} /><div className="icon-grid">{filteredIcons.map((name) => { const Icon = iconMap[name]; return <button key={name} type="button" className={field.value === name ? 'selected' : ''} aria-label={name} aria-pressed={field.value === name} onClick={() => field.onChange(name)}><Icon size={20} /><span>{name}</span></button>; })}</div>{!filteredIcons.length && <p className="empty-mini">No icons match that search. Try a different search term.</p>}{errors.icon && <p className="field-error">Icon: {errors.icon.message}</p>}</fieldset>} />
       <section className="attribute-builder"><div className="section-title"><div><h3>Attributes</h3><p>Optional class-specific region details.</p></div><Button type="button" kind="ghost" size="sm" renderIcon={Add} onClick={() => append({ name: '', kind: 'text', options: [] })}>Add attribute</Button></div>
         {fields.map((field, index) => {
           const row = attributeRows[index] || {};
@@ -55,7 +55,7 @@ function TaxonomyForm({ open, editing, onClose, openerRef }) {
               <Controller name={`attributes.${index}.options`} control={control} render={({ field: optionField }) => <TextInput id={`attribute-${index}-options`} labelText="Options (comma separated)" disabled={row.kind !== 'select'} value={(optionField.value || []).join(', ')} invalid={Boolean(fieldError(errors, ['attributes', index, 'options']))} invalidText={fieldError(errors, ['attributes', index, 'options'])} onChange={(e) => optionField.onChange(e.target.value.split(',').map((v) => v.trim()).filter(Boolean))} />} />
               {needsOptions && <p className="field-error" id={`attribute-${index}-options-error`}>Attribute options: a select attribute needs at least one non-empty option.</p>}
             </div>
-            <Button type="button" hasIconOnly kind="danger--ghost" size="sm" renderIcon={TrashCan} iconDescription="Remove attribute" onClick={() => remove(index)} />
+            <Button type="button" hasIconOnly tooltipPosition="bottom" kind="danger--ghost" size="sm" renderIcon={TrashCan} iconDescription="Remove attribute" onClick={() => remove(index)} />
           </div>;
         })}
         {!fields.length && <p className="empty-mini">No attributes. Regions of this class will use an empty attributeValues object.</p>}
@@ -81,7 +81,7 @@ function MetadataForm({ open, onClose, openerRef }) {
     if (!result.ok) { setError(result.field || 'root', { message: result.error }); return; }
     onClose();
   };
-  return <ComposedModal open={open} onClose={onClose} size="sm" preventCloseOnClickOutside selectorPrimaryFocus="#metadata-name" launcherButtonRef={openerRef}>
+  return <ComposedModal open={open} onClose={onClose} size="sm" preventCloseOnClickOutside selectorPrimaryFocus="#metadata-name" launcherButtonRef={openerRef} onKeyDown={(e) => { if (e.key === "Escape") onClose(); }}>
     <ModalHeader title="New metadata field" label="Metadata field builder" closeModal={onClose} />
     <ModalBody hasForm><form id="metadata-form" className="modal-form" onSubmit={handleSubmit(submit)}>
       <TextInput id="metadata-name" labelText="Name" invalid={Boolean(errors.name)} invalidText={errors.name?.message} {...register('name')} />
@@ -99,7 +99,7 @@ function MetadataForm({ open, onClose, openerRef }) {
 function ConfirmDelete({ deleting, count, onCancel, onConfirm }) {
   const kind = deleting?.kind || 'class';
   const noun = kind === 'class' ? 'regions' : 'saved annotations';
-  return <ComposedModal open={Boolean(deleting)} onClose={onCancel} size="xs" preventCloseOnClickOutside selectorPrimaryFocus=".cds--btn--secondary">
+  return <ComposedModal open={Boolean(deleting)} onClose={onCancel} size="xs" preventCloseOnClickOutside selectorPrimaryFocus=".cds--btn--secondary" onKeyDown={(e) => { if (e.key === "Escape") onCancel(); }}>
     <ModalHeader title={`Delete ${kind}`} label="Confirmation required" closeModal={onCancel} />
     <ModalBody><p>Delete <strong>{deleting?.target?.name}</strong>? Exactly <strong>{count}</strong> {noun} carry {kind === 'class' ? 'this class' : 'values for this field'}. {kind === 'class' && 'Those regions will be marked Unclassified.'}</p></ModalBody>
     <ModalFooter><Button kind="secondary" onClick={onCancel}>Cancel</Button><Button kind="danger" onClick={onConfirm}>Delete {kind}</Button></ModalFooter>
@@ -124,10 +124,10 @@ export default function TaxonomyView() {
     <div className="class-list" role="list">{taxonomy.map((cls) => <article id={`taxonomy-${cls.id}`} role="listitem" className="class-row" key={cls.id} tabIndex={-1}>
       <span className="class-swatch" style={{ background: cls.color }} /><ClassIcon name={cls.icon} size={22} /><div className="class-info"><h2>{cls.name}</h2><div><Tag type="gray">Shortcut {cls.shortcut}</Tag><Tag type="cool-gray">{cls.icon}</Tag></div></div>
       <div className="attribute-tags">{cls.attributes.length ? cls.attributes.map((attribute) => <span key={attribute.name}><strong>{attribute.name}</strong> · {attribute.kind}{attribute.options.length ? ` · ${attribute.options.join(' / ')}` : ''}</span>) : <em>No attributes</em>}</div>
-      <div className="row-actions"><Button hasIconOnly kind="ghost" renderIcon={Edit} iconDescription={`Edit ${cls.name}`} onClick={() => { setEditing(cls); setFormOpen(true); }} /><Button hasIconOnly kind="danger--ghost" renderIcon={TrashCan} iconDescription={`Delete ${cls.name}`} disabled={cls.id === 'cls-unclassified'} onClick={() => setDeleting({ kind: 'class', target: cls })} /></div>
+      <div className="row-actions"><Button hasIconOnly tooltipPosition="bottom" kind="ghost" renderIcon={Edit} iconDescription={`Edit ${cls.name}`} onClick={() => { setEditing(cls); setFormOpen(true); }} /><Button hasIconOnly tooltipPosition="bottom" kind="danger--ghost" renderIcon={TrashCan} iconDescription={`Delete ${cls.name}`} disabled={cls.id === 'cls-unclassified'} onClick={() => setDeleting({ kind: 'class', target: cls })} /></div>
     </article>)}</div>
     <section className="metadata-section"><header className="section-title"><div><p className="eyebrow">Annotation metadata</p><h2>Metadata fields</h2><p>Controls appear below comments on every annotation card.</p></div><Button kind="tertiary" renderIcon={Add} onClick={(event) => { newFieldOpener.current = event.currentTarget; setMetadataOpen(true); }}>New field</Button></header>
-      <div className="metadata-list">{metadataFields.map((field) => <div key={field.id}><span><strong>{field.name}</strong><small>{field.kind}{field.options.length ? ` · ${field.options.join(', ')}` : ''}</small></span><Button hasIconOnly kind="danger--ghost" size="sm" renderIcon={TrashCan} iconDescription={`Delete ${field.name}`} onClick={() => setDeleting({ kind: 'metadata field', target: field })} /></div>)}</div>
+      <div className="metadata-list">{metadataFields.map((field) => <div key={field.id}><span><strong>{field.name}</strong><small>{field.kind}{field.options.length ? ` · ${field.options.join(', ')}` : ''}</small></span><Button hasIconOnly tooltipPosition="bottom" kind="danger--ghost" size="sm" renderIcon={TrashCan} iconDescription={`Delete ${field.name}`} onClick={() => setDeleting({ kind: 'metadata field', target: field })} /></div>)}</div>
     </section>
     <TaxonomyForm open={formOpen} editing={editing} openerRef={newClassOpener} onClose={() => setFormOpen(false)} />
     <MetadataForm open={metadataOpen} openerRef={newFieldOpener} onClose={() => setMetadataOpen(false)} />

@@ -20,7 +20,7 @@ const defaultState = {
   editorMode: 'code' // 'code' | 'config'
 };
 
-const seed = readJSON(CODE_STORE_KEY, { ...defaultState });
+const seed = readJSON(CODE_STORE_KEY, defaultState);
 
 export const store = $state({
   code: seed.code,
@@ -58,8 +58,10 @@ const persist = () => {
 };
 
 let revalidateTimer;
+let revalidateToken = 0;
 
 const doRevalidate = async () => {
+  const token = ++revalidateToken;
   const code = store.code;
   if (!code.trim()) {
     // Empty source: no parser error banner — the preview pane shows its
@@ -74,6 +76,7 @@ const doRevalidate = async () => {
   }
   try {
     const { diagramType: parsedType } = await parse(code);
+    if (token !== revalidateToken) return;
     // Prefer the type mermaid actually parsed (it ignores leading %% comment
     // lines, so the badge tracks the rendered diagram even when the first
     // line is a comment), then the first-line detector, then the last valid
@@ -96,6 +99,7 @@ export const setCode = (code) => {
   store.code = code;
   store.renderCount += 1;
   persist();
+  store.error = undefined;
   revalidate();
 };
 
@@ -114,10 +118,11 @@ export const setConfig = (configStr) => {
       store.configError = `config document: not valid JSON (${e.message})`;
     } else {
       const { field, message } = formatZodError(e);
-      store.configError = field === 'document' ? message : `${field}: ${message}`;
+      store.configError = field === 'document' ? `config document: ${message}` : `config field '${field}': ${message}`;
     }
   }
   persist();
+  store.error = undefined;
   revalidate();
 };
 
@@ -155,6 +160,7 @@ export const setTheme = (theme) => {
   } catch {}
   document.documentElement.classList.toggle('dark', store.theme === 'dark');
   applyMermaidTheme();
+  store.error = undefined;
   revalidate();
 };
 
@@ -215,6 +221,7 @@ export const importSessionJSON = (jsonStr) => {
   } catch {}
 
   store.renderCount += 1;
+  store.error = undefined;
   revalidate();
   return { ok: true };
 };
@@ -226,6 +233,7 @@ export const importMMD = (mmdStr) => {
   store.code = text.trim() ? text : '';
   store.renderCount += 1;
   persist();
+  store.error = undefined;
   revalidate();
   return { ok: true };
 };

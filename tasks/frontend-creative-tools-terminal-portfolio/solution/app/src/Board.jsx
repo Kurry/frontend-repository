@@ -57,7 +57,8 @@ export default function Board() {
     if (res.ok) { setIsCreating(false); setNotice(`Created "${res.value.name}". It now appears on the board, in /work, and in the export preview.`); }
     return res;
   };
-  const onUpdate = (data, originalSlug) => {
+  const onUpdate = (data) => {
+    const originalSlug = editing ? editing.slug : data.slug;
     const res = updateProject(originalSlug, data);
     if (res.ok) { setEditing(null); setNotice(`Updated "${res.value.name}" across the board, /work, detail, autocomplete, and exports.`); }
     return res;

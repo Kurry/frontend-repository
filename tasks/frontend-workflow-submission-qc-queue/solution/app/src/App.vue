@@ -64,22 +64,20 @@ function openPalette() {
 
 function onKeydown(event) {
   const command = event.ctrlKey || event.metaKey
+  if (event.key === 'Escape') {
+    if (store.palette.open) { store.palette.open = false; return }
+    if (store.drawerContributor) { store.drawerContributor = null; return }
+    if (store.dialogs.add || store.dialogs.revision || store.dialogs.override || store.dialogs.approve) {
+      store.closeDialogs(); return
+    }
+  }
   if (command && event.key.toLowerCase() === 'k') {
     event.preventDefault()
     if (!store.palette.open) store.paletteOpener = document.activeElement
     store.palette.open = !store.palette.open
     return
   }
-  if (store.palette.open) return
-  if (store.dialogs.add || store.dialogs.revision || store.dialogs.override || store.dialogs.approve) {
-    if (event.key === 'Escape') {
-      event.preventDefault()
-      store.closeDialogs()
-    }
-    return
-  }
   if (command && event.key.toLowerCase() === 'z') { event.preventDefault(); event.shiftKey ? store.redo() : store.undo() }
-  if (event.key === 'Escape' && store.drawerContributor) store.drawerContributor = null
 }
 
 function toggleTheme() {

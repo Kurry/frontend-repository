@@ -151,7 +151,7 @@ export default function WebMCP() {
         if (filter === 'status' && value !== '' && !EVENT_STATUSES.includes(value as EventStatus)) return { success: false, error: `Invalid status: ${value}` };
         if (filter === 'category' && value !== '' && !EVENT_CATEGORIES.includes(value as EventCategory)) return { success: false, error: `Invalid category: ${value}` };
         if (filter !== 'status' && filter !== 'category') return { success: false, error: 'filter must be status or category' };
-        $eventsFilter.set({ ...$eventsFilter.get(), [filter]: value });
+        $eventsFilter.set({ status: '', category: '', [filter]: value });
         $eventsManagerOpen.set(true);
         return { success: true, filter, value };
       } },
@@ -222,6 +222,9 @@ export default function WebMCP() {
       { name: 'form.submit', module: 'form-workflow-v1', description: 'Validate and submit a contact lead through the shared store action.', handler: args => {
         const contact = parseContact(fieldsArg(args.fields));
         addLead(contact); announce(`Contact lead captured from ${contact.name}. Session leads total updated.`);
+        // Mirror the visible form's success state so tool submits and UI submits
+        // produce the same observable outcome.
+        window.dispatchEvent(new Event('ridge:contact-success'));
         document.getElementById('session-leads-section')?.scrollIntoView({ behavior: 'smooth' });
         return { success: true, total: $leads.get().length };
       } },
@@ -258,10 +261,16 @@ export default function WebMCP() {
       } },
     ];
 
-    const invoke = (name: string, args: Record<string, unknown> = {}) => {
+    const invoke = async (name: string, args: Record<string, unknown> = {}) => {
       const tool = tools.find(candidate => candidate.name === name);
       if (!tool) return { success: false, error: `Unknown tool: ${name}` };
-      try { return tool.handler(args ?? {}); }
+      try {
+        const result = await tool.handler(args ?? {});
+        // Flush the resulting UI updates before returning, but preserve the
+        // handler's structured result (success flags, errors, counts, totals).
+        await new Promise<void>(resolve => window.requestAnimationFrame(() => window.requestAnimationFrame(() => resolve())));
+        return result;
+      }
       catch (error) { return { success: false, error: error instanceof Error ? error.message : String(error) }; }
     };
 

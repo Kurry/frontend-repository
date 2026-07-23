@@ -14,14 +14,11 @@
     .min(2, 'displayName must be at least 2 characters')
     .max(20, 'displayName must be at most 20 characters');
   const intensitySchema = z
-    .string()
-    .trim()
-    .min(1, 'effectsIntensity is required')
-    .regex(/^\d+$/, 'effectsIntensity must be a whole number')
+    .union([z.string(), z.number()])
     .transform(Number)
     .pipe(
       z
-        .number()
+        .number({ invalid_type_error: 'effectsIntensity must be a whole number' })
         .int('effectsIntensity must be a whole number')
         .min(0, 'effectsIntensity must be at least 0')
         .max(100, 'effectsIntensity must be at most 100'),

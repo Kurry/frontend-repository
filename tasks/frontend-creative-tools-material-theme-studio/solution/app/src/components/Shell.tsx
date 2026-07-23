@@ -164,7 +164,7 @@ export default function Shell({ children }: { children: ReactNode }) {
           </button>
           <button
             type="button"
-            className="px-3 py-1.5 text-sm font-medium text-blue-400 hover:bg-blue-400/10 rounded transition-colors outline-none focus-visible:ring-2 focus-visible:ring-blue-400 min-h-11"
+            className="px-3 py-1.5 text-sm font-medium text-blue-400 hover:bg-blue-400/10 hover:underline rounded transition-colors outline-none focus-visible:ring-2 focus-visible:ring-blue-400 min-h-11"
             id="btn-tutorial"
             onClick={() => setTutorialOpen(true)}
           >
@@ -219,7 +219,10 @@ export default function Shell({ children }: { children: ReactNode }) {
         />
       </nav>
 
-      <main className="flex-1 overflow-hidden relative">{children}</main>
+      {/* Below lg the main region itself scrolls (Saved Themes / Export content
+          taller than the viewport stays reachable at 768px); at lg+ each tab
+          manages its own internal scrolling. */}
+      <main className="flex-1 overflow-y-auto lg:overflow-hidden relative">{children}</main>
 
       {/* Polite live region for validation + status announcements. The span is
           re-keyed on every announce dispatch so identical consecutive messages

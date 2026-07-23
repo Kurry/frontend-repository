@@ -187,6 +187,7 @@ export default function ExportCenter() {
           </button>
         </div>
         {copyError && <p className="field-error" role="alert">{copyError}</p>}
+        {copied && <p className="field-success" role="status">{`Copied ${active.label} to clipboard.`}</p>}
         <pre className="preview-pre" tabIndex={0}>{activeText}</pre>
       </div>
 

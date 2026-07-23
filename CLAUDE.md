@@ -46,13 +46,17 @@ Maintainers can comment exactly `/judge` on an open PR to run
 `.github/workflows/judge-oracle.yml` for a PR whose diff is confined to exactly one
 `tasks/<slug>/solution/app/` tree.
 The workflow uses `gpt-5.6-luna` and the repository's `CODEX_AUTH_JSON`
-secret, updates a sticky PR score comment, and appends a successful score to
-`docs/judge-ledger.jsonl` on `main`. Reward artifacts remain ephemeral and must
+secret, updates a sticky PR score comment, and opens a small PR appending a
+successful score to `docs/judge-ledger.jsonl` (targeting `main`) for a
+maintainer to review and merge. It cannot self-merge that PR: `main`'s
+`approved_pr_to_merge` ruleset requires one approving review with no bypass
+actors, so the ledger is only current on `main` once someone merges the
+`ci/judge-ledger-<slug>-<run>` branch it opens. Reward artifacts remain ephemeral and must
 never be committed inside task directories. This workflow consumes the owner's
 ChatGPT-plan quota, never runs automatically on PR-controlled code, is globally
-serialized, and accepts one task only. Full-corpus judge sweeps are dispatched
-exclusively by the repository owner via `.github/workflows/judge-oracle-all.yml`.
-A maintainer can also use `.github/workflows/judge-oracle.yml`'s one-slug manual dispatch.
+serialized, and accepts one task only; do not add
+matrix fanout, broad push triggers, or OAuth corpus sweeps. A maintainer can
+also use the workflow's one-slug manual dispatch.
 
 Dimension tomls (`tests/<dim>/<dim>.toml`) are the single source of truth for criteria and are edited directly (see `docs/rubrics.md` for criterion conventions; the `rubrics` skill does the alignment work). Outcome / user-flow lists are authored as criteria in a dimension toml — the `behavioral` dimension covers them when a task ships it; until then they live in `core_features`. There is no separate outcomes file.
 

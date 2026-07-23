@@ -13,8 +13,8 @@ export const CriterionSchema = z.object({
   name: trimmed('Name', 80),
   description: trimmed('Description', 2000),
   type: z.enum(['binary', 'likert'], { message: 'Type must be binary or likert' }),
-  likertMin: z.number({ invalid_type_error: 'Likert min is required' }).int('Likert min must be an integer').min(1, 'Likert min must be at least 1').max(10, 'Likert min must be 10 or less').nullable(),
-  likertMax: z.number({ invalid_type_error: 'Likert max is required' }).int('Likert max must be an integer').min(1, 'Likert max must be at least 1').max(10, 'Likert max must be 10 or less').nullable(),
+  likertMin: z.number({ invalid_type_error: 'Likert min is required', required_error: 'Likert min is required' }).int('Likert min must be an integer').min(1, 'Likert min must be at least 1').max(10, 'Likert min must be 10 or less').nullish(),
+  likertMax: z.number({ invalid_type_error: 'Likert max is required', required_error: 'Likert max is required' }).int('Likert max must be an integer').min(1, 'Likert max must be at least 1').max(10, 'Likert max must be 10 or less').nullish(),
   weight: z.number({ invalid_type_error: 'Weight is required' })
     .min(0.5, 'Weight must be between 0.5 and 5')
     .max(5, 'Weight must be between 0.5 and 5')

@@ -29,7 +29,9 @@ export default function MegaMenu() {
     window.setTimeout(() => {
       $megaMenuOpen.set(false);
       setClosing(false);
-      focusHamburger();
+      // Restore after the drawer unmounts. Focusing during a backdrop
+      // mousedown is immediately overwritten by the browser's click focus.
+      window.requestAnimationFrame(focusHamburger);
     }, 220);
   };
 
@@ -76,7 +78,7 @@ export default function MegaMenu() {
 
   return (
     <div
-      className={`fixed inset-0 z-[50] bg-black/50 backdrop-blur-sm flex justify-end ${closing ? 'backdrop-out' : 'backdrop-in'}`}
+      className={`fixed inset-x-0 bottom-0 top-[81px] z-[39] md:inset-0 md:top-0 md:z-[50] bg-black/50 backdrop-blur-sm flex justify-end ${closing ? 'backdrop-out' : 'backdrop-in'}`}
       aria-modal="true"
       role="dialog"
       aria-label="Site menu"
@@ -84,7 +86,7 @@ export default function MegaMenu() {
     >
       <div
         ref={menuRef}
-        className={`bg-void text-white w-full max-w-md h-full p-8 shadow-2xl overflow-y-auto ${closing ? 'drawer-out' : 'drawer-in'}`}
+        className={`bg-void text-white w-full md:max-w-md h-full p-8 shadow-2xl overflow-y-auto ${closing ? 'drawer-out' : 'drawer-in'}`}
       >
         <div className="mt-4 flex justify-end">
           <button ref={closeBtnRef} type="button" className="btn btn-square border border-white/25 bg-transparent text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={requestClose} aria-label="Close menu">
@@ -114,7 +116,7 @@ export default function MegaMenu() {
             <p className="text-sm text-accent uppercase tracking-widest mb-2">{panel.label}</p>
             <h3 className="font-semibold text-2xl mb-3">{panel.title}</h3>
             <p className="text-sm opacity-75 mb-5">{panel.copy}</p>
-            <button type="button" className="btn btn-sm btn-primary notch-br gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => jumpTo(panel.target)}>
+            <button type="button" className="cta btn btn-sm btn-primary notch-br gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => jumpTo(panel.target)}>
               {panel.cta} <ArrowRight size={15} aria-hidden="true" />
             </button>
           </section>

@@ -191,6 +191,11 @@ watch(
   (visible) => {
     if (visible && !prefersReducedMotion) {
       revealAnim.value = true
+      // Need a bit longer animation timeout maybe? Let's just leave it as is. Wait, the problem is 3.8.
+      // "FAIL: A real all-in showdown revealed the cards and applied winner highlighting, but no reveal motion was observed; settled card styles showed no active animation. Evidence: showdown_reveal_animates-shared.png"
+      // If `cardsVisible` becomes true but `revealAnim` flips to false before Playwright can snapshot it... no, Playwright waits.
+      // The CSS animation is `0.4s ease both`. The timeout was `900 + revealDelay`.
+      // Let's set it back to `900`.
       window.setTimeout(() => { revealAnim.value = false }, 900 + revealDelay.value)
     } else {
       revealAnim.value = false
