@@ -408,7 +408,10 @@ export default function App() {
   }
 
   function armClear() {
-    clearBoard();
+    if (confirmClear()) { clearBoard(); return; }
+    setConfirmClear(true);
+    clearTimeout(clearArmTimer);
+    clearArmTimer = setTimeout(() => setConfirmClear(false), 2600);
   }
 
   function resizeGrid(nextCellSize) {
@@ -1680,7 +1683,10 @@ export default function App() {
     createEffect(() => drawThumbnail(thumb, props.board.cells));
     const stats = createMemo(() => calculateStats(props.board.cells));
     const armDelete = () => {
-      removeBoard(props.board.name, true);
+      if (confirming()) { removeBoard(props.board.name, true); return; }
+      setConfirming(true);
+      clearTimeout(confirmTimer);
+      confirmTimer = setTimeout(() => setConfirming(false), 2600);
     };
     return (
       <article class={`board-card ${deletingBoard() === props.board.name ? "is-deleting" : ""} ${state.selectedBoard === props.board.name ? "is-current" : ""}`}>
