@@ -470,15 +470,28 @@ def validate_oracle(
         if not isinstance(scripts, dict) or not required_scripts.issubset(scripts):
             keys = sorted(scripts) if isinstance(scripts, dict) else []
             messages.append(f"package.json scripts must include start+verify:build (found {keys})")
+        # Build output (dist/, build/, etc.) is never committed — test.sh always
+        # runs verify:build before start, and the screenshot capture harness
+        # builds on demand too — so its on-disk absence here is expected, not a
+        # defect. What *would* be a defect: start serving a build directory it
+        # never builds inline (no "&&") when the package has no build/
+        # verify:build script that could produce it.
         start = str(scripts.get("start", "")) if isinstance(scripts, dict) else ""
         referenced_outputs: set[str] = set()
         if re.search(r"\b(?:dist|build)(?:/|\b)", start):
             referenced_outputs.update(re.findall(r"\b(dist|build)(?=/|\b)", start))
         if re.search(r"\bpreview\b", start) and not referenced_outputs:
             referenced_outputs.add("dist")
-        for output in sorted(referenced_outputs):
-            if not (app_dir / output).is_dir():
-                messages.append(f"start references {output!r}, but solution/app/{output} is absent")
+        if referenced_outputs and "&&" not in start:
+            has_build_step = isinstance(scripts, dict) and bool(
+                scripts.get("build") or scripts.get("verify:build")
+            )
+            if not has_build_step:
+                outputs = ", ".join(sorted(referenced_outputs))
+                messages.append(
+                    f"start references {outputs} output but no build/verify:build "
+                    "script produces it before start runs"
+                )
 
     denied: dict[str, list[str]] = {}
     html_texts: list[tuple[Path, str]] = []
