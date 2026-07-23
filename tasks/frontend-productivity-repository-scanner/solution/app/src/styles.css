@@ -360,6 +360,49 @@ footer { max-width: 1520px; margin: 0 auto; padding: 20px 40px 32px; color: #697
 .coachmark strong { display: block; color: var(--navy); font-size: 13px; margin-bottom: 4px; }
 .coachmark p { margin: 0; color: var(--text-muted); font-size: 12px; line-height: 1.45; }
 
+.guidance-topology { position: relative; display: grid; grid-template-columns: minmax(260px, .8fr) minmax(230px, .55fr) minmax(300px, 1fr); gap: 18px; margin: 0 0 18px; padding: 20px; overflow: hidden; color: #e5edf7; background: linear-gradient(125deg, #07182f 0%, #102b4f 58%, #123d4a 100%); border: 1px solid #31577d; box-shadow: 0 18px 48px rgb(15 23 42 / .2); }
+.guidance-topology::before { content: ''; position: absolute; width: 330px; height: 330px; right: -120px; top: -210px; border: 1px solid rgb(120 169 255 / .26); border-radius: 50%; box-shadow: 0 0 0 42px rgb(120 169 255 / .04), 0 0 0 84px rgb(66 190 185 / .035); pointer-events: none; }
+.topology-intro, .topology-score-card, .topology-coverage, .topology-recommendation { position: relative; z-index: 1; }
+.topology-intro .eyebrow { color: #78d5d0; }
+.topology-intro h2 { margin: 2px 0 7px; font-size: 22px; font-weight: 500; }
+.topology-intro > p:last-of-type { margin: 0; max-width: 430px; color: #b8c9db; font-size: 12px; line-height: 1.55; }
+.topology-repository-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+.topology-repository-tabs button { min-height: 32px; padding: 6px 10px; border: 1px solid #56799c; color: #c8d8e8; background: rgb(7 24 47 / .55); cursor: pointer; font-size: 11px; transition: border-color .18s, background .18s, transform .18s; }
+.topology-repository-tabs button:hover { border-color: #78d5d0; transform: translateY(-1px); }
+.topology-repository-tabs button.is-active { color: #07182f; border-color: #78d5d0; background: #78d5d0; }
+.topology-score-card { display: flex; align-items: center; gap: 15px; padding: 14px; border: 1px solid rgb(166 200 255 / .3); background: rgb(4 17 34 / .48); }
+.topology-orbit { position: relative; width: 94px; height: 94px; flex: 0 0 94px; display: grid; place-items: center; border-radius: 50%; background: conic-gradient(#42beb9 0 var(--coverage), #31577d var(--coverage) 100%); box-shadow: 0 0 28px rgb(66 190 185 / .18); }
+.topology-orbit::before { content: ''; position: absolute; width: 70px; height: 70px; border-radius: 50%; background: #0a203b; }
+.topology-orbit > div { position: relative; z-index: 1; text-align: center; }
+.topology-orbit strong { display: block; font: 21px "IBM Plex Mono", monospace; color: white; }
+.topology-orbit span, .topology-score-copy > span, .topology-recommendation span { color: #8faac3; font-size: 9px; text-transform: uppercase; letter-spacing: .09em; }
+.topology-score-copy { min-width: 0; }
+.topology-score-copy h3 { margin: 4px 0 6px; color: white; font-size: 15px; }
+.topology-score-copy p { margin: 0; color: #b8c9db; font-size: 10px; line-height: 1.5; }
+.topology-coverage { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.topology-coverage > div { position: relative; min-height: 66px; padding: 11px; overflow: hidden; border: 1px solid #31577d; background: rgb(7 24 47 / .68); }
+.topology-coverage span, .topology-coverage strong { display: block; }
+.topology-coverage span { color: #b8c9db; font-size: 10px; }
+.topology-coverage strong { margin-top: 6px; color: white; font-size: 11px; }
+.topology-coverage i { position: absolute; height: 3px; left: 0; bottom: 0; background: #42beb9; transition: width .35s ease; }
+.topology-coverage .is-missing { border-color: #8e6a00; background: rgb(73 53 0 / .24); }
+.topology-coverage .is-missing strong { color: #fddc69; }
+.topology-coverage .is-missing i { background: #f1c21b; }
+.topology-recommendation { grid-column: 2 / 4; display: flex; align-items: center; gap: 12px; margin-top: -7px; padding: 9px 12px; border-left: 3px solid #42beb9; background: rgb(4 17 34 / .38); }
+.topology-recommendation strong { color: #d9fbf8; font-size: 11px; font-weight: 500; }
+
+@media (max-width: 1023px) {
+  .guidance-topology { grid-template-columns: 1fr 1fr; }
+  .topology-intro { grid-column: 1 / -1; }
+  .topology-coverage { grid-column: 2; }
+  .topology-recommendation { grid-column: 1 / -1; margin-top: 0; }
+}
+
+@media (max-width: 620px) {
+  .guidance-topology { grid-template-columns: 1fr; padding: 16px; }
+  .topology-intro, .topology-score-card, .topology-coverage, .topology-recommendation { grid-column: 1; }
+}
+
 @font-face { font-family: 'IBM Plex Sans'; src: local('IBM Plex Sans'), local('Helvetica Neue'), local('Arial'); font-weight: 300; font-display: swap; }
 @font-face { font-family: 'IBM Plex Sans'; src: local('IBM Plex Sans'), local('Helvetica Neue'), local('Arial'); font-weight: 400; font-display: swap; }
 @font-face { font-family: 'IBM Plex Sans'; src: local('IBM Plex Sans'), local('Helvetica Neue'), local('Arial'); font-weight: 600; font-display: swap; }

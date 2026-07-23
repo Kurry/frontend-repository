@@ -1143,6 +1143,75 @@ function FirstScanCoachmark() {
   )
 }
 
+function GuidanceTopology() {
+  const repositories = useAppStore((state) => state.repositories)
+  const documents = useAppStore((state) => state.documents)
+  const [activeRepositoryId, setActiveRepositoryId] = useState(repositories[0]?.id || '')
+
+  useEffect(() => {
+    if (!repositories.some((repository) => repository.id === activeRepositoryId)) {
+      setActiveRepositoryId(repositories[0]?.id || '')
+    }
+  }, [activeRepositoryId, repositories])
+
+  if (!repositories.length) return null
+  const repository = repositories.find((item) => item.id === activeRepositoryId) || repositories[0]
+  const repositoryDocuments = documents[repository.id] || []
+  const coveredTypes = new Set(repositoryDocuments.map((document) => document.type))
+  const findings = repositoryDocuments.flatMap((document) => document.findings)
+  const weightedFindings = findings.reduce((total, finding) => total + (finding.severity === 'error' ? 3 : finding.severity === 'warning' ? 2 : 1), 0)
+  const riskIndex = repositoryDocuments.length ? Math.min(100, Math.round((weightedFindings / repositoryDocuments.length) * 18)) : 0
+  const coverage = coveredTypes.size
+  const missingTypes = DOCUMENT_TYPES.filter((type) => !coveredTypes.has(type))
+  const nextAction = !repositoryDocuments.length
+    ? 'Run the first scan to generate a guidance fingerprint.'
+    : missingTypes.length
+      ? `Restore ${typeLabels[missingTypes[0]]} coverage to close the largest guidance gap.`
+      : riskIndex >= 45
+        ? 'Review high-signal findings before sharing this scan index.'
+        : 'Coverage is balanced; export this repository as a review baseline.'
+
+  return (
+    <section className="guidance-topology" aria-labelledby="guidance-topology-heading">
+      <div className="topology-intro">
+        <p className="eyebrow">Live intelligence layer</p>
+        <h2 id="guidance-topology-heading">Guidance topology</h2>
+        <p>Compare instruction coverage and finding pressure across the current in-memory repository index.</p>
+        <div className="topology-repository-tabs" role="list" aria-label="Compare repository guidance topology">
+          {repositories.map((item) => (
+            <button key={item.id} type="button" className={item.id === repository.id ? 'is-active' : ''} aria-pressed={item.id === repository.id} onClick={() => setActiveRepositoryId(item.id)}>
+              {repositoryLabel(item)}
+            </button>
+          ))}
+        </div>
+      </div>
+      <motion.div className="topology-score-card" layout aria-live="polite">
+        <div className="topology-orbit" style={{ '--coverage': `${coverage * 25}%` } as React.CSSProperties}>
+          <div><strong>{coverage}/4</strong><span>types covered</span></div>
+        </div>
+        <div className="topology-score-copy">
+          <span>Active fingerprint</span>
+          <h3>{repositoryLabel(repository)}</h3>
+          <p>{repositoryDocuments.length} documents · {findings.length} findings · risk index {riskIndex}</p>
+        </div>
+      </motion.div>
+      <div className="topology-coverage" aria-label={`${repositoryLabel(repository)} guidance coverage`}>
+        {DOCUMENT_TYPES.map((type, index) => {
+          const count = repositoryDocuments.filter((document) => document.type === type).length
+          return (
+            <motion.div key={type} className={count ? 'is-covered' : 'is-missing'} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}>
+              <span>{typeLabels[type]}</span>
+              <strong>{count ? `${count} indexed` : 'Coverage gap'}</strong>
+              <i style={{ width: `${Math.min(100, count * 50)}%` }} />
+            </motion.div>
+          )
+        })}
+      </div>
+      <div className="topology-recommendation"><span>Next best action</span><strong>{nextAction}</strong></div>
+    </section>
+  )
+}
+
 function Toolbar() {
   const setUi = useAppStore((state) => state.setUi)
   const selectedCount = useAppStore((state) => state.selectedRepositoryIds.length)
@@ -1252,6 +1321,7 @@ function AppContent() {
             ))}
           </div>
         </section>
+        <GuidanceTopology />
         <FirstScanCoachmark />
         <Toolbar />
         <div className="workspace-grid">
