@@ -46,8 +46,12 @@ Maintainers can comment exactly `/judge` on an open PR to run
 `.github/workflows/judge-oracle.yml` for a PR whose diff is confined to exactly one
 `tasks/<slug>/solution/app/` tree.
 The workflow uses `gpt-5.6-luna` and the repository's `CODEX_AUTH_JSON`
-secret, updates a sticky PR score comment, and appends a successful score to
-`docs/judge-ledger.jsonl` on `main`. Reward artifacts remain ephemeral and must
+secret, updates a sticky PR score comment, and opens a small PR appending a
+successful score to `docs/judge-ledger.jsonl` (targeting `main`) for a
+maintainer to review and merge. It cannot self-merge that PR: `main`'s
+`approved_pr_to_merge` ruleset requires one approving review with no bypass
+actors, so the ledger is only current on `main` once someone merges the
+`ci/judge-ledger-<slug>-<run>` branch it opens. Reward artifacts remain ephemeral and must
 never be committed inside task directories. This workflow consumes the owner's
 ChatGPT-plan quota and never runs automatically on PR-controlled code. It grades
 one task per run but is NOT globally serialized: runs are grouped per PR (or per
