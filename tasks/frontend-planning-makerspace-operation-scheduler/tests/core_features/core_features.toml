@@ -1,0 +1,167 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "core_features.1"
+name = "graph_operations"
+description = "Starting from a seeded or empty state, create a new operation, split an operation, join operations, and reorder operations with valid edges (finish-start, start-start, or batch-compatible). Confirm that all these actions succeed and the graph structurally reflects them without a reload. Cycles and impossible joins must be previewed only (they do not save or persist)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.2"
+name = "operation_data_fields"
+description = "Verify that each created operation correctly stores and reflects its duration, setup family, eligible machines, operator role, material requirements, and output quantity in its detail view or list representation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.3"
+name = "machine_operator_matrix"
+description = "In the machine and operator scheduling matrix view, observe machine lanes (rows) with operator overlays. Move/drag or use keyboard/mobile commands to schedule an operation block into a specific time and lane. Verify the assignment updates visually."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.4"
+name = "assignment_validation"
+description = "Attempt to assign an operation that violates a machine qualification, operator qualification, material availability, predecessor dependency, or maintenance window. Confirm the assignment is rejected or marked invalid, and that conflict lenses clearly explain every contributing constraint."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.5"
+name = "setup_batching"
+description = "Group adjacent compatible operations that share a setup family. Confirm they share setup time and the total setup minutes are reduced without breaking any due promises or dependencies."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.6"
+name = "schedule_comparison"
+description = "Compare a current schedule and a candidate schedule. Confirm the UI presents a comparison by completion time, changeover time, idle time, risk, and material readiness."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.7"
+name = "qualification_material_evidence"
+description = "Select an operation and verify that it correctly traces operator qualification records and material lots. Check that missing, expired, duplicate, and insufficient evidence are presented as distinct visual states."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.8"
+name = "check_in_and_recovery"
+description = "Advance the logical clock and check in an operation. Record actual output/consumption, pause to simulate a partial run, and verify the partial-run state. Then resume, reassign, split the remainder, or scrap the remaining run and rollback unconsumed allocations. Ensure all these events properly apply and reflect in the run log."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.9"
+name = "outage_and_repair"
+description = "Trigger a machine outage. Create a repair branch, shift eligible operations while preserving locked/in-progress work, and compare lateness/setup effects. Approve the repair branch to merge the changes. Ensure that approving freezes the basis and any subsequent fixture changes mark it as stale."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.10"
+name = "desktop_linked_views"
+description = "On desktop, select an operation or time block in one view and confirm that the operation graph, scheduling lanes, qualifications/lots, compare view, and run log all update to share the selection context."
+type = "binary"
+weight = 1.0
