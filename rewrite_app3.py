@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+with open('tasks/frontend-data-tracking-music-practice-loop-studio/solution/app/src/App.jsx', 'w') as f:
+    f.write("""import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, SkipForward, RotateCcw, Plus, FileUp, FileDown, Activity, Calendar, FileJson, Clock } from 'lucide-react';
 import { registerWebMCP } from './webmcp';
 
@@ -122,10 +123,10 @@ export default function App() {
       const data = makeDossier();
       const variants = {
         'practice-dossier-json': { contents: JSON.stringify(data, null, 2), type: 'application/json', name: 'practice_dossier.json' },
-        'practice-events-csv': { contents: `take,event,measure,beat,type\n${takes.flatMap(take => take.events.map((event, index) => `${take.id},${index},${event.measure},${event.beat},${event.type}`)).join('\n')}`, type: 'text/csv', name: 'practice_events.csv' },
+        'practice-events-csv': { contents: `take,event,measure,beat,type\\n${takes.flatMap(take => take.events.map((event, index) => `${take.id},${index},${event.measure},${event.beat},${event.type}`)).join('\\n')}`, type: 'text/csv', name: 'practice_events.csv' },
         'score-overlay-svg': { contents: `<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Practice score overlay"><text x="10" y="24">Measures ${selectedRange.start}-${selectedRange.end}</text></svg>`, type: 'image/svg+xml', name: 'score_overlay.svg' },
-        'practice-schedule-ics': { contents: `BEGIN:VCALENDAR\nVERSION:2.0\n${schedule.map(item => `BEGIN:VEVENT\nUID:${item.loop}-day-${item.day}@practice-studio\nSUMMARY:Practice ${item.loop}\nDTSTART;VALUE=DATE:202601${String(item.day).padStart(2, '0')}\nEND:VEVENT`).join('\n')}\nEND:VCALENDAR`, type: 'text/calendar', name: 'practice_schedule.ics' },
-        'practice-summary-md': { contents: `# Practice Summary\n\nLoops: ${loops.length}\nTakes: ${takes.length}\n`, type: 'text/markdown', name: 'practice_summary.md' },
+        'practice-schedule-ics': { contents: `BEGIN:VCALENDAR\\nVERSION:2.0\\n${schedule.map(item => `BEGIN:VEVENT\\nUID:${item.loop}-day-${item.day}@practice-studio\\nSUMMARY:Practice ${item.loop}\\nDTSTART;VALUE=DATE:202601${String(item.day).padStart(2, '0')}\\nEND:VEVENT`).join('\\n')}\\nEND:VCALENDAR`, type: 'text/calendar', name: 'practice_schedule.ics' },
+        'practice-summary-md': { contents: `# Practice Summary\\n\\nLoops: ${loops.length}\\nTakes: ${takes.length}\\n`, type: 'text/markdown', name: 'practice_summary.md' },
       };
       const artifact = variants[typeof format === 'string' ? format : 'practice-dossier-json'] || variants['practice-dossier-json'];
       const blob = new Blob([artifact.contents], { type: artifact.type });
@@ -373,3 +374,4 @@ export default function App() {
     </div>
   );
 }
+""")
