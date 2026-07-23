@@ -2,10 +2,10 @@ import { z } from 'zod'
 
 export const classificationSchema = z.object({
   task: z.string().trim().min(1, 'task must be a non-empty string').max(80, 'task must be at most 80 characters'),
-  classification: z.enum(['capability-gap', 'spec-defect'], {
-    required_error: 'classification must be capability-gap or spec-defect',
-    invalid_type_error: 'classification must be capability-gap or spec-defect',
-  }),
+  classification: z.string().refine(
+    (value) => ['capability-gap', 'spec-defect'].includes(value),
+    'classification must be capability-gap or spec-defect',
+  ),
   rationale: z.string().trim().min(15, 'rationale must be at least 15 characters').max(500, 'rationale must be at most 500 characters'),
 }).strict()
 

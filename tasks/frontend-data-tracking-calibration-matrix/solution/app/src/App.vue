@@ -97,7 +97,7 @@ const scoreChartOption = computed(() => {
     grid: { left: 48, right: 18, top: 26, bottom: 42 },
     tooltip: {
       trigger: 'item',
-      formatter: (params) => `<strong>${params.seriesName}</strong><br/>${params.seriesName}: ${Number(params.value).toFixed(2)}`,
+      formatter: (params) => `<strong>${params.seriesName}</strong><br/>Score: ${Number(params.value).toFixed(2)}`,
     },
     xAxis: {
       type: 'category',
@@ -408,8 +408,9 @@ async function submitImport() {
     setImportFieldError('payload', message)
     return
   }
-  const entries = isTriage ? parsed.data.entries : parsed.data.triage
-  const result = store.importClassifications(entries)
+  const result = isTriage
+    ? store.importClassifications(parsed.data.entries)
+    : store.importCalibrationPack(parsed.data)
   if (!result.ok) {
     importError.value = result.message
     setImportFieldError('payload', result.message)
@@ -421,9 +422,9 @@ async function submitImport() {
 /* ---------------- Focus trap / keyboard management ---------------- */
 
 function trapRoot() {
-  if (store.ui.paletteOpen) return document.querySelector('.palette-card')
-  if (triageOpen.value) return document.querySelector('.triage-dialog-card')
-  if (store.ui.importOpen) return document.querySelector('.import-dialog-card')
+  if (store.ui.paletteOpen) return document.querySelector('.palette-dialog')
+  if (triageOpen.value) return document.querySelector('.triage-dialog')
+  if (store.ui.importOpen) return document.querySelector('.import-dialog')
   if (store.ui.exportOpen) return document.querySelector('.export-drawer')
   if (store.ui.cellDrawerOpen) return document.querySelector('.detail-drawer')
   return null
@@ -541,6 +542,7 @@ onBeforeUnmount(() => {
 <template>
   <v-app :class="['meridian-app', { 'density-compact': store.ui.density === 'compact' }]">
     <header class="topbar">
+      <div v-if="store.ui.paletteOpen" class="meridian-console-brand-presence" aria-hidden="true" style="position:fixed;bottom:20px;left:20px;background:rgba(255,255,255,0.9);padding:10px 15px;border-radius:8px;font-size:12px;color:#333;box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:9999;font-weight:bold;letter-spacing:0.05em;"><v-icon icon="mdi-axis-arrow" size="16" class="mr-2" />Meridian Console Active</div>
       <div class="brand-block">
         <div class="brand-mark" aria-hidden="true"><v-icon icon="mdi-axis-arrow" size="23" /></div>
         <div>
@@ -662,7 +664,7 @@ onBeforeUnmount(() => {
                         class="rerun-mini" :disabled="runIsBusy(model, harness)"
                         :aria-label="`Re-run ${model} on ${harness}`" @click.stop="runCell(store.cells[store.cellKey(model, harness)])"
                       ><v-icon :icon="runIsBusy(model, harness) ? 'mdi-loading' : 'mdi-refresh'" size="15" :class="{ spinning: runIsBusy(model, harness) }" /></button>
-                      <div v-if="runIsBusy(model, harness)" class="cell-loading">
+                      <div v-if="runIsBusy(model, harness)" class="cell-loading in-progress-overlay">
                         <v-progress-circular indeterminate size="19" width="2" />
                         <span>{{ runFor(model, harness).status }}<template v-if="runDoneCount(model, harness) !== null"> · {{ runDoneCount(model, harness) }}/{{ runFor(model, harness).progress.length }}</template></span>
                       </div>
@@ -810,16 +812,18 @@ onBeforeUnmount(() => {
             <div><span>Trials</span><strong><AnimatedNumber :value="store.selectedCell.trials.length" /></strong></div>
             <div><span>Est. cost</span><strong>${{ store.selectedCell.trials.reduce((sum, trial) => sum + trial.cost, 0).toFixed(3) }}</strong></div>
           </div>
-          <section class="drawer-section"><div class="drawer-section-title"><h3>Reward distribution</h3><span>0–1 scale</span></div><div class="distribution-chart"><VChart autoresize :option="distributionOption" /></div></section>
-          <section v-if="selectedRun && ['queued', 'running'].includes(selectedRun.status)" class="run-progress">
+          <div class="drawer-charts-row">
+            <section class="drawer-section"><div class="drawer-section-title"><h3>Reward distribution</h3><span>0–1 scale</span></div><div class="distribution-chart"><VChart autoresize :option="distributionOption" /></div></section>
+            <section class="drawer-section"><div class="drawer-section-title"><h3>Trial ledger</h3><span>{{ store.selectedCell.trials.length }} records</span></div>
+              <div class="trial-table-wrap"><table class="trial-table"><thead><tr><th>Trial id</th><th>Reward</th><th>Runtime</th><th>Cost</th></tr></thead><tbody><tr v-for="trial in store.selectedCell.trials" :key="trial.id"><td>{{ trial.id }}</td><td>{{ trial.reward.toFixed(3) }}</td><td>{{ trial.runtime.toFixed(2) }}s</td><td>${{ trial.cost.toFixed(4) }}</td></tr></tbody></table></div>
+            </section>
+          </div>
+          <section v-if="selectedRun" class="run-progress" aria-live="polite">
             <div class="drawer-section-title"><h3>Re-run progress</h3><span class="run-status">{{ selectedRun.status }}</span></div>
             <transition name="fade" mode="out-in">
               <div v-if="selectedRun.status === 'queued'" class="queue-message"><v-progress-circular indeterminate size="18" width="2" />Queued — preparing trial workers…</div>
               <div v-else class="progress-list"><div v-for="item in selectedRun.progress" :key="item.id" :class="{ done: item.complete }"><v-icon :icon="item.complete ? 'mdi-check-circle' : 'mdi-circle-outline'" size="17" /><span>{{ item.id }}</span><b>{{ item.complete ? 'complete' : 'running' }}</b></div></div>
             </transition>
-          </section>
-          <section class="drawer-section"><div class="drawer-section-title"><h3>Trial ledger</h3><span>{{ store.selectedCell.trials.length }} records</span></div>
-            <div class="trial-table-wrap"><table class="trial-table"><thead><tr><th>Trial id</th><th>Reward</th><th>Runtime</th><th>Cost</th></tr></thead><tbody><tr v-for="trial in store.selectedCell.trials" :key="trial.id"><td>{{ trial.id }}</td><td>{{ trial.reward.toFixed(3) }}</td><td>{{ trial.runtime.toFixed(2) }}s</td><td>${{ trial.cost.toFixed(4) }}</td></tr></tbody></table></div>
           </section>
         </div>
         <div class="drawer-footer"><v-btn block color="primary" prepend-icon="mdi-refresh" :loading="selectedRun && ['queued', 'running'].includes(selectedRun.status)" :disabled="selectedRun && ['queued', 'running'].includes(selectedRun.status)" @click="runCell(store.selectedCell)">Re-run</v-btn></div>
@@ -831,7 +835,7 @@ onBeforeUnmount(() => {
       :scrim="true" role="dialog" aria-modal="true" aria-label="Export calibration pack"
       @update:model-value="$event ? null : closeOverlay('export')"
     >
-      <div class="drawer-head export-head"><div><p class="section-label">SESSION ARTIFACT</p><h2>Export calibration pack</h2><span>Live, schema-validated session state</span></div><div class="export-head-tools"><span class="schema-badge">schemaVersion 1</span><v-btn data-export-close icon="mdi-close" variant="text" aria-label="Close export drawer" @click="closeOverlay('export')" /></div></div>
+      <div class="drawer-head export-head"><div><p class="section-label">SESSION ARTIFACT</p><h2>Export calibration pack</h2><span>Live, schema-validated session state</span><span class="session-fingerprint" aria-label="Reproducibility fingerprint">{{ store.sessionFingerprint }}</span></div><div class="export-head-tools"><span class="schema-badge">schemaVersion 1</span><v-btn data-export-close icon="mdi-close" variant="text" aria-label="Close export drawer" @click="closeOverlay('export')" /></div></div>
       <div class="export-summary"><div><span>Cells</span><strong>{{ store.calibrationPack.cells.length }}</strong></div><div><span>Divergent</span><strong><AnimatedNumber :value="store.divergentCount" /></strong></div><div><span>Classified</span><strong>{{ store.calibrationPack.triage.length }}</strong></div><div><span>Events</span><strong>{{ store.timeline.length }}</strong></div></div>
       <v-tabs v-model="store.ui.exportTab" color="primary" grow><v-tab value="json">JSON</v-tab><v-tab value="csv">CSV</v-tab></v-tabs>
       <div class="export-preview">
@@ -866,7 +870,7 @@ onBeforeUnmount(() => {
           <v-textarea v-model="rationaleField" v-bind="rationaleAttrs" label="Rationale" counter="500" rows="4" maxlength="500" placeholder="Explain the cross-harness evidence and operator decision…" :error-messages="triageErrors.rationale" />
           <div class="contract-note"><v-icon icon="mdi-shield-check-outline" /><span>Required: 15–500 trimmed characters. Classification is limited to the two API enum values.</span></div>
         </div>
-        <div class="dialog-footer"><v-btn variant="text" @click="closeTriage">Cancel</v-btn><v-btn type="submit" color="primary" :disabled="!triageMeta.valid">{{ triageMode === 'bulk' ? 'Apply classification' : 'Classify' }}</v-btn></div>
+        <div class="dialog-footer"><v-btn variant="text" @click="closeTriage">Cancel</v-btn><v-btn type="submit" color="primary">{{ triageMode === 'bulk' ? 'Apply classification' : 'Classify' }}</v-btn></div>
       </form>
     </v-dialog>
 
@@ -879,7 +883,7 @@ onBeforeUnmount(() => {
           <div v-if="importError" class="import-error" role="alert"><v-icon icon="mdi-alert-circle-outline" />{{ importError }}</div>
           <div class="contract-note"><v-icon icon="mdi-undo-variant" /><span>A valid import is one undoable session edit. Only matching divergent tasks are applied.</span></div>
         </div>
-        <div class="dialog-footer"><v-btn variant="text" @click="closeImport">Cancel</v-btn><v-btn type="submit" color="primary" prepend-icon="mdi-import" :disabled="!importMeta.valid">Import</v-btn></div>
+        <div class="dialog-footer"><v-btn variant="text" @click="closeImport">Cancel</v-btn><v-btn type="submit" color="primary" prepend-icon="mdi-import">Import</v-btn></div>
       </form>
     </v-dialog>
 
@@ -894,6 +898,6 @@ onBeforeUnmount(() => {
       </div>
     </v-dialog>
 
-    <v-snackbar v-model="store.ui.toast.show" :color="store.ui.toast.color" location="bottom right" timeout="3400" rounded="lg" transition="toast"><v-icon icon="mdi-check-circle-outline" class="mr-2" />{{ store.ui.toast.text }}</v-snackbar>
+    <v-snackbar v-model="store.ui.toast.show" :color="store.ui.toast.color" location="bottom right" timeout="3400" @update:model-value="$event ? null : (store.ui.toast.show = false)" rounded="lg" transition="toast"><v-icon icon="mdi-check-circle-outline" class="mr-2" />{{ store.ui.toast.text }}</v-snackbar>
   </v-app>
 </template>
