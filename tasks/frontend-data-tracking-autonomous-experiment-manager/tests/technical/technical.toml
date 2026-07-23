@@ -1,0 +1,43 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "sse"
+url = "http://localhost:3000/sse"
+
+[[criterion]]
+id = "observe_network"
+description = "Observe network: real port-4317 stream headers, stable IDs, cursors, tools, data, and finish events appear."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "disconnect_crash_resume"
+description = "Disconnect, crash, and resume: checkpoint or prefix persists and no duplicate sample, decision, or incumbent is created."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "reload_pending_approval"
+description = "Reload during pending approval or run: exact campaign, experiment, tool, and approval identities restore fully."
+type = "binary"
+weight = 1.0

@@ -1,0 +1,49 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "sse"
+url = "http://localhost:3000/sse"
+
+[[criterion]]
+id = "move_threshold_keyboard"
+description = "Move threshold by keyboard: provides the same preview, bounds checking, commit, and recomputation as pointer interaction."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "navigate_relationships"
+description = "Navigate diff, plot, and ledger: hunk, sample, decision, and lineage relationships are correctly announced to screen readers."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "accessible_streaming_tools"
+description = "Use streaming tools and approval: names, statuses, expansion, error, and focus management are complete and accessible."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "high_zoom_perception"
+description = "High zoom and non-color perception: keep, revert, risk, selection, and plot data remain perceivable without relying solely on color."
+type = "binary"
+weight = 1.0

@@ -1,0 +1,43 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "sse"
+url = "http://localhost:3000/sse"
+
+[[criterion]]
+id = "stream_experiment_motion"
+description = "Stream experiment: progress, checkpoints, and samples enter in causal order without layout shift."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "keep_revert_transition"
+description = "Keep or revert transition: lineage visibly changes (keep) or retains (revert) the incumbent before the ledger visually settles."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "reduced_motion_support"
+description = "Reduced motion: when prefers-reduced-motion is enabled, a persistent transition summary provides equivalent evidence without sweeps or animated travel."
+type = "binary"
+weight = 1.0

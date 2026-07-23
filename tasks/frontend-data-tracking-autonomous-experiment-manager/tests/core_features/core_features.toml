@@ -1,0 +1,61 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "sse"
+url = "http://localhost:3000/sse"
+
+[[criterion]]
+id = "define_valid_campaign"
+description = "Define valid campaign: goal, program, metric, constraints, and budget persist and agree across views."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "run_baseline"
+description = "Run baseline: exactly one valid generation-zero incumbent with evidence appears after the baseline action."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "generate_and_review_proposal"
+description = "Generate and review proposal: hypothesis and constraint-valid inert patch bind to the current hash."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "execute_fixed_budget"
+description = "Execute fixed budget: samples, checkpoints, progress, and ledger derive from server data and terminate coherently."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "compare_experiment_metric"
+description = "Compare experiment metric: exact policy yields keep, revert, or approval reason and one atomic incumbent transition."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "repeat_reload_export"
+description = "Repeat, reload, export: linear lineage and complete campaign artifacts remain consistent after multiple loops and exports."
+type = "binary"
+weight = 1.0

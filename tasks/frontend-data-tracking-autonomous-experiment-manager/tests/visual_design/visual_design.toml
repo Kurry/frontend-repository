@@ -1,0 +1,43 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "sse"
+url = "http://localhost:3000/sse"
+
+[[criterion]]
+id = "view_desktop_layout"
+description = "View desktop layout: the research conveyor, active chamber, lineage, ledger, and inspector are distinctive, coherent, and match the specified layout."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "inspect_states"
+description = "Inspect incumbent, proposal, run, keep, revert, and risk states: redundant visual semantics (color, icon, label) make each state unmistakable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "read_typography"
+description = "Read diff, plot, and ledger: typography, density, axes, hashes, and hierarchy remain legible and use specified fonts (monospace for code/hashes)."
+type = "binary"
+weight = 1.0

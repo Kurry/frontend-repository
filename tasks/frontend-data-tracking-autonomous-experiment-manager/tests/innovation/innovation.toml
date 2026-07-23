@@ -1,0 +1,44 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "sse"
+url = "http://localhost:3000/sse"
+
+[[criterion]]
+id = "move_threshold_innovation"
+description = "Move threshold: plot, decision gate, risk, report preview, and policy history coordinate seamlessly without corrupting historical decisions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "keep_patch_innovation"
+description = "Keep a patch: inspectable hunk evidence, fixed-budget metric, automatic policy, approval, and lineage form one coherent proof chain."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "innovation.catchall"
+name = "innovation_catchall"
+description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0

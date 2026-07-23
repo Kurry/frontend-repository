@@ -1,0 +1,37 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "sse"
+url = "http://localhost:3000/sse"
+
+[[criterion]]
+id = "review_copy_labels"
+description = "Review copy: every run and time is clearly labeled 'simulated'; forecast, measurement, and decision terms remain precise."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "trigger_validation_messages"
+description = "Trigger validation: error messages regarding entity, rule, observed value, bound, or recovery are specific and actionable."
+type = "binary"
+weight = 1.0

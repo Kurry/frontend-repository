@@ -1,0 +1,37 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "sse"
+url = "http://localhost:3000/sse"
+
+[[criterion]]
+id = "compare_to_prd"
+description = "Compare to PRD: a linear research conveyor and staged mobile loop are materially present, specifically not an A/B dashboard."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "exercise_ai_states"
+description = "Exercise AI and recovery states: proposal, patch, run, checkpoint, crash, decision, and approval UI flows are polished."
+type = "binary"
+weight = 1.0
