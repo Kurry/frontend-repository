@@ -58,6 +58,7 @@ export default function App() {
   const [showPalette, setShowPalette] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [showCoach, setShowCoach] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
   const [listening, setListening] = useState(false);
   const recognitionRef = useRef<any>(null);
@@ -151,6 +152,7 @@ export default function App() {
           {showPalette && <CommandPalette close={() => setShowPalette(false)} />}
           {showSettings && <SettingsModal close={() => setShowSettings(false)} />}
           {showHelp && <HelpModal close={() => setShowHelp(false)} />}
+          {showCoach && <CutCoach close={() => setShowCoach(false)} />}
           {store.reorderPreview && <ReorderPreviewModal />}
 
           <Header
@@ -159,6 +161,7 @@ export default function App() {
             listening={listening}
             onSettings={() => setShowSettings(true)}
             onHelp={() => setShowHelp(true)}
+            onCoach={() => setShowCoach(true)}
           />
 
           <DndContext onDragEnd={handleDragEnd}>
@@ -233,8 +236,18 @@ export default function App() {
 // Header
 // ---------------------------------------------------------------------------
 
-function Header(props: { onPalette: () => void; onVoice: () => void; listening: boolean; onSettings: () => void; onHelp: () => void }) {
+function Header(props: { onPalette: () => void; onVoice: () => void; listening: boolean; onSettings: () => void; onHelp: () => void; onCoach: () => void }) {
   const store = useStore();
+  const share = async () => {
+    const data = { title: 'Side Street Signals Cut', text: `Review ${store.branch} at ${cutChecksum(store)}`, url: location.href };
+    try {
+      if (navigator.share) await navigator.share(data);
+      else await navigator.clipboard.writeText(`${data.title}: ${data.text} ${data.url}`);
+      store.addToast('success', navigator.share ? 'Cut handoff opened in the system share sheet.' : 'Cut handoff copied to the clipboard.');
+    } catch (error: any) {
+      if (error?.name !== 'AbortError') store.addToast('error', 'Cut handoff could not be shared. Try Export instead.');
+    }
+  };
   return (
     <header className="flex flex-col gap-2 border-b border-[var(--border)] bg-[var(--panel)] px-3 py-3 md:flex-row md:items-center md:justify-between md:px-4">
       <div className="min-w-0">
@@ -245,6 +258,9 @@ function Header(props: { onPalette: () => void; onVoice: () => void; listening: 
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-1.5">
+        <span className="rounded border border-green-700 bg-green-950/50 px-2 py-1 text-[10px] font-bold text-green-200" title="The app shell is cached by a service worker and can reopen offline">Offline Ready</span>
+        <button onClick={props.onCoach} className={btnGhost} title="Open the live cut-risk forecast"><Sparkles className="h-4 w-4" /> Cut Coach</button>
+        <button onClick={share} className={btnGhost} title="Share this cut handoff with the system share sheet or clipboard"><Clipboard className="h-4 w-4" /> Share</button>
         <button onClick={props.onPalette} className={btnGhost} title="Command palette (Ctrl+K)"><CommandIcon className="h-4 w-4" /> Commands</button>
         <button onClick={props.onVoice} className={`${btnGhost} ${props.listening ? 'ring-2 ring-[var(--accent)]' : ''}`} title="Voice commands (alternative input)"><Mic className="h-4 w-4" /> Voice</button>
         <button onClick={() => store.setTheme(store.theme === 'dark' ? 'light' : 'dark')} className={btnGhost} title="Toggle color theme">
@@ -1656,6 +1672,42 @@ function HelpModal({ close }: { close: () => void }) {
           </tbody>
         </table>
         <div className="mt-4 flex justify-end"><button onClick={close} className={btnAccent}>Close</button></div>
+      </div>
+    </div>
+  );
+}
+
+function CutCoach({ close }: { close: () => void }) {
+  const store = useStore();
+  const pending = APPROVAL_CATS.find(cat => store.approvals[cat].status !== 'approved');
+  const blockers = pending ? store.approvalBlockers(pending) : [];
+  const next = pending
+    ? blockers[0] ?? `Approve ${pending} to freeze checksum ${cutChecksum(store)}.`
+    : store.renderPipeline.status === 'failed'
+      ? 'Retry only the failed transcript timestamp and RSS enclosure outputs.'
+      : store.renderPipeline.status === 'success'
+        ? 'Export and share the completed package.'
+        : 'Run the deterministic render batch.';
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" role="dialog" aria-modal="true" aria-label="Cut Coach" onClick={close}>
+      <div className={`${panelCls} w-full max-w-lg overflow-hidden`} onClick={e => e.stopPropagation()}>
+        <div className="bg-gradient-to-r from-sky-600 via-violet-600 to-amber-500 p-5 text-white">
+          <div className="mb-1 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em]"><Sparkles className="h-4 w-4" /> Live Risk Forecast</div>
+          <h2 className="text-2xl font-bold">One move closer to air.</h2>
+        </div>
+        <div className="space-y-3 p-5">
+          <p className="text-sm text-[var(--muted)]">The coach derives its recommendation from the live cut, approval checksums, citations, rights, mix findings, and render attempts.</p>
+          <div className="rounded-lg border border-[var(--accent)] bg-[var(--panel2)] p-4">
+            <div className="mb-1 text-xs font-bold uppercase tracking-wider text-[var(--accent)]">Next Best Action</div>
+            <p className="text-base font-semibold">{next}</p>
+          </div>
+          <div className="grid grid-cols-3 gap-2 text-center text-xs">
+            <div className="rounded bg-[var(--panel2)] p-2"><strong className="block text-lg">{store.instances.length}</strong>clips</div>
+            <div className="rounded bg-[var(--panel2)] p-2"><strong className="block text-lg">{store.citations.filter(c => c.status === 'orphan').length}</strong>orphan cites</div>
+            <div className="rounded bg-[var(--panel2)] p-2"><strong className="block text-lg">{APPROVAL_CATS.filter(c => store.approvals[c].status === 'approved').length}/5</strong>approvals</div>
+          </div>
+          <div className="flex justify-end"><button onClick={close} className={btnAccent}>Back To The Cut</button></div>
+        </div>
       </div>
     </div>
   );

@@ -10,6 +10,10 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   </React.StrictMode>
 );
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => undefined));
+}
+
 // ---------------------------------------------------------------------------
 // WebMCP contract (zto-webmcp-v1). Handlers call the same store actions as the
 // visible UI controls.

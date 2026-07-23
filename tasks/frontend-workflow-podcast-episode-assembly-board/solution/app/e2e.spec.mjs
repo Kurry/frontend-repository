@@ -210,3 +210,58 @@ test('4.7 te_7', async ({ page }) => {
   }));
   await expect(page.getByRole('button', { name: /Re-Export/ })).toBeVisible();
 });
+
+test('11.2 advanced_motion_mechanics', async ({ page }) => {
+  await enterWorkspace(page);
+  await page.getByRole('button', { name: 'Timeline' }).click();
+  await page.getByRole('button', { name: 'Preview Sweep' }).click();
+  const running = await page.evaluate(() => document.getAnimations().some(animation => animation.playState === 'running'));
+  expect(running).toBe(true);
+});
+
+test('11.9 genre_appropriate_platform_features', async ({ page }) => {
+  await enterWorkspace(page);
+  await expect(page.getByText('Offline Ready')).toBeVisible();
+  expect((await page.request.get(`${BASE}/manifest.webmanifest`)).ok()).toBe(true);
+  expect((await page.request.get(`${BASE}/sw.js`)).ok()).toBe(true);
+  await expect(page.getByRole('button', { name: 'Share' })).toBeVisible();
+});
+
+test('11.10 competition_level_innovation', async ({ page }) => {
+  await enterWorkspace(page);
+  await page.getByRole('button', { name: 'Cut Coach' }).click();
+  await expect(page.getByRole('dialog', { name: 'Cut Coach' })).toContainText('Live Risk Forecast');
+  await expect(page.getByRole('dialog', { name: 'Cut Coach' })).toContainText('Next Best Action');
+});
+
+test('11.n6 helpful_platform_capabilities_ignored', async ({ page }) => {
+  await enterWorkspace(page);
+  await expect(page.getByText('Offline Ready')).toHaveAttribute('title', /service worker/i);
+  await expect(page.getByRole('button', { name: 'Share' })).toHaveAttribute('title', /system share sheet|clipboard/i);
+});
+
+test('11.n9 design_has_no_twist', async ({ page }) => {
+  await enterWorkspace(page);
+  await page.getByRole('button', { name: 'Cut Coach' }).click();
+  const coach = page.getByRole('dialog', { name: 'Cut Coach' });
+  await expect(coach.locator('.bg-gradient-to-r')).toBeVisible();
+  await expect(coach.getByText('One move closer to air.')).toBeVisible();
+});
+
+test('11.n10 effort_stops_at_mvp', async ({ page }) => {
+  await enterWorkspace(page);
+  await expect(page.getByRole('navigation', { name: 'Workspace sections' }).getByRole('button')).toHaveCount(9);
+  await expect(page.getByRole('button', { name: 'Cut Coach' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Voice' })).toBeVisible();
+  await expect(page.getByText('Offline Ready')).toBeVisible();
+});
+
+test('innovation.catchall innovation_catchall', async ({ page }) => {
+  await enterWorkspace(page);
+  await page.getByRole('button', { name: 'Cut Coach' }).click();
+  const coach = page.getByRole('dialog', { name: 'Cut Coach' });
+  await expect(coach).toContainText(/blocks|Approve|Remove/);
+  await expect(coach).toContainText(/clips/);
+  await expect(coach).toContainText(/orphan cites/);
+  await expect(coach).toContainText(/approvals/);
+});
