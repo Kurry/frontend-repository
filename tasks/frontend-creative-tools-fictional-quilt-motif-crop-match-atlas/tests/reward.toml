@@ -91,8 +91,12 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
-[[criterion]]
-id = "vd-01"
-title = "Color-independent hierarchy"
-description = "Hierarchy and meaning remain clear without color alone for all cell states (shared, query-only, candidate-only)."
-weight = 1.0
+# Aggregate scores. WebMCP is never a scoring dimension.
+[[reward]]
+name = "reward"
+aggregation = "weighted_mean"
+
+[[reward]]
+name = "pass"
+aggregation = "threshold"
+threshold = 0.7
