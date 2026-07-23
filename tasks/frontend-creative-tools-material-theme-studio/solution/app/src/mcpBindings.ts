@@ -197,7 +197,7 @@ export function initializeWebMCP() {
         if (store.getState().theme.themes.some(theme => theme.name === themeName)) {
           throw new Error('name must be unique');
         }
-        const id = args.id || 'theme-' + Date.now();
+        const id = args.id || 'theme-' + Date.now() + '-' + Math.random().toString(36).slice(2);
         if (store.getState().theme.themes.some(theme => theme.id === id)) {
           throw new Error('id must be unique');
         }
