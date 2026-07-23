@@ -1,0 +1,2605 @@
+{
+  "accessibility": {
+    "score": 0.7,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "controls_are_keyboard_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every interactive control \u2014 search input, threshold slider, chips, feedback controls, disclosures, palette entries, history checkboxes, bulk action bar, and run controls \u2014 is reachable and operable with Tab, Shift+Tab, Enter, Space, or arrow keys",
+        "reasoning": "Search submission, slider ArrowRight adjustment, and Group by topic Space toggle all worked through keyboard; visible controls use native buttons, inputs, checkboxes, and a focusable slider. Evidence: slider-keyboard.png"
+      },
+      {
+        "id": "1.2",
+        "name": "overlays_manage_focus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The command palette, export modal, save-search form, and confirmation dialogs trap focus while open, close on Escape, and return focus to the control that opened them",
+        "reasoning": "FAIL: Command palette and export/save/add-document overlays focused their first control and Escape returned focus for tested cases, but the confirmation dialog workflow could not be verified as a focus-managed overlay. Evidence: overlays-commands.png"
+      },
+      {
+        "id": "1.3",
+        "name": "icons_have_accessible_names",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Icon-only controls (thumbs, close buttons, bulk checkboxes, status icons) carry accessible names or labels; decorative icons are hidden from the accessibility tree",
+        "reasoning": "Visible icon-only result feedback controls, close buttons, clear-search, add-document, and delete controls exposed accessible names through aria-label, aria-labelledby, or tooltip labeling; decorative SVGs were aria-hidden. Evidence: results-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "run_and_count_changes_announced",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Completion of a re-index run, a step entering the failed state, and result-count changes from threshold or filter changes are announced through aria-live regions as well as shown visually",
+        "reasoning": "Live regions visibly announced threshold result changes, indexing start, failure after retries, and final completion (\u201cIndexed 120 documents\u201d). Evidence: reindex-retry.png"
+      },
+      {
+        "id": "1.5",
+        "name": "forms_have_explicit_labels",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Save search and Add document form fields have visible labels, and validation messages are programmatically associated with their fields",
+        "reasoning": "FAIL: Save search and Add document fields had visible labels, but no programmatically associated validation messages were observed; fields had no aria-describedby linkage. Evidence: add-document-modal.png"
+      },
+      {
+        "id": "1.6",
+        "name": "headings_follow_logical_order",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Panel and section headings follow a logical order with no skips (H1 for the app, H2 for panels, H3 within)",
+        "reasoning": "Observed heading hierarchy starts with H1, followed by H2 panel/section headings and H3 result/detail headings without skipped levels. Evidence: document-detail.png"
+      },
+      {
+        "id": "1.7",
+        "name": "landmark_navigation_is_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Landmark structure (main, navigation/complementary regions for the rail and panel) or a skip-to-content path is present",
+        "reasoning": "The rendered app exposes main, complementary, and navigation landmarks, including the labeled workspace rail. Evidence: initial-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "text_and_controls_have_contrast",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "All text \u2014 including score badges, highlighted excerpts, chips, and status treatments \u2014 meets sufficient color contrast against its background",
+        "reasoning": "FAIL: Read-only computed-style measurement found visible contrast below 4.5:1, including Save search at 4.47:1 and a result-status treatment at 4.45:1. Evidence: results-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "semantic_html_roles_are_used",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Interactive and structural elements use semantic roles \u2014 real buttons for actions, a slider role with value semantics for the threshold, list semantics for results and history",
+        "reasoning": "Observed semantic roles include main/nav/complementary, search, list/listitem for results and history, switch, and a slider with aria-valuemin, aria-valuemax, aria-valuenow, and accessible labeling. Evidence: slider-keyboard.png"
+      },
+      {
+        "id": "1.10",
+        "name": "reduced_motion_is_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, staggered entrances, panel slides, re-rank movement, and countdown animations are removed while all functionality remains",
+        "reasoning": "In the reduced-motion browser, prefers-reduced-motion matched true and computed transition/animation durations were reduced to 1e-06s; real keyboard search still produced results and live announcements. Evidence: reduced-motion.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"controls_are_keyboard_accessible\":{\"score\":\"yes\",\"reasoning\":\"Search submission, slider ArrowRight adjustment, and Group by topic Space toggle all worked through keyboard; visible controls use native buttons, inputs, checkboxes, and a focusable slider. Evidence: slider-keyboard.png\"},\"overlays_manage_focus\":{\"score\":\"no\",\"reasoning\":\"FAIL: Command palette and export/save/add-document overlays focused their first control and Escape returned focus for tested cases, but the confirmation dialog workflow could not be verified as a focus-managed overlay. Evidence: overlays-commands.png\"},\"icons_have_accessible_names\":{\"score\":\"yes\",\"reasoning\":\"Visible icon-only result feedback controls, close buttons, clear-search, add-document, and delete controls exposed accessible names through aria-label, aria-labelledby, or tooltip labeling; decorative SVGs were aria-hidden. Evidence: results-shared.png\"},\"run_and_count_changes_announced\":{\"score\":\"yes\",\"reasoning\":\"Live regions visibly announced threshold result changes, indexing start, failure after retries, and final completion (\u201cIndexed 120 documents\u201d). Evidence: reindex-retry.png\"},\"forms_have_explicit_labels\":{\"score\":\"no\",\"reasoning\":\"FAIL: Save search and Add document fields had visible labels, but no programmatically associated validation messages were observed; fields had no aria-describedby linkage. Evidence: add-document-modal.png\"},\"headings_follow_logical_order\":{\"score\":\"yes\",\"reasoning\":\"Observed heading hierarchy starts with H1, followed by H2 panel/section headings and H3 result/detail headings without skipped levels. Evidence: document-detail.png\"},\"landmark_navigation_is_present\":{\"score\":\"yes\",\"reasoning\":\"The rendered app exposes main, complementary, and navigation landmarks, including the labeled workspace rail. Evidence: initial-shared.png\"},\"text_and_controls_have_contrast\":{\"score\":\"no\",\"reasoning\":\"FAIL: Read-only computed-style measurement found visible contrast below 4.5:1, including Save search at 4.47:1 and a result-status treatment at 4.45:1. Evidence: results-shared.png\"},\"semantic_html_roles_are_used\":{\"score\":\"yes\",\"reasoning\":\"Observed semantic roles include main/nav/complementary, search, list/listitem for results and history, switch, and a slider with aria-valuemin, aria-valuemax, aria-valuenow, and accessible labeling. Evidence: slider-keyboard.png\"},\"reduced_motion_is_respected\":{\"score\":\"yes\",\"reasoning\":\"In the reduced-motion browser, prefers-reduced-motion matched true and computed transition/animation durations were reduced to 1e-06s; real keyboard search still produced results and live announcements. Evidence: reduced-motion.png\"}}",
+    "cost_usd": 0.7724354
+  },
+  "behavioral": {
+    "score": 0.4444,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_reload_reset",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Run a query, give one result a thumbs-up, save a search, add a document, and set the threshold to 0.4 \u2014 then reload the page. All facets coherently reset to the seeded baseline: seeded corpus without the added document, empty query, no history, no saved searches, no feedback, threshold at its default, and a fully built index \u2014 never a mix of surviving and reset facets",
+        "reasoning": "Reload returned the seeded baseline: empty query/history, no added document, default threshold, and no feedback. Evidence: multi_facet_reload_reset-shared.png"
+      },
+      {
+        "id": "14.2",
+        "name": "search_to_export_pipeline_tracks",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Full pipeline probe: run a query, note the top three results and their scores, thumbs-up the third result, and raise the threshold; then open the Search report export. The JSON has schemaVersion 1, request.threshold matches the slider, results order and feedback match the cards after the boost, and only hits at or above the threshold appear \u2014 every stage tracked the same live state under the SearchReport field contract",
+        "reasoning": "FAIL: The Search report exported threshold 0.45 and three visible results, but the thumbs-up feedback was exported as \"none\" instead of matching the requested boosted card. Evidence: search_to_export_pipeline_tracks-shared.png"
+      },
+      {
+        "id": "14.3",
+        "name": "add_index_search_pipeline",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Add a document whose body contains a distinctive invented word, confirm a search for that word returns nothing before rebuild while the stale count reads one, run Index Now to completion, then search again: the new document appears with a similarity score, the stale count reads zero, and the index statistics count the new document",
+        "reasoning": "FAIL: The new document showed stale count 1 and no search match, but indexing did not complete successfully; the run reached a failed step and stale remained 1. Evidence: add_index_search_pipeline-shared.png"
+      },
+      {
+        "id": "14.4",
+        "name": "different_queries_different_rankings",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Run two clearly different queries (different topics) and compare their result lists: the rankings, similarity scores, and explanation disclosures differ in ways consistent with each query's terms; then select both in the Compare view and confirm the overlap and unique counts are consistent with the two visible result sets",
+        "reasoning": "The React and data-engineering queries produced distinct rankings, scores, explanations, and visible result sets; Compare showed 0 overlap and 12 unique results on each side. Evidence: different_queries_different_rankings-shared-final.png"
+      },
+      {
+        "id": "14.5",
+        "name": "threshold_count_delta_exact",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With results visible, note the result count, then raise the threshold until at least one card disappears: the count decreases by exactly the number of hidden cards, and the cluster group counts (when grouped) still sum to the new total",
+        "reasoning": "The query returned 15 results at baseline; raising the threshold to 0.45 produced 3 results, hiding exactly 12, and grouped results showed one group totaling 3. Evidence: threshold_count_delta_exact-shared.png"
+      },
+      {
+        "id": "14.6",
+        "name": "feedback_rerank_and_reset_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Note a query's ranked order, thumbs-up a mid-ranked result and confirm it moves up with its score adjusted, re-run the same query and confirm the adjusted order reproduces, then use Reset Feedback and confirm the original order returns exactly",
+        "reasoning": "FAIL: The requested thumbs-up did not produce an observed feedback state or reranked card order, so rerun/reset equivalence could not be established. Evidence: search_to_export_pipeline_tracks-shared.png"
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_run_and_search_integrity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Start a re-index run, pause it mid-run, run a search and open a result's detail panel, then resume the run: the run continues from exactly the paused step with earlier timestamps unchanged, and the search results and panel remain intact \u2014 neither flow corrupted the other",
+        "reasoning": "A re-index run was started and paused, a search returned 15 results, a document detail panel remained open, and resume returned the run to running without losing either search results or detail content. Evidence: interleaved_run_and_search_integrity-shared.png"
+      },
+      {
+        "id": "14.8",
+        "name": "undo_redo_round_trip_tracks_derived",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Delete a document that appears in the current results, confirm the card disappears and the index statistics drop by one, undo and confirm both the card and statistics return, then redo and confirm they drop again \u2014 derived surfaces track through every transition",
+        "reasoning": "FAIL: Delete, undo, and redo changed the result count 15\u219214\u219215\u219214, but the full required statistics checks at each transition were not directly observed end-to-end. Evidence: undo_redo_round_trip_tracks_derived-shared.png"
+      },
+      {
+        "id": "14.9",
+        "name": "library_package_import_export_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Add a document with a distinctive title and save a uniquely named search, open Library package export and note documents length and that saved search name, delete documents until the count diverges, Import the earlier package JSON, then confirm the index list count, the saved search name, and a fresh Library package export reconstruct to match the imported document \u2014 including schemaVersion 1 and library exactly Semantic Search Library",
+        "reasoning": "FAIL: Library package export was observed with schemaVersion 1 and library \"Semantic Search Library\", but the required add/save/delete/import/re-export round trip was not completed. Evidence: library_package_import_export_round_trip-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"multi_facet_reload_reset\":{\"score\":\"yes\",\"reasoning\":\"Reload returned the seeded baseline: empty query/history, no added document, default threshold, and no feedback. Evidence: multi_facet_reload_reset-shared.png\"},\"search_to_export_pipeline_tracks\":{\"score\":\"no\",\"reasoning\":\"FAIL: The Search report exported threshold 0.45 and three visible results, but the thumbs-up feedback was exported as \\\"none\\\" instead of matching the requested boosted card. Evidence: search_to_export_pipeline_tracks-shared.png\"},\"add_index_search_pipeline\":{\"score\":\"no\",\"reasoning\":\"FAIL: The new document showed stale count 1 and no search match, but indexing did not complete successfully; the run reached a failed step and stale remained 1. Evidence: add_index_search_pipeline-shared.png\"},\"different_queries_different_rankings\":{\"score\":\"yes\",\"reasoning\":\"The React and data-engineering queries produced distinct rankings, scores, explanations, and visible result sets; Compare showed 0 overlap and 12 unique results on each side. Evidence: different_queries_different_rankings-shared-final.png\"},\"threshold_count_delta_exact\":{\"score\":\"yes\",\"reasoning\":\"The query returned 15 results at baseline; raising the threshold to 0.45 produced 3 results, hiding exactly 12, and grouped results showed one group totaling 3. Evidence: threshold_count_delta_exact-shared.png\"},\"feedback_rerank_and_reset_round_trip\":{\"score\":\"no\",\"reasoning\":\"FAIL: The requested thumbs-up did not produce an observed feedback state or reranked card order, so rerun/reset equivalence could not be established. Evidence: search_to_export_pipeline_tracks-shared.png\"},\"interleaved_run_and_search_integrity\":{\"score\":\"yes\",\"reasoning\":\"A re-index run was started and paused, a search returned 15 results, a document detail panel remained open, and resume returned the run to running without losing either search results or detail content. Evidence: interleaved_run_and_search_integrity-shared.png\"},\"undo_redo_round_trip_tracks_derived\":{\"score\":\"no\",\"reasoning\":\"FAIL: Delete, undo, and redo changed the result count 15\u219214\u219215\u219214, but the full required statistics checks at each transition were not directly observed end-to-end. Evidence: undo_redo_round_trip_tracks_derived-shared.png\"},\"library_package_import_export_round_trip\":{\"score\":\"no\",\"reasoning\":\"FAIL: Library package export was observed with schemaVersion 1 and library \\\"Semantic Search Library\\\", but the required add/save/delete/import/re-export round trip was not completed. Evidence: library_package_import_export_round_trip-shared.png\"}}",
+    "cost_usd": 0.503936
+  },
+  "core_features": {
+    "score": 0.3929,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "seeded_corpus_and_index_stats",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On first load the index panel reports at least 120 seeded documents spanning at least 6 topics and using all six closed document types (guide, reference, prompt, checklist, paper, note), its document list shows entries with realistic multi-sentence content, and the index statistics (total indexed, stale count, last build time, distinct term count) render with values consistent with the library",
+        "reasoning": "120 documents, 6 document types, realistic entries, and consistent index statistics were observed. Evidence: seeded_corpus_and_index_stats-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "ranked_result_card_anatomy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Running a query via Enter or the Search control renders a ranked list of document cards, each showing the document title, a type tag, its topic tags, a similarity score badge with a monospace numeric value between 0.00 and 1.00, and a two-line excerpt whose most relevant passage carries a distinct highlight background",
+        "reasoning": "Search results showed titled cards with type/topic tags, numeric scores, excerpts, and highlighted terms. Evidence: ranked_result_card_anatomy-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "descending_order_and_determinism",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The result list is sorted by similarity score descending, a visible count above the results states how many match, and re-running the same query with unchanged corpus, threshold, and feedback returns the same ranked order both times",
+        "reasoning": "FAIL: Descending scores and result counts were observed, but identical rerun order under unchanged conditions was not fully verified. Evidence: ranked_result_card_anatomy-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "syntax_chips_parse_and_combine",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typing structured tokens (tag:, type:, before: followed by a value) in the query turns each token into a removable chip above the results when the query runs, a query combining tag, type, and before tokens applies all filters together, and the result count reflects the combination while the free-text remainder still drives the semantic ranking",
+        "reasoning": "Combined tag:, type:, and before: tokens rendered as chips and reduced results to 5 while retaining semantic text ranking. Evidence: ranked_result_card_anatomy-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "chip_removal_and_unknown_token_notice",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Removing a filter chip re-runs the query without that filter and the visible count updates; removing all chips restores unfiltered results; a token with an unknown tag or type value shows an inline notice naming the unmatched value while the remaining valid tokens still apply",
+        "reasoning": "FAIL: Unknown tag notice was observed, but chip removal and restoration of unfiltered results were not completed. Evidence: ranked_result_card_anatomy-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "threshold_slider_filters_live",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A similarity threshold slider from 0.0 to 1.0 in 0.05 increments hides result cards whose score is below the selected value, and the visible result count updates immediately as the slider moves, without re-running the query",
+        "reasoning": "The real slider advanced in 0.05 increments and threshold 1.00 immediately produced 0 results. Evidence: empty_state_recovery-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "feedback_reranks_persists_and_resets",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Thumbs-up on a result visibly boosts its position and score in the current query's ranking and thumbs-down demotes it, the affected card shows a feedback marker, re-running the same query reproduces the adjusted ranking, and a Reset Feedback control restores the unadjusted order",
+        "reasoning": "FAIL: Up/down feedback visibly changed scores and markers, but rerun persistence and reset restoration were not fully completed. Evidence: feedback_reranks_persists_and_resets-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "score_explanation_disclosure",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Each result card has a collapsed-by-default explanation disclosure that expands on activation with a rotating chevron to reveal matched terms with per-term contribution bars and values (plus any feedback adjustment line), remembers its open state per result while the app is open, and shows different terms and contributions for two different results consistent with their excerpts",
+        "reasoning": "FAIL: Explanation expanded with matched terms, contribution value, and feedback adjustment, but different contributions across two expanded results were not fully verified. Evidence: feedback_reranks_persists_and_resets-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "keyword_fallback_labeled",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A query that returns zero semantic results with similarity at or above 0.2 falls back to keyword matching, the results section is labeled Keyword results (no semantic matches above threshold), and fallback cards still show the matched words via the highlighted excerpt",
+        "reasoning": "FAIL: A labeled keyword-fallback state was not observed. Evidence: ranked_result_card_anatomy-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "topic_clustering_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Group by topic toggle regroups the ranked list into expandable topic groups whose header counts sum to the total result count, expanding or collapsing a group shows or hides only that group's cards, and toggling grouping off restores the flat ranked order",
+        "reasoning": "FAIL: Topic grouping and counts were observed, but reliable collapse/expand and flat-order restoration were not completed. Evidence: ranked_result_card_anatomy-shared.png"
+      },
+      {
+        "id": "1.11",
+        "name": "detail_panel_related_and_breadcrumbs",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Clicking a result card opens a side panel with the document's full body, type, tags, and a Related section of exactly three next-most-similar documents with similarity values that differ between two different documents; clicking a related row shows that document in the same panel and pushes a breadcrumb, clicking an earlier breadcrumb navigates back, and the panel closes via its close control or Escape",
+        "reasoning": "The detail panel showed full body, type, tags, exactly three related rows with differing scores, breadcrumbs, related navigation, and Escape close. Evidence: detail_panel_related_and_breadcrumbs-shared.png"
+      },
+      {
+        "id": "1.12",
+        "name": "command_palette_fuzzy_and_keyboard",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Pressing Cmd+K or Ctrl+K opens a command palette whose input fuzzy-matches across document titles, saved searches, and app commands with matches updating on every keystroke; arrow keys move the highlight, Enter activates the highlighted entry (opening a document, running a saved search, or invoking a command), and Escape closes the palette",
+        "reasoning": "Ctrl+K opened the palette; typing filtered matches, arrow navigation was available, and Enter activated the history command. Evidence: history_timeline_appends-shared.png"
+      },
+      {
+        "id": "1.13",
+        "name": "arrow_key_result_selection",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "With results on screen, ArrowDown and ArrowUp move a visible selection highlight through the result cards and Enter opens the selected card's detail panel",
+        "reasoning": "FAIL: ArrowDown did not produce a single visible result selection highlight or open a selected result with Enter. Evidence: arrow_key_result_selection-shared.png"
+      },
+      {
+        "id": "1.14",
+        "name": "history_timeline_appends",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every executed query appends a history entry showing the query text, its chips, a timestamp, and the result count at execution, with entries ordered newest first",
+        "reasoning": "History showed four newest-first entries with query text, timestamps, and result counts. Evidence: history_timeline_appends-shared.png"
+      },
+      {
+        "id": "1.15",
+        "name": "save_search_validation_and_rerun",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Save search form keeps its Save control disabled until the required name is non-empty, saving with an empty name shows an inline message naming the name field and adds nothing, a successfully saved search appears in the Saved list, clicking a saved search or history entry re-runs that query restoring its chips and threshold, and a saved search's Delete action requires confirmation",
+        "reasoning": "FAIL: Disabled empty-name validation and successful saved-search creation were observed, but delete confirmation and full rerun restoration were not completed. Evidence: save_search_validation_and_rerun-shared.png"
+      },
+      {
+        "id": "1.16",
+        "name": "history_bulk_delete_exact",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "History entries support checkbox multi-selection that reveals a contextual action bar with Delete selected (its confirmation naming the selected count) and Clear selection; confirming removes exactly the selected entries and leaves the rest",
+        "reasoning": "BLOCKED: The history bulk-selection confirmation workflow was not reached and verified. Evidence: history_timeline_appends-shared.png"
+      },
+      {
+        "id": "1.17",
+        "name": "compare_queries_overlap_and_diff",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Compare view shows two chosen queries' result sets side by side with documents in both sets marked as overlap in both columns and side-unique documents carrying a distinct marker, a summary line states the overlap count and each side's unique count consistently with the columns, and changing either selected query updates the columns and summary without a reload",
+        "reasoning": "Two queries rendered side-by-side with overlap/unique markers and consistent 0 overlap, 12 unique left, and 12 unique right summary. Evidence: compare_queries_overlap_and_diff-shared.png"
+      },
+      {
+        "id": "1.18",
+        "name": "add_document_validates_and_marks_stale",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Add document form keeps its Add control disabled until title, body, and type are valid and shows an inline message naming an empty required field without adding; a valid submission adds the document to the index panel's list immediately, increases the stale count by exactly one, and the new document does not appear in search results before a rebuild",
+        "reasoning": "A valid document was added immediately, increasing documents to 121 and stale count to 1; it was not searchable before rebuild. Evidence: add_document_validates_and_marks_stale-shared.png"
+      },
+      {
+        "id": "1.19",
+        "name": "index_bulk_actions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The index panel's document list supports checkbox multi-selection with a contextual action bar offering Delete selected (confirmation naming the count) and Mark stale; bulk deleting removes exactly the selected documents and the index statistics update to match",
+        "reasoning": "BLOCKED: Bulk selection, confirmation, deletion, and Mark stale were not reached and verified. Evidence: add_document_validates_and_marks_stale-shared.png"
+      },
+      {
+        "id": "1.20",
+        "name": "reindex_run_steps_and_status_bar",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Index Now starts a simulated re-index decomposed into one visible ingest step per document, each showing the document title and a status advancing through pending, running, and complete or failed; while active the status bar shows Indexing with running progress M/N and on completion it shows Indexed N documents",
+        "reasoning": "Indexing visibly showed per-document pending/running/complete states, progress, elapsed time, and ultimately 121/121 ingested. Evidence: reindex_run_steps_and_status_bar-shared.png"
+      },
+      {
+        "id": "1.21",
+        "name": "retry_backoff_and_resume_from_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A simulated ingest failure retries automatically with a visible backoff countdown and attempt counter (such as retry 2 of 3); a step that exhausts retries is marked failed with an inline error summary and a manual Retry control, and activating it resumes the run from that step while earlier completed steps keep their original timestamps and never re-execute",
+        "reasoning": "A failure showed retry backoff, attempt 2 of 3, failed count and Retry failed step; retry resumed from 93/121 with earlier steps complete. Evidence: reindex_run_steps_and_status_bar-shared.png"
+      },
+      {
+        "id": "1.22",
+        "name": "pause_resume_rollup_timeline",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Pausing a running re-index freezes progression at the current document and resuming continues from exactly that step; a rollup showing documents ingested out of total, elapsed time, and failure count derives live from the step states, and an ordered event timeline of step transitions with timestamps can be filtered by status",
+        "reasoning": "FAIL: Live rollup and timestamped timeline were observed, but pause/resume did not visibly freeze and continue at a verified exact step. Evidence: reindex_run_steps_and_status_bar-shared.png"
+      },
+      {
+        "id": "1.23",
+        "name": "rebuild_makes_stale_searchable",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After the re-index run completes, a query matching a previously stale document's content returns it with a similarity score, and the stale count returns to zero",
+        "reasoning": "FAIL: Rebuild completed with stale count 0, but searching for the added document did not return it. Evidence: reindex_run_steps_and_status_bar-shared.png"
+      },
+      {
+        "id": "1.24",
+        "name": "undo_redo_with_labels",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Undo and Redo controls revert and reapply document additions, deletions, bulk deletions, feedback marks, and saved-search changes, each showing the label of the action it will affect and disabling when its stack is empty; undoing a document deletion restores the document to the library and index statistics, and redo removes it again",
+        "reasoning": "FAIL: Undo and Redo visibly reverted and reapplied Add document with labels, but the required deletion, feedback, and saved-search action coverage was not completed. Evidence: add_document_validates_and_marks_stale-shared.png"
+      },
+      {
+        "id": "1.25",
+        "name": "export_report_live_and_copyable",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Export modal's Search report tab shows JSON under the SearchReport field contract \u2014 schemaVersion exactly 1, generatedAt ending in Z, request with query, filters (kind one of tag|type|before and value), and threshold, plus results hits each with id, title, type one of guide|reference|prompt|checklist|paper|note, score to two decimals, snippet, highlights, and feedback one of up|down|none \u2014 the JSON parses without error, matches on-screen ranking after threshold and feedback changes, and Download and Copy emit the visible text with Copy showing a confirmation",
+        "reasoning": "FAIL: Search-report JSON visibly matched the contract and Download/Copy controls existed, but Copy produced no visible confirmation. Evidence: export_report_live_and_copyable-shared.png"
+      },
+      {
+        "id": "1.27",
+        "name": "document_and_saved_search_field_contracts",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Add document submits a DocumentUpsert shape \u2014 title 1\u2013200 trimmed, body at least 20 characters trimmed, type exactly one of guide|reference|prompt|checklist|paper|note, tags 0\u201312 unique non-empty strings \u2014 keeping Add disabled with named field errors when invalid; Save search submits a SavedSearch shape with unique name 1\u201380, query, filters, and threshold, rejecting empty or duplicate names with an inline name error and storing nothing",
+        "reasoning": "FAIL: Valid document and saved-search creation worked, but all invalid-field, duplicate-name, and named-error branches were not fully verified. Evidence: add_document_validates_and_marks_stale-shared.png"
+      },
+      {
+        "id": "1.28",
+        "name": "library_package_export_and_import_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Export modal's Library package tab shows JSON with schemaVersion exactly 1, library exactly Semantic Search Library, documents as DocumentUpsert objects including id, savedSearches as SavedSearch objects, and generatedAt ending in Z; adding a document or saving a search updates those arrays on reopen; Import of a previously exported package restores the corpus and saved list so a fresh export matches, while malformed packages show a named error and change nothing",
+        "reasoning": "FAIL: Library package export showed schemaVersion 1, library name, documents, and saved searches, but import round-trip and malformed-package behavior were not completed. Evidence: export_report_live_and_copyable-shared.png"
+      },
+      {
+        "id": "1.26",
+        "name": "empty_state_recovery",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A query matching nothing even by keyword, or a threshold set above the top score, shows an empty state explaining that no documents matched and offering a control that clears chips and resets the threshold; using it restores results",
+        "reasoning": "FAIL: Threshold 1.00 produced an empty result state, but the clear/reset recovery control was not observed restoring results. Evidence: empty_state_recovery-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"seeded_corpus_and_index_stats\":{\"score\":\"yes\",\"reasoning\":\"120 documents, 6 document types, realistic entries, and consistent index statistics were observed. Evidence: seeded_corpus_and_index_stats-shared.png\"},\"ranked_result_card_anatomy\":{\"score\":\"yes\",\"reasoning\":\"Search results showed titled cards with type/topic tags, numeric scores, excerpts, and highlighted terms. Evidence: ranked_result_card_anatomy-shared.png\"},\"descending_order_and_determinism\":{\"score\":\"no\",\"reasoning\":\"FAIL: Descending scores and result counts were observed, but identical rerun order under unchanged conditions was not fully verified. Evidence: ranked_result_card_anatomy-shared.png\"},\"syntax_chips_parse_and_combine\":{\"score\":\"yes\",\"reasoning\":\"Combined tag:, type:, and before: tokens rendered as chips and reduced results to 5 while retaining semantic text ranking. Evidence: ranked_result_card_anatomy-shared.png\"},\"chip_removal_and_unknown_token_notice\":{\"score\":\"no\",\"reasoning\":\"FAIL: Unknown tag notice was observed, but chip removal and restoration of unfiltered results were not completed. Evidence: ranked_result_card_anatomy-shared.png\"},\"threshold_slider_filters_live\":{\"score\":\"yes\",\"reasoning\":\"The real slider advanced in 0.05 increments and threshold 1.00 immediately produced 0 results. Evidence: empty_state_recovery-shared.png\"},\"feedback_reranks_persists_and_resets\":{\"score\":\"no\",\"reasoning\":\"FAIL: Up/down feedback visibly changed scores and markers, but rerun persistence and reset restoration were not fully completed. Evidence: feedback_reranks_persists_and_resets-shared.png\"},\"score_explanation_disclosure\":{\"score\":\"no\",\"reasoning\":\"FAIL: Explanation expanded with matched terms, contribution value, and feedback adjustment, but different contributions across two expanded results were not fully verified. Evidence: feedback_reranks_persists_and_resets-shared.png\"},\"keyword_fallback_labeled\":{\"score\":\"no\",\"reasoning\":\"FAIL: A labeled keyword-fallback state was not observed. Evidence: ranked_result_card_anatomy-shared.png\"},\"topic_clustering_round_trip\":{\"score\":\"no\",\"reasoning\":\"FAIL: Topic grouping and counts were observed, but reliable collapse/expand and flat-order restoration were not completed. Evidence: ranked_result_card_anatomy-shared.png\"},\"detail_panel_related_and_breadcrumbs\":{\"score\":\"yes\",\"reasoning\":\"The detail panel showed full body, type, tags, exactly three related rows with differing scores, breadcrumbs, related navigation, and Escape close. Evidence: detail_panel_related_and_breadcrumbs-shared.png\"},\"command_palette_fuzzy_and_keyboard\":{\"score\":\"yes\",\"reasoning\":\"Ctrl+K opened the palette; typing filtered matches, arrow navigation was available, and Enter activated the history command. Evidence: history_timeline_appends-shared.png\"},\"arrow_key_result_selection\":{\"score\":\"no\",\"reasoning\":\"FAIL: ArrowDown did not produce a single visible result selection highlight or open a selected result with Enter. Evidence: arrow_key_result_selection-shared.png\"},\"history_timeline_appends\":{\"score\":\"yes\",\"reasoning\":\"History showed four newest-first entries with query text, timestamps, and result counts. Evidence: history_timeline_appends-shared.png\"},\"save_search_validation_and_rerun\":{\"score\":\"no\",\"reasoning\":\"FAIL: Disabled empty-name validation and successful saved-search creation were observed, but delete confirmation and full rerun restoration were not completed. Evidence: save_search_validation_and_rerun-shared.png\"},\"history_bulk_delete_exact\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The history bulk-selection confirmation workflow was not reached and verified. Evidence: history_timeline_appends-shared.png\"},\"compare_queries_overlap_and_diff\":{\"score\":\"yes\",\"reasoning\":\"Two queries rendered side-by-side with overlap/unique markers and consistent 0 overlap, 12 unique left, and 12 unique right summary. Evidence: compare_queries_overlap_and_diff-shared.png\"},\"add_document_validates_and_marks_stale\":{\"score\":\"yes\",\"reasoning\":\"A valid document was added immediately, increasing documents to 121 and stale count to 1; it was not searchable before rebuild. Evidence: add_document_validates_and_marks_stale-shared.png\"},\"index_bulk_actions\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Bulk selection, confirmation, deletion, and Mark stale were not reached and verified. Evidence: add_document_validates_and_marks_stale-shared.png\"},\"reindex_run_steps_and_status_bar\":{\"score\":\"yes\",\"reasoning\":\"Indexing visibly showed per-document pending/running/complete states, progress, elapsed time, and ultimately 121/121 ingested. Evidence: reindex_run_steps_and_status_bar-shared.png\"},\"retry_backoff_and_resume_from_step\":{\"score\":\"yes\",\"reasoning\":\"A failure showed retry backoff, attempt 2 of 3, failed count and Retry failed step; retry resumed from 93/121 with earlier steps complete. Evidence: reindex_run_steps_and_status_bar-shared.png\"},\"pause_resume_rollup_timeline\":{\"score\":\"no\",\"reasoning\":\"FAIL: Live rollup and timestamped timeline were observed, but pause/resume did not visibly freeze and continue at a verified exact step. Evidence: reindex_run_steps_and_status_bar-shared.png\"},\"rebuild_makes_stale_searchable\":{\"score\":\"no\",\"reasoning\":\"FAIL: Rebuild completed with stale count 0, but searching for the added document did not return it. Evidence: reindex_run_steps_and_status_bar-shared.png\"},\"undo_redo_with_labels\":{\"score\":\"no\",\"reasoning\":\"FAIL: Undo and Redo visibly reverted and reapplied Add document with labels, but the required deletion, feedback, and saved-search action coverage was not completed. Evidence: add_document_validates_and_marks_stale-shared.png\"},\"export_report_live_and_copyable\":{\"score\":\"no\",\"reasoning\":\"FAIL: Search-report JSON visibly matched the contract and Download/Copy controls existed, but Copy produced no visible confirmation. Evidence: export_report_live_and_copyable-shared.png\"},\"document_and_saved_search_field_contracts\":{\"score\":\"no\",\"reasoning\":\"FAIL: Valid document and saved-search creation worked, but all invalid-field, duplicate-name, and named-error branches were not fully verified. Evidence: add_document_validates_and_marks_stale-shared.png\"},\"library_package_export_and_import_round_trip\":{\"score\":\"no\",\"reasoning\":\"FAIL: Library package export showed schemaVersion 1, library name, documents, and saved searches, but import round-trip and malformed-package behavior were not completed. Evidence: export_report_live_and_copyable-shared.png\"},\"empty_state_recovery\":{\"score\":\"no\",\"reasoning\":\"FAIL: Threshold 1.00 produced an empty result state, but the clear/reset recovery control was not observed restoring results. Evidence: empty_state_recovery-shared.png\"}}",
+    "cost_usd": 2.0613008
+  },
+  "design_fidelity": {
+    "score": 0.625,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "spacing_and_sizing_follow_scale",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Spacing and sizing follow a consistent design-system scale across cards, panels, and forms, with no arbitrary one-off values visible in computed styles",
+        "reasoning": "Consistent 8/16/24px-style spacing and aligned card/panel sizing observed. Evidence: spacing_and_sizing_follow_scale-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "specified_treatments_implemented",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The treatments the spec calls out exist as described: the monospace score badge, the scoped excerpt highlight, the score-scaled accent bar, and the warning-treated stale count",
+        "reasoning": "FAIL: Monospace score badges, excerpt highlights, and accent bars are present, but a warning-treated stale count was not observed. Evidence: specified_treatments_implemented-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "layout_matches_specified_composition",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The desktop layout matches the specified composition \u2014 main search column, right detail panel area, left rail with history, saved, compare, and index sections",
+        "reasoning": "Desktop view shows the main search/results column, left workspace rail, and right-side document detail panel. Evidence: layout_matches_specified_composition-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "specified_state_changes_animate",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The state changes the spec calls out animate: staggered result entrances, panel slide, re-rank movement, disclosure expansion, and countdown ticking",
+        "reasoning": "FAIL: Result items and disclosure controls reported 0s transition durations/delays; required staggered entrances, panel slide, rerank movement, and countdown animation were not observed. Evidence: specified_treatments_implemented-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "responsive_behavior_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Responsive behavior matches the spec: the rail collapses behind a toggle at 768 pixels and below, the detail panel becomes a full-width overlay, and 375 pixels shows no page-level horizontal scroll",
+        "reasoning": "At 375px the rail is hidden behind an Open workspace rail toggle, the detail view becomes full-width, and measured document scroll width does not exceed the viewport. Evidence: responsive_behavior_matches_spec-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "control_styling_cohesive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, tags, sliders, and form controls share cohesive radii, padding, and depth treatments rather than mixing unrelated styles",
+        "reasoning": "Buttons, search controls, sliders, and tags use a consistent square Carbon-like treatment, shared spacing, borders, and depth conventions. Evidence: specified_treatments_implemented-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "typography_has_clear_hierarchy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography distinguishes app title, panel headings, card titles, and body/metadata text as specified",
+        "reasoning": "Observed distinct typography levels for the app title, section headings, result titles, metadata, and monospace score badges. Evidence: spacing_and_sizing_follow_scale-shared.png"
+      },
+      {
+        "id": "3.8",
+        "name": "component_states_match_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Default, hover, focus, disabled, and error states are all present and visually distinct on interactive controls, as specified",
+        "reasoning": "FAIL: Hover color change and disabled controls were observed, but no distinct validation/error state was produced after submitting an empty search. Evidence: specified_treatments_implemented-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"spacing_and_sizing_follow_scale\":{\"score\":\"yes\",\"reasoning\":\"Consistent 8/16/24px-style spacing and aligned card/panel sizing observed. Evidence: spacing_and_sizing_follow_scale-shared.png\"},\"specified_treatments_implemented\":{\"score\":\"no\",\"reasoning\":\"FAIL: Monospace score badges, excerpt highlights, and accent bars are present, but a warning-treated stale count was not observed. Evidence: specified_treatments_implemented-shared.png\"},\"layout_matches_specified_composition\":{\"score\":\"yes\",\"reasoning\":\"Desktop view shows the main search/results column, left workspace rail, and right-side document detail panel. Evidence: layout_matches_specified_composition-shared.png\"},\"specified_state_changes_animate\":{\"score\":\"no\",\"reasoning\":\"FAIL: Result items and disclosure controls reported 0s transition durations/delays; required staggered entrances, panel slide, rerank movement, and countdown animation were not observed. Evidence: specified_treatments_implemented-shared.png\"},\"responsive_behavior_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"At 375px the rail is hidden behind an Open workspace rail toggle, the detail view becomes full-width, and measured document scroll width does not exceed the viewport. Evidence: responsive_behavior_matches_spec-shared.png\"},\"control_styling_cohesive\":{\"score\":\"yes\",\"reasoning\":\"Buttons, search controls, sliders, and tags use a consistent square Carbon-like treatment, shared spacing, borders, and depth conventions. Evidence: specified_treatments_implemented-shared.png\"},\"typography_has_clear_hierarchy\":{\"score\":\"yes\",\"reasoning\":\"Observed distinct typography levels for the app title, section headings, result titles, metadata, and monospace score badges. Evidence: spacing_and_sizing_follow_scale-shared.png\"},\"component_states_match_spec\":{\"score\":\"no\",\"reasoning\":\"FAIL: Hover color change and disabled controls were observed, but no distinct validation/error state was produced after submitting an empty search. Evidence: specified_treatments_implemented-shared.png\"}}",
+    "cost_usd": 0.5673686
+  },
+  "edge_cases": {
+    "score": 0.4545,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "no_match_empty_state_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A query that matches nothing even by keyword renders a designed empty state explaining that no documents matched and suggesting removing filters or lowering the threshold, with a working recovery control",
+        "reasoning": "A nonsense query produced a designed \u201cNo documents matched\u201d state with guidance to remove filters or lower the score and a working recovery button. Evidence: no-match-empty-state_present-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "forms_validate_inline_before_submit",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Save search and Add document forms validate inline before submit under their field contracts \u2014 empty or duplicate saved-search name, empty title, body shorter than 20 characters, or type outside guide|reference|prompt|checklist|paper|note name the field, and the submit controls stay disabled until the form is valid",
+        "reasoning": "Save Search and Add Document showed disabled submit controls until valid; short body showed the inline error \u201cbody must contain at least 20 characters,\u201d and duplicate names showed \u201cname must be unique.\u201d Evidence: forms_validate_inline_before_submit-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "errors_are_actionable",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Error and notice copy is actionable: the unknown-token notice names the unmatched value, the duplicate saved-search message names the conflict, and the failed-step summary explains what failed",
+        "reasoning": "FAIL: Duplicate-name and failed-step messages were actionable, but the required unknown-token notice naming the unmatched value was not directly exercised. Evidence: forms_validate_inline_before_submit-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "actions_show_confirmation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Saving a search, copying a report, deleting entries, and completing a re-index each produce visible success feedback (toast or inline confirmation)",
+        "reasoning": "FAIL: Save and copy actions showed success feedback, but delete and completed re-index confirmations were not both observed end-to-end. Evidence: actions_show_confirmation-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "simulated_work_shows_progress",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The simulated re-index shows live progress affordances \u2014 per-step statuses, the M/N status bar, and the backoff countdown \u2014 rather than an unexplained wait",
+        "reasoning": "Re-indexing displayed live per-step statuses, an M/N progress counter, elapsed progress, pause control, and retry/backoff status. Evidence: simulated_work_shows_progress-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "destructive_actions_guarded_and_undoable",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Destructive actions are guarded and recoverable: single and bulk deletions require confirmation naming the scope, and document deletions can be reverted via Undo",
+        "reasoning": "BLOCKED: The document selection/delete control could not be reached through real pointer interaction after the permitted retry because pointer events were intercepted, so confirmation and Undo could not be verified. Evidence: actions_show_confirmation-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "syntax_and_shortcuts_discoverable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Non-obvious features are discoverable in-app: the search syntax (tag:, type:, before:) and the Cmd+K shortcut are surfaced through placeholder text, hints, or tooltips",
+        "reasoning": "The UI visibly surfaced tag:, type:, and before: syntax plus the Cmd/Ctrl+K shortcut hint. Evidence: static-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "controls_use_semantic_tags",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, inputs, checkboxes, and the slider use semantic interactive elements with real labels rather than bare div or span wrappers",
+        "reasoning": "Observed controls were native buttons, inputs, checkboxes, a combobox, a switch, and a range slider with labels. Evidence: static-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "overlays_support_close_paths",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The export modal, save-search form, and command palette close via their close control, Escape, and (for modals) a background click",
+        "reasoning": "FAIL: Export, Save Search, and Command Palette were reachable and closable via controls/Escape, but the required modal background-click close path was not verified. Evidence: actions_show_confirmation-shared.png"
+      },
+      {
+        "id": "4.10",
+        "name": "boundary_values_handled",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Boundary inputs behave: threshold at exactly 0.0 shows all results and at 1.0 hides all but perfect scores, a title longer than 80 characters truncates with an ellipsis on the card and shows in full in the panel, and undo/redo at empty stacks are disabled",
+        "reasoning": "FAIL: Threshold 0.0 showed all results and 1.0 showed none, and empty Undo/Redo were disabled, but the required >80-character title truncation/full-panel behavior was not verified. Evidence: boundary_values_handled-shared.png"
+      },
+      {
+        "id": "4.11",
+        "name": "invalid_library_package_import_rejected",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Importing malformed Library package JSON, schemaVersion other than 1, library other than Semantic Search Library, or a document or saved search that fails its field contract leaves the corpus and saved list unchanged and shows a visible error naming the problem",
+        "reasoning": "FAIL: Malformed `{}` import was rejected with the visible error \u201cschemaVersion: Invalid input: expected 1\u201d while data remained intact, but the other required invalid package/document cases were not exercised. Evidence: invalid_library_package_import_rejected-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"no_match_empty_state_present\":{\"score\":\"yes\",\"reasoning\":\"A nonsense query produced a designed \u201cNo documents matched\u201d state with guidance to remove filters or lower the score and a working recovery button. Evidence: no-match-empty-state_present-shared.png\"},\"forms_validate_inline_before_submit\":{\"score\":\"yes\",\"reasoning\":\"Save Search and Add Document showed disabled submit controls until valid; short body showed the inline error \u201cbody must contain at least 20 characters,\u201d and duplicate names showed \u201cname must be unique.\u201d Evidence: forms_validate_inline_before_submit-shared.png\"},\"errors_are_actionable\":{\"score\":\"no\",\"reasoning\":\"FAIL: Duplicate-name and failed-step messages were actionable, but the required unknown-token notice naming the unmatched value was not directly exercised. Evidence: forms_validate_inline_before_submit-shared.png\"},\"actions_show_confirmation\":{\"score\":\"no\",\"reasoning\":\"FAIL: Save and copy actions showed success feedback, but delete and completed re-index confirmations were not both observed end-to-end. Evidence: actions_show_confirmation-shared.png\"},\"simulated_work_shows_progress\":{\"score\":\"yes\",\"reasoning\":\"Re-indexing displayed live per-step statuses, an M/N progress counter, elapsed progress, pause control, and retry/backoff status. Evidence: simulated_work_shows_progress-shared.png\"},\"destructive_actions_guarded_and_undoable\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The document selection/delete control could not be reached through real pointer interaction after the permitted retry because pointer events were intercepted, so confirmation and Undo could not be verified. Evidence: actions_show_confirmation-shared.png\"},\"syntax_and_shortcuts_discoverable\":{\"score\":\"yes\",\"reasoning\":\"The UI visibly surfaced tag:, type:, and before: syntax plus the Cmd/Ctrl+K shortcut hint. Evidence: static-shared.png\"},\"controls_use_semantic_tags\":{\"score\":\"yes\",\"reasoning\":\"Observed controls were native buttons, inputs, checkboxes, a combobox, a switch, and a range slider with labels. Evidence: static-shared.png\"},\"overlays_support_close_paths\":{\"score\":\"no\",\"reasoning\":\"FAIL: Export, Save Search, and Command Palette were reachable and closable via controls/Escape, but the required modal background-click close path was not verified. Evidence: actions_show_confirmation-shared.png\"},\"boundary_values_handled\":{\"score\":\"no\",\"reasoning\":\"FAIL: Threshold 0.0 showed all results and 1.0 showed none, and empty Undo/Redo were disabled, but the required >80-character title truncation/full-panel behavior was not verified. Evidence: boundary_values_handled-shared.png\"},\"invalid_library_package_import_rejected\":{\"score\":\"no\",\"reasoning\":\"FAIL: Malformed `{}` import was rejected with the visible error \u201cschemaVersion: Invalid input: expected 1\u201d while data remained intact, but the other required invalid package/document cases were not exercised. Evidence: invalid_library_package_import_rejected-shared.png\"}}",
+    "cost_usd": 0.7455056
+  },
+  "innovation": {
+    "score": 0.1818,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "delightful_microinteractions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app has unique, delightful microinteractions beyond the specified motion \u2014 for example score badges that animate their value, or chips that assemble from typed tokens",
+        "reasoning": "FAIL: No distinctive delightful microinteraction beyond the visible search, feedback, and expandable explanation controls was observed. Evidence: live-search-shared.png"
+      },
+      {
+        "id": "11.2",
+        "name": "advanced_motion_mechanics",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app has advanced animation mechanics beyond the spec, such as coordinated list choreography or physics-feeling re-rank movement",
+        "reasoning": "FAIL: No advanced coordinated or physics-like motion mechanics were observed during live interaction. Evidence: live-search-shared.png"
+      },
+      {
+        "id": "11.3",
+        "name": "guided_onboarding",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app has a guided onboarding or first-run explanation of the search syntax, palette shortcut, and index workflow",
+        "reasoning": "FAIL: The first view provides descriptive copy but no guided first-run explanation or walkthrough. Evidence: innovation-shared.png"
+      },
+      {
+        "id": "11.4",
+        "name": "enhanced_interactive_graphics",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Score explanations, compare views, or index statistics gain extra interactive visualization beyond the required bars and counts",
+        "reasoning": "FAIL: \u201cWhy this ranks\u201d expanded to textual weighted contributions; no additional interactive visualization beyond the required result metrics was observed. Evidence: score-explanation-shared.png"
+      },
+      {
+        "id": "11.5",
+        "name": "keyboard_shortcut_depth",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app supports a broader keyboard-shortcut surface than required (for example a shortcut reference overlay or shortcuts for feedback and saving)",
+        "reasoning": "The live Commands palette opened and exposed searchable commands plus keyboard controls for navigation, opening, and closing. Evidence: keyboard-shortcut-depth-shared.png"
+      },
+      {
+        "id": "11.6",
+        "name": "preference_personalization",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app provides personalization such as per-topic color coding, adjustable result density, or configurable default threshold",
+        "reasoning": "FAIL: Search controls include a minimum-score slider and topic grouping, but no user personalization such as density, topic color coding, or configurable defaults was observed. Evidence: live-search-shared.png"
+      },
+      {
+        "id": "11.7",
+        "name": "polished_product_narrative",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app presents a polished, coherent product identity \u2014 naming, empty states, and copy feel like one designed product rather than assembled panels",
+        "reasoning": "The rendered app consistently presents \u201cAtlas semantic library\u201d with coherent knowledge-operations branding, purposeful empty-state copy, and aligned search/index/export language. Evidence: innovation-shared.png"
+      },
+      {
+        "id": "11.8",
+        "name": "dynamic_theming_beyond_requirements",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app provides a theme or color mode beyond requirements, applied consistently across all surfaces",
+        "reasoning": "FAIL: No user-facing theme or color-mode control was observed. Evidence: innovation-shared.png"
+      },
+      {
+        "id": "11.9",
+        "name": "corpus_derived_suggestions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app offers query suggestions, related-search hints, or spark-lines of saved-search result history derived from the live corpus",
+        "reasoning": "FAIL: The live search produced ranked results and history, but no corpus-derived query suggestions, related-search hints, or result-history spark-lines were observed. Evidence: live-search-shared.png"
+      },
+      {
+        "id": "11.10",
+        "name": "competition_level_innovation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Competition-level innovation is visible to users beyond everything already listed",
+        "reasoning": "FAIL: No competition-level innovation beyond the listed enhancements was directly observed. Evidence: live-search-shared.png"
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "FAIL: No additional noteworthy browser-observable enhancement outside the covered categories was directly observed. Evidence: live-search-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"delightful_microinteractions\":{\"score\":\"no\",\"reasoning\":\"FAIL: No distinctive delightful microinteraction beyond the visible search, feedback, and expandable explanation controls was observed. Evidence: live-search-shared.png\"},\"advanced_motion_mechanics\":{\"score\":\"no\",\"reasoning\":\"FAIL: No advanced coordinated or physics-like motion mechanics were observed during live interaction. Evidence: live-search-shared.png\"},\"guided_onboarding\":{\"score\":\"no\",\"reasoning\":\"FAIL: The first view provides descriptive copy but no guided first-run explanation or walkthrough. Evidence: innovation-shared.png\"},\"enhanced_interactive_graphics\":{\"score\":\"no\",\"reasoning\":\"FAIL: \u201cWhy this ranks\u201d expanded to textual weighted contributions; no additional interactive visualization beyond the required result metrics was observed. Evidence: score-explanation-shared.png\"},\"keyboard_shortcut_depth\":{\"score\":\"yes\",\"reasoning\":\"The live Commands palette opened and exposed searchable commands plus keyboard controls for navigation, opening, and closing. Evidence: keyboard-shortcut-depth-shared.png\"},\"preference_personalization\":{\"score\":\"no\",\"reasoning\":\"FAIL: Search controls include a minimum-score slider and topic grouping, but no user personalization such as density, topic color coding, or configurable defaults was observed. Evidence: live-search-shared.png\"},\"polished_product_narrative\":{\"score\":\"yes\",\"reasoning\":\"The rendered app consistently presents \u201cAtlas semantic library\u201d with coherent knowledge-operations branding, purposeful empty-state copy, and aligned search/index/export language. Evidence: innovation-shared.png\"},\"dynamic_theming_beyond_requirements\":{\"score\":\"no\",\"reasoning\":\"FAIL: No user-facing theme or color-mode control was observed. Evidence: innovation-shared.png\"},\"corpus_derived_suggestions\":{\"score\":\"no\",\"reasoning\":\"FAIL: The live search produced ranked results and history, but no corpus-derived query suggestions, related-search hints, or result-history spark-lines were observed. Evidence: live-search-shared.png\"},\"competition_level_innovation\":{\"score\":\"no\",\"reasoning\":\"FAIL: No competition-level innovation beyond the listed enhancements was directly observed. Evidence: live-search-shared.png\"},\"innovation_catchall\":{\"score\":\"no\",\"reasoning\":\"FAIL: No additional noteworthy browser-observable enhancement outside the covered categories was directly observed. Evidence: live-search-shared.png\"}}",
+    "cost_usd": 0.1429028
+  },
+  "motion": {
+    "score": 0.4444,
+    "criteria": [
+      {
+        "id": "8.1",
+        "name": "staggered_result_entrance",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "On a new search run through the real Search control, result cards animate in staggered at roughly 40 milliseconds per card, fading and translating up from about 8 pixels below their final position rather than appearing all at once",
+        "reasoning": "FAIL: After real searches, result cards were fully opaque with no transform, animation, or staggered transition styles observed. Evidence: staggered_result_entrance.png"
+      },
+      {
+        "id": "8.2",
+        "name": "detail_panel_slide",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Clicking a result card slides the detail side panel in from the right over roughly 200 milliseconds, and closing it slides it out rather than snapping",
+        "reasoning": "The detail panel was observed mid-entry with partial opacity and a right-to-left translate transform, then it was closed through the real control. Evidence: detail_panel_slide.png"
+      },
+      {
+        "id": "8.3",
+        "name": "palette_transition_without_flicker",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening the command palette with the real keyboard shortcut shows a short opacity and scale entrance, and its match list updates without flicker or layout jumping while typing",
+        "reasoning": "The real Ctrl+K shortcut opened the palette with partial opacity and scale, and typing updated the match list cleanly without visible layout disruption. Evidence: palette_transition_without_flicker.png"
+      },
+      {
+        "id": "8.4",
+        "name": "feedback_rerank_slides",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Giving thumbs-up or thumbs-down through the real control makes the affected cards slide to their new ranking positions rather than snapping, so the boost or demotion reads as movement",
+        "reasoning": "FAIL: Real thumbs-up actions produced no positional change before, during, or after the expected reranking interval. Evidence: feedback_rerank_slides.png"
+      },
+      {
+        "id": "8.5",
+        "name": "disclosure_chevron_and_bars",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The score-explanation disclosure expands with its chevron rotating, and the per-term contribution bars grow from zero width when first revealed",
+        "reasoning": "Opening \u201cWhy this ranks\u201d showed the chevron rotating and contribution bars growing from near-zero width. Evidence: disclosure_chevron_and_bars.png"
+      },
+      {
+        "id": "8.6",
+        "name": "countdown_ticks_and_status_fades",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "During a re-index run started from the real Index Now control, the retry backoff countdown ticks visibly and a completing step's status transitions with a short fade rather than snapping",
+        "reasoning": "FAIL: The real Index Now run exposed a retry countdown, but the run entered a failed state and a completing-step fade was not observed. Evidence: countdown_ticks_and_status_fades.png"
+      },
+      {
+        "id": "8.7",
+        "name": "hover_system_required",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "While hovering with the real pointer: buttons ease background and shadow with a slight press effect on activation, result cards, history entries, and related rows take a full-width hover wash, and form controls show focus rings \u2014 verified via computed styles while hovering",
+        "reasoning": "FAIL: The Search button changed background on hover, but the hovered result card showed no background, shadow, or transform change; the required full hover system was therefore not satisfied. Evidence: hover_system_required.png"
+      },
+      {
+        "id": "8.8",
+        "name": "toasts_slide_and_dismiss",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Toasts for saves, deletions, copies, and index completion slide in, remain readable, and auto-dismiss with a fade",
+        "reasoning": "FAIL: A save toast was observed, but its slide-in, fade-out, and auto-dismiss behavior could not be directly established; indexing ended with a failure toast. Evidence: toasts_slide_and_dismiss.png"
+      },
+      {
+        "id": "8.9",
+        "name": "reduced_motion_complete",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, result cards appear immediately, the panel and palette appear instantly, and re-ranking applies without movement, while every feature remains fully usable",
+        "reasoning": "In the reduced-motion browser, media preference matched; result cards rendered immediately, the detail panel appeared instantly, and feedback remained usable without movement. Evidence: reduced_motion_complete.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"staggered_result_entrance\":{\"score\":\"no\",\"reasoning\":\"FAIL: After real searches, result cards were fully opaque with no transform, animation, or staggered transition styles observed. Evidence: staggered_result_entrance.png\"},\"detail_panel_slide\":{\"score\":\"yes\",\"reasoning\":\"The detail panel was observed mid-entry with partial opacity and a right-to-left translate transform, then it was closed through the real control. Evidence: detail_panel_slide.png\"},\"palette_transition_without_flicker\":{\"score\":\"yes\",\"reasoning\":\"The real Ctrl+K shortcut opened the palette with partial opacity and scale, and typing updated the match list cleanly without visible layout disruption. Evidence: palette_transition_without_flicker.png\"},\"feedback_rerank_slides\":{\"score\":\"no\",\"reasoning\":\"FAIL: Real thumbs-up actions produced no positional change before, during, or after the expected reranking interval. Evidence: feedback_rerank_slides.png\"},\"disclosure_chevron_and_bars\":{\"score\":\"yes\",\"reasoning\":\"Opening \u201cWhy this ranks\u201d showed the chevron rotating and contribution bars growing from near-zero width. Evidence: disclosure_chevron_and_bars.png\"},\"countdown_ticks_and_status_fades\":{\"score\":\"no\",\"reasoning\":\"FAIL: The real Index Now run exposed a retry countdown, but the run entered a failed state and a completing-step fade was not observed. Evidence: countdown_ticks_and_status_fades.png\"},\"hover_system_required\":{\"score\":\"no\",\"reasoning\":\"FAIL: The Search button changed background on hover, but the hovered result card showed no background, shadow, or transform change; the required full hover system was therefore not satisfied. Evidence: hover_system_required.png\"},\"toasts_slide_and_dismiss\":{\"score\":\"no\",\"reasoning\":\"FAIL: A save toast was observed, but its slide-in, fade-out, and auto-dismiss behavior could not be directly established; indexing ended with a failure toast. Evidence: toasts_slide_and_dismiss.png\"},\"reduced_motion_complete\":{\"score\":\"yes\",\"reasoning\":\"In the reduced-motion browser, media preference matched; result cards rendered immediately, the detail panel appeared instantly, and feedback remained usable without movement. Evidence: reduced_motion_complete.png\"}}",
+    "cost_usd": 0.4614558
+  },
+  "performance": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_is_under_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cold start to an interactive search input is under 2 seconds on local render",
+        "reasoning": "Interactive search input was available after local navigation in about 1.4 seconds. Evidence: cold_start_is_under_two_seconds-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "console_is_clean",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Browser devtools show no errors or warnings on load or while exercising search, palette, feedback, bulk operations, and a re-index run",
+        "reasoning": "No errors or warnings were reported on load or after exercising search, palette, indexing, and rapid interactions."
+      },
+      {
+        "id": "9.3",
+        "name": "search_and_palette_feel_instant",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Query results, palette fuzzy matches, and threshold filtering land within roughly 100 milliseconds of input with no perceptible lag",
+        "reasoning": "Search returned 15 results immediately, and palette fuzzy typing produced matching commands/documents without lag. Evidence: search_and_palette_feel_instant-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "simulated_work_has_progress_indicators",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The simulated re-index shows continuous progress (step statuses, M/N status bar) rather than a frozen or blank interface",
+        "reasoning": "The re-index run emitted continuous indexed events and retry status rather than remaining blank or frozen. Evidence: simulated_work_has_progress_indicators-shared.png"
+      },
+      {
+        "id": "9.5",
+        "name": "large_corpus_renders_without_lag",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A broad query matching most of the 120-plus-document corpus renders and scrolls its full result list smoothly without perceived lag or dropped frames",
+        "reasoning": "A broad query rendered 120 results; scrolling through the 24,912px page completed smoothly with ~45\u201379ms wheel-step timings. Evidence: large_corpus_renders_without_lag-shared.png"
+      },
+      {
+        "id": "9.6",
+        "name": "ui_interactive_during_run",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The UI remains fully interactive while a re-index run advances \u2014 searching, opening panels, and switching sections all work mid-run",
+        "reasoning": "While indexing activity was present, search and section navigation successfully changed views and returned results. Evidence: ui_interactive_during_run-shared.png"
+      },
+      {
+        "id": "9.7",
+        "name": "animations_maintain_smooth_frame_rate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Staggered entrances, re-rank slides, and panel transitions hold a smooth frame rate with no visible stutter",
+        "reasoning": "A panel transition measured 32 animation frames over 500ms with a 16.1ms average and 18.7ms maximum frame gap. Evidence: animations_maintain_smooth_frame_rate-shared.png"
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_input_does_not_freeze",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapid repeated input \u2014 fast palette typing, rapid slider drags, quick feedback clicks, fast section switches \u2014 never hangs or drops interactions",
+        "reasoning": "Rapid palette fills, slider key changes, feedback clicks, and repeated section switches completed with the UI functional afterward. Evidence: rapid_input_does_not_freeze-final.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_start_is_under_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"Interactive search input was available after local navigation in about 1.4 seconds. Evidence: cold_start_is_under_two_seconds-shared.png\"},\"console_is_clean\":{\"score\":\"yes\",\"reasoning\":\"No errors or warnings were reported on load or after exercising search, palette, indexing, and rapid interactions.\"},\"search_and_palette_feel_instant\":{\"score\":\"yes\",\"reasoning\":\"Search returned 15 results immediately, and palette fuzzy typing produced matching commands/documents without lag. Evidence: search_and_palette_feel_instant-shared.png\"},\"simulated_work_has_progress_indicators\":{\"score\":\"yes\",\"reasoning\":\"The re-index run emitted continuous indexed events and retry status rather than remaining blank or frozen. Evidence: simulated_work_has_progress_indicators-shared.png\"},\"large_corpus_renders_without_lag\":{\"score\":\"yes\",\"reasoning\":\"A broad query rendered 120 results; scrolling through the 24,912px page completed smoothly with ~45\u201379ms wheel-step timings. Evidence: large_corpus_renders_without_lag-shared.png\"},\"ui_interactive_during_run\":{\"score\":\"yes\",\"reasoning\":\"While indexing activity was present, search and section navigation successfully changed views and returned results. Evidence: ui_interactive_during_run-shared.png\"},\"animations_maintain_smooth_frame_rate\":{\"score\":\"yes\",\"reasoning\":\"A panel transition measured 32 animation frames over 500ms with a 16.1ms average and 18.7ms maximum frame gap. Evidence: animations_maintain_smooth_frame_rate-shared.png\"},\"rapid_input_does_not_freeze\":{\"score\":\"yes\",\"reasoning\":\"Rapid palette fills, slider key changes, feedback clicks, and repeated section switches completed with the UI functional afterward. Evidence: rapid_input_does_not_freeze-final.png\"}}",
+    "cost_usd": 0.26650939999999995
+  },
+  "responsiveness": {
+    "score": 0.8,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "layout_adapts_desktop_to_mobile",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The three-region layout adapts gracefully from 1440px desktop (rail, results, panel) to 375px mobile without breaking any of the search, index, or compare surfaces",
+        "reasoning": "Desktop uses a docked rail and wide main area; mobile collapses the rail and reflows search/results vertically, with compare/index still reachable. Evidence: layout-desktop-shared.png, mobile-results-shared.png"
+      },
+      {
+        "id": "7.2",
+        "name": "mobile_tap_targets_are_large_enough",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At mobile width, chips, feedback controls, checkboxes, and card actions are tap targets of at least 44px",
+        "reasoning": "FAIL: Most primary controls meet 44px, but observed detail/card actions include 32\u201334px wide buttons, below the 44px target. Evidence: mobile-detail-shared.png"
+      },
+      {
+        "id": "7.3",
+        "name": "typography_resizes_across_breakpoints",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Card titles, badges, and body text resize appropriately between desktop and mobile and remain readable at both",
+        "reasoning": "Desktop heading and card typography are large and horizontal; mobile typography visibly scales down and wraps while remaining readable. Evidence: layout-desktop-shared.png, mobile-results-shared.png"
+      },
+      {
+        "id": "7.4",
+        "name": "content_avoids_clipping_and_overflow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No result card, chip row, status bar, or panel content clips or overflows the viewport at any width between 1440px and 375px",
+        "reasoning": "At desktop, tablet, and mobile widths, cards, chips, search controls, status areas, and detail content remain within their available width and wrap appropriately. Evidence: layout-desktop-shared.png, mobile-results-shared.png, tablet-overlay-shared.png"
+      },
+      {
+        "id": "7.5",
+        "name": "rail_and_panel_adapt_below_768",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At widths of 768 pixels and below the left rail collapses behind a toggle that opens it as an overlay and the detail panel becomes a full-width overlay; at desktop widths both are docked and the rail is open by default",
+        "reasoning": "At 768px, the rail is fixed off-canvas at x=-336 with an open toggle, while the document detail panel is a fixed full-width overlay; desktop shows the rail docked open. Evidence: tablet-overlay-shared.png"
+      },
+      {
+        "id": "7.6",
+        "name": "stacking_reflows_logically",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At narrow widths the regions stack in a logical order \u2014 query controls first, then results, with secondary sections reachable \u2014 rather than interleaving arbitrarily",
+        "reasoning": "Mobile order is workspace heading, search controls, filters/status, then result cards; secondary rail and detail surfaces are overlays. Evidence: mobile-results-shared.png, mobile-detail-shared.png"
+      },
+      {
+        "id": "7.7",
+        "name": "chips_wrap_or_scroll_contained",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Overflowing chip rows and the history list wrap or scroll within their own containers at narrow widths instead of stretching the page",
+        "reasoning": "Mobile filter chips and explanatory syntax wrap onto multiple lines without widening the page; the workspace rail is independently scrollable when open. Evidence: mobile-results-shared.png"
+      },
+      {
+        "id": "7.8",
+        "name": "small_screens_avoid_horizontal_scroll",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px width there is no page-level horizontal scrolling anywhere in the app",
+        "reasoning": "At 375px, measured document/body scroll width was 360px, not wider than the viewport; visible content stayed within the screen. Evidence: mobile-results-shared.png"
+      },
+      {
+        "id": "7.9",
+        "name": "long_lists_scroll_contained",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The result list, index document list, and event timeline scroll within the layout at every width without pushing fixed chrome off screen",
+        "reasoning": "FAIL: Search results and indexed documents expand the main/page height with overflow visible instead of scrolling inside bounded list containers; measured result and index lists had clientHeight equal to scrollHeight and overflowY visible. Evidence: mobile-results-shared.png"
+      },
+      {
+        "id": "7.10",
+        "name": "fixed_controls_remain_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The search input, status bar, and undo/redo controls remain reachable at every viewport size",
+        "reasoning": "The header remains sticky with undo/redo and command/export controls, the mobile rail toggle is reachable, and search/status controls remain reachable in the reflowed content. Evidence: mobile-results-shared.png, tablet-overlay-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"layout_adapts_desktop_to_mobile\":{\"score\":\"yes\",\"reasoning\":\"Desktop uses a docked rail and wide main area; mobile collapses the rail and reflows search/results vertically, with compare/index still reachable. Evidence: layout-desktop-shared.png, mobile-results-shared.png\"},\"mobile_tap_targets_are_large_enough\":{\"score\":\"no\",\"reasoning\":\"FAIL: Most primary controls meet 44px, but observed detail/card actions include 32\u201334px wide buttons, below the 44px target. Evidence: mobile-detail-shared.png\"},\"typography_resizes_across_breakpoints\":{\"score\":\"yes\",\"reasoning\":\"Desktop heading and card typography are large and horizontal; mobile typography visibly scales down and wraps while remaining readable. Evidence: layout-desktop-shared.png, mobile-results-shared.png\"},\"content_avoids_clipping_and_overflow\":{\"score\":\"yes\",\"reasoning\":\"At desktop, tablet, and mobile widths, cards, chips, search controls, status areas, and detail content remain within their available width and wrap appropriately. Evidence: layout-desktop-shared.png, mobile-results-shared.png, tablet-overlay-shared.png\"},\"rail_and_panel_adapt_below_768\":{\"score\":\"yes\",\"reasoning\":\"At 768px, the rail is fixed off-canvas at x=-336 with an open toggle, while the document detail panel is a fixed full-width overlay; desktop shows the rail docked open. Evidence: tablet-overlay-shared.png\"},\"stacking_reflows_logically\":{\"score\":\"yes\",\"reasoning\":\"Mobile order is workspace heading, search controls, filters/status, then result cards; secondary rail and detail surfaces are overlays. Evidence: mobile-results-shared.png, mobile-detail-shared.png\"},\"chips_wrap_or_scroll_contained\":{\"score\":\"yes\",\"reasoning\":\"Mobile filter chips and explanatory syntax wrap onto multiple lines without widening the page; the workspace rail is independently scrollable when open. Evidence: mobile-results-shared.png\"},\"small_screens_avoid_horizontal_scroll\":{\"score\":\"yes\",\"reasoning\":\"At 375px, measured document/body scroll width was 360px, not wider than the viewport; visible content stayed within the screen. Evidence: mobile-results-shared.png\"},\"long_lists_scroll_contained\":{\"score\":\"no\",\"reasoning\":\"FAIL: Search results and indexed documents expand the main/page height with overflow visible instead of scrolling inside bounded list containers; measured result and index lists had clientHeight equal to scrollHeight and overflowY visible. Evidence: mobile-results-shared.png\"},\"fixed_controls_remain_accessible\":{\"score\":\"yes\",\"reasoning\":\"The header remains sticky with undo/redo and command/export controls, the mobile rail toggle is reachable, and search/status controls remain reachable in the reflowed content. Evidence: mobile-results-shared.png, tablet-overlay-shared.png\"} }",
+    "cost_usd": 0.3678732
+  },
+  "technical": {
+    "score": 0.4286,
+    "criteria": [
+      {
+        "id": "10.1",
+        "name": "serves_clean_and_fast",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app serves via its documented npm start path on port 3000, renders a working interface (not a blank or broken page), and is interactive within 2 seconds of a local cold load",
+        "reasoning": "Rendered a usable Atlas Semantic Library UI quickly at localhost:3000 with interactive search and workspace controls. Evidence: serves_clean_and_fast-shared.png"
+      },
+      {
+        "id": "10.2",
+        "name": "shared_state_coherence",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Deleting a document from the index panel immediately removes its card from any visible results, decreases the result count, and updates the index statistics \u2014 the same datum never shows different values in two places without a reload",
+        "reasoning": "FAIL: After deleting doc-001, the React result count stayed at 15 and \u201cFoundations: React guide\u201d remained visible; index/result surfaces did not update coherently. Evidence: shared_state_coherence-after-delete.png"
+      },
+      {
+        "id": "10.3",
+        "name": "reload_resets_to_seed",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A page reload returns the app to its seeded baseline: the seeded corpus, an empty query, no history entries, no saved searches, no feedback, and a fully built index",
+        "reasoning": "After a search, reload returned an empty search field, zero history entries, and the seeded 120-document corpus with a current index. Evidence: reload_resets_to_seed-shared.png"
+      },
+      {
+        "id": "10.4",
+        "name": "console_stays_clean",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "No console errors or unhandled promise rejections appear on load or during a full exercise of searching, feedback, palette use, bulk operations, undo/redo, and a complete re-index run",
+        "reasoning": "BLOCKED: Console errors were absent during the exercised search, feedback, palette, export, compare, undo/redo, and re-index actions, but the complete required bulk-operation exercise could not be completed because the visible selection control was obstructed. Evidence: rapid_interaction_stays_synced-shared.png"
+      },
+      {
+        "id": "10.5",
+        "name": "derived_surfaces_agree",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Search report export, Library package export, the compare view, the cluster group counts, and the visible result list all agree with each other for the same query and corpus state \u2014 counts sum, rankings match, and export field contracts use the same ids, types, and scores shown on cards",
+        "reasoning": "FAIL: The visible result list/export reported 15 results, while compare for the same query reported only 12 overlap; derived counts therefore disagreed. Evidence: derived_surfaces_agree-shared.png"
+      },
+      {
+        "id": "10.7",
+        "name": "api_shaped_exports_parse",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Search report and Library package Download/Copy payloads parse as JSON with schemaVersion exactly 1; Search report includes request and results under the declared keys; Library package includes library exactly Semantic Search Library plus documents and savedSearches arrays whose objects match the DocumentUpsert and SavedSearch field contracts",
+        "reasoning": "Visible Search report and Library package previews parsed as JSON with schemaVersion 1; the package had the required library string, documents array, and savedSearches array, with document fields matching the observed contract. Evidence: api_shaped_exports_parse-shared.png"
+      },
+      {
+        "id": "10.6",
+        "name": "rapid_interaction_stays_synced",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Rapid interleaved interaction \u2014 quick threshold drags, fast feedback clicks, palette open/close, view switches during a re-index run \u2014 leaves all views consistent with each other, with no desynced counts or stale panels",
+        "reasoning": "BLOCKED: Re-index and view switching were exercised, but the required rapid threshold-drag and bulk interaction sequence could not be completed because the visible controls were obstructed; full synchronization was not directly verifiable. Evidence: rapid_interaction_stays_synced-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"serves_clean_and_fast\":{\"score\":\"yes\",\"reasoning\":\"Rendered a usable Atlas Semantic Library UI quickly at localhost:3000 with interactive search and workspace controls. Evidence: serves_clean_and_fast-shared.png\"},\"shared_state_coherence\":{\"score\":\"no\",\"reasoning\":\"FAIL: After deleting doc-001, the React result count stayed at 15 and \u201cFoundations: React guide\u201d remained visible; index/result surfaces did not update coherently. Evidence: shared_state_coherence-after-delete.png\"},\"reload_resets_to_seed\":{\"score\":\"yes\",\"reasoning\":\"After a search, reload returned an empty search field, zero history entries, and the seeded 120-document corpus with a current index. Evidence: reload_resets_to_seed-shared.png\"},\"console_stays_clean\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Console errors were absent during the exercised search, feedback, palette, export, compare, undo/redo, and re-index actions, but the complete required bulk-operation exercise could not be completed because the visible selection control was obstructed. Evidence: rapid_interaction_stays_synced-shared.png\"},\"derived_surfaces_agree\":{\"score\":\"no\",\"reasoning\":\"FAIL: The visible result list/export reported 15 results, while compare for the same query reported only 12 overlap; derived counts therefore disagreed. Evidence: derived_surfaces_agree-shared.png\"},\"api_shaped_exports_parse\":{\"score\":\"yes\",\"reasoning\":\"Visible Search report and Library package previews parsed as JSON with schemaVersion 1; the package had the required library string, documents array, and savedSearches array, with document fields matching the observed contract. Evidence: api_shaped_exports_parse-shared.png\"},\"rapid_interaction_stays_synced\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Re-index and view switching were exercised, but the required rapid threshold-drag and bulk interaction sequence could not be completed because the visible controls were obstructed; full synchronization was not directly verifiable. Evidence: rapid_interaction_stays_synced-shared.png\"}}",
+    "cost_usd": 0.3565716
+  },
+  "user_flows": {
+    "score": 0.0909,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "search_to_report_flow_complete",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The full search flow works end to end: entering a query and pressing Enter renders the ranked list with scores descending, moving the threshold slider hides low-scoring cards and updates the count, thumbs-up moves a result up with a feedback marker, and the Search report export shows schemaVersion 1 with the same query, threshold, order, and feedback \u2014 all without a reload",
+        "reasoning": "FAIL: Search, ranking, feedback, and report export worked, but the threshold slider did not change the threshold or result count. Evidence: search_to_report_flow_complete-threshold-empty.png"
+      },
+      {
+        "id": "6.2",
+        "name": "invalid_forms_validate_inline",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Submitting Save search with an empty or duplicate name, or Add document with an empty title, body shorter than 20 characters, or type outside the closed list, triggers immediate inline validation naming the field and creates nothing",
+        "reasoning": "FAIL: Empty Save search and Add document forms showed disabled submits, but the required inline field-specific validation for all invalid cases was not observed. Evidence: invalid_forms_validate_inline-add-document.png"
+      },
+      {
+        "id": "6.3",
+        "name": "index_flow_updates_related_displays",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The add-and-index flow updates every related display: after adding a document the index list, stale count, and status bar all change; after Index Now completes the results, statistics, and status bar all reflect the rebuilt index",
+        "reasoning": "FAIL: Adding a document updated the document and stale counts, but the initial Index Now run failed before completion and required retry. Evidence: index_flow_updates_related_displays-index-complete.png"
+      },
+      {
+        "id": "6.4",
+        "name": "delete_flow_updates_all_surfaces",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Deleting a document (singly or via bulk delete) removes it from the index list, any visible results, the related rows, and the index statistics after deletion",
+        "reasoning": "FAIL: The delete confirmation opened, but after accepting, the document remained in the index and results. Evidence: delete_flow_updates_all_surfaces-after-delete.png"
+      },
+      {
+        "id": "6.5",
+        "name": "view_switch_retains_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Switching between the results, compare, history, and index sections and back retains the current query, threshold, chips, and selection \u2014 no view switch silently clears search state",
+        "reasoning": "FAIL: The query persisted across view switches, but retention of threshold, chips, and selection was not fully observed. Evidence: view_switch_retains_state-react.png"
+      },
+      {
+        "id": "6.6",
+        "name": "no_match_empty_state_recovers",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Driving results to empty (an unmatched query or an over-raised threshold) shows a clear empty state whose recovery control (clear chips / reset threshold) restores results without a reload",
+        "reasoning": "FAIL: An unmatched query produced a clear empty state, but its recovery control left the app at zero results. Evidence: no_match_empty_state_recovers-after-clear.png"
+      },
+      {
+        "id": "6.7",
+        "name": "filters_update_all_surfaces",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Applying and removing chips updates the result list, the visible count, and the cluster groups together \u2014 no surface keeps showing filtered-out documents",
+        "reasoning": "Applied and removed the tag:react chip; the result count/list and grouped cluster display updated consistently. Evidence: filters_update_all_surfaces-grouped-on.png"
+      },
+      {
+        "id": "6.8",
+        "name": "collapsible_chrome_preserves_workflow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Collapsing and reopening the left rail (and closing then reopening the detail panel) preserves workflow continuity \u2014 the same query, results, and selection are still in place",
+        "reasoning": "BLOCKED: No left-rail collapse/reopen control was observable, so the full required workflow could not be exercised; detail closing was observed. Evidence: collapsible_chrome_preserves_workflow-detail.png"
+      },
+      {
+        "id": "6.9",
+        "name": "overlays_support_expected_flows",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The command palette, export modal, save-search form, and delete confirmations open, complete their flow, and close as expected, returning the user to an intact search context",
+        "reasoning": "FAIL: Command palette, export modal, and save-search flow worked, but the delete confirmation did not complete successfully and the document remained. Evidence: overlays_support_expected_flows-save-complete.png"
+      },
+      {
+        "id": "6.10",
+        "name": "flow_recovers_without_reload",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Every dead-end candidate recovers in-app: an unknown syntax token, an empty compare selection, a failed ingest step, and an emptied history all leave working controls to continue without a reload",
+        "reasoning": "FAIL: The failed ingest recovered through Retry failed step, but recovery for unknown syntax, empty compare, and emptied history was not fully verified. Evidence: flow_recovers_without_reload-failed-ingest-retry.png"
+      },
+      {
+        "id": "6.11",
+        "name": "library_package_round_trip_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Exporting a Library package after adding a document and saving a search, diverging the corpus by deletes, then Importing that JSON restores the index list count and saved search so a fresh Library package export matches \u2014 Download or Copy emits the visible preview text",
+        "reasoning": "FAIL: Library package export, preview, and copy worked, but the required delete divergence and Import restoration round trip could not be completed. Evidence: library_package_round_trip_flow-copy-toast.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"search_to_report_flow_complete\":{\"score\":\"no\",\"reasoning\":\"FAIL: Search, ranking, feedback, and report export worked, but the threshold slider did not change the threshold or result count. Evidence: search_to_report_flow_complete-threshold-empty.png\"},\"invalid_forms_validate_inline\":{\"score\":\"no\",\"reasoning\":\"FAIL: Empty Save search and Add document forms showed disabled submits, but the required inline field-specific validation for all invalid cases was not observed. Evidence: invalid_forms_validate_inline-add-document.png\"},\"index_flow_updates_related_displays\":{\"score\":\"no\",\"reasoning\":\"FAIL: Adding a document updated the document and stale counts, but the initial Index Now run failed before completion and required retry. Evidence: index_flow_updates_related_displays-index-complete.png\"},\"delete_flow_updates_all_surfaces\":{\"score\":\"no\",\"reasoning\":\"FAIL: The delete confirmation opened, but after accepting, the document remained in the index and results. Evidence: delete_flow_updates_all_surfaces-after-delete.png\"},\"view_switch_retains_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: The query persisted across view switches, but retention of threshold, chips, and selection was not fully observed. Evidence: view_switch_retains_state-react.png\"},\"no_match_empty_state_recovers\":{\"score\":\"no\",\"reasoning\":\"FAIL: An unmatched query produced a clear empty state, but its recovery control left the app at zero results. Evidence: no_match_empty_state_recovers-after-clear.png\"},\"filters_update_all_surfaces\":{\"score\":\"yes\",\"reasoning\":\"Applied and removed the tag:react chip; the result count/list and grouped cluster display updated consistently. Evidence: filters_update_all_surfaces-grouped-on.png\"},\"collapsible_chrome_preserves_workflow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No left-rail collapse/reopen control was observable, so the full required workflow could not be exercised; detail closing was observed. Evidence: collapsible_chrome_preserves_workflow-detail.png\"},\"overlays_support_expected_flows\":{\"score\":\"no\",\"reasoning\":\"FAIL: Command palette, export modal, and save-search flow worked, but the delete confirmation did not complete successfully and the document remained. Evidence: overlays_support_expected_flows-save-complete.png\"},\"flow_recovers_without_reload\":{\"score\":\"no\",\"reasoning\":\"FAIL: The failed ingest recovered through Retry failed step, but recovery for unknown syntax, empty compare, and emptied history was not fully verified. Evidence: flow_recovers_without_reload-failed-ingest-retry.png\"},\"library_package_round_trip_flow\":{\"score\":\"no\",\"reasoning\":\"FAIL: Library package export, preview, and copy worked, but the required delete divergence and Import restoration round trip could not be completed. Evidence: library_package_round_trip_flow-copy-toast.png\"}}",
+    "cost_usd": 0.9828638
+  },
+  "visual_design": {
+    "score": 0.6667,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "three_region_layout",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At desktop width the app composes a main search column (query input, chips row, threshold slider, results), a right side panel area for document detail, and a left rail with sections or tabs for history, saved searches, compare, and the index panel",
+        "reasoning": "Desktop view shows a left workspace rail, central search/results column, and right document-detail panel. Evidence: three_region_layout-detail.png"
+      },
+      {
+        "id": "2.2",
+        "name": "accent_bar_encodes_score",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Result cards carry a left accent bar whose opacity visibly scales with the similarity score \u2014 a card scoring near 1.0 renders the accent clearly stronger than a card scoring near 0.5 \u2014 so ranking strength is readable at a glance",
+        "reasoning": "FAIL: Result cards show accent bars, but the observed bars did not visibly scale between the displayed similarity scores. Evidence: accent_bar_encodes_score-compare.png"
+      },
+      {
+        "id": "2.3",
+        "name": "badges_and_markers_distinct",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Similarity badges render their two-decimal value in a monospace face inside a compact tag, and feedback markers, overlap markers, and unique markers are visually distinct chips that cannot be confused with each other",
+        "reasoning": "FAIL: Monospace two-decimal similarity badges and feedback/topic chips were observed, but distinct overlap and unique markers were not observed. Evidence: badges_and_markers_distinct-shared.png"
+      },
+      {
+        "id": "2.4",
+        "name": "excerpt_highlight_scoped",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The highlighted excerpt passage uses a warm highlight background distinct from the card background, applied only to the matching span rather than the whole excerpt",
+        "reasoning": "Matching terms use a warm highlight applied only to the matching spans, with the rest of each excerpt retaining its normal background. Evidence: badges_and_markers_distinct-shared.png"
+      },
+      {
+        "id": "2.5",
+        "name": "status_bar_semantic_treatments",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The index status bar uses an informational treatment while indexing and a success treatment when the index is current, and the stale count renders in a warning treatment whenever it is above zero",
+        "reasoning": "Indexing was shown with an informational blue treatment, current status with green success treatment, and stale count above zero with a yellow warning treatment. Evidence: status_bar_semantic_treatments-shared.png"
+      },
+      {
+        "id": "2.6",
+        "name": "step_status_treatments_consistent",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Pending, running, retrying, failed, and complete ingest states each carry a distinct color or icon treatment, applied consistently between the step list and the event timeline",
+        "reasoning": "FAIL: Running, failed/retry, and complete treatments were observed, but all required pending and retrying states were not directly observed consistently across both lists. Evidence: status_bar_semantic_treatments-shared.png"
+      },
+      {
+        "id": "2.7",
+        "name": "typography_hierarchy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography shows a clear hierarchy \u2014 app title larger than panel headings, panel headings larger than card titles, card titles larger than body and metadata text \u2014 consistent across views",
+        "reasoning": "The app title is visibly largest, followed by section headings, card titles, and body/metadata text; computed sizes confirmed 46px, 22px, 17px, and 14px respectively. Evidence: typography_hierarchy-shared.png"
+      },
+      {
+        "id": "2.8",
+        "name": "spacing_rhythm",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Gaps between the rail, results column, and side panel, and between cards and sections, are visually regular with no crowded or orphaned regions",
+        "reasoning": "Desktop rail, main column, detail panel, cards, and sections use regular, visibly consistent gaps without crowded or orphaned regions. Evidence: three_region_layout-detail.png"
+      },
+      {
+        "id": "2.9",
+        "name": "component_state_treatments",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, inputs, sliders, and toggles show distinct default, hover, focus (visible ring), disabled, and error treatments, and one consistent icon set is used across the toolbar, cards, status bar, and panels",
+        "reasoning": "Observed distinct default and hover button colors, a visible blue focus ring on the search input, disabled controls, slider/toggle styling, warning/error index states, and a consistent outlined icon style. Evidence: component_state_treatments-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"three_region_layout\":{\"score\":\"yes\",\"reasoning\":\"Desktop view shows a left workspace rail, central search/results column, and right document-detail panel. Evidence: three_region_layout-detail.png\"},\"accent_bar_encodes_score\":{\"score\":\"no\",\"reasoning\":\"FAIL: Result cards show accent bars, but the observed bars did not visibly scale between the displayed similarity scores. Evidence: accent_bar_encodes_score-compare.png\"},\"badges_and_markers_distinct\":{\"score\":\"no\",\"reasoning\":\"FAIL: Monospace two-decimal similarity badges and feedback/topic chips were observed, but distinct overlap and unique markers were not observed. Evidence: badges_and_markers_distinct-shared.png\"},\"excerpt_highlight_scoped\":{\"score\":\"yes\",\"reasoning\":\"Matching terms use a warm highlight applied only to the matching spans, with the rest of each excerpt retaining its normal background. Evidence: badges_and_markers_distinct-shared.png\"},\"status_bar_semantic_treatments\":{\"score\":\"yes\",\"reasoning\":\"Indexing was shown with an informational blue treatment, current status with green success treatment, and stale count above zero with a yellow warning treatment. Evidence: status_bar_semantic_treatments-shared.png\"},\"step_status_treatments_consistent\":{\"score\":\"no\",\"reasoning\":\"FAIL: Running, failed/retry, and complete treatments were observed, but all required pending and retrying states were not directly observed consistently across both lists. Evidence: status_bar_semantic_treatments-shared.png\"},\"typography_hierarchy\":{\"score\":\"yes\",\"reasoning\":\"The app title is visibly largest, followed by section headings, card titles, and body/metadata text; computed sizes confirmed 46px, 22px, 17px, and 14px respectively. Evidence: typography_hierarchy-shared.png\"},\"spacing_rhythm\":{\"score\":\"yes\",\"reasoning\":\"Desktop rail, main column, detail panel, cards, and sections use regular, visibly consistent gaps without crowded or orphaned regions. Evidence: three_region_layout-detail.png\"},\"component_state_treatments\":{\"score\":\"yes\",\"reasoning\":\"Observed distinct default and hover button colors, a visible blue focus ring on the search input, disabled controls, slider/toggle styling, warning/error index states, and a consistent outlined icon style. Evidence: component_state_treatments-shared.png\"}}",
+    "cost_usd": 0.44994839999999997
+  },
+  "writing": {
+    "score": 0.8125,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "headings_use_consistent_capitalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders headings and panel titles (results, history, saved searches, index, compare), they use one consistent capitalization convention throughout",
+        "reasoning": "Headings and panel titles consistently use sentence case, while uppercase text is reserved for eyebrow labels. Evidence: initial-shared.png"
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders action labels, they are specific verbs such as Save search, Index now, Download report, and Copy report rather than generic labels like Submit or OK when a specific label is possible",
+        "reasoning": "Visible actions use specific labels such as Save search, Index now, Clear filters and threshold, Download report, and Copy report. Evidence: results-shared.png"
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Where the app renders errors and notices, they name the problem and the fix \u2014 the unmatched token value, the empty required field, what failed in an ingest step \u2014 not just a rejection",
+        "reasoning": "FAIL: Validation leaves the Add document action disabled without explaining the missing body, and indexing retry notices say retrying without naming the failure or fix. Evidence: error-notice-shared.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders empty states (no results, empty history, empty saved list), the copy explains what belongs there and how to get it \u2014 such as loosening filters or lowering the threshold",
+        "reasoning": "The empty result state says no documents matched and instructs users to remove a filter or lower the minimum score. Evidence: empty-state-shared.png"
+      },
+      {
+        "id": "15.5",
+        "name": "body_copy_is_well_written",
+        "value": 0.5,
+        "raw": 3,
+        "weight": 0.5,
+        "description": "Where the app renders seeded document bodies, explanations, and notices, rate how free the copy is of spelling and grammatical errors",
+        "reasoning": "Most visible copy is clear and grammatical, but seeded result text contains awkward repeated phrases such as \u201cschema, schema\u201d and \u201cexamples, examples, examples.\u201d Evidence: results-shared.png"
+      },
+      {
+        "id": "15.6",
+        "name": "terminology_is_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app names the same concept in multiple places, terminology is consistent \u2014 always documents (not files here and docs there), always saved searches, always stale",
+        "reasoning": "The app consistently uses documents, saved searches, and stale across search, saved, and index views. Evidence: saved-shared.png"
+      },
+      {
+        "id": "15.7",
+        "name": "numbers_dates_and_units_are_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Similarity scores render with two decimals everywhere they appear, and timestamps use one consistent format across history, steps, and the event timeline",
+        "reasoning": "Similarity values are displayed with two decimals, and history, indexing steps, and event timeline timestamps use the same \u201cJul 23, 4:50 AM\u201d style. Evidence: results-shared.png"
+      },
+      {
+        "id": "15.8",
+        "name": "success_messages_are_specific",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders confirmations, they state what happened \u2014 Search saved, Report copied, Indexed 120 documents \u2014 not vague affirmations",
+        "reasoning": "The confirmation toast explicitly says Saved \u201cReact research,\u201d identifying the completed action and item. Evidence: success-saved-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"headings_use_consistent_capitalization\":{\"score\":\"yes\",\"reasoning\":\"Headings and panel titles consistently use sentence case, while uppercase text is reserved for eyebrow labels. Evidence: initial-shared.png\"},\"actions_use_specific_labels\":{\"score\":\"yes\",\"reasoning\":\"Visible actions use specific labels such as Save search, Index now, Clear filters and threshold, Download report, and Copy report. Evidence: results-shared.png\"},\"errors_name_problem_and_fix\":{\"score\":\"no\",\"reasoning\":\"FAIL: Validation leaves the Add document action disabled without explaining the missing body, and indexing retry notices say retrying without naming the failure or fix. Evidence: error-notice-shared.png\"},\"empty_states_explain_next_step\":{\"score\":\"yes\",\"reasoning\":\"The empty result state says no documents matched and instructs users to remove a filter or lower the minimum score. Evidence: empty-state-shared.png\"},\"body_copy_is_well_written\":{\"score\":3,\"reasoning\":\"Most visible copy is clear and grammatical, but seeded result text contains awkward repeated phrases such as \u201cschema, schema\u201d and \u201cexamples, examples, examples.\u201d Evidence: results-shared.png\"},\"terminology_is_consistent\":{\"score\":\"yes\",\"reasoning\":\"The app consistently uses documents, saved searches, and stale across search, saved, and index views. Evidence: saved-shared.png\"},\"numbers_dates_and_units_are_consistent\":{\"score\":\"yes\",\"reasoning\":\"Similarity values are displayed with two decimals, and history, indexing steps, and event timeline timestamps use the same \u201cJul 23, 4:50 AM\u201d style. Evidence: results-shared.png\"},\"success_messages_are_specific\":{\"score\":\"yes\",\"reasoning\":\"The confirmation toast explicitly says Saved \u201cReact research,\u201d identifying the completed action and item. Evidence: success-saved-shared.png\"}}",
+    "cost_usd": 0.422097
+  }
+}

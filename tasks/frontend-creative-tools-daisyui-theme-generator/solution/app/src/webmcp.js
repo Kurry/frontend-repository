@@ -5,7 +5,7 @@ import {
   state, activeTheme, selectTheme, selectByName, notify,
   setColor, setRadius, setFontFamily, createTheme, validateRename,
   removeTheme, importFromText, uniqueName, pushExternalHistory, snapshotState,
-  syncHash,
+  syncHash, ensureEditable,
 } from './state.js';
 import { COLOR_KEYS, RADIUS_VALUES, RADIUS_GROUPS, FONT_FAMILIES } from './data.js';
 import { openArtifact, copyArtifact, showToast } from './ui.js';
@@ -23,7 +23,7 @@ const themeName = (description) => ({
   description,
   minLength: 2,
   maxLength: 30,
-  pattern: '^[a-z][a-z0-9_-]*$',
+  pattern: '^[A-Za-z][A-Za-z0-9 _-]*$',
 });
 const toolModule = (name) => name.startsWith('editor_')
   ? 'structured-editor-v1'
@@ -76,7 +76,7 @@ const TOOLS = [
         type: 'object',
         description: 'Fields for the new theme',
         properties: {
-          name: themeName('Theme name: 2-30 characters, starting with a lowercase letter and containing only lowercase letters, digits, hyphens, and underscores'),
+          name: themeName('Theme name: 2-30 characters, starting with a letter and containing only letters, digits, spaces, hyphens, and underscores'),
           tokens: { type: 'object', description: "Optional initial tokens, e.g. { colors: { '--color-primary': '#123456' } }" },
         },
       },
@@ -99,7 +99,7 @@ const TOOLS = [
       fields: {
         type: 'object',
         properties: {
-          name: themeName('New theme name: 2-30 characters, starting with a lowercase letter and containing only lowercase letters, digits, hyphens, and underscores'),
+          name: themeName('New theme name: 2-30 characters, starting with a letter and containing only letters, digits, spaces, hyphens, and underscores'),
           tokens: { type: 'object', description: "Token patch, e.g. { colors: { '--color-primary': '#123456' }, radius: { box: '1rem' } }" },
         },
       },
@@ -254,14 +254,20 @@ const handlers = {
       } else target = act;
     }
     if (!target) {
-      // editing a built-in via entity_update forks like the visible editor
-      const res = createTheme(fields.name || uniqueName(`${activeTheme().name}-edit`));
-      if (!res.ok) return err(res.error);
-      if (applyTokenPatch(res.theme, fields.tokens)) {
-        syncHash();
-        notify('structure');
+      // Editing the active built-in via entity_update forks an editable copy
+      // carrying the built-in's own tokens — the same fork the visible editor
+      // performs — instead of creating a fresh light-seeded theme.
+      const forked = ensureEditable();
+      if (fields.name && String(fields.name).trim() && String(fields.name).trim() !== forked.name) {
+        const check = validateRename(fields.name);
+        if (!check.ok) return err(check.error);
+        forked.name = check.value;
       }
-      return { ok: true, name: res.theme.name, count: state.customs.length };
+      applyTokenPatch(forked, fields.tokens);
+      pushExternalHistory(before);
+      syncHash();
+      notify('structure');
+      return { ok: true, name: forked.name, count: state.customs.length };
     }
     state.activeId = target.id;
     if (fields.name && fields.name.trim() !== target.name) {

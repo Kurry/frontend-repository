@@ -1,0 +1,2905 @@
+{
+  "accessibility": {
+    "score": 0.8462,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "toolbar_gallery_keyboard_operable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every toolbar control, swatch, and gallery action is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), each showing a visible focus indicator when focused.",
+        "reasoning": "Native controls are tabbable, keyboard focus is visibly indicated, and gallery actions expose keyboard-reachable buttons. Evidence: toolbar_gallery_keyboard_operable-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "camera_overlay_focus_trap",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The camera overlay behaves as a modal dialog: focus moves into it when opened, stays trapped while open, and returns to the triggering control on close.",
+        "reasoning": "FAIL: Opening Camera moves focus into the overlay and tabbing stays inside, but Escape does not close it; the dialog remained open with focus on CANCEL. Evidence: camera_overlay_focus_trap-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "swatches_and_tools_named",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Palette swatches expose accessible names for their colors (white, black, red, yellow, green, blue, pink) rather than being unlabeled colored squares; tool toggles (QR Brush, Color Brush, Eraser, Grid On/Off) likewise expose accessible names.",
+        "reasoning": "Swatches expose names for all seven colors, and brush/grid controls have accessible names. Evidence: toolbar_gallery_keyboard_operable-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "save_validation_announced_live",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The inline save-validation message is announced to assistive technology (for example via an aria-live region) as well as shown visually.",
+        "reasoning": "FAIL: With a required save field missing, the submit remained disabled and no inline validation message or live announcement appeared. Evidence: save_validation_announced_live-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "save_rename_fields_labeled",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Save board and rename form fields use explicit label elements associated with the controls.",
+        "reasoning": "Save fields have explicit labels associated with save-board-name and save-board-tag. Evidence: save_validation_announced_live-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "headings_follow_logical_order",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Studio headings (for example <SHAPESHIFT GRID TOOL> / gallery section titles) follow a logical order with no skips such as H1 jumping directly to H3.",
+        "reasoning": "The rendered Studio view has an H1 and no skipped heading levels. Evidence: toolbar_gallery_keyboard_operable-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "landmarks_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The page exposes semantic landmarks (for example main for the paint stage or gallery) so assistive technology can navigate the chrome.",
+        "reasoning": "The page exposes main, header, complementary tools, labeled paint-stage region, and footer landmarks. Evidence: toolbar_gallery_keyboard_operable-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "text_and_controls_have_contrast",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Toolbar labels, gallery card text, and form copy on the light paper stage have sufficient color contrast against the ink and washes.",
+        "reasoning": "Rendered toolbar labels, gallery text, and light-stage copy are visibly high-contrast against their backgrounds. Evidence: toolbar_gallery_keyboard_operable-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "selected_tool_not_color_alone",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Palette swatches and tool toggles expose a discernible selected state to assistive technology (aria-pressed, aria-checked, or equivalent), not color alone.",
+        "reasoning": "Selected tools and palette swatches expose aria-pressed states, including QR Brush, black, Grid On, and gallery favorites. Evidence: toolbar_gallery_keyboard_operable-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "reduced_motion_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, animations are removed and state changes apply instantly while every feature remains usable \u2014 verified on a fresh load.",
+        "reasoning": "Fresh reduced-motion load confirmed prefers-reduced-motion; animation/transition durations were reduced to approximately 0 and the Gallery interaction remained usable. Evidence: reduced_motion_respected-shared.png"
+      },
+      {
+        "id": "1.11",
+        "name": "export_dialog_focus_trap",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Export surface behaves as a modal dialog: focus moves into it when opened, stays trapped while open, closes on Escape, and returns to the triggering control on close.",
+        "reasoning": "Export opens a dialog with focus inside; repeated Tab remained within the dialog, Escape closed it, and focus returned to Export. Evidence: export_dialog_focus_trap-shared.png"
+      },
+      {
+        "id": "1.12",
+        "name": "import_validation_announced",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Import validation messages that name the offending field-contract key are announced to assistive technology (for example via an aria-live region) as well as shown visually.",
+        "reasoning": "Invalid session JSON visibly reports the offending schemaVersion key and an assertive aria-live alert contains the same message. Evidence: import_validation_announced-shared.png"
+      },
+      {
+        "id": "1.13",
+        "name": "fill_stats_not_color_alone",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Fill-stats counts (painted, qr, colorFilled, blank) are exposed as text numerals readable by assistive technology, not color alone.",
+        "reasoning": "Painted, qr, color filled, and blank counts are exposed as readable text numerals in a polite live region. Evidence: toolbar_gallery_keyboard_operable-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"toolbar_gallery_keyboard_operable\":{\"score\":\"yes\",\"reasoning\":\"Native controls are tabbable, keyboard focus is visibly indicated, and gallery actions expose keyboard-reachable buttons. Evidence: toolbar_gallery_keyboard_operable-shared.png\"},\"camera_overlay_focus_trap\":{\"score\":\"no\",\"reasoning\":\"FAIL: Opening Camera moves focus into the overlay and tabbing stays inside, but Escape does not close it; the dialog remained open with focus on CANCEL. Evidence: camera_overlay_focus_trap-shared.png\"},\"swatches_and_tools_named\":{\"score\":\"yes\",\"reasoning\":\"Swatches expose names for all seven colors, and brush/grid controls have accessible names. Evidence: toolbar_gallery_keyboard_operable-shared.png\"},\"save_validation_announced_live\":{\"score\":\"no\",\"reasoning\":\"FAIL: With a required save field missing, the submit remained disabled and no inline validation message or live announcement appeared. Evidence: save_validation_announced_live-shared.png\"},\"save_rename_fields_labeled\":{\"score\":\"yes\",\"reasoning\":\"Save fields have explicit labels associated with save-board-name and save-board-tag. Evidence: save_validation_announced_live-shared.png\"},\"headings_follow_logical_order\":{\"score\":\"yes\",\"reasoning\":\"The rendered Studio view has an H1 and no skipped heading levels. Evidence: toolbar_gallery_keyboard_operable-shared.png\"},\"landmarks_present\":{\"score\":\"yes\",\"reasoning\":\"The page exposes main, header, complementary tools, labeled paint-stage region, and footer landmarks. Evidence: toolbar_gallery_keyboard_operable-shared.png\"},\"text_and_controls_have_contrast\":{\"score\":\"yes\",\"reasoning\":\"Rendered toolbar labels, gallery text, and light-stage copy are visibly high-contrast against their backgrounds. Evidence: toolbar_gallery_keyboard_operable-shared.png\"},\"selected_tool_not_color_alone\":{\"score\":\"yes\",\"reasoning\":\"Selected tools and palette swatches expose aria-pressed states, including QR Brush, black, Grid On, and gallery favorites. Evidence: toolbar_gallery_keyboard_operable-shared.png\"},\"reduced_motion_respected\":{\"score\":\"yes\",\"reasoning\":\"Fresh reduced-motion load confirmed prefers-reduced-motion; animation/transition durations were reduced to approximately 0 and the Gallery interaction remained usable. Evidence: reduced_motion_respected-shared.png\"},\"export_dialog_focus_trap\":{\"score\":\"yes\",\"reasoning\":\"Export opens a dialog with focus inside; repeated Tab remained within the dialog, Escape closed it, and focus returned to Export. Evidence: export_dialog_focus_trap-shared.png\"},\"import_validation_announced\":{\"score\":\"yes\",\"reasoning\":\"Invalid session JSON visibly reports the offending schemaVersion key and an assertive aria-live alert contains the same message. Evidence: import_validation_announced-shared.png\"},\"fill_stats_not_color_alone\":{\"score\":\"yes\",\"reasoning\":\"Painted, qr, color filled, and blank counts are exposed as readable text numerals in a polite live region. Evidence: toolbar_gallery_keyboard_operable-shared.png\"}}",
+    "cost_usd": 0.6212454000000001
+  },
+  "behavioral": {
+    "score": 0.5455,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "in_memory_multi_facet_reload_reset",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Starting on Paint: switch to Color Brush, pick a non-default swatch, paint at least 3 cells, switch to Gallery and save a uniquely named board, then reload. All facets coherently reset to the seeded baseline together \u2014 blank canvas, unlocked cell-size slider, and exactly the seeded boards in Gallery \u2014 never a mix of persisted user art with reset tools.",
+        "reasoning": "Reload visibly restored the seeded 4-board gallery, blank canvas, and enabled cell-size slider. Evidence: in_memory_multi_facet_reload_reset-after.png"
+      },
+      {
+        "id": "14.2",
+        "name": "tag_filter_then_clear_restores_list",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Filter-reversal proof: note the full gallery list, filter by a seeded board's tag so the list narrows, then clear the filter; the full list restores exactly (same boards, same count), proving the visible list is derived from the shared collection rather than two hardcoded snapshots.",
+        "reasoning": "Festival filtering narrowed the gallery to one board, and clearing restored all 4 seeded boards. Evidence: tag_filter_then_clear_restores_list-filter.png"
+      },
+      {
+        "id": "14.3",
+        "name": "gallery_list_responds_to_tag_filter",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Derived-view sensitivity: apply a tag filter that matches a subset of boards; the visible gallery list changes meaningfully (fewer cards, only matching tags). Clearing the filter restores the full list rather than redrawing identically regardless of filter input.",
+        "reasoning": "The visible gallery changed from 4 boards to only the Festival-tagged board, then restored after clearing. Evidence: tag_filter_then_clear_restores_list-filter.png"
+      },
+      {
+        "id": "14.4",
+        "name": "paint_save_echo_across_modes",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cross-view echo: paint a recognizable pattern in Paint mode, save it with a valid name and tag, switch between Paint and Gallery without reload \u2014 the painted board remains intact in Paint and Gallery shows the new card with a thumbnail matching those cells.",
+        "reasoning": "A blue 3-cell pattern was painted and saved; Gallery showed the EchoBlue card with 3 painted and 3 color-filled cells. Evidence: paint_save_echo_across_modes-shared.png"
+      },
+      {
+        "id": "14.5",
+        "name": "gallery_count_delta_exact",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Count-delta integrity: note the gallery count, save one new uniquely named board, and confirm the count increases by exactly one; after deleting that board, confirm the count decreases by exactly one with no off-by-one lag.",
+        "reasoning": "Observed gallery count changed 4\u21925 after saving a board and 5\u21924 after deleting it. Evidence: paint_save_echo_across_modes-shared.png"
+      },
+      {
+        "id": "14.6",
+        "name": "different_paints_save_different_thumbnails",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Input-dependent output: paint two clearly different patterns (for example red block vs blue block), save each with a distinct name; the two gallery thumbnails differ in the ways those painted cells dictate.",
+        "reasoning": "FAIL: only one custom painted board was completed; two distinct painted boards and their differing thumbnails were not verified. Evidence: paint_save_echo_across_modes-shared.png"
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_paint_and_gallery",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Interleaved-flow integrity: start painting in Paint mode, switch to Gallery and favorite/filter a seeded board, return to Paint and continue; neither flow corrupts the other \u2014 painted cells and gallery facets remain coherent without reload.",
+        "reasoning": "FAIL: the complete paint\u2192gallery favorite/filter\u2192paint continuation workflow was not completed and verified. Evidence: tag_filter_then_clear_restores_list-filter.png"
+      },
+      {
+        "id": "14.8",
+        "name": "empty_gallery_then_repopulate",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Edge-state round-trip: delete every board (empty-gallery state visible), then paint and save a new named board; the gallery count tracks through both transitions (zero then one) and the new card appears with a matching thumbnail.",
+        "reasoning": "FAIL: deleting every board to a visible empty state and repopulating it was not completed. Evidence: tag_filter_then_clear_restores_list-filter.png"
+      },
+      {
+        "id": "14.9",
+        "name": "export_import_roundtrip_under_session_schema",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Starting with a blank canvas: paint cells with a known paletteColor, set mirrorMode to horizontal or vertical, save one uniquely named board, open Export and confirm the preview shows schemaVersion shapeshift-session-v1 with brushMode, paletteColor, mirrorMode, fillStats, cells, and boards, Download or Copy that session JSON, then Import it. Confirm canvas cells, mirror mode, fill stats, and the saved board return under the same field-contract keys \u2014 proving the export contains the session's actual work.",
+        "reasoning": "FAIL: Export visibly contained the required session schema, cells, mirrorMode, fillStats, and boards, but the subsequent Import interaction timed out before completion. Evidence: export_import_roundtrip_under_session_schema-shared.png"
+      },
+      {
+        "id": "14.10",
+        "name": "import_schema_rejection_preserves_studio",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "With painted cells and at least one gallery board already present: attempt Import with a payload that violates the Session field contract (wrong schemaVersion or missing required board keys). Confirm an inline error names the import problem, gallery count is unchanged, and canvas cells match the pre-import state.",
+        "reasoning": "BLOCKED: the invalid-import workflow could not be completed after the browser session became unresponsive during the import attempt. Evidence: export_import_roundtrip_under_session_schema-shared.png"
+      },
+      {
+        "id": "14.11",
+        "name": "mirror_and_fill_stats_cross_view",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Input-dependent derived surfaces: with mirrorMode Horizontal, paint two distinct blank cells in sequence; fill stats increase by two painted cells per stroke when partners were blank, and Export Session JSON mirrorMode plus fillStats match the on-stage readout without a reload.",
+        "reasoning": "With Horizontal mirror active, two strokes produced 4 painted/color-filled cells; Export showed mirrorMode horizontal and matching fillStats. Evidence: export_import_roundtrip_under_session_schema-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"in_memory_multi_facet_reload_reset\":{\"score\":\"yes\",\"reasoning\":\"Reload visibly restored the seeded 4-board gallery, blank canvas, and enabled cell-size slider. Evidence: in_memory_multi_facet_reload_reset-after.png\"},\"tag_filter_then_clear_restores_list\":{\"score\":\"yes\",\"reasoning\":\"Festival filtering narrowed the gallery to one board, and clearing restored all 4 seeded boards. Evidence: tag_filter_then_clear_restores_list-filter.png\"},\"gallery_list_responds_to_tag_filter\":{\"score\":\"yes\",\"reasoning\":\"The visible gallery changed from 4 boards to only the Festival-tagged board, then restored after clearing. Evidence: tag_filter_then_clear_restores_list-filter.png\"},\"paint_save_echo_across_modes\":{\"score\":\"yes\",\"reasoning\":\"A blue 3-cell pattern was painted and saved; Gallery showed the EchoBlue card with 3 painted and 3 color-filled cells. Evidence: paint_save_echo_across_modes-shared.png\"},\"gallery_count_delta_exact\":{\"score\":\"yes\",\"reasoning\":\"Observed gallery count changed 4\u21925 after saving a board and 5\u21924 after deleting it. Evidence: paint_save_echo_across_modes-shared.png\"},\"different_paints_save_different_thumbnails\":{\"score\":\"no\",\"reasoning\":\"FAIL: only one custom painted board was completed; two distinct painted boards and their differing thumbnails were not verified. Evidence: paint_save_echo_across_modes-shared.png\"},\"interleaved_paint_and_gallery\":{\"score\":\"no\",\"reasoning\":\"FAIL: the complete paint\u2192gallery favorite/filter\u2192paint continuation workflow was not completed and verified. Evidence: tag_filter_then_clear_restores_list-filter.png\"},\"empty_gallery_then_repopulate\":{\"score\":\"no\",\"reasoning\":\"FAIL: deleting every board to a visible empty state and repopulating it was not completed. Evidence: tag_filter_then_clear_restores_list-filter.png\"},\"export_import_roundtrip_under_session_schema\":{\"score\":\"no\",\"reasoning\":\"FAIL: Export visibly contained the required session schema, cells, mirrorMode, fillStats, and boards, but the subsequent Import interaction timed out before completion. Evidence: export_import_roundtrip_under_session_schema-shared.png\"},\"import_schema_rejection_preserves_studio\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: the invalid-import workflow could not be completed after the browser session became unresponsive during the import attempt. Evidence: export_import_roundtrip_under_session_schema-shared.png\"},\"mirror_and_fill_stats_cross_view\":{\"score\":\"yes\",\"reasoning\":\"With Horizontal mirror active, two strokes produced 4 painted/color-filled cells; Export showed mirrorMode horizontal and matching fillStats. Evidence: export_import_roundtrip_under_session_schema-shared.png\"}}",
+    "cost_usd": 0.7098129999999999
+  },
+  "core_features": {
+    "score": 0.2535,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "paint_stage_toolbar_on_load",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On load, Paint mode shows the canvas stage with the floating toolbar and brush/palette controls",
+        "reasoning": "Paint mode visibly opened with the grid stage, floating tools, brush controls, palette, and stats. Evidence: paint_stage_toolbar_on_load-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "seeded_boards_visible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On load (or after opening Gallery), at least 4 seeded saved boards are visible with names",
+        "reasoning": "Gallery visibly showed 4 seeded boards: Pulse Study, Sun Gate, Field Notes, and After Dark. Evidence: seeded_boards_visible-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "save_board_harbor_signal_visible",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After saving/creating a board named 'Harbor Signal' with a valid name, the text 'Harbor Signal' is visible in Gallery",
+        "reasoning": "FAIL: The save workflow was opened, but a valid Harbor Signal submission was not completed and observed."
+      },
+      {
+        "id": "1.4",
+        "name": "gallery_count_plus_three",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After adding 3 new boards on top of the seed set, Gallery shows exactly 3 more items than the initial seeded count",
+        "reasoning": "FAIL: Three added boards were not successfully submitted and verified in Gallery."
+      },
+      {
+        "id": "1.5",
+        "name": "load_seeded_board_updates_canvas",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After loading a seeded board from Gallery, the paint canvas cells update to that board's snapshot",
+        "reasoning": "FAIL: A seeded board load and resulting canvas snapshot were not completed."
+      },
+      {
+        "id": "1.6",
+        "name": "rename_board_evening_grid",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After editing a board name to 'Evening Grid', the text 'Evening Grid' is visible and the previous name is not",
+        "reasoning": "FAIL: Rename was not completed and verified."
+      },
+      {
+        "id": "1.7",
+        "name": "delete_board_removes_name",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After deleting a board, that board name is no longer visible in Gallery",
+        "reasoning": "FAIL: Delete was not completed and verified."
+      },
+      {
+        "id": "1.8",
+        "name": "empty_gallery_after_delete_all",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After deleting all boards, an empty state is visible in Gallery",
+        "reasoning": "FAIL: Delete-all workflow was not exercised."
+      },
+      {
+        "id": "1.9",
+        "name": "invalid_save_blocked_with_field_error",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting the Save board form with a Board field-contract violation (empty or whitespace-only name, empty or whitespace-only tag, name over 40 characters, tag over 24 characters, or a duplicate name) adds no board: the gallery count stays the same, an inline validation message naming the offending field appears before submit, and the save control stays disabled until name and tag are valid",
+        "reasoning": "Whitespace-only Name produced the inline error \u201cname: enter a board name\u201d and the Save board control remained disabled. Evidence: invalid_save_blocked_with_field_error-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "gallery_filter_matches_only",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After filtering Gallery by a tag or favorites (with mixed items present), only matching boards remain visible",
+        "reasoning": "FAIL: A mixed gallery filter result was not exercised."
+      },
+      {
+        "id": "1.11",
+        "name": "paint_gallery_mode_switch",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After switching between Paint and Gallery modes, the main canvas shows the other mode without full page navigation",
+        "reasoning": "Paint and Gallery switched in-place on the same URL without full-page navigation. Evidence: seeded_boards_visible-shared.png"
+      },
+      {
+        "id": "1.12",
+        "name": "toolbar_gallery_hover_wash",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When hovering toolbar buttons, swatches, or gallery rows, a visible hover wash or fill change appears",
+        "reasoning": "A real hover over Color Brush was performed and its computed filled background/shadow state was observed. Evidence: keyboard_shortcuts_tools_palette-shared.png"
+      },
+      {
+        "id": "1.16",
+        "name": "console_clean_during_session",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session",
+        "reasoning": "Browser console inspection reported 0 errors during the session."
+      },
+      {
+        "id": "1.17",
+        "name": "boards_crud_shared_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Saved boards collection supports create, edit, and delete with list rows and derived counts updating from shared application state",
+        "reasoning": "FAIL: Full create, edit, and delete CRUD with derived counts was not completed end-to-end."
+      },
+      {
+        "id": "1.18",
+        "name": "two_interaction_modes",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At least two distinct views or interaction modes are switchable without full page navigation",
+        "reasoning": "Paint and Gallery are distinct switchable interaction modes on the same page."
+      },
+      {
+        "id": "1.19",
+        "name": "domain_state_beyond_crud",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Domain state beyond CRUD is implemented (filters, favorites, mirror mode, or fill stats) and recomputes visible results from the shared collection",
+        "reasoning": "The live UI visibly provides favorites/tag filtering, mirror modes, and live fill statistics beyond basic CRUD. Evidence: seeded_boards_visible-shared.png"
+      },
+      {
+        "id": "1.23",
+        "name": "qr_brush_scannable_mask",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "QR Brush stamps a scannable festival-QR mask into the cell and recolors it per the active swatch: a white swatch yields a black QR on white, a black swatch yields a white QR on black, and any other swatch yields that color QR on white",
+        "reasoning": "FAIL: QR painting was observed, but the required white/black/other swatch mask behavior was not fully exercised."
+      },
+      {
+        "id": "1.24",
+        "name": "branded_png_footer_export",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Download or Share exports a PNG of the canvas with an appended black footer band reading '/MADE WITH SHAPESHIFT GRID TOOL' on the left and '<SHAPESHIFTFESTIVAL.COM>' on the right",
+        "reasoning": "FAIL: The branded footer is visible in the app, but a downloaded/shared PNG with the required appended footer was not verified."
+      },
+      {
+        "id": "1.25",
+        "name": "cell_slider_resample_and_lock",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The cell-size slider rebuilds the grid and resamples the existing painting into the new grid (art preserved, not cleared), then locks to a disabled state after the first paint, image upload, or camera capture, and Clear re-enables it",
+        "reasoning": "FAIL: Slider disabled state after painting was observed, but resampling preservation and Clear re-enable were not completed."
+      },
+      {
+        "id": "1.26",
+        "name": "image_or_camera_pixelize",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Image upload or front-camera capture center-crops the source square and pixelizes it onto the grid; the camera opens an overlay offering Capture and Cancel",
+        "reasoning": "FAIL: Upload/camera pixelization workflow was not completed."
+      },
+      {
+        "id": "1.27",
+        "name": "keyboard_shortcuts_tools_palette",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Keyboard shortcuts work on the canvas: Q/B/E select the QR/Color/Eraser brushes, G toggles the grid overlay, Backspace undoes the last change, and keys 1-7 select palette colors",
+        "reasoning": "FAIL: Backspace undo worked after painting, but all required Q/B/E, G, Backspace, and 1\u20137 shortcuts were not fully verified.",
+        "optional": true
+      },
+      {
+        "id": "1.30",
+        "name": "save_flow_multi_surface_probe",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Starting from a blank canvas: paint several cells, open Save board, and submit a valid Board payload with name 'Flow Probe' and a trimmed tag of at most 24 characters. Measured immediately around the submit, the gallery collection count increases by exactly one; the new card appears in Gallery mode with a thumbnail matching the painted cells and its tag; the Export session JSON boards array includes that board under the field-contract keys name, tag, favorite, and cells; and switching Paint -> Gallery -> Paint shows the same new board both times without a reload",
+        "reasoning": "FAIL: The complete Flow Probe save, gallery, thumbnail, JSON, and mode-switch chain was not completed."
+      },
+      {
+        "id": "1.31",
+        "name": "load_flow_paint_undo_chain",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "From Gallery mode, load a saved board: its cells appear on the paint canvas immediately and the app switches to Paint mode showing the loaded art; painting one further cell changes only that cell, and pressing Undo reverts exactly that one change while the rest of the loaded board stays intact",
+        "reasoning": "FAIL: The loaded-board paint/undo chain was not completed."
+      },
+      {
+        "id": "1.32",
+        "name": "rename_delete_filter_integrity_chain",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Renaming a board updates that same card's name in Gallery without changing the collection count; then deleting a board decreases the count by exactly one (measured immediately around the delete), removes its card, clears it from any current selection, and the deleted board's name appears under no tag filter afterwards",
+        "reasoning": "FAIL: Rename, delete, selection clearing, and post-delete filtering were not completed."
+      },
+      {
+        "id": "1.33",
+        "name": "favorite_filter_recompute_chain",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Marking a board as favorite updates its indicator on the card immediately; choosing a tag filter recomputes the visible gallery to only boards with that tag; clearing the filter restores the full collection with the favorite indicator still shown on the same board",
+        "reasoning": "FAIL: Favorite and tag-filter recomputation chain was not completed."
+      },
+      {
+        "id": "1.34",
+        "name": "reload_resets_all_facets_to_seed",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After saving a new board, painting cells (locking the slider), and applying a tag filter, a page reload coherently returns every facet to the seeded baseline: a blank canvas, an unlocked cell-size slider, and exactly the seeded boards in Gallery with the board saved before the reload gone \u2014 never a mix of reset and surviving facets",
+        "reasoning": "FAIL: Reload reset behavior after creating and painting was not exercised."
+      },
+      {
+        "id": "1.35",
+        "name": "tag_filter_no_match_empty_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A tag filter that matches no boards shows the gallery empty state rather than a blank region, and clearing the filter restores the full list",
+        "reasoning": "FAIL: No-match tag filtering and restoration were not exercised."
+      },
+      {
+        "id": "1.36",
+        "name": "undo_without_history_safe_noop",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Pressing Undo (or Backspace) with no paint history leaves the canvas unchanged and surfaces no error message or console exception",
+        "reasoning": "FAIL: Undo was tested after history existed, not from a clean no-history state."
+      },
+      {
+        "id": "1.37",
+        "name": "camera_cancel_leaves_canvas_untouched",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Choosing Cancel in the camera overlay closes it without altering the canvas cells and leaves the cell-size slider unlocked",
+        "reasoning": "FAIL: Camera overlay Cancel was not exercised."
+      },
+      {
+        "id": "1.38",
+        "name": "drag_stroke_records_cell_once",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Dragging a paint stroke back and forth over the same cell with the same brush and color paints continuously across cells, records that cell to undo history only once, and a single Undo reverts it",
+        "reasoning": "FAIL: Drag stroke and single-history-entry behavior were not exercised."
+      },
+      {
+        "id": "1.39",
+        "name": "grid_toggle_label_flips",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Clicking the grid-overlay toggle flips its button label between 'Grid On' and 'Grid Off' and correspondingly shows or hides the hairline grid between cells",
+        "reasoning": "FAIL: The Grid On control was observed, but toggling and corresponding hairline visibility were not verified."
+      },
+      {
+        "id": "1.40",
+        "name": "color_brush_fill_and_eraser_clear",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Color Brush fills a painted cell completely with the active swatch color, and Eraser clears a painted cell back to blank",
+        "reasoning": "FAIL: Color Brush and Eraser controls were visible, but their complete fill/clear interaction was not completed."
+      },
+      {
+        "id": "1.41",
+        "name": "slider_resize_before_paint_keeps_blank",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Moving the cell-size slider before any painting rebuilds the grid at the new cell size while the board stays completely blank, with no stray painted cells appearing",
+        "reasoning": "FAIL: Pre-paint slider resizing was not exercised."
+      },
+      {
+        "id": "1.42",
+        "name": "session_json_field_contract_keys_visible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening Export and selecting session JSON shows a monospaced preview matching the Session field contract: schemaVersion exactly shapeshift-session-v1, plus visible keys cellSize (16\u201364), brushMode (qr|color|erase), paletteColor (white|black|red|yellow|green|blue|pink), gridOverlay, mirrorMode (off|horizontal|vertical), fillStats with painted/qr/colorFilled/blank, cells, and boards",
+        "reasoning": "Export Session JSON visibly showed schemaVersion shapeshift-session-v1, cellSize, brushMode, paletteColor, gridOverlay, mirrorMode, fillStats, cells, and boards. Evidence: keyboard_shortcuts_tools_palette-shared.png"
+      },
+      {
+        "id": "1.43",
+        "name": "import_rejects_nonconforming_session_schema",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Importing session JSON that fails the field contract (wrong schemaVersion, cellSize outside 16\u201364, brushMode or paletteColor or mirrorMode outside their closed enums, or a board missing name/tag/cells) shows an inline error naming the offending field or the import problem and leaves gallery count, canvas cells, and fill stats unchanged",
+        "reasoning": "FAIL: Invalid session JSON import was not submitted and verified."
+      },
+      {
+        "id": "1.46",
+        "name": "mirror_mode_paints_partner_cell",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "With mirrorMode set to Horizontal or Vertical via the real toolbar control, painting one blank cell also paints its mirror-partner cell with the same brush and color in the same stroke; switching mirrorMode to Off then painting a different cell changes only that cell",
+        "reasoning": "FAIL: Mirror mode controls were visible, but partner-cell painting and Off behavior were not completed."
+      },
+      {
+        "id": "1.47",
+        "name": "fill_stats_track_paint_mutations",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After painting QR and Color cells then erasing one cell, the live fill-stats readout updates painted, qr, colorFilled, and blank immediately so painted equals qr plus colorFilled and painted plus blank equals the total cell count",
+        "reasoning": "FAIL: Initial fill stats and a painted cell were observed, but the required QR/color/erase sequence and all invariant counts were not fully verified."
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"paint_stage_toolbar_on_load\":{\"score\":\"yes\",\"reasoning\":\"Paint mode visibly opened with the grid stage, floating tools, brush controls, palette, and stats. Evidence: paint_stage_toolbar_on_load-shared.png\"},\"seeded_boards_visible\":{\"score\":\"yes\",\"reasoning\":\"Gallery visibly showed 4 seeded boards: Pulse Study, Sun Gate, Field Notes, and After Dark. Evidence: seeded_boards_visible-shared.png\"},\"save_board_harbor_signal_visible\":{\"score\":\"no\",\"reasoning\":\"FAIL: The save workflow was opened, but a valid Harbor Signal submission was not completed and observed.\"},\"gallery_count_plus_three\":{\"score\":\"no\",\"reasoning\":\"FAIL: Three added boards were not successfully submitted and verified in Gallery.\"},\"load_seeded_board_updates_canvas\":{\"score\":\"no\",\"reasoning\":\"FAIL: A seeded board load and resulting canvas snapshot were not completed.\"},\"rename_board_evening_grid\":{\"score\":\"no\",\"reasoning\":\"FAIL: Rename was not completed and verified.\"},\"delete_board_removes_name\":{\"score\":\"no\",\"reasoning\":\"FAIL: Delete was not completed and verified.\"},\"empty_gallery_after_delete_all\":{\"score\":\"no\",\"reasoning\":\"FAIL: Delete-all workflow was not exercised.\"},\"invalid_save_blocked_with_field_error\":{\"score\":\"yes\",\"reasoning\":\"Whitespace-only Name produced the inline error \u201cname: enter a board name\u201d and the Save board control remained disabled. Evidence: invalid_save_blocked_with_field_error-shared.png\"},\"gallery_filter_matches_only\":{\"score\":\"no\",\"reasoning\":\"FAIL: A mixed gallery filter result was not exercised.\"},\"paint_gallery_mode_switch\":{\"score\":\"yes\",\"reasoning\":\"Paint and Gallery switched in-place on the same URL without full-page navigation. Evidence: seeded_boards_visible-shared.png\"},\"toolbar_gallery_hover_wash\":{\"score\":\"yes\",\"reasoning\":\"A real hover over Color Brush was performed and its computed filled background/shadow state was observed. Evidence: keyboard_shortcuts_tools_palette-shared.png\"},\"console_clean_during_session\":{\"score\":\"yes\",\"reasoning\":\"Browser console inspection reported 0 errors during the session.\"},\"boards_crud_shared_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: Full create, edit, and delete CRUD with derived counts was not completed end-to-end.\"},\"two_interaction_modes\":{\"score\":\"yes\",\"reasoning\":\"Paint and Gallery are distinct switchable interaction modes on the same page.\"},\"domain_state_beyond_crud\":{\"score\":\"yes\",\"reasoning\":\"The live UI visibly provides favorites/tag filtering, mirror modes, and live fill statistics beyond basic CRUD. Evidence: seeded_boards_visible-shared.png\"},\"qr_brush_scannable_mask\":{\"score\":\"no\",\"reasoning\":\"FAIL: QR painting was observed, but the required white/black/other swatch mask behavior was not fully exercised.\"},\"branded_png_footer_export\":{\"score\":\"no\",\"reasoning\":\"FAIL: The branded footer is visible in the app, but a downloaded/shared PNG with the required appended footer was not verified.\"},\"cell_slider_resample_and_lock\":{\"score\":\"no\",\"reasoning\":\"FAIL: Slider disabled state after painting was observed, but resampling preservation and Clear re-enable were not completed.\"},\"image_or_camera_pixelize\":{\"score\":\"no\",\"reasoning\":\"FAIL: Upload/camera pixelization workflow was not completed.\"},\"keyboard_shortcuts_tools_palette\":{\"score\":\"no\",\"reasoning\":\"FAIL: Backspace undo worked after painting, but all required Q/B/E, G, Backspace, and 1\u20137 shortcuts were not fully verified.\"},\"save_flow_multi_surface_probe\":{\"score\":\"no\",\"reasoning\":\"FAIL: The complete Flow Probe save, gallery, thumbnail, JSON, and mode-switch chain was not completed.\"},\"load_flow_paint_undo_chain\":{\"score\":\"no\",\"reasoning\":\"FAIL: The loaded-board paint/undo chain was not completed.\"},\"rename_delete_filter_integrity_chain\":{\"score\":\"no\",\"reasoning\":\"FAIL: Rename, delete, selection clearing, and post-delete filtering were not completed.\"},\"favorite_filter_recompute_chain\":{\"score\":\"no\",\"reasoning\":\"FAIL: Favorite and tag-filter recomputation chain was not completed.\"},\"reload_resets_all_facets_to_seed\":{\"score\":\"no\",\"reasoning\":\"FAIL: Reload reset behavior after creating and painting was not exercised.\"},\"tag_filter_no_match_empty_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: No-match tag filtering and restoration were not exercised.\"},\"undo_without_history_safe_noop\":{\"score\":\"no\",\"reasoning\":\"FAIL: Undo was tested after history existed, not from a clean no-history state.\"},\"camera_cancel_leaves_canvas_untouched\":{\"score\":\"no\",\"reasoning\":\"FAIL: Camera overlay Cancel was not exercised.\"},\"drag_stroke_records_cell_once\":{\"score\":\"no\",\"reasoning\":\"FAIL: Drag stroke and single-history-entry behavior were not exercised.\"},\"grid_toggle_label_flips\":{\"score\":\"no\",\"reasoning\":\"FAIL: The Grid On control was observed, but toggling and corresponding hairline visibility were not verified.\"},\"color_brush_fill_and_eraser_clear\":{\"score\":\"no\",\"reasoning\":\"FAIL: Color Brush and Eraser controls were visible, but their complete fill/clear interaction was not completed.\"},\"slider_resize_before_paint_keeps_blank\":{\"score\":\"no\",\"reasoning\":\"FAIL: Pre-paint slider resizing was not exercised.\"},\"session_json_field_contract_keys_visible\":{\"score\":\"yes\",\"reasoning\":\"Export Session JSON visibly showed schemaVersion shapeshift-session-v1, cellSize, brushMode, paletteColor, gridOverlay, mirrorMode, fillStats, cells, and boards. Evidence: keyboard_shortcuts_tools_palette-shared.png\"},\"import_rejects_nonconforming_session_schema\":{\"score\":\"no\",\"reasoning\":\"FAIL: Invalid session JSON import was not submitted and verified.\"},\"mirror_mode_paints_partner_cell\":{\"score\":\"no\",\"reasoning\":\"FAIL: Mirror mode controls were visible, but partner-cell painting and Off behavior were not completed.\"},\"fill_stats_track_paint_mutations\":{\"score\":\"no\",\"reasoning\":\"FAIL: Initial fill stats and a painted cell were observed, but the required QR/color/erase sequence and all invariant counts were not fully verified.\"}}",
+    "cost_usd": 0.22008940000000002
+  },
+  "design_fidelity": {
+    "score": 0.7,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "stage_spacing_matches_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 1440px, spacing and sizing of the light paper stage, floating black toolbar, and large centered canvas follow the reference composition in /reference-screenshots/ (overview.png / segment-NN.png) within a small tolerance \u2014 no arbitrary one-off collisions.",
+        "reasoning": "Yes \u2014 desktop screenshot shows the light paper stage, soft radial washes, floating black toolbar, and centered large canvas in a coherent composition. Evidence: stage-spacing-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "bracket_title_typography_matches",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The angle-bracket display title reading <SHAPESHIFT GRID TOOL> and condensed UI type match the reference's typographic treatment for headings and toolbar labels.",
+        "reasoning": "Yes \u2014 the angle-bracket title is large, uppercase, condensed/monospace display type, with condensed UI labeling throughout. Evidence: stage-spacing-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "desktop_layout_matches_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Desktop layout matches reference screenshots to within a small tolerance: light paper stage with soft radial washes, floating black toolbar, and large centered canvas \u2014 a desktop-first creative tool composition, not a dashboard.",
+        "reasoning": "Yes \u2014 desktop view presents a creative-tool composition rather than a dashboard, with paper stage, floating toolbar, and centered grid canvas. Evidence: stage-spacing-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "gallery_card_motion_matches_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Saving a board animates its new card into the gallery and deleting a board animates its card out rather than snapping, matching the motion the spec calls for.",
+        "reasoning": "FAIL: Live save created the Motion Test gallery card and the card reports an enter animation, but the live delete action did not visibly remove the card, so the complete add/remove motion workflow was not observed. Evidence: gallery-motion-full.png"
+      },
+      {
+        "id": "3.5",
+        "name": "narrow_toolbar_reflow_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On narrow viewports the toolbar reflows or docks so all brush modes, swatches, and actions stay reachable, matching the responsiveness patterns rather than keeping broken free-float chrome.",
+        "reasoning": "Yes \u2014 at 390px the toolbar docks into the page flow; brush modes, mirror controls, all seven swatches, grid controls, and actions remain reachable by scrolling. Evidence: narrow-toolbar-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "toolbar_control_styling_matches",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Toolbar buttons, cell-size slider, and form fields show styled radii/padding/depth consistent with the reference floating black toolbar \u2014 not unstyled browser defaults.",
+        "reasoning": "Yes \u2014 controls use styled dark panels, borders, padding, square radii, acid-yellow active states, depth shadows, and custom sliders rather than browser defaults. Evidence: seven-swatches-qr-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "title_vs_toolbar_hierarchy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography hierarchy clearly distinguishes the <SHAPESHIFT GRID TOOL> display title / typewriter intro from toolbar and gallery body labels.",
+        "reasoning": "Yes \u2014 the large display title is clearly dominant, while intro, toolbar, statistics, and gallery labels use substantially smaller condensed type. Evidence: stage-spacing-shared.png"
+      },
+      {
+        "id": "3.8",
+        "name": "component_states_match_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Toolbar buttons, swatches, and form fields show distinct default, hover, focus, disabled, and error treatments as specified \u2014 including the muted/disabled cell-size slider when locked.",
+        "reasoning": "FAIL: Active/default states, disabled Undo, and the muted locked cell-size slider were observed, but the full required set including error treatment was not directly observed. Evidence: seven-swatches-qr-shared.png"
+      },
+      {
+        "id": "3.9",
+        "name": "seven_swatches_and_qr_cells",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Seven square palette swatches (white, black, red, yellow, green, blue, pink) are visible with the active swatch marked; QR cells render as a scannable festival QR mask and Color cells as flat fills, with grid hairlines when Grid On.",
+        "reasoning": "FAIL: Seven square swatches with an active mark and QR-pattern cells were directly observed, but Color cells rendering as flat fills was not observed in the completed workflow. Evidence: seven-swatches-qr-shared.png"
+      },
+      {
+        "id": "3.10",
+        "name": "toolbar_controls_present_in_order",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The floating toolbar carries the cell-size slider, mode buttons (QR Brush, Color Brush, Eraser, Grid On/Off), seven square swatches, and action buttons in a coherent creative-tool grouping matching the reference.",
+        "reasoning": "Yes \u2014 the toolbar visibly groups cell size, Paint/Gallery, QR Brush, Color Brush, Eraser, mirror controls, seven swatches, grid/undo/clear, media, save/import, export, and share actions coherently. Evidence: gallery-motion-full.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"stage_spacing_matches_reference\":{\"score\":\"yes\",\"reasoning\":\"Yes \u2014 desktop screenshot shows the light paper stage, soft radial washes, floating black toolbar, and centered large canvas in a coherent composition. Evidence: stage-spacing-shared.png\"},\"bracket_title_typography_matches\":{\"score\":\"yes\",\"reasoning\":\"Yes \u2014 the angle-bracket title is large, uppercase, condensed/monospace display type, with condensed UI labeling throughout. Evidence: stage-spacing-shared.png\"},\"desktop_layout_matches_reference\":{\"score\":\"yes\",\"reasoning\":\"Yes \u2014 desktop view presents a creative-tool composition rather than a dashboard, with paper stage, floating toolbar, and centered grid canvas. Evidence: stage-spacing-shared.png\"},\"gallery_card_motion_matches_spec\":{\"score\":\"no\",\"reasoning\":\"FAIL: Live save created the Motion Test gallery card and the card reports an enter animation, but the live delete action did not visibly remove the card, so the complete add/remove motion workflow was not observed. Evidence: gallery-motion-full.png\"},\"narrow_toolbar_reflow_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"Yes \u2014 at 390px the toolbar docks into the page flow; brush modes, mirror controls, all seven swatches, grid controls, and actions remain reachable by scrolling. Evidence: narrow-toolbar-shared.png\"},\"toolbar_control_styling_matches\":{\"score\":\"yes\",\"reasoning\":\"Yes \u2014 controls use styled dark panels, borders, padding, square radii, acid-yellow active states, depth shadows, and custom sliders rather than browser defaults. Evidence: seven-swatches-qr-shared.png\"},\"title_vs_toolbar_hierarchy\":{\"score\":\"yes\",\"reasoning\":\"Yes \u2014 the large display title is clearly dominant, while intro, toolbar, statistics, and gallery labels use substantially smaller condensed type. Evidence: stage-spacing-shared.png\"},\"component_states_match_spec\":{\"score\":\"no\",\"reasoning\":\"FAIL: Active/default states, disabled Undo, and the muted locked cell-size slider were observed, but the full required set including error treatment was not directly observed. Evidence: seven-swatches-qr-shared.png\"},\"seven_swatches_and_qr_cells\":{\"score\":\"no\",\"reasoning\":\"FAIL: Seven square swatches with an active mark and QR-pattern cells were directly observed, but Color cells rendering as flat fills was not observed in the completed workflow. Evidence: seven-swatches-qr-shared.png\"},\"toolbar_controls_present_in_order\":{\"score\":\"yes\",\"reasoning\":\"Yes \u2014 the toolbar visibly groups cell size, Paint/Gallery, QR Brush, Color Brush, Eraser, mirror controls, seven swatches, grid/undo/clear, media, save/import, export, and share actions coherently. Evidence: gallery-motion-full.png\"}}",
+    "cost_usd": 0.5723224
+  },
+  "edge_cases": {
+    "score": 0.7391,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "empty_gallery_state_after_delete_all",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After deleting all boards, Gallery mode shows an empty state with a message explaining the gallery is empty and how to save a board.",
+        "reasoning": "Deleted all boards and observed the Gallery 0 empty state with guidance to switch to Paint and save a board. Evidence: empty_gallery_state_after_delete_all-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "save_form_inline_validation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Save board form validates against the Board field contract before submit: empty/whitespace name, empty/whitespace tag, name over 40 characters, tag over 24 characters, or a duplicate name each show a per-field message naming the offending field, and the save control stays disabled until name and tag are valid.",
+        "reasoning": "Observed per-field messages for whitespace, overlong name/tag, and duplicate name; Save remained disabled. Evidence: save_form_inline_validation-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "empty_name_blocks_save_count",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting the Save board form with an empty name must not add a board \u2014 the gallery count stays the same and the inline validation message names the name field.",
+        "reasoning": "Whitespace name produced \u201cname: enter a board name,\u201d the Save control stayed disabled, and the gallery count was unchanged. Evidence: empty_name_blocks_save_count-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "zero_match_tag_filter_empty_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A tag filter that matches no boards shows the empty state rather than a blank region, and clearing the filter restores the list.",
+        "reasoning": "Filtering by a tag after deleting its only board showed \u201cNo boards match this tag,\u201d and Clear filter restored the collection. Evidence: zero_match_tag_filter_empty_state-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "undo_empty_history_noop",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Pressing Undo with no history is a safe no-op: the canvas does not change and no error appears.",
+        "reasoning": "Pressed Backspace with an empty history; all 400 cells remained blank, Undo stayed disabled, and no alert appeared. Evidence: undo_empty_history_noop-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "same_cell_stroke_records_once",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Dragging a paint stroke back and forth over the same cell with the same brush and color records the cell to undo history only once, so one Undo reverts it.",
+        "reasoning": "Dragged repeatedly within one cell, then used one Undo; the cell reverted to blank and history became empty. Evidence: same_cell_stroke_records_once-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "cell_slider_locks_until_clear",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After the first paint, image upload, or camera capture, the cell-size slider locks and fades to a muted disabled look; Clear empties the board and re-enables it.",
+        "reasoning": "FAIL: First paint visibly locked the slider, but the real Clear control did not clear the painted cell or re-enable the slider."
+      },
+      {
+        "id": "4.8",
+        "name": "toolbar_and_gallery_controls_semantic",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Toolbar tools, swatches, gallery save/rename/delete/favorite controls, and form fields use semantic button/input/label elements rather than unlabeled decorative wrappers.",
+        "reasoning": "Observed accessible button controls, gridcells, textbox fields, and zero unlabeled empty buttons in the live DOM. Evidence: toolbar_and_gallery_controls_semantic-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "camera_cancel_leaves_board_and_slider",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Cancel in the camera overlay closes it without altering the canvas or locking the slider.",
+        "reasoning": "FAIL: Camera Cancel closed the overlay and preserved the board, but the slider remained disabled on the blank board state."
+      },
+      {
+        "id": "4.10",
+        "name": "resize_before_and_after_paint",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Resizing the cell slider before any paint keeps the board blank; resizing after painting resamples the art into the new grid rather than clearing it.",
+        "reasoning": "FAIL: Resizing before paint preserved a blank grid, but after painting the slider became disabled, so the required post-paint resize/resampling could not be exercised."
+      },
+      {
+        "id": "4.11",
+        "name": "import_schema_invalid_session_rejected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Importing malformed session JSON, or parseable JSON that fails the Session/Board/Cell field contract (wrong schemaVersion, cellSize outside 16\u201364, brushMode/paletteColor/mirrorMode outside closed enums, Cell kind/color mismatch, Board missing required keys, or fillStats that do not sum to the cell count), shows an inline error naming the offending field or the import problem, leaves gallery count, canvas cells, and fill stats unchanged, and produces no console crash.",
+        "reasoning": "Malformed JSON showed an inline import error, while gallery count, cell count, and filled count stayed unchanged; console error output was empty. Evidence: import_schema_invalid_session_rejected-shared.png"
+      },
+      {
+        "id": "4.12",
+        "name": "mirror_center_cell_records_once",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "With mirrorMode Horizontal or Vertical on an odd-width grid, painting the center cell (partner coincides with itself) writes that cell only once and a single Undo reverts it.",
+        "reasoning": "On a 37\u00d737 grid with Vertical mirror, the center cell produced exactly one filled cell; one Undo reverted it completely. Evidence: mirror_center_cell_records_once-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"empty_gallery_state_after_delete_all\":{\"score\":\"yes\",\"reasoning\":\"Deleted all boards and observed the Gallery 0 empty state with guidance to switch to Paint and save a board. Evidence: empty_gallery_state_after_delete_all-shared.png\"},\"save_form_inline_validation\":{\"score\":\"yes\",\"reasoning\":\"Observed per-field messages for whitespace, overlong name/tag, and duplicate name; Save remained disabled. Evidence: save_form_inline_validation-shared.png\"},\"empty_name_blocks_save_count\":{\"score\":\"yes\",\"reasoning\":\"Whitespace name produced \u201cname: enter a board name,\u201d the Save control stayed disabled, and the gallery count was unchanged. Evidence: empty_name_blocks_save_count-shared.png\"},\"zero_match_tag_filter_empty_state\":{\"score\":\"yes\",\"reasoning\":\"Filtering by a tag after deleting its only board showed \u201cNo boards match this tag,\u201d and Clear filter restored the collection. Evidence: zero_match_tag_filter_empty_state-shared.png\"},\"undo_empty_history_noop\":{\"score\":\"yes\",\"reasoning\":\"Pressed Backspace with an empty history; all 400 cells remained blank, Undo stayed disabled, and no alert appeared. Evidence: undo_empty_history_noop-shared.png\"},\"same_cell_stroke_records_once\":{\"score\":\"yes\",\"reasoning\":\"Dragged repeatedly within one cell, then used one Undo; the cell reverted to blank and history became empty. Evidence: same_cell_stroke_records_once-shared.png\"},\"cell_slider_locks_until_clear\":{\"score\":\"no\",\"reasoning\":\"FAIL: First paint visibly locked the slider, but the real Clear control did not clear the painted cell or re-enable the slider.\"},\"toolbar_and_gallery_controls_semantic\":{\"score\":\"yes\",\"reasoning\":\"Observed accessible button controls, gridcells, textbox fields, and zero unlabeled empty buttons in the live DOM. Evidence: toolbar_and_gallery_controls_semantic-shared.png\"},\"camera_cancel_leaves_board_and_slider\":{\"score\":\"no\",\"reasoning\":\"FAIL: Camera Cancel closed the overlay and preserved the board, but the slider remained disabled on the blank board state.\"},\"resize_before_and_after_paint\":{\"score\":\"no\",\"reasoning\":\"FAIL: Resizing before paint preserved a blank grid, but after painting the slider became disabled, so the required post-paint resize/resampling could not be exercised.\"},\"import_schema_invalid_session_rejected\":{\"score\":\"yes\",\"reasoning\":\"Malformed JSON showed an inline import error, while gallery count, cell count, and filled count stayed unchanged; console error output was empty. Evidence: import_schema_invalid_session_rejected-shared.png\"},\"mirror_center_cell_records_once\":{\"score\":\"yes\",\"reasoning\":\"On a 37\u00d737 grid with Vertical mirror, the center cell produced exactly one filled cell; one Undo reverted it completely. Evidence: mirror_center_cell_records_once-shared.png\"}}",
+    "cost_usd": 0.6765222
+  },
+  "innovation": {
+    "score": 0.5333,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "qr_brush_recolor_craft",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Beyond bare cell fills, QR Brush mask recoloring with the active swatch (white\u2192black QR on white, black\u2192white QR on black, color\u2192colored QR on white) feels like a polished creative mechanic.",
+        "reasoning": "FAIL: QR strokes rendered as black QR patterns for white, black, and red swatches; colored QR output was not observed. Evidence: qr_brush_recolor_craft-shared.png"
+      },
+      {
+        "id": "11.2",
+        "name": "typewriter_bracket_intro",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "The angle-bracket <SHAPESHIFT GRID TOOL> title with a typewriter-style intro line reads as intentional brand motion beyond a static headline.",
+        "reasoning": "Fresh-load observation showed the intro text mid-type, then the bracketed title and completed typewriter-style intro settled visibly. Evidence: paper_stage_studio_identity-shared.png"
+      },
+      {
+        "id": "11.3",
+        "name": "draggable_toolbar_craft",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "The floating black draggable toolbar that repositions from its tools header feels like a finished creative-tool workspace, not a static bar.",
+        "reasoning": "Dragging the toolbar header repositioned the floating black panel from the left side to the center-right. Evidence: draggable_toolbar_craft-shared.png"
+      },
+      {
+        "id": "11.4",
+        "name": "gallery_thumbnail_workflow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Saved-board thumbnails plus favorite/tag filter form a delightful recall workflow beyond a minimal name-only list.",
+        "reasoning": "Gallery displayed saved board thumbnails, named/tagged cards, favorite stars, and an active tag-filter menu. Evidence: gallery_thumbnail_workflow-shared.png"
+      },
+      {
+        "id": "11.5",
+        "name": "camera_capture_pixelize_polish",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Camera overlay with Capture center-crop pixelization feels like a thoughtful import path, not a stub file picker only.",
+        "reasoning": "BLOCKED: Camera overlay and Capture control were present, but the live camera reported permission denied/no camera available, so capture pixelization could not be completed. Evidence: camera_capture_pixelize_polish-shared.png"
+      },
+      {
+        "id": "11.6",
+        "name": "branded_export_footer",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Download or Share a PNG with the black branded footer (/MADE WITH SHAPESHIFT GRID TOOL and <SHAPESHIFTFESTIVAL.COM>) elevates export beyond a silent dump.",
+        "reasoning": "Share PNG downloaded a PNG whose visible artifact includes the black branded footer with both required strings. Evidence: shapeshift-grid.png"
+      },
+      {
+        "id": "11.7",
+        "name": "paper_stage_studio_identity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "The light paper stage with soft radial washes, high-contrast ink, and condensed angle-bracket branding reads as a cohesive SHAPESHIFT Grid Tool identity rather than a default admin template.",
+        "reasoning": "The rendered app visibly uses a light paper-like stage, radial color washes, high-contrast ink, condensed typography, angle-bracket branding, and a black footer. Evidence: paper_stage_studio_identity-shared.png"
+      },
+      {
+        "id": "11.8",
+        "name": "change_aware_undo_feel",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Recording a cell to undo history only when its value actually changes (so redundant same-cell strokes do not spam history) feels like intentional painting craft.",
+        "reasoning": "FAIL: After repeated same-cell strokes and one undo, the cell returned to blank but Undo remained enabled, indicating redundant history was not shown to collapse cleanly. Evidence: change_aware_undo_feel-shared.png"
+      },
+      {
+        "id": "11.9",
+        "name": "cell_lock_and_resample_craft",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Cell-size lock after first paint/upload/capture plus art resampling on rebuild (when unlocked via Clear) feels like a thoughtful resolution workflow.",
+        "reasoning": "FAIL: Cell-size lock after painting and the Clear reset affordance were visible, but art resampling during a rebuild was not directly observed end-to-end. Evidence: qr_brush_recolor_craft-shared.png"
+      },
+      {
+        "id": "11.10",
+        "name": "competition_level_tool_feel",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Taken together, QR Brush, draggable toolbar, gallery recall, and branded festival export present competition-level creative-tool craft visible to a real user.",
+        "reasoning": "The live app visibly combines QR Brush, a repositionable floating toolbar, thumbnail gallery recall with filtering/favorites, and branded PNG export. Evidence: gallery_thumbnail_workflow-shared.png"
+      },
+      {
+        "id": "11.11",
+        "name": "mirror_paint_symmetry_craft",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Horizontal/Vertical mirror painting that writes partner cells in the same stroke feels like intentional festival-grid craft beyond a single-cell brush.",
+        "reasoning": "FAIL: After selecting Horizontal mirror and painting a cell, the expected partner cell remained blank. Evidence: change_aware_undo_feel-shared.png"
+      },
+      {
+        "id": "11.12",
+        "name": "session_json_artifact_craft",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "A live Session JSON Export with Copy/Download plus Import round-trip elevates the end state beyond PNG-only download.",
+        "reasoning": "Export opened a live Session JSON preview with Copy JSON and Download; the downloaded JSON was then imported through the visible Import Session JSON flow and restored the painted cells. Evidence: session_json_artifact_craft-shared.png"
+      },
+      {
+        "id": "11.13",
+        "name": "live_fill_stats_craft",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "A live painted/qr/colorFilled/blank readout that tracks every stroke feels like a useful studio meter beyond a bare canvas.",
+        "reasoning": "The live meter visibly updated after strokes, showing painted, QR, color-filled, and blank counts. Evidence: live_fill_stats_craft-shared.png"
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the SHAPESHIFT Grid Tool spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "FAIL: No additional qualifying enhancement beyond the separately covered QR, toolbar, gallery, camera, export, mirror, session, and statistics features was observed. Evidence: paper_stage_studio_identity-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"qr_brush_recolor_craft\":{\"score\":\"no\",\"reasoning\":\"FAIL: QR strokes rendered as black QR patterns for white, black, and red swatches; colored QR output was not observed. Evidence: qr_brush_recolor_craft-shared.png\"},\"typewriter_bracket_intro\":{\"score\":\"yes\",\"reasoning\":\"Fresh-load observation showed the intro text mid-type, then the bracketed title and completed typewriter-style intro settled visibly. Evidence: paper_stage_studio_identity-shared.png\"},\"draggable_toolbar_craft\":{\"score\":\"yes\",\"reasoning\":\"Dragging the toolbar header repositioned the floating black panel from the left side to the center-right. Evidence: draggable_toolbar_craft-shared.png\"},\"gallery_thumbnail_workflow\":{\"score\":\"yes\",\"reasoning\":\"Gallery displayed saved board thumbnails, named/tagged cards, favorite stars, and an active tag-filter menu. Evidence: gallery_thumbnail_workflow-shared.png\"},\"camera_capture_pixelize_polish\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Camera overlay and Capture control were present, but the live camera reported permission denied/no camera available, so capture pixelization could not be completed. Evidence: camera_capture_pixelize_polish-shared.png\"},\"branded_export_footer\":{\"score\":\"yes\",\"reasoning\":\"Share PNG downloaded a PNG whose visible artifact includes the black branded footer with both required strings. Evidence: shapeshift-grid.png\"},\"paper_stage_studio_identity\":{\"score\":\"yes\",\"reasoning\":\"The rendered app visibly uses a light paper-like stage, radial color washes, high-contrast ink, condensed typography, angle-bracket branding, and a black footer. Evidence: paper_stage_studio_identity-shared.png\"},\"change_aware_undo_feel\":{\"score\":\"no\",\"reasoning\":\"FAIL: After repeated same-cell strokes and one undo, the cell returned to blank but Undo remained enabled, indicating redundant history was not shown to collapse cleanly. Evidence: change_aware_undo_feel-shared.png\"},\"cell_lock_and_resample_craft\":{\"score\":\"no\",\"reasoning\":\"FAIL: Cell-size lock after painting and the Clear reset affordance were visible, but art resampling during a rebuild was not directly observed end-to-end. Evidence: qr_brush_recolor_craft-shared.png\"},\"competition_level_tool_feel\":{\"score\":\"yes\",\"reasoning\":\"The live app visibly combines QR Brush, a repositionable floating toolbar, thumbnail gallery recall with filtering/favorites, and branded PNG export. Evidence: gallery_thumbnail_workflow-shared.png\"},\"mirror_paint_symmetry_craft\":{\"score\":\"no\",\"reasoning\":\"FAIL: After selecting Horizontal mirror and painting a cell, the expected partner cell remained blank. Evidence: change_aware_undo_feel-shared.png\"},\"session_json_artifact_craft\":{\"score\":\"yes\",\"reasoning\":\"Export opened a live Session JSON preview with Copy JSON and Download; the downloaded JSON was then imported through the visible Import Session JSON flow and restored the painted cells. Evidence: session_json_artifact_craft-shared.png\"},\"live_fill_stats_craft\":{\"score\":\"yes\",\"reasoning\":\"The live meter visibly updated after strokes, showing painted, QR, color-filled, and blank counts. Evidence: live_fill_stats_craft-shared.png\"},\"innovation_catchall\":{\"score\":\"no\",\"reasoning\":\"FAIL: No additional qualifying enhancement beyond the separately covered QR, toolbar, gallery, camera, export, mirror, session, and statistics features was observed. Evidence: paper_stage_studio_identity-shared.png\"}}",
+    "cost_usd": 0.7625124
+  },
+  "motion": {
+    "score": 0.2308,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "toolbar_gallery_hover_animations",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Required hover animations are present on the real UI path: primary action buttons fill/ease on hover; mode buttons, mirror control, and swatches show active fill/opacity/border changes; gallery board rows take a hover wash",
+        "reasoning": "PASS \u2014 Hovering Gallery changed background, color, and border, and toolbar controls exposed eased transitions; gallery cards also showed hover wash/transform. Evidence: toolbar_gallery_hover_animations-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "paint_gallery_switch_keeps_hover",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Paint/Gallery mode switches update without full reload and keep hover feedback on toolbar and gallery rows",
+        "reasoning": "PASS \u2014 Paint/Gallery switched in place without reload; Gallery rows retained hover feedback with background and transform changes. Evidence: paint_gallery_switch_keeps_hover-shared.png",
+        "optional": true
+      },
+      {
+        "id": "4.4",
+        "name": "cell_slider_lock_fade_and_toolbar_drag",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Through the real UI controls: the cell-size control fades toward a muted disabled look when locked and restores on Clear, and the floating toolbar repositions by dragging its header",
+        "reasoning": "FAIL: Painting disabled the slider and muted its parent (opacity 0.55, grayscale), and the toolbar moved by drag, but Clear did not restore the slider. Evidence: cell_slider_lock_fade_and_toolbar_drag-shared.png",
+        "optional": true
+      },
+      {
+        "id": "4.5",
+        "name": "camera_overlay_fades",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Opening the camera overlay through its real toolbar control fades it in, and closing it (Cancel or Capture) fades it out rather than snapping, while painting continues to update cells immediately",
+        "reasoning": "FAIL: Camera opened and closed, but the overlay was observed at opacity 1 with identity transform and transition `all`, with no directly observed fade; camera access also showed permission-denied feedback. Evidence: camera_overlay_fades-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "gallery_card_enter_exit_animation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Saving a board through the real Save control animates its new card into the gallery, and deleting a board animates its card out rather than snapping away instantly",
+        "reasoning": "FAIL: Saving created a gallery card with an animation transition, but the real Delete control did not remove the card even after confirmation handling, so the end-to-end enter/exit workflow was not satisfied. Evidence: gallery_card_enter_exit_animation-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "validation_feedback_eased_in",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Validation and save feedback appears with a brief eased transition rather than popping in instantly",
+        "reasoning": "BLOCKED: No directly observable validation or eased save-feedback state was captured during the exercised workflows. Evidence: gallery_card_enter_exit_animation-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "reduced_motion_removes_animation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set on a fresh load, animations are removed and state changes apply instantly while every feature (painting, saving, loading, filtering, camera overlay, Export, and Import) remains usable",
+        "reasoning": "FAIL: Reduced-motion mode was confirmed, and animation/transition durations became 1e-06s; painting, mode switching, camera, Export, and Import worked, but the full required set including saving, loading, and filtering was not completed and verified. Evidence: reduced_motion_removes_animation-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "export_surface_enter_and_copy_confirm",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Opening Export through its real control enters with a brief opacity/scale transition, and clicking Copy on Session JSON shows a short confirmation before resetting \u2014 verified on the real UI path, not a WebMCP shortcut",
+        "reasoning": "FAIL: Copy JSON produced visible `copied` confirmation, but the opened Export surface was observed at opacity 1 and identity transform with transition `all`; no directly observed opacity/scale entrance transition. Evidence: export_surface_enter_and_copy_confirm-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"toolbar_gallery_hover_animations\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Hovering Gallery changed background, color, and border, and toolbar controls exposed eased transitions; gallery cards also showed hover wash/transform. Evidence: toolbar_gallery_hover_animations-shared.png\"},\"paint_gallery_switch_keeps_hover\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Paint/Gallery switched in place without reload; Gallery rows retained hover feedback with background and transform changes. Evidence: paint_gallery_switch_keeps_hover-shared.png\"},\"cell_slider_lock_fade_and_toolbar_drag\":{\"score\":\"no\",\"reasoning\":\"FAIL: Painting disabled the slider and muted its parent (opacity 0.55, grayscale), and the toolbar moved by drag, but Clear did not restore the slider. Evidence: cell_slider_lock_fade_and_toolbar_drag-shared.png\"},\"camera_overlay_fades\":{\"score\":\"no\",\"reasoning\":\"FAIL: Camera opened and closed, but the overlay was observed at opacity 1 with identity transform and transition `all`, with no directly observed fade; camera access also showed permission-denied feedback. Evidence: camera_overlay_fades-shared.png\"},\"gallery_card_enter_exit_animation\":{\"score\":\"no\",\"reasoning\":\"FAIL: Saving created a gallery card with an animation transition, but the real Delete control did not remove the card even after confirmation handling, so the end-to-end enter/exit workflow was not satisfied. Evidence: gallery_card_enter_exit_animation-shared.png\"},\"validation_feedback_eased_in\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No directly observable validation or eased save-feedback state was captured during the exercised workflows. Evidence: gallery_card_enter_exit_animation-shared.png\"},\"reduced_motion_removes_animation\":{\"score\":\"no\",\"reasoning\":\"FAIL: Reduced-motion mode was confirmed, and animation/transition durations became 1e-06s; painting, mode switching, camera, Export, and Import worked, but the full required set including saving, loading, and filtering was not completed and verified. Evidence: reduced_motion_removes_animation-shared.png\"},\"export_surface_enter_and_copy_confirm\":{\"score\":\"no\",\"reasoning\":\"FAIL: Copy JSON produced visible `copied` confirmation, but the opened Export surface was observed at opacity 1 and identity transform with transition `all`; no directly observed opacity/scale entrance transition. Evidence: export_surface_enter_and_copy_confirm-shared.png\"}}",
+    "cost_usd": 0.4912938
+  },
+  "performance": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_under_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive within 2 seconds of a local cold load \u2014 paint stage, toolbar, and canvas respond without a long blank wait.",
+        "reasoning": "yes \u2014 Local load rendered an interactive paint stage, toolbar, and 20\u00d720 canvas promptly. Evidence: cold_start_under_two_seconds-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "console_clean_during_studio_flows",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No console errors or warnings appear during a full exercise of painting, saving, loading, filtering, Export, Import, and mode switching.",
+        "reasoning": "yes \u2014 After painting, saving, loading, gallery switching, export/import, and mode changes, console reported 0 errors and 0 warnings. Evidence: console_clean_during_studio_flows-shared.png"
+      },
+      {
+        "id": "9.3",
+        "name": "paint_strokes_respond_immediately",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Continuous drag-painting across many cells stays smooth with no visible lag between pointer movement and cells filling (UI response under ~100ms), including when mirrorMode is Horizontal or Vertical.",
+        "reasoning": "yes \u2014 Real drag painting filled cells, including with Horizontal mirror enabled, while the grid remained responsive. Evidence: paint_strokes_respond_immediately-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "image_import_stays_responsive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Uploading an image or capturing from the camera onto the grid completes without freezing the page; the UI remains interactive once pixelization finishes.",
+        "reasoning": "yes \u2014 A real image upload completed, filled the grid, closed the chooser, and left the canvas interactive. Evidence: image_import_stays_responsive-shared.png"
+      },
+      {
+        "id": "9.5",
+        "name": "cell_rebuild_without_freeze",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rebuilding the grid via the cell-size slider (while unlocked) completes without freezing the page.",
+        "reasoning": "yes \u2014 With the slider unlocked, changing cell size rebuilt the grid from 400 to 169 cells and remained responsive. Evidence: cell_rebuild_without_freeze-shared.png"
+      },
+      {
+        "id": "9.6",
+        "name": "mode_switch_stays_interactive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Switching between Paint and Gallery and saving/loading boards keeps the UI interactive during the state change.",
+        "reasoning": "yes \u2014 Paint/Gallery switching and loading a saved board completed through the visible UI without losing interactivity. Evidence: mode_switch_stays_interactive-shared.png"
+      },
+      {
+        "id": "9.7",
+        "name": "rapid_drag_stays_smooth",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapid drag strokes across the grid keep painting smoothly with no hangs, dropped cells, or visible frame stutter.",
+        "reasoning": "yes \u2014 60 rapid real drag strokes completed with 88 filled cells and the grid/toolbar still present, with no hang. Evidence: rapid_drag_stays_smooth-shared.png"
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_tool_and_undo_no_freeze",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapid tool switching (Q/B/E), swatch picks (1\u20137), and Undo/Backspace do not hang or freeze the studio.",
+        "reasoning": "yes \u2014 Repeated Q/B/E, 1\u20137, Backspace, and undo-related keyboard actions completed while the grid and toolbar remained available. Evidence: rapid_tool_and_undo_no_freeze-shared.png"
+      },
+      {
+        "id": "9.9",
+        "name": "extended_paint_session_stable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "An extended painting session with many strokes and several gallery saves shows no runaway slowdown or browser resource collapse.",
+        "reasoning": "yes \u2014 An extended session of many strokes plus several gallery saves completed without runaway slowdown or resource collapse. Evidence: extended_paint_session_stable-shared.png"
+      },
+      {
+        "id": "9.10",
+        "name": "camera_cancel_recovers_promptly",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening then cancelling the camera overlay recovers promptly without hanging the toolbar or paint stage.",
+        "reasoning": "yes \u2014 Camera opened with the unavailable-camera alert, Cancel dismissed the overlay, and the studio recovered immediately. Evidence: camera_cancel_recovers_promptly-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_start_under_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Local load rendered an interactive paint stage, toolbar, and 20\u00d720 canvas promptly. Evidence: cold_start_under_two_seconds-shared.png\"},\"console_clean_during_studio_flows\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 After painting, saving, loading, gallery switching, export/import, and mode changes, console reported 0 errors and 0 warnings. Evidence: console_clean_during_studio_flows-shared.png\"},\"paint_strokes_respond_immediately\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Real drag painting filled cells, including with Horizontal mirror enabled, while the grid remained responsive. Evidence: paint_strokes_respond_immediately-shared.png\"},\"image_import_stays_responsive\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 A real image upload completed, filled the grid, closed the chooser, and left the canvas interactive. Evidence: image_import_stays_responsive-shared.png\"},\"cell_rebuild_without_freeze\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 With the slider unlocked, changing cell size rebuilt the grid from 400 to 169 cells and remained responsive. Evidence: cell_rebuild_without_freeze-shared.png\"},\"mode_switch_stays_interactive\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Paint/Gallery switching and loading a saved board completed through the visible UI without losing interactivity. Evidence: mode_switch_stays_interactive-shared.png\"},\"rapid_drag_stays_smooth\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 60 rapid real drag strokes completed with 88 filled cells and the grid/toolbar still present, with no hang. Evidence: rapid_drag_stays_smooth-shared.png\"},\"rapid_tool_and_undo_no_freeze\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Repeated Q/B/E, 1\u20137, Backspace, and undo-related keyboard actions completed while the grid and toolbar remained available. Evidence: rapid_tool_and_undo_no_freeze-shared.png\"},\"extended_paint_session_stable\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 An extended session of many strokes plus several gallery saves completed without runaway slowdown or resource collapse. Evidence: extended_paint_session_stable-shared.png\"},\"camera_cancel_recovers_promptly\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Camera opened with the unavailable-camera alert, Cancel dismissed the overlay, and the studio recovered immediately. Evidence: camera_cancel_recovers_promptly-shared.png\"}}",
+    "cost_usd": 0.5172882
+  },
+  "responsiveness": {
+    "score": 0.6364,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "layout_adapts_1440_to_375",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Layout adapts gracefully from 1440px desktop (floating toolbar over centered canvas) to 375px mobile without broken stage or unreachable tools.",
+        "reasoning": "FAIL: Desktop shows a 760px paint grid, but at 375px the paint stage/grid is absent, leaving a broken mobile stage. Evidence: layout_adapts_1440_to_375-desktop.png; layout_adapts_1440_to_375-mobile.png"
+      },
+      {
+        "id": "7.2",
+        "name": "mobile_tap_targets_large_enough",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On a 375px viewport, toolbar tools, swatches, and gallery actions present tap targets at least 44px.",
+        "reasoning": "All mobile toolbar, swatch, and gallery action buttons observed at 44px or larger. Evidence: layout_adapts_1440_to_375-mobile.png"
+      },
+      {
+        "id": "7.3",
+        "name": "typography_readable_across_breakpoints",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography remains readable at both desktop and 375px mobile \u2014 title, toolbar labels, and gallery card text do not become illegibly tiny.",
+        "reasoning": "Title, toolbar labels, and gallery text remain visibly legible at desktop and mobile widths. Evidence: layout_adapts_1440_to_375-mobile.png; gallery_cards_reflow_single_column-desktop-gallery.png"
+      },
+      {
+        "id": "7.4",
+        "name": "no_clip_or_overflow_at_375",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At 375px width the canvas and toolbar reflow to fit with no horizontal scrolling and no clipped controls.",
+        "reasoning": "FAIL: The mobile layout fits horizontally, but the paint canvas is missing at 375px rather than reflowing into a usable stage. Evidence: layout_adapts_1440_to_375-mobile.png"
+      },
+      {
+        "id": "7.5",
+        "name": "toolbar_docks_or_reflows_on_narrow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At small widths the floating toolbar may dock, but all brush modes, swatches, mirror control, fill stats, Export, Import, and actions stay reachable.",
+        "reasoning": "The toolbar reflows into a full-width mobile panel, with brush modes, swatches, mirror, stats, Export, Import, and actions reachable. Evidence: layout_adapts_1440_to_375-mobile.png"
+      },
+      {
+        "id": "7.6",
+        "name": "gallery_cards_reflow_single_column",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Gallery cards reflow from a dense multi-column desktop arrangement to a single column at narrow widths without losing names, tags, or actions.",
+        "reasoning": "Desktop gallery cards appear in two columns; at 375px five cards are observed in one column with names, tags, and Load actions retained. Evidence: gallery_cards_reflow_single_column-desktop-gallery.png; gallery_cards_reflow_single_column-mobile-gallery.png"
+      },
+      {
+        "id": "7.7",
+        "name": "touch_drag_paints_on_mobile",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At 375px width, painting by touch drag works on the mobile layout \u2014 cells the stroke crosses fill in one gesture.",
+        "reasoning": "BLOCKED: No paint grid/stage is rendered at 375px, so a real touch-drag painting gesture cannot be exercised. Evidence: layout_adapts_1440_to_375-mobile.png"
+      },
+      {
+        "id": "7.8",
+        "name": "no_horizontal_scroll_at_375",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px width, no horizontal scrolling appears on the paint stage or gallery.",
+        "reasoning": "At 375px, measured document scroll width is 360px and gallery cards fit within the viewport; no horizontal overflow observed. Evidence: gallery_cards_reflow_single_column-mobile-gallery.png"
+      },
+      {
+        "id": "7.9",
+        "name": "canvas_grid_sizes_responsively",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The paint canvas and grid size responsively to fit the layout at desktop and mobile widths without a fixed size overflowing the viewport.",
+        "reasoning": "FAIL: The desktop grid is 760px square, but no grid is rendered at 375px, so it does not responsively size into the mobile layout. Evidence: layout_adapts_1440_to_375-desktop.png; layout_adapts_1440_to_375-mobile.png"
+      },
+      {
+        "id": "7.10",
+        "name": "docked_toolbar_actions_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Fixed or docked toolbar controls (brush modes, swatches, and actions) remain accessible on mobile devices.",
+        "reasoning": "Mobile toolbar controls are present, reflowed, and have usable 44px+ targets, including brush modes, swatches, and actions. Evidence: layout_adapts_1440_to_375-mobile.png"
+      },
+      {
+        "id": "7.11",
+        "name": "export_import_usable_at_375",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px width the Export and Import surfaces remain readable and operable without clipped format tabs, Copy/Download, or paste/file controls.",
+        "reasoning": "Export opens a fitting dialog with readable Session JSON/PNG tabs and Copy/Download controls; Import opens a fitting dialog with JSON input, file chooser, and import controls. Evidence: export_import_usable_at_375-export.png; export_import_usable_at_375-import.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"layout_adapts_1440_to_375\":{\"score\":\"no\",\"reasoning\":\"FAIL: Desktop shows a 760px paint grid, but at 375px the paint stage/grid is absent, leaving a broken mobile stage. Evidence: layout_adapts_1440_to_375-desktop.png; layout_adapts_1440_to_375-mobile.png\"},\"mobile_tap_targets_large_enough\":{\"score\":\"yes\",\"reasoning\":\"All mobile toolbar, swatch, and gallery action buttons observed at 44px or larger. Evidence: layout_adapts_1440_to_375-mobile.png\"},\"typography_readable_across_breakpoints\":{\"score\":\"yes\",\"reasoning\":\"Title, toolbar labels, and gallery text remain visibly legible at desktop and mobile widths. Evidence: layout_adapts_1440_to_375-mobile.png; gallery_cards_reflow_single_column-desktop-gallery.png\"},\"no_clip_or_overflow_at_375\":{\"score\":\"no\",\"reasoning\":\"FAIL: The mobile layout fits horizontally, but the paint canvas is missing at 375px rather than reflowing into a usable stage. Evidence: layout_adapts_1440_to_375-mobile.png\"},\"toolbar_docks_or_reflows_on_narrow\":{\"score\":\"yes\",\"reasoning\":\"The toolbar reflows into a full-width mobile panel, with brush modes, swatches, mirror, stats, Export, Import, and actions reachable. Evidence: layout_adapts_1440_to_375-mobile.png\"},\"gallery_cards_reflow_single_column\":{\"score\":\"yes\",\"reasoning\":\"Desktop gallery cards appear in two columns; at 375px five cards are observed in one column with names, tags, and Load actions retained. Evidence: gallery_cards_reflow_single_column-desktop-gallery.png; gallery_cards_reflow_single_column-mobile-gallery.png\"},\"touch_drag_paints_on_mobile\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No paint grid/stage is rendered at 375px, so a real touch-drag painting gesture cannot be exercised. Evidence: layout_adapts_1440_to_375-mobile.png\"},\"no_horizontal_scroll_at_375\":{\"score\":\"yes\",\"reasoning\":\"At 375px, measured document scroll width is 360px and gallery cards fit within the viewport; no horizontal overflow observed. Evidence: gallery_cards_reflow_single_column-mobile-gallery.png\"},\"canvas_grid_sizes_responsively\":{\"score\":\"no\",\"reasoning\":\"FAIL: The desktop grid is 760px square, but no grid is rendered at 375px, so it does not responsively size into the mobile layout. Evidence: layout_adapts_1440_to_375-desktop.png; layout_adapts_1440_to_375-mobile.png\"},\"docked_toolbar_actions_accessible\":{\"score\":\"yes\",\"reasoning\":\"Mobile toolbar controls are present, reflowed, and have usable 44px+ targets, including brush modes, swatches, and actions. Evidence: layout_adapts_1440_to_375-mobile.png\"},\"export_import_usable_at_375\":{\"score\":\"yes\",\"reasoning\":\"Export opens a fitting dialog with readable Session JSON/PNG tabs and Copy/Download controls; Import opens a fitting dialog with JSON input, file chooser, and import controls. Evidence: export_import_usable_at_375-export.png; export_import_usable_at_375-import.png\"} }",
+    "cost_usd": 0.2401224
+  },
+  "technical": {
+    "score": 0.5789,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "shared_state_coherence",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A change made in one surface (renaming a board, toggling a favorite, saving a new board) is immediately reflected in every other surface showing that datum \u2014 gallery cards, tag-filtered lists, and the current selection \u2014 without a reload",
+        "reasoning": "Rename and favorite changes immediately appeared in the gallery without reload. Evidence: shared_state_coherence-updated.png"
+      },
+      {
+        "id": "2.2",
+        "name": "reload_returns_seeded_baseline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A page reload returns the app to its seeded in-memory baseline \u2014 blank canvas, unlocked cell-size slider, exactly the seeded boards \u2014 with no facet (favorites, filters, saved boards) surviving the reload",
+        "reasoning": "Reload restored four seeded boards, blank 400-cell canvas, and enabled 32px slider; renamed board was absent. Evidence: reload_returns_seeded_baseline-shared.png"
+      },
+      {
+        "id": "2.5",
+        "name": "local_qrious_festival_mask",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The QR mask is generated client-side from a locally shipped QRious (or equivalent) under vendor/, encoding the fixed festival URL with no network calls",
+        "reasoning": "BLOCKED: QR generation/library provenance and fixed URL encoding could not be directly verified through browser observation."
+      },
+      {
+        "id": "2.7",
+        "name": "keyboard_operable_with_focus_ring",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Every toolbar control, palette swatch, and gallery action is reachable and operable with the keyboard alone, and the focused control shows a visible focus indicator",
+        "reasoning": "BLOCKED: Focus rings and many toolbar/swatches were observed, but the complete set of gallery actions was not fully exercised. Evidence: keyboard_operable_with_focus_ring-shared.png"
+      },
+      {
+        "id": "2.8",
+        "name": "camera_dialog_traps_focus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The camera overlay behaves as a modal dialog: focus moves into it when opened, stays trapped inside while open, and returns to the triggering control on close",
+        "reasoning": "Opening Camera moved focus into a role=dialog; repeated Tab stayed among dialog controls, and closing returned focus to Camera. Evidence: camera_dialog_traps_focus-shared.png"
+      },
+      {
+        "id": "2.9",
+        "name": "swatches_expose_color_names",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Each palette swatch exposes an accessible name identifying its color in the accessibility tree, rather than being an unlabeled colored square",
+        "reasoning": "All seven palette buttons exposed accessible names including their color names. Evidence: keyboard_operable_with_focus_ring-shared.png"
+      },
+      {
+        "id": "2.10",
+        "name": "validation_message_announced",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "The inline save-validation message is exposed to assistive technology (an aria-live region or role='alert') in addition to being shown visually",
+        "reasoning": "Invalid save input displayed an inline name error with role=alert and aria-live=assertive. Evidence: validation_message_announced-shared.png"
+      },
+      {
+        "id": "2.11",
+        "name": "interactive_within_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive within 2 seconds of a local cold load",
+        "reasoning": "The local cold load rendered a usable editor with interactive controls and WebMCP-ready state immediately after navigation."
+      },
+      {
+        "id": "2.13",
+        "name": "drag_painting_stays_smooth",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Continuous drag-painting across many cells stays smooth, with no visible lag between pointer movement and cells filling",
+        "reasoning": "FAIL: A real drag across many grid cells completed without visible cells filling or updated paint statistics. Evidence: drag_painting_stays_smooth-shared.png"
+      },
+      {
+        "id": "2.15",
+        "name": "form_and_export_share_board_session_schema",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Save board, rename, and Import enforce the same Board/Session field contracts the Export session JSON uses (name \u226440 unique, tag \u226424 non-empty, schemaVersion shapeshift-session-v1, closed brushMode/paletteColor/mirrorMode enums, cellSize 16\u201364): invalid values show inline per-field errors before commit, and Export/Import round-trip only contracted shapes",
+        "reasoning": "FAIL: Export visibly showed schemaVersion shapeshift-session-v1 and contracted fields, and invalid Import/save values produced errors, but a complete successful Import/Export round-trip was not observed. Evidence: form_and_export_share_board_session_schema-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"shared_state_coherence\":{\"score\":\"yes\",\"reasoning\":\"Rename and favorite changes immediately appeared in the gallery without reload. Evidence: shared_state_coherence-updated.png\"},\"reload_returns_seeded_baseline\":{\"score\":\"yes\",\"reasoning\":\"Reload restored four seeded boards, blank 400-cell canvas, and enabled 32px slider; renamed board was absent. Evidence: reload_returns_seeded_baseline-shared.png\"},\"local_qrious_festival_mask\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: QR generation/library provenance and fixed URL encoding could not be directly verified through browser observation.\"},\"keyboard_operable_with_focus_ring\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Focus rings and many toolbar/swatches were observed, but the complete set of gallery actions was not fully exercised. Evidence: keyboard_operable_with_focus_ring-shared.png\"},\"camera_dialog_traps_focus\":{\"score\":\"yes\",\"reasoning\":\"Opening Camera moved focus into a role=dialog; repeated Tab stayed among dialog controls, and closing returned focus to Camera. Evidence: camera_dialog_traps_focus-shared.png\"},\"swatches_expose_color_names\":{\"score\":\"yes\",\"reasoning\":\"All seven palette buttons exposed accessible names including their color names. Evidence: keyboard_operable_with_focus_ring-shared.png\"},\"validation_message_announced\":{\"score\":\"yes\",\"reasoning\":\"Invalid save input displayed an inline name error with role=alert and aria-live=assertive. Evidence: validation_message_announced-shared.png\"},\"interactive_within_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"The local cold load rendered a usable editor with interactive controls and WebMCP-ready state immediately after navigation.\"},\"drag_painting_stays_smooth\":{\"score\":\"no\",\"reasoning\":\"FAIL: A real drag across many grid cells completed without visible cells filling or updated paint statistics. Evidence: drag_painting_stays_smooth-shared.png\"},\"form_and_export_share_board_session_schema\":{\"score\":\"no\",\"reasoning\":\"FAIL: Export visibly showed schemaVersion shapeshift-session-v1 and contracted fields, and invalid Import/save values produced errors, but a complete successful Import/Export round-trip was not observed. Evidence: form_and_export_share_board_session_schema-shared.png\"}}",
+    "cost_usd": 0.2905128
+  },
+  "user_flows": {
+    "score": 0.25,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "paint_save_increments_gallery",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Save flow: paint several cells, open Save board, and submit a valid Board payload (trimmed unique name \u226440 chars and trimmed tag \u226424 chars) \u2014 the gallery collection count increases by exactly one, the new board card appears in Gallery mode with a thumbnail matching the painted cells and its tag, the Export session JSON boards array includes that board under name/tag/favorite/cells, and switching between Paint and Gallery modes shows the same new board without a reload.",
+        "reasoning": "FAIL: Gallery count increased from 4 to 5 and the saved Red Square card appeared with its tag and thumbnail, but the export boards-array requirement was not verified in the same saved state. Evidence: paint-save-increments_gallery-gallery.png"
+      },
+      {
+        "id": "6.2",
+        "name": "empty_save_name_inline_validation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create flow: submitting Save board with a Board field-contract violation (empty or whitespace-only name, empty tag, name over 40 characters, or a duplicate name) triggers immediate inline validation naming the offending field, keeps the save control disabled until name and tag are valid, and does not increase the gallery count.",
+        "reasoning": "Whitespace-only name and tag immediately produced field-specific inline alerts and kept SAVE BOARD disabled. Evidence: empty-save-name-inline-validation-shared.png"
+      },
+      {
+        "id": "6.3",
+        "name": "rename_updates_card_in_place",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Rename flow: renaming a board updates that same card's name in Gallery without changing the collection count and without creating a duplicate card.",
+        "reasoning": "FAIL: Renaming changed the displayed card name but the visible collection collapsed from five boards to one, so count preservation was not satisfied. Evidence: rename-updates-card-in-place-shared.png"
+      },
+      {
+        "id": "6.4",
+        "name": "delete_removes_card_and_selection",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Delete flow: deleting a board removes its card, decreases the count by exactly one, clears it from any current selection, and the deleted board no longer appears under any tag filter.",
+        "reasoning": "FAIL: Delete WebMCP actions reported success, but the visible Gallery still showed all four seeded cards afterward. Evidence: last-delete-reveals-empty-gallery-shared.png"
+      },
+      {
+        "id": "6.5",
+        "name": "load_board_to_paint_with_undo",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Load flow: from Gallery mode, load a saved board \u2014 its cells appear on the paint canvas immediately, the app switches to Paint mode showing the loaded art, painting a further cell changes only that cell, and pressing Undo reverts exactly that one change while the rest of the loaded board stays intact.",
+        "reasoning": "BLOCKED: The visible Load control was obstructed by the floating toolbar, and the equivalent WebMCP load action returned \u201cboard was not found\u201d; loaded-art and undo behavior could not be verified. Evidence: load-board-to-paint-with-undo-shared.png"
+      },
+      {
+        "id": "6.6",
+        "name": "last_delete_reveals_empty_gallery",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After deleting every board, Gallery mode shows an empty state with a message explaining the gallery is empty and how to save a board.",
+        "reasoning": "FAIL: After deletion actions reported zero boards, Gallery visibly still showed four seeded boards rather than an empty-state message. Evidence: last-delete-reveals-empty-gallery-shared.png"
+      },
+      {
+        "id": "6.7",
+        "name": "favorite_and_tag_filter_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Favorite and filter flow: marking a board as favorite updates its indicator on the card immediately; choosing a tag filter recomputes the visible gallery to only boards with that tag, and clearing the filter restores the full collection with the favorite state preserved.",
+        "reasoning": "BLOCKED: Favorite state visibly updated, but selecting the visible Festival tag option could not be completed and no filtered result was verified. Evidence: favorite-and-tag-filter-flow-shared.png"
+      },
+      {
+        "id": "6.8",
+        "name": "toolbar_drag_preserves_paint_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "On desktop, grabbing the tools header repositions the floating toolbar; the current brush mode, active swatch, grid overlay state, and painted board all survive the drag with workflow continuity.",
+        "reasoning": "FAIL: A real drag gesture was performed, but the toolbar did not visibly reposition; continuity after a successful reposition was therefore not demonstrated. Evidence: mirror-then-fill-stats-flow-shared.png"
+      },
+      {
+        "id": "6.9",
+        "name": "camera_cancel_leaves_board_unlocked",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Camera overlay flow: Cancel closes the overlay without altering the canvas or locking the cell-size slider.",
+        "reasoning": "Cancel closed the camera overlay; the canvas remained blank and the cell-size slider was visibly enabled. Evidence: camera-cancel-leaves-board-unlocked-shared.png"
+      },
+      {
+        "id": "6.10",
+        "name": "reload_returns_seeded_baseline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Reload baseline: a page reload returns the app to its seeded state \u2014 the blank canvas, the unlocked cell-size slider, and exactly the seeded boards in Gallery; boards saved before the reload are gone.",
+        "reasoning": "Reload returned a blank 20\u00d720 canvas with 400 blank cells, an enabled 32px slider, and exactly four seeded gallery boards; the saved board was gone. Evidence: reload-returns-seeded-baseline-shared.png"
+      },
+      {
+        "id": "6.11",
+        "name": "export_import_roundtrip_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "End-to-end: paint cells, set Horizontal or Vertical mirror, save or rename one board, open Export and confirm the session JSON preview includes schemaVersion shapeshift-session-v1 plus brushMode, paletteColor, mirrorMode, fillStats, cells, and boards; Download or Copy that JSON, then Import it \u2014 canvas, mirror mode, fill stats, and gallery boards match the pre-export state; then Import a non-conforming payload (wrong schemaVersion or missing required fields) and confirm an inline error names the import problem while the studio stays unchanged.",
+        "reasoning": "FAIL: Export visibly included schemaVersion, brushMode, paletteColor, mirrorMode, fillStats, cells, and boards, but the import roundtrip and invalid-payload inline-error workflow was not completed. Evidence: export-import-roundtrip-flow-shared.png"
+      },
+      {
+        "id": "6.12",
+        "name": "mirror_then_fill_stats_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Mirror paint flow: set mirrorMode to Horizontal or Vertical, paint one blank cell near an edge \u2014 the mirror-partner cell receives the same brush and color; fill stats increase for both cells when both were blank; switching mirrorMode to Off then painting a different cell changes only that cell.",
+        "reasoning": "FAIL: Horizontal mirror was set through the app action, but painting an edge cell produced only one painted cell and stats of 1 painted/399 blank; no mirror partner appeared. Evidence: mirror-then-fill-stats-flow-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"paint_save_increments_gallery\":{\"score\":\"no\",\"reasoning\":\"FAIL: Gallery count increased from 4 to 5 and the saved Red Square card appeared with its tag and thumbnail, but the export boards-array requirement was not verified in the same saved state. Evidence: paint-save-increments_gallery-gallery.png\"},\"empty_save_name_inline_validation\":{\"score\":\"yes\",\"reasoning\":\"Whitespace-only name and tag immediately produced field-specific inline alerts and kept SAVE BOARD disabled. Evidence: empty-save-name-inline-validation-shared.png\"},\"rename_updates_card_in_place\":{\"score\":\"no\",\"reasoning\":\"FAIL: Renaming changed the displayed card name but the visible collection collapsed from five boards to one, so count preservation was not satisfied. Evidence: rename-updates-card-in-place-shared.png\"},\"delete_removes_card_and_selection\":{\"score\":\"no\",\"reasoning\":\"FAIL: Delete WebMCP actions reported success, but the visible Gallery still showed all four seeded cards afterward. Evidence: last-delete-reveals-empty-gallery-shared.png\"},\"load_board_to_paint_with_undo\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The visible Load control was obstructed by the floating toolbar, and the equivalent WebMCP load action returned \u201cboard was not found\u201d; loaded-art and undo behavior could not be verified. Evidence: load-board-to-paint-with-undo-shared.png\"},\"last_delete_reveals_empty_gallery\":{\"score\":\"no\",\"reasoning\":\"FAIL: After deletion actions reported zero boards, Gallery visibly still showed four seeded boards rather than an empty-state message. Evidence: last-delete-reveals-empty-gallery-shared.png\"},\"favorite_and_tag_filter_flow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Favorite state visibly updated, but selecting the visible Festival tag option could not be completed and no filtered result was verified. Evidence: favorite-and-tag-filter-flow-shared.png\"},\"toolbar_drag_preserves_paint_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: A real drag gesture was performed, but the toolbar did not visibly reposition; continuity after a successful reposition was therefore not demonstrated. Evidence: mirror-then-fill-stats-flow-shared.png\"},\"camera_cancel_leaves_board_unlocked\":{\"score\":\"yes\",\"reasoning\":\"Cancel closed the camera overlay; the canvas remained blank and the cell-size slider was visibly enabled. Evidence: camera-cancel-leaves-board-unlocked-shared.png\"},\"reload_returns_seeded_baseline\":{\"score\":\"yes\",\"reasoning\":\"Reload returned a blank 20\u00d720 canvas with 400 blank cells, an enabled 32px slider, and exactly four seeded gallery boards; the saved board was gone. Evidence: reload-returns-seeded-baseline-shared.png\"},\"export_import_roundtrip_flow\":{\"score\":\"no\",\"reasoning\":\"FAIL: Export visibly included schemaVersion, brushMode, paletteColor, mirrorMode, fillStats, cells, and boards, but the import roundtrip and invalid-payload inline-error workflow was not completed. Evidence: export-import-roundtrip-flow-shared.png\"},\"mirror_then_fill_stats_flow\":{\"score\":\"no\",\"reasoning\":\"FAIL: Horizontal mirror was set through the app action, but painting an edge cell produced only one painted cell and stats of 1 painted/399 blank; no mirror partner appeared. Evidence: mirror-then-fill-stats-flow-shared.png\"}}",
+    "cost_usd": 0.456141
+  },
+  "visual_design": {
+    "score": 0.931,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "creative_tool_not_dashboard",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Paint stage + floating toolbar + Gallery density remains a creative tool, not a dashboard",
+        "reasoning": "PASS \u2014 Paint stage, dense canvas, floating black tool panel, and Gallery mode visibly form a creative grid tool. Evidence: creative_tool_not_dashboard-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "empty_gallery_visually_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Empty Gallery state is visually present when no boards remain",
+        "reasoning": "PASS \u2014 After deleting all boards through the visible confirmation controls, the gallery showed \u201c0 BOARDS\u201d and an empty-state panel. Evidence: empty_gallery_visually_present-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "paper_stage_condensed_type",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The stage is a light paper background with high-contrast ink-dark text, soft radial washes, and condensed UI type, with a large centered canvas under the toolbar in a desktop-first creative-tool composition",
+        "reasoning": "PASS \u2014 Light paper stage, radial washes, condensed typography, dark ink text, and centered desktop canvas are visible. Evidence: creative_tool_not_dashboard-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "angle_bracket_title_and_intro_line",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On first load an angle-bracket display title reading <SHAPESHIFT GRID TOOL> and a typewriter-style intro line are visible",
+        "reasoning": "PASS \u2014 The angle-bracket title and typewriter-style introductory copy are visible on load. Evidence: creative_tool_not_dashboard-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "black_toolbar_contains_all_controls",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A floating black toolbar contains the cell-size slider, the three brush-mode buttons, the mirror-mode control, seven square color swatches, and action buttons including Export and Import",
+        "reasoning": "PASS \u2014 Toolbar visibly includes slider, three brush modes, mirror controls, seven swatches, Export, Import, and related actions. Evidence: creative_tool_not_dashboard-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "seven_swatches_with_active_marking",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Exactly seven palette swatches (white, black, red, yellow, green, blue, pink) render as square chips and the currently selected swatch shows a visible active marking",
+        "reasoning": "PASS \u2014 Exactly seven square palette chips are visible, with black visibly marked active. Evidence: creative_tool_not_dashboard-shared.png"
+      },
+      {
+        "id": "3.8",
+        "name": "canvas_cell_render_styles",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "On the canvas, QR cells render as a scannable festival QR mask, Color cells render as flat color fills, and when the grid overlay is on, light hairlines are drawn between cells",
+        "reasoning": "FAIL: QR cells and overlay hairlines were observed, but a complete canvas observation of both a scannable QR mask and flat color-filled cells was not established. Evidence: canvas_cell_render_styles-shared.png"
+      },
+      {
+        "id": "3.9",
+        "name": "single_consistent_icon_set",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Icons in the toolbar and gallery share one consistent icon set and stroke style across the whole app, with no mismatched or pixelated icons",
+        "reasoning": "PASS \u2014 Toolbar and gallery controls use a consistent outlined icon style. Evidence: creative_tool_not_dashboard-shared.png"
+      },
+      {
+        "id": "3.10",
+        "name": "mobile_375_reflow_no_overflow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px viewport width the canvas and toolbar reflow to fit with no horizontal scrolling and no clipped controls",
+        "reasoning": "PASS \u2014 At 375px, measured document width stayed within the viewport and the canvas measured 346px wide; controls were not clipped horizontally. Evidence: mobile_375_reflow_no_overflow-shared.png"
+      },
+      {
+        "id": "3.11",
+        "name": "toolbar_controls_reachable_all_widths",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At desktop widths the toolbar floats over the stage; at narrow widths (whether docked or floating) all brush modes, swatches, and action buttons remain visible and reachable",
+        "reasoning": "PASS \u2014 Desktop toolbar floats over the stage, while the 375px layout keeps brush modes, swatches, and action buttons within the mobile column. Evidence: mobile_375_reflow_no_overflow-shared.png"
+      },
+      {
+        "id": "3.12",
+        "name": "gallery_reflows_to_single_column",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Gallery cards reflow from a dense multi-column desktop arrangement to a single column at narrow widths without losing names, tags, or actions",
+        "reasoning": "PASS \u2014 At 375px, four gallery articles measured the same width and stacked vertically in one column, retaining card content/actions. Evidence: gallery_reflows_to_single_column-shared.png"
+      },
+      {
+        "id": "3.13",
+        "name": "empty_state_copy_actionable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "The gallery empty-state copy explains that the gallery is empty and tells the user how to save a board",
+        "reasoning": "PASS \u2014 Empty gallery copy states that the gallery is empty and instructs users to switch to Paint and use Save board. Evidence: empty_gallery_visually_present-shared.png"
+      },
+      {
+        "id": "3.15",
+        "name": "consistent_terminology_and_case",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Headings, buttons, and labels use one consistent capitalization convention, and the same concepts (boards, gallery, tags) are named consistently across Paint mode, Gallery mode, and dialogs",
+        "reasoning": "PASS \u2014 Paint, Gallery, boards, tags, Save board, Import, and Export use consistent concepts across the observed views. Evidence: creative_tool_not_dashboard-shared.png"
+      },
+      {
+        "id": "3.16",
+        "name": "touch_drag_paint_works_on_mobile_layout",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px viewport width, painting across cells by touch drag works on the mobile layout, filling the cells under the drag path",
+        "reasoning": "PASS \u2014 A real drag across five mobile grid cells changed all five accessible cell labels to QR black. Evidence: touch_drag_paint_works_on_mobile_layout-shared.png"
+      },
+      {
+        "id": "3.17",
+        "name": "export_surface_format_tabs_and_preview",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export opens as a centered surface with Session JSON / PNG format tabs, a scrollable monospaced Session JSON preview, and visible Copy and Download affordances distinct from the rest of the studio chrome",
+        "reasoning": "PASS \u2014 Export opened as a centered surface with Session JSON and PNG tabs, scrollable monospaced JSON preview, Copy JSON, and Download controls. Evidence: export_surface_format_tabs_and_preview-shared.png"
+      },
+      {
+        "id": "3.18",
+        "name": "fill_stats_readout_visible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A live fill-stats readout near the stage shows painted, qr, colorFilled, and blank counts as readable numerals on the light paper stage",
+        "reasoning": "PASS \u2014 Live readout visibly shows painted, qr, color filled, and blank numeric counts. Evidence: creative_tool_not_dashboard-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"creative_tool_not_dashboard\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Paint stage, dense canvas, floating black tool panel, and Gallery mode visibly form a creative grid tool. Evidence: creative_tool_not_dashboard-shared.png\"},\"empty_gallery_visually_present\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 After deleting all boards through the visible confirmation controls, the gallery showed \u201c0 BOARDS\u201d and an empty-state panel. Evidence: empty_gallery_visually_present-shared.png\"},\"paper_stage_condensed_type\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Light paper stage, radial washes, condensed typography, dark ink text, and centered desktop canvas are visible. Evidence: creative_tool_not_dashboard-shared.png\"},\"angle_bracket_title_and_intro_line\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 The angle-bracket title and typewriter-style introductory copy are visible on load. Evidence: creative_tool_not_dashboard-shared.png\"},\"black_toolbar_contains_all_controls\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Toolbar visibly includes slider, three brush modes, mirror controls, seven swatches, Export, Import, and related actions. Evidence: creative_tool_not_dashboard-shared.png\"},\"seven_swatches_with_active_marking\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Exactly seven square palette chips are visible, with black visibly marked active. Evidence: creative_tool_not_dashboard-shared.png\"},\"canvas_cell_render_styles\":{\"score\":\"no\",\"reasoning\":\"FAIL: QR cells and overlay hairlines were observed, but a complete canvas observation of both a scannable QR mask and flat color-filled cells was not established. Evidence: canvas_cell_render_styles-shared.png\"},\"single_consistent_icon_set\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Toolbar and gallery controls use a consistent outlined icon style. Evidence: creative_tool_not_dashboard-shared.png\"},\"mobile_375_reflow_no_overflow\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 At 375px, measured document width stayed within the viewport and the canvas measured 346px wide; controls were not clipped horizontally. Evidence: mobile_375_reflow_no_overflow-shared.png\"},\"toolbar_controls_reachable_all_widths\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Desktop toolbar floats over the stage, while the 375px layout keeps brush modes, swatches, and action buttons within the mobile column. Evidence: mobile_375_reflow_no_overflow-shared.png\"},\"gallery_reflows_to_single_column\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 At 375px, four gallery articles measured the same width and stacked vertically in one column, retaining card content/actions. Evidence: gallery_reflows_to_single_column-shared.png\"},\"empty_state_copy_actionable\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Empty gallery copy states that the gallery is empty and instructs users to switch to Paint and use Save board. Evidence: empty_gallery_visually_present-shared.png\"},\"consistent_terminology_and_case\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Paint, Gallery, boards, tags, Save board, Import, and Export use consistent concepts across the observed views. Evidence: creative_tool_not_dashboard-shared.png\"},\"touch_drag_paint_works_on_mobile_layout\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 A real drag across five mobile grid cells changed all five accessible cell labels to QR black. Evidence: touch_drag_paint_works_on_mobile_layout-shared.png\"},\"export_surface_format_tabs_and_preview\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Export opened as a centered surface with Session JSON and PNG tabs, scrollable monospaced JSON preview, Copy JSON, and Download controls. Evidence: export_surface_format_tabs_and_preview-shared.png\"},\"fill_stats_readout_visible\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Live readout visibly shows painted, qr, color filled, and blank numeric counts. Evidence: creative_tool_not_dashboard-shared.png\"}}",
+    "cost_usd": 0.4925515999999999
+  },
+  "writing": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "toolbar_gallery_capitalization_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders toolbar labels, gallery actions, and form labels, they use one consistent capitalization convention throughout.",
+        "reasoning": "Toolbar, gallery, and form chrome use a consistent uppercase visual convention. Evidence: toolbar_gallery_capitalization_consistent-shared.png"
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders button or action labels, they use specific verbs appropriate to the studio (for example Save board, Clear, Grid On/Off) rather than generic Submit/OK alone when a specific label is possible.",
+        "reasoning": "Actions use specific labels such as Save board, Clear, Grid On, Upload, Import, Export, and Share PNG. Evidence: toolbar_gallery_capitalization_consistent-shared.png"
+      },
+      {
+        "id": "15.3",
+        "name": "validation_names_field_and_fix",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders validation messages for Save board, rename, or Import, they name the offending field-contract key and the fix (for example name, tag, or schemaVersion), not only a bare rejection like 'Invalid'.",
+        "reasoning": "Empty Save board validation explicitly states \u201cname: enter a board name,\u201d naming the field and fix. Evidence: validation_names_field_and_fix-shared.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_gallery_copy_explains_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders an empty gallery state (after delete-all or a zero-match tag filter), the copy explains what belongs there and how to save a board or clear the filter.",
+        "reasoning": "The empty gallery states it is empty and explains to switch to Paint, make a grid, and use Save board. Evidence: empty_gallery_copy_explains_next_step-shared.png"
+      },
+      {
+        "id": "15.5",
+        "name": "stage_and_toolbar_copy_polished",
+        "value": 1.0,
+        "raw": 5,
+        "weight": 0.5,
+        "description": "Where the app renders the <SHAPESHIFT GRID TOOL> title, typewriter-style intro line, and toolbar chrome copy, rate how free it is of spelling and grammatical errors.",
+        "reasoning": "The title, intro, and toolbar copy are legible, grammatical, and free of observed spelling errors. Evidence: toolbar_gallery_capitalization_consistent-shared.png"
+      },
+      {
+        "id": "15.6",
+        "name": "board_terminology_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders labels for the same concept in multiple places, terminology stays consistent (board / gallery / cell / brush) rather than mixing conflicting synonyms across Paint and Gallery.",
+        "reasoning": "The UI consistently uses board, gallery, cell, and brush terminology across Paint and Gallery. Evidence: board_terminology_consistent-shared.png"
+      },
+      {
+        "id": "15.7",
+        "name": "export_footer_copy_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders export footer captions (/MADE WITH SHAPESHIFT GRID TOOL and <SHAPESHIFTFESTIVAL.COM>), formatting and product naming stay consistent with the on-stage branding.",
+        "reasoning": "Footer captions use consistent SHAPESHIFT branding: /MADE WITH SHAPESHIFT GRID TOOL and <SHAPESHIFTFESTIVAL.COM>. Evidence: toolbar_gallery_capitalization_consistent-shared.png"
+      },
+      {
+        "id": "15.8",
+        "name": "save_feedback_is_specific",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders confirmation or success messages after saving a board, they state what happened rather than a vague affirmation alone.",
+        "reasoning": "A board was successfully saved through the visible Save board workflow; no vague confirmation message was rendered. Evidence: save_feedback_is_specific-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"toolbar_gallery_capitalization_consistent\":{\"score\":\"yes\",\"reasoning\":\"Toolbar, gallery, and form chrome use a consistent uppercase visual convention. Evidence: toolbar_gallery_capitalization_consistent-shared.png\"},\"actions_use_specific_labels\":{\"score\":\"yes\",\"reasoning\":\"Actions use specific labels such as Save board, Clear, Grid On, Upload, Import, Export, and Share PNG. Evidence: toolbar_gallery_capitalization_consistent-shared.png\"},\"validation_names_field_and_fix\":{\"score\":\"yes\",\"reasoning\":\"Empty Save board validation explicitly states \u201cname: enter a board name,\u201d naming the field and fix. Evidence: validation_names_field_and_fix-shared.png\"},\"empty_gallery_copy_explains_next_step\":{\"score\":\"yes\",\"reasoning\":\"The empty gallery states it is empty and explains to switch to Paint, make a grid, and use Save board. Evidence: empty_gallery_copy_explains_next_step-shared.png\"},\"stage_and_toolbar_copy_polished\":{\"score\":5,\"reasoning\":\"The title, intro, and toolbar copy are legible, grammatical, and free of observed spelling errors. Evidence: toolbar_gallery_capitalization_consistent-shared.png\"},\"board_terminology_consistent\":{\"score\":\"yes\",\"reasoning\":\"The UI consistently uses board, gallery, cell, and brush terminology across Paint and Gallery. Evidence: board_terminology_consistent-shared.png\"},\"export_footer_copy_consistent\":{\"score\":\"yes\",\"reasoning\":\"Footer captions use consistent SHAPESHIFT branding: /MADE WITH SHAPESHIFT GRID TOOL and <SHAPESHIFTFESTIVAL.COM>. Evidence: toolbar_gallery_capitalization_consistent-shared.png\"},\"save_feedback_is_specific\":{\"score\":\"yes\",\"reasoning\":\"A board was successfully saved through the visible Save board workflow; no vague confirmation message was rendered. Evidence: save_feedback_is_specific-shared.png\"}}",
+    "cost_usd": 0.2605594
+  }
+}

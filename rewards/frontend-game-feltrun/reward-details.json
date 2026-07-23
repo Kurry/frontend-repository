@@ -1,0 +1,2817 @@
+{
+  "accessibility": {
+    "score": 0.7778,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "betting_and_export_keyboard_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every betting control, panel toggle, slider, Undo last action, Save table, Load saved table, difficulty control, and Export Copy/Download/Import control is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space, arrows for the slider)",
+        "reasoning": "Native buttons, tabs, difficulty select, raise input, slider, and import/export controls are keyboard-focusable; betting and export controls are visibly present and usable. Evidence: started-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "session_modal_focus_trap",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Start new session confirmation traps focus while open and returns focus to the control that opened it on close",
+        "reasoning": "The confirmation dialog trapped Tab and Shift+Tab focus within Cancel/Reset, and Escape closed it with focus returned to Start new session. Evidence: session-modal-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "icons_have_accessible_names",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Icon-only controls in the chrome expose accessible names (aria-label or equivalent) so their purpose is announced",
+        "reasoning": "No icon-only chrome controls were observed; controls containing icons also had text or accessible labels. Evidence: accessibility-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "toast_and_copy_live_regions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The badge-unlock toast and the export copied confirmation are announced via a polite live region as well as shown visually",
+        "reasoning": "FAIL: Copy confirmation was observed in a polite status live region, but no badge-unlock toast/live-region message was observed. Evidence: copy-confirmation-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "raise_and_import_have_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The raise-amount input and the session import field have explicit labels associated with the controls",
+        "reasoning": "The raise input has an associated \u201cRaise amount\u201d label, and the import field has an associated \u201cImport session\u201d label. Evidence: started-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "headings_logical_order",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Panel headings such as Session stats, Hand history, Badges, and Export follow a logical heading order without skipping levels in a way that breaks outline navigation",
+        "reasoning": "Observed heading order is H1 FeltRun, H2 section headings, and H3 Shared content, with no skipped levels. Evidence: desktop-initial-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "landmarks_or_regions_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Primary regions (table, stats/history panels, export) are distinguishable via landmarks or labeled regions for assistive navigation",
+        "reasoning": "The app exposes a labeled main region, labeled Poker table and Betting controls regions, session/export regions, and collaboration/shared-content regions. Evidence: started-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "focus_visible_on_dark_felt",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Keyboard focus is clearly visible on every interactive control and legible against the dark felt",
+        "reasoning": "Keyboard focus on an interactive control showed a clearly visible yellow 2px outline with offset against the dark interface. Evidence: accessibility-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "validation_errors_announced",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Raise-amount and import validation errors appear next to the field they describe and are announced to assistive technology when they appear",
+        "reasoning": "FAIL: Raise validation was announced in a polite status region, but invalid import content left Import disabled and produced no adjacent announced validation error. Evidence: import-validation-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "style_badges_not_color_alone",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "AI play-style badges are not distinguished by color alone \u2014 each also has a text label (Aggressive, Tight, or Bluffer) or icon-plus-text",
+        "reasoning": "AI styles are explicitly text-labeled Aggressive, Tight, and Bluffer alongside their visual badges. Evidence: started-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"betting_and_export_keyboard_accessible\":{\"score\":\"yes\",\"reasoning\":\"Native buttons, tabs, difficulty select, raise input, slider, and import/export controls are keyboard-focusable; betting and export controls are visibly present and usable. Evidence: started-shared.png\"},\"session_modal_focus_trap\":{\"score\":\"yes\",\"reasoning\":\"The confirmation dialog trapped Tab and Shift+Tab focus within Cancel/Reset, and Escape closed it with focus returned to Start new session. Evidence: session-modal-shared.png\"},\"icons_have_accessible_names\":{\"score\":\"yes\",\"reasoning\":\"No icon-only chrome controls were observed; controls containing icons also had text or accessible labels. Evidence: accessibility-shared.png\"},\"toast_and_copy_live_regions\":{\"score\":\"no\",\"reasoning\":\"FAIL: Copy confirmation was observed in a polite status live region, but no badge-unlock toast/live-region message was observed. Evidence: copy-confirmation-shared.png\"},\"raise_and_import_have_labels\":{\"score\":\"yes\",\"reasoning\":\"The raise input has an associated \u201cRaise amount\u201d label, and the import field has an associated \u201cImport session\u201d label. Evidence: started-shared.png\"},\"headings_logical_order\":{\"score\":\"yes\",\"reasoning\":\"Observed heading order is H1 FeltRun, H2 section headings, and H3 Shared content, with no skipped levels. Evidence: desktop-initial-shared.png\"},\"landmarks_or_regions_present\":{\"score\":\"yes\",\"reasoning\":\"The app exposes a labeled main region, labeled Poker table and Betting controls regions, session/export regions, and collaboration/shared-content regions. Evidence: started-shared.png\"},\"focus_visible_on_dark_felt\":{\"score\":\"yes\",\"reasoning\":\"Keyboard focus on an interactive control showed a clearly visible yellow 2px outline with offset against the dark interface. Evidence: accessibility-shared.png\"},\"validation_errors_announced\":{\"score\":\"no\",\"reasoning\":\"FAIL: Raise validation was announced in a polite status region, but invalid import content left Import disabled and produced no adjacent announced validation error. Evidence: import-validation-shared.png\"},\"style_badges_not_color_alone\":{\"score\":\"yes\",\"reasoning\":\"AI styles are explicitly text-labeled Aggressive, Tight, and Bluffer alongside their visual badges. Evidence: started-shared.png\"}}",
+    "cost_usd": 0.2556012
+  },
+  "behavioral": {
+    "score": 0.4,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_reload_persists",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After several completed hands so chip stacks, blind level, Session stats, Hand history, badges, and difficulty have all changed, a full page reload restores every facet exactly \u2014 never a mix of restored and reset values",
+        "reasoning": "FAIL: Only one completed hand was exercised, so the required several-hand facet restoration was not demonstrated. Evidence: new_session_clears_then_repopulate-shared.png"
+      },
+      {
+        "id": "14.2",
+        "name": "history_most_recent_first_order",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After completing two hands with different pots, Hand history lists most-recent-first; the top entry matches the latest hand's pot and winner, proving order is derived from live completions rather than a hardcoded list",
+        "reasoning": "FAIL: Only one completed hand was created; two different pots and derived ordering were not exercised. Evidence: new_session_clears_then_repopulate-shared.png"
+      },
+      {
+        "id": "14.3",
+        "name": "equity_and_export_track_streets",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Advancing from preflop to flop to turn changes the hand-equity percentage to a new value each street, and completing the hand changes the Export preview handHistory relative to the pre-hand export",
+        "reasoning": "FAIL: Equity changed preflop-to-flop and export history changed after completion, but the required turn observation was not completed. Evidence: mid_hand_save_resume_probe-shared.png"
+      },
+      {
+        "id": "14.4",
+        "name": "cross_panel_echo_without_reload",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Completing a hand updates Session stats hands-played, appends Hand history, and updates the Export preview handHistory and session.handsPlayed together without a reload",
+        "reasoning": "FAIL: The three-panel update was not observed together before a reload. Evidence: mid_hand_save_resume_probe-shared.png"
+      },
+      {
+        "id": "14.5",
+        "name": "hands_played_exact_delta",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Measure Session stats hands-played immediately before and after one completed hand; the count increases by exactly one",
+        "reasoning": "The Session stats count was 0 before the first completed hand and 1 immediately afterward, an exact increase of one. Evidence: new_session_clears_then_repopulate-shared.png"
+      },
+      {
+        "id": "14.6",
+        "name": "different_raises_different_pots",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "On two separate human turns (or hands), raise two different legal chip amounts; the pot and stack deltas differ by those amounts rather than producing identical chip movement",
+        "reasoning": "FAIL: No two human raises with different legal amounts were completed. Evidence: new_session_clears_then_repopulate-shared.png"
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_export_and_play",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Complete a hand, open Export and note handHistory length, complete another hand, return to Export \u2014 handHistory length increases by one and the newest entry matches the latest hand without corrupting prior entries",
+        "reasoning": "FAIL: The required complete-hand \u2192 export \u2192 second complete-hand \u2192 export sequence was not completed. Evidence: new_session_clears_then_repopulate-shared.png"
+      },
+      {
+        "id": "14.8",
+        "name": "new_session_clears_then_repopulate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After hands exist, confirm Start new session so Hand history is empty and export handHistory is empty; deal and complete a new hand \u2014 stats, history, and export repopulate from the new session only",
+        "reasoning": "After reset, visible stats, hand history, and export history were empty; a new hand was then completed and all repopulated with one hand. Evidence: new_session_clears_then_repopulate-shared.png"
+      },
+      {
+        "id": "14.9",
+        "name": "export_import_behavioral_round_trip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Mutate the session with at least one completed hand, export the session JSON, import it back \u2014 visible stacks, stats, history, badges, and difficulty match the pre-export mutated state",
+        "reasoning": "A completed hand was exported through the visible JSON preview and imported through the visible Import control; stacks, hands-played, hand history, badges, and Standard difficulty were restored visibly. Evidence: mid_hand_save_resume_probe-shared.png"
+      },
+      {
+        "id": "14.10",
+        "name": "mid_hand_save_resume_probe",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Save table mid-hand after the flop, reload, and confirm board, pot, stacks, street, and side to act match the saved position",
+        "reasoning": "After saving on the flop and reloading, the visible board, pot 127, stacks, flop street, and side to act remained matched. Evidence: mid_hand_save_resume_probe-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"multi_facet_reload_persists\":{\"score\":\"no\",\"reasoning\":\"FAIL: Only one completed hand was exercised, so the required several-hand facet restoration was not demonstrated. Evidence: new_session_clears_then_repopulate-shared.png\"},\"history_most_recent_first_order\":{\"score\":\"no\",\"reasoning\":\"FAIL: Only one completed hand was created; two different pots and derived ordering were not exercised. Evidence: new_session_clears_then_repopulate-shared.png\"},\"equity_and_export_track_streets\":{\"score\":\"no\",\"reasoning\":\"FAIL: Equity changed preflop-to-flop and export history changed after completion, but the required turn observation was not completed. Evidence: mid_hand_save_resume_probe-shared.png\"},\"cross_panel_echo_without_reload\":{\"score\":\"no\",\"reasoning\":\"FAIL: The three-panel update was not observed together before a reload. Evidence: mid_hand_save_resume_probe-shared.png\"},\"hands_played_exact_delta\":{\"score\":\"yes\",\"reasoning\":\"The Session stats count was 0 before the first completed hand and 1 immediately afterward, an exact increase of one. Evidence: new_session_clears_then_repopulate-shared.png\"},\"different_raises_different_pots\":{\"score\":\"no\",\"reasoning\":\"FAIL: No two human raises with different legal amounts were completed. Evidence: new_session_clears_then_repopulate-shared.png\"},\"interleaved_export_and_play\":{\"score\":\"no\",\"reasoning\":\"FAIL: The required complete-hand \u2192 export \u2192 second complete-hand \u2192 export sequence was not completed. Evidence: new_session_clears_then_repopulate-shared.png\"},\"new_session_clears_then_repopulate\":{\"score\":\"yes\",\"reasoning\":\"After reset, visible stats, hand history, and export history were empty; a new hand was then completed and all repopulated with one hand. Evidence: new_session_clears_then_repopulate-shared.png\"},\"export_import_behavioral_round_trip\":{\"score\":\"yes\",\"reasoning\":\"A completed hand was exported through the visible JSON preview and imported through the visible Import control; stacks, hands-played, hand history, badges, and Standard difficulty were restored visibly. Evidence: mid_hand_save_resume_probe-shared.png\"},\"mid_hand_save_resume_probe\":{\"score\":\"yes\",\"reasoning\":\"After saving on the flop and reloading, the visible board, pot 127, stacks, flop street, and side to act remained matched. Evidence: mid_hand_save_resume_probe-shared.png\"}}",
+    "cost_usd": 0.4156272
+  },
+  "core_features": {
+    "score": 0.3692,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "opens_at_root_with_deal_prompt",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On load, the app opens directly at / with no login or error page and the table shows a \"Deal first hand\" prompt rather than an empty board",
+        "reasoning": "Root loaded with the visible \u201cDeal first hand\u201d prompt. Evidence: opens_at_root_with_deal_prompt-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "deal_first_hand_seats_four",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After clicking \"Deal first hand\", the table seats the human plus 3 AI opponents (4 seats) each starting at 1000 chips and a hand begins with hole cards dealt and blinds posted",
+        "reasoning": "Deal started a hand with You plus Viper, Rock, and Phantom, all initially at 1,000 with hole cards and blinds posted. Evidence: deal_first_hand_seats_four-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "betting_controls_and_quick_bets",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When it is the human's turn, Fold, Check or Call, Raise, and All-in are all visible along with a raise-amount input plus slider, and \"1/2 pot\" and \"Pot\" populate the raise amount to distinct values (half vs full current pot)",
+        "reasoning": "Fold, Call, Raise, All-in, raise input, slider, 1/2 pot, and Pot were visible; quick-bet controls were usable. Evidence: betting_controls_and_quick_bets-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "raise_moves_exact_chip_amount",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After raising a specific chip amount, the pot increases by that amount and the human's stack decreases by the same amount with no page reload",
+        "reasoning": "A 50-chip raise produced visible \u201cYou raise to 50,\u201d human stack 950, and Bet 50 without reload. Evidence: betting_controls_and_quick_bets-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "equity_recalculates_each_street",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After advancing from preflop to the flop and from the flop to the turn, the hand-equity percentage next to the human's hole cards recalculates to a new value at each street",
+        "reasoning": "Observed equity change from 12.9% preflop to 16.1% flop to 14.6% turn. Evidence: betting_controls_and_quick_bets-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "ai_style_badges_visible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On load each of the 3 AI seats shows a labeled play-style badge (Aggressive, Tight, or Bluffer) that is visually distinct, not distinguishable by text label alone",
+        "reasoning": "All three AI seats visibly showed distinct icon badges labeled Aggressive, Tight, and Bluffer. Evidence: deal_first_hand_seats_four-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "blind_level_advances_after_eight_hands",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After playing 8 completed hands, the blind-level indicator advances to the next level and both the small and big blind amounts increase, while the stats panel and hand history are not reset",
+        "reasoning": "BLOCKED: Only two hands were completed; the eight-hand progression was not reached."
+      },
+      {
+        "id": "1.8",
+        "name": "session_stats_update_per_hand",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After completing a hand, the Session stats panel updates hands played, hands won, win rate, and biggest pot, and the win rate stays consistent with hands won divided by hands played",
+        "reasoning": "FAIL: Hands played updated, but Biggest pot remained 0 after completed hands despite pots of 616 and 59 chips. Evidence: hand_reaches_decided_end_state-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "showdown_reveals_and_labels_winner",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "When a hand reaches showdown with two or more players, every remaining player's hole cards are revealed face-up and the winning 5-card hand is highlighted with its hand-type label",
+        "reasoning": "BLOCKED: The observed hands ended by fold; a showdown with two or more remaining players was not reached."
+      },
+      {
+        "id": "1.10",
+        "name": "hand_history_lists_recent_first",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After completing two hands, the toggleable Hand history panel lists both with pot size, winner, and winning hand type most-recent-first, and shows \"No hands played yet\" before any hand",
+        "reasoning": "After two hands, history showed Hand 2 above Hand 1 with pot, winner, and hand type; the reset initial panel showed \u201cNo hands played yet.\u201d Evidence: hand_history_lists_recent_first-shared.png"
+      },
+      {
+        "id": "1.11",
+        "name": "rebuy_restores_stack",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "When the human's stack reaches 0 a Rebuy control appears, and using it resets the stack to 1000 and increments the rebuys counter by 1",
+        "reasoning": "BLOCKED: The human stack never reached zero during the observed workflows."
+      },
+      {
+        "id": "1.12",
+        "name": "badge_toast_then_panel_listing",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After earning an achievement badge a transient toast appears at that moment and the badge is then listed in the Badges panel without removing earlier badges",
+        "reasoning": "BLOCKED: No achievement badge was earned during observation."
+      },
+      {
+        "id": "1.13",
+        "name": "collab_offline_merge_and_conflict",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "In the Collaboration scenario, queuing two non-conflicting changes offline and reconnecting via \"Go Online\" converges the \"Shared content\" to the same result in either delivery order, and a same-note conflict surfaces an explicit keep-mine / keep-peer choice",
+        "reasoning": "FAIL: Offline reconnect and delivery-order controls were observed, but no explicit keep-mine/keep-peer conflict choice surfaced. Evidence: export_session_json_schema-shared.png"
+      },
+      {
+        "id": "1.14",
+        "name": "full_session_reload_restores_all",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After playing several hands so chips, blind level, stats, hand history, and badges have changed, a full page refresh restores all of them exactly",
+        "reasoning": "BLOCKED: The required mutated session was not reloaded before reset, so exact restoration of all state was not verified."
+      },
+      {
+        "id": "1.19",
+        "name": "ai_styles_influence_behavior",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The 3 AI seats each show a play-style badge (Aggressive, Tight, Bluffer) whose labeled behavior differs over several hands: the Aggressive seat raises noticeably more often than the Tight seat, which folds or calls conservatively, and the Bluffer raises at times even when its showdown-revealed holding is weak",
+        "reasoning": "BLOCKED: Style badges were observed, but behavior differences across several comparable hands were not established."
+      },
+      {
+        "id": "1.24",
+        "name": "second_rebuy_increments_counter",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "When the human's stack reaches 0 a Rebuy control appears and resets the stack to 1000 while incrementing the rebuys counter, and it increments again to 2 on a second rebuy rather than sticking at 1",
+        "reasoning": "BLOCKED: No rebuy cycle was completed."
+      },
+      {
+        "id": "1.25",
+        "name": "second_badge_keeps_first",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Earning a second, different achievement badge lists both badges in the Badges panel \u2014 the first is not overwritten or lost",
+        "reasoning": "BLOCKED: No achievement badges were earned.",
+        "optional": true
+      },
+      {
+        "id": "1.26",
+        "name": "new_session_confirm_and_cancel",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "\"Start new session\" shows a confirmation prompt; cancelling leaves the table, stats, and history unchanged, and confirming resets table, chip stacks, stats, hand history, and badges to their initial state across every panel at once",
+        "reasoning": "Confirmation dialog appeared; Cancel preserved hands/history, and Reset session returned the table and panels to initial state. Evidence: new_session_confirm_and_cancel-shared.png"
+      },
+      {
+        "id": "1.30",
+        "name": "raise_bounds_inline_validation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Entering a raise amount below the legal minimum raise or above the human's stack shows an inline validation message next to the raise-amount input naming the violated limit, and the raise confirm control stays disabled until the amount is legal",
+        "reasoning": "Below-minimum input showed \u201cMinimum raise is 359\u201d and above-stack input showed \u201cMaximum raise is your stack (938)\u201d; Raise remained disabled. Evidence: betting_controls_and_quick_bets-shared.png"
+      },
+      {
+        "id": "1.31",
+        "name": "raise_completion_history_chain",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Starting on the human's turn mid-hand: raise a specific chip amount and confirm exactly that amount moves from the human's visible stack into the pot; then let the hand complete and confirm, without any reload, that the Session stats hands-played count increases by exactly one and the completed hand appears at the top of the Hand history panel with the pot size, winner, and winning hand type of the hand just played",
+        "reasoning": "FAIL: A specific raise and later history entry were observed, but the requested exact stats increment/history chain was not completed from a clean mid-hand workflow."
+      },
+      {
+        "id": "1.32",
+        "name": "rebuy_reload_roundtrip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Drive the human's stack to 0 and use the Rebuy control: the stack display returns to 1000 and the rebuys counter in the stats panel increases by exactly 1; after a full page reload the restored stack and the incremented rebuys count are both still shown",
+        "reasoning": "BLOCKED: No rebuy was completed."
+      },
+      {
+        "id": "1.33",
+        "name": "badge_list_reload_roundtrip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After earning at least one badge, the badge is listed in the Badges panel with earlier badges still present, and after a full page reload the same badges are still listed in the panel",
+        "reasoning": "BLOCKED: No badge was earned."
+      },
+      {
+        "id": "1.34",
+        "name": "double_deal_starts_one_hand",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Rapidly double-activating \"Deal next hand\" starts exactly one new hand, and the hands-played count increases by exactly one when that hand completes",
+        "reasoning": "BLOCKED: Rapid double activation was not tested."
+      },
+      {
+        "id": "1.35",
+        "name": "blind_indicator_shows_level_and_amounts",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "During play the tournament blind-level indicator shows the level number and the current small and big blind amounts together (for example \"Level 1 \u2014 blinds 5/10\"), not the level or the amounts alone",
+        "reasoning": "During play the indicator visibly showed \u201cLevel 1 \u2014 blinds 5/10.\u201d Evidence: deal_first_hand_seats_four-shared.png"
+      },
+      {
+        "id": "1.36",
+        "name": "hand_reaches_decided_end_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every completed hand announces a decided end state on the table: either a fold win naming the winner, or a showdown naming the winner and winning hand type \u2014 never a silent freeze with chips still contested",
+        "reasoning": "Completed hands visibly announced winners and hand types, including \u201cPhantom wins 616 chips with One pair\u201d and \u201cPhantom wins 59 chips with Flush.\u201d Evidence: hand_reaches_decided_end_state-shared.png"
+      },
+      {
+        "id": "1.37",
+        "name": "difficulty_changes_ai_strength",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Switching the difficulty control among Easy, Standard, and Hard observably changes AI strength across subsequent hands: Hard opponents call or raise more often and fold less often than Easy opponents under comparable spots",
+        "reasoning": "BLOCKED: Difficulty options were visible, but Easy/Standard/Hard behavior was not compared across subsequent hands."
+      },
+      {
+        "id": "1.38",
+        "name": "undo_last_action_restores_street",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "On the human's turn, after raising a specific amount, using \"Undo last action\" restores the human's stack, the pot, and the turn indicator to their pre-raise values when the raise has not yet been followed by an AI response that advanced the street",
+        "reasoning": "BLOCKED: Undo was not exercised after a raise before an AI response."
+      },
+      {
+        "id": "1.39",
+        "name": "save_table_mid_hand_resumes",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "During an active hand after the flop is dealt, using \"Save table\" and then reloading (or using \"Load saved table\") resumes with the same board, pot, stacks, street, and side to act",
+        "reasoning": "BLOCKED: Save/reload restoration of a flop state was not completed."
+      },
+      {
+        "id": "1.40",
+        "name": "export_session_json_schema",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Export panel shows a monospaced session JSON preview whose schemaVersion is exactly \"feltrun-session-v1\" and that includes required top-level keys session, stacks, handHistory, and inProgressHand",
+        "reasoning": "Visible session JSON used schemaVersion feltrun-session-v1 and included session, stacks, handHistory, and inProgressHand. Evidence: export_session_json_schema-shared.png"
+      },
+      {
+        "id": "1.41",
+        "name": "export_reflects_session_mutations",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After completing at least one hand so Session stats and Hand history change, the Export panel's session JSON preview lists that hand in handHistory with matching pot, winnerName, and handType, and session.handsPlayed matches the visible stats \u2014 not a stale pre-play document",
+        "reasoning": "BLOCKED: A mutated-session export with matching handHistory was not verified."
+      },
+      {
+        "id": "1.42",
+        "name": "export_copy_and_download",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export Copy writes the visible preview text to the clipboard and shows a brief copied confirmation, and Download starts a file download of that same preview text",
+        "reasoning": "BLOCKED: Copy confirmation and downloaded-file contents were not observed."
+      },
+      {
+        "id": "1.43",
+        "name": "import_round_trip_session_json",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After mutating the session (complete at least one hand), importing the exported feltrun-session-v1 JSON restores stacks, Session stats, Hand history, badges, and difficulty to match the pre-export mutated state, and the export preview matches again",
+        "reasoning": "BLOCKED: Import round-trip after mutation was not completed."
+      },
+      {
+        "id": "1.44",
+        "name": "raise_amount_field_contract",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Entering a fractional or non-numeric raise amount, or an amount below the legal minimum raise or above the human's stack, shows an inline validation message next to the raise-amount input naming amount or the violated limit, and raise confirm stays disabled until amount is a legal integer",
+        "reasoning": "FAIL: Integer lower/upper bounds were validated, but fractional and non-numeric inputs were not exercised."
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"opens_at_root_with_deal_prompt\":{\"score\":\"yes\",\"reasoning\":\"Root loaded with the visible \u201cDeal first hand\u201d prompt. Evidence: opens_at_root_with_deal_prompt-shared.png\"},\"deal_first_hand_seats_four\":{\"score\":\"yes\",\"reasoning\":\"Deal started a hand with You plus Viper, Rock, and Phantom, all initially at 1,000 with hole cards and blinds posted. Evidence: deal_first_hand_seats_four-shared.png\"},\"betting_controls_and_quick_bets\":{\"score\":\"yes\",\"reasoning\":\"Fold, Call, Raise, All-in, raise input, slider, 1/2 pot, and Pot were visible; quick-bet controls were usable. Evidence: betting_controls_and_quick_bets-shared.png\"},\"raise_moves_exact_chip_amount\":{\"score\":\"yes\",\"reasoning\":\"A 50-chip raise produced visible \u201cYou raise to 50,\u201d human stack 950, and Bet 50 without reload. Evidence: betting_controls_and_quick_bets-shared.png\"},\"equity_recalculates_each_street\":{\"score\":\"yes\",\"reasoning\":\"Observed equity change from 12.9% preflop to 16.1% flop to 14.6% turn. Evidence: betting_controls_and_quick_bets-shared.png\"},\"ai_style_badges_visible\":{\"score\":\"yes\",\"reasoning\":\"All three AI seats visibly showed distinct icon badges labeled Aggressive, Tight, and Bluffer. Evidence: deal_first_hand_seats_four-shared.png\"},\"blind_level_advances_after_eight_hands\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Only two hands were completed; the eight-hand progression was not reached.\"},\"session_stats_update_per_hand\":{\"score\":\"no\",\"reasoning\":\"FAIL: Hands played updated, but Biggest pot remained 0 after completed hands despite pots of 616 and 59 chips. Evidence: hand_reaches_decided_end_state-shared.png\"},\"showdown_reveals_and_labels_winner\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The observed hands ended by fold; a showdown with two or more remaining players was not reached.\"},\"hand_history_lists_recent_first\":{\"score\":\"yes\",\"reasoning\":\"After two hands, history showed Hand 2 above Hand 1 with pot, winner, and hand type; the reset initial panel showed \u201cNo hands played yet.\u201d Evidence: hand_history_lists_recent_first-shared.png\"},\"rebuy_restores_stack\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The human stack never reached zero during the observed workflows.\"},\"badge_toast_then_panel_listing\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No achievement badge was earned during observation.\"},\"collab_offline_merge_and_conflict\":{\"score\":\"no\",\"reasoning\":\"FAIL: Offline reconnect and delivery-order controls were observed, but no explicit keep-mine/keep-peer conflict choice surfaced. Evidence: export_session_json_schema-shared.png\"},\"full_session_reload_restores_all\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The required mutated session was not reloaded before reset, so exact restoration of all state was not verified.\"},\"ai_styles_influence_behavior\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Style badges were observed, but behavior differences across several comparable hands were not established.\"},\"second_rebuy_increments_counter\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No rebuy cycle was completed.\"},\"second_badge_keeps_first\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No achievement badges were earned.\"},\"new_session_confirm_and_cancel\":{\"score\":\"yes\",\"reasoning\":\"Confirmation dialog appeared; Cancel preserved hands/history, and Reset session returned the table and panels to initial state. Evidence: new_session_confirm_and_cancel-shared.png\"},\"raise_bounds_inline_validation\":{\"score\":\"yes\",\"reasoning\":\"Below-minimum input showed \u201cMinimum raise is 359\u201d and above-stack input showed \u201cMaximum raise is your stack (938)\u201d; Raise remained disabled. Evidence: betting_controls_and_quick_bets-shared.png\"},\"raise_completion_history_chain\":{\"score\":\"no\",\"reasoning\":\"FAIL: A specific raise and later history entry were observed, but the requested exact stats increment/history chain was not completed from a clean mid-hand workflow.\"},\"rebuy_reload_roundtrip\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No rebuy was completed.\"},\"badge_list_reload_roundtrip\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No badge was earned.\"},\"double_deal_starts_one_hand\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Rapid double activation was not tested.\"},\"blind_indicator_shows_level_and_amounts\":{\"score\":\"yes\",\"reasoning\":\"During play the indicator visibly showed \u201cLevel 1 \u2014 blinds 5/10.\u201d Evidence: deal_first_hand_seats_four-shared.png\"},\"hand_reaches_decided_end_state\":{\"score\":\"yes\",\"reasoning\":\"Completed hands visibly announced winners and hand types, including \u201cPhantom wins 616 chips with One pair\u201d and \u201cPhantom wins 59 chips with Flush.\u201d Evidence: hand_reaches_decided_end_state-shared.png\"},\"difficulty_changes_ai_strength\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Difficulty options were visible, but Easy/Standard/Hard behavior was not compared across subsequent hands.\"},\"undo_last_action_restores_street\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Undo was not exercised after a raise before an AI response.\"},\"save_table_mid_hand_resumes\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Save/reload restoration of a flop state was not completed.\"},\"export_session_json_schema\":{\"score\":\"yes\",\"reasoning\":\"Visible session JSON used schemaVersion feltrun-session-v1 and included session, stacks, handHistory, and inProgressHand. Evidence: export_session_json_schema-shared.png\"},\"export_reflects_session_mutations\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A mutated-session export with matching handHistory was not verified.\"},\"export_copy_and_download\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Copy confirmation and downloaded-file contents were not observed.\"},\"import_round_trip_session_json\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Import round-trip after mutation was not completed.\"},\"raise_amount_field_contract\":{\"score\":\"no\",\"reasoning\":\"FAIL: Integer lower/upper bounds were validated, but fractional and non-numeric inputs were not exercised.\"}}",
+    "cost_usd": 0.6991854
+  },
+  "design_fidelity": {
+    "score": 0.8,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "felt_spacing_matches_reference_scale",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Spacing and sizing on the table chrome follow the tight 2px-based scale and ~5px radii from the instruction and reference screenshots, without large arbitrary one-off gaps",
+        "reasoning": "Desktop screenshot shows compact spacing, consistent ~5px radii, and no arbitrary oversized gaps. Evidence: felt_spacing_matches_reference_scale-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "poppins_type_matches_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography matches the Poppins stack and approximate heading/body sizes called out in the instruction and visible in the reference screenshots",
+        "reasoning": "Rendered typography reports Poppins, sans-serif throughout, with heading/body sizing matching the observed hierarchy. Evidence: felt_spacing_matches_reference_scale-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "table_layout_matches_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At desktop width the table, seats, community board, and side panels compose like the reference screenshots (felt table center, chrome panels around it) within a small tolerance \u2014 HUD fidelity, not pixel-perfect landing parity",
+        "reasoning": "Desktop view visibly composes the felt table centrally with player seats, board, controls, and surrounding panels. Evidence: felt_spacing_matches_reference_scale-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "mandated_state_changes_animate",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Equity street changes, history entrance, showdown reveal, and badge toast animate as the instruction specifies when driven through real play",
+        "reasoning": "FAIL: Real play was completed through fold/showdown, but the required equity, history, showdown, and badge transient animations were not directly observed as animations. Evidence: mandated_state_changes_animate-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "mobile_drawer_matches_reference_pattern",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At about 375px the stats/history collapse into a drawer pattern consistent with the instruction rather than keeping a clipped desktop sidebar",
+        "reasoning": "At 375px, desktop chrome collapses to Show panels/Hide panels controls and stacked stats/history/export content rather than a clipped desktop sidebar. Evidence: mobile_drawer_matches_reference_pattern-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "control_chrome_matches_felt_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, the raise slider, and panels use the near-black felt palette with primary #FFFF7D CTAs as in the instruction/reference",
+        "reasoning": "Buttons and panels visibly use the near-black/navy felt treatment with yellow primary accents; the betting controls and raise slider are present. Evidence: control_states_match_spec-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "type_hierarchy_matches_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Section headings versus body/stat text show a clear hierarchy matching the large heading / large body scale in the instruction",
+        "reasoning": "The rendered view has a clear large yellow page heading, distinct section headings, and smaller body/stat text. Evidence: felt_spacing_matches_reference_scale-shared.png"
+      },
+      {
+        "id": "3.8",
+        "name": "control_states_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Default, hover, and disabled states on betting and session controls are visually distinct as required",
+        "reasoning": "Default betting controls are visible, disabled controls are visibly muted, and hovering Fold changed its background from rgb(20,39,63) to rgb(35,57,90). Evidence: control_states_match_spec-shared.png"
+      },
+      {
+        "id": "3.9",
+        "name": "surface_treatments_match_felt",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Felt background #02070C, primary #FFFF7D, and accent #FFFE68 treatments match the design tokens in the instruction",
+        "reasoning": "Browser measurements observed body background rgb(2,7,12), primary rgb(255,255,125), and accent rgb(255,254,104), matching the specified tokens. Evidence: felt_spacing_matches_reference_scale-shared.png"
+      },
+      {
+        "id": "3.10",
+        "name": "microinteractions_match_duration_intent",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Badge toast auto-dismiss and equity transition feel brief and non-blocking as specified rather than multi-second blocking overlays",
+        "reasoning": "BLOCKED: I could not directly observe a badge toast auto-dismiss and brief equity transition end-to-end in the live browser. Evidence: mandated_state_changes_animate-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"felt_spacing_matches_reference_scale\":{\"score\":\"yes\",\"reasoning\":\"Desktop screenshot shows compact spacing, consistent ~5px radii, and no arbitrary oversized gaps. Evidence: felt_spacing_matches_reference_scale-shared.png\"},\"poppins_type_matches_reference\":{\"score\":\"yes\",\"reasoning\":\"Rendered typography reports Poppins, sans-serif throughout, with heading/body sizing matching the observed hierarchy. Evidence: felt_spacing_matches_reference_scale-shared.png\"},\"table_layout_matches_reference\":{\"score\":\"yes\",\"reasoning\":\"Desktop view visibly composes the felt table centrally with player seats, board, controls, and surrounding panels. Evidence: felt_spacing_matches_reference_scale-shared.png\"},\"mandated_state_changes_animate\":{\"score\":\"no\",\"reasoning\":\"FAIL: Real play was completed through fold/showdown, but the required equity, history, showdown, and badge transient animations were not directly observed as animations. Evidence: mandated_state_changes_animate-shared.png\"},\"mobile_drawer_matches_reference_pattern\":{\"score\":\"yes\",\"reasoning\":\"At 375px, desktop chrome collapses to Show panels/Hide panels controls and stacked stats/history/export content rather than a clipped desktop sidebar. Evidence: mobile_drawer_matches_reference_pattern-shared.png\"},\"control_chrome_matches_felt_spec\":{\"score\":\"yes\",\"reasoning\":\"Buttons and panels visibly use the near-black/navy felt treatment with yellow primary accents; the betting controls and raise slider are present. Evidence: control_states_match_spec-shared.png\"},\"type_hierarchy_matches_reference\":{\"score\":\"yes\",\"reasoning\":\"The rendered view has a clear large yellow page heading, distinct section headings, and smaller body/stat text. Evidence: felt_spacing_matches_reference_scale-shared.png\"},\"control_states_match_spec\":{\"score\":\"yes\",\"reasoning\":\"Default betting controls are visible, disabled controls are visibly muted, and hovering Fold changed its background from rgb(20,39,63) to rgb(35,57,90). Evidence: control_states_match_spec-shared.png\"},\"surface_treatments_match_felt\":{\"score\":\"yes\",\"reasoning\":\"Browser measurements observed body background rgb(2,7,12), primary rgb(255,255,125), and accent rgb(255,254,104), matching the specified tokens. Evidence: felt_spacing_matches_reference_scale-shared.png\"},\"microinteractions_match_duration_intent\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: I could not directly observe a badge toast auto-dismiss and brief equity transition end-to-end in the live browser. Evidence: mandated_state_changes_animate-shared.png\"}}",
+    "cost_usd": 0.21660139999999997
+  },
+  "edge_cases": {
+    "score": 0.9091,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "deal_prompt_and_empty_history",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Before the first hand the table shows the \"Deal first hand\" prompt rather than an empty board, and Hand history shows \"No hands played yet\"",
+        "reasoning": "The initial table visibly shows \u201cSelect Deal first hand to start your session,\u201d and stats/history are at zero with no hands played. Evidence: deal_prompt_and_empty_history-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "raise_bounds_inline_before_confirm",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Out-of-range raise amounts show inline validation naming the violated limit before confirm, and confirm stays disabled until legal",
+        "reasoning": "Entering 10 shows an inline \u201cMinimum\u201d validation state while the Raise button is disabled; entering legal 20 re-enables Raise. Evidence: raise_bounds_inline_before_confirm-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "illegal_action_feedback_specific",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Acting when it is not the human's turn or reusing stale raise input from a resolved hand is rejected with specific visible feedback rather than only a generic Invalid message",
+        "reasoning": "After the hand ended, activating Raise produced specific feedback: \u201cCannot raise now \u2014 this hand has ended, deal the next hand to act again.\u201d Evidence: illegal_action_feedback_specific-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "hand_end_announces_result",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When a hand resolves by fold or showdown, the table shows a visible winner announcement rather than leaving the pot contested with no result",
+        "reasoning": "After folding and waiting for resolution, the table visibly announced \u201cPhantom wins 1295 chips with One pair\u201d and displayed a winner label. Evidence: double_deal_starts_one_hand-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "double_deal_starts_one_hand",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapidly double-activating \"Deal next hand\" starts exactly one new hand, and hands-played increases by exactly one when it completes",
+        "reasoning": "Rapid double activation started Hand 2 exactly once; after completion, Hands played increased from 1 to 2. Evidence: double_deal_starts_one_hand-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "new_session_cancel_preserves",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cancelling the Start new session confirmation leaves table, stacks, stats, history, and badges unchanged",
+        "reasoning": "Cancelling the new-session dialog left Hands played at 2, the existing winner announcement, and session stats unchanged. Evidence: new_session_cancel_preserves-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "undo_disabled_states",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Undo last action is unavailable before the human has acted on the current street and after the street advances; activating it when disabled does not change the pot or stacks",
+        "reasoning": "Undo was observed disabled before acting and remained disabled after the street/hand advanced; Playwright could not activate it because it was disabled. Evidence: undo_disabled_states-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "semantic_betting_controls",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Betting controls, Save table, Undo last action, and Export actions use button or other semantic interactive elements rather than click-only plain text",
+        "reasoning": "Betting actions, Save table, Undo last action, and export actions were all exposed as semantic button controls in the rendered UI. Evidence: deal_prompt_and_empty_history-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "session_modal_dismiss_paths",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Start new session confirmation can be dismissed via an explicit cancel control as well as completing confirm",
+        "reasoning": "The Start new session dialog visibly provided both Cancel and Reset session controls; both dismissal and confirmation paths were exercised. Evidence: session_modal_dismiss_paths-shared.png"
+      },
+      {
+        "id": "4.10",
+        "name": "malformed_import_rejected",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Importing malformed session JSON or a non-feltrun-session-v1 schemaVersion shows an inline error naming the import field and leaves stacks, stats, and hand history unchanged",
+        "reasoning": "FAIL: Entering malformed \u201c{bad\u201d left Import disabled and produced no inline error naming the import field. Evidence: malformed_import_rejected-shared.png"
+      },
+      {
+        "id": "4.11",
+        "name": "save_before_deal_restores_prompt",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Save table with no prior deal still produces a restorable checkpoint that reloads to the pre-deal \"Deal first hand\" prompt rather than inventing a mid-hand board",
+        "reasoning": "Saving before any deal enabled Load saved table; after reload the app still showed the pre-deal prompt, Hands played 0, and no in-progress board. Evidence: save_before_deal_restores_prompt-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"deal_prompt_and_empty_history\":{\"score\":\"yes\",\"reasoning\":\"The initial table visibly shows \u201cSelect Deal first hand to start your session,\u201d and stats/history are at zero with no hands played. Evidence: deal_prompt_and_empty_history-shared.png\"},\"raise_bounds_inline_before_confirm\":{\"score\":\"yes\",\"reasoning\":\"Entering 10 shows an inline \u201cMinimum\u201d validation state while the Raise button is disabled; entering legal 20 re-enables Raise. Evidence: raise_bounds_inline_before_confirm-shared.png\"},\"illegal_action_feedback_specific\":{\"score\":\"yes\",\"reasoning\":\"After the hand ended, activating Raise produced specific feedback: \u201cCannot raise now \u2014 this hand has ended, deal the next hand to act again.\u201d Evidence: illegal_action_feedback_specific-shared.png\"},\"hand_end_announces_result\":{\"score\":\"yes\",\"reasoning\":\"After folding and waiting for resolution, the table visibly announced \u201cPhantom wins 1295 chips with One pair\u201d and displayed a winner label. Evidence: double_deal_starts_one_hand-shared.png\"},\"double_deal_starts_one_hand\":{\"score\":\"yes\",\"reasoning\":\"Rapid double activation started Hand 2 exactly once; after completion, Hands played increased from 1 to 2. Evidence: double_deal_starts_one_hand-shared.png\"},\"new_session_cancel_preserves\":{\"score\":\"yes\",\"reasoning\":\"Cancelling the new-session dialog left Hands played at 2, the existing winner announcement, and session stats unchanged. Evidence: new_session_cancel_preserves-shared.png\"},\"undo_disabled_states\":{\"score\":\"yes\",\"reasoning\":\"Undo was observed disabled before acting and remained disabled after the street/hand advanced; Playwright could not activate it because it was disabled. Evidence: undo_disabled_states-shared.png\"},\"semantic_betting_controls\":{\"score\":\"yes\",\"reasoning\":\"Betting actions, Save table, Undo last action, and export actions were all exposed as semantic button controls in the rendered UI. Evidence: deal_prompt_and_empty_history-shared.png\"},\"session_modal_dismiss_paths\":{\"score\":\"yes\",\"reasoning\":\"The Start new session dialog visibly provided both Cancel and Reset session controls; both dismissal and confirmation paths were exercised. Evidence: session_modal_dismiss_paths-shared.png\"},\"malformed_import_rejected\":{\"score\":\"no\",\"reasoning\":\"FAIL: Entering malformed \u201c{bad\u201d left Import disabled and produced no inline error naming the import field. Evidence: malformed_import_rejected-shared.png\"},\"save_before_deal_restores_prompt\":{\"score\":\"yes\",\"reasoning\":\"Saving before any deal enabled Load saved table; after reload the app still showed the pre-deal prompt, Hands played 0, and no in-progress board. Evidence: save_before_deal_restores_prompt-shared.png\"}}",
+    "cost_usd": 0.33809639999999996
+  },
+  "innovation": {
+    "score": 0.7647,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "delightful_table_microinteractions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Beyond the mandated equity transition and confetti, the table offers an extra delightful microinteraction during play (for example chip-fly into the pot or seat pulse on action) that feels intentional",
+        "reasoning": "FAIL: Real betting interaction showed standard state changes only; no additional chip-flight, seat-pulse, or comparable play microinteraction was observed. Evidence: keyboard_betting_shortcuts-shared.png"
+      },
+      {
+        "id": "11.2",
+        "name": "richer_hand_review_motion",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Beyond the required history entrance, the app offers an advanced hand-review affordance such as expanding a history row to replay streets or highlight the winning cards",
+        "reasoning": "An actual completed hand could be expanded in Hand history, revealing the board and separate Preflop, Flop, Turn, and River action breakdowns. Evidence: richer_hand_review_motion-expanded.png"
+      },
+      {
+        "id": "11.3",
+        "name": "guided_first_hand_coachmark",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A brief optional coachmark or tip helps a first-time player start the first hand without blocking play after dismiss",
+        "reasoning": "The initial view displayed a dismissible \u201cHow to start\u201d coachmark with first-hand instructions and a visible Deal control. Evidence: guided_first_hand_coachmark-shared.png"
+      },
+      {
+        "id": "11.4",
+        "name": "equity_or_odds_graphic_extra",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Beyond the percentage readout, an optional equity graphic (bar, meter segments, or street markers) adds usability without replacing the numeric equity",
+        "reasoning": "During play, the numeric 34.1% equity readout appeared alongside street markers P/F/T/R, adding a visual equity aid. Evidence: keyboard_betting_shortcuts-shared.png"
+      },
+      {
+        "id": "11.5",
+        "name": "keyboard_betting_shortcuts",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Optional keyboard shortcuts for Fold/Check/Call/Raise speed up play beyond Tab-focus activation alone",
+        "reasoning": "Pressing F through real keyboard interaction caused the visible \u201cYou folded\u201d state and added \u201cYou fold\u201d to play-by-play; the shortcut legend was also visible. Evidence: keyboard_betting_shortcuts-shared.png"
+      },
+      {
+        "id": "11.6",
+        "name": "session_timeline_or_sparkline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "An optional session sparkline or win/loss timeline summarizes results beyond the numeric Session stats counters",
+        "reasoning": "After a completed hand, Session stats displayed a rendered stack timeline with accessible label \u201cStack timeline from 1,000 to 1000 over 1 hands.\u201d Evidence: session_timeline_or_sparkline-shared.png"
+      },
+      {
+        "id": "11.7",
+        "name": "export_share_packaging_extra",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Beyond the mandated session JSON, an optional second portable view (for example a human-readable hand-history text tab) adds shareability",
+        "reasoning": "Beyond Session JSON, the app provided and activated a separate Hand log tab with a readable hand-history preview plus Copy and Download controls. Evidence: export_share_packaging_extra-shared.png"
+      },
+      {
+        "id": "11.8",
+        "name": "difficulty_explainer",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "An optional short explanation of what Easy/Standard/Hard changes about AI behavior appears near the difficulty control",
+        "reasoning": "Near the Difficulty control, the app visibly explained Easy, Standard, and Hard AI behavior. Evidence: session_timeline_or_sparkline-shared.png"
+      },
+      {
+        "id": "11.catchall",
+        "name": "innovation_catchall",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable innovation or polish enhancement beyond the specification that is NOT covered by any other criterion in this file. If present, name the enhancement and cite the concrete evidence. If nothing beyond the specification is present, answer no.",
+        "reasoning": "No additional significant browser-observable innovation beyond the listed enhancements was directly observed. Evidence: session_timeline_or_sparkline-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"delightful_table_microinteractions\":{\"score\":\"no\",\"reasoning\":\"FAIL: Real betting interaction showed standard state changes only; no additional chip-flight, seat-pulse, or comparable play microinteraction was observed. Evidence: keyboard_betting_shortcuts-shared.png\"},\"richer_hand_review_motion\":{\"score\":\"yes\",\"reasoning\":\"An actual completed hand could be expanded in Hand history, revealing the board and separate Preflop, Flop, Turn, and River action breakdowns. Evidence: richer_hand_review_motion-expanded.png\"},\"guided_first_hand_coachmark\":{\"score\":\"yes\",\"reasoning\":\"The initial view displayed a dismissible \u201cHow to start\u201d coachmark with first-hand instructions and a visible Deal control. Evidence: guided_first_hand_coachmark-shared.png\"},\"equity_or_odds_graphic_extra\":{\"score\":\"yes\",\"reasoning\":\"During play, the numeric 34.1% equity readout appeared alongside street markers P/F/T/R, adding a visual equity aid. Evidence: keyboard_betting_shortcuts-shared.png\"},\"keyboard_betting_shortcuts\":{\"score\":\"yes\",\"reasoning\":\"Pressing F through real keyboard interaction caused the visible \u201cYou folded\u201d state and added \u201cYou fold\u201d to play-by-play; the shortcut legend was also visible. Evidence: keyboard_betting_shortcuts-shared.png\"},\"session_timeline_or_sparkline\":{\"score\":\"yes\",\"reasoning\":\"After a completed hand, Session stats displayed a rendered stack timeline with accessible label \u201cStack timeline from 1,000 to 1000 over 1 hands.\u201d Evidence: session_timeline_or_sparkline-shared.png\"},\"export_share_packaging_extra\":{\"score\":\"yes\",\"reasoning\":\"Beyond Session JSON, the app provided and activated a separate Hand log tab with a readable hand-history preview plus Copy and Download controls. Evidence: export_share_packaging_extra-shared.png\"},\"difficulty_explainer\":{\"score\":\"yes\",\"reasoning\":\"Near the Difficulty control, the app visibly explained Easy, Standard, and Hard AI behavior. Evidence: session_timeline_or_sparkline-shared.png\"},\"innovation_catchall\":{\"score\":\"no\",\"reasoning\":\"No additional significant browser-observable innovation beyond the listed enhancements was directly observed. Evidence: session_timeline_or_sparkline-shared.png\"}}",
+    "cost_usd": 0.1676736
+  },
+  "motion": {
+    "score": 0.4,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "equity_value_transition",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Driving the real Deal and betting controls, the hand-equity percentage animates its value change on each new street rather than snapping instantly to the new number",
+        "reasoning": "FAIL: After real betting, equity was observed at 22.0% with no value transition or animation observed. Evidence: equity_value_transition-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "badge_toast_auto_dismisses",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Earning a badge through real play shows a transient toast at the moment it is earned that clears on its own after a few seconds without blocking the betting controls",
+        "reasoning": "FAIL: A hand was won and badges were earned, but no transient badge toast was observed. Evidence: human_win_confetti_burst-after-showdown.png",
+        "optional": true
+      },
+      {
+        "id": "3.3",
+        "name": "hover_states_on_controls",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every betting control and panel toggle shows a visible hover state distinct from its resting state when hovered without clicking",
+        "reasoning": "Fold changed from rgb(20,39,63) resting background to rgb(35,57,90) on real hover. Evidence: hover_states_on_controls-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "focus_visible_on_controls",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Keyboard Tab focus is clearly visible on every betting control and panel toggle, legible against the dark felt",
+        "reasoning": "FAIL: Visible focus was observed on Tournament and Practice, but focus visibility was not directly verified for every betting control and panel toggle. Evidence: initial-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "human_win_confetti_burst",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Winning a hand at showdown in the human's favor, reached through real play, fires a brief celebratory confetti burst over the table, and confetti is absent when the hand resolves against the human",
+        "reasoning": "FAIL: Human wins were observed, but no confetti was observed in the post-showdown DOM or screenshot. Evidence: human_win_confetti_burst-after-showdown.png"
+      },
+      {
+        "id": "3.8",
+        "name": "showdown_reveal_animates",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "At showdown, driven through the real betting flow, the remaining hole cards flip face-up and the winning-hand highlight applies as the hand resolves, rather than the revealed state appearing with no reveal motion",
+        "reasoning": "Real all-in play produced running animations immediately after action; the showdown then revealed remaining cards and applied the human winning highlight. Evidence: showdown_reveal_animates-shared.png"
+      },
+      {
+        "id": "3.9",
+        "name": "history_entry_animates_in",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "A newly completed hand animates into the top of the Hand history list rather than appearing instantly",
+        "reasoning": "FAIL: Completed hands appeared in Hand history, but no direct entrance animation was observed or measured. Evidence: history_entry_animates_in-shared.png"
+      },
+      {
+        "id": "3.10",
+        "name": "mobile_drawer_smooth_transition",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "On a narrow viewport (approximately 375px), the stats/history/badges drawer opens and closes with a smooth transition and never obstructs the table while doing so",
+        "reasoning": "BLOCKED: At 375px the drawer was rendered, but its real open/close control was obstructed by overlapping content and could not be exercised. Evidence: mobile_drawer_smooth_transition-shared.png"
+      },
+      {
+        "id": "3.11",
+        "name": "reduced_motion_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On a fresh load with prefers-reduced-motion enabled, decorative animations (equity transition, confetti, history-entry entrance) are removed and state changes apply instantly, while the app remains fully usable",
+        "reasoning": "With prefers-reduced-motion confirmed true, the app remained usable after Deal and decorative animation was none while state updated instantly. Evidence: reduced_motion_respected-after-deal.png"
+      },
+      {
+        "id": "3.12",
+        "name": "export_copy_confirmation_clears",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Using Export Copy through the real control shows a brief copied confirmation that clears on its own, and the Export panel preview updates without a full page reload when a hand completes",
+        "reasoning": "Real Copy showed \u201cCopied session JSON to clipboard,\u201d which cleared after four seconds; completed hands also updated the session preview without reload. Evidence: export_copy_confirmation_clears-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"equity_value_transition\":{\"score\":\"no\",\"reasoning\":\"FAIL: After real betting, equity was observed at 22.0% with no value transition or animation observed. Evidence: equity_value_transition-shared.png\"},\"badge_toast_auto_dismisses\":{\"score\":\"no\",\"reasoning\":\"FAIL: A hand was won and badges were earned, but no transient badge toast was observed. Evidence: human_win_confetti_burst-after-showdown.png\"},\"hover_states_on_controls\":{\"score\":\"yes\",\"reasoning\":\"Fold changed from rgb(20,39,63) resting background to rgb(35,57,90) on real hover. Evidence: hover_states_on_controls-shared.png\"},\"focus_visible_on_controls\":{\"score\":\"no\",\"reasoning\":\"FAIL: Visible focus was observed on Tournament and Practice, but focus visibility was not directly verified for every betting control and panel toggle. Evidence: initial-shared.png\"},\"human_win_confetti_burst\":{\"score\":\"no\",\"reasoning\":\"FAIL: Human wins were observed, but no confetti was observed in the post-showdown DOM or screenshot. Evidence: human_win_confetti_burst-after-showdown.png\"},\"showdown_reveal_animates\":{\"score\":\"yes\",\"reasoning\":\"Real all-in play produced running animations immediately after action; the showdown then revealed remaining cards and applied the human winning highlight. Evidence: showdown_reveal_animates-shared.png\"},\"history_entry_animates_in\":{\"score\":\"no\",\"reasoning\":\"FAIL: Completed hands appeared in Hand history, but no direct entrance animation was observed or measured. Evidence: history_entry_animates_in-shared.png\"},\"mobile_drawer_smooth_transition\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: At 375px the drawer was rendered, but its real open/close control was obstructed by overlapping content and could not be exercised. Evidence: mobile_drawer_smooth_transition-shared.png\"},\"reduced_motion_respected\":{\"score\":\"yes\",\"reasoning\":\"With prefers-reduced-motion confirmed true, the app remained usable after Deal and decorative animation was none while state updated instantly. Evidence: reduced_motion_respected-after-deal.png\"},\"export_copy_confirmation_clears\":{\"score\":\"yes\",\"reasoning\":\"Real Copy showed \u201cCopied session JSON to clipboard,\u201d which cleared after four seconds; completed hands also updated the session preview without reload. Evidence: export_copy_confirmation_clears-shared.png\"}}",
+    "cost_usd": 0.4052726
+  },
+  "performance": {
+    "score": 0.9412,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "interactive_within_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive within 2 seconds of a local cold load at /",
+        "reasoning": "Loaded a functional poker table promptly; controls and meaningful UI were available immediately. Evidence: interactive_within_two_seconds-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "console_clean_full_session",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No console errors or uncaught exceptions appear during dealing, betting, showdown, rebuy, undo, save/load, export/import, and panel toggling",
+        "reasoning": "Completed dealing, betting, showdown/end-of-hand, export copy, history, save/reload, and panel interactions; final console check reported 0 errors and 0 warnings. Evidence: reload_resume_prompt-shared.png"
+      },
+      {
+        "id": "9.3",
+        "name": "betting_ui_stays_responsive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Using betting controls and quick-bet shortcuts keeps the UI responsive with no multi-second hangs between action and visible stack/pot update",
+        "reasoning": "Betting actions updated pot, stacks, and play-by-play within well under two seconds, with no visible hangs. Evidence: betting_ui_stays_responsive-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "export_preview_updates_promptly",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After a completed hand the Export preview updates without a long freeze of the betting controls",
+        "reasoning": "After the completed hand, the session JSON preview immediately reflected updated hand and stack data. Evidence: state_changes_remain_interactive-shared.png"
+      },
+      {
+        "id": "9.5",
+        "name": "history_list_stays_smooth",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "As Hand history grows across several completed hands, opening the panel and scrolling remain usable without multi-second lag",
+        "reasoning": "Opened Hand history with multiple completed hands and scrolled the page successfully without lag or unusable controls. Evidence: history_list_stays_smooth-shared.png"
+      },
+      {
+        "id": "9.6",
+        "name": "state_changes_remain_interactive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "During showdown reveal, badge toast, and export copy confirmation the table controls remain interactive afterward",
+        "reasoning": "After end-of-hand state and export copy confirmation, subsequent deal and betting controls remained usable. Evidence: state_changes_remain_interactive-shared.png"
+      },
+      {
+        "id": "9.7",
+        "name": "confetti_does_not_jank_table",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "A human-win confetti burst does not freeze the table or leave controls unresponsive after it finishes",
+        "reasoning": "BLOCKED: A human-win confetti burst was not reached during the exercised session, so post-confetti responsiveness could not be directly observed. Evidence: state_changes_remain_interactive-shared.png"
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_betting_no_freeze",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapid repeated input on betting controls produces no hangs, blank screen, or dropped interactions",
+        "reasoning": "Performed eight rapid repeated betting-control clicks; the interaction completed in about 394 ms and the table remained rendered and interactive afterward. Evidence: betting_ui_stays_responsive-shared.png"
+      },
+      {
+        "id": "9.9",
+        "name": "extended_session_stable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Playing through multiple hands with export and panel toggles shows no runaway slowdown that makes the table unusable",
+        "reasoning": "Played multiple hands, opened history, copied export data, toggled panels, and reloaded; the table remained usable with no runaway slowdown. Evidence: history_list_stays_smooth-shared.png"
+      },
+      {
+        "id": "9.10",
+        "name": "reload_resume_prompt",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After reload of a saved mid-hand state the table becomes interactive again promptly with the restored position visible",
+        "reasoning": "Saved a mid-hand table, reloaded the app, and promptly observed the restored hand, cards, stacks, pot, and active betting controls. Evidence: reload_resume_prompt-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"interactive_within_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"Loaded a functional poker table promptly; controls and meaningful UI were available immediately. Evidence: interactive_within_two_seconds-shared.png\"},\"console_clean_full_session\":{\"score\":\"yes\",\"reasoning\":\"Completed dealing, betting, showdown/end-of-hand, export copy, history, save/reload, and panel interactions; final console check reported 0 errors and 0 warnings. Evidence: reload_resume_prompt-shared.png\"},\"betting_ui_stays_responsive\":{\"score\":\"yes\",\"reasoning\":\"Betting actions updated pot, stacks, and play-by-play within well under two seconds, with no visible hangs. Evidence: betting_ui_stays_responsive-shared.png\"},\"export_preview_updates_promptly\":{\"score\":\"yes\",\"reasoning\":\"After the completed hand, the session JSON preview immediately reflected updated hand and stack data. Evidence: state_changes_remain_interactive-shared.png\"},\"history_list_stays_smooth\":{\"score\":\"yes\",\"reasoning\":\"Opened Hand history with multiple completed hands and scrolled the page successfully without lag or unusable controls. Evidence: history_list_stays_smooth-shared.png\"},\"state_changes_remain_interactive\":{\"score\":\"yes\",\"reasoning\":\"After end-of-hand state and export copy confirmation, subsequent deal and betting controls remained usable. Evidence: state_changes_remain_interactive-shared.png\"},\"confetti_does_not_jank_table\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A human-win confetti burst was not reached during the exercised session, so post-confetti responsiveness could not be directly observed. Evidence: state_changes_remain_interactive-shared.png\"},\"rapid_betting_no_freeze\":{\"score\":\"yes\",\"reasoning\":\"Performed eight rapid repeated betting-control clicks; the interaction completed in about 394 ms and the table remained rendered and interactive afterward. Evidence: betting_ui_stays_responsive-shared.png\"},\"extended_session_stable\":{\"score\":\"yes\",\"reasoning\":\"Played multiple hands, opened history, copied export data, toggled panels, and reloaded; the table remained usable with no runaway slowdown. Evidence: history_list_stays_smooth-shared.png\"},\"reload_resume_prompt\":{\"score\":\"yes\",\"reasoning\":\"Saved a mid-hand table, reloaded the app, and promptly observed the restored hand, cards, stacks, pot, and active betting controls. Evidence: reload_resume_prompt-shared.png\"}}",
+    "cost_usd": 0.191811
+  },
+  "responsiveness": {
+    "score": 0.9,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "desktop_to_mobile_table_adapts",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "From about 1440px to about 375px the poker table and betting controls remain usable; at ~375px stats/history/badges collapse into a toggleable drawer rather than clipping",
+        "reasoning": "Desktop and 375px layouts were both observed; the felt scales down and side panels become a toggleable mobile panel. Evidence: desktop-layout.png, mobile-full-panels.png"
+      },
+      {
+        "id": "7.2",
+        "name": "mobile_tap_targets_usable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At about 375px wide, Deal, betting, Undo, Save, and Export controls remain large enough to activate without precise cursor aiming",
+        "reasoning": "Mobile buttons including Deal, Fold/Call/Raise, All-in, quick bets, Save, and export controls were observed at usable touch sizes, generally 48px high. Evidence: mobile-dealt.png, mobile-full-panels.png"
+      },
+      {
+        "id": "7.3",
+        "name": "dense_text_legible_mobile",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At about 375px wide, chip amounts, equity percentage, and Session stats numbers stay legible and unclipped",
+        "reasoning": "Chip stacks, equity percentage, and Session stats values rendered within the 375px layout without clipping. Evidence: mobile-full-panels.png"
+      },
+      {
+        "id": "7.4",
+        "name": "no_clip_or_overflow_375",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At about 375px wide no content clips or overflows the viewport and no horizontal page scroll appears",
+        "reasoning": "At 375px, measured document and body scroll widths were 360px, with visible content contained inside the viewport. Evidence: mobile-dealt.png"
+      },
+      {
+        "id": "7.5",
+        "name": "drawer_adapts_side_panels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At about 375px wide the stats/history/badges panels use a toggleable drawer rather than remaining a clipped side column",
+        "reasoning": "The mobile view exposes a Show panels/Hide panels toggle and renders stats, history, badges, and export in the expanded panel. Evidence: mobile-panels-drawer.png"
+      },
+      {
+        "id": "7.6",
+        "name": "export_controls_reachable_mobile",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At about 375px wide the Export panel, Save table / Load saved table, Undo last action, and difficulty controls remain reachable without permanently covering the betting controls",
+        "reasoning": "The expanded mobile panel visibly contains Export session, Save table, Load saved table, Undo last action, and difficulty controls below the table without covering betting controls. Evidence: mobile-full-panels.png"
+      },
+      {
+        "id": "7.7",
+        "name": "betting_controls_tap_work",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At about 375px wide Fold, Check/Call, Raise, All-in, and quick-bet shortcuts remain tappable and functional",
+        "reasoning": "FAIL: Fold, Call, and Raise were reached through real interaction, but the full set including All-in and quick-bet shortcuts was not fully verified end-to-end. Evidence: mobile-betting.png"
+      },
+      {
+        "id": "7.8",
+        "name": "no_horizontal_scroll_mobile",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At about 375px wide the page has no horizontal scrolling",
+        "reasoning": "At 375px, document and body scroll widths measured 360px, so no horizontal page scrolling was present. Evidence: mobile-dealt.png"
+      },
+      {
+        "id": "7.9",
+        "name": "table_felt_scales",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The table felt and card layout scale to fit the narrow viewport without cutting off hole cards or community cards",
+        "reasoning": "The felt measured 328px wide at the compact viewport, and hole/community cards remained inside its bounds without horizontal clipping. Evidence: mobile-dealt.png, mobile-full-panels.png"
+      },
+      {
+        "id": "7.10",
+        "name": "fixed_betting_bar_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "If betting controls are fixed or sticky on small screens, they remain reachable and do not permanently obscure the community board",
+        "reasoning": "Betting controls were rendered in normal document flow rather than as a permanently covering fixed bar; the community board remained visible above them. Evidence: mobile-betting.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"desktop_to_mobile_table_adapts\":{\"score\":\"yes\",\"reasoning\":\"Desktop and 375px layouts were both observed; the felt scales down and side panels become a toggleable mobile panel. Evidence: desktop-layout.png, mobile-full-panels.png\"},\"mobile_tap_targets_usable\":{\"score\":\"yes\",\"reasoning\":\"Mobile buttons including Deal, Fold/Call/Raise, All-in, quick bets, Save, and export controls were observed at usable touch sizes, generally 48px high. Evidence: mobile-dealt.png, mobile-full-panels.png\"},\"dense_text_legible_mobile\":{\"score\":\"yes\",\"reasoning\":\"Chip stacks, equity percentage, and Session stats values rendered within the 375px layout without clipping. Evidence: mobile-full-panels.png\"},\"no_clip_or_overflow_375\":{\"score\":\"yes\",\"reasoning\":\"At 375px, measured document and body scroll widths were 360px, with visible content contained inside the viewport. Evidence: mobile-dealt.png\"},\"drawer_adapts_side_panels\":{\"score\":\"yes\",\"reasoning\":\"The mobile view exposes a Show panels/Hide panels toggle and renders stats, history, badges, and export in the expanded panel. Evidence: mobile-panels-drawer.png\"},\"export_controls_reachable_mobile\":{\"score\":\"yes\",\"reasoning\":\"The expanded mobile panel visibly contains Export session, Save table, Load saved table, Undo last action, and difficulty controls below the table without covering betting controls. Evidence: mobile-full-panels.png\"},\"betting_controls_tap_work\":{\"score\":\"no\",\"reasoning\":\"FAIL: Fold, Call, and Raise were reached through real interaction, but the full set including All-in and quick-bet shortcuts was not fully verified end-to-end. Evidence: mobile-betting.png\"},\"no_horizontal_scroll_mobile\":{\"score\":\"yes\",\"reasoning\":\"At 375px, document and body scroll widths measured 360px, so no horizontal page scrolling was present. Evidence: mobile-dealt.png\"},\"table_felt_scales\":{\"score\":\"yes\",\"reasoning\":\"The felt measured 328px wide at the compact viewport, and hole/community cards remained inside its bounds without horizontal clipping. Evidence: mobile-dealt.png, mobile-full-panels.png\"},\"fixed_betting_bar_accessible\":{\"score\":\"yes\",\"reasoning\":\"Betting controls were rendered in normal document flow rather than as a permanently covering fixed bar; the community board remained visible above them. Evidence: mobile-betting.png\"} }",
+    "cost_usd": 0.1794912
+  },
+  "technical": {
+    "score": 0.7727,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "interactive_within_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Navigating to / on a local cold load reaches an interactive table within 2 seconds \u2014 not a blank page, a framework error overlay, or a noscript fallback",
+        "reasoning": "The initial load rendered an interactive poker table and controls immediately. Evidence: interactive_within_two_seconds-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "console_clean_full_session",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Loading, dealing a hand, betting through a round, reaching showdown or fold, opening Hand history, using Rebuy when available, and using New Session produce no uncaught JavaScript errors or unhandled promise rejections in the console",
+        "reasoning": "After dealing, betting, folding, completing hands, and opening badges, console inspection reported 0 errors and 0 warnings. Evidence: export_compiled_live_from_store-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "reload_restores_persisted_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After playing several hands so chips, blind level, hand count, win-rate stats, hand history, and badges have changed, a full page refresh restores all of them exactly as before",
+        "reasoning": "FAIL: Reload restored chips, hand count, stats, and hand history, but no badges had changed after the exercised hands, so the full required state-change workflow was not satisfied. Evidence: reload_restores_persisted_state-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "no_failed_same_origin_requests",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Driving the core hand flow produces no failed same-origin (4xx/5xx) network requests, consistent with fully client-side hand logic (the browser's own /favicon.ico probe aside)",
+        "reasoning": "Network inspection after the core flow showed no failed same-origin requests. Evidence: core-hand-start-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "rapid_input_stays_responsive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapidly repeating the primary game action many times through the visible controls keeps the UI responsive with an exact final state and no blank screen, uncaught error, or sustained freeze",
+        "reasoning": "Twenty-five rapid visible Fold actions left the UI rendered and responsive with feedback and no blank screen. Evidence: rapid_input_stays_responsive-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "illegal_actions_rejected_with_feedback",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Acting when it is not the human's turn, entering an out-of-range raise, or reusing input left over from a resolved hand is rejected with specific visible feedback rather than silently mutating the current hand",
+        "reasoning": "An out-of-range raise was disabled and displayed the specific message \u201cMinimum raise is 44\u201d; repeated folding also produced explicit feedback without silent mutation. Evidence: illegal_actions_rejected_with_feedback-shared.png",
+        "optional": true
+      },
+      {
+        "id": "4.11",
+        "name": "keyboard_only_operation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every betting control, panel toggle, and the raise slider is reachable and operable with the keyboard alone (Tab/Shift+Tab to reach, Enter/Space to activate, arrow keys to adjust the slider)",
+        "reasoning": "Controls were keyboard reachable, the dialog focus cycled, and the raise slider changed from 73 to 74 with ArrowRight. Evidence: core-hand-start-shared.png"
+      },
+      {
+        "id": "4.12",
+        "name": "session_dialog_traps_and_returns_focus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The \"Start new session\" confirmation behaves as a modal dialog: keyboard focus stays trapped inside it while open and returns to the control that opened it when it closes",
+        "reasoning": "The modal trapped Tab focus between Cancel and Reset session, and Escape closed it with focus returned to Start new session. Evidence: session_dialog_traps_and_returns_focus-shared.png"
+      },
+      {
+        "id": "4.13",
+        "name": "badge_toast_polite_live_region",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "The badge-unlock toast is exposed to assistive technology through a polite live region (aria-live=\"polite\" or role=\"status\") in addition to its visual display",
+        "reasoning": "FAIL: After completing a hand and opening Badges, no badge unlock toast or corresponding announcement was observed; the badges remained locked. Evidence: badge_toast_polite_live_region-shared.png"
+      },
+      {
+        "id": "4.15",
+        "name": "session_json_import_schema_validated",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Importing malformed session JSON or a document whose schemaVersion is not feltrun-session-v1 shows an inline error naming the import field, leaves stacks and stats unchanged, and does not clear hand history",
+        "reasoning": "FAIL: Entering schemaVersion \u201cwrong\u201d left Import disabled and produced no inline error naming the import field. Evidence: session_json_import_schema_validated-shared.png"
+      },
+      {
+        "id": "4.16",
+        "name": "mid_hand_persists_across_reload",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After saving an in-progress post-flop hand and performing a full page reload, the table restores the same board, pot, stacks, street, side to act, blind level, stats, hand history, badges, and difficulty",
+        "reasoning": "A saved post-flop hand reloaded with the same board (8\u2663 4\u2666 K\u2665), pot 145, stacks, flop street, side-to-act, stats, history, badges, and difficulty. Evidence: mid_hand_persists_across_reload-shared.png"
+      },
+      {
+        "id": "4.17",
+        "name": "export_compiled_live_from_store",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Completing a hand updates the Export panel preview without a full page reload so handHistory and session stats match the visible panels",
+        "reasoning": "After hand completion, the live Export preview immediately showed handsPlayed 3, handHistory containing the completed hand, and inProgressHand null without reload. Evidence: export_compiled_live_from_store-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"interactive_within_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"The initial load rendered an interactive poker table and controls immediately. Evidence: interactive_within_two_seconds-shared.png\"},\"console_clean_full_session\":{\"score\":\"yes\",\"reasoning\":\"After dealing, betting, folding, completing hands, and opening badges, console inspection reported 0 errors and 0 warnings. Evidence: export_compiled_live_from_store-shared.png\"},\"reload_restores_persisted_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: Reload restored chips, hand count, stats, and hand history, but no badges had changed after the exercised hands, so the full required state-change workflow was not satisfied. Evidence: reload_restores_persisted_state-shared.png\"},\"no_failed_same_origin_requests\":{\"score\":\"yes\",\"reasoning\":\"Network inspection after the core flow showed no failed same-origin requests. Evidence: core-hand-start-shared.png\"},\"rapid_input_stays_responsive\":{\"score\":\"yes\",\"reasoning\":\"Twenty-five rapid visible Fold actions left the UI rendered and responsive with feedback and no blank screen. Evidence: rapid_input_stays_responsive-shared.png\"},\"illegal_actions_rejected_with_feedback\":{\"score\":\"yes\",\"reasoning\":\"An out-of-range raise was disabled and displayed the specific message \u201cMinimum raise is 44\u201d; repeated folding also produced explicit feedback without silent mutation. Evidence: illegal_actions_rejected_with_feedback-shared.png\"},\"keyboard_only_operation\":{\"score\":\"yes\",\"reasoning\":\"Controls were keyboard reachable, the dialog focus cycled, and the raise slider changed from 73 to 74 with ArrowRight. Evidence: core-hand-start-shared.png\"},\"session_dialog_traps_and_returns_focus\":{\"score\":\"yes\",\"reasoning\":\"The modal trapped Tab focus between Cancel and Reset session, and Escape closed it with focus returned to Start new session. Evidence: session_dialog_traps_and_returns_focus-shared.png\"},\"badge_toast_polite_live_region\":{\"score\":\"no\",\"reasoning\":\"FAIL: After completing a hand and opening Badges, no badge unlock toast or corresponding announcement was observed; the badges remained locked. Evidence: badge_toast_polite_live_region-shared.png\"},\"session_json_import_schema_validated\":{\"score\":\"no\",\"reasoning\":\"FAIL: Entering schemaVersion \u201cwrong\u201d left Import disabled and produced no inline error naming the import field. Evidence: session_json_import_schema_validated-shared.png\"},\"mid_hand_persists_across_reload\":{\"score\":\"yes\",\"reasoning\":\"A saved post-flop hand reloaded with the same board (8\u2663 4\u2666 K\u2665), pot 145, stacks, flop street, side-to-act, stats, history, badges, and difficulty. Evidence: mid_hand_persists_across_reload-shared.png\"},\"export_compiled_live_from_store\":{\"score\":\"yes\",\"reasoning\":\"After hand completion, the live Export preview immediately showed handsPlayed 3, handHistory containing the completed hand, and inProgressHand null without reload. Evidence: export_compiled_live_from_store-shared.png\"}}",
+    "cost_usd": 0.4066244
+  },
+  "user_flows": {
+    "score": 0.5625,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "raise_to_history_to_export_chain",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Raising a specific chip amount moves exactly that amount from the human stack into the pot; when the hand completes, Session stats hands-played increases by exactly one, the hand appears at the top of Hand history with pot, winner, and hand type, and the Export preview lists that same hand in handHistory with matching pot, winnerName, and handType \u2014 all without a reload",
+        "reasoning": "Raised 20 chips, completed the hand, and observed Hands played 1, Hand 1 history with 152-chip pot/winner/hand type, plus matching export JSON. Evidence: raise_to_history_to_export_chain.png"
+      },
+      {
+        "id": "6.2",
+        "name": "raise_invalid_inline_validation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Entering a raise amount below the legal minimum or above the human's stack shows an inline validation message naming the violated limit and keeps raise confirm disabled until the amount is legal",
+        "reasoning": "Invalid amounts showed \u201cMinimum raise is 20\u201d and \u201cMaximum raise is your stack (1000)\u201d; Raise remained disabled. Evidence: raise_invalid_inline_validation.png"
+      },
+      {
+        "id": "6.3",
+        "name": "blind_level_advance_export_tracks",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Completing the 8th hand of a blind level advances the blind-level indicator by exactly one level and increases both blinds; Session stats and Hand history carry over unchanged, and the export preview's session.blindLevel, smallBlind, and bigBlind match the advanced values",
+        "reasoning": "BLOCKED: Did not complete eight hands, so blind-level advancement could not be verified. Evidence: new_session_confirm_reset_result.png"
+      },
+      {
+        "id": "6.4",
+        "name": "rebuy_then_reload_restores",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "When the human's stack reaches 0, Rebuy restores the stack to 1000 and increments rebuys by exactly 1; after a full page reload both the restored stack and incremented rebuys count remain",
+        "reasoning": "BLOCKED: Could not reach a zero stack and no Rebuy control appeared; the demo trigger did not create the required state. Evidence: raise_to_history_to_export_chain.png"
+      },
+      {
+        "id": "6.5",
+        "name": "panel_toggles_retain_table_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Toggling Hand history, Session stats, Badges, and Export panels does not reset chip stacks, the active hand, or the pot",
+        "reasoning": "Toggled history, badges, and export panels; Hand 2, Pot 15, Stack 960, and Hands played 1 remained unchanged. Evidence: panel_toggles_retain_table_state.png"
+      },
+      {
+        "id": "6.6",
+        "name": "empty_history_before_first_hand",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Before any hand is played, Hand history shows \"No hands played yet\" and the table shows the \"Deal first hand\" prompt",
+        "reasoning": "Before dealing, observed \u201cNo hands played yet\u201d and the \u201cDeal first hand\u201d prompt. Evidence: empty_history_before_first_hand.png"
+      },
+      {
+        "id": "6.7",
+        "name": "difficulty_switch_preserves_progress",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Switching difficulty mid-session does not reset chip stacks, Session stats, or Hand history",
+        "reasoning": "Changed difficulty to Hard while mid-hand; Hand 2, stacks, pot, Hands played 1, and Hand 1 history remained. Evidence: export_import_round_trip_flow.png"
+      },
+      {
+        "id": "6.8",
+        "name": "history_drawer_preserves_workflow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "On a narrow viewport, collapsing and reopening the stats/history/badges drawer leaves the table hand, stacks, and pot intact",
+        "reasoning": "FAIL: At narrow width, the visible drawer controls were intercepted and the collapse/reopen workflow could not be completed. Evidence: history_drawer_preserves_workflow.png"
+      },
+      {
+        "id": "6.9",
+        "name": "new_session_confirm_overlay",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "\"Start new session\" opens a confirmation overlay; cancelling leaves every panel unchanged, and confirming resets table, stacks, stats, history, badges, and clears export handHistory to empty with inProgressHand null",
+        "reasoning": "Start new session opened a confirmation dialog; cancelling preserved progress, and confirming reset stacks/stats/history/badges and export handHistory to [] with inProgressHand null. Evidence: new_session_confirm_reset_result.png"
+      },
+      {
+        "id": "6.10",
+        "name": "undo_then_continue_hand",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "On the human's turn, raise, Undo last action to restore stack and pot, then take a different legal action \u2014 the hand advances normally without a reload",
+        "reasoning": "FAIL: Raise succeeded, but Undo last action remained disabled, so rollback and alternate continuation were not observed. Evidence: export_import_round_trip_flow.png"
+      },
+      {
+        "id": "6.11",
+        "name": "mid_hand_save_resume_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Mid-hand after the flop: Save table, note board/pot/stacks/side to act, reload \u2014 the table resumes with the same board, pot, stacks, street, and side to act",
+        "reasoning": "Saved a turn-state hand with board, pot 90, stacks, and side-to-act; after reload the same Hand 2 turn state and board were restored. Evidence: export_import_round_trip_flow.png"
+      },
+      {
+        "id": "6.12",
+        "name": "export_import_round_trip_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After completing at least one hand, Copy or Download the session JSON then Import that same text \u2014 visible stacks, Session stats, Hand history, badges, and difficulty match the pre-export state and the export preview matches again",
+        "reasoning": "Exported session JSON, imported the same text, and observed matching stacks, Hands played 1, difficulty Hard, hand history, and in-progress turn state. Evidence: export_import_round_trip_flow.png"
+      },
+      {
+        "id": "6.13",
+        "name": "collab_offline_merge_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "In Collaboration scenario, queue two non-conflicting offline edits, reconnect, and apply either delivery order \u2014 Shared content converges identically without dropping either change",
+        "reasoning": "Queued two offline notes, reconnected, selected delivery order, and observed both Alpha and Beta retained in Shared content. Evidence: collab_offline_merge_flow_final.png"
+      },
+      {
+        "id": "6.14",
+        "name": "badge_toast_panel_and_reload_persistence",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Earn a badge through real play and observe its transient toast at unlock, then confirm it remains listed in the Badges panel as another badge is earned; after a full page reload, the same earned badges remain listed",
+        "reasoning": "BLOCKED: No badge was earned through play, so unlock toast and reload persistence could not be verified. Evidence: panel_toggles_retain_table_state.png"
+      },
+      {
+        "id": "6.15",
+        "name": "three_hand_reload_restores_full_session",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After at least 3 completed hands, record chip stacks, blind level, Session stats, Hand history entries, badges, and difficulty; a full page reload restores every recorded facet exactly rather than a partial mixture",
+        "reasoning": "BLOCKED: Only one hand was completed; the required three-hand persistence workflow was not reached. Evidence: export_import_round_trip_flow.png"
+      },
+      {
+        "id": "6.16",
+        "name": "same_note_conflict_requires_explicit_choice",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "In Collaboration scenario, create two offline edits to the same note and reconnect; the UI presents an explicit keep-mine / keep-peer choice instead of silently overwriting, and Shared content shows exactly the version selected",
+        "reasoning": "FAIL: Reconnection presented generic delivery-order choices (\u201cApply mine first\u201d/\u201cApply peer first\u201d), not an explicit keep-mine/keep-peer choice for the same note. Evidence: same_note_conflict_requires_explicit_choice.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"raise_to_history_to_export_chain\":{\"score\":\"yes\",\"reasoning\":\"Raised 20 chips, completed the hand, and observed Hands played 1, Hand 1 history with 152-chip pot/winner/hand type, plus matching export JSON. Evidence: raise_to_history_to_export_chain.png\"},\"raise_invalid_inline_validation\":{\"score\":\"yes\",\"reasoning\":\"Invalid amounts showed \u201cMinimum raise is 20\u201d and \u201cMaximum raise is your stack (1000)\u201d; Raise remained disabled. Evidence: raise_invalid_inline_validation.png\"},\"blind_level_advance_export_tracks\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Did not complete eight hands, so blind-level advancement could not be verified. Evidence: new_session_confirm_reset_result.png\"},\"rebuy_then_reload_restores\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not reach a zero stack and no Rebuy control appeared; the demo trigger did not create the required state. Evidence: raise_to_history_to_export_chain.png\"},\"panel_toggles_retain_table_state\":{\"score\":\"yes\",\"reasoning\":\"Toggled history, badges, and export panels; Hand 2, Pot 15, Stack 960, and Hands played 1 remained unchanged. Evidence: panel_toggles_retain_table_state.png\"},\"empty_history_before_first_hand\":{\"score\":\"yes\",\"reasoning\":\"Before dealing, observed \u201cNo hands played yet\u201d and the \u201cDeal first hand\u201d prompt. Evidence: empty_history_before_first_hand.png\"},\"difficulty_switch_preserves_progress\":{\"score\":\"yes\",\"reasoning\":\"Changed difficulty to Hard while mid-hand; Hand 2, stacks, pot, Hands played 1, and Hand 1 history remained. Evidence: export_import_round_trip_flow.png\"},\"history_drawer_preserves_workflow\":{\"score\":\"no\",\"reasoning\":\"FAIL: At narrow width, the visible drawer controls were intercepted and the collapse/reopen workflow could not be completed. Evidence: history_drawer_preserves_workflow.png\"},\"new_session_confirm_overlay\":{\"score\":\"yes\",\"reasoning\":\"Start new session opened a confirmation dialog; cancelling preserved progress, and confirming reset stacks/stats/history/badges and export handHistory to [] with inProgressHand null. Evidence: new_session_confirm_reset_result.png\"},\"undo_then_continue_hand\":{\"score\":\"no\",\"reasoning\":\"FAIL: Raise succeeded, but Undo last action remained disabled, so rollback and alternate continuation were not observed. Evidence: export_import_round_trip_flow.png\"},\"mid_hand_save_resume_flow\":{\"score\":\"yes\",\"reasoning\":\"Saved a turn-state hand with board, pot 90, stacks, and side-to-act; after reload the same Hand 2 turn state and board were restored. Evidence: export_import_round_trip_flow.png\"},\"export_import_round_trip_flow\":{\"score\":\"yes\",\"reasoning\":\"Exported session JSON, imported the same text, and observed matching stacks, Hands played 1, difficulty Hard, hand history, and in-progress turn state. Evidence: export_import_round_trip_flow.png\"},\"collab_offline_merge_flow\":{\"score\":\"yes\",\"reasoning\":\"Queued two offline notes, reconnected, selected delivery order, and observed both Alpha and Beta retained in Shared content. Evidence: collab_offline_merge_flow_final.png\"},\"badge_toast_panel_and_reload_persistence\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No badge was earned through play, so unlock toast and reload persistence could not be verified. Evidence: panel_toggles_retain_table_state.png\"},\"three_hand_reload_restores_full_session\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Only one hand was completed; the required three-hand persistence workflow was not reached. Evidence: export_import_round_trip_flow.png\"},\"same_note_conflict_requires_explicit_choice\":{\"score\":\"no\",\"reasoning\":\"FAIL: Reconnection presented generic delivery-order choices (\u201cApply mine first\u201d/\u201cApply peer first\u201d), not an explicit keep-mine/keep-peer choice for the same note. Evidence: same_note_conflict_requires_explicit_choice.png\"}}",
+    "cost_usd": 0.6308824
+  },
+  "visual_design": {
+    "score": 0.8,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "felt_background_and_primary_token",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The page background renders the near-black felt token --color-background (#02070C) and the human seat highlight or a key call-to-action uses --color-primary (#FFFF7D)",
+        "reasoning": "Near-black felt background and yellow human-seat/key-action accents are visibly rendered. Evidence: felt-background_and_primary_token-shared.png"
+      },
+      {
+        "id": "2.2",
+        "name": "poppins_type_scale",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Headings and body text use the Poppins font stack, with a section heading rendering near 34.56px and body text near 24.84px",
+        "reasoning": "Computed styles show Poppins throughout, 34.56px section headings, and 24.84px body intro text. Evidence: felt-background_and_primary_token-shared.png"
+      },
+      {
+        "id": "2.3",
+        "name": "tight_spacing_and_5px_radius",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Cards and panels use an approximately 5px border radius and spacing follows a tight 2px-based scale rather than large default browser spacing",
+        "reasoning": "Panels and controls use 5px radii with compact spacing and consistent tight gaps. Evidence: felt-background_and_primary_token-shared.png",
+        "optional": true
+      },
+      {
+        "id": "2.4",
+        "name": "light_on_dark_legibility",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Card faces, chip-stack amounts, and seat badges use light-on-dark contrast that is clearly legible against the near-black felt",
+        "reasoning": "Cards, chip amounts, seat labels, and statistics are clearly legible against the dark felt/panel surfaces. Evidence: winning_hand_highlight_distinct-shared.png"
+      },
+      {
+        "id": "2.5",
+        "name": "style_badges_visually_distinct",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The three AI play-style badges are visually distinct from one another by color and/or icon, not distinguishable by text label alone",
+        "reasoning": "Aggressive, Tight, and Bluffer badges visibly differ by color and icon. Evidence: felt-background_and_primary_token-shared.png"
+      },
+      {
+        "id": "2.6",
+        "name": "designed_idle_and_empty_states",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Before the first hand the table shows a \"Deal first hand\" prompt and the empty Hand history panel shows \"No hands played yet\" rather than blank areas",
+        "reasoning": "Idle table visibly shows \u201cDeal first hand,\u201d and the empty history state shows \u201cNo hands played yet.\u201d Evidence: felt-background_and_primary_token-shared.png"
+      },
+      {
+        "id": "2.7",
+        "name": "winning_hand_highlight_distinct",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "At the showdown the winning hand's highlight (border or glow) is clearly distinguishable at a glance from the other revealed hands",
+        "reasoning": "At showdown, the winning hand/cards have a clearly visible bright yellow glow and winner labeling. Evidence: winning_hand_highlight_distinct-shared.png",
+        "optional": true
+      },
+      {
+        "id": "2.8",
+        "name": "mobile_drawer_layout_holds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At approximately 375px wide the table and betting controls stay usable with no horizontal page scroll, the stats and history panels collapse into a toggleable drawer rather than being clipped, and data-dense text (chip amounts, equity percentage, stats numbers) stays legible and unclipped",
+        "reasoning": "At 375px, document width stays within the viewport with no horizontal overflow; \u201cShow panels\u201d provides a usable collapsed drawer control and content remains unclipped. Evidence: mobile_drawer_layout_holds-shared.png"
+      },
+      {
+        "id": "2.11",
+        "name": "consistent_icon_set",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Icons across the chrome (panel toggles, badges, controls) come from one consistent icon set with a uniform stroke and sizing, not a visible mix of styles",
+        "reasoning": "FAIL: Badge symbols are visible, but the chrome controls and panel toggles do not use a consistent icon set; the interface is largely text-only with mixed symbol treatment. Evidence: felt-background_and_primary_token-shared.png"
+      },
+      {
+        "id": "2.12",
+        "name": "accent_token_secondary_highlights",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Links and secondary highlights render the accent token --color-accent (#FFFE68), visually distinct from the primary #FFFF7D reserved for the human seat highlight and key call-to-action buttons",
+        "reasoning": "Secondary level/link highlights use a distinct pale-yellow accent while the primary human seat and CTA use the brighter yellow token. Evidence: felt-background_and_primary_token-shared.png"
+      },
+      {
+        "id": "2.13",
+        "name": "badge_toast_legible_on_felt",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "The badge-unlock toast is clearly legible against the near-black felt background when it appears",
+        "reasoning": "BLOCKED: No badge was unlocked during the exercised workflow, so the badge-unlock toast never appeared and its legibility could not be directly verified. Evidence: winning_hand_highlight_distinct-shared.png"
+      },
+      {
+        "id": "2.14",
+        "name": "ui_copy_consistent_terminology",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders headings, panel titles, and control labels, capitalization follows one consistent convention and the same concept is named consistently across panels (for example the stats, history, and badges panels agree on terminology)",
+        "reasoning": "Visible headings and controls use consistent sentence-case terminology, including Session stats, Export session, Hand log, and Shared content. Evidence: export_panel_monospace_preview-shared.png"
+      },
+      {
+        "id": "2.16",
+        "name": "export_panel_monospace_preview",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Export panel shows a monospaced session JSON preview with Copy and Download actions, and the difficulty control and Save table / Load saved table controls read as part of the same felt chrome rather than a disconnected gadget strip",
+        "reasoning": "FAIL: Export, Copy, Download, Difficulty, Save table, and Load saved table are present in the felt panel, but the JSON preview visibly computes as Poppins rather than a monospaced font. Evidence: export_panel_monospace_preview-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"felt_background_and_primary_token\":{\"score\":\"yes\",\"reasoning\":\"Near-black felt background and yellow human-seat/key-action accents are visibly rendered. Evidence: felt-background_and_primary_token-shared.png\"},\"poppins_type_scale\":{\"score\":\"yes\",\"reasoning\":\"Computed styles show Poppins throughout, 34.56px section headings, and 24.84px body intro text. Evidence: felt-background_and_primary_token-shared.png\"},\"tight_spacing_and_5px_radius\":{\"score\":\"yes\",\"reasoning\":\"Panels and controls use 5px radii with compact spacing and consistent tight gaps. Evidence: felt-background_and_primary_token-shared.png\"},\"light_on_dark_legibility\":{\"score\":\"yes\",\"reasoning\":\"Cards, chip amounts, seat labels, and statistics are clearly legible against the dark felt/panel surfaces. Evidence: winning_hand_highlight_distinct-shared.png\"},\"style_badges_visually_distinct\":{\"score\":\"yes\",\"reasoning\":\"Aggressive, Tight, and Bluffer badges visibly differ by color and icon. Evidence: felt-background_and_primary_token-shared.png\"},\"designed_idle_and_empty_states\":{\"score\":\"yes\",\"reasoning\":\"Idle table visibly shows \u201cDeal first hand,\u201d and the empty history state shows \u201cNo hands played yet.\u201d Evidence: felt-background_and_primary_token-shared.png\"},\"winning_hand_highlight_distinct\":{\"score\":\"yes\",\"reasoning\":\"At showdown, the winning hand/cards have a clearly visible bright yellow glow and winner labeling. Evidence: winning_hand_highlight_distinct-shared.png\"},\"mobile_drawer_layout_holds\":{\"score\":\"yes\",\"reasoning\":\"At 375px, document width stays within the viewport with no horizontal overflow; \u201cShow panels\u201d provides a usable collapsed drawer control and content remains unclipped. Evidence: mobile_drawer_layout_holds-shared.png\"},\"consistent_icon_set\":{\"score\":\"no\",\"reasoning\":\"FAIL: Badge symbols are visible, but the chrome controls and panel toggles do not use a consistent icon set; the interface is largely text-only with mixed symbol treatment. Evidence: felt-background_and_primary_token-shared.png\"},\"accent_token_secondary_highlights\":{\"score\":\"yes\",\"reasoning\":\"Secondary level/link highlights use a distinct pale-yellow accent while the primary human seat and CTA use the brighter yellow token. Evidence: felt-background_and_primary_token-shared.png\"},\"badge_toast_legible_on_felt\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No badge was unlocked during the exercised workflow, so the badge-unlock toast never appeared and its legibility could not be directly verified. Evidence: winning_hand_highlight_distinct-shared.png\"},\"ui_copy_consistent_terminology\":{\"score\":\"yes\",\"reasoning\":\"Visible headings and controls use consistent sentence-case terminology, including Session stats, Export session, Hand log, and Shared content. Evidence: export_panel_monospace_preview-shared.png\"},\"export_panel_monospace_preview\":{\"score\":\"no\",\"reasoning\":\"FAIL: Export, Copy, Download, Difficulty, Save table, and Load saved table are present in the felt panel, but the JSON preview visibly computes as Poppins rather than a monospaced font. Evidence: export_panel_monospace_preview-shared.png\"}}",
+    "cost_usd": 0.29468340000000004
+  },
+  "writing": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "panel_headings_consistent_case",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders headings such as Session stats, Hand history, Badges, and Export, they use one consistent capitalization convention",
+        "reasoning": "Headings consistently use title case, including Session stats, Export session, Hand history, Badges, and Collaboration scenario. Evidence: initial-view.png"
+      },
+      {
+        "id": "15.2",
+        "name": "action_labels_specific",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders actions, labels are specific verbs such as Deal first hand, Undo last action, Save table, and Export Copy rather than generic Submit or OK when a specific label is possible",
+        "reasoning": "Actions use specific labels such as Deal first hand, Save table, Undo last action, and Download. Evidence: initial-view.png"
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders raise-amount or import errors, they name the problem and the fix (for example naming amount or the import field), not only Invalid",
+        "reasoning": "No raise-amount or import error message was rendered; the criterion is therefore not applicable. Evidence: initial-view.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_history_explains_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where Hand history is empty, the copy \"No hands played yet\" (or equivalent) explains what belongs there; the pre-deal table shows Deal first hand guidance",
+        "reasoning": "Hand history visibly says No hands played yet, and the pre-deal table provides Deal first hand guidance. Evidence: empty-history.png"
+      },
+      {
+        "id": "15.5",
+        "name": "body_copy_quality",
+        "value": 1.0,
+        "raw": 5,
+        "weight": 0.5,
+        "description": "Where the app renders body or instructional copy on the table chrome, rate how free it is of spelling and grammatical errors",
+        "reasoning": "Visible instructional and body copy is grammatical and free of apparent spelling errors. Evidence: initial-view.png"
+      },
+      {
+        "id": "15.6",
+        "name": "hand_type_labels_readable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where showdown hand-type labels appear (for example Two pair or Flush), they read as finished poker terminology rather than placeholder tokens",
+        "reasoning": "No showdown hand-type labels were rendered, so there were no placeholder labels to fail this criterion. Evidence: badges-visible.png"
+      },
+      {
+        "id": "15.7",
+        "name": "badge_names_specific",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where achievement badges are listed, names such as First win or Comeback kid are specific rather than Badge 1 style placeholders",
+        "reasoning": "Badges use specific names including First win, First bluff win, Big pot, Comeback kid, and All-in winner. Evidence: badges-visible.png"
+      },
+      {
+        "id": "15.8",
+        "name": "export_labels_clear",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where Export Copy, Download, and Import labels appear, they clearly describe the session-artifact action",
+        "reasoning": "Export session, Session JSON, Copy, Download, Import session, and Import clearly describe session-artifact actions. Evidence: initial-view.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"panel_headings_consistent_case\":{\"score\":\"yes\",\"reasoning\":\"Headings consistently use title case, including Session stats, Export session, Hand history, Badges, and Collaboration scenario. Evidence: initial-view.png\"},\"action_labels_specific\":{\"score\":\"yes\",\"reasoning\":\"Actions use specific labels such as Deal first hand, Save table, Undo last action, and Download. Evidence: initial-view.png\"},\"errors_name_problem_and_fix\":{\"score\":\"yes\",\"reasoning\":\"No raise-amount or import error message was rendered; the criterion is therefore not applicable. Evidence: initial-view.png\"},\"empty_history_explains_next_step\":{\"score\":\"yes\",\"reasoning\":\"Hand history visibly says No hands played yet, and the pre-deal table provides Deal first hand guidance. Evidence: empty-history.png\"},\"body_copy_quality\":{\"score\":5,\"reasoning\":\"Visible instructional and body copy is grammatical and free of apparent spelling errors. Evidence: initial-view.png\"},\"hand_type_labels_readable\":{\"score\":\"yes\",\"reasoning\":\"No showdown hand-type labels were rendered, so there were no placeholder labels to fail this criterion. Evidence: badges-visible.png\"},\"badge_names_specific\":{\"score\":\"yes\",\"reasoning\":\"Badges use specific names including First win, First bluff win, Big pot, Comeback kid, and All-in winner. Evidence: badges-visible.png\"},\"export_labels_clear\":{\"score\":\"yes\",\"reasoning\":\"Export session, Session JSON, Copy, Download, Import session, and Import clearly describe session-artifact actions. Evidence: initial-view.png\"}}",
+    "cost_usd": 0.1646582
+  }
+}

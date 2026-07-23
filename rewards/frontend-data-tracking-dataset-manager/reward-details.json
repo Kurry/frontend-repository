@@ -1,0 +1,2821 @@
+{
+  "accessibility": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "keyboard_reaches_everything",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sidebar entries, toolbar controls, grid cells and row actions, wizard steps, panel forms, and tray actions are all reachable and operable with the keyboard alone, with a visible focus indicator",
+        "reasoning": "Tab navigation reached toolbar controls and grid cells with visible focus outlines; row actions are real buttons. Evidence: initial-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "cell_keyboard_editing",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A focused grid cell opens its inline editor with Enter and cancels with Escape, entirely from the keyboard",
+        "reasoning": "Focused a grid cell, Enter opened its inline input editor, and Escape exited editing without submitting. Evidence: cell-editor.png"
+      },
+      {
+        "id": "1.3",
+        "name": "modals_manage_focus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Modals and the export drawer trap focus while open, close on Escape, and return focus to the control that opened them",
+        "reasoning": "The export drawer kept focus within its controls across repeated Tab presses; Escape closed it and restored focus to Export package. Evidence: export-drawer.png"
+      },
+      {
+        "id": "1.4",
+        "name": "live_region_announcements",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Import commit completion, bulk apply results, and merge completion are announced through an aria-live region as well as shown visually",
+        "reasoning": "Import commit, bulk verification, and duplicate merge each produced visible results plus polite/assertive aria-live announcements. Evidence: import-commit.png, bulk-apply.png, merge-announcement-final.png"
+      },
+      {
+        "id": "1.5",
+        "name": "forms_have_explicit_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every form field across New Dataset, Add Row, thresholds, splits, the wizard, and Import package has a visible label, and validation messages are programmatically associated with their fields",
+        "reasoning": "Observed explicit labels across New Dataset, Add Row, thresholds, and splits; blank New Dataset submission set aria-invalid and aria-describedby-linked validation messages. Evidence: new-dataset-validation.png"
+      },
+      {
+        "id": "1.6",
+        "name": "headings_follow_logical_order",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Page and panel headings follow a logical order with no skipped levels",
+        "reasoning": "Visible page and panel headings use a logical H1/H2/H3 hierarchy without skipped levels. Evidence: initial-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "state_not_color_only",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Verified, flagged, split, and diff states are conveyed by icon or text in addition to color",
+        "reasoning": "Flagged rows include icon alt text and \u201cflagged\u201d text; verification states use Yes/No text and accessible button labels. Evidence: initial-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "text_and_controls_have_contrast",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "All text and controls \u2014 including badge text, flagged cells, and diff treatments \u2014 keep sufficient color contrast",
+        "reasoning": "Computed contrast across 795 visible text/control/grid elements had a minimum observed ratio of 6.57:1, with no sampled elements below 4.5:1. Evidence: final-grid.png"
+      },
+      {
+        "id": "1.9",
+        "name": "semantic_html_roles_are_used",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app uses semantic structure: real buttons for actions, a table or grid role for the data grid, and landmark regions for sidebar and main content",
+        "reasoning": "Observed aside/navigation/main landmarks, a grid with rows and gridcells, and native buttons for actions. Evidence: initial-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "reduced_motion_is_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, batch animations, slides, and gauge transitions are replaced by instant changes while all functionality remains",
+        "reasoning": "In the reduced-motion browser, prefers-reduced-motion matched true and computed animation/transition durations were reduced to 0.001s while the app remained functional. Evidence: reduced-motion.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"keyboard_reaches_everything\":{\"score\":\"yes\",\"reasoning\":\"Tab navigation reached toolbar controls and grid cells with visible focus outlines; row actions are real buttons. Evidence: initial-shared.png\"},\"cell_keyboard_editing\":{\"score\":\"yes\",\"reasoning\":\"Focused a grid cell, Enter opened its inline input editor, and Escape exited editing without submitting. Evidence: cell-editor.png\"},\"modals_manage_focus\":{\"score\":\"yes\",\"reasoning\":\"The export drawer kept focus within its controls across repeated Tab presses; Escape closed it and restored focus to Export package. Evidence: export-drawer.png\"},\"live_region_announcements\":{\"score\":\"yes\",\"reasoning\":\"Import commit, bulk verification, and duplicate merge each produced visible results plus polite/assertive aria-live announcements. Evidence: import-commit.png, bulk-apply.png, merge-announcement-final.png\"},\"forms_have_explicit_labels\":{\"score\":\"yes\",\"reasoning\":\"Observed explicit labels across New Dataset, Add Row, thresholds, and splits; blank New Dataset submission set aria-invalid and aria-describedby-linked validation messages. Evidence: new-dataset-validation.png\"},\"headings_follow_logical_order\":{\"score\":\"yes\",\"reasoning\":\"Visible page and panel headings use a logical H1/H2/H3 hierarchy without skipped levels. Evidence: initial-shared.png\"},\"state_not_color_only\":{\"score\":\"yes\",\"reasoning\":\"Flagged rows include icon alt text and \u201cflagged\u201d text; verification states use Yes/No text and accessible button labels. Evidence: initial-shared.png\"},\"text_and_controls_have_contrast\":{\"score\":\"yes\",\"reasoning\":\"Computed contrast across 795 visible text/control/grid elements had a minimum observed ratio of 6.57:1, with no sampled elements below 4.5:1. Evidence: final-grid.png\"},\"semantic_html_roles_are_used\":{\"score\":\"yes\",\"reasoning\":\"Observed aside/navigation/main landmarks, a grid with rows and gridcells, and native buttons for actions. Evidence: initial-shared.png\"},\"reduced_motion_is_respected\":{\"score\":\"yes\",\"reasoning\":\"In the reduced-motion browser, prefers-reduced-motion matched true and computed animation/transition durations were reduced to 0.001s while the app remained functional. Evidence: reduced-motion.png\"}}",
+    "cost_usd": 0.9112182
+  },
+  "behavioral": {
+    "score": 0.1111,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_reload_reset",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Multi-facet round-trip: enable Show unverified only, apply a split, add a threshold rule, and create a row, then reload the page. All facets coherently reset to the seeded baseline \u2014 the seeded datasets and counts, seeded rules and snapshots only, default view, empty undo history \u2014 never a mix of surviving and reset state",
+        "reasoning": "BLOCKED: The threshold-rule setup was not completed end-to-end, so the full required round-trip was not directly verified. Evidence: multi_facet_reload_reset-final.png"
+      },
+      {
+        "id": "14.2",
+        "name": "import_pipeline_full_track",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Full import pipeline probe: note the sidebar row count, capacity figures, a pivot summary value, and the export Rows CSV line count; run the wizard from a seeded sample CSV through mapping, fix at least one flagged diagnostic cell, exclude one row, and commit. The sidebar count rises by exactly the included row count, the imported rows are findable in the grid, the capacity gauge grows, the pivot summaries change, and both export tabs (Rows CSV and Dataset Package JSON) change",
+        "reasoning": "FAIL: The wizard repaired diagnostics, excluded one row, and committed 3 rows (520\u2192523; capacity 584\u2192587), but pivot-summary and before/after export-tab changes were not fully verified. Evidence: import_pipeline_full_track-final.png"
+      },
+      {
+        "id": "14.3",
+        "name": "edit_ripple_track",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Edit ripple probe: display a formula result over a numeric column, snapshot the dataset, then edit one cell in that column across a threshold cap. The formula result changes to the correct new value, the row's flag state updates, Dataset Package JSON stats for that column change, and a diff of a new snapshot against the earlier one shows exactly that cell changed",
+        "reasoning": "BLOCKED: The required snapshot/edit/diff workflow was not completed. Evidence: multi_facet_reload_reset-final.png"
+      },
+      {
+        "id": "14.4",
+        "name": "merge_count_delta_exact",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Count-delta integrity: note the row count, merge a duplicate group of size k, and confirm the count decreased by exactly k minus 1 with the group gone from a re-run scan",
+        "reasoning": "Merged a duplicate group of 2 rows; the grid count decreased from 523 to 522 and the duplicate group count dropped from 2 to 1. Evidence: merge_count_delta_exact-final.png"
+      },
+      {
+        "id": "14.5",
+        "name": "different_inputs_change_outcomes",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Input-dependent output: two different formulas over two different columns show different results, and two different split percentage sets produce visibly different proportion bars and stratification counts",
+        "reasoning": "FAIL: A formula result changed from 4.969 to 2,598.7, but two different columns and two distinct split configurations with proportion/count comparisons were not demonstrated. Evidence: merge_count_delta_exact-final.png"
+      },
+      {
+        "id": "14.6",
+        "name": "undo_redo_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Undo integrity: apply a bulk Mark verified to several rows, undo once, and confirm every affected row and the Verified badge return to their exact prior values; redo reapplies them exactly",
+        "reasoning": "FAIL: Bulk Mark verified did not visibly update every selected row, and undo/redo did not restore and reapply the required exact state. Evidence: undo_redo_round_trip-final.png"
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_flows_preserve_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Interleaved-flow integrity: start the import wizard, leave it at the mapping step to edit a grid cell, then return and complete the wizard; both the cell edit and the committed import land correctly with neither flow corrupting the other",
+        "reasoning": "BLOCKED: The import-mapping/grid-edit interleaving workflow was not completed and verified. Evidence: import_pipeline_full_track-final.png"
+      },
+      {
+        "id": "14.8",
+        "name": "empty_to_repopulated_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Edge-state round-trip: drive a small dataset to empty (counts, gauge, and badges track to zero and the empty state shows), then repopulate via Add Row or import; all derived surfaces track back up",
+        "reasoning": "BLOCKED: The dataset was not driven to an empty state and repopulated. Evidence: multi_facet_reload_reset-final.png"
+      },
+      {
+        "id": "14.9",
+        "name": "package_export_import_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Package round-trip probe: add a row with a distinctive expectedOutput token, toggle it verified, save a uniquely named snapshot, export Dataset Package JSON showing schemaVersion dataset-manager.package/v1 with that token and snapshot name, edit another cell so live state differs, Import the earlier package, and confirm the grid, verified badge, snapshot list, and a fresh export match the imported package",
+        "reasoning": "BLOCKED: A complete package export/edit/import verification with a distinctive token and snapshot was not completed. Evidence: import_pipeline_full_track-final.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"multi_facet_reload_reset\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The threshold-rule setup was not completed end-to-end, so the full required round-trip was not directly verified. Evidence: multi_facet_reload_reset-final.png\"},\"import_pipeline_full_track\":{\"score\":\"no\",\"reasoning\":\"FAIL: The wizard repaired diagnostics, excluded one row, and committed 3 rows (520\u2192523; capacity 584\u2192587), but pivot-summary and before/after export-tab changes were not fully verified. Evidence: import_pipeline_full_track-final.png\"},\"edit_ripple_track\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The required snapshot/edit/diff workflow was not completed. Evidence: multi_facet_reload_reset-final.png\"},\"merge_count_delta_exact\":{\"score\":\"yes\",\"reasoning\":\"Merged a duplicate group of 2 rows; the grid count decreased from 523 to 522 and the duplicate group count dropped from 2 to 1. Evidence: merge_count_delta_exact-final.png\"},\"different_inputs_change_outcomes\":{\"score\":\"no\",\"reasoning\":\"FAIL: A formula result changed from 4.969 to 2,598.7, but two different columns and two distinct split configurations with proportion/count comparisons were not demonstrated. Evidence: merge_count_delta_exact-final.png\"},\"undo_redo_round_trip\":{\"score\":\"no\",\"reasoning\":\"FAIL: Bulk Mark verified did not visibly update every selected row, and undo/redo did not restore and reapply the required exact state. Evidence: undo_redo_round_trip-final.png\"},\"interleaved_flows_preserve_state\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The import-mapping/grid-edit interleaving workflow was not completed and verified. Evidence: import_pipeline_full_track-final.png\"},\"empty_to_repopulated_round_trip\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The dataset was not driven to an empty state and repopulated. Evidence: multi_facet_reload_reset-final.png\"},\"package_export_import_round_trip\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A complete package export/edit/import verification with a distinctive token and snapshot was not completed. Evidence: import_pipeline_full_track-final.png\"}}",
+    "cost_usd": 0.6457954
+  },
+  "core_features": {
+    "score": 0.597,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "seeded_dataset_sidebar",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On load, the left sidebar lists at least 3 seeded datasets, each entry showing a dataset name, a row count, and a created date; clicking an entry loads that dataset's rows into the main grid and the entry shows a visibly selected treatment",
+        "reasoning": "Three seeded datasets showed names, row counts, dates, and selected styling; selecting the flagship loaded its grid. Evidence: seeded_dataset_sidebar-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "create_dataset_field_contract",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "New Dataset opens a modal whose submit produces a dataset-create payload: name 1-80 chars, optional description at most 500 chars, and a non-empty schema of field records (name 1-40 letters/digits/underscores, type text|number|category, allowedValues required non-empty for category and empty otherwise, unique names case-insensitively); Submit stays disabled until the contracts pass, and a valid submit adds exactly one sidebar entry with row count 0 whose name, description, and schema match the submitted payload",
+        "reasoning": "FAIL: The valid dataset was created, but Create dataset was enabled with an empty name/schema, violating the disabled-until-valid contract. Evidence: create_dataset_field_contract-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "invalid_create_field_contract",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting New Dataset with an empty name, a schema field name outside the allowed pattern, a category field with an empty allowedValues list, duplicate schema field names, or a description longer than 500 characters shows an inline validation message naming the offending field and adds no sidebar entry",
+        "reasoning": "Invalid submission showed inline messages for the missing dataset and field names and did not add a dataset. Evidence: invalid_create_field_contract-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "virtualized_grid_500_rows",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The flagship seeded dataset holds at least 500 rows, the DOM contains only a window of row elements at any time (verifiably fewer than the full row count), and scrolling from the first to the last row is smooth with no blank flashes",
+        "reasoning": "The flagship showed 520+ rows while the DOM contained only a limited visible row window, and scrolling reached the dataset without blank content. Evidence: seeded_dataset_sidebar-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "grid_column_anatomy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The grid shows one labeled column per schema field plus expected output, verified, and split columns under a fixed header row",
+        "reasoning": "The fixed header showed schema fields plus Expected output, Verified, Split, and Actions. Evidence: grid_column_anatomy-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "inline_cell_edit_contract",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Double-clicking a cell opens an in-place editor; Enter commits only when the value satisfies the row record field contract and the change propagates to dependent surfaces, while Escape cancels and restores the prior value; committing a value that violates the contract (non-numeric text in a number field, a value outside a category field's allowed list, or text longer than the bound) is rejected with an inline error naming the field and the violated rule and the prior value stays in place",
+        "reasoning": "FAIL: Valid inline editing worked, but the required Escape restoration and invalid-value rejection cases were not fully completed. Evidence: formula_recomputes_on_edit-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "add_edit_delete_row_contract",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Add Row opens a modal with one input per schema field plus an expected output textarea; a valid submit appends a row matching the row record field contract (values keys equal schema field names; text at most 2000 chars; number finite; category in allowedValues; expectedOutput at most 4000 chars; verified boolean; optional split train|validation|test) and increments the sidebar count; Edit saves in place under the same contract; Delete asks for confirmation, removes the row, and decrements the sidebar count, while cancel leaves it intact",
+        "reasoning": "FAIL: The complete add, edit, delete, and cancel workflow under the row contract was not completed. Evidence: seeded_dataset_sidebar-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "import_sources_offered",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Import CSV wizard offers a .csv file picker, a drag-and-drop dropzone with a visible drag-over treatment, a paste-CSV-text tab, and at least 2 seeded sample fixtures selectable inside the wizard",
+        "reasoning": "The wizard exposed sample fixtures, file/drop input, and paste-text tabs; at least two seeded fixtures were listed. Evidence: import_sources_offered-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "mapping_step_with_preassignment",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The mapping step lists one row per detected CSV column with its header, a preview of first values, and a select targeting a schema field, the expected output, or Ignore; columns whose header matches a schema field arrive pre-assigned, and Continue stays disabled with an explanatory message until at least one column is assigned",
+        "reasoning": "Mapping listed CSV headers, previews, destination selects, and preassigned matching schema headers. Evidence: mapping_step_with_preassignment-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "diagnostic_cell_fixes",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The diagnostic step highlights individual cells that violate the record contract \u2014 wrong type for a number field, a value outside a category field's allowed list, or an empty required cell \u2014 with a message naming the field and the violated rule; editing a flagged cell in place clears its highlight immediately and the ready-versus-issues summary counts update",
+        "reasoning": "Diagnostics highlighted wrong numeric type, invalid category, and missing score with field-specific messages; fixing cells changed the issue summary to zero unresolved. Evidence: diagnostic_cell_fixes-shared.png"
+      },
+      {
+        "id": "1.11",
+        "name": "exclude_and_gated_commit",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Diagnostic rows have an Exclude toggle that removes them from the commit and updates the ready count; Commit stays disabled while any included row has an unresolved issue, and committing imports every included row, raises the sidebar count by exactly that number, shows the rows in the grid, and raises a toast stating how many rows were imported",
+        "reasoning": "Commit was disabled with unresolved issues, then enabled after fixes; committing imported exactly four rows and showed an import-count toast. Evidence: exclude_and_gated_commit-result.png"
+      },
+      {
+        "id": "1.12",
+        "name": "verified_toggle_and_badge",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Each row's Verified toggle switches between a checkmark icon and a dash icon in the verified column, and the panel-header Verified count badge updates immediately on every toggle",
+        "reasoning": "A row\u2019s Verified control changed state and the header verified count increased immediately. Evidence: verified_toggle_and_badge-shared.png"
+      },
+      {
+        "id": "1.13",
+        "name": "unverified_filter_round_trip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Show unverified only hides verified rows, and turning it off restores exactly the full row set",
+        "reasoning": "Enabling Show unverified only reduced the visible set to unverified rows, and disabling it restored the full virtualized set. Evidence: unverified_filter_round_trip-shared.png"
+      },
+      {
+        "id": "1.14",
+        "name": "formula_bar_functions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The formula bar evaluates =SUM, =AVERAGE, =MIN, =MAX, and =COUNT over a named numeric column, supports an optional row range such as =SUM(score, 1:100), and shows the computed result next to the input",
+        "reasoning": "SUM, AVERAGE, MIN, MAX, COUNT, and a ranged SUM were evaluated with displayed results. Evidence: formula_bar_functions-shared.png"
+      },
+      {
+        "id": "1.15",
+        "name": "formula_recomputes_on_edit",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With a formula result displayed, editing a cell inside the evaluated column changes the displayed result without re-entering the formula",
+        "reasoning": "After editing a score cell, rerunning/observing the existing SUM showed the changed aggregate without re-entering the formula. Evidence: formula_recomputes_on_edit-shared.png"
+      },
+      {
+        "id": "1.16",
+        "name": "formula_error_messages",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Submitting a formula with an unknown function, an unknown column, or a numeric function over a non-numeric column shows an inline error naming the problem and no result value",
+        "reasoning": "FAIL: Unknown-function, unknown-column, and nonnumeric-column formula errors were not exercised. Evidence: formula_bar_functions-shared.png"
+      },
+      {
+        "id": "1.17",
+        "name": "threshold_rules_flag_rows",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A threshold rule matching the field contract (column naming an existing numeric schema field, comparator exactly above or below, finite numeric cap \u2014 all required with inline validation naming the field) flags breaching rows with a treatment on the offending cell and a row flag icon, and a Flagged count badge shows how many rows breach any rule",
+        "reasoning": "The seeded numeric threshold rule was visible, breaching score cells were treated as flagged, row flag icons appeared, and the header showed a Flagged count. Evidence: grid_column_anatomy-shared.png"
+      },
+      {
+        "id": "1.18",
+        "name": "flags_track_edits_and_rule_delete",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Editing a cell across a rule's cap adds or clears that row's flag immediately, and deleting a rule clears every flag it caused",
+        "reasoning": "FAIL: Editing across a threshold cap and deleting the rule to verify flag clearing were not completed. Evidence: threshold_rules_flag_rows-shared.png"
+      },
+      {
+        "id": "1.19",
+        "name": "dedup_scan_stages",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Scan for duplicates runs a visible staged scan (scanning rows, grouping matches, done) whose stage statuses advance from pending through running to complete with an overall progress indicator, and on the seeded flagship dataset the result lists at least 2 duplicate groups with member rows shown side by side",
+        "reasoning": "Duplicate scanning visibly progressed through Scanning rows, Grouping matches, and Done at 100%, finding two groups with side-by-side members. Evidence: dedup_scan_stages-shared.png"
+      },
+      {
+        "id": "1.20",
+        "name": "merge_flow_and_dismiss",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A group's Merge flow lets the user pick the surviving value per differing column; confirming merges the group into one row, decreases the dataset row count by the group size minus one, and removes the group from the results, while Not duplicates dismisses a group without changing rows",
+        "reasoning": "A duplicate group allowed survivor-value selection and merge, reducing rows by one; the remaining group was dismissed as not duplicates and results became empty. Evidence: merge_flow_and_dismiss-result.png"
+      },
+      {
+        "id": "1.21",
+        "name": "pivot_buckets_and_nesting",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The pivot view offers draggable column chips and Rows, Columns, and Values buckets with a count/sum/average aggregation select; dropping or removing a chip recomputes the pivot immediately, and two chips in the Rows bucket produce nested row summaries grouped by the first field then the second",
+        "reasoning": "Pivot exposed draggable chips, Rows/Columns/Values buckets, aggregation choices, and nested summaries after placing two chips in Rows. Evidence: pivot_buckets_and_nesting-shared.png"
+      },
+      {
+        "id": "1.22",
+        "name": "pivot_tracks_data_edits",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After editing a grid cell that feeds the pivot, reopening the pivot shows changed summary values reflecting the edit",
+        "reasoning": "FAIL: A pivot summary fed by an edited value was not reopened and verified as changed. Evidence: pivot_buckets_and_nesting-shared.png"
+      },
+      {
+        "id": "1.23",
+        "name": "snapshots_and_row_diff",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Save Snapshot captures the rows under a required unique name of 1\u201380 characters with a timestamp (empty or duplicate names are rejected inline); the snapshot list shows saved snapshots, and diffing two snapshots marks added rows, removed rows, and changed cells with old and new values; a snapshot-edit-snapshot sequence diffs to exactly the one changed cell",
+        "reasoning": "Unique snapshots were saved, and comparing two snapshots showed exactly one changed cell with old and new values. Evidence: snapshots_and_row_diff-shared.png"
+      },
+      {
+        "id": "1.24",
+        "name": "split_apply_and_stratification",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Split percentages that are integers from 0 to 100 summing to exactly 100 enable Apply, which labels every row in the grid's split column; the segmented proportion bar shows the assigned distribution, and the stratification readout shows per-split verified and unverified counts that update when rows change",
+        "reasoning": "FAIL: Split percentages, Apply, distribution bar, and stratification readouts were not completed. Evidence: seeded_dataset_sidebar-shared.png"
+      },
+      {
+        "id": "1.25",
+        "name": "bulk_tray_actions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Selecting rows via checkboxes (including select-all-visible) raises a bulk tray with the live selected count offering Mark verified, Mark unverified, Assign split, and Delete with confirmation; applying updates every selected row and all derived counts, then clears the selection",
+        "reasoning": "FAIL: Selection and bulk tray actions were not exercised end-to-end. Evidence: seeded_dataset_sidebar-shared.png"
+      },
+      {
+        "id": "1.26",
+        "name": "undo_redo_coverage",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Undo and Redo toolbar controls plus Ctrl+Z and Ctrl+Shift+Z step through cell edits, row additions and deletions, merges, bulk actions, committed CSV imports, and successful Import package operations; undo restores exact prior values including derived counts and export previews, and both controls disable when their stack is empty",
+        "reasoning": "FAIL: Undo/Redo controls were visible, but the required coverage across all listed mutation types was not completed. Evidence: seeded_dataset_sidebar-shared.png"
+      },
+      {
+        "id": "1.27",
+        "name": "export_package_live_derived",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The export drawer offers Rows CSV and Dataset Package JSON tabs compiled live from the store with Copy, Download, and Import package controls; Rows CSV shows visible rows (schema fields plus expectedOutput, verified, split) honoring the unverified-only filter; Dataset Package JSON shows a single object with required keys schemaVersion exactly dataset-manager.package/v1, generatedAt, dataset (id, name, description, createdAt, schema, rows, thresholdRules, snapshots, splitPercentages, attachedSuiteId), and stats (totalRows equal to rows.length, verifiedCount, flaggedCount, numericSummaries, splitDistribution, snapshotCount); editing a cell, toggling verified, applying a split, or saving a snapshot and reopening changes the exported text; Copy confirms and Download offers rows.csv or dataset-package.json",
+        "reasoning": "Export showed Rows CSV and Dataset Package JSON tabs, live schemaVersion/package JSON with required dataset/stats fields, and Copy, Download, and Import controls; the package reflected edits, verification, and snapshots. Evidence: export_package_live_derived-shared.png"
+      },
+      {
+        "id": "1.28",
+        "name": "capacity_gauge_updates",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The instrumentation panel shows a workspace capacity gauge with total rows and estimated size against a displayed mock capacity plus a per-dataset breakdown, and importing, adding, or deleting rows updates the gauge and breakdown immediately",
+        "reasoning": "The capacity gauge and per-dataset breakdown were visible, and after import the total and flagship row/size values increased. Evidence: exclude_and_gated_commit-result.png"
+      },
+      {
+        "id": "1.29",
+        "name": "eval_suite_attach_detach",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Use in Eval Suite opens a select modal listing at least 3 seeded suites; confirming shows a success toast naming the suite and renders an attached-suite chip on the dataset header whose remove affordance detaches it",
+        "reasoning": "The attach dialog listed three seeded suites; attaching showed a named success toast and header chip with a detach affordance, which was then used to detach. Evidence: eval_suite_attach_detach-shared.png"
+      },
+      {
+        "id": "1.30",
+        "name": "empty_and_no_match_states",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Deleting every row shows an empty state naming the dataset with Add Row and Import CSV controls; enabling the unverified-only filter when all rows are verified shows an empty-filter message with a control that clears the filter; a duplicate scan with no duplicates completes its stages and shows an empty result message",
+        "reasoning": "FAIL: The no-duplicates result was observed, but deleting every row and the all-verified unverified-filter empty state were not completed. Evidence: merge_flow_and_dismiss-result.png"
+      },
+      {
+        "id": "1.31",
+        "name": "double_activation_single_effect",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Rapidly double-activating Add Row's Submit appends exactly one row, and rapidly double-activating the import wizard's Commit imports the rows exactly once",
+        "reasoning": "FAIL: Rapid double activation of Add Row submit and import Commit was not exercised. Evidence: exclude_and_gated_commit-result.png"
+      },
+      {
+        "id": "1.32",
+        "name": "long_value_truncation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "A cell value longer than 80 characters renders truncated with an ellipsis in the grid and is shown in full in the inline editor and the row Edit modal",
+        "reasoning": "FAIL: A value over 80 characters was not created and verified in the grid, inline editor, and edit modal. Evidence: grid_column_anatomy-shared.png"
+      },
+      {
+        "id": "1.33",
+        "name": "import_package_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After exporting Dataset Package JSON that includes a session-added row and snapshot, making a further cell edit, then Importing that package, the grid, verified badge, snapshot list, and a fresh export return to the imported package's contents under schemaVersion dataset-manager.package/v1",
+        "reasoning": "FAIL: The required export-edit-import round trip was not completed. Evidence: export_package_live_derived-shared.png"
+      },
+      {
+        "id": "1.34",
+        "name": "invalid_package_import_rejected",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Importing Dataset Package JSON with schemaVersion other than dataset-manager.package/v1, missing dataset or stats, or stats.totalRows disagreeing with dataset.rows.length shows validation naming the offending field and leaves the selected dataset's row count and snapshot list unchanged",
+        "reasoning": "FAIL: Invalid package variants were not imported and checked for validation plus unchanged state. Evidence: export_package_live_derived-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"seeded_dataset_sidebar\":{\"score\":\"yes\",\"reasoning\":\"Three seeded datasets showed names, row counts, dates, and selected styling; selecting the flagship loaded its grid. Evidence: seeded_dataset_sidebar-shared.png\"},\"create_dataset_field_contract\":{\"score\":\"no\",\"reasoning\":\"FAIL: The valid dataset was created, but Create dataset was enabled with an empty name/schema, violating the disabled-until-valid contract. Evidence: create_dataset_field_contract-shared.png\"},\"invalid_create_field_contract\":{\"score\":\"yes\",\"reasoning\":\"Invalid submission showed inline messages for the missing dataset and field names and did not add a dataset. Evidence: invalid_create_field_contract-shared.png\"},\"virtualized_grid_500_rows\":{\"score\":\"yes\",\"reasoning\":\"The flagship showed 520+ rows while the DOM contained only a limited visible row window, and scrolling reached the dataset without blank content. Evidence: seeded_dataset_sidebar-shared.png\"},\"grid_column_anatomy\":{\"score\":\"yes\",\"reasoning\":\"The fixed header showed schema fields plus Expected output, Verified, Split, and Actions. Evidence: grid_column_anatomy-shared.png\"},\"inline_cell_edit_contract\":{\"score\":\"no\",\"reasoning\":\"FAIL: Valid inline editing worked, but the required Escape restoration and invalid-value rejection cases were not fully completed. Evidence: formula_recomputes_on_edit-shared.png\"},\"add_edit_delete_row_contract\":{\"score\":\"no\",\"reasoning\":\"FAIL: The complete add, edit, delete, and cancel workflow under the row contract was not completed. Evidence: seeded_dataset_sidebar-shared.png\"},\"import_sources_offered\":{\"score\":\"yes\",\"reasoning\":\"The wizard exposed sample fixtures, file/drop input, and paste-text tabs; at least two seeded fixtures were listed. Evidence: import_sources_offered-shared.png\"},\"mapping_step_with_preassignment\":{\"score\":\"yes\",\"reasoning\":\"Mapping listed CSV headers, previews, destination selects, and preassigned matching schema headers. Evidence: mapping_step_with_preassignment-shared.png\"},\"diagnostic_cell_fixes\":{\"score\":\"yes\",\"reasoning\":\"Diagnostics highlighted wrong numeric type, invalid category, and missing score with field-specific messages; fixing cells changed the issue summary to zero unresolved. Evidence: diagnostic_cell_fixes-shared.png\"},\"exclude_and_gated_commit\":{\"score\":\"yes\",\"reasoning\":\"Commit was disabled with unresolved issues, then enabled after fixes; committing imported exactly four rows and showed an import-count toast. Evidence: exclude_and_gated_commit-result.png\"},\"verified_toggle_and_badge\":{\"score\":\"yes\",\"reasoning\":\"A row\u2019s Verified control changed state and the header verified count increased immediately. Evidence: verified_toggle_and_badge-shared.png\"},\"unverified_filter_round_trip\":{\"score\":\"yes\",\"reasoning\":\"Enabling Show unverified only reduced the visible set to unverified rows, and disabling it restored the full virtualized set. Evidence: unverified_filter_round_trip-shared.png\"},\"formula_bar_functions\":{\"score\":\"yes\",\"reasoning\":\"SUM, AVERAGE, MIN, MAX, COUNT, and a ranged SUM were evaluated with displayed results. Evidence: formula_bar_functions-shared.png\"},\"formula_recomputes_on_edit\":{\"score\":\"yes\",\"reasoning\":\"After editing a score cell, rerunning/observing the existing SUM showed the changed aggregate without re-entering the formula. Evidence: formula_recomputes_on_edit-shared.png\"},\"formula_error_messages\":{\"score\":\"no\",\"reasoning\":\"FAIL: Unknown-function, unknown-column, and nonnumeric-column formula errors were not exercised. Evidence: formula_bar_functions-shared.png\"},\"threshold_rules_flag_rows\":{\"score\":\"yes\",\"reasoning\":\"The seeded numeric threshold rule was visible, breaching score cells were treated as flagged, row flag icons appeared, and the header showed a Flagged count. Evidence: grid_column_anatomy-shared.png\"},\"flags_track_edits_and_rule_delete\":{\"score\":\"no\",\"reasoning\":\"FAIL: Editing across a threshold cap and deleting the rule to verify flag clearing were not completed. Evidence: threshold_rules_flag_rows-shared.png\"},\"dedup_scan_stages\":{\"score\":\"yes\",\"reasoning\":\"Duplicate scanning visibly progressed through Scanning rows, Grouping matches, and Done at 100%, finding two groups with side-by-side members. Evidence: dedup_scan_stages-shared.png\"},\"merge_flow_and_dismiss\":{\"score\":\"yes\",\"reasoning\":\"A duplicate group allowed survivor-value selection and merge, reducing rows by one; the remaining group was dismissed as not duplicates and results became empty. Evidence: merge_flow_and_dismiss-result.png\"},\"pivot_buckets_and_nesting\":{\"score\":\"yes\",\"reasoning\":\"Pivot exposed draggable chips, Rows/Columns/Values buckets, aggregation choices, and nested summaries after placing two chips in Rows. Evidence: pivot_buckets_and_nesting-shared.png\"},\"pivot_tracks_data_edits\":{\"score\":\"no\",\"reasoning\":\"FAIL: A pivot summary fed by an edited value was not reopened and verified as changed. Evidence: pivot_buckets_and_nesting-shared.png\"},\"snapshots_and_row_diff\":{\"score\":\"yes\",\"reasoning\":\"Unique snapshots were saved, and comparing two snapshots showed exactly one changed cell with old and new values. Evidence: snapshots_and_row_diff-shared.png\"},\"split_apply_and_stratification\":{\"score\":\"no\",\"reasoning\":\"FAIL: Split percentages, Apply, distribution bar, and stratification readouts were not completed. Evidence: seeded_dataset_sidebar-shared.png\"},\"bulk_tray_actions\":{\"score\":\"no\",\"reasoning\":\"FAIL: Selection and bulk tray actions were not exercised end-to-end. Evidence: seeded_dataset_sidebar-shared.png\"},\"undo_redo_coverage\":{\"score\":\"no\",\"reasoning\":\"FAIL: Undo/Redo controls were visible, but the required coverage across all listed mutation types was not completed. Evidence: seeded_dataset_sidebar-shared.png\"},\"export_package_live_derived\":{\"score\":\"yes\",\"reasoning\":\"Export showed Rows CSV and Dataset Package JSON tabs, live schemaVersion/package JSON with required dataset/stats fields, and Copy, Download, and Import controls; the package reflected edits, verification, and snapshots. Evidence: export_package_live_derived-shared.png\"},\"capacity_gauge_updates\":{\"score\":\"yes\",\"reasoning\":\"The capacity gauge and per-dataset breakdown were visible, and after import the total and flagship row/size values increased. Evidence: exclude_and_gated_commit-result.png\"},\"eval_suite_attach_detach\":{\"score\":\"yes\",\"reasoning\":\"The attach dialog listed three seeded suites; attaching showed a named success toast and header chip with a detach affordance, which was then used to detach. Evidence: eval_suite_attach_detach-shared.png\"},\"empty_and_no_match_states\":{\"score\":\"no\",\"reasoning\":\"FAIL: The no-duplicates result was observed, but deleting every row and the all-verified unverified-filter empty state were not completed. Evidence: merge_flow_and_dismiss-result.png\"},\"double_activation_single_effect\":{\"score\":\"no\",\"reasoning\":\"FAIL: Rapid double activation of Add Row submit and import Commit was not exercised. Evidence: exclude_and_gated_commit-result.png\"},\"long_value_truncation\":{\"score\":\"no\",\"reasoning\":\"FAIL: A value over 80 characters was not created and verified in the grid, inline editor, and edit modal. Evidence: grid_column_anatomy-shared.png\"},\"import_package_round_trip\":{\"score\":\"no\",\"reasoning\":\"FAIL: The required export-edit-import round trip was not completed. Evidence: export_package_live_derived-shared.png\"},\"invalid_package_import_rejected\":{\"score\":\"no\",\"reasoning\":\"FAIL: Invalid package variants were not imported and checked for validation plus unchanged state. Evidence: export_package_live_derived-shared.png\"}}",
+    "cost_usd": 1.5098646
+  },
+  "design_fidelity": {
+    "score": 0.3333,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "spacing_and_sizing_follow_scale",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Spacing and sizing across the sidebar, toolbar, grid, and panels follow a consistent scale, with no arbitrary one-off values visible in computed styles",
+        "reasoning": "Sampled toolbar controls use consistent 6px radii and 10px horizontal padding, with regular panel/grid spacing. Evidence: desktop-initial-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "specified_quantities_match",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Specified quantities are implemented as written: at least 3 seeded datasets, a flagship of at least 500 rows with at least 2 duplicate groups, at least 2 sample CSV fixtures, at least 1 seeded snapshot and threshold rule, and at least 3 eval suites",
+        "reasoning": "Observed 3 seeded datasets including a 520-row flagship, duplicate pairs in the grid, 2 seeded CSV fixtures, 1 saved snapshot, 1 active threshold rule, and 3 seeded eval suites. Evidence: desktop-initial-shared.png, import-ui-shared.png, snapshots-shared.png, eval-suites-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "layout_matches_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The realized layout matches the specified composition: dataset list above the instrumentation panel on the left, toolbar above the grid, thresholds/splits/snapshots as side panels, and an export drawer with Rows CSV and Dataset Package JSON tabs",
+        "reasoning": "FAIL: Dataset list, instrumentation, toolbar, grid, threshold panel, and snapshot panel were observed, but the export interaction did not visibly produce the required drawer with Rows CSV and Dataset Package JSON tabs. Evidence: export-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "specified_state_changes_animate",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The state changes the spec calls out animate as specified: import batches of 10 at roughly 100 milliseconds each, single-row slide-in at roughly 200 milliseconds, and modal transitions at roughly 200 to 300 milliseconds",
+        "reasoning": "FAIL: Modal animation was observed at 0.24s, but the required import batch timing and single-row 200ms slide-in animation were not observed. Evidence: add-row-shared.png, import-ui-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "responsive_behavior_matches_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Responsive behavior matches the spec: sidebar collapses behind a toggle at 768 pixels and below, and the grid, mapping table, and diff scroll in their own containers at 375 pixels",
+        "reasoning": "FAIL: At 375px the grid had its own horizontal scroll container, but the sidebar remained visible instead of collapsing behind a toggle. Evidence: compact-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "control_styling_is_consistent",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Button and form radii, padding, and shadows are consistent across the toolbar, wizard, panels, and tray",
+        "reasoning": "FAIL: Sampled controls shared radius and padding, but Add row had a box shadow while neighboring toolbar controls did not, so styling was not fully consistent. Evidence: desktop-initial-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "typography_has_clear_hierarchy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The specified type hierarchy is realized: app title above panel headings above grid body and label text",
+        "reasoning": "Observed app title, panel heading, and grid/body text hierarchy; computed sizes included 18px app title, 20px dataset heading, and smaller body/grid text. Evidence: desktop-initial-shared.png"
+      },
+      {
+        "id": "3.8",
+        "name": "component_states_match_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Default, hover, focus, disabled, and error component states are all present as specified, including disabled Submit, Continue, Commit, Apply, Undo, and Redo controls in their gated states",
+        "reasoning": "FAIL: Initial Undo and Redo were visibly disabled, but the full required set of gated disabled Submit, Continue, Commit, and Apply states was not present/observable; Add row was enabled even with empty fields. Evidence: desktop-initial-shared.png, import-ui-shared.png"
+      },
+      {
+        "id": "3.9",
+        "name": "semantic_color_treatments_match",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The specified color treatments are realized: success-color checkmarks, secondary-color dashes, warning-tinted flags, error-colored diagnostics, and green/red diff tints",
+        "reasoning": "FAIL: Green verification checkmarks, gray dashes, yellow warning flags, and flagged-cell tinting were observed, but the required green/red diff tints and error-colored diagnostics were not observed in a completed diff state. Evidence: desktop-initial-shared.png, snapshots-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"spacing_and_sizing_follow_scale\":{\"score\":\"yes\",\"reasoning\":\"Sampled toolbar controls use consistent 6px radii and 10px horizontal padding, with regular panel/grid spacing. Evidence: desktop-initial-shared.png\"},\"specified_quantities_match\":{\"score\":\"yes\",\"reasoning\":\"Observed 3 seeded datasets including a 520-row flagship, duplicate pairs in the grid, 2 seeded CSV fixtures, 1 saved snapshot, 1 active threshold rule, and 3 seeded eval suites. Evidence: desktop-initial-shared.png, import-ui-shared.png, snapshots-shared.png, eval-suites-shared.png\"},\"layout_matches_spec\":{\"score\":\"no\",\"reasoning\":\"FAIL: Dataset list, instrumentation, toolbar, grid, threshold panel, and snapshot panel were observed, but the export interaction did not visibly produce the required drawer with Rows CSV and Dataset Package JSON tabs. Evidence: export-shared.png\"},\"specified_state_changes_animate\":{\"score\":\"no\",\"reasoning\":\"FAIL: Modal animation was observed at 0.24s, but the required import batch timing and single-row 200ms slide-in animation were not observed. Evidence: add-row-shared.png, import-ui-shared.png\"},\"responsive_behavior_matches_spec\":{\"score\":\"no\",\"reasoning\":\"FAIL: At 375px the grid had its own horizontal scroll container, but the sidebar remained visible instead of collapsing behind a toggle. Evidence: compact-shared.png\"},\"control_styling_is_consistent\":{\"score\":\"no\",\"reasoning\":\"FAIL: Sampled controls shared radius and padding, but Add row had a box shadow while neighboring toolbar controls did not, so styling was not fully consistent. Evidence: desktop-initial-shared.png\"},\"typography_has_clear_hierarchy\":{\"score\":\"yes\",\"reasoning\":\"Observed app title, panel heading, and grid/body text hierarchy; computed sizes included 18px app title, 20px dataset heading, and smaller body/grid text. Evidence: desktop-initial-shared.png\"},\"component_states_match_spec\":{\"score\":\"no\",\"reasoning\":\"FAIL: Initial Undo and Redo were visibly disabled, but the full required set of gated disabled Submit, Continue, Commit, and Apply states was not present/observable; Add row was enabled even with empty fields. Evidence: desktop-initial-shared.png, import-ui-shared.png\"},\"semantic_color_treatments_match\":{\"score\":\"no\",\"reasoning\":\"FAIL: Green verification checkmarks, gray dashes, yellow warning flags, and flagged-cell tinting were observed, but the required green/red diff tints and error-colored diagnostics were not observed in a completed diff state. Evidence: desktop-initial-shared.png, snapshots-shared.png\"} }",
+    "cost_usd": 0.4930626
+  },
+  "edge_cases": {
+    "score": 0.7037,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "empty_states_are_designed",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "An emptied dataset, an all-verified unverified-only filter, and a no-duplicates scan each render a designed empty state with a message and a next-step control, never a blank region",
+        "reasoning": "PASS: Empty dataset, all-verified unverified-only filter, and no-duplicate results each showed a message plus next-step control. Evidence: empty_states_are_designed-empty-dataset2.png, empty_states_are_designed-unverified-only-empty.png, empty_states_are_designed.png"
+      },
+      {
+        "id": "4.2",
+        "name": "forms_validate_inline",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "New Dataset, Add Row, threshold rule, splits, snapshot name, and Import package forms all validate inline before submit with messages naming the offending field",
+        "reasoning": "FAIL: New Dataset, Add Row, threshold, splits, and snapshot forms showed field-specific inline errors, but no Import package form was available to exercise. Evidence: schema_field_contract_rejects_bad_names-shared.png, row_contract_rejects_overlong_expected_output-shared.png, forms_validate_inline-threshold.png"
+      },
+      {
+        "id": "4.3",
+        "name": "errors_are_actionable",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The formula bar, import wizard, and Import package errors name the actual problem (unknown column, non-numeric column, no parseable rows, percentages must sum to 100, wrong schemaVersion, missing dataset or stats), not just Invalid",
+        "reasoning": "FAIL: Formula and CSV import errors named the actual column/value problems, but the required Import package error surface was not available. Evidence: errors_are_actionable-shared.png, long_import_shows_step_feedback-diagnostics.png"
+      },
+      {
+        "id": "4.4",
+        "name": "actions_show_confirmation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Import commit, merge, bulk apply, attach, and copy each produce visible success feedback (toast or confirmation) stating what happened",
+        "reasoning": "PASS: Import commit, merge, split bulk apply, attach, and copy each produced visible success feedback naming the action. Evidence: actions_show_confirmation-import-commit.png, actions_show_confirmation-merge.png, actions_show_confirmation-attach4.png, actions_show_confirmation-copy.png"
+      },
+      {
+        "id": "4.5",
+        "name": "scan_shows_progress",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The duplicate scan shows its staged progress while running rather than freezing or completing invisibly",
+        "reasoning": "PASS: Duplicate scan visibly showed 17% progress, Scanning rows Running, and later staged completion. Evidence: scan_shows_progress-running.png"
+      },
+      {
+        "id": "4.6",
+        "name": "destructive_actions_guarded_and_undoable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Row delete, bulk delete, and merge require confirmation, and undo restores their effect exactly",
+        "reasoning": "PASS: Row delete, bulk delete, and merge each opened confirmation dialogs; row, bulk, and merge effects were undone and restored. Evidence: destructive_actions_guarded_and_undoable-bulk-modal.png, destructive_actions_guarded_and_undoable-bulk-undo.png, destructive_actions_guarded_and_undoable.png"
+      },
+      {
+        "id": "4.7",
+        "name": "non_obvious_controls_have_help",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Non-obvious controls \u2014 the formula bar syntax, pivot buckets, split stratification \u2014 carry placeholder text, hints, or tooltips explaining their use",
+        "reasoning": "PASS: Formula syntax, pivot buckets, and split stratification all displayed explanatory hints. Evidence: non_obvious_controls_have_help.png"
+      },
+      {
+        "id": "4.8",
+        "name": "controls_use_semantic_tags",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, inputs, selects, and labels across the toolbar, wizard, and panels use semantic elements rather than bare divs or spans",
+        "reasoning": "PASS: Browser inspection showed semantic buttons, inputs, labels, comboboxes, toolbar, dialogs, and form controls throughout the UI. Evidence: controls_use_semantic_tags-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "modal_supports_close_paths",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Modals and the export drawer close via their close control, Escape, and (for modals) a background click",
+        "reasoning": "FAIL: Close control and Escape worked, but background clicks did not close the export drawer or modal. Evidence: modal_supports_close_paths.png, modal_supports_close_paths-modal-bg.png"
+      },
+      {
+        "id": "4.10",
+        "name": "long_import_shows_step_feedback",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The multi-step import wizard shows which step is active and how many rows are ready versus flagged throughout the flow",
+        "reasoning": "PASS: Import wizard showed active Source/Mapping/Diagnostics steps and ready versus unresolved row counts throughout the flow. Evidence: long_import_shows_step_feedback-mapping.png, long_import_shows_step_feedback-diagnostics.png"
+      },
+      {
+        "id": "4.11",
+        "name": "schema_field_contract_rejects_bad_names",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting New Dataset with a schema field name containing spaces or punctuation, or a category field with empty allowedValues, shows inline validation naming the field and creates no dataset",
+        "reasoning": "PASS: New Dataset rejected a field name containing spaces with the inline message \u201cField name may contain only letters, digits, and underscores\u201d; no dataset was created. Evidence: schema_field_contract_rejects_bad_names-shared.png"
+      },
+      {
+        "id": "4.12",
+        "name": "row_contract_rejects_overlong_expected_output",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting Add Row with expectedOutput longer than 4000 characters, or a category value outside allowedValues, shows inline validation naming the field and appends no row",
+        "reasoning": "PASS: Add Row rejected a 4001-character expectedOutput with \u201cExpected output must be at most 4000 characters\u201d and did not append a row. Evidence: row_contract_rejects_overlong_expected_output-shared.png"
+      },
+      {
+        "id": "4.13",
+        "name": "invalid_package_import_leaves_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Importing malformed Dataset Package JSON, or JSON with schemaVersion other than dataset-manager.package/v1 or stats.totalRows disagreeing with rows.length, leaves the selected dataset unchanged and shows validation naming the offending field",
+        "reasoning": "BLOCKED: No Import package control or package-JSON import workflow was available in the rendered app, so malformed package cases could not be exercised. Evidence: controls_use_semantic_tags-shared.png"
+      },
+      {
+        "id": "4.14",
+        "name": "seeded_export_still_schema_valid",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening Export before any in-session edits still produces Dataset Package JSON for the selected seeded dataset with schemaVersion dataset-manager.package/v1 and every required top-level key; the drawer never shows an empty or broken region",
+        "reasoning": "PASS: Opening Export on the seeded dataset showed Dataset Package JSON with schemaVersion dataset-manager.package/v1 and populated dataset, rows, and stats keys. Evidence: seeded_export_still_schema_valid.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"empty_states_are_designed\":{\"score\":\"yes\",\"reasoning\":\"PASS: Empty dataset, all-verified unverified-only filter, and no-duplicate results each showed a message plus next-step control. Evidence: empty_states_are_designed-empty-dataset2.png, empty_states_are_designed-unverified-only-empty.png, empty_states_are_designed.png\"},\"forms_validate_inline\":{\"score\":\"no\",\"reasoning\":\"FAIL: New Dataset, Add Row, threshold, splits, and snapshot forms showed field-specific inline errors, but no Import package form was available to exercise. Evidence: schema_field_contract_rejects_bad_names-shared.png, row_contract_rejects_overlong_expected_output-shared.png, forms_validate_inline-threshold.png\"},\"errors_are_actionable\":{\"score\":\"no\",\"reasoning\":\"FAIL: Formula and CSV import errors named the actual column/value problems, but the required Import package error surface was not available. Evidence: errors_are_actionable-shared.png, long_import_shows_step_feedback-diagnostics.png\"},\"actions_show_confirmation\":{\"score\":\"yes\",\"reasoning\":\"PASS: Import commit, merge, split bulk apply, attach, and copy each produced visible success feedback naming the action. Evidence: actions_show_confirmation-import-commit.png, actions_show_confirmation-merge.png, actions_show_confirmation-attach4.png, actions_show_confirmation-copy.png\"},\"scan_shows_progress\":{\"score\":\"yes\",\"reasoning\":\"PASS: Duplicate scan visibly showed 17% progress, Scanning rows Running, and later staged completion. Evidence: scan_shows_progress-running.png\"},\"destructive_actions_guarded_and_undoable\":{\"score\":\"yes\",\"reasoning\":\"PASS: Row delete, bulk delete, and merge each opened confirmation dialogs; row, bulk, and merge effects were undone and restored. Evidence: destructive_actions_guarded_and_undoable-bulk-modal.png, destructive_actions_guarded_and_undoable-bulk-undo.png, destructive_actions_guarded_and_undoable.png\"},\"non_obvious_controls_have_help\":{\"score\":\"yes\",\"reasoning\":\"PASS: Formula syntax, pivot buckets, and split stratification all displayed explanatory hints. Evidence: non_obvious_controls_have_help.png\"},\"controls_use_semantic_tags\":{\"score\":\"yes\",\"reasoning\":\"PASS: Browser inspection showed semantic buttons, inputs, labels, comboboxes, toolbar, dialogs, and form controls throughout the UI. Evidence: controls_use_semantic_tags-shared.png\"},\"modal_supports_close_paths\":{\"score\":\"no\",\"reasoning\":\"FAIL: Close control and Escape worked, but background clicks did not close the export drawer or modal. Evidence: modal_supports_close_paths.png, modal_supports_close_paths-modal-bg.png\"},\"long_import_shows_step_feedback\":{\"score\":\"yes\",\"reasoning\":\"PASS: Import wizard showed active Source/Mapping/Diagnostics steps and ready versus unresolved row counts throughout the flow. Evidence: long_import_shows_step_feedback-mapping.png, long_import_shows_step_feedback-diagnostics.png\"},\"schema_field_contract_rejects_bad_names\":{\"score\":\"yes\",\"reasoning\":\"PASS: New Dataset rejected a field name containing spaces with the inline message \u201cField name may contain only letters, digits, and underscores\u201d; no dataset was created. Evidence: schema_field_contract_rejects_bad_names-shared.png\"},\"row_contract_rejects_overlong_expected_output\":{\"score\":\"yes\",\"reasoning\":\"PASS: Add Row rejected a 4001-character expectedOutput with \u201cExpected output must be at most 4000 characters\u201d and did not append a row. Evidence: row_contract_rejects_overlong_expected_output-shared.png\"},\"invalid_package_import_leaves_state\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No Import package control or package-JSON import workflow was available in the rendered app, so malformed package cases could not be exercised. Evidence: controls_use_semantic_tags-shared.png\"},\"seeded_export_still_schema_valid\":{\"score\":\"yes\",\"reasoning\":\"PASS: Opening Export on the seeded dataset showed Dataset Package JSON with schemaVersion dataset-manager.package/v1 and populated dataset, rows, and stats keys. Evidence: seeded_export_still_schema_valid.png\"}}",
+    "cost_usd": 1.784588
+  },
+  "innovation": {
+    "score": 0.8182,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "delightful_microinteractions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app has unique, delightful microinteractions beyond the required set \u2014 for example satisfying verify ticks, tactile pivot chip drags, or a playful capacity gauge",
+        "reasoning": "yes \u2014 visible verified checkmarks, animated tick-pop styling, and a workspace capacity gauge add polished feedback. Evidence: delightful_microinteractions-shared.png"
+      },
+      {
+        "id": "11.2",
+        "name": "advanced_motion_mechanics",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app has advanced animation mechanics beyond the spec, such as choreographed wizard step transitions or staggered diff reveals",
+        "reasoning": "FAIL: only basic transitions and small feedback animations were observed; no advanced choreography or staggered reveals were evidenced. Evidence: enhanced_interactive_graphics-shared.png"
+      },
+      {
+        "id": "11.3",
+        "name": "guided_onboarding",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app offers a narrative or guided onboarding, tour, or first-run coachmarks explaining the grid, wizard, and panels",
+        "reasoning": "yes \u2014 a live 5-step tour appeared with narrative guidance for the dataset collection and data grid. Evidence: guided_onboarding-shared.png"
+      },
+      {
+        "id": "11.4",
+        "name": "enhanced_interactive_graphics",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Data-dense surfaces (stratification, capacity, diff) provide extra usability beyond the spec \u2014 richer readouts, drill-ins, or visual summaries",
+        "reasoning": "yes \u2014 the Pivot builder accepts schema chips and recomputes grouped summaries with counts for live data. Evidence: enhanced_interactive_graphics-shared.png"
+      },
+      {
+        "id": "11.5",
+        "name": "keyboard_power_features",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app supports power-user input beyond the spec, such as a command palette, extended shortcuts, or keyboard-driven grid navigation",
+        "reasoning": "yes \u2014 a working command palette exposes commands and shortcuts including Ctrl+Z, Ctrl+K, and grid actions. Evidence: keyboard_power_features-shared.png"
+      },
+      {
+        "id": "11.6",
+        "name": "preference_personalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app provides personalization beyond requirements, such as column visibility, density controls, or configurable defaults",
+        "reasoning": "yes \u2014 Workspace preferences provide theme, grid density, visible-column, and reduced-animation controls. Evidence: preference_personalization-shared.png"
+      },
+      {
+        "id": "11.7",
+        "name": "polished_brand_narrative",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app presents a polished, coherent product identity in its naming, empty states, and copy",
+        "reasoning": "yes \u2014 coherent Dataset Workbench branding, Evaluation Data Ops positioning, meaningful dataset copy, and capacity messaging are visible. Evidence: delightful_microinteractions-shared.png"
+      },
+      {
+        "id": "11.8",
+        "name": "dynamic_theming_beyond_requirements",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app provides dynamic theming or a color mode beyond requirements",
+        "reasoning": "yes \u2014 the real theme control switched the app to dark mode and changed the control label to \u201cSwitch to light theme.\u201d Evidence: dynamic_theming_beyond_requirements-shared.png"
+      },
+      {
+        "id": "11.9",
+        "name": "genre_appropriate_platform_features",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app uses web platform features where they clearly help (clipboard richness, print-friendly export, drag-and-drop niceties) beyond the spec",
+        "reasoning": "yes \u2014 export supports CSV/JSON artifacts, copy, download, print preview, and package import. Evidence: genre_appropriate_platform_features-shared.png"
+      },
+      {
+        "id": "11.10",
+        "name": "competition_level_innovation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Competition-level innovation is visible to users somewhere in the app",
+        "reasoning": "yes \u2014 the live combination of guided tour, command palette, pivot analysis, fingerprinting, and export tooling is visibly competition-level polish. Evidence: enhanced_interactive_graphics-shared.png"
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "FAIL: no additional noteworthy enhancement was isolated beyond those already covered by the other criteria. Evidence: delightful_microinteractions-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"delightful_microinteractions\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 visible verified checkmarks, animated tick-pop styling, and a workspace capacity gauge add polished feedback. Evidence: delightful_microinteractions-shared.png\"},\"advanced_motion_mechanics\":{\"score\":\"no\",\"reasoning\":\"FAIL: only basic transitions and small feedback animations were observed; no advanced choreography or staggered reveals were evidenced. Evidence: enhanced_interactive_graphics-shared.png\"},\"guided_onboarding\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 a live 5-step tour appeared with narrative guidance for the dataset collection and data grid. Evidence: guided_onboarding-shared.png\"},\"enhanced_interactive_graphics\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 the Pivot builder accepts schema chips and recomputes grouped summaries with counts for live data. Evidence: enhanced_interactive_graphics-shared.png\"},\"keyboard_power_features\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 a working command palette exposes commands and shortcuts including Ctrl+Z, Ctrl+K, and grid actions. Evidence: keyboard_power_features-shared.png\"},\"preference_personalization\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Workspace preferences provide theme, grid density, visible-column, and reduced-animation controls. Evidence: preference_personalization-shared.png\"},\"polished_brand_narrative\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 coherent Dataset Workbench branding, Evaluation Data Ops positioning, meaningful dataset copy, and capacity messaging are visible. Evidence: delightful_microinteractions-shared.png\"},\"dynamic_theming_beyond_requirements\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 the real theme control switched the app to dark mode and changed the control label to \u201cSwitch to light theme.\u201d Evidence: dynamic_theming_beyond_requirements-shared.png\"},\"genre_appropriate_platform_features\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 export supports CSV/JSON artifacts, copy, download, print preview, and package import. Evidence: genre_appropriate_platform_features-shared.png\"},\"competition_level_innovation\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 the live combination of guided tour, command palette, pivot analysis, fingerprinting, and export tooling is visibly competition-level polish. Evidence: enhanced_interactive_graphics-shared.png\"},\"innovation_catchall\":{\"score\":\"no\",\"reasoning\":\"FAIL: no additional noteworthy enhancement was isolated beyond those already covered by the other criteria. Evidence: delightful_microinteractions-shared.png\"}}",
+    "cost_usd": 0.392183
+  },
+  "motion": {
+    "score": 0.6842,
+    "criteria": [
+      {
+        "id": "8.1",
+        "name": "import_batches_animate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Committing an import through the real wizard Commit control animates rows into the grid in batches of 10, each batch fading in over roughly 100 milliseconds rather than all rows appearing at once",
+        "reasoning": "Observed the real CSV Commit flow; imported rows had staggered `row-batch` animations with 0.11s duration and a second batch delayed by 0.1s. Evidence: import_batches_final.png"
+      },
+      {
+        "id": "8.2",
+        "name": "single_row_slide_in",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A row added through the real Add Row flow slides in from opacity 0 over roughly 200 milliseconds",
+        "reasoning": "The real Add Row flow produced a row observed at opacity 0 and translated upward, then transitioning to opacity 1 and its final position. Evidence: single_row_final.png"
+      },
+      {
+        "id": "8.3",
+        "name": "modal_enter_exit_transition",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Modals (New Dataset, Add Row, Edit Row, merge, attach) enter with a short opacity and scale transition of roughly 200 to 300 milliseconds and exit the same way, never snapping",
+        "reasoning": "New Dataset modal samples showed opacity/scale changing over time on both entry and exit rather than snapping. Evidence: modal_enter.png"
+      },
+      {
+        "id": "8.4",
+        "name": "tray_and_drawer_slides",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The bulk tray slides up when the first row is selected and slides away when the selection clears, and the export drawer and threshold, splits, and snapshot panels slide in from the side rather than snapping open",
+        "reasoning": "BLOCKED: The export drawer\u2019s side transition was observed, but the bulk selection tray could not be exercised and verified end-to-end. Evidence: export_drawer.png"
+      },
+      {
+        "id": "8.5",
+        "name": "toggle_and_flag_transitions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The verified toggle animates its state change with a short tick transition, and a cell newly flagged by a threshold rule transitions its background rather than snapping",
+        "reasoning": "BLOCKED: The verified toggle transitioned successfully, but a newly threshold-flagged cell was not directly exercised. Evidence: hover_system.png"
+      },
+      {
+        "id": "8.6",
+        "name": "scan_stage_activity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "During a duplicate scan started from the real control, the running stage shows continuous activity and stage status changes animate rather than snapping",
+        "reasoning": "The real Find Duplicates control showed active scanning at 17%, a running Scanning rows stage, pending Grouping matches, and animated stage transitions. Evidence: scan_stage.png"
+      },
+      {
+        "id": "8.7",
+        "name": "gauge_animates_to_value",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "The capacity gauge animates toward its new value when rows are added, imported, or deleted rather than jumping instantly",
+        "reasoning": "After row/import mutations, the capacity gauge was observed with a 0.55s cubic-bezier width transition toward its updated value. Evidence: import_batches_final.png"
+      },
+      {
+        "id": "8.8",
+        "name": "hover_system",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "While actually hovering: buttons ease background and shadow with a slight press effect on activation, sidebar entries, grid rows, and panel list items take a full-width hover wash, and form controls show focus rings (verify via computed style while the pointer is over the element)",
+        "reasoning": "While hovering the real Add Row button, computed background and shadow changed from resting values; transition styles were present. Evidence: hover_system.png"
+      },
+      {
+        "id": "8.9",
+        "name": "toast_lifecycle",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Feedback toasts after CSV import, package import, merge, bulk apply, attach, and copy slide in, remain readable, and auto-dismiss with a fade",
+        "reasoning": "FAIL: Import feedback remained readable but was still present after 2.5 seconds with opacity 1 and no fade-out, so the required auto-dismiss lifecycle was not observed. Evidence: toast_persistent.png"
+      },
+      {
+        "id": "8.10",
+        "name": "reduced_motion_instant",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, imported rows and batches appear instantly and modal, drawer, tray, and gauge transitions apply immediately while every feature remains fully usable",
+        "reasoning": "In the reduced-motion browser, prefers-reduced-motion matched true; modal, drawer, and imported-row animations were reduced to 0.001s, and imported rows appeared immediately while remaining usable. Evidence: reduced_motion.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"import_batches_animate\":{\"score\":\"yes\",\"reasoning\":\"Observed the real CSV Commit flow; imported rows had staggered `row-batch` animations with 0.11s duration and a second batch delayed by 0.1s. Evidence: import_batches_final.png\"},\"single_row_slide_in\":{\"score\":\"yes\",\"reasoning\":\"The real Add Row flow produced a row observed at opacity 0 and translated upward, then transitioning to opacity 1 and its final position. Evidence: single_row_final.png\"},\"modal_enter_exit_transition\":{\"score\":\"yes\",\"reasoning\":\"New Dataset modal samples showed opacity/scale changing over time on both entry and exit rather than snapping. Evidence: modal_enter.png\"},\"tray_and_drawer_slides\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The export drawer\u2019s side transition was observed, but the bulk selection tray could not be exercised and verified end-to-end. Evidence: export_drawer.png\"},\"toggle_and_flag_transitions\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The verified toggle transitioned successfully, but a newly threshold-flagged cell was not directly exercised. Evidence: hover_system.png\"},\"scan_stage_activity\":{\"score\":\"yes\",\"reasoning\":\"The real Find Duplicates control showed active scanning at 17%, a running Scanning rows stage, pending Grouping matches, and animated stage transitions. Evidence: scan_stage.png\"},\"gauge_animates_to_value\":{\"score\":\"yes\",\"reasoning\":\"After row/import mutations, the capacity gauge was observed with a 0.55s cubic-bezier width transition toward its updated value. Evidence: import_batches_final.png\"},\"hover_system\":{\"score\":\"yes\",\"reasoning\":\"While hovering the real Add Row button, computed background and shadow changed from resting values; transition styles were present. Evidence: hover_system.png\"},\"toast_lifecycle\":{\"score\":\"no\",\"reasoning\":\"FAIL: Import feedback remained readable but was still present after 2.5 seconds with opacity 1 and no fade-out, so the required auto-dismiss lifecycle was not observed. Evidence: toast_persistent.png\"},\"reduced_motion_instant\":{\"score\":\"yes\",\"reasoning\":\"In the reduced-motion browser, prefers-reduced-motion matched true; modal, drawer, and imported-row animations were reduced to 0.001s, and imported rows appeared immediately while remaining usable. Evidence: reduced_motion.png\"}}",
+    "cost_usd": 0.9631295999999999
+  },
+  "performance": {
+    "score": 0.875,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_is_under_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cold start to an interactive seeded workspace is under 2 seconds on local render",
+        "reasoning": "The seeded workspace became interactive with 520 rows; navigation timing reported load at ~508 ms. Evidence: cold-start_is_under_two_seconds-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "console_is_clean",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Browser devtools show no errors or warnings on load or during a full exercise of the app",
+        "reasoning": "Full exercise produced 0 errors and 0 warnings; only an informational React DevTools message appeared. Evidence: cold-start_is_under_two_seconds-shared.png"
+      },
+      {
+        "id": "9.3",
+        "name": "virtualized_scroll_is_smooth",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Scrolling the 500-row flagship dataset from first to last row is smooth with no hangs, blank flashes, or visible frame drops",
+        "reasoning": "Scrolled the flagship grid incrementally to the bottom; rows remained populated throughout with no blank flashes or hangs. Evidence: virtualized_scroll_is_smooth-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "scan_shows_progress_not_freeze",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The duplicate scan shows its staged progress while running and never freezes the UI",
+        "reasoning": "Observed scan progress at 17% during execution, then completion at 100% with duplicate groups shown. Evidence: scan_shows_progress_not_freeze-running.png"
+      },
+      {
+        "id": "9.5",
+        "name": "derived_recomputes_feel_instant",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Formula results, threshold flags, pivot summaries, and Dataset Package JSON / Rows CSV export text recompute without perceptible lag after an edit",
+        "reasoning": "Formula output updated immediately, verified toggles changed the computed sum, pivot view rendered, and live Dataset Package JSON export content was present. Evidence: derived_recomputes_feel_instant-export.png"
+      },
+      {
+        "id": "9.6",
+        "name": "ui_interactive_during_operations",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The UI stays interactive while an import commits, a scan runs, or batches animate in \u2014 other controls still respond",
+        "reasoning": "BLOCKED: Scan progress was observable, but an independent control response during the active operation could not be fully verified because the scan overlay intercepted other controls. Evidence: scan_shows_progress_not_freeze-running.png"
+      },
+      {
+        "id": "9.7",
+        "name": "animations_maintain_smooth_frame_rate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Batch fade-ins, drawer slides, and the gauge animation stay smooth without stutter",
+        "reasoning": "The export drawer rendered cleanly with its 0.2-second entrance animation and no visible stutter; the resulting drawer was visually stable. Evidence: animations_maintain_smooth_frame_rate-shared.png"
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_input_does_not_freeze",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapid repeated input \u2014 fast verified toggles, quick dataset switches, rapid undo/redo \u2014 never hangs the app or drops interactions",
+        "reasoning": "Rapid repeated verification toggles and repeated dataset switching completed, returning to a responsive flagship workspace without a hang. Evidence: rapid_input_does_not_freeze-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_start_is_under_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"The seeded workspace became interactive with 520 rows; navigation timing reported load at ~508 ms. Evidence: cold-start_is_under_two_seconds-shared.png\"},\"console_is_clean\":{\"score\":\"yes\",\"reasoning\":\"Full exercise produced 0 errors and 0 warnings; only an informational React DevTools message appeared. Evidence: cold-start_is_under_two_seconds-shared.png\"},\"virtualized_scroll_is_smooth\":{\"score\":\"yes\",\"reasoning\":\"Scrolled the flagship grid incrementally to the bottom; rows remained populated throughout with no blank flashes or hangs. Evidence: virtualized_scroll_is_smooth-shared.png\"},\"scan_shows_progress_not_freeze\":{\"score\":\"yes\",\"reasoning\":\"Observed scan progress at 17% during execution, then completion at 100% with duplicate groups shown. Evidence: scan_shows_progress_not_freeze-running.png\"},\"derived_recomputes_feel_instant\":{\"score\":\"yes\",\"reasoning\":\"Formula output updated immediately, verified toggles changed the computed sum, pivot view rendered, and live Dataset Package JSON export content was present. Evidence: derived_recomputes_feel_instant-export.png\"},\"ui_interactive_during_operations\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Scan progress was observable, but an independent control response during the active operation could not be fully verified because the scan overlay intercepted other controls. Evidence: scan_shows_progress_not_freeze-running.png\"},\"animations_maintain_smooth_frame_rate\":{\"score\":\"yes\",\"reasoning\":\"The export drawer rendered cleanly with its 0.2-second entrance animation and no visible stutter; the resulting drawer was visually stable. Evidence: animations_maintain_smooth_frame_rate-shared.png\"},\"rapid_input_does_not_freeze\":{\"score\":\"yes\",\"reasoning\":\"Rapid repeated verification toggles and repeated dataset switching completed, returning to a responsive flagship workspace without a hang. Evidence: rapid_input_does_not_freeze-shared.png\"}}",
+    "cost_usd": 0.4892124
+  },
+  "responsiveness": {
+    "score": 0.7895,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "layout_adapts_desktop_to_mobile",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The layout adapts gracefully from 1440 pixel desktop to 375 pixel mobile: sidebar, toolbar, grid, and panels reflow without breakage",
+        "reasoning": "Desktop shows an open sidebar and wide grid; at 375px the sidebar hides, toolbar wraps, and primary content remains reachable. Evidence: desktop-layout.png, mobile-layout.png"
+      },
+      {
+        "id": "7.2",
+        "name": "sidebar_collapses_behind_toggle",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At widths of 768 pixels and below the sidebar collapses behind a toggle control that opens it as an overlay; at desktop widths it is open by default",
+        "reasoning": "At 375px the sidebar is positioned off-canvas and the toolbar toggle opens it as a mobile overlay; desktop shows it open by default. Evidence: mobile-layout.png, sidebar-overlay-mobile.png"
+      },
+      {
+        "id": "7.3",
+        "name": "typography_resizes_across_breakpoints",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Headings, grid text, and labels remain readable at both desktop and 375 pixel widths",
+        "reasoning": "Headings, labels, toolbar text, and grid text remain readable at both 1440px and 375px. Evidence: desktop-layout.png, mobile-layout.png"
+      },
+      {
+        "id": "7.4",
+        "name": "content_avoids_clipping_and_overflow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375 pixel width no content clips or overflows the viewport and no page-level horizontal scrolling appears",
+        "reasoning": "At 375px document scroll width does not exceed the viewport, and the rendered page has no page-level horizontal overflow; wide grid content is contained separately. Evidence: mobile-layout.png"
+      },
+      {
+        "id": "7.5",
+        "name": "wide_surfaces_scroll_in_containers",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The grid, the mapping table, and the snapshot diff scroll horizontally within their own containers at narrow widths rather than widening the page",
+        "reasoning": "FAIL: The grid and mapping surface have contained wide content, but a snapshot diff surface was not observed in a completed comparison state, so the full requirement could not be directly verified. Evidence: mapping-mobile.png, snapshots-mobile.png"
+      },
+      {
+        "id": "7.6",
+        "name": "stacking_reflows_logically",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At narrow widths the toolbar, panels, and tray stack in a logical order with the primary grid content reachable first",
+        "reasoning": "At mobile width the toolbar wraps into rows, formula controls follow it, and the grid remains the next primary content; split controls also stack within a usable panel. Evidence: mobile-layout.png, assign-splits-mobile.png"
+      },
+      {
+        "id": "7.7",
+        "name": "mobile_tap_targets_are_large_enough",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Row actions, toggles, and tray controls present tap targets of at least 44 pixels at mobile widths",
+        "reasoning": "Measured mobile row actions and tray controls are 44px high, while toolbar controls are also 44px high. Evidence: bulk-tray-mobile-visible.png"
+      },
+      {
+        "id": "7.8",
+        "name": "overlays_fit_small_screens",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Modals, the import wizard, and the export drawer fit within a 375 pixel viewport with their controls reachable and usable",
+        "reasoning": "FAIL: The import wizard and split panel fit within 375px, but invoking the export preview produced no visible drawer or export content, so the complete overlay requirement was not satisfied. Evidence: import-wizard-mobile.png, assign-splits-mobile.png, export-after-import-mobile.png"
+      },
+      {
+        "id": "7.9",
+        "name": "gauge_and_bar_resize",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The capacity gauge and the split proportion bar resize to their containers rather than overflowing at any width",
+        "reasoning": "The mobile split distribution bar fits its 318px container, and the capacity gauge fits within the sidebar capacity card when the sidebar overlay is open. Evidence: assign-splits-mobile.png, sidebar-overlay-mobile.png"
+      },
+      {
+        "id": "7.10",
+        "name": "fixed_controls_remain_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The bulk tray and toolbar remain visible and operable at every width without covering the content they act on",
+        "reasoning": "With one row selected, the fixed bulk tray occupies the bottom of the 375px viewport with its controls fully visible and 44px tap targets; the toolbar remains usable above. Evidence: bulk-tray-mobile-visible.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"layout_adapts_desktop_to_mobile\":{\"score\":\"yes\",\"reasoning\":\"Desktop shows an open sidebar and wide grid; at 375px the sidebar hides, toolbar wraps, and primary content remains reachable. Evidence: desktop-layout.png, mobile-layout.png\"},\"sidebar_collapses_behind_toggle\":{\"score\":\"yes\",\"reasoning\":\"At 375px the sidebar is positioned off-canvas and the toolbar toggle opens it as a mobile overlay; desktop shows it open by default. Evidence: mobile-layout.png, sidebar-overlay-mobile.png\"},\"typography_resizes_across_breakpoints\":{\"score\":\"yes\",\"reasoning\":\"Headings, labels, toolbar text, and grid text remain readable at both 1440px and 375px. Evidence: desktop-layout.png, mobile-layout.png\"},\"content_avoids_clipping_and_overflow\":{\"score\":\"yes\",\"reasoning\":\"At 375px document scroll width does not exceed the viewport, and the rendered page has no page-level horizontal overflow; wide grid content is contained separately. Evidence: mobile-layout.png\"},\"wide_surfaces_scroll_in_containers\":{\"score\":\"no\",\"reasoning\":\"FAIL: The grid and mapping surface have contained wide content, but a snapshot diff surface was not observed in a completed comparison state, so the full requirement could not be directly verified. Evidence: mapping-mobile.png, snapshots-mobile.png\"},\"stacking_reflows_logically\":{\"score\":\"yes\",\"reasoning\":\"At mobile width the toolbar wraps into rows, formula controls follow it, and the grid remains the next primary content; split controls also stack within a usable panel. Evidence: mobile-layout.png, assign-splits-mobile.png\"},\"mobile_tap_targets_are_large_enough\":{\"score\":\"yes\",\"reasoning\":\"Measured mobile row actions and tray controls are 44px high, while toolbar controls are also 44px high. Evidence: bulk-tray-mobile-visible.png\"},\"overlays_fit_small_screens\":{\"score\":\"no\",\"reasoning\":\"FAIL: The import wizard and split panel fit within 375px, but invoking the export preview produced no visible drawer or export content, so the complete overlay requirement was not satisfied. Evidence: import-wizard-mobile.png, assign-splits-mobile.png, export-after-import-mobile.png\"},\"gauge_and_bar_resize\":{\"score\":\"yes\",\"reasoning\":\"The mobile split distribution bar fits its 318px container, and the capacity gauge fits within the sidebar capacity card when the sidebar overlay is open. Evidence: assign-splits-mobile.png, sidebar-overlay-mobile.png\"},\"fixed_controls_remain_accessible\":{\"score\":\"yes\",\"reasoning\":\"With one row selected, the fixed bulk tray occupies the bottom of the 375px viewport with its controls fully visible and 44px tap targets; the toolbar remains usable above. Evidence: bulk-tray-mobile-visible.png\"}}",
+    "cost_usd": 0.4835568
+  },
+  "technical": {
+    "score": 0.3684,
+    "criteria": [
+      {
+        "id": "10.1",
+        "name": "serves_cleanly",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app serves from its documented start path on port 3000 and renders the seeded workspace with no console errors or unhandled promise rejections on load",
+        "reasoning": "Seeded Dataset Workbench rendered at http://localhost:3000 with 3 datasets and no console errors on load. Evidence: serves_cleanly-shared.png"
+      },
+      {
+        "id": "10.2",
+        "name": "shared_state_coherence",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A change made in one surface is immediately reflected in every other surface showing or deriving from that data without a reload: a cell edit updates the formula result, threshold flags, pivot summaries, Dataset Package JSON stats, and capacity figures wherever they are visible",
+        "reasoning": "FAIL: Cell edits and verified toggles updated the grid, counts, flags, formula, and export stats, but pivot summaries were not fully exercised and verified. Evidence: shared_state_coherence-shared.png"
+      },
+      {
+        "id": "10.3",
+        "name": "storage_stays_empty",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After a full exercise of the app (create, CSV import, package export/import, edit, merge, split), localStorage and sessionStorage are both empty and no other browser storage API holds app data",
+        "reasoning": "FAIL: Observed empty localStorage, sessionStorage, IndexedDB, and Cache Storage, but the complete requested exercise was not fully completed. Evidence: reload_resets_to_seed-shared.png"
+      },
+      {
+        "id": "10.4",
+        "name": "reload_resets_to_seed",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A page reload returns the app to its seeded baseline: the seeded datasets and row counts, seeded snapshots and threshold rules only, empty undo history, and the default view",
+        "reasoning": "FAIL: Reload restored seeded row counts and values, but an export dialog/tour remained visible, so the default view did not fully reset. Evidence: reload_resets_to_seed-shared.png"
+      },
+      {
+        "id": "10.5",
+        "name": "console_clean_during_flows",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "No console errors or unhandled rejections appear while exercising the import wizard, inline editing, dedup scan and merge, pivot, snapshots and diff, splits, bulk tray, undo/redo, Dataset Package JSON export, and Import package",
+        "reasoning": "FAIL: No console errors appeared during exercised flows, but the entire specified flow set was not completed. Evidence: serves_cleanly-shared.png"
+      },
+      {
+        "id": "10.6",
+        "name": "same_origin_only",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Only same-origin requests appear in the network log during load and a full exercise \u2014 no CDN, font, icon, analytics, or API calls to other origins",
+        "reasoning": "All observed network requests were GETs to http://localhost:3000 with no external origins. Evidence: serves_cleanly-shared.png"
+      },
+      {
+        "id": "10.7",
+        "name": "rapid_input_stays_coherent",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Rapid interaction \u2014 fast verified toggles across rows, quick undo/redo sequences, rapid dataset switches \u2014 leaves all derived counts (sidebar, badges, gauge) consistent with the grid contents",
+        "reasoning": "FAIL: Rapid toggle, undo/redo, and dataset-switch sequences were not fully exercised and verified. Evidence: shared_state_coherence-shared.png"
+      },
+      {
+        "id": "10.8",
+        "name": "forms_validate_before_mutation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Every form (New Dataset, Add Row, threshold rule, splits, snapshot name, attach, Import package) shows inline per-field validation before submit and an invalid submit never mutates the collection",
+        "reasoning": "FAIL: The complete set of forms and invalid-submit nonmutation behavior was not fully exercised. Evidence: reload_resets_to_seed-shared.png"
+      },
+      {
+        "id": "10.9",
+        "name": "no_debug_artifacts",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "The running app shows no debug overlays, placeholder scaffolding, or console.log spam during normal use",
+        "reasoning": "No debug overlays, placeholder scaffolding, or console.log spam were observed; the visible tour was normal onboarding UI. Evidence: serves_cleanly-shared.png"
+      },
+      {
+        "id": "10.10",
+        "name": "package_export_matches_live_store",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After a cell edit, verified toggle, and snapshot save, reopening Export shows Dataset Package JSON whose dataset.rows, stats.verifiedCount, and dataset.snapshots match the live UI under schemaVersion dataset-manager.package/v1",
+        "reasoning": "After editing a score, toggling verification, and saving a snapshot, Dataset Package JSON visibly reported the edited row, verifiedCount 262, schemaVersion dataset-manager.package/v1, and snapshotCount 2. Evidence: package_export_matches_live_store-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"serves_cleanly\":{\"score\":\"yes\",\"reasoning\":\"Seeded Dataset Workbench rendered at http://localhost:3000 with 3 datasets and no console errors on load. Evidence: serves_cleanly-shared.png\"},\"shared_state_coherence\":{\"score\":\"no\",\"reasoning\":\"FAIL: Cell edits and verified toggles updated the grid, counts, flags, formula, and export stats, but pivot summaries were not fully exercised and verified. Evidence: shared_state_coherence-shared.png\"},\"storage_stays_empty\":{\"score\":\"no\",\"reasoning\":\"FAIL: Observed empty localStorage, sessionStorage, IndexedDB, and Cache Storage, but the complete requested exercise was not fully completed. Evidence: reload_resets_to_seed-shared.png\"},\"reload_resets_to_seed\":{\"score\":\"no\",\"reasoning\":\"FAIL: Reload restored seeded row counts and values, but an export dialog/tour remained visible, so the default view did not fully reset. Evidence: reload_resets_to_seed-shared.png\"},\"console_clean_during_flows\":{\"score\":\"no\",\"reasoning\":\"FAIL: No console errors appeared during exercised flows, but the entire specified flow set was not completed. Evidence: serves_cleanly-shared.png\"},\"same_origin_only\":{\"score\":\"yes\",\"reasoning\":\"All observed network requests were GETs to http://localhost:3000 with no external origins. Evidence: serves_cleanly-shared.png\"},\"rapid_input_stays_coherent\":{\"score\":\"no\",\"reasoning\":\"FAIL: Rapid toggle, undo/redo, and dataset-switch sequences were not fully exercised and verified. Evidence: shared_state_coherence-shared.png\"},\"forms_validate_before_mutation\":{\"score\":\"no\",\"reasoning\":\"FAIL: The complete set of forms and invalid-submit nonmutation behavior was not fully exercised. Evidence: reload_resets_to_seed-shared.png\"},\"no_debug_artifacts\":{\"score\":\"yes\",\"reasoning\":\"No debug overlays, placeholder scaffolding, or console.log spam were observed; the visible tour was normal onboarding UI. Evidence: serves_cleanly-shared.png\"},\"package_export_matches_live_store\":{\"score\":\"yes\",\"reasoning\":\"After editing a score, toggling verification, and saving a snapshot, Dataset Package JSON visibly reported the edited row, verifiedCount 262, schemaVersion dataset-manager.package/v1, and snapshotCount 2. Evidence: package_export_matches_live_store-shared.png\"}}",
+    "cost_usd": 0.3114116
+  },
+  "user_flows": {
+    "score": 0.3889,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "create_flow_updates_all_surfaces",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Creating a dataset via New Dataset and then adding a row via Add Row updates every surface: the sidebar entry and its row count, the grid, and the capacity breakdown, all without a reload",
+        "reasoning": "Created \u201cQA Scratch\u201d and added a row; the sidebar count, grid row, and capacity breakdown updated immediately. Evidence: create-flow-surfaces.png"
+      },
+      {
+        "id": "6.2",
+        "name": "invalid_create_shows_inline_validation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Submitting New Dataset with an empty name, a schema field name with spaces, a category field with empty allowedValues, or a threshold rule with a missing cap triggers immediate inline validation naming the field and nothing is created",
+        "reasoning": "FAIL: Empty-name submission showed inline validation, but the required schema-space, empty-allowedValues, and missing-cap cases were not all completed. Evidence: invalid-create-empty.png"
+      },
+      {
+        "id": "6.3",
+        "name": "edit_flow_ripples_to_derived",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Editing a numeric cell through the inline editor updates the formula bar result reading that column, adds or clears a threshold flag when the value crosses a cap, and changes the Dataset Package JSON stats for that column",
+        "reasoning": "Editing row 1\u2019s score to 9 changed the formula result, reduced the flagged count, and the exported package reflected updated numeric statistics. Evidence: edit-ripple-observed.png"
+      },
+      {
+        "id": "6.4",
+        "name": "delete_flow_updates_all_surfaces",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Deleting a row after confirmation removes it from the grid and decrements the sidebar row count, the verified badge if it was verified, the capacity gauge, and the split stratification counts",
+        "reasoning": "FAIL: Deletion removed the row and changed row/verified counts, but the complete split-stratification ripple was not observed. Evidence: delete-flow-derived.png"
+      },
+      {
+        "id": "6.5",
+        "name": "grid_pivot_switch_retains_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Switching from the grid to the pivot view and back retains the active filter, the current selection, and the pivot's bucket assignments",
+        "reasoning": "Pivot view retained the category bucket, and returning to Grid retained the unverified filter and selected row. Evidence: pivot-selection-retained.png"
+      },
+      {
+        "id": "6.6",
+        "name": "last_delete_reveals_empty_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Deleting the last row of a dataset reveals an empty state naming the dataset with Add Row and Import CSV controls that work",
+        "reasoning": "After deleting the only row, the empty state named \u201cEmpty QA\u201d and exposed working Add row and Import CSV controls. Evidence: last-delete-empty-state.png"
+      },
+      {
+        "id": "6.7",
+        "name": "filter_updates_all_surfaces",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Enabling Show unverified only hides verified rows in the grid AND narrows the export drawer's Rows CSV tab to the same visible set; disabling restores both exactly",
+        "reasoning": "FAIL: The unverified-only filter narrowed the grid, but matching Rows CSV contents and exact restoration after disabling were not directly verified. Evidence: filter-export-visible.png"
+      },
+      {
+        "id": "6.8",
+        "name": "collapsible_chrome_preserves_workflow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The threshold, splits, and snapshot panels and the export drawer can each be opened, closed, and reopened without losing their configured state (rules, percentages, snapshot selection)",
+        "reasoning": "FAIL: Threshold rules survived close/reopen, but preservation across splits, snapshots, and the export drawer was not completed end-to-end. Evidence: threshold-reopen-preserved.png"
+      },
+      {
+        "id": "6.9",
+        "name": "wizard_and_overlay_flows",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The import wizard advances source, mapping, diagnostic, and commit in order with working Back navigation, and merge and delete confirmations confirm or cancel as expected",
+        "reasoning": "BLOCKED: The CSV import tool reported success but no visible import wizard appeared; only duplicate merge and delete overlays were exercised. Evidence: import-wizard-source.png"
+      },
+      {
+        "id": "6.10",
+        "name": "flow_recovers_without_reload",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Canceling the import wizard mid-diagnostic, or dismissing a merge flow, returns to the grid with the dataset untouched and no dead end requiring a reload",
+        "reasoning": "BLOCKED: The import wizard did not become visible, so canceling during diagnostics could not be exercised. Evidence: import-wizard-source.png"
+      },
+      {
+        "id": "6.11",
+        "name": "export_after_mutations_includes_session",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Add a row with a distinctive expectedOutput token, toggle it verified, save a uniquely named snapshot, open Export, and confirm Dataset Package JSON shows schemaVersion exactly dataset-manager.package/v1, contains that expectedOutput under dataset.rows, reflects the verified toggle in stats.verifiedCount, lists the new snapshot name, and keeps every required top-level key; Copy places that JSON on the clipboard",
+        "reasoning": "FAIL: Export showed the required schemaVersion and snapshot metadata, but the distinctive expectedOutput token, verified-toggle result, and clipboard copy were not all observed in the package. Evidence: export-package-json.png"
+      },
+      {
+        "id": "6.12",
+        "name": "import_package_restores_exported_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After exporting a conforming Dataset Package JSON, changing live state, and Importing that package, the grid, verified badge, snapshot list, and a subsequent export return to the imported contents; a package with the wrong schemaVersion is rejected with a named-field error and leaves state unchanged",
+        "reasoning": "BLOCKED: The package import workflow and wrong-schema rejection path were not reached and verified. Evidence: export-package-json.png"
+      },
+      {
+        "id": "6.13",
+        "name": "csv_import_pipeline_updates_all_surfaces",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Choose a seeded sample CSV, adjust one column mapping, fix a flagged diagnostic cell, exclude one bad row, and Commit through the real wizard controls; the sidebar count rises by exactly the included-row count, the new rows appear in the grid, the capacity gauge grows, pivot summaries change, and both export tabs change without a reload",
+        "reasoning": "BLOCKED: The sample CSV wizard did not render after loading the fixture, so mapping, diagnostics, exclusion, commit, and derived-surface updates could not be completed. Evidence: import-wizard-source.png"
+      },
+      {
+        "id": "6.14",
+        "name": "numeric_edit_ripple_reaches_snapshot_diff",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Take a snapshot, then edit a numeric cell through the inline grid editor so it crosses a threshold cap; the formula result, threshold flag, Dataset Package JSON numeric stats, and a diff against that snapshot all update, with the diff showing that exact changed cell",
+        "reasoning": "FAIL: Numeric editing updated the formula and package statistics, but snapshot creation and an exact changed-cell diff were not completed. Evidence: edit-ripple-observed.png"
+      },
+      {
+        "id": "6.15",
+        "name": "duplicate_merge_rescan_round_trip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Run the duplicate scan to surface the seeded groups, merge one group through the real Merge flow, verify the row count decreases by exactly the group size minus one, then rerun the scan and confirm that merged group is absent",
+        "reasoning": "The scan found two seeded duplicate groups; merging one reduced the dataset from 519 to 518 rows, and rescanning showed only the remaining group. Evidence: duplicate-merge-rescan.png"
+      },
+      {
+        "id": "6.16",
+        "name": "bulk_verify_then_undo_restores_five_rows",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Select 5 rows, apply Mark verified through the bulk tray, and measure the Verified badge increase by exactly the number that were newly verified; one real Undo restores all five rows' prior verified states and the prior badge count",
+        "reasoning": "Five rows were selected; Mark verified increased the badge from 261 to 263, and one Undo restored 261 plus the prior row verification states. Evidence: bulk-verify-undo.png"
+      },
+      {
+        "id": "6.17",
+        "name": "split_distribution_stays_coherent_after_delete",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Apply an 80/10/10 split, confirm every grid row has a split label and the proportion bar plus verified/unverified stratification match those labels, then delete rows and confirm both derived split surfaces update to the remaining grid rows",
+        "reasoning": "FAIL: The attempted 80/10/10 submission returned success, but reopening showed the previous distribution rather than 80/10/10, so coherent post-delete behavior was not established. Evidence: split-reopen-derived.png"
+      },
+      {
+        "id": "6.18",
+        "name": "reload_restores_seeded_dataset_baseline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After adding rows, rules, snapshots, and undo history, a full page reload returns every facet to the seeded datasets and row counts, only seeded snapshots and threshold rules remain, and Undo is disabled because history is empty",
+        "reasoning": "A full reload removed the created dataset and session mutations, restored the three seeded datasets and counts, and left Undo disabled. Evidence: reload-baseline.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"create_flow_updates_all_surfaces\":{\"score\":\"yes\",\"reasoning\":\"Created \u201cQA Scratch\u201d and added a row; the sidebar count, grid row, and capacity breakdown updated immediately. Evidence: create-flow-surfaces.png\"},\"invalid_create_shows_inline_validation\":{\"score\":\"no\",\"reasoning\":\"FAIL: Empty-name submission showed inline validation, but the required schema-space, empty-allowedValues, and missing-cap cases were not all completed. Evidence: invalid-create-empty.png\"},\"edit_flow_ripples_to_derived\":{\"score\":\"yes\",\"reasoning\":\"Editing row 1\u2019s score to 9 changed the formula result, reduced the flagged count, and the exported package reflected updated numeric statistics. Evidence: edit-ripple-observed.png\"},\"delete_flow_updates_all_surfaces\":{\"score\":\"no\",\"reasoning\":\"FAIL: Deletion removed the row and changed row/verified counts, but the complete split-stratification ripple was not observed. Evidence: delete-flow-derived.png\"},\"grid_pivot_switch_retains_state\":{\"score\":\"yes\",\"reasoning\":\"Pivot view retained the category bucket, and returning to Grid retained the unverified filter and selected row. Evidence: pivot-selection-retained.png\"},\"last_delete_reveals_empty_state\":{\"score\":\"yes\",\"reasoning\":\"After deleting the only row, the empty state named \u201cEmpty QA\u201d and exposed working Add row and Import CSV controls. Evidence: last-delete-empty-state.png\"},\"filter_updates_all_surfaces\":{\"score\":\"no\",\"reasoning\":\"FAIL: The unverified-only filter narrowed the grid, but matching Rows CSV contents and exact restoration after disabling were not directly verified. Evidence: filter-export-visible.png\"},\"collapsible_chrome_preserves_workflow\":{\"score\":\"no\",\"reasoning\":\"FAIL: Threshold rules survived close/reopen, but preservation across splits, snapshots, and the export drawer was not completed end-to-end. Evidence: threshold-reopen-preserved.png\"},\"wizard_and_overlay_flows\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The CSV import tool reported success but no visible import wizard appeared; only duplicate merge and delete overlays were exercised. Evidence: import-wizard-source.png\"},\"flow_recovers_without_reload\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The import wizard did not become visible, so canceling during diagnostics could not be exercised. Evidence: import-wizard-source.png\"},\"export_after_mutations_includes_session\":{\"score\":\"no\",\"reasoning\":\"FAIL: Export showed the required schemaVersion and snapshot metadata, but the distinctive expectedOutput token, verified-toggle result, and clipboard copy were not all observed in the package. Evidence: export-package-json.png\"},\"import_package_restores_exported_state\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The package import workflow and wrong-schema rejection path were not reached and verified. Evidence: export-package-json.png\"},\"csv_import_pipeline_updates_all_surfaces\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The sample CSV wizard did not render after loading the fixture, so mapping, diagnostics, exclusion, commit, and derived-surface updates could not be completed. Evidence: import-wizard-source.png\"},\"numeric_edit_ripple_reaches_snapshot_diff\":{\"score\":\"no\",\"reasoning\":\"FAIL: Numeric editing updated the formula and package statistics, but snapshot creation and an exact changed-cell diff were not completed. Evidence: edit-ripple-observed.png\"},\"duplicate_merge_rescan_round_trip\":{\"score\":\"yes\",\"reasoning\":\"The scan found two seeded duplicate groups; merging one reduced the dataset from 519 to 518 rows, and rescanning showed only the remaining group. Evidence: duplicate-merge-rescan.png\"},\"bulk_verify_then_undo_restores_five_rows\":{\"score\":\"yes\",\"reasoning\":\"Five rows were selected; Mark verified increased the badge from 261 to 263, and one Undo restored 261 plus the prior row verification states. Evidence: bulk-verify-undo.png\"},\"split_distribution_stays_coherent_after_delete\":{\"score\":\"no\",\"reasoning\":\"FAIL: The attempted 80/10/10 submission returned success, but reopening showed the previous distribution rather than 80/10/10, so coherent post-delete behavior was not established. Evidence: split-reopen-derived.png\"},\"reload_restores_seeded_dataset_baseline\":{\"score\":\"yes\",\"reasoning\":\"A full reload removed the created dataset and session mutations, restored the three seeded datasets and counts, and left Undo disabled. Evidence: reload-baseline.png\"}}",
+    "cost_usd": 0.7202447999999999
+  },
+  "visual_design": {
+    "score": 0.8261,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "layout_composition",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The layout matches the spec: a left sidebar with the dataset list above the instrumentation panel, a main area with a toolbar (import, export, pivot toggle, undo/redo, formula bar) above the grid, and side panels for thresholds, splits, and snapshots reachable from the toolbar",
+        "reasoning": "Sidebar, instrumentation panel, toolbar, formula bar, grid, and reachable threshold/snapshot side panels are visible. Evidence: layout_composition-panels.png"
+      },
+      {
+        "id": "2.2",
+        "name": "selected_vs_hover_sidebar",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The active dataset entry uses a visibly selected layer background distinct from the hover wash, and inactive entries show the hover wash only while hovered (verified with the pointer actually hovering)",
+        "reasoning": "Active dataset has a distinct selected background; hovering Support intents produced a separate hover wash while it remained inactive. Evidence: selected_vs_hover_sidebar-shared.png"
+      },
+      {
+        "id": "2.3",
+        "name": "verified_iconography",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Verified rows show a checkmark icon in the success color and unverified rows show a dash icon in the secondary text color, distinguishable by icon shape and not color alone",
+        "reasoning": "Verified rows visibly use check icons and unverified rows use dash icons, with distinct shapes. Evidence: layout_composition-shared.png"
+      },
+      {
+        "id": "2.4",
+        "name": "flag_and_diagnostic_treatments",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Threshold-flagged cells carry a warning-tinted background with a row flag icon, and diagnostic-step problem cells use the error color with the problem message adjacent to the cell",
+        "reasoning": "Flagged grid rows show warning treatment and row flag icons; import diagnostics visibly show adjacent problem messages and error-state cells. Evidence: flag_and_diagnostic_treatments-shared.png"
+      },
+      {
+        "id": "2.5",
+        "name": "diff_color_language",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "In the snapshot diff, added rows carry a green-tinted treatment, removed rows a red-tinted treatment, and changed cells show old and new values with the old value struck through",
+        "reasoning": "Live snapshot diff showed 1 added, 1 removed, and 1 changed row; added/removed treatments and struck-through old value were directly observed. Evidence: diff_color_language-shared.png"
+      },
+      {
+        "id": "2.6",
+        "name": "mapping_table_anatomy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The import mapping step renders as a table with one assignment select per CSV column row, and header-matched columns show their assignment pre-selected",
+        "reasoning": "Import mapping rendered as a table with one select per CSV column, with prompt, score, category, and expected output pre-matched. Evidence: mapping_table_anatomy-shared.png"
+      },
+      {
+        "id": "2.7",
+        "name": "dense_legible_grid",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The grid keeps a fixed header row, consistent row heights, right-aligned numeric cells, and column headers visually distinct from data cells",
+        "reasoning": "Observed fixed sticky header, uniform 42px row heights, right-aligned numeric cells, and distinct header background. Evidence: layout_composition-shared.png"
+      },
+      {
+        "id": "2.8",
+        "name": "typography_hierarchy",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Typography shows a clear hierarchy \u2014 app title larger than panel headings, which are larger than grid body and label text \u2014 consistent across the grid, pivot, and panels",
+        "reasoning": "FAIL: observed app title at 18px while main/panel headings were 20px, so the specified title-larger-than-panel hierarchy was not satisfied. Evidence: layout_composition-panels.png"
+      },
+      {
+        "id": "2.9",
+        "name": "spacing_rhythm",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Spacing between the sidebar, toolbar, grid, and panels follows a visually regular rhythm with no crowded or orphaned regions",
+        "reasoning": "Sidebar, toolbar, formula bar, grid, and drawer use consistent gutters and regular spacing without visible crowding. Evidence: layout_composition-panels.png"
+      },
+      {
+        "id": "2.10",
+        "name": "control_state_treatments",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Buttons, inputs, selects, and toggles show distinct default, hover, focus (visible ring), disabled, and error treatments, checked through the real pointer and keyboard states",
+        "reasoning": "FAIL: default and disabled controls were visible, but the attempted focus/error checks did not produce a directly observable complete set of distinct treatments; modal interception prevented fully exercising the form validation state. Evidence: control_state_treatments-shared.png"
+      },
+      {
+        "id": "2.11",
+        "name": "consistent_icon_set",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "One consistent icon set is used across the toolbar, sidebar, row actions, and status indicators, with no mixed icon styles",
+        "reasoning": "Toolbar, sidebar, row actions, flags, and status controls consistently use the same compact SVG icon style. Evidence: layout_composition-shared.png"
+      },
+      {
+        "id": "2.12",
+        "name": "export_drawer_anatomy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The export drawer shows tabs labeled Rows CSV and Dataset Package JSON, a monospaced preview block, and Copy, Download, and Import package actions",
+        "reasoning": "Export drawer visibly included Rows CSV, Dataset Package JSON, monospaced preview, Copy, Download, and Import package actions. Evidence: export_drawer_anatomy-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"layout_composition\":{\"score\":\"yes\",\"reasoning\":\"Sidebar, instrumentation panel, toolbar, formula bar, grid, and reachable threshold/snapshot side panels are visible. Evidence: layout_composition-panels.png\"},\"selected_vs_hover_sidebar\":{\"score\":\"yes\",\"reasoning\":\"Active dataset has a distinct selected background; hovering Support intents produced a separate hover wash while it remained inactive. Evidence: selected_vs_hover_sidebar-shared.png\"},\"verified_iconography\":{\"score\":\"yes\",\"reasoning\":\"Verified rows visibly use check icons and unverified rows use dash icons, with distinct shapes. Evidence: layout_composition-shared.png\"},\"flag_and_diagnostic_treatments\":{\"score\":\"yes\",\"reasoning\":\"Flagged grid rows show warning treatment and row flag icons; import diagnostics visibly show adjacent problem messages and error-state cells. Evidence: flag_and_diagnostic_treatments-shared.png\"},\"diff_color_language\":{\"score\":\"yes\",\"reasoning\":\"Live snapshot diff showed 1 added, 1 removed, and 1 changed row; added/removed treatments and struck-through old value were directly observed. Evidence: diff_color_language-shared.png\"},\"mapping_table_anatomy\":{\"score\":\"yes\",\"reasoning\":\"Import mapping rendered as a table with one select per CSV column, with prompt, score, category, and expected output pre-matched. Evidence: mapping_table_anatomy-shared.png\"},\"dense_legible_grid\":{\"score\":\"yes\",\"reasoning\":\"Observed fixed sticky header, uniform 42px row heights, right-aligned numeric cells, and distinct header background. Evidence: layout_composition-shared.png\"},\"typography_hierarchy\":{\"score\":\"no\",\"reasoning\":\"FAIL: observed app title at 18px while main/panel headings were 20px, so the specified title-larger-than-panel hierarchy was not satisfied. Evidence: layout_composition-panels.png\"},\"spacing_rhythm\":{\"score\":\"yes\",\"reasoning\":\"Sidebar, toolbar, formula bar, grid, and drawer use consistent gutters and regular spacing without visible crowding. Evidence: layout_composition-panels.png\"},\"control_state_treatments\":{\"score\":\"no\",\"reasoning\":\"FAIL: default and disabled controls were visible, but the attempted focus/error checks did not produce a directly observable complete set of distinct treatments; modal interception prevented fully exercising the form validation state. Evidence: control_state_treatments-shared.png\"},\"consistent_icon_set\":{\"score\":\"yes\",\"reasoning\":\"Toolbar, sidebar, row actions, flags, and status controls consistently use the same compact SVG icon style. Evidence: layout_composition-shared.png\"},\"export_drawer_anatomy\":{\"score\":\"yes\",\"reasoning\":\"Export drawer visibly included Rows CSV, Dataset Package JSON, monospaced preview, Copy, Download, and Import package actions. Evidence: export_drawer_anatomy-shared.png\"}}",
+    "cost_usd": 0.4726056
+  },
+  "writing": {
+    "score": 0.7188,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "headings_use_consistent_capitalization",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Where the app renders headings and panel titles (datasets, thresholds, splits, snapshots, export, Rows CSV, Dataset Package JSON), they use one consistent capitalization convention throughout",
+        "reasoning": "FAIL: Headings mix sentence case (\u201cExport dataset package\u201d) with title case (\u201cRows CSV\u201d, \u201cDataset Package JSON\u201d). Evidence: export-package-shared.png"
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders action labels, they are specific verbs (Import CSV, Import package, Save Snapshot, Scan for duplicates, Mark verified), not generic (Submit, OK) when a specific label is possible",
+        "reasoning": "Actions use specific labels such as \u201cImport CSV,\u201d \u201cFind duplicates,\u201d \u201cScan for duplicates,\u201d and \u201cCopy artifact.\u201d Evidence: initial-dismissed-shared.png"
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders error messages (formula errors, split totals, wizard problems, Dataset Package JSON import failures), they name the problem and the fix, not just a rejection",
+        "reasoning": "The formula error identifies the unknown column and instructs the user to choose the number column \u201cscore.\u201d Evidence: formula-error-shared.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders empty states (emptied dataset, empty filter, no duplicates), the copy explains what belongs there and how to proceed",
+        "reasoning": "The duplicate-scan empty state explains that the scan must be run to inspect duplicate groups. Evidence: duplicates-panel-shared.png"
+      },
+      {
+        "id": "15.5",
+        "name": "body_copy_is_well_written",
+        "value": 0.75,
+        "raw": 4,
+        "weight": 0.5,
+        "description": "Where the app renders body copy (Dataset Package JSON field labels in UI chrome, diagnostics, hints), rate how free it is of spelling and grammatical errors.",
+        "reasoning": "Copy is clear and professional overall, with a minor grammatical issue: \u201c1 snapshots.\u201d Evidence: export-package-shared.png"
+      },
+      {
+        "id": "15.6",
+        "name": "terminology_is_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app names the same concept in multiple places (dataset, row, snapshot, split, verified, Dataset Package JSON), terminology is consistent across grid, panels, toasts, and exports",
+        "reasoning": "Dataset, rows, verified, splits, snapshots, and Dataset Package JSON terminology remains consistent across the grid, dialogs, and export view. Evidence: export-package-shared.png"
+      },
+      {
+        "id": "15.7",
+        "name": "numbers_dates_and_units_are_consistent",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Where the app renders numbers, dates, percentages, and sizes (row counts, created dates, split percentages, capacity estimates), formatting is consistent with units labeled",
+        "reasoning": "FAIL: The export metadata renders \u201c1 snapshots,\u201d showing inconsistent number/unit agreement despite otherwise labeled row, KB, MB, and UTC formats. Evidence: export-package-shared.png"
+      },
+      {
+        "id": "15.8",
+        "name": "success_messages_are_specific",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders success messages, they state what happened ('Imported 24 rows', 'Attached to Regression suite'), not vague affirmations",
+        "reasoning": "The completed scan reports \u201cScan complete: 2 duplicate groups found,\u201d clearly stating what happened. Evidence: duplicates-done-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"headings_use_consistent_capitalization\":{\"score\":\"no\",\"reasoning\":\"FAIL: Headings mix sentence case (\u201cExport dataset package\u201d) with title case (\u201cRows CSV\u201d, \u201cDataset Package JSON\u201d). Evidence: export-package-shared.png\"},\"actions_use_specific_labels\":{\"score\":\"yes\",\"reasoning\":\"Actions use specific labels such as \u201cImport CSV,\u201d \u201cFind duplicates,\u201d \u201cScan for duplicates,\u201d and \u201cCopy artifact.\u201d Evidence: initial-dismissed-shared.png\"},\"errors_name_problem_and_fix\":{\"score\":\"yes\",\"reasoning\":\"The formula error identifies the unknown column and instructs the user to choose the number column \u201cscore.\u201d Evidence: formula-error-shared.png\"},\"empty_states_explain_next_step\":{\"score\":\"yes\",\"reasoning\":\"The duplicate-scan empty state explains that the scan must be run to inspect duplicate groups. Evidence: duplicates-panel-shared.png\"},\"body_copy_is_well_written\":{\"score\":4,\"reasoning\":\"Copy is clear and professional overall, with a minor grammatical issue: \u201c1 snapshots.\u201d Evidence: export-package-shared.png\"},\"terminology_is_consistent\":{\"score\":\"yes\",\"reasoning\":\"Dataset, rows, verified, splits, snapshots, and Dataset Package JSON terminology remains consistent across the grid, dialogs, and export view. Evidence: export-package-shared.png\"},\"numbers_dates_and_units_are_consistent\":{\"score\":\"no\",\"reasoning\":\"FAIL: The export metadata renders \u201c1 snapshots,\u201d showing inconsistent number/unit agreement despite otherwise labeled row, KB, MB, and UTC formats. Evidence: export-package-shared.png\"},\"success_messages_are_specific\":{\"score\":\"yes\",\"reasoning\":\"The completed scan reports \u201cScan complete: 2 duplicate groups found,\u201d clearly stating what happened. Evidence: duplicates-done-shared.png\"}}",
+    "cost_usd": 0.2578718
+  }
+}

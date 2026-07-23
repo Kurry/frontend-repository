@@ -16,7 +16,7 @@ function onResize() { viewportWidth.value = window.innerWidth }
 onMounted(() => window.addEventListener('resize', onResize))
 onBeforeUnmount(() => window.removeEventListener('resize', onResize))
 
-const drawerWidth = computed(() => (viewportWidth.value <= 768 ? Math.min(viewportWidth.value, 520) : 520))
+const drawerWidth = computed(() => (viewportWidth.value <= 768 ? viewportWidth.value : 520))
 const profile = computed(() => contributors.find((c) => c.name === store.drawerContributor))
 const submissions = computed(() => store.drawerContributor ? store.contributorSubmissions(store.drawerContributor) : [])
 const timeline = computed(() => store.drawerContributor ? store.contributorTimeline(store.drawerContributor) : [])

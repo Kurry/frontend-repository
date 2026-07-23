@@ -93,18 +93,27 @@ function handleValidate() {
       confirming.value = true
     } else {
       error.value = result.error.issues[0]?.message ?? 'Invalid Workspace JSON'
+      showToast(error.value, 'error')
       parsedData = null
     }
-  } catch {
+  } catch (err) {
     error.value = 'Invalid JSON format'
+    showToast(error.value, 'error')
     parsedData = null
   }
 }
 
 function handleImport() {
   if (!parsedData) return
-  store.setWorkspace(parsedData)
-  showToast('Workspace imported successfully', 'success')
-  open.value = false
+  try {
+    store.setWorkspace(parsedData)
+    showToast('Workspace imported successfully', 'success')
+    open.value = false
+  } catch (err: any) {
+    error.value = err.message || 'Invalid input'
+    showToast(error.value, 'error')
+    parsedData = null
+    confirming.value = false
+  }
 }
 </script>

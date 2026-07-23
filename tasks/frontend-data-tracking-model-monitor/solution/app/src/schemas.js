@@ -36,15 +36,15 @@ export const budgetSchema = z.object({
 })
 
 export const makeUsageFormSchema = (catalogNames) => z.object({
-  model: z.string().min(1, namedMessage('Model', 'is required'))
-    .refine((value) => catalogNames.includes(value), namedMessage('Model', 'must exactly match the catalog')),
-  request_label: z.string().trim().min(1, namedMessage('Request label', 'is required')).max(80, namedMessage('Request label', 'must be 80 characters or fewer')),
-  prompt_tokens: z.number({ error: namedMessage('Prompt tokens', 'is required') })
-    .int(namedMessage('Prompt tokens', 'must be a whole number'))
-    .nonnegative(namedMessage('Prompt tokens', 'must be 0 or greater')),
-  completion_tokens: z.number({ error: namedMessage('Completion tokens', 'is required') })
-    .int(namedMessage('Completion tokens', 'must be a whole number'))
-    .nonnegative(namedMessage('Completion tokens', 'must be 0 or greater')),
+  model: z.string().min(1, 'Model is required. Select a model present in the catalog.')
+    .refine((value) => catalogNames.includes(value), 'Model is invalid. Select or type a model present in the catalog.'),
+  request_label: z.string().trim().min(1, 'Request label is required. Enter a description for this request (1–80 characters).').max(80, 'Request label must be 80 characters or fewer. Shorten the description.'),
+  prompt_tokens: z.number({ error: 'Prompt tokens is required. Enter a non-negative integer (0 or greater).' })
+    .int('Prompt tokens must be a whole number. Remove decimal places.')
+    .nonnegative('Prompt tokens must be 0 or greater'),
+  completion_tokens: z.number({ error: 'Completion tokens is required. Enter a non-negative integer (0 or greater).' })
+    .int('Completion tokens must be a whole number. Remove decimal places.')
+    .nonnegative('Completion tokens must be 0 or greater'),
 })
 
 export const sessionReportSchema = z.object({

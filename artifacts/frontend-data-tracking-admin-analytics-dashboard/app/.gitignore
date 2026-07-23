@@ -1,0 +1,7 @@
+node_modules/
+.next/
+out/
+_next/
+*.html
+!index.html
+!src/**/*.html

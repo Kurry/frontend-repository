@@ -1,0 +1,2659 @@
+{
+  "accessibility": {
+    "score": 0.7,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "controls_are_keyboard_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every interactive control \u2014 navigation, sortable headers, filter and search controls, row actions and checkboxes, rejection select, dialog fields, queue move and remove, bulk tray actions, Undo and Redo, Export and Import, copy controls, and command palette results \u2014 is reachable and operable with the keyboard alone with a visible focus indicator",
+        "reasoning": "Native buttons, inputs, selects, queue controls, and command-palette results were reachable; command-palette navigation also worked with ArrowDown/Enter. Evidence: initial-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "modals_manage_focus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The pin confirm dialog, command palette, and export/import panels trap focus while open, close on Escape, and return focus to the control that opened them",
+        "reasoning": "FAIL: Pin and command-palette dialogs received focus, but Escape did not close them as required. Evidence: command-palette-fail.png"
+      },
+      {
+        "id": "1.3",
+        "name": "icons_have_accessible_names",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Icon-only controls such as copy, queue move, and close affordances expose an accessible name via aria-label or equivalent text",
+        "reasoning": "Icon-only controls exposed aria-labels, including queue movement, removal, close, undo/redo, and copy controls. Evidence: initial-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "feedback_uses_live_regions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Fetch-more completion, bulk actions, successful import, export copy, and keyboard queue reorders are announced through an aria-live region as well as shown visually",
+        "reasoning": "FAIL: The app had a polite status live region, but fetch-more completion produced no announcement text in it. Evidence: feedback-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "forms_have_explicit_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rejection reason, pin notes, import paste, name-search, and filter controls have visible labels associated with their fields",
+        "reasoning": "Rejection reason, pin notes, raw JSON import, search, and filter controls had visible associated labels. Evidence: import-panel-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "headings_follow_logical_order",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "View titles and section headings in candidates, quota, timeline, and export panels follow a logical heading order without skipping levels in a confusing way",
+        "reasoning": "Candidates, quota, timeline, and export views used an H1 title followed by H2 sections without confusing level skips. Evidence: headings-export-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "status_not_color_alone",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Status chips always include their label text so Candidate through Queued is never conveyed by color alone; pass/fail style distinctions in guards use text as well as caution styling",
+        "reasoning": "Candidate, Scored, Selected, Rejected, Pinned, and Queued statuses were rendered with visible text labels; rejection reasons also appeared as text. Evidence: initial-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "sort_state_exposed",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Sortable name, stars, and difficulty headers expose their active sort column and direction programmatically",
+        "reasoning": "FAIL: Repository, Stars, and Difficulty sort buttons were present, but none exposed aria-sort, aria-pressed, or another programmatic direction/state indicator. Evidence: initial-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "focus_visible_on_chrome",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Keyboard focus shows a visible ring on buttons, selects, checkboxes, queue controls, and palette results",
+        "reasoning": "Keyboard focus on queue controls visibly exposed a 3px outline ring, and the same native focus treatment was available on buttons and form controls. Evidence: queue-reorder-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "queue_reorder_keyboard_announced",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Queue reordering is fully achievable via move-up and move-down without a pointer, and a reorder is announced via a polite live region naming the entry and its new position",
+        "reasoning": "The queued entry was focused and moved with Alt+ArrowUp; its position changed and the polite live region announced \u201csilversprig/moss-router moved to queue position 1.\u201d Evidence: queue-reorder-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"controls_are_keyboard_accessible\":{\"score\":\"yes\",\"reasoning\":\"Native buttons, inputs, selects, queue controls, and command-palette results were reachable; command-palette navigation also worked with ArrowDown/Enter. Evidence: initial-shared.png\"},\"modals_manage_focus\":{\"score\":\"no\",\"reasoning\":\"FAIL: Pin and command-palette dialogs received focus, but Escape did not close them as required. Evidence: command-palette-fail.png\"},\"icons_have_accessible_names\":{\"score\":\"yes\",\"reasoning\":\"Icon-only controls exposed aria-labels, including queue movement, removal, close, undo/redo, and copy controls. Evidence: initial-shared.png\"},\"feedback_uses_live_regions\":{\"score\":\"no\",\"reasoning\":\"FAIL: The app had a polite status live region, but fetch-more completion produced no announcement text in it. Evidence: feedback-shared.png\"},\"forms_have_explicit_labels\":{\"score\":\"yes\",\"reasoning\":\"Rejection reason, pin notes, raw JSON import, search, and filter controls had visible associated labels. Evidence: import-panel-shared.png\"},\"headings_follow_logical_order\":{\"score\":\"yes\",\"reasoning\":\"Candidates, quota, timeline, and export views used an H1 title followed by H2 sections without confusing level skips. Evidence: headings-export-shared.png\"},\"status_not_color_alone\":{\"score\":\"yes\",\"reasoning\":\"Candidate, Scored, Selected, Rejected, Pinned, and Queued statuses were rendered with visible text labels; rejection reasons also appeared as text. Evidence: initial-shared.png\"},\"sort_state_exposed\":{\"score\":\"no\",\"reasoning\":\"FAIL: Repository, Stars, and Difficulty sort buttons were present, but none exposed aria-sort, aria-pressed, or another programmatic direction/state indicator. Evidence: initial-shared.png\"},\"focus_visible_on_chrome\":{\"score\":\"yes\",\"reasoning\":\"Keyboard focus on queue controls visibly exposed a 3px outline ring, and the same native focus treatment was available on buttons and form controls. Evidence: queue-reorder-shared.png\"},\"queue_reorder_keyboard_announced\":{\"score\":\"yes\",\"reasoning\":\"The queued entry was focused and moved with Alt+ArrowUp; its position changed and the polite live region announced \u201csilversprig/moss-router moved to queue position 1.\u201d Evidence: queue-reorder-shared.png\"}}",
+    "cost_usd": 0.4087258
+  },
+  "behavioral": {
+    "score": 0.9091,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_reload_resets_seeded",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Multi-facet round-trip: change the active view, apply a language filter plus name-search, select a Scored candidate, and queue a pinned row, then reload; all facets coherently reset to the seeded baseline (seeded statuses, default filters and search, seeded queue/timeline, empty undo history) with no mix of surviving and reset facets",
+        "reasoning": "yes \u2014 filters, selection, pin/queue changes were exercised, then reload restored seeded counts, default facets, queue, and disabled undo. Evidence: multi_facet_reload_resets_seeded-shared.png"
+      },
+      {
+        "id": "14.2",
+        "name": "sort_reversal_proves_live_data",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sort-reversal proof: sort candidates by difficulty ascending, note the order, then sort descending; the order reverses correctly relative to ascending without changing the visible row count, proving sort is derived from live data rather than two hardcoded orders",
+        "reasoning": "yes \u2014 difficulty values were observed ascending, then exactly reversed descending with 31 rows both times. Evidence: sort_reversal_proves_live_data-shared.png"
+      },
+      {
+        "id": "14.3",
+        "name": "quota_and_export_track_inputs",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Derived-view sensitivity: select an eligible Scored candidate and confirm the matching quota cell's achieved count and fill bar increase by exactly one and the rollup Selected count increases by one; open Export sourcing pack and confirm Queue JSON quotaFillPercent and candidates statuses reflect that selection rather than redrawing the pre-select export identically",
+        "reasoning": "yes \u2014 selection raised Rust/easy from 0 to 1 and the rollup from 3 to 4; export JSON reflected the selected status. Evidence: quota_and_export_track_inputs-shared.png"
+      },
+      {
+        "id": "14.4",
+        "name": "cross_view_echo_without_reload",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cross-view echo: pin and queue a candidate on the candidates view, switch to timeline and confirm the pin and queue transitions appear newest-first, switch to quota and confirm the language/band cell still counts the queued candidate, then open Export and confirm the queue array names that repository \u2014 all without a reload",
+        "reasoning": "yes \u2014 pin and queue transitions appeared newest-first in Timeline, quota showed Rust/easy 1, and export included the queued repository. Evidence: cross_view_echo_without_reload-shared.png"
+      },
+      {
+        "id": "14.5",
+        "name": "count_delta_is_exact",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Count-delta integrity: measure the Selected rollup and a quota cell's achieved count immediately before and after Select on an eligible Scored row; both increase by exactly one with no off-by-one or lagging counter",
+        "reasoning": "yes \u2014 Selected increased exactly 3\u21924 and the matching quota cell exactly 0\u21921 after one selection. Evidence: count_delta_is_exact-shared.png"
+      },
+      {
+        "id": "14.6",
+        "name": "different_rejection_reasons_differ",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Input-dependent output: reject two different Scored candidates with two different reasons (for example license-blocked vs too-large); the two rows show different reason labels, the timeline entries record different rejectionReason values, and Export Queue JSON lists those distinct rejectionReason strings",
+        "reasoning": "yes \u2014 two candidates showed distinct rejection reasons, Timeline recorded both, and export JSON preserved both strings. Evidence: different_rejection_reasons_differ-shared.png"
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_flows_preserve_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Interleaved-flow integrity: open the pin confirm dialog for candidate A, switch to the quota view without confirming, reject candidate B with duplicate-cluster, return and cancel A's pin dialog; B is Rejected with the reason shown and A remains Selected with no pin hash, and rollups agree",
+        "reasoning": "yes \u2014 the pin dialog was opened, another candidate was rejected duplicate-cluster, and after cancellation A remained Selected without a pin hash. Evidence: interleaved_flows_preserve_state-shared.png"
+      },
+      {
+        "id": "14.8",
+        "name": "queue_empty_to_repopulated",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edge-state round-trip: remove every queued entry until the build-queue panel is empty and the queue-length rollup is 0, then pin and queue a candidate again; the queue shows position 1, the rollup reads 1, and Export Queue JSON queue array length is 1",
+        "reasoning": "yes \u2014 the queue reached 0 with an empty panel, then repopulated at position 1 with rollup 1 and a one-item export queue. Evidence: queue_empty_to_repopulated-shared.png"
+      },
+      {
+        "id": "14.9",
+        "name": "mutate_export_pipeline",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Full-pipeline probe: score, select, pin, and queue one candidate, reject another with gui-heavy, open Export sourcing pack; Queue JSON contains the queued name with commit and queuePosition, the rejected name with rejectionReason gui-heavy, and quotaFillPercent matching the rollup; Copy places that exact JSON text on the clipboard",
+        "reasoning": "BLOCKED: the full pipeline and export JSON were observed, but browser clipboard read permission was denied after Copy, so exact clipboard contents could not be verified. Evidence: mutate_export_pipeline-shared.png"
+      },
+      {
+        "id": "14.10",
+        "name": "import_export_round_trip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Round-trip probe: export Queue JSON, change at least one status in the UI so the table differs from the export, import the earlier JSON (or seeded sample that matches it), and confirm statuses, queue order, commits, and rollups return to the pack; exporting again yields the same queue order and status set",
+        "reasoning": "yes \u2014 seeded import restored the changed status, queue order, commits, and quota; re-export matched the restored pack. Evidence: import_export_round_trip-shared.png"
+      },
+      {
+        "id": "14.11",
+        "name": "undo_round_trip_after_bulk",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Undo round-trip: Bulk Select three guard-eligible Scored rows, confirm Selected rises by exactly 3, Undo once, and confirm all three chips and the Selected rollup restore exactly; Redo restores the bulk selection again",
+        "reasoning": "yes \u2014 Bulk Select raised Selected exactly 3\u21926, Undo restored all three Scored rows and 3, and Redo restored all three selections and 6. Evidence: undo_round_trip_after_bulk-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"multi_facet_reload_resets_seeded\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 filters, selection, pin/queue changes were exercised, then reload restored seeded counts, default facets, queue, and disabled undo. Evidence: multi_facet_reload_resets_seeded-shared.png\"},\"sort_reversal_proves_live_data\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 difficulty values were observed ascending, then exactly reversed descending with 31 rows both times. Evidence: sort_reversal_proves_live_data-shared.png\"},\"quota_and_export_track_inputs\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 selection raised Rust/easy from 0 to 1 and the rollup from 3 to 4; export JSON reflected the selected status. Evidence: quota_and_export_track_inputs-shared.png\"},\"cross_view_echo_without_reload\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 pin and queue transitions appeared newest-first in Timeline, quota showed Rust/easy 1, and export included the queued repository. Evidence: cross_view_echo_without_reload-shared.png\"},\"count_delta_is_exact\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Selected increased exactly 3\u21924 and the matching quota cell exactly 0\u21921 after one selection. Evidence: count_delta_is_exact-shared.png\"},\"different_rejection_reasons_differ\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 two candidates showed distinct rejection reasons, Timeline recorded both, and export JSON preserved both strings. Evidence: different_rejection_reasons_differ-shared.png\"},\"interleaved_flows_preserve_state\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 the pin dialog was opened, another candidate was rejected duplicate-cluster, and after cancellation A remained Selected without a pin hash. Evidence: interleaved_flows_preserve_state-shared.png\"},\"queue_empty_to_repopulated\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 the queue reached 0 with an empty panel, then repopulated at position 1 with rollup 1 and a one-item export queue. Evidence: queue_empty_to_repopulated-shared.png\"},\"mutate_export_pipeline\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: the full pipeline and export JSON were observed, but browser clipboard read permission was denied after Copy, so exact clipboard contents could not be verified. Evidence: mutate_export_pipeline-shared.png\"},\"import_export_round_trip\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 seeded import restored the changed status, queue order, commits, and quota; re-export matched the restored pack. Evidence: import_export_round_trip-shared.png\"},\"undo_round_trip_after_bulk\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Bulk Select raised Selected exactly 3\u21926, Undo restored all three Scored rows and 3, and Redo restored all three selections and 6. Evidence: undo_round_trip_after_bulk-shared.png\"}}",
+    "cost_usd": 0.551072
+  },
+  "core_features": {
+    "score": 0.8148,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "seeded_candidates_columns_complete",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On load, the candidates table shows at least 25 seeded rows with fictional org-slash-repo names, and each row shows language, star count, a difficulty score from 0 to 10 to one decimal, category, cluster id, a license chip reading Permissive, Weak copyleft, Strong copyleft, or Unlicensed, and a status chip reading Candidate, Scored, Selected, Rejected (with its reason), Pinned, or Queued",
+        "reasoning": "31 fictional repository rows visibly render with language, stars, one-decimal difficulty, category, cluster, license, and status columns. Evidence: seeded_candidates_columns_complete-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "sort_round_trip_with_indicator",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Scripted probe: click the difficulty column header and confirm rows sort by difficulty with a visible direction indicator; click it again and confirm the order reverses relative to the first click without changing the visible row count; sorting by stars behaves the same",
+        "reasoning": "Real header clicks sorted difficulty ascending then descending and stars in both directions while retaining 31 rows and visible indicators. Evidence: sort_round_trip_with_indicator-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "combined_filters_search_and_clear",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Filtering by a language plus a difficulty band (Easy 0-3.9, Medium 4-6.9, Hard 7-10) narrows the table to rows matching both; adding a license or status filter or a name-search substring narrows it further; the clear control restores the full table with the pre-filter row count; when filters and search match nothing an empty state names the active filters and offers the clear control",
+        "reasoning": "Language + Easy + Permissive + name search narrowed to one row; an impossible search showed active filters and Clear filters; clearing restored 31 rows. Evidence: seeded_candidates_columns_complete-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "score_select_transitions_update_everywhere",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Scripted probe: use Score on a Candidate row and confirm its chip reads Scored and its difficulty is revealed; use Select on a Scored row and confirm the chip reads Selected, the rollup Selected count increases by exactly one, the matching quota cell's achieved count increases by exactly one, and the timeline gains one entry recording the old and new status \u2014 all without a reload",
+        "reasoning": "Scoring and selecting bluequartz/prism-diff changed its chip, raised Selected 3\u21924 and quota fill 21%\u219225%, and added a timeline transition without reload. Evidence: score_select_transitions_update_everywhere-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "rejection_reason_constrained_select",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Reject form's reason control is a constrained select offering exactly license-blocked, gui-heavy, network-dependent, duplicate-cluster, and too-large with no free-text entry; submitting with no reason shows an inline message naming the reason field and changes no status; submitting with a reason moves the row to Rejected showing that reason; the submitted rejection payload is that required reason enum value",
+        "reasoning": "Reject uses a select with exactly the five required enum options; empty submission showed \u201cReason field,\u201d while license-blocked produced Rejected with that reason. Evidence: rejection_reason_constrained_select-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "timeline_records_status_changes",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The timeline view lists status-change entries newest first, each showing time, repository name, old status, new status, and the rejection reason when there is one, and a newly performed transition appears at the top without a reload",
+        "reasoning": "Timeline showed newest-first entries with timestamps, repository, old/new statuses, and rejection reasons where applicable; the new transition appeared immediately. Evidence: timeline_records_status_changes-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "quota_grid_cells_render",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The quota view shows a language-by-band grid where each cell reads achieved of target with a fill bar proportional to achieved over target, cells below target carry a visible unfilled highlight, and at least one seeded cell shows an oversubscription indicator because its achieved count exceeds 1.5 times its target",
+        "reasoning": "Quota dashboard visibly rendered the language-by-band grid, proportional bars, needs highlights, and oversubscription cells. Evidence: quota_grid_cells_render-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "quota_cell_click_filters_table",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Activating a quota cell switches to the candidates view with the language and difficulty-band filters set to that cell so the table shows exactly the matching rows, with the active filters visible and clearable",
+        "reasoning": "Clicking Python easy switched to Candidates with Python/easy filters and exactly the matching five rows visible. Evidence: quota_cell_click_filters_table-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "cluster_guard_blocks_selection",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Scripted probe: select a Scored candidate, then attempt to Select a second Scored candidate with the same cluster id; the second attempt shows an inline explanation naming the cluster guard, the cluster id, and the already-holding repository, and the second row's chip, the rollups, the quota grid, and the timeline are all unchanged; attempting to Select a candidate whose org already holds 3 candidates in Selected, Pinned, or Queued status is blocked the same way, with the explanation naming the org cap of 3 and the org",
+        "reasoning": "Selecting a second cl-aurora candidate showed the cluster guard naming cl-aurora and emberforge/ash-parser; an org-cap attempt showed \u201cOrg cap of 3: emberforge\u201d with unchanged status/rollup. Evidence: cluster_guard_blocks_selection-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "pin_dialog_hash_and_copy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Pin action on a Selected row opens a confirm dialog showing the repository name, an automatically generated fictional 12-character lowercase hex commit hash, and an optional notes field capped at 200 characters with the confirm control disabled until the dialog is valid; notes longer than 200 characters show an inline message naming the notes field and do not pin; after confirming, the row reads Pinned and shows the frozen hash with a copy control that places the exact hash on the clipboard with visible confirmation; cancelling the dialog leaves status, queue, and timeline unchanged, and rapidly double-activating the confirm control pins exactly once",
+        "reasoning": "Pin dialog showed a 12-character lowercase hex hash, 200-character notes validation, disabled confirm for overlong notes, cancellation preservation, successful pin, double-click idempotence, and visible clipboard confirmation. Evidence: pin_dialog_hash_and_copy-shared.png"
+      },
+      {
+        "id": "1.11",
+        "name": "queue_append_positions_metadata",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Using Queue on a Pinned row moves it to Queued and appends it to the build-queue panel, where each entry shows a position number, repository name, difficulty score, and cluster id, and positions run contiguously from 1",
+        "reasoning": "Queueing a pinned candidate produced a contiguous position 3 entry with repository, difficulty, and cluster metadata. Evidence: queue_append_positions_metadata-shared.png"
+      },
+      {
+        "id": "1.12",
+        "name": "queue_reorder_persists_across_views",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Scripted probe: with at least three queued entries, move the third entry to position one by dragging or by the keyboard move controls, confirm positions renumber contiguously in the new order, navigate to another view and back, and confirm the order persists",
+        "reasoning": "The third queued entry was moved to position 1, positions renumbered contiguously, and the order remained after Timeline\u2192Candidates navigation. Evidence: queue_reorder_persists_across_views-shared.png"
+      },
+      {
+        "id": "1.13",
+        "name": "queue_remove_returns_to_selected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Scripted probe: remove a queue entry and confirm the candidate's chip returns to Selected, the queue renumbers contiguously, the queue-length rollup decreases by exactly one, and the affected quota cell keeps counting the candidate (still Selected) while the timeline records the change",
+        "reasoning": "Removing the queued candidate returned its chip to Selected, reduced queue length 3\u21922, renumbered entries, and preserved selected quota counting with a timeline transition. Evidence: queue_remove_returns_to_selected-shared.png"
+      },
+      {
+        "id": "1.14",
+        "name": "rollup_strip_derives_live",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The rollup strip shows one count per status, the overall quota fill percentage to the nearest whole percent, and the queue length, and after any transition (select, reject, pin, queue, remove, bulk, undo, import) every rollup value agrees with the table and updates in the same interaction",
+        "reasoning": "Rollups visibly updated consistently after select, reject, pin, queue, remove, bulk, undo/redo, fetch, and import interactions. Evidence: score_select_transitions_update_everywhere-shared.png"
+      },
+      {
+        "id": "1.15",
+        "name": "fetch_more_run_appends_coherently",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Scripted probe: record the table row count, start Fetch more candidates, confirm a progress list steps Querying then Scoring then Classifying from pending to running to complete in order while the control is disabled, and on completion exactly 6 new fictional candidates appear in the table with the rollups and quota grid updated to include them; a second run appends 6 further distinct candidates",
+        "reasoning": "Two real runs showed Querying\u2192Scoring\u2192Classifying progress, disabled the control while running, and appended exactly six candidates per run (31\u219237\u219243). Evidence: fetch_more_run_appends_coherently-shared.png"
+      },
+      {
+        "id": "1.18",
+        "name": "bulk_tray_select_and_actions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Scripted probe: select at least two visible Candidate or Scored rows with checkboxes (or select-all-visible on a filtered table) and confirm the bulk tray shows the live selected count; Bulk Score moves selected Candidate rows to Scored; Bulk Select moves only guard-eligible Scored rows to Selected while blocked rows stay Scored with their own guard explanation; Bulk Reject applies one chosen reason to selected Scored rows; after a bulk action the tray clears and rollups, quota, and timeline update by exactly the changed rows",
+        "reasoning": "FAIL: Bulk tray, Bulk Score, and Bulk Select were exercised successfully, but the complete required Bulk Reject and blocked-row behavior were not directly verified. Evidence: bulk_tray_select_and_actions-shared.png"
+      },
+      {
+        "id": "1.19",
+        "name": "undo_redo_restores_surfaces",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Scripted probe: perform a Select (or Bulk Select), note the Selected rollup and chips, activate Undo, and confirm chips, rollups, quota cells, and timeline length return to their prior values; Redo reapplies the same change; Undo and Redo are disabled when their stacks are empty, and a blocked guard attempt creates no undo entry",
+        "reasoning": "A Select transition was undone and redone, restoring/reapplying the chip and Selected rollup; Redo was initially disabled. Evidence: undo_redo_restores_surfaces-shared.png"
+      },
+      {
+        "id": "1.20",
+        "name": "command_palette_destinations_and_actions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Pressing Control-K or Command-K opens a command palette that fuzzy-matches Candidates, Quota, Timeline, Build queue, Fetch more candidates, Export sourcing pack, and Import sourcing pack; choosing Quota switches to the quota view and closes the palette; Escape closes the palette and returns focus; with no matches a designed empty state names what to type",
+        "reasoning": "Palette visibly listed Candidates, Quota, Timeline, Build queue, Fetch, Export, and Import; Quota switched views and Escape closed it; an unmatched query showed the designed empty state. Evidence: command_palette_destinations_and_actions-shared.png"
+      },
+      {
+        "id": "1.21",
+        "name": "export_sourcing_pack_field_contract",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export sourcing pack opens a panel with Queue JSON, Candidates CSV, and Sourcing report tabs compiled live from session state; Queue JSON top-level keys are exactly schemaVersion (sourcing-pack/v1), generatedAt, quotaFillPercent, queue, candidates, quota, and timeline, with per-entry keys and enums as specified (queue entries include position, name, difficulty, clusterId, commit; candidates include license and status enums and conditional rejectionReason, commit, notes, queuePosition); CSV honors active filters/search; the report markdown includes quota fill, numbered queue, per-status counts, and unfilled cells; Copy places the active tab text on the clipboard with confirmation and Download offers the same text",
+        "reasoning": "Export panel showed Queue JSON, Candidates CSV, and Sourcing report tabs; parsed live JSON had the exact seven top-level keys, and Copy produced visible confirmation. Evidence: export_sourcing_pack_field_contract-shared.png"
+      },
+      {
+        "id": "1.22",
+        "name": "export_reflects_session_mutations",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Scripted probe: pin and queue one candidate and reject another with license-blocked, then open Export sourcing pack; Queue JSON lists the queued repository with its frozen commit and matching queuePosition, includes the rejected repository with rejectionReason license-blocked, and shows quotaFillPercent matching the rollup strip; an earlier export captured before those mutations does not already contain them",
+        "reasoning": "Live export contained bluequartz/prism-diff with frozen commit and queuePosition 3, sunnyanvil1 with rejectionReason license-blocked, and quotaFillPercent 43 matching the rollup. Evidence: export_reflects_session_mutations-shared.png"
+      },
+      {
+        "id": "1.23",
+        "name": "import_validates_and_round_trips",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Import sourcing pack accepts a file, paste, or seeded sample; invalid JSON (wrong schemaVersion or illegal status/license enum) shows an inline message naming the violated field and changes no state; a valid import replaces statuses, commits, notes, rejection reasons, and queue order, recomputes rollups and quota, and appends a timeline import entry; exporting Queue JSON then re-importing that text reconstructs the same visible statuses, queue order, and rollup counts",
+        "reasoning": "FAIL: Invalid schemaVersion validation worked, but the seeded valid import reported 2 queue entries while the visible queue panel retained 3 entries, so replacement/round-trip coherence was not satisfied. Evidence: import_success_notice_names_applied_counts-shared.png"
+      },
+      {
+        "id": "1.26",
+        "name": "quota_oversubscription_names_exact_excess",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "For a quota cell whose achieved count exceeds 1.5 times its target, the cell shows an oversubscription indicator that names the numerical excess achieved minus target; cells at or below 1.5 times target do not show that indicator.",
+        "reasoning": "The Python easy cell visibly showed 3 of 1 and \u201c+2 EXCESS\u201d; non-oversubscribed cells showed needs indicators instead. Evidence: quota_grid_cells_render-shared.png"
+      },
+      {
+        "id": "1.27",
+        "name": "undo_redo_covers_every_sourcing_mutation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Using header controls and Control-Z/Control-Shift-Z (or Command-Z/Command-Shift-Z), Undo and Redo correctly reverse and reapply a status transition, pin confirm, queue append, queue removal, queue reorder, bulk action, and accepted import, restoring chips, rollups, quota cells, queue order, and timeline length each time; blocked guards and cancelled pin/rejection forms add no undo step.",
+        "reasoning": "FAIL: Select undo/redo was verified, but the required complete matrix covering pin, queue append/removal/reorder, bulk, and accepted import was not fully exercised. Evidence: undo_redo_restores_surfaces-shared.png"
+      },
+      {
+        "id": "1.28",
+        "name": "command_palette_runs_flows_and_row_actions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "With a focused or selected eligible candidate, the command palette fuzzy-matches Score, Select, Reject, Pin, and Queue as applicable and each result invokes the same visible row handler; choosing Fetch more, Export sourcing pack, or Import sourcing pack starts that flow and closes the palette.",
+        "reasoning": "FAIL: Palette Score and Select actions were executed, but the full required Score/Select/Reject/Pin/Queue action set was not directly completed through the palette. Evidence: command_palette_destinations_and_actions-shared.png"
+      },
+      {
+        "id": "1.29",
+        "name": "queue_json_exact_nested_entry_contracts",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Queue JSON uses exactly the declared nested shapes: queue entries have position/name/difficulty/clusterId/commit with contiguous integer positions and 12-lowercase-hex commits; candidates have name/language/stars/difficulty/category/clusterId/license/status plus only the applicable rejectionReason, commit, notes, and queuePosition fields; quota entries have language/band/achieved/target with valid bands and bounds; timeline entries have at/name/fromStatus/toStatus plus rejectionReason only when applicable.",
+        "reasoning": "Live Queue JSON parsed with exact queue, candidate, quota, and timeline nested key shapes; queue entries had contiguous integer positions and 12-character lowercase hex commits. Evidence: export_sourcing_pack_field_contract-shared.png"
+      },
+      {
+        "id": "1.30",
+        "name": "csv_and_sourcing_report_exact_content",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Candidates CSV starts with name,language,stars,difficulty,category,clusterId,license,status,rejectionReason,commit,notes,queuePosition and has one line per candidate currently visible under filters/search; Sourcing report is markdown with a title, live quota-fill percentage, numbered queue in panel order, per-status counts matching rollups, and every below-target quota cell named.",
+        "reasoning": "CSV visibly began with the required 12-column header and one line per visible candidate; report showed title, live quota percentage, numbered queue, status counts, and every unfilled cell. Evidence: export_sourcing_pack_field_contract-shared.png"
+      },
+      {
+        "id": "1.31",
+        "name": "import_success_notice_names_applied_counts",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After a valid sourcing-pack import, the success notice names the exact applied candidate count and applied queue-entry count, matching the imported candidates and queue arrays while the table, queue panel, rollups, quota grid, and import timeline entry show the applied state.",
+        "reasoning": "FAIL: The success notice correctly named 31 candidates and 2 queue entries, but the visible queue panel still showed 3 entries, so the full applied-state requirement was inconsistent. Evidence: import_success_notice_names_applied_counts-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"seeded_candidates_columns_complete\":{\"score\":\"yes\",\"reasoning\":\"31 fictional repository rows visibly render with language, stars, one-decimal difficulty, category, cluster, license, and status columns. Evidence: seeded_candidates_columns_complete-shared.png\"},\"sort_round_trip_with_indicator\":{\"score\":\"yes\",\"reasoning\":\"Real header clicks sorted difficulty ascending then descending and stars in both directions while retaining 31 rows and visible indicators. Evidence: sort_round_trip_with_indicator-shared.png\"},\"combined_filters_search_and_clear\":{\"score\":\"yes\",\"reasoning\":\"Language + Easy + Permissive + name search narrowed to one row; an impossible search showed active filters and Clear filters; clearing restored 31 rows. Evidence: seeded_candidates_columns_complete-shared.png\"},\"score_select_transitions_update_everywhere\":{\"score\":\"yes\",\"reasoning\":\"Scoring and selecting bluequartz/prism-diff changed its chip, raised Selected 3\u21924 and quota fill 21%\u219225%, and added a timeline transition without reload. Evidence: score_select_transitions_update_everywhere-shared.png\"},\"rejection_reason_constrained_select\":{\"score\":\"yes\",\"reasoning\":\"Reject uses a select with exactly the five required enum options; empty submission showed \u201cReason field,\u201d while license-blocked produced Rejected with that reason. Evidence: rejection_reason_constrained_select-shared.png\"},\"timeline_records_status_changes\":{\"score\":\"yes\",\"reasoning\":\"Timeline showed newest-first entries with timestamps, repository, old/new statuses, and rejection reasons where applicable; the new transition appeared immediately. Evidence: timeline_records_status_changes-shared.png\"},\"quota_grid_cells_render\":{\"score\":\"yes\",\"reasoning\":\"Quota dashboard visibly rendered the language-by-band grid, proportional bars, needs highlights, and oversubscription cells. Evidence: quota_grid_cells_render-shared.png\"},\"quota_cell_click_filters_table\":{\"score\":\"yes\",\"reasoning\":\"Clicking Python easy switched to Candidates with Python/easy filters and exactly the matching five rows visible. Evidence: quota_cell_click_filters_table-shared.png\"},\"cluster_guard_blocks_selection\":{\"score\":\"yes\",\"reasoning\":\"Selecting a second cl-aurora candidate showed the cluster guard naming cl-aurora and emberforge/ash-parser; an org-cap attempt showed \u201cOrg cap of 3: emberforge\u201d with unchanged status/rollup. Evidence: cluster_guard_blocks_selection-shared.png\"},\"pin_dialog_hash_and_copy\":{\"score\":\"yes\",\"reasoning\":\"Pin dialog showed a 12-character lowercase hex hash, 200-character notes validation, disabled confirm for overlong notes, cancellation preservation, successful pin, double-click idempotence, and visible clipboard confirmation. Evidence: pin_dialog_hash_and_copy-shared.png\"},\"queue_append_positions_metadata\":{\"score\":\"yes\",\"reasoning\":\"Queueing a pinned candidate produced a contiguous position 3 entry with repository, difficulty, and cluster metadata. Evidence: queue_append_positions_metadata-shared.png\"},\"queue_reorder_persists_across_views\":{\"score\":\"yes\",\"reasoning\":\"The third queued entry was moved to position 1, positions renumbered contiguously, and the order remained after Timeline\u2192Candidates navigation. Evidence: queue_reorder_persists_across_views-shared.png\"},\"queue_remove_returns_to_selected\":{\"score\":\"yes\",\"reasoning\":\"Removing the queued candidate returned its chip to Selected, reduced queue length 3\u21922, renumbered entries, and preserved selected quota counting with a timeline transition. Evidence: queue_remove_returns_to_selected-shared.png\"},\"rollup_strip_derives_live\":{\"score\":\"yes\",\"reasoning\":\"Rollups visibly updated consistently after select, reject, pin, queue, remove, bulk, undo/redo, fetch, and import interactions. Evidence: score_select_transitions_update_everywhere-shared.png\"},\"fetch_more_run_appends_coherently\":{\"score\":\"yes\",\"reasoning\":\"Two real runs showed Querying\u2192Scoring\u2192Classifying progress, disabled the control while running, and appended exactly six candidates per run (31\u219237\u219243). Evidence: fetch_more_run_appends_coherently-shared.png\"},\"bulk_tray_select_and_actions\":{\"score\":\"no\",\"reasoning\":\"FAIL: Bulk tray, Bulk Score, and Bulk Select were exercised successfully, but the complete required Bulk Reject and blocked-row behavior were not directly verified. Evidence: bulk_tray_select_and_actions-shared.png\"},\"undo_redo_restores_surfaces\":{\"score\":\"yes\",\"reasoning\":\"A Select transition was undone and redone, restoring/reapplying the chip and Selected rollup; Redo was initially disabled. Evidence: undo_redo_restores_surfaces-shared.png\"},\"command_palette_destinations_and_actions\":{\"score\":\"yes\",\"reasoning\":\"Palette visibly listed Candidates, Quota, Timeline, Build queue, Fetch, Export, and Import; Quota switched views and Escape closed it; an unmatched query showed the designed empty state. Evidence: command_palette_destinations_and_actions-shared.png\"},\"export_sourcing_pack_field_contract\":{\"score\":\"yes\",\"reasoning\":\"Export panel showed Queue JSON, Candidates CSV, and Sourcing report tabs; parsed live JSON had the exact seven top-level keys, and Copy produced visible confirmation. Evidence: export_sourcing_pack_field_contract-shared.png\"},\"export_reflects_session_mutations\":{\"score\":\"yes\",\"reasoning\":\"Live export contained bluequartz/prism-diff with frozen commit and queuePosition 3, sunnyanvil1 with rejectionReason license-blocked, and quotaFillPercent 43 matching the rollup. Evidence: export_reflects_session_mutations-shared.png\"},\"import_validates_and_round_trips\":{\"score\":\"no\",\"reasoning\":\"FAIL: Invalid schemaVersion validation worked, but the seeded valid import reported 2 queue entries while the visible queue panel retained 3 entries, so replacement/round-trip coherence was not satisfied. Evidence: import_success_notice_names_applied_counts-shared.png\"},\"quota_oversubscription_names_exact_excess\":{\"score\":\"yes\",\"reasoning\":\"The Python easy cell visibly showed 3 of 1 and \u201c+2 EXCESS\u201d; non-oversubscribed cells showed needs indicators instead. Evidence: quota_grid_cells_render-shared.png\"},\"undo_redo_covers_every_sourcing_mutation\":{\"score\":\"no\",\"reasoning\":\"FAIL: Select undo/redo was verified, but the required complete matrix covering pin, queue append/removal/reorder, bulk, and accepted import was not fully exercised. Evidence: undo_redo_restores_surfaces-shared.png\"},\"command_palette_runs_flows_and_row_actions\":{\"score\":\"no\",\"reasoning\":\"FAIL: Palette Score and Select actions were executed, but the full required Score/Select/Reject/Pin/Queue action set was not directly completed through the palette. Evidence: command_palette_destinations_and_actions-shared.png\"},\"queue_json_exact_nested_entry_contracts\":{\"score\":\"yes\",\"reasoning\":\"Live Queue JSON parsed with exact queue, candidate, quota, and timeline nested key shapes; queue entries had contiguous integer positions and 12-character lowercase hex commits. Evidence: export_sourcing_pack_field_contract-shared.png\"},\"csv_and_sourcing_report_exact_content\":{\"score\":\"yes\",\"reasoning\":\"CSV visibly began with the required 12-column header and one line per visible candidate; report showed title, live quota percentage, numbered queue, status counts, and every unfilled cell. Evidence: export_sourcing_pack_field_contract-shared.png\"},\"import_success_notice_names_applied_counts\":{\"score\":\"no\",\"reasoning\":\"FAIL: The success notice correctly named 31 candidates and 2 queue entries, but the visible queue panel still showed 3 entries, so the full applied-state requirement was inconsistent. Evidence: import_success_notice_names_applied_counts-shared.png\"}}",
+    "cost_usd": 1.542394
+  },
+  "design_fidelity": {
+    "score": 0.8,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "spacing_rhythm_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Spacing between table rows, quota cells, queue entries, and header controls follows a consistent rhythm with no crowded or orphaned regions",
+        "reasoning": "Consistent spacing is visible across the header, dense candidate table, quota cells, and build queue. Evidence: spacing_rhythm_consistent-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "typography_hierarchy_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "View titles are visibly larger than section headings, which are larger than row and label text, and repository names and commit hashes use a monospaced face",
+        "reasoning": "View titles are visibly larger than section headings and row labels; repository names and commit hashes use monospace styling. Evidence: spacing_rhythm_consistent-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "layout_matches_sourcing_register",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Layout matches the sourcing-console register: header with product name and view navigation, dedicated build-queue region at desktop width, and dense data surfaces for table, quota matrix, and timeline",
+        "reasoning": "The app has a sourcing-console header/navigation, dedicated desktop build queue, dense candidate table, quota matrix, and supporting data panels. Evidence: spacing_rhythm_consistent-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "specified_state_changes_animate",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Pin dialog, palette, export panel, queue reorder, fetch-more steps, status chip changes, bulk tray, and toasts use the motion treatments the instruction specifies",
+        "reasoning": "FAIL: Base controls expose transitions, but the full set of specified pin, palette, export, reorder, fetch-more, chip, bulk-tray, and toast motion treatments was not directly observed end-to-end. Evidence: spacing_rhythm_consistent-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "status_license_chip_system",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Six status chips are visually distinct; license chips are lighter; guard messages use a caution treatment distinct from validation errors and success notices",
+        "reasoning": "Statuses are represented with distinct colored chips, licenses use lighter neutral chips, and caution-style quota indicators are distinct from success/status treatments. Evidence: spacing_rhythm_consistent-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "quota_matrix_fidelity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Quota grid shows language-by-band matrix layout, uniform cells, shared fill-bar treatment, unfilled highlight, and distinct oversubscription indicator",
+        "reasoning": "The quota view visibly presents a language-by-band matrix with uniform cells, shared fill bars, unfilled highlights, and distinct excess/needs indicators. Evidence: quota_matrix_fidelity-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "panels_match_chrome_language",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Bulk tray, command palette, and export/import panels share the same surface and border language as the header and table rather than unstyled browser defaults",
+        "reasoning": "The command palette and export panel use the same dark surfaces, borders, typography, and control styling as the main chrome and table. Evidence: panels_match_chrome_language-command.png"
+      },
+      {
+        "id": "3.8",
+        "name": "component_states_complete",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Buttons, selects, headers, and fields show distinct default, hover, focus, disabled, and error treatments",
+        "reasoning": "FAIL: Disabled, focused, and default treatments were observed, but the complete required set including hover and error treatments was not directly verified across buttons, selects, headers, and fields. Evidence: component_states_complete-shared.png"
+      },
+      {
+        "id": "3.9",
+        "name": "iconography_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "One consistent icon set is used across header actions, row actions, queue controls, and toasts",
+        "reasoning": "Header actions, queue controls, row actions, and panel controls use a consistent outlined icon style throughout. Evidence: spacing_rhythm_consistent-shared.png"
+      },
+      {
+        "id": "3.10",
+        "name": "real_product_copy_only",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rendered copy is real product language with no lorem ipsum; empty states and validation messages match the instruction's voice",
+        "reasoning": "Rendered copy is product-specific and operational, with no lorem ipsum; labels, guidance, statuses, and panel text use a coherent sourcing-console voice. Evidence: spacing_rhythm_consistent-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"spacing_rhythm_consistent\":{\"score\":\"yes\",\"reasoning\":\"Consistent spacing is visible across the header, dense candidate table, quota cells, and build queue. Evidence: spacing_rhythm_consistent-shared.png\"},\"typography_hierarchy_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"View titles are visibly larger than section headings and row labels; repository names and commit hashes use monospace styling. Evidence: spacing_rhythm_consistent-shared.png\"},\"layout_matches_sourcing_register\":{\"score\":\"yes\",\"reasoning\":\"The app has a sourcing-console header/navigation, dedicated desktop build queue, dense candidate table, quota matrix, and supporting data panels. Evidence: spacing_rhythm_consistent-shared.png\"},\"specified_state_changes_animate\":{\"score\":\"no\",\"reasoning\":\"FAIL: Base controls expose transitions, but the full set of specified pin, palette, export, reorder, fetch-more, chip, bulk-tray, and toast motion treatments was not directly observed end-to-end. Evidence: spacing_rhythm_consistent-shared.png\"},\"status_license_chip_system\":{\"score\":\"yes\",\"reasoning\":\"Statuses are represented with distinct colored chips, licenses use lighter neutral chips, and caution-style quota indicators are distinct from success/status treatments. Evidence: spacing_rhythm_consistent-shared.png\"},\"quota_matrix_fidelity\":{\"score\":\"yes\",\"reasoning\":\"The quota view visibly presents a language-by-band matrix with uniform cells, shared fill bars, unfilled highlights, and distinct excess/needs indicators. Evidence: quota_matrix_fidelity-shared.png\"},\"panels_match_chrome_language\":{\"score\":\"yes\",\"reasoning\":\"The command palette and export panel use the same dark surfaces, borders, typography, and control styling as the main chrome and table. Evidence: panels_match_chrome_language-command.png\"},\"component_states_complete\":{\"score\":\"no\",\"reasoning\":\"FAIL: Disabled, focused, and default treatments were observed, but the complete required set including hover and error treatments was not directly verified across buttons, selects, headers, and fields. Evidence: component_states_complete-shared.png\"},\"iconography_consistent\":{\"score\":\"yes\",\"reasoning\":\"Header actions, queue controls, row actions, and panel controls use a consistent outlined icon style throughout. Evidence: spacing_rhythm_consistent-shared.png\"},\"real_product_copy_only\":{\"score\":\"yes\",\"reasoning\":\"Rendered copy is product-specific and operational, with no lorem ipsum; labels, guidance, statuses, and panel text use a coherent sourcing-console voice. Evidence: spacing_rhythm_consistent-shared.png\"}}",
+    "cost_usd": 0.16089779999999998
+  },
+  "edge_cases": {
+    "score": 0.9231,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "filter_empty_state_names_filters",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When filters and search match no candidates, the table region shows an empty state naming the active filters and offering the clear control rather than a blank region",
+        "reasoning": "yes \u2014 A no-match search rendered \u201cNo candidates match,\u201d named the active name filter, and offered \u201cClear filters.\u201d Evidence: filter_empty_state_names_filters-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "rejection_and_pin_validate_inline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rejection with no reason and pin notes longer than 200 characters show inline validation naming the reason or notes field before any status change",
+        "reasoning": "yes \u2014 Empty rejection reason showed an inline \u201cReason field\u201d alert, and 201-character pin notes showed an inline \u201cNotes field\u201d alert while leaving submission disabled. Evidence: rejection_and_pin_validate_inline-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "errors_name_field_and_fix",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Validation and import errors name the violated field (reason, notes, schemaVersion, status, or license) and what to fix rather than only saying Invalid",
+        "reasoning": "yes \u2014 Import validation explicitly named the schemaVersion field and required sourcing-pack/v1; form errors named the reason and notes fields with fixes. Evidence: invalid_import_leaves_state-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "actions_show_confirmation_toasts",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Successful pin, queue, copy, bulk, import, and export-copy actions show a visible confirmation toast that auto-dismisses",
+        "reasoning": "yes \u2014 Successful pin, queue, and export-copy actions displayed visible completion confirmation toasts that later dismissed. Evidence: actions_show_confirmation_toasts-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "fetch_more_shows_step_progress",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Fetch more candidates shows the Querying, Scoring, and Classifying steps advancing pending to running to complete while the control stays disabled",
+        "reasoning": "FAIL: Fetch progress visibly showed running and complete states with the control disabled, but the pending state was not directly observed. Evidence: fetch_more_shows_step_progress-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "cancel_and_undo_recover",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cancelling the pin dialog or rejection form leaves status unchanged, and Undo is available after a completed status transition or bulk action",
+        "reasoning": "yes \u2014 Canceling rejection/pin/import left the underlying status unchanged, and Undo became enabled after status transitions. Evidence: actions_show_confirmation_toasts-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "guards_explain_cluster_and_org",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Blocked Select attempts show an inline explanation naming the cluster guard with cluster id and holding repository, or the org cap of 3 and the org",
+        "reasoning": "yes \u2014 A blocked Select attempt displayed \u201cOrg cap of 3: emberforge already has three active candidates.\u201d Evidence: guards_explain_cluster_and_org-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "controls_use_semantic_tags",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Navigation, row actions, checkboxes, selects, and dialog buttons use semantic button, input, or select elements rather than clickable plain text alone",
+        "reasoning": "yes \u2014 Browser inspection found semantic buttons, inputs, and selects throughout, with no onclick-based plain-text controls. Evidence: actions_show_confirmation_toasts-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "modals_support_escape_and_cancel",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Pin confirm, command palette, and export/import panels close via Escape or an explicit cancel/close control without changing underlying status when cancelled",
+        "reasoning": "yes \u2014 Rejection and pin dialogs exposed Cancel controls, import/export panels exposed cancel/close controls, and the command palette closed via Escape without changing status. Evidence: modals_support_escape_and_cancel-shared.png"
+      },
+      {
+        "id": "4.10",
+        "name": "fetch_more_and_import_show_progress",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Long flows \u2014 fetch-more steps and import validation/apply \u2014 provide visible progress or completion feedback rather than a silent wait",
+        "reasoning": "yes \u2014 Fetch displayed a multi-step progress panel and import displayed explicit validation feedback instead of a silent wait. Evidence: fetch_more_shows_step_progress-shared.png; invalid_import_leaves_state-shared.png"
+      },
+      {
+        "id": "4.11",
+        "name": "queue_end_moves_inert",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Move-up on the first queue entry and move-down on the last are disabled or inert; positions never leave a contiguous 1 to N sequence",
+        "reasoning": "yes \u2014 Queue positions remained contiguous and the first entry\u2019s move-up and last entry\u2019s move-down controls were disabled. Evidence: queue_end_moves_inert-shared.png"
+      },
+      {
+        "id": "4.12",
+        "name": "invalid_import_leaves_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Importing JSON with schemaVersion other than sourcing-pack/v1 or an illegal status token shows an inline message and leaves every surface unchanged",
+        "reasoning": "yes \u2014 Invalid schemaVersion import showed an inline schemaVersion error and left the candidate table, counts, and queue unchanged. Evidence: invalid_import_leaves_state-shared.png"
+      },
+      {
+        "id": "4.13",
+        "name": "select_all_respects_filter",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Select-all on a filtered table selects only the visible subset; clearing filters does not silently keep previously hidden rows selected",
+        "reasoning": "yes \u2014 Filtering to Python showed seven rows; select-all checked only those visible rows, and clearing the filter left no rows selected. Evidence: select_all_respects_filter-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"filter_empty_state_names_filters\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 A no-match search rendered \u201cNo candidates match,\u201d named the active name filter, and offered \u201cClear filters.\u201d Evidence: filter_empty_state_names_filters-shared.png\"},\"rejection_and_pin_validate_inline\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Empty rejection reason showed an inline \u201cReason field\u201d alert, and 201-character pin notes showed an inline \u201cNotes field\u201d alert while leaving submission disabled. Evidence: rejection_and_pin_validate_inline-shared.png\"},\"errors_name_field_and_fix\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Import validation explicitly named the schemaVersion field and required sourcing-pack/v1; form errors named the reason and notes fields with fixes. Evidence: invalid_import_leaves_state-shared.png\"},\"actions_show_confirmation_toasts\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Successful pin, queue, and export-copy actions displayed visible completion confirmation toasts that later dismissed. Evidence: actions_show_confirmation_toasts-shared.png\"},\"fetch_more_shows_step_progress\":{\"score\":\"no\",\"reasoning\":\"FAIL: Fetch progress visibly showed running and complete states with the control disabled, but the pending state was not directly observed. Evidence: fetch_more_shows_step_progress-shared.png\"},\"cancel_and_undo_recover\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Canceling rejection/pin/import left the underlying status unchanged, and Undo became enabled after status transitions. Evidence: actions_show_confirmation_toasts-shared.png\"},\"guards_explain_cluster_and_org\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 A blocked Select attempt displayed \u201cOrg cap of 3: emberforge already has three active candidates.\u201d Evidence: guards_explain_cluster_and_org-shared.png\"},\"controls_use_semantic_tags\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Browser inspection found semantic buttons, inputs, and selects throughout, with no onclick-based plain-text controls. Evidence: actions_show_confirmation_toasts-shared.png\"},\"modals_support_escape_and_cancel\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Rejection and pin dialogs exposed Cancel controls, import/export panels exposed cancel/close controls, and the command palette closed via Escape without changing status. Evidence: modals_support_escape_and_cancel-shared.png\"},\"fetch_more_and_import_show_progress\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Fetch displayed a multi-step progress panel and import displayed explicit validation feedback instead of a silent wait. Evidence: fetch_more_shows_step_progress-shared.png; invalid_import_leaves_state-shared.png\"},\"queue_end_moves_inert\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Queue positions remained contiguous and the first entry\u2019s move-up and last entry\u2019s move-down controls were disabled. Evidence: queue_end_moves_inert-shared.png\"},\"invalid_import_leaves_state\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Invalid schemaVersion import showed an inline schemaVersion error and left the candidate table, counts, and queue unchanged. Evidence: invalid_import_leaves_state-shared.png\"},\"select_all_respects_filter\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Filtering to Python showed seven rows; select-all checked only those visible rows, and clearing the filter left no rows selected. Evidence: select_all_respects_filter-shared.png\"}}",
+    "cost_usd": 1.2209986
+  },
+  "innovation": {
+    "score": 0.9091,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "quota_pressure_sparklines",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Beyond the required fill bars, quota cells or a summary strip show a compact trend or pressure cue that helps operators spot underfilled bands at a glance",
+        "reasoning": "Quota dashboard visibly includes a \u201cFill trend this session\u201d sparkline and Easy/Medium/Hard pressure summaries. Evidence: quota_pressure_sparklines.png"
+      },
+      {
+        "id": "11.2",
+        "name": "cluster_map_or_graph",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Beyond the inline cluster-guard message, the app offers a cluster map or grouping visualization that shows which repositories share a cluster id",
+        "reasoning": "Candidate view visibly includes a Cluster map grouping repositories by shared cluster IDs. Evidence: initial-shared.png"
+      },
+      {
+        "id": "11.3",
+        "name": "guided_sourcing_coachmarks",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A short guided coachmark or checklist walkthrough highlights Score \u2192 Select \u2192 Pin \u2192 Queue \u2192 Export for first-time operators without blocking power use",
+        "reasoning": "A visible First-run guide walks through Score \u2192 Select \u2192 Pin \u2192 Queue \u2192 Export. Evidence: initial-shared.png"
+      },
+      {
+        "id": "11.4",
+        "name": "queue_diff_preview",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Before import apply or after a bulk action, a diff preview names which statuses and queue positions will change",
+        "reasoning": "FAIL: Build queue and seeded import were exercised, but no preview naming changed statuses or queue positions appeared. Evidence: queue_diff_preview_import.png"
+      },
+      {
+        "id": "11.5",
+        "name": "keyboard_chord_cheatsheet",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A discoverable keyboard cheatsheet documents Control-K/Command-K, Undo/Redo chords, and queue move shortcuts",
+        "reasoning": "The visible Keyboard shortcuts dialog documents Ctrl/Command-K, undo/redo, and Alt+Arrow queue movement. Evidence: keyboard_chord_cheatsheet.png"
+      },
+      {
+        "id": "11.6",
+        "name": "export_checksum_or_fingerprint",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Exported Queue JSON includes a visible integrity fingerprint or content hash of the pack that changes when session mutations change the export",
+        "reasoning": "Queue JSON visibly shows an integrity fingerprint and states it changes when session mutations change the export; a mutation changed the displayed fingerprint. Evidence: export_checksum_or_fingerprint.png"
+      },
+      {
+        "id": "11.7",
+        "name": "saved_filter_presets",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Operators can save and reapply named filter-plus-search presets beyond the one-off clear control",
+        "reasoning": "A named \u201cPython ember\u201d filter preset was saved, then filters were cleared and the preset reapplied successfully. Evidence: saved_filter_presets.png"
+      },
+      {
+        "id": "11.8",
+        "name": "org_diversity_dashboard",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A compact org diversity readout shows how close each org is to the cap of 3 before a Select is attempted",
+        "reasoning": "Candidate view visibly includes an Org cap tracker with per-organization counts such as 1/3 and 0/3 before selection. Evidence: initial-shared.png"
+      },
+      {
+        "id": "11.9",
+        "name": "timeline_filter_chips",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The timeline view offers filter chips by transition type (score, select, reject, pin, queue, import) beyond the plain newest-first list",
+        "reasoning": "Timeline visibly provides chips for All, Score, Select, Reject, Pin, Queue, and Import transitions. Evidence: timeline_filter_chips.png"
+      },
+      {
+        "id": "11.10",
+        "name": "compare_two_exports",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A lightweight compare mode highlights differences between two exported Queue JSON snapshots from the same session",
+        "reasoning": "Two live export snapshots were taken around a status mutation, and the comparison visibly reported \u201cbluequartz/prism-diff: candidate \u2192 scored.\u201d Evidence: compare_two_exports.png"
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app includes an additional browser-observable delight, power-user, or operator-efficiency enhancement in the sourcing console that is NOT covered by any other criterion in this file and goes beyond the written specification. If present, name the enhancement and cite the concrete evidence. If nothing beyond the spec is present, answer no.",
+        "reasoning": "Candidate rows visibly provide one-click Copy commit controls, an additional operator-efficiency enhancement beyond the listed criteria. Evidence: initial-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"quota_pressure_sparklines\":{\"score\":\"yes\",\"reasoning\":\"Quota dashboard visibly includes a \u201cFill trend this session\u201d sparkline and Easy/Medium/Hard pressure summaries. Evidence: quota_pressure_sparklines.png\"},\"cluster_map_or_graph\":{\"score\":\"yes\",\"reasoning\":\"Candidate view visibly includes a Cluster map grouping repositories by shared cluster IDs. Evidence: initial-shared.png\"},\"guided_sourcing_coachmarks\":{\"score\":\"yes\",\"reasoning\":\"A visible First-run guide walks through Score \u2192 Select \u2192 Pin \u2192 Queue \u2192 Export. Evidence: initial-shared.png\"},\"queue_diff_preview\":{\"score\":\"no\",\"reasoning\":\"FAIL: Build queue and seeded import were exercised, but no preview naming changed statuses or queue positions appeared. Evidence: queue_diff_preview_import.png\"},\"keyboard_chord_cheatsheet\":{\"score\":\"yes\",\"reasoning\":\"The visible Keyboard shortcuts dialog documents Ctrl/Command-K, undo/redo, and Alt+Arrow queue movement. Evidence: keyboard_chord_cheatsheet.png\"},\"export_checksum_or_fingerprint\":{\"score\":\"yes\",\"reasoning\":\"Queue JSON visibly shows an integrity fingerprint and states it changes when session mutations change the export; a mutation changed the displayed fingerprint. Evidence: export_checksum_or_fingerprint.png\"},\"saved_filter_presets\":{\"score\":\"yes\",\"reasoning\":\"A named \u201cPython ember\u201d filter preset was saved, then filters were cleared and the preset reapplied successfully. Evidence: saved_filter_presets.png\"},\"org_diversity_dashboard\":{\"score\":\"yes\",\"reasoning\":\"Candidate view visibly includes an Org cap tracker with per-organization counts such as 1/3 and 0/3 before selection. Evidence: initial-shared.png\"},\"timeline_filter_chips\":{\"score\":\"yes\",\"reasoning\":\"Timeline visibly provides chips for All, Score, Select, Reject, Pin, Queue, and Import transitions. Evidence: timeline_filter_chips.png\"},\"compare_two_exports\":{\"score\":\"yes\",\"reasoning\":\"Two live export snapshots were taken around a status mutation, and the comparison visibly reported \u201cbluequartz/prism-diff: candidate \u2192 scored.\u201d Evidence: compare_two_exports.png\"},\"innovation_catchall\":{\"score\":\"yes\",\"reasoning\":\"Candidate rows visibly provide one-click Copy commit controls, an additional operator-efficiency enhancement beyond the listed criteria. Evidence: initial-shared.png\"}}",
+    "cost_usd": 0.3937032
+  },
+  "motion": {
+    "score": 0.5714,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "hover_feedback_on_chrome",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Hovering with the real pointer over buttons, table rows, queue entries, navigation items, and quota cells shows a visible hover treatment (wash, shadow, or background ease), and form controls show focus rings",
+        "reasoning": "PASS: Hovering Fetch more candidates visibly changed its background and added a shadow; controls expose transitions. Evidence: hover_feedback_on_chrome-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "list_add_remove_microinteractions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Driven through the real UI controls (never a state-shortcut tool call): a fetch-more candidate row animates into the table, a newly queued entry animates into the build-queue panel, and a removed queue entry animates out rather than vanishing instantly",
+        "reasoning": "FAIL: Fetch-more added candidates, but the required queue-entry add and remove animations were not fully observed; settled rows showed no add/remove animation. Evidence: list_add_remove_microinteractions-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "queue_reorder_slides_entries",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Reordering the queue by real drag or by the keyboard move controls animates entries sliding to their new positions rather than snapping, and position numbers settle correctly after the animation",
+        "reasoning": "PASS: Real Alt+ArrowDown reordered the queue; entries showed opposing transforms during the move and settled with corrected positions. Evidence: queue_reorder_slides_entries-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "progress_steps_animate",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "During a real fetch-more run, each progress step visibly transitions from pending to running to complete, the running step shows an animated activity indicator, and the completed run's notice appears with a transition",
+        "reasoning": "FAIL: Real fetch runs showed pending and complete states, but no running animated activity indicator was observed. Evidence: progress_steps_animate-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "chip_transitions_and_toasts",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Status chip changes transition their color rather than hard-swapping; the pin confirm dialog, command palette, and export/import panels enter and exit with a short opacity and scale transition of roughly 200 to 300 milliseconds through the real controls; and after pinning, queueing, copy, bulk, import, and export-copy actions a confirmation toast slides in, remains readable long enough to scan, and auto-dismisses with a fade",
+        "reasoning": "FAIL: Chip and dialog transitions were observed, but the confirmation toast remained after 3.2 seconds and no complete slide-in/fade-out lifecycle was observed. Evidence: chip_transitions_and_toasts-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "reduced_motion_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion enabled, transitions are removed and state changes apply instantly while dialogs, reorders, runs, filters, export, and import remain fully functional",
+        "reasoning": "PASS: Reduced-motion browser matched prefers-reduced-motion, transitions were reduced to 1e-05s, and command palette plus filtering remained functional. Evidence: reduced_motion_respected-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "bulk_tray_slides",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Driven through real checkbox selection: the bulk action tray slides in when a selection starts and slides out when the selection clears",
+        "reasoning": "PASS: Real checkbox selection and clearing produced a bulk tray whose opacity and transform changed during entry and exit. Evidence: bulk_tray_slides-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"hover_feedback_on_chrome\":{\"score\":\"yes\",\"reasoning\":\"PASS: Hovering Fetch more candidates visibly changed its background and added a shadow; controls expose transitions. Evidence: hover_feedback_on_chrome-shared.png\"},\"list_add_remove_microinteractions\":{\"score\":\"no\",\"reasoning\":\"FAIL: Fetch-more added candidates, but the required queue-entry add and remove animations were not fully observed; settled rows showed no add/remove animation. Evidence: list_add_remove_microinteractions-shared.png\"},\"queue_reorder_slides_entries\":{\"score\":\"yes\",\"reasoning\":\"PASS: Real Alt+ArrowDown reordered the queue; entries showed opposing transforms during the move and settled with corrected positions. Evidence: queue_reorder_slides_entries-shared.png\"},\"progress_steps_animate\":{\"score\":\"no\",\"reasoning\":\"FAIL: Real fetch runs showed pending and complete states, but no running animated activity indicator was observed. Evidence: progress_steps_animate-shared.png\"},\"chip_transitions_and_toasts\":{\"score\":\"no\",\"reasoning\":\"FAIL: Chip and dialog transitions were observed, but the confirmation toast remained after 3.2 seconds and no complete slide-in/fade-out lifecycle was observed. Evidence: chip_transitions_and_toasts-shared.png\"},\"reduced_motion_respected\":{\"score\":\"yes\",\"reasoning\":\"PASS: Reduced-motion browser matched prefers-reduced-motion, transitions were reduced to 1e-05s, and command palette plus filtering remained functional. Evidence: reduced_motion_respected-shared.png\"},\"bulk_tray_slides\":{\"score\":\"yes\",\"reasoning\":\"PASS: Real checkbox selection and clearing produced a bulk tray whose opacity and transform changed during entry and exit. Evidence: bulk_tray_slides-shared.png\"}}",
+    "cost_usd": 0.3594624
+  },
+  "performance": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_under_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive within 2 seconds of a local cold load: navigation and table controls respond",
+        "reasoning": "Interactive candidate workbench loaded in about 1.5s with responsive controls. Evidence: cold_start_under_two_seconds-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "console_clean_on_load",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No console errors or warnings appear on first load",
+        "reasoning": "Initial console inspection reported 0 errors and 0 warnings. Evidence: cold_start_under_two_seconds-shared.png"
+      },
+      {
+        "id": "9.3",
+        "name": "console_clean_full_exercise",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No console errors or warnings appear during a full exercise including fetch-more, bulk actions, command palette, export, and import",
+        "reasoning": "After fetch-more, bulk actions, palette, export, import, undo, and redo, console inspection still reported 0 errors and 0 warnings. Evidence: export_regenerates_without_freeze-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "sort_filter_search_smooth",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sorting, filtering, and name-search stay smooth with the full seeded table plus fetch-more appends; no interaction hangs the UI",
+        "reasoning": "Sorting, language filtering, and repository search completed promptly; the filtered result showed one matching row with correct search and language values. Evidence: sort_filter_search_smooth-shared.png"
+      },
+      {
+        "id": "9.5",
+        "name": "rapid_input_stable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapid repeated input \u2014 fast filter changes, quick view switches, rapid queue reorders, palette open/close \u2014 causes no dropped interactions or stale counts",
+        "reasoning": "Rapid view switching, palette open/close, filtering, search, sorting, and queue actions completed without locking the UI or leaving stale counts. Evidence: rapid_input_stable-shared.png"
+      },
+      {
+        "id": "9.6",
+        "name": "export_regenerates_without_freeze",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening Export sourcing pack regenerates Queue JSON, Candidates CSV, and Sourcing report from live state without freezing the UI for more than a brief moment",
+        "reasoning": "All three export formats regenerated from live state in about 108ms, showing the export panel and live candidate/queue counts. Evidence: export_regenerates_without_freeze-shared.png"
+      },
+      {
+        "id": "9.7",
+        "name": "fetch_more_stays_responsive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "During a fetch-more run the UI remains responsive enough to show step status changes without locking the entire chrome permanently",
+        "reasoning": "Fetch-more completed promptly, showed Querying/Scoring/Classifying status completion, and increased the table to 37 rows while controls remained usable. Evidence: fetch_more_stays_responsive-shared.png"
+      },
+      {
+        "id": "9.8",
+        "name": "bulk_action_updates_promptly",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Bulk Score/Select/Reject updates chips and rollups in the same interaction without multi-second UI lock",
+        "reasoning": "Bulk Score updated two selected candidates to Scored in about 661ms, cleared selection, and removed the bulk tray without a prolonged lock. Evidence: bulk_action_updates_promptly-shared.png"
+      },
+      {
+        "id": "9.9",
+        "name": "import_applies_without_hang",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A valid import applies statuses and queue order without hanging the page or leaving a permanent spinner",
+        "reasoning": "Seeded valid import completed and visibly reported that 31 candidates and 2 queue entries were applied, with no permanent spinner. Evidence: import_applies_without_hang-shared.png"
+      },
+      {
+        "id": "9.10",
+        "name": "undo_redo_feels_immediate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Undo and Redo restore or reapply state without multi-second delay or frozen chrome",
+        "reasoning": "Undo restored 37 rows in about 692ms and Redo reapplied 31 rows in about 648ms; chrome remained responsive. Evidence: undo_redo_feels_immediate-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_start_under_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"Interactive candidate workbench loaded in about 1.5s with responsive controls. Evidence: cold_start_under_two_seconds-shared.png\"},\"console_clean_on_load\":{\"score\":\"yes\",\"reasoning\":\"Initial console inspection reported 0 errors and 0 warnings. Evidence: cold_start_under_two_seconds-shared.png\"},\"console_clean_full_exercise\":{\"score\":\"yes\",\"reasoning\":\"After fetch-more, bulk actions, palette, export, import, undo, and redo, console inspection still reported 0 errors and 0 warnings. Evidence: export_regenerates_without_freeze-shared.png\"},\"sort_filter_search_smooth\":{\"score\":\"yes\",\"reasoning\":\"Sorting, language filtering, and repository search completed promptly; the filtered result showed one matching row with correct search and language values. Evidence: sort_filter_search_smooth-shared.png\"},\"rapid_input_stable\":{\"score\":\"yes\",\"reasoning\":\"Rapid view switching, palette open/close, filtering, search, sorting, and queue actions completed without locking the UI or leaving stale counts. Evidence: rapid_input_stable-shared.png\"},\"export_regenerates_without_freeze\":{\"score\":\"yes\",\"reasoning\":\"All three export formats regenerated from live state in about 108ms, showing the export panel and live candidate/queue counts. Evidence: export_regenerates_without_freeze-shared.png\"},\"fetch_more_stays_responsive\":{\"score\":\"yes\",\"reasoning\":\"Fetch-more completed promptly, showed Querying/Scoring/Classifying status completion, and increased the table to 37 rows while controls remained usable. Evidence: fetch_more_stays_responsive-shared.png\"},\"bulk_action_updates_promptly\":{\"score\":\"yes\",\"reasoning\":\"Bulk Score updated two selected candidates to Scored in about 661ms, cleared selection, and removed the bulk tray without a prolonged lock. Evidence: bulk_action_updates_promptly-shared.png\"},\"import_applies_without_hang\":{\"score\":\"yes\",\"reasoning\":\"Seeded valid import completed and visibly reported that 31 candidates and 2 queue entries were applied, with no permanent spinner. Evidence: import_applies_without_hang-shared.png\"},\"undo_redo_feels_immediate\":{\"score\":\"yes\",\"reasoning\":\"Undo restored 37 rows in about 692ms and Redo reapplied 31 rows in about 648ms; chrome remained responsive. Evidence: undo_redo_feels_immediate-shared.png\"}}",
+    "cost_usd": 0.2126736
+  },
+  "responsiveness": {
+    "score": 0.9,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "desktop_queue_alongside_table",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 1440px width the build-queue region is visible alongside the candidates table and the header shows navigation plus Export, Import, Undo, and Redo",
+        "reasoning": "Queue is visible beside the candidates table at 1440px, with navigation and Import, Export, Undo, and Redo in the header. Evidence: desktop_queue_alongside_table-shared.png"
+      },
+      {
+        "id": "7.2",
+        "name": "tablet_queue_collapses",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At widths of 768px and below the build-queue region collapses into a toggleable panel reachable from the header, and the quota grid scrolls within its own container if needed",
+        "reasoning": "At 768px the queue becomes a header toggle, and the quota grid uses an internal horizontal overflow container. Evidence: tablet_queue_collapses-shared.png; quota_grid_scrolls_in_container-shared.png"
+      },
+      {
+        "id": "7.3",
+        "name": "mobile_no_page_overflow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px width no content clips or overflows the viewport and no page-level horizontal scrolling appears; the candidates table scrolls within its own container",
+        "reasoning": "At 375px page scroll width matches the client width, while the wide candidates table is contained in its own horizontal scroller. Evidence: mobile_no_page_overflow-shared.png"
+      },
+      {
+        "id": "7.4",
+        "name": "mobile_header_menu_reaches_actions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px width header actions collapse into a compact menu that still reaches Export, Import, Undo, Redo, and the command palette",
+        "reasoning": "The compact menu exposes Undo, Redo, Import, Export, Command palette, and keyboard shortcuts at 375px. Evidence: mobile_header_menu_reaches_actions-shared.png"
+      },
+      {
+        "id": "7.5",
+        "name": "quota_grid_scrolls_in_container",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At narrow widths the quota grid remains usable by scrolling inside its own container rather than forcing page-level horizontal scroll",
+        "reasoning": "The quota grid overflows within a dedicated overflow-x-auto container rather than the page. Evidence: quota_grid_scrolls_in_container-shared.png"
+      },
+      {
+        "id": "7.6",
+        "name": "export_panel_usable_on_mobile",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px width the export and import panels remain readable and operable without clipped tabs or unreachable Download/Copy controls",
+        "reasoning": "Export tabs, Copy, and Download are visible and reachable on mobile; the import panel also shows file selection, seeded sample, text input, and actions. Evidence: export_panel_usable_on_mobile-clear.png; export_panel_usable_on_mobile-import-panel2.png"
+      },
+      {
+        "id": "7.7",
+        "name": "bulk_tray_adapts",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At 768px and 375px widths the bulk action tray remains usable with readable selected count and Bulk Score/Select/Reject actions",
+        "reasoning": "FAIL: After selecting a candidate at 375px, no bulk action tray or Bulk Score/Select/Reject controls appeared. Evidence: bulk_tray_adapts-mobile2.png"
+      },
+      {
+        "id": "7.8",
+        "name": "typography_remains_legible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px width repository names, chips, and rollup counts remain legible without overlapping",
+        "reasoning": "Mobile rollup counts, repository/workbench text, and status chips remain readable without visible overlap. Evidence: mobile_no_page_overflow-shared.png"
+      },
+      {
+        "id": "7.9",
+        "name": "touch_targets_reach_controls",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px width primary controls (row actions, queue moves, header menu items) remain hittable without overlapping neighbors",
+        "reasoning": "The mobile menu and queue panel expose separated, hittable controls with adequate touch-sized bounds; the candidates table remains reachable through its own scroller. Evidence: mobile_header_menu_reaches_actions-shared.png; touch_targets_reach_controls-queue.png"
+      },
+      {
+        "id": "7.10",
+        "name": "layout_stable_across_breakpoints",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Resizing from 1440px to 768px to 375px and back does not permanently break the queue panel, filters, or export entry points",
+        "reasoning": "After resizing through 1440px, 768px, and 375px, queue, filters, and export entry points remained available and the layout returned to the desktop composition. Evidence: layout_stable_across_breakpoints-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"desktop_queue_alongside_table\":{\"score\":\"yes\",\"reasoning\":\"Queue is visible beside the candidates table at 1440px, with navigation and Import, Export, Undo, and Redo in the header. Evidence: desktop_queue_alongside_table-shared.png\"},\"tablet_queue_collapses\":{\"score\":\"yes\",\"reasoning\":\"At 768px the queue becomes a header toggle, and the quota grid uses an internal horizontal overflow container. Evidence: tablet_queue_collapses-shared.png; quota_grid_scrolls_in_container-shared.png\"},\"mobile_no_page_overflow\":{\"score\":\"yes\",\"reasoning\":\"At 375px page scroll width matches the client width, while the wide candidates table is contained in its own horizontal scroller. Evidence: mobile_no_page_overflow-shared.png\"},\"mobile_header_menu_reaches_actions\":{\"score\":\"yes\",\"reasoning\":\"The compact menu exposes Undo, Redo, Import, Export, Command palette, and keyboard shortcuts at 375px. Evidence: mobile_header_menu_reaches_actions-shared.png\"},\"quota_grid_scrolls_in_container\":{\"score\":\"yes\",\"reasoning\":\"The quota grid overflows within a dedicated overflow-x-auto container rather than the page. Evidence: quota_grid_scrolls_in_container-shared.png\"},\"export_panel_usable_on_mobile\":{\"score\":\"yes\",\"reasoning\":\"Export tabs, Copy, and Download are visible and reachable on mobile; the import panel also shows file selection, seeded sample, text input, and actions. Evidence: export_panel_usable_on_mobile-clear.png; export_panel_usable_on_mobile-import-panel2.png\"},\"bulk_tray_adapts\":{\"score\":\"no\",\"reasoning\":\"FAIL: After selecting a candidate at 375px, no bulk action tray or Bulk Score/Select/Reject controls appeared. Evidence: bulk_tray_adapts-mobile2.png\"},\"typography_remains_legible\":{\"score\":\"yes\",\"reasoning\":\"Mobile rollup counts, repository/workbench text, and status chips remain readable without visible overlap. Evidence: mobile_no_page_overflow-shared.png\"},\"touch_targets_reach_controls\":{\"score\":\"yes\",\"reasoning\":\"The mobile menu and queue panel expose separated, hittable controls with adequate touch-sized bounds; the candidates table remains reachable through its own scroller. Evidence: mobile_header_menu_reaches_actions-shared.png; touch_targets_reach_controls-queue.png\"},\"layout_stable_across_breakpoints\":{\"score\":\"yes\",\"reasoning\":\"After resizing through 1440px, 768px, and 375px, queue, filters, and export entry points remained available and the layout returned to the desktop composition. Evidence: layout_stable_across_breakpoints-shared.png\"} }",
+    "cost_usd": 0.29237979999999997
+  },
+  "technical": {
+    "score": 0.4286,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "shared_state_coherence",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "All views derive from one shared collection: a status transition, queue reorder, bulk action, undo, import, or fetch-more append made anywhere is immediately reflected in the table, rollup strip, quota grid, build-queue panel, timeline, and export text without a reload, with no surface disagreeing with another",
+        "reasoning": "FAIL: Candidate, queue, timeline, and export reflected the mutation, but the complete quota-grid cross-view consistency was not fully established. Evidence: shared-coherence.png, shared-views.png, export-panel.png"
+      },
+      {
+        "id": "2.2",
+        "name": "no_storage_reload_seeded",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No browser storage is used: localStorage and sessionStorage remain empty after transitions, pinning, queue edits, bulk actions, imports, and fetch-more runs, and a page reload returns the app to its seeded state (seeded candidates and statuses, default filters and search, seeded queue and timeline baselines, empty undo history)",
+        "reasoning": "Storage remained empty, and reload restored seeded counts, filters, queue, and baseline state. Evidence: reload-seeded.png"
+      },
+      {
+        "id": "2.4",
+        "name": "console_clean_full_session",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The console is free of errors, warnings, and unhandled promise rejections on first load and stays clean after sorting, filtering, search, transitions, guard blocks, pinning, queue reorders, bulk actions, undo/redo, export, import, and fetch-more runs",
+        "reasoning": "Console inspection after the full exercised session reported 0 errors and 0 warnings. Evidence: reload-seeded.png"
+      },
+      {
+        "id": "2.5",
+        "name": "rapid_input_stability",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive (navigation and table controls respond) within 2 seconds of a local cold load, and under rapid repeated input (fast filter changes, quick view switches, rapid queue move activations, palette open/close) the UI stays responsive with no hangs and no surface showing stale counts another surface already updated, with the fetch-more control unable to start a second run while one is in progress",
+        "reasoning": "Rapid filter/search/view operations stayed responsive; fetch-more completed and the control was unavailable during the active run, preventing a second start. Evidence: fetch-more-result.png"
+      },
+      {
+        "id": "2.6",
+        "name": "keyboard_operability_focus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Every interactive control \u2014 navigation, sortable headers (exposing their sort state programmatically), filter and search controls, row actions and checkboxes, the rejection select, dialog fields, queue move and remove controls, bulk tray, Undo/Redo, Export/Import, copy controls, and command palette results \u2014 is reachable and operable with the keyboard alone, with a visible focus indicator; queue reordering is fully achievable without a pointer and a keyboard reorder is announced via a polite live region naming the entry and its new position",
+        "reasoning": "FAIL: Keyboard queue reordering worked and announced the new position, but operability and visible focus for every listed interactive control was not fully verified. Evidence: keyboard-queue-reorder.png"
+      },
+      {
+        "id": "2.7",
+        "name": "dialog_focus_and_aria_semantics",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The pin confirm dialog, command palette, and export/import panels trap focus while open, close on Escape, and return focus to their opener, and validation messages are associated with the fields they name",
+        "reasoning": "FAIL: Command-palette Escape close/focus return and pin validation semantics were observed, but complete focus trapping and Escape behavior for every required panel was not established. Evidence: command-palette.png, shared-transition-dialog.png, import-validation.png"
+      },
+      {
+        "id": "2.10",
+        "name": "field_contracts_enforced",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Rejection requires one of the five reason tokens, pin notes longer than 200 characters are rejected inline, commit hashes shown after pin are exactly 12 lowercase hex characters, and import rejects documents whose schemaVersion is not sourcing-pack/v1 or whose status/license enums are outside the allowed sets",
+        "reasoning": "FAIL: Invalid rejection reason, overlong pin notes, exact 12-character lowercase commits, and invalid schemaVersion were observed; invalid status/license enum import cases were not fully exercised. Evidence: import-validation.png, shared-transition-dialog.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"shared_state_coherence\":{\"score\":\"no\",\"reasoning\":\"FAIL: Candidate, queue, timeline, and export reflected the mutation, but the complete quota-grid cross-view consistency was not fully established. Evidence: shared-coherence.png, shared-views.png, export-panel.png\"},\"no_storage_reload_seeded\":{\"score\":\"yes\",\"reasoning\":\"Storage remained empty, and reload restored seeded counts, filters, queue, and baseline state. Evidence: reload-seeded.png\"},\"console_clean_full_session\":{\"score\":\"yes\",\"reasoning\":\"Console inspection after the full exercised session reported 0 errors and 0 warnings. Evidence: reload-seeded.png\"},\"rapid_input_stability\":{\"score\":\"yes\",\"reasoning\":\"Rapid filter/search/view operations stayed responsive; fetch-more completed and the control was unavailable during the active run, preventing a second start. Evidence: fetch-more-result.png\"},\"keyboard_operability_focus\":{\"score\":\"no\",\"reasoning\":\"FAIL: Keyboard queue reordering worked and announced the new position, but operability and visible focus for every listed interactive control was not fully verified. Evidence: keyboard-queue-reorder.png\"},\"dialog_focus_and_aria_semantics\":{\"score\":\"no\",\"reasoning\":\"FAIL: Command-palette Escape close/focus return and pin validation semantics were observed, but complete focus trapping and Escape behavior for every required panel was not established. Evidence: command-palette.png, shared-transition-dialog.png, import-validation.png\"},\"field_contracts_enforced\":{\"score\":\"no\",\"reasoning\":\"FAIL: Invalid rejection reason, overlong pin notes, exact 12-character lowercase commits, and invalid schemaVersion were observed; invalid status/license enum import cases were not fully exercised. Evidence: import-validation.png, shared-transition-dialog.png\"}}",
+    "cost_usd": 0.30236799999999997
+  },
+  "user_flows": {
+    "score": 0.6923,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "sourcing_flow_to_export",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sourcing flow end to end: score a Candidate, select it, pin it through the confirm dialog, queue it, and confirm at each step that the status chip, rollup strip, matching quota cell, and timeline update without a reload; then open Export sourcing pack and confirm Queue JSON names that repository in the queue array with its frozen commit and matching queuePosition",
+        "reasoning": "Score \u2192 select \u2192 pin \u2192 queue was completed; live rollups, statuses, timeline, and Queue JSON visibly included amberkiln/glaze-codec with commit and queuePosition. Evidence: sourcing_flow_to_export-shared.png"
+      },
+      {
+        "id": "6.2",
+        "name": "rejection_validation_blocks_invalid",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Reject flow: opening Reject and submitting with no reason shows an inline message naming the reason field and leaves the row Scored; submitting with a chosen reason moves it to Rejected showing that reason on the row and in the timeline",
+        "reasoning": "Empty rejection submission visibly showed \u201cReason field\u201d validation while remaining Scored; duplicate-cluster rejection then visibly appeared with reason and timeline entry. Evidence: rejection_validation_blocks_invalid-shared.png"
+      },
+      {
+        "id": "6.3",
+        "name": "quota_drilldown_then_select",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Quota drill-down: activate an unfilled quota cell, confirm the candidates view opens filtered to that language and band, select an eligible Scored row, return to quota, and confirm that cell's achieved count and fill bar increased by exactly one",
+        "reasoning": "FAIL: quota drill-down opened the Python/Medium filtered candidates, but selecting the eligible row did not visibly increase that quota cell\u2019s achieved count. Evidence: quota_drilldown_then_select-result-shared.png"
+      },
+      {
+        "id": "6.4",
+        "name": "queue_remove_updates_surfaces",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Queue remove flow: remove a queued entry and confirm the chip returns to Selected, positions renumber contiguously, queue-length rollup decreases by one, and the timeline records the change",
+        "reasoning": "Removing amberkiln/glaze-codec visibly reduced Build queue from 3 to 2, removed it from the queue, and renumbered the remaining entries; the mutation was recorded in the live session. Evidence: queue_remove_updates_surfaces-shared.png"
+      },
+      {
+        "id": "6.5",
+        "name": "view_switch_retains_queue_order",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "View switch: after reordering the build queue, navigate to quota or timeline and back to candidates; the queue order and position numbers remain exactly as left, with no document reload",
+        "reasoning": "After moving silversprig/moss-router to position 1, switching through quota/timeline/candidates without reload preserved positions 1 and 2 exactly. Evidence: view_switch_retains_queue_order-shared.png"
+      },
+      {
+        "id": "6.6",
+        "name": "filtered_empty_state_recoverable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edge: apply filters and search that match no candidates; the empty state names the active filters and offers clear; clearing restores the full seeded table",
+        "reasoning": "Combined Rust + Hard + \u201czzzz\u201d filters produced a visible 0-results empty state naming all active filters; clearing restored 31 rows. Evidence: filtered_empty_state_recoverable-shared.png"
+      },
+      {
+        "id": "6.7",
+        "name": "filters_and_search_update_table",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Filter and search: combining language, difficulty band, and name-search narrows the table to the intersection, and clearing restores the prior full count",
+        "reasoning": "Language Rust plus Hard plus name search \u201cglass\u201d narrowed the table to exactly glassbadger/burrow-sync; clearing restored the full 31-row table. Evidence: filters_and_search_update_table-shared.png"
+      },
+      {
+        "id": "6.8",
+        "name": "queue_panel_collapse_preserves_workflow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At widths of 768px and below, the build-queue region collapses into a toggleable panel; hiding and reopening it preserves queue order and still allows move and remove actions",
+        "reasoning": "BLOCKED: the compact queue drawer opened and exposed move/remove controls, but a command/import overlay intercepted the real move gesture, so the required move-and-remove workflow could not be completed. Evidence: queue_panel_collapse_preserves_workflow-shared.png"
+      },
+      {
+        "id": "6.9",
+        "name": "pin_and_export_overlays_behave",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Overlays: the pin confirm dialog, command palette, and export/import panels open from their controls, support cancel/Escape without corrupting status, and after a successful pin or export copy a confirmation toast appears",
+        "reasoning": "Pin confirmation dialog opened and confirmed; command palette opened and dismissed; export panel opened, and Copy produced the visible \u201cQueue JSON copied to the clipboard\u201d toast. Evidence: pin_and_export_overlays_behave-shared.png"
+      },
+      {
+        "id": "6.10",
+        "name": "guard_then_reject_recovers",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Recovery: after a blocked Select on a duplicate-cluster candidate, rejecting that candidate with duplicate-cluster succeeds; the row reads Rejected, rollups update once, and no reload is required",
+        "reasoning": "FAIL: selecting the duplicate-cluster candidate was not blocked; it became Selected, and the subsequent duplicate-cluster rejection did not succeed. Evidence: guard_then_reject_recovers-shared.png"
+      },
+      {
+        "id": "6.11",
+        "name": "bulk_then_undo_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Bulk then undo: select 3 guard-eligible Scored rows, apply Bulk Select, confirm Selected rises by exactly 3 and the tray clears; Undo restores all three chips and the rollup",
+        "reasoning": "Three visible Scored rows were selected, Bulk Select raised Selected from 4 to 7 and cleared the tray, then Undo restored Selected to 4 and all three rows to Scored. Evidence: bulk_then_undo_flow-shared.png"
+      },
+      {
+        "id": "6.12",
+        "name": "import_round_trip_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Import round trip: export Queue JSON, change a status, import the earlier JSON or seeded sample, and confirm statuses and queue order return to the pack with rollups agreeing",
+        "reasoning": "FAIL: seeded-sample import returned success, but a clear visible post-import confirmation of restored statuses, queue order, and agreeing rollups was not captured before later mutations. Evidence: import_round_trip_flow-shared.png"
+      },
+      {
+        "id": "6.13",
+        "name": "command_palette_jump_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Command palette jump: open with Control-K or Command-K, type enough to match Quota, choose it, and land on the quota view with the palette closed",
+        "reasoning": "Control-K opened the live command palette; typing \u201cQuota\u201d left the Quota destination, which was selected and landed on the quota view with the palette closed. Evidence: command_palette_jump_flow-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"sourcing_flow_to_export\":{\"score\":\"yes\",\"reasoning\":\"Score \u2192 select \u2192 pin \u2192 queue was completed; live rollups, statuses, timeline, and Queue JSON visibly included amberkiln/glaze-codec with commit and queuePosition. Evidence: sourcing_flow_to_export-shared.png\"},\"rejection_validation_blocks_invalid\":{\"score\":\"yes\",\"reasoning\":\"Empty rejection submission visibly showed \u201cReason field\u201d validation while remaining Scored; duplicate-cluster rejection then visibly appeared with reason and timeline entry. Evidence: rejection_validation_blocks_invalid-shared.png\"},\"quota_drilldown_then_select\":{\"score\":\"no\",\"reasoning\":\"FAIL: quota drill-down opened the Python/Medium filtered candidates, but selecting the eligible row did not visibly increase that quota cell\u2019s achieved count. Evidence: quota_drilldown_then_select-result-shared.png\"},\"queue_remove_updates_surfaces\":{\"score\":\"yes\",\"reasoning\":\"Removing amberkiln/glaze-codec visibly reduced Build queue from 3 to 2, removed it from the queue, and renumbered the remaining entries; the mutation was recorded in the live session. Evidence: queue_remove_updates_surfaces-shared.png\"},\"view_switch_retains_queue_order\":{\"score\":\"yes\",\"reasoning\":\"After moving silversprig/moss-router to position 1, switching through quota/timeline/candidates without reload preserved positions 1 and 2 exactly. Evidence: view_switch_retains_queue_order-shared.png\"},\"filtered_empty_state_recoverable\":{\"score\":\"yes\",\"reasoning\":\"Combined Rust + Hard + \u201czzzz\u201d filters produced a visible 0-results empty state naming all active filters; clearing restored 31 rows. Evidence: filtered_empty_state_recoverable-shared.png\"},\"filters_and_search_update_table\":{\"score\":\"yes\",\"reasoning\":\"Language Rust plus Hard plus name search \u201cglass\u201d narrowed the table to exactly glassbadger/burrow-sync; clearing restored the full 31-row table. Evidence: filters_and_search_update_table-shared.png\"},\"queue_panel_collapse_preserves_workflow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: the compact queue drawer opened and exposed move/remove controls, but a command/import overlay intercepted the real move gesture, so the required move-and-remove workflow could not be completed. Evidence: queue_panel_collapse_preserves_workflow-shared.png\"},\"pin_and_export_overlays_behave\":{\"score\":\"yes\",\"reasoning\":\"Pin confirmation dialog opened and confirmed; command palette opened and dismissed; export panel opened, and Copy produced the visible \u201cQueue JSON copied to the clipboard\u201d toast. Evidence: pin_and_export_overlays_behave-shared.png\"},\"guard_then_reject_recovers\":{\"score\":\"no\",\"reasoning\":\"FAIL: selecting the duplicate-cluster candidate was not blocked; it became Selected, and the subsequent duplicate-cluster rejection did not succeed. Evidence: guard_then_reject_recovers-shared.png\"},\"bulk_then_undo_flow\":{\"score\":\"yes\",\"reasoning\":\"Three visible Scored rows were selected, Bulk Select raised Selected from 4 to 7 and cleared the tray, then Undo restored Selected to 4 and all three rows to Scored. Evidence: bulk_then_undo_flow-shared.png\"},\"import_round_trip_flow\":{\"score\":\"no\",\"reasoning\":\"FAIL: seeded-sample import returned success, but a clear visible post-import confirmation of restored statuses, queue order, and agreeing rollups was not captured before later mutations. Evidence: import_round_trip_flow-shared.png\"},\"command_palette_jump_flow\":{\"score\":\"yes\",\"reasoning\":\"Control-K opened the live command palette; typing \u201cQuota\u201d left the Quota destination, which was selected and landed on the quota view with the palette closed. Evidence: command_palette_jump_flow-shared.png\"}}",
+    "cost_usd": 0.8562813999999999
+  },
+  "visual_design": {
+    "score": 0.625,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "sourcing_console_register",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app presents a dense sourcing-console layout: a header bar with product name, navigation for candidates, quota, and timeline, Undo and Redo, Export and Import, a dedicated build-queue region visible at desktop width, and data-dense surfaces (table, matrix grid, ordered queue list) rather than sparse marketing-style spacing",
+        "reasoning": "PASS \u2014 Desktop browser shows a dense Sourcebench header, Candidates/Quota/Timeline navigation, Undo/Redo, Import/Export, build queue, matrix, and repository table. Evidence: sourcing_console_register-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "status_and_license_chips_distinct",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The six status chips are visually distinguishable from one another without reading their labels; license chips use a visually lighter treatment than status chips so the two chip families do not read as one system; and guard explanations render in a caution treatment distinct from validation errors and success notices",
+        "reasoning": "FAIL: Status and license chips are visibly differentiated, but guard explanations versus validation errors and success notices were not fully observed. Evidence: candidates-status-license-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "quota_matrix_visual_system",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The quota grid reads as a matrix with language labels on one axis and the three band labels on the other, uniform cell sizing, fill bars sharing one visual treatment, unfilled cells clearly highlighted, and an oversubscription indicator visually distinct from the unfilled highlight",
+        "reasoning": "PASS \u2014 Quota view visibly presents language rows, Easy/Medium/Hard columns, uniform cells, fill bars, highlighted unmet cells, and distinct excess indicators. Evidence: sourcing_console_register-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "typography_hierarchy_monospace_ids",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "View titles are visibly larger than section headings, which are larger than row and label text, consistently across views, and repository names and commit hashes render in a monospaced face",
+        "reasoning": "PASS \u2014 View titles visibly exceed section and row text in size; repository names and commit/hash identifiers use monospaced typography. Evidence: candidates-status-license-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "component_state_treatments",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Buttons, selects, sortable headers, and form fields show distinct default, hover, focus (visible ring), disabled, and error treatments",
+        "reasoning": "FAIL: Default, disabled, and focus states were observed, but the complete required set including hover and error treatments was not fully verified. Evidence: component_state_treatments-error.png"
+      },
+      {
+        "id": "3.6",
+        "name": "responsive_queue_collapse_no_overflow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 768px width the build-queue region collapses into a toggleable panel reachable from the header, and at 375px width no content clips or overflows the viewport and no page-level horizontal scrolling appears, with the candidates table scrolling inside its own container",
+        "reasoning": "PASS \u2014 At 768px the queue collapses behind a header toggle; at 375px document width does not exceed the viewport and the table is inside an overflow-auto container. Evidence: responsive_queue_collapse_no_overflow-768.png and responsive_queue_collapse_no_overflow-375.png"
+      },
+      {
+        "id": "3.9",
+        "name": "panels_share_surface_language",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The bulk action tray, command palette, and export/import panels use the same surface and border language as the rest of the app rather than unstyled browser defaults",
+        "reasoning": "PASS \u2014 Bulk action tray, command palette, export panel, and import panel visibly use consistent dark surfaces, borders, spacing, and controls. Evidence: panels_export.png, panels_command_palette.png, panels_import.png"
+      },
+      {
+        "id": "3.10",
+        "name": "real_product_copy_no_lorem",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "All rendered copy is real product copy with no lorem ipsum or placeholder text; validation messages name the field and the fix; empty states explain what belongs in the region",
+        "reasoning": "FAIL: Copy is product-specific and contains no lorem ipsum, but the visible preset empty state only says \u201cNone saved yet\u201d without explaining what belongs in that region. Evidence: candidates-status-license-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"sourcing_console_register\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Desktop browser shows a dense Sourcebench header, Candidates/Quota/Timeline navigation, Undo/Redo, Import/Export, build queue, matrix, and repository table. Evidence: sourcing_console_register-shared.png\"},\"status_and_license_chips_distinct\":{\"score\":\"no\",\"reasoning\":\"FAIL: Status and license chips are visibly differentiated, but guard explanations versus validation errors and success notices were not fully observed. Evidence: candidates-status-license-shared.png\"},\"quota_matrix_visual_system\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Quota view visibly presents language rows, Easy/Medium/Hard columns, uniform cells, fill bars, highlighted unmet cells, and distinct excess indicators. Evidence: sourcing_console_register-shared.png\"},\"typography_hierarchy_monospace_ids\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 View titles visibly exceed section and row text in size; repository names and commit/hash identifiers use monospaced typography. Evidence: candidates-status-license-shared.png\"},\"component_state_treatments\":{\"score\":\"no\",\"reasoning\":\"FAIL: Default, disabled, and focus states were observed, but the complete required set including hover and error treatments was not fully verified. Evidence: component_state_treatments-error.png\"},\"responsive_queue_collapse_no_overflow\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 At 768px the queue collapses behind a header toggle; at 375px document width does not exceed the viewport and the table is inside an overflow-auto container. Evidence: responsive_queue_collapse_no_overflow-768.png and responsive_queue_collapse_no_overflow-375.png\"},\"panels_share_surface_language\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Bulk action tray, command palette, export panel, and import panel visibly use consistent dark surfaces, borders, spacing, and controls. Evidence: panels_export.png, panels_command_palette.png, panels_import.png\"},\"real_product_copy_no_lorem\":{\"score\":\"no\",\"reasoning\":\"FAIL: Copy is product-specific and contains no lorem ipsum, but the visible preset empty state only says \u201cNone saved yet\u201d without explaining what belongs in that region. Evidence: candidates-status-license-shared.png\"}}",
+    "cost_usd": 0.2384142
+  },
+  "writing": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "headings_use_consistent_capitalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders headings and section titles (Candidates, Quota, Timeline, Export sourcing pack, Import sourcing pack), they use consistent capitalization throughout",
+        "reasoning": "Headings and section titles use consistent sentence/title capitalization, including Candidate workbench, Build queue, Export sourcing pack, and Import sourcing pack. Evidence: headings_use_consistent_capitalization-shared.png"
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders button or action labels, they use specific verbs such as Score, Select, Reject, Pin, Queue, Fetch more candidates, Export sourcing pack, and Import sourcing pack rather than generic Submit or OK when a specific label is possible",
+        "reasoning": "Visible actions use specific labels such as Score, Select, Reject, Pin, Queue, Fetch more candidates, Export sourcing pack, and Import sourcing pack; no generic Submit or OK labels were observed. Evidence: actions_use_specific_labels-shared.png"
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders validation or guard messages, they name the field or constraint (reason, notes, schemaVersion, cluster id, org cap) and the fix",
+        "reasoning": "The rejection validation message identifies the problem and fix: \u201cReason field: choose one of the listed reasons.\u201d Evidence: errors_name_problem_and_fix-shared.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders empty states (no filter matches, empty queue, palette no matches), they explain what belongs there and what action produces content",
+        "reasoning": "The command palette empty state says \u201cNo matching commands\u201d and instructs the user to try typing quota, export, or a candidate action. Evidence: empty_states_explain_next_step-shared.png"
+      },
+      {
+        "id": "15.5",
+        "name": "status_chips_use_exact_tokens",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where status chips render, they use the exact tokens Candidate, Scored, Selected, Rejected, Pinned, and Queued",
+        "reasoning": "Observed status chips use the exact tokens Candidate, Scored, Selected, Rejected, Pinned, and Queued. Evidence: headings_use_consistent_capitalization-shared.png"
+      },
+      {
+        "id": "15.6",
+        "name": "license_chips_use_exact_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where license chips render, they use Permissive, Weak copyleft, Strong copyleft, or Unlicensed",
+        "reasoning": "Observed license chips use Permissive, Weak copyleft, Strong copyleft, and Unlicensed. Evidence: headings_use_consistent_capitalization-shared.png"
+      },
+      {
+        "id": "15.7",
+        "name": "rejection_reasons_use_exact_tokens",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where rejection reasons render on rows or in forms, they use the exact tokens license-blocked, gui-heavy, network-dependent, duplicate-cluster, and too-large",
+        "reasoning": "Observed rejection reasons and form options use the exact tokens license-blocked, gui-heavy, network-dependent, duplicate-cluster, and too-large. Evidence: headings_use_consistent_capitalization-shared.png"
+      },
+      {
+        "id": "15.8",
+        "name": "no_lorem_or_placeholder_copy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders product copy, there is no lorem ipsum or placeholder text such as TODO or Coming soon in chrome, empty states, or panels",
+        "reasoning": "No lorem ipsum, TODO, or Coming soon copy was observed in the rendered chrome, panels, dialogs, or empty states. Evidence: actions_use_specific_labels-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"headings_use_consistent_capitalization\":{\"score\":\"yes\",\"reasoning\":\"Headings and section titles use consistent sentence/title capitalization, including Candidate workbench, Build queue, Export sourcing pack, and Import sourcing pack. Evidence: headings_use_consistent_capitalization-shared.png\"},\"actions_use_specific_labels\":{\"score\":\"yes\",\"reasoning\":\"Visible actions use specific labels such as Score, Select, Reject, Pin, Queue, Fetch more candidates, Export sourcing pack, and Import sourcing pack; no generic Submit or OK labels were observed. Evidence: actions_use_specific_labels-shared.png\"},\"errors_name_problem_and_fix\":{\"score\":\"yes\",\"reasoning\":\"The rejection validation message identifies the problem and fix: \u201cReason field: choose one of the listed reasons.\u201d Evidence: errors_name_problem_and_fix-shared.png\"},\"empty_states_explain_next_step\":{\"score\":\"yes\",\"reasoning\":\"The command palette empty state says \u201cNo matching commands\u201d and instructs the user to try typing quota, export, or a candidate action. Evidence: empty_states_explain_next_step-shared.png\"},\"status_chips_use_exact_tokens\":{\"score\":\"yes\",\"reasoning\":\"Observed status chips use the exact tokens Candidate, Scored, Selected, Rejected, Pinned, and Queued. Evidence: headings_use_consistent_capitalization-shared.png\"},\"license_chips_use_exact_labels\":{\"score\":\"yes\",\"reasoning\":\"Observed license chips use Permissive, Weak copyleft, Strong copyleft, and Unlicensed. Evidence: headings_use_consistent_capitalization-shared.png\"},\"rejection_reasons_use_exact_tokens\":{\"score\":\"yes\",\"reasoning\":\"Observed rejection reasons and form options use the exact tokens license-blocked, gui-heavy, network-dependent, duplicate-cluster, and too-large. Evidence: headings_use_consistent_capitalization-shared.png\"},\"no_lorem_or_placeholder_copy\":{\"score\":\"yes\",\"reasoning\":\"No lorem ipsum, TODO, or Coming soon copy was observed in the rendered chrome, panels, dialogs, or empty states. Evidence: actions_use_specific_labels-shared.png\"}}",
+    "cost_usd": 0.22560959999999997
+  }
+}

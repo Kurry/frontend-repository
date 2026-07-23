@@ -264,7 +264,7 @@ const paletteTab = `
 </div>`;
 
 export const PREVIEW_TABS = [
-  { id: 'demo', label: 'Components Demo', html: demoTab },
-  { id: 'variants', label: 'Component Variants', html: variantsTab },
-  { id: 'palette', label: 'Color Palette', html: paletteTab },
+  { id: 'demo', label: 'Components demo', html: demoTab },
+  { id: 'variants', label: 'Component variants', html: variantsTab },
+  { id: 'palette', label: 'Color palette', html: paletteTab },
 ];

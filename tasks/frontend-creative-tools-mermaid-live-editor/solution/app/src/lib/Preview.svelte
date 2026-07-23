@@ -7,6 +7,9 @@
   let container = $state();
   let hasError = $state(false);
   let renderToken = 0;
+  let zoom = $state(1);
+  let panX = $state(0);
+  let panY = $state(0);
 
   const isEmpty = $derived(!store.code.trim());
   const errorActive = $derived(!!store.error);
@@ -59,7 +62,8 @@
     <div
       id="container"
       bind:this={container}
-      class="grid-bg flex h-full min-h-full w-full items-center justify-center overflow-auto p-6 transition-[opacity,filter] motion-safe:duration-300"
+      class="grid-bg flex h-full min-h-full w-full items-center justify-center overflow-auto p-6 transition-[opacity,filter] motion-safe:duration-300 duration-300 ease-in-out"
+      style="transform: scale({zoom}) translate({panX}px, {panY}px); transform-origin: center;"
       class:opacity-40={errorActive || hasError}
       class:grayscale={errorActive || hasError}
       aria-label="Diagram preview"
@@ -78,6 +82,34 @@
       Fix the source to update the preview
     </div>
   {/if}
+
+
+  <div class="absolute bottom-4 right-4 flex gap-2">
+    <button
+      type="button"
+      data-testid="zoom-in"
+      onclick={() => (zoom = Math.min(zoom + 0.25, 3))}
+      class="rounded-md bg-white px-2 py-1 text-xs font-medium text-slate-700 shadow-sm border border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 dark:hover:bg-slate-700"
+    >
+      Zoom In
+    </button>
+    <button
+      type="button"
+      data-testid="zoom-out"
+      onclick={() => (zoom = Math.max(zoom - 0.25, 0.25))}
+      class="rounded-md bg-white px-2 py-1 text-xs font-medium text-slate-700 shadow-sm border border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 dark:hover:bg-slate-700"
+    >
+      Zoom Out
+    </button>
+    <button
+      type="button"
+      data-testid="zoom-fit"
+      onclick={() => { zoom = 1; panX = 0; panY = 0; }}
+      class="rounded-md bg-white px-2 py-1 text-xs font-medium text-slate-700 shadow-sm border border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 dark:hover:bg-slate-700"
+    >
+      Fit
+    </button>
+  </div>
 
   <p class="sr-only" role="status" aria-live="polite">
     {#if isEmpty}

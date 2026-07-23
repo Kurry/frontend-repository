@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Warehouse evaluation scene">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#b9ddff"/><stop offset="1" stop-color="#eef7ff"/></linearGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d8dee4"/><stop offset="1" stop-color="#a8b1bb"/></linearGradient>
+  </defs>
+  <rect width="640" height="230" fill="url(#sky)"/><rect y="230" width="640" height="130" fill="url(#floor)"/>
+  <rect x="38" y="88" width="188" height="160" rx="4" fill="#697986"/><rect x="54" y="105" width="46" height="48" fill="#f1c21b"/><rect x="112" y="105" width="46" height="48" fill="#fa4d56"/><rect x="170" y="105" width="40" height="48" fill="#42be65"/>
+  <rect x="54" y="170" width="156" height="12" fill="#343a3f"/><rect x="60" y="190" width="58" height="48" fill="#8a3ffc"/><rect x="132" y="190" width="70" height="48" fill="#ff832b"/>
+  <path d="M368 244h142l34 47H338z" fill="#525a61"/><rect x="388" y="183" width="104" height="68" rx="5" fill="#0f62fe"/><rect x="402" y="196" width="34" height="30" fill="#d0e2ff"/><circle cx="384" cy="292" r="22" fill="#21272a"/><circle cx="505" cy="292" r="22" fill="#21272a"/>
+  <circle cx="284" cy="182" r="18" fill="#f1c21b"/><path d="M265 205h38l14 68h-66z" fill="#198038"/><path d="M264 223l-42 30M301 224l38 19" stroke="#5c341e" stroke-width="10" stroke-linecap="round"/><path d="M268 272l-14 61M298 272l18 61" stroke="#343a3f" stroke-width="12" stroke-linecap="round"/>
+  <rect x="524" y="92" width="78" height="112" fill="#fff" stroke="#525252" stroke-width="4"/><path d="M542 120h43M542 140h43M542 160h30" stroke="#0f62fe" stroke-width="5"/>
+  <text x="20" y="335" font-family="sans-serif" font-size="13" fill="#343a3f">Locally bundled evaluation image · 640 × 360</text>
+</svg>

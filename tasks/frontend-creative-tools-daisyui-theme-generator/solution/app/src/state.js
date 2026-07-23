@@ -6,6 +6,16 @@ import { encodeThemeHash, decodeThemeHash, slugOf, NAME_RE, validateDeclaredThem
 
 const clone = (x) => JSON.parse(JSON.stringify(x));
 
+// Token snapshot used as a per-theme reset baseline (captured at create /
+// fork / import time so Reset restores the theme's own prior defaults, not
+// the seeded light theme's).
+function tokensOf(t) {
+  return clone({
+    colors: t.colors, radius: t.radius, size: t.size, border: t.border,
+    depth: t.depth, noise: t.noise, fontFamily: t.fontFamily, options: t.options,
+  });
+}
+
 export const state = {
   customs: [],          // user-created theme records
   activeId: 'builtin-light',
@@ -32,6 +42,26 @@ export function byId(id) {
 
 export function activeTheme() {
   return byId(state.activeId) || BUILTINS[0];
+}
+
+// A decoded hash payload whose name and tokens exactly match a built-in is
+// the built-in (e.g. a shared URL captured while a pristine built-in was
+// active) — select it instead of manufacturing a duplicate custom copy.
+function builtinMatching(decoded) {
+  const slug = slugOf(decoded.name);
+  const b = BUILTINS.find((t) => slugOf(t.name) === slug);
+  if (!b) return null;
+  const same = COLOR_KEYS.every((k) => String(b.colors[k]).toLowerCase() === decoded.colors[k])
+    && ['box', 'field', 'selector'].every((g) => b.radius[g] === decoded.radius[g])
+    && ['field', 'selector'].every((k) => b.size[k] === decoded.size[k])
+    && b.border === decoded.border
+    && b.depth === decoded.depth
+    && b.noise === decoded.noise
+    && b.fontFamily === decoded.fontFamily
+    && !!b.options.defaultTheme === decoded.options.defaultTheme
+    && !!b.options.defaultDarkTheme === decoded.options.defaultDarkTheme
+    && !!b.options.darkColorScheme === decoded.options.darkColorScheme;
+  return same ? b : null;
 }
 
 export function findByName(name) {
@@ -125,15 +155,22 @@ export function watchHash() {
       notify('structure');
       return;
     }
+    const b = builtinMatching(decoded);
+    if (b) {
+      state.activeId = b.id;
+      notify('structure');
+      return;
+    }
     const slug = slugOf(decoded.name);
     let rec = state.customs.find((c) => slugOf(c.name) === slug);
     if (!rec) {
       rec = {
         id: `custom-${slug}-${Date.now().toString(36)}`,
         builtin: false,
-        name: decoded.name,
         ...clone(decoded),
+        name: decoded.name,
       };
+      rec.baseline = tokensOf(rec);
       state.customs.push(rec);
     } else {
       Object.assign(rec, clone(decoded), { name: rec.name });
@@ -171,6 +208,7 @@ export function ensureEditable() {
   copy.builtin = false;
   copy.name = name;
   copy.generatedAt = new Date().toISOString();
+  copy.baseline = tokensOf(t); // pristine source tokens, pre-mutation
   state.customs.push(copy);
   state.activeId = copy.id;
   return copy;
@@ -246,15 +284,19 @@ export function setOption(key, value) {
 export function resetActive() {
   const t = activeTheme();
   if (t.builtin) return false; // built-ins are already pristine
-  const pristine = BUILTINS[0];
+  // Restore the theme's own baseline (its tokens at create / fork / import
+  // time) so Reset reverts session edits rather than snapping every custom
+  // theme to the seeded light defaults.
+  const base = t.baseline || tokensOf(BUILTINS[0]);
   pushHistory();
-  t.colors = clone(pristine.colors);
-  t.radius = { box: '0.5rem', field: '0.25rem', selector: '0.25rem' };
-  t.size = { field: 'md', selector: 'md' };
-  t.border = '1px';
-  t.depth = 1;
-  t.noise = 0;
-  t.fontFamily = 'outfit';
+  t.colors = clone(base.colors);
+  t.radius = clone(base.radius);
+  t.size = clone(base.size);
+  t.border = base.border;
+  t.depth = base.depth;
+  t.noise = base.noise;
+  t.fontFamily = base.fontFamily;
+  t.options = clone(base.options);
   syncHash();
   notify('structure');
   return true;
@@ -302,7 +344,7 @@ export function createTheme(name) {
   const trimmed = String(name || '').trim();
   if (!trimmed) return { ok: false, error: 'Name is required — give the theme a name before adding it' };
   if (trimmed.length < 2 || trimmed.length > 30) return { ok: false, error: 'Name must be 2–30 characters long' };
-  if (!NAME_RE.test(trimmed)) return { ok: false, error: 'Name must start with a lowercase letter and use only lowercase letters, numbers, hyphens, and underscores' };
+  if (!NAME_RE.test(trimmed)) return { ok: false, error: 'Name must start with a letter and use only letters, numbers, spaces, hyphens, and underscores' };
   if (findByName(trimmed)) return { ok: false, error: `A theme named “${trimmed}” already exists — pick a unique name` };
   pushHistory();
   const seed = BUILTINS[0];
@@ -320,6 +362,7 @@ export function createTheme(name) {
     options: { ...seed.options, defaultTheme: false },
     generatedAt: new Date().toISOString(),
   };
+  rec.baseline = tokensOf(rec);
   state.customs.push(rec);
   state.activeId = rec.id;
   syncHash();
@@ -332,7 +375,7 @@ export function validateRename(raw) {
   const trimmed = String(raw || '').trim();
   if (!trimmed) return { ok: false, error: 'Name is required — the theme keeps its current name' };
   if (trimmed.length < 2 || trimmed.length > 30) return { ok: false, error: 'Name must be 2–30 characters long' };
-  if (!NAME_RE.test(trimmed)) return { ok: false, error: 'Name must start with a lowercase letter and use only lowercase letters, numbers, hyphens, and underscores' };
+  if (!NAME_RE.test(trimmed)) return { ok: false, error: 'Name must start with a letter and use only letters, numbers, spaces, hyphens, and underscores' };
   const clash = state.customs.find((t) => t.id !== state.activeId && slugOf(t.name) === slugOf(trimmed));
   if (clash) return { ok: false, error: `A theme named “${trimmed}” already exists in My Themes` };
   return { ok: true, value: trimmed };
@@ -377,7 +420,9 @@ export function removeTheme(id, animate = true) {
   state.snapshots = state.snapshots.filter((s) => s.themeId !== id);
   if (animate) {
     leavingRows.set(id, t);
-    setTimeout(() => { leavingRows.delete(id); removing.delete(id); notify('structure'); }, 260);
+    // Ghost lives long enough for the expanded→collapsed exit transition
+    // (0.24s) to start on the next frame and fully play out.
+    setTimeout(() => { leavingRows.delete(id); removing.delete(id); notify('structure'); }, 450);
   } else {
     removing.delete(id);
   }
@@ -398,6 +443,7 @@ export function importFromText(text) {
     name,
     generatedAt: res.theme.generatedAt,
   };
+  rec.baseline = tokensOf(rec);
   state.customs.push(rec);
   state.activeId = rec.id;
   syncHash();
@@ -465,6 +511,7 @@ export function loadFromHash() {
     state.activeId = 'builtin-light';
     state.previewTab = 'demo';
     state.colorBlind = 'none';
+    try { history.replaceState(null, '', location.pathname + location.search); } catch { /* noop */ }
     notify('structure');
     return false;
   }
@@ -482,13 +529,20 @@ export function loadFromHash() {
     notify('structure');
     return false;
   }
+  const b = builtinMatching(decoded);
+  if (b) {
+    state.activeId = b.id;
+    notify('structure');
+    return true;
+  }
   const name = uniqueName(decoded.name);
   const rec = {
     id: `custom-${slugOf(name)}-${Date.now().toString(36)}`,
     builtin: false,
-    name,
     ...clone(decoded),
+    name,
   };
+  rec.baseline = tokensOf(rec);
   state.customs.push(rec);
   state.activeId = rec.id;
   return true;

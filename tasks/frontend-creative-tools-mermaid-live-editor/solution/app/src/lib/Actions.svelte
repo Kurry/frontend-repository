@@ -12,7 +12,7 @@
   let toastTimer;
   let copiedTimer;
 
-  const disabled = $derived(!!store.error || !store.code.trim());
+  const disabled = $derived(!!store.error || !!store.configError || !store.code.trim());
 
   const motion = (base) => (prefersReducedMotion.current ? 0 : base);
 

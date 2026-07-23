@@ -9,6 +9,7 @@ export default defineConfig({
   testDir: '.',
   testMatch: 'e2e.spec.mjs',
   timeout: 30_000,
+  workers: 2,
   retries: 0,
   reporter: [['list']],
 });

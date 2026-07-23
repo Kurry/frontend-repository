@@ -100,3 +100,12 @@ Criteria are authored directly as `[[criterion]]` entries in the dimension tomls
 ## Pull request messages
 
 PR bodies are checkable specifications, not summaries. Always include: (1) a **What this PR does** paragraph naming the exact task/tooling touched and linked issue; (2) a **This PR must** checklist itemizing every intended change — for oracle fixes, one item per addressed criterion with its name and the previously observed failure; (3) a **Verification contract** listing the commands run and their observable results (build clean, port-3000 serve with zero console errors, WebMCP round-trip, verification media committed, no out-of-scope changes). Bugbot reviews PRs against their stated promises — a thin body makes the review vacuous, so it is treated as a defect.
+
+## Cursor Cloud specific instructions
+
+The startup update script runs `uv sync` (Python `uv` workspace: `harbor` fork + `corpuscheck`) and `npm ci` (root npm workspace: `@zto/webmcp-contracts` + Playwright/ESLint dev deps). `uv` lives at `~/.local/bin`; if it is not on `PATH` in a fresh shell, invoke it as `~/.local/bin/uv`. Standard commands live in this file's **Commands** section, `README.md`, root `package.json` scripts, and per-task `solution/app/package.json` — reference those rather than re-deriving them.
+
+- **`uv sync` and root `npm ci` do NOT install per-task oracle dependencies.** Each `tasks/<slug>/solution/app/` is its own npm project. To run/build an oracle: `cd tasks/<slug>/solution/app && npm install && npm run verify:build && npm run start` (serves on `http://localhost:3000` via `vite preview --strictPort`, so free port 3000 first). There are ~100 task apps; install only the one(s) you are working on, on demand.
+- **`uv run corpuscheck propagate --check` reports pre-existing drift** (~133 files across tasks) on a clean checkout — this is the corpus's committed state, not a setup failure. Only treat NEW drift you introduce as actionable.
+- **`corpuscheck validate` takes task names as positional args** (e.g. `uv run corpuscheck validate frontend-game-letterdrop --root tasks`), not `-i`. Use `--all` for the whole corpus.
+- **The full `harbor run` builder+verifier loop is NOT set up here.** It needs Docker (not installed) plus external LLM credentials — `CLAUDE_CODE_OAUTH_TOKEN` (builder) and `OPENAI_API_KEY`/`CODEX_AUTH_JSON` (judge, `REWARDKIT_MODEL=gpt-5.6-luna` for the cheap dev tier). Day-to-day authoring/validation and running oracle apps do not require it.

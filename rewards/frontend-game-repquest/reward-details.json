@@ -1,0 +1,2848 @@
+{
+  "accessibility": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "controls_keyboard_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every interactive control (tabs, form fields, buttons, toggles, Export/Import, Difficulty, Save Progress, Resume Saved Run) is reachable and operable with the keyboard alone, with a visible focus indicator",
+        "reasoning": "Native tabs, buttons, inputs, comboboxes, and checkboxes are keyboard reachable; focus visibly cycles through controls. Evidence: keyboard-focus-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "reset_dialog_focus_trap",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Reset Quest confirmation dialog traps focus while open, closes on Escape, and returns focus to the Reset Quest control on close",
+        "reasoning": "The reset dialog trapped Tab focus between Cancel and Reset everything, Escape closed it, and focus returned to Reset quest. Evidence: reset-dialog-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "icons_have_accessible_names",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Icon-only controls expose accessible names (aria-label or equivalent) so their purpose is available to assistive tech",
+        "reasoning": "Icon-only controls exposed accessible names such as Amber accent, Teal accent, Rose accent, and Dismiss notification. Evidence: settings snapshot state in reset-dialog-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "notifications_aria_live",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Transient notification banners (zone unlocked, boss defeated, gear bought, quest reset, daily reminder, export/import feedback, Victory, Defeat) are announced through an aria-live region as well as shown visually",
+        "reasoning": "Transient feedback appeared visually and in a role=status aria-live=polite region, including Victory and Logged 7 reps. Evidence: victory-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "forms_have_explicit_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Log Reps, Settings (dailyGoal, reminderEnabled, reminderHour), and note fields use explicit labels associated with their inputs",
+        "reasoning": "Log reps, note, daily goal, reminder, and reminder-hour fields had associated labels verified through the browser DOM. Evidence: quest-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "headings_follow_logical_order",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Visible headings follow a logical order without skipping levels across Quest, History, Gear, and Settings",
+        "reasoning": "Visible headings followed H1 RepQuest, H2 section headings, and H3 subsections without skipped levels across views. Evidence: quest-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "landmark_navigation_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Primary regions use landmark structure (main/nav or equivalent roles) so tabs and play surfaces are reachable by landmark navigation",
+        "reasoning": "The app exposed banner, tablist navigation, main content, tabpanels, regions, and contentinfo landmarks. Evidence: quest-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "text_and_controls_have_contrast",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Body text, totals, and primary controls maintain readable contrast against their backgrounds",
+        "reasoning": "Body text and primary controls rendered with bright foreground colors against dark backgrounds, with readable contrast. Evidence: initial-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "canvas_labels_and_text_mirror",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Each canvas surface (quest map, weekly summary chart) carries an accessible label describing what it shows, and today's total, lifetime reps, and per-day totals are also available as visible text outside the canvas",
+        "reasoning": "The quest map and weekly chart had accessible labels, while lifetime reps, today\u2019s total, and per-day totals were rendered as visible text outside the graphics. Evidence: quest-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "victory_defeat_not_color_only",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Victory versus Defeat is distinguishable by text (the words Victory and Defeat), not by color alone",
+        "reasoning": "The completed challenge displayed explicit Victory text and the challenge UI exposed textual run-status states, so outcome communication is not color-only. Evidence: victory-shared.png"
+      },
+      {
+        "id": "1.11",
+        "name": "heatmap_has_text_summary",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The streak heat-map exposes a text summary of recent day totals or an accessible description so the pattern is not color-only",
+        "reasoning": "The heat-map included accessible per-day button names and a full visible text summary of recent day totals. Evidence: quest-shared.png"
+      },
+      {
+        "id": "1.12",
+        "name": "reduced_motion_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When prefers-reduced-motion is enabled, non-essential motion (confetti loops, attention pulses) is reduced or disabled while controls remain usable",
+        "reasoning": "With prefers-reduced-motion enabled, computed transition durations were reduced to 0.01s and animations were non-looping while controls remained usable. Evidence: reduced-motion-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"controls_keyboard_accessible\":{\"score\":\"yes\",\"reasoning\":\"Native tabs, buttons, inputs, comboboxes, and checkboxes are keyboard reachable; focus visibly cycles through controls. Evidence: keyboard-focus-shared.png\"},\"reset_dialog_focus_trap\":{\"score\":\"yes\",\"reasoning\":\"The reset dialog trapped Tab focus between Cancel and Reset everything, Escape closed it, and focus returned to Reset quest. Evidence: reset-dialog-shared.png\"},\"icons_have_accessible_names\":{\"score\":\"yes\",\"reasoning\":\"Icon-only controls exposed accessible names such as Amber accent, Teal accent, Rose accent, and Dismiss notification. Evidence: settings snapshot state in reset-dialog-shared.png\"},\"notifications_aria_live\":{\"score\":\"yes\",\"reasoning\":\"Transient feedback appeared visually and in a role=status aria-live=polite region, including Victory and Logged 7 reps. Evidence: victory-shared.png\"},\"forms_have_explicit_labels\":{\"score\":\"yes\",\"reasoning\":\"Log reps, note, daily goal, reminder, and reminder-hour fields had associated labels verified through the browser DOM. Evidence: quest-shared.png\"},\"headings_follow_logical_order\":{\"score\":\"yes\",\"reasoning\":\"Visible headings followed H1 RepQuest, H2 section headings, and H3 subsections without skipped levels across views. Evidence: quest-shared.png\"},\"landmark_navigation_present\":{\"score\":\"yes\",\"reasoning\":\"The app exposed banner, tablist navigation, main content, tabpanels, regions, and contentinfo landmarks. Evidence: quest-shared.png\"},\"text_and_controls_have_contrast\":{\"score\":\"yes\",\"reasoning\":\"Body text and primary controls rendered with bright foreground colors against dark backgrounds, with readable contrast. Evidence: initial-shared.png\"},\"canvas_labels_and_text_mirror\":{\"score\":\"yes\",\"reasoning\":\"The quest map and weekly chart had accessible labels, while lifetime reps, today\u2019s total, and per-day totals were rendered as visible text outside the graphics. Evidence: quest-shared.png\"},\"victory_defeat_not_color_only\":{\"score\":\"yes\",\"reasoning\":\"The completed challenge displayed explicit Victory text and the challenge UI exposed textual run-status states, so outcome communication is not color-only. Evidence: victory-shared.png\"},\"heatmap_has_text_summary\":{\"score\":\"yes\",\"reasoning\":\"The heat-map included accessible per-day button names and a full visible text summary of recent day totals. Evidence: quest-shared.png\"},\"reduced_motion_respected\":{\"score\":\"yes\",\"reasoning\":\"With prefers-reduced-motion enabled, computed transition durations were reduced to 0.01s and animations were non-looping while controls remained usable. Evidence: reduced-motion-shared.png\"}}",
+    "cost_usd": 0.2649586
+  },
+  "behavioral": {
+    "score": 0.8,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_persistence_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After logging sets, unlocking and equipping gear, saving a dailyGoal, and optionally saving a challenge checkpoint, a full page reload restores all of those facets coherently from localStorage \u2014 never a mix of restored and reset values",
+        "reasoning": "BLOCKED: Full workflow with a saved dailyGoal, gear state, and reload was not completed end-to-end. Evidence: multi_facet_persistence_round_trip-shared.png"
+      },
+      {
+        "id": "14.2",
+        "name": "history_order_most_recent_first",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With at least three logged sets of different reps, History lists them most recent first; after reload the same order and reps remain",
+        "reasoning": "Three sets appeared in History as 15, 10, 5; the same ordering and reps were observed after reload. Evidence: history_order_most_recent_first-shared.png"
+      },
+      {
+        "id": "14.3",
+        "name": "derived_surfaces_track_log_and_delete",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Logging a set changes weekly-chart today's bar, personal records when broken, and today's heat-map cell; deleting that set recomputes those derived surfaces from remaining entries",
+        "reasoning": "Logging produced 30 reps in today\u2019s heat-map/chart and records; deleting the 15-rep set recomputed them to 15 reps. Evidence: history_order_most_recent_first-shared.png"
+      },
+      {
+        "id": "14.4",
+        "name": "cross_view_echo_quest_history_gear",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Logging a set on Quest updates History without reload; unlocking gear on Gear updates the quest-point balance and equipped appearance on Quest without reload",
+        "reasoning": "Quest logging updated History immediately, and unlocking/equipping Warrior armor updated QP and Quest\u2019s equipped state without reload. Evidence: multi_facet_persistence_round_trip-shared.png"
+      },
+      {
+        "id": "14.5",
+        "name": "count_delta_exact_on_log",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Measuring lifetime reps immediately before and after logging N reps shows a delta of exactly N with no off-by-one or lag",
+        "reasoning": "Lifetime reps changed from 0 to exactly 7 after logging 7 reps, with no lag or extra increment. Evidence: undo_restores_prior_snapshot-shared.png"
+      },
+      {
+        "id": "14.6",
+        "name": "different_inputs_change_export",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Logging two sessions with different reps (or different gear unlocks) produces Export Quest Log JSON whose sets/lifetimeReps/unlockedGearIds differ accordingly",
+        "reasoning": "The visible JSON preview changed from empty/zero state to a payload containing sets with 5/10/15 reps and unlocked/equipped Warrior gear. Evidence: multi_facet_persistence_round_trip-shared.png"
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_quest_and_challenge",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Starting a challenge run, switching back to Quest to inspect History, then returning to Challenge preserves the in-progress run state and does not corrupt History totals",
+        "reasoning": "An active challenge run survived switching through History and back to Quest/Challenge; History state retained lifetime 30 and the logged-set entries. Evidence: history_order_most_recent_first-shared.png"
+      },
+      {
+        "id": "14.8",
+        "name": "empty_to_repopulated_after_reset",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Confirming Reset Quest empties History and zeros lifetime reps; logging a new set repopulates History, chart, and heat-map from that set alone",
+        "reasoning": "Reset visibly emptied History and zeroed lifetime reps; a subsequent real UI log of 7 reps repopulated History, chart, and heat-map with 7 alone. Evidence: empty_to_repopulated_after_reset-shared.png"
+      },
+      {
+        "id": "14.9",
+        "name": "export_import_behavioral_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Mutate state (log sets, unlock gear), export Quest Log, reset, import the file: History reps, lifetimeReps, unlocked gear, and equipped appearance match the pre-reset export",
+        "reasoning": "BLOCKED: Export/reset/import was not completed and verified end-to-end in the browser. Evidence: empty_to_repopulated_after_reset-shared.png"
+      },
+      {
+        "id": "14.10",
+        "name": "undo_restores_prior_snapshot",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After logging a set then Undo, lifetime reps, streak, quest points, and History return to the prior snapshot values shown in the History state region",
+        "reasoning": "After logging 7 reps, Undo restored lifetime reps, streak, QP, heat-map, and History state to the prior zero snapshot. Evidence: undo_restores_prior_snapshot-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"multi_facet_persistence_round_trip\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Full workflow with a saved dailyGoal, gear state, and reload was not completed end-to-end. Evidence: multi_facet_persistence_round_trip-shared.png\"},\"history_order_most_recent_first\":{\"score\":\"yes\",\"reasoning\":\"Three sets appeared in History as 15, 10, 5; the same ordering and reps were observed after reload. Evidence: history_order_most_recent_first-shared.png\"},\"derived_surfaces_track_log_and_delete\":{\"score\":\"yes\",\"reasoning\":\"Logging produced 30 reps in today\u2019s heat-map/chart and records; deleting the 15-rep set recomputed them to 15 reps. Evidence: history_order_most_recent_first-shared.png\"},\"cross_view_echo_quest_history_gear\":{\"score\":\"yes\",\"reasoning\":\"Quest logging updated History immediately, and unlocking/equipping Warrior armor updated QP and Quest\u2019s equipped state without reload. Evidence: multi_facet_persistence_round_trip-shared.png\"},\"count_delta_exact_on_log\":{\"score\":\"yes\",\"reasoning\":\"Lifetime reps changed from 0 to exactly 7 after logging 7 reps, with no lag or extra increment. Evidence: undo_restores_prior_snapshot-shared.png\"},\"different_inputs_change_export\":{\"score\":\"yes\",\"reasoning\":\"The visible JSON preview changed from empty/zero state to a payload containing sets with 5/10/15 reps and unlocked/equipped Warrior gear. Evidence: multi_facet_persistence_round_trip-shared.png\"},\"interleaved_quest_and_challenge\":{\"score\":\"yes\",\"reasoning\":\"An active challenge run survived switching through History and back to Quest/Challenge; History state retained lifetime 30 and the logged-set entries. Evidence: history_order_most_recent_first-shared.png\"},\"empty_to_repopulated_after_reset\":{\"score\":\"yes\",\"reasoning\":\"Reset visibly emptied History and zeroed lifetime reps; a subsequent real UI log of 7 reps repopulated History, chart, and heat-map with 7 alone. Evidence: empty_to_repopulated_after_reset-shared.png\"},\"export_import_behavioral_round_trip\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Export/reset/import was not completed and verified end-to-end in the browser. Evidence: empty_to_repopulated_after_reset-shared.png\"},\"undo_restores_prior_snapshot\":{\"score\":\"yes\",\"reasoning\":\"After logging 7 reps, Undo restored lifetime reps, streak, QP, heat-map, and History state to the prior zero snapshot. Evidence: undo_restores_prior_snapshot-shared.png\"}}",
+    "cost_usd": 0.39759639999999996
+  },
+  "core_features": {
+    "score": 0.4444,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "quest_tab_initial_layout",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "On load, the Quest tab shows a canvas quest map with numbered waypoint markers and a character sprite on the path, a Log Reps form (number input plus Log reps button), the daily-goal progress indicator, a Current Streak counter, the History state region, Personal Records or streak heat-map surfaces, and the weekly summary chart, and the History tab shows the empty-state placeholder before any set is logged",
+        "reasoning": "BLOCKED: Quest layout was observed, but the pre-log History empty state was not verified in the same workflow. Evidence: quest_tab_initial_layout-desktop.png"
+      },
+      {
+        "id": "1.2",
+        "name": "log_reps_updates_totals_and_advances",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After logging a set with a valid positive whole number of reps from 1 through 9999, today's total and lifetime reps increase by exactly that amount and the character visibly advances along the quest map canvas without a page reload",
+        "reasoning": "Logged 12 reps; lifetime and today both increased from 0 to 12 and the live map remained rendered. Evidence: log_set_flow_cross_surface-after-12.png"
+      },
+      {
+        "id": "1.3",
+        "name": "log_reps_inline_validation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "While the Log Reps field holds an invalid value (empty, zero, negative, non-integer, or outside 1 through 9999), an inline error message names the reps field and the rule it breaks before submit, the Log reps control is disabled or rejects the submission, and today's total, lifetime reps, and the character position stay unchanged",
+        "reasoning": "FAIL: Invalid 0 showed an inline rule error only after submission, not while the field merely held the invalid value. Evidence: log_set_flow_cross_surface-after-12.png"
+      },
+      {
+        "id": "1.4",
+        "name": "zone_unlock_palette_and_notification",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After logging enough reps to cross a waypoint into a new zone, the quest map canvas background switches to that zone's own distinct sky/ground palette and a Zone Unlocked notification appears exactly once for that zone, not again on later visits or later sets",
+        "reasoning": "BLOCKED: The waypoint-crossing workflow was not completed successfully, so palette and one-time notification behavior could not be verified. Evidence: zone_unlock_palette_and_notification.png"
+      },
+      {
+        "id": "1.5",
+        "name": "boss_defeat_marker_and_bonus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After logging a qualifying set on a Boss Challenge waypoint (lifetime reps at or past the waypoint and the single set meeting its stated minimum reps), the boss marker permanently switches to a defeated treatment and bonus Quest Points are awarded",
+        "reasoning": "BLOCKED: A qualifying Quest-map boss waypoint set was not reached and verified. Evidence: quest_tab_initial_layout-desktop.png"
+      },
+      {
+        "id": "1.6",
+        "name": "gear_unlock_and_equip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After earning enough quest points and unlocking a Gear Shop outfit, the outfit shows a full-color unlocked treatment instead of its prior muted/grayscale locked treatment, and selecting Equip immediately changes the character's appearance on the quest map canvas",
+        "reasoning": "Warrior armor unlocked for 15 QP, changed to an Equip control, and equipping produced an immediate equipped notification with the Quest map still rendered. Evidence: gear_unlock_and_equip-after-equip.png"
+      },
+      {
+        "id": "1.7",
+        "name": "delete_entry_recalculates_from_remaining",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After deleting a History entry, exactly that entry disappears from the list and today's total, lifetime reps, quest points, unlocked zones, defeated bosses, the streak, personal records, and heat-map cells are recalculated from the remaining entries rather than by adjusting a running total",
+        "reasoning": "FAIL: A history entry disappeared and totals recalculated, but every required derived facet was not verified end-to-end. Evidence: history_list_order_and_details-after-12.png"
+      },
+      {
+        "id": "1.8",
+        "name": "refresh_restores_all_facets_coherently",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After logging sets, unlocking and equipping gear, setting a daily goal, and saving a challenge checkpoint when applicable, a full page refresh restores lifetime reps, the character's waypoint position, current streak, quest points, unlocked zones and gear, equipped gear, the full rep history, settings, personal records, heat-map day totals, and any challenge checkpoint exactly as they were \u2014 all facets coherently, never a mix of restored and reset values",
+        "reasoning": "FAIL: Refresh preserved core totals, streak, goal, records, history, and QP, but the complete required facet set was not fully verified after refresh. Evidence: refresh_restores_all_facets_coherently.png"
+      },
+      {
+        "id": "1.9",
+        "name": "mode_switch_round_trip_preserves_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Switching Game Mode from Quest to Challenge and back preserves lifetime reps, today's total, quest points, the History list, and any in-progress challenge run state identically before and after the round trip, and only one mode's panel (map/log form or Boss Challenge panel) is visible at a time",
+        "reasoning": "Challenge and Quest panels switched exclusively while lifetime reps, streak, QP, and history-state values remained unchanged. Evidence: challenge_lifecycle_and_targets.png"
+      },
+      {
+        "id": "1.10",
+        "name": "undo_redo_steps_through_snapshots",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After performing a recorded sequence of state-changing actions (log a set, update the daily goal, buy gear), each Undo updates the History state region's snapshot label and the displayed lifetime reps, streak, and quest points to the prior snapshot's values, and each Redo steps forward through the same sequence",
+        "reasoning": "Undo changed the snapshot label and QP from 22 to 12; Redo restored the Scenario B snapshot and QP 22. Evidence: challenge_lifecycle_and_targets.png"
+      },
+      {
+        "id": "1.11",
+        "name": "undo_branching_preserves_branches",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After Undo followed by a different action (not Redo), a new selectable branch appears in a branch list rather than the redo-able snapshots being overwritten or silently discarded, and selecting the earlier branch restores its exact prior visible state (lifetime reps, streak, quest points, History list)",
+        "reasoning": "Undo followed by a different scenario created visible Main and Branch 2 buttons; selecting Main restored the earlier QP 12/streak 0 state. Evidence: challenge_lifecycle_and_targets.png"
+      },
+      {
+        "id": "1.12",
+        "name": "reset_quest_confirmation_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Activating the Reset Quest control opens a confirmation dialog first; confirming wipes lifetime reps, streak, quest points, unlocked zones/gear, the full rep history, personal records, heat-map day cells, and any challenge checkpoint back to a fresh start, while Cancel leaves all state untouched",
+        "reasoning": "Reset opened a confirmation dialog; Cancel left state intact, and Reset everything returned lifetime, QP, streak, gear list, and sets to fresh-start values. Evidence: reset_quest_confirmation_flow-after-reset.png"
+      },
+      {
+        "id": "1.20",
+        "name": "goal_progress_and_streak_tracking",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The daily-goal progress indicator on the Quest tab tracks today's logged reps against the Settings dailyGoal target, and the Current Streak counter counts consecutive local-calendar days the goal was met, resetting to zero the first day the goal is missed",
+        "reasoning": "FAIL: Goal progress and a met streak were observed, but the consecutive-day miss/reset behavior was not exercised. Evidence: refresh_restores_all_facets_coherently.png"
+      },
+      {
+        "id": "1.21",
+        "name": "weekly_chart_daily_totals",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The canvas-rendered weekly summary bar chart shows total reps per day for the last 7 calendar days with a visible daily-goal reference line, and days with zero reps still render a visible zero-height tick rather than a blank area",
+        "reasoning": "BLOCKED: The chart and seven daily totals rendered, but pixel-level zero-height ticks and goal-line placement were not directly verified. Evidence: quest_tab_initial_layout-desktop.png"
+      },
+      {
+        "id": "1.24",
+        "name": "challenge_run_lifecycle_gating",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "In Challenge mode, the Start run / Pause / Resume / End run lifecycle (idle to active, active to paused, paused to active, active or paused to ended, restart back to idle) only allows transitions from their legal predecessor state; unavailable transitions are disabled controls, not silently ignored clicks",
+        "reasoning": "Start enabled Pause/End and disabled Start/Resume; Pause enabled Resume; Resume restored Active controls; End produced a terminal Defeat state with illegal controls disabled. Evidence: challenge_lifecycle_and_targets.png"
+      },
+      {
+        "id": "1.27",
+        "name": "rapid_logging_integrity",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Logging 25 rep sets back to back in immediate succession leaves lifetime reps, today's total, and the History list exactly matching the sum of what was entered, with no dropped, duplicated, or corrupted entries and no frozen or blank screen",
+        "reasoning": "BLOCKED: Twenty-five immediate consecutive logging actions were not performed. Evidence: log_set_flow_cross_surface-after-12.png"
+      },
+      {
+        "id": "1.28",
+        "name": "apply_scenario_change_snapshot",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Apply scenario change control in the History state region visibly mutates state (rotating through a small set of scenario effects) and is recorded as its own snapshot in the same undo/redo history as other state-changing actions",
+        "reasoning": "Apply scenario change visibly changed QP and the History state label, and the change appeared as an undo/redo snapshot. Evidence: challenge_lifecycle_and_targets.png"
+      },
+      {
+        "id": "1.31",
+        "name": "log_set_flow_cross_surface",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Starting on the Quest tab with the current today's total and lifetime reps noted, logging a valid set of 12 reps increases both totals by exactly 12 (measured immediately around the action), glides the character forward on the quest map, grows today's bar in the weekly summary chart, and switching to the History tab shows the new entry at the top with its rep count and timestamp, all without a page reload; after a full page refresh, today's total, lifetime reps, the character position, and the History entry all show the same values",
+        "reasoning": "FAIL: A 12-rep set was logged and observed in Quest and History, but the complete exact before/after and refresh workflow was not completed as specified. Evidence: log_set_flow_cross_surface-after-12.png"
+      },
+      {
+        "id": "1.32",
+        "name": "delete_entry_flow_cross_surface",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Starting with at least two logged sets, deleting one History entry removes exactly that entry from the list; returning to the Quest tab shows the recomputed today's total, lifetime reps, character position, and weekly chart without a reload, and a page refresh preserves the recomputed state",
+        "reasoning": "FAIL: Deletion removed exactly one row and recomputed visible totals, but the required post-delete refresh verification was not completed. Evidence: history_list_order_and_details-after-12.png"
+      },
+      {
+        "id": "1.33",
+        "name": "gear_purchase_flow_with_refresh",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "With the Quest Point balance noted, unlocking a Gear Shop outfit decreases the visible balance by exactly the outfit's cost and flips its card from locked to unlocked; equipping it immediately changes the character's appearance on the quest map, and after a full page refresh the balance, the unlocked state, and the equipped appearance are all preserved",
+        "reasoning": "FAIL: Purchase and equip worked, but the complete post-refresh equipped-appearance verification was not directly completed. Evidence: gear_unlock_and_equip-after-equip.png"
+      },
+      {
+        "id": "1.34",
+        "name": "daily_goal_save_rescales_surfaces",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Saving a new dailyGoal value in Settings immediately re-scales the Quest tab progress indicator and moves the goal reference line on the weekly summary chart to the new target, without a page reload",
+        "reasoning": "FAIL: Saving 20 immediately changed the Quest progress target from 50 to 20, but the chart reference-line movement was not directly verified. Evidence: refresh_restores_all_facets_coherently.png"
+      },
+      {
+        "id": "1.35",
+        "name": "daily_goal_invalid_rejected",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Editing the dailyGoal field with an invalid value (empty, zero, negative, or non-integer) shows an inline error naming the field before submit, and the Save control leaves the previously saved goal in effect",
+        "reasoning": "FAIL: Saving 0 produced a named inline validation error and retained 50, but the criterion requires the error before submit. Evidence: reset_quest_confirmation_flow.png"
+      },
+      {
+        "id": "1.36",
+        "name": "daily_reminder_banner_logic",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Settings offers reminderEnabled on/off and reminderHour (0 through 23); when reminderEnabled is on and reminderHour has passed today with the daily goal still unmet, an in-app reminder banner appears, and no banner appears when reminderEnabled is off or once the goal is met",
+        "reasoning": "BLOCKED: Reminder configuration was visible, but the passed-hour/unmet-goal and off/met suppression cases were not exercised. Evidence: reset_quest_confirmation_flow-after-reset.png"
+      },
+      {
+        "id": "1.37",
+        "name": "history_list_order_and_details",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The History tab lists every logged set with its rep count, optional note, and date/time, most recent first, each entry with its own Delete control",
+        "reasoning": "History showed every logged set most-recent-first with reps, timestamps, optional note text, and separate Delete controls. Evidence: history_list_order_and_details-after-12.png"
+      },
+      {
+        "id": "1.38",
+        "name": "undo_redo_disabled_at_bounds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Undo control is visibly disabled when there is nothing to undo, and the Redo control is visibly disabled when there is nothing to redo, rather than the clicks being silently ignored",
+        "reasoning": "Initial state showed both Undo and Redo disabled, and the post-Redo state showed Redo disabled at the forward bound. Evidence: quest_tab_initial_layout-desktop.png"
+      },
+      {
+        "id": "1.39",
+        "name": "log_outside_active_run_feedback",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "In Challenge mode, attempting to log reps while a run is not active shows visible feedback and the run state remains unchanged",
+        "reasoning": "BLOCKED: The explanatory text was visible, but an actual out-of-run logging attempt was not performed. Evidence: challenge_lifecycle_and_targets.png"
+      },
+      {
+        "id": "1.40",
+        "name": "rep_set_note_field_contract",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Log Reps form accepts an optional note up to 120 characters; a valid submit with a note shows that note on the matching History row, and a note longer than 120 characters shows an inline error naming the note field without creating a History entry",
+        "reasoning": "A valid set with note \u201cmorning set\u201d appeared as the matching History row with its note and timestamp. Evidence: history_list_order_and_details-after-12.png"
+      },
+      {
+        "id": "1.41",
+        "name": "settings_payload_fields",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Settings form exposes dailyGoal (1 through 9999), reminderEnabled (boolean), and reminderHour (0 through 23); saving valid values updates the Quest tab goal and reminder behavior from those fields, and invalid values show inline errors naming the field",
+        "reasoning": "Settings visibly exposed daily goal, reminder checkbox, and 0\u201323 hour options; valid save and named invalid-goal feedback were observed. Evidence: reset_quest_confirmation_flow-after-reset.png"
+      },
+      {
+        "id": "1.42",
+        "name": "challenge_difficulty_changes_target",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "In Challenge mode before a run starts, choosing Easy, Normal, and Hard shows three different boss minimum-rep targets (Hard greater than Normal, Normal greater than Easy) as a visible target number",
+        "reasoning": "Easy, Normal, and Hard visibly produced targets 15, 20, and 30 reps respectively. Evidence: challenge_lifecycle_and_targets.png"
+      },
+      {
+        "id": "1.43",
+        "name": "challenge_victory_decided_outcome",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Starting a challenge run, logging enough reps during the active run to meet the shown target, then ending or resolving the run shows a Victory result panel that names Victory and shows logged reps at or above the target",
+        "reasoning": "An active Hard run logged 30 against a 30 target and displayed a Victory result panel naming Victory. Evidence: challenge_lifecycle_and_targets.png"
+      },
+      {
+        "id": "1.44",
+        "name": "challenge_defeat_decided_outcome",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Starting a challenge run and ending it before the target is met shows a Defeat result panel that names Defeat and the shortfall; Restart or New run returns to idle with zero run reps and no Defeat banner leftover from the prior run",
+        "reasoning": "Ending an active run at 0/30 displayed Defeat and the shortfall; New run returned the panel to idle without the prior result. Evidence: challenge_lifecycle_and_targets.png"
+      },
+      {
+        "id": "1.45",
+        "name": "challenge_save_and_resume",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "During an active or paused challenge run after at least one set logged in that run, Save Progress shows a Saved confirmation; after a full page refresh, Resume Saved Run restores the same difficulty, targetReps, and repsLogged",
+        "reasoning": "BLOCKED: Save Progress and Resume Saved Run were visible, but a saved active/paused run was not completed and restored after refresh. Evidence: challenge_lifecycle_and_targets.png"
+      },
+      {
+        "id": "1.46",
+        "name": "personal_records_live_update",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Personal Records panel shows bestSingleSet and bestDayTotal; logging a set that beats either record updates that readout immediately without a reload",
+        "reasoning": "After logging, Best single set and Best day total immediately updated to the observed values without reload. Evidence: refresh_restores_all_facets_coherently.png"
+      },
+      {
+        "id": "1.47",
+        "name": "streak_heatmap_28_days",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A streak heat-map shows the last 28 local calendar days with visually distinct empty/zero, below-goal, and at-or-above-goal treatments, and logging reps for today updates today's cell without a reload",
+        "reasoning": "The 28-day heatmap rendered with Empty/Building/Goal met legend treatments; logged today changed the cell to a goal-met state. Evidence: refresh_restores_all_facets_coherently.png"
+      },
+      {
+        "id": "1.48",
+        "name": "export_quest_log_contains_session",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After logging at least two distinct sets and unlocking one gear item, Export Quest Log produces downloadable/copyable JSON whose sets array includes those exact reps and whose unlockedGearIds and lifetimeReps match the UI; Copy shows a Copied confirmation",
+        "reasoning": "Live JSON preview visibly contained the session sets, lifetimeReps 30, and unlockedGearIds including warrior; Copy JSON produced a Copied confirmation. Evidence: gear_unlock_and_equip-after-equip.png"
+      },
+      {
+        "id": "1.49",
+        "name": "export_workout_csv_matches_sets",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export Workout CSV downloads a CSV-shaped text file with header date,reps,note and one data row per logged set whose reps match the session History",
+        "reasoning": "FAIL: CSV export produced a success notification, but the downloaded text/header and rows were not directly observed. Evidence: reset_quest_confirmation_flow-after-reset.png"
+      },
+      {
+        "id": "1.50",
+        "name": "import_quest_log_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After Export Quest Log, confirming Reset Quest, then Import Quest Log with that file reconstructs the same History list, lifetime reps, streak, quest points, unlocked gear, and equipped appearance; malformed JSON shows a visible invalid-file rejection and changes nothing",
+        "reasoning": "BLOCKED: File import and malformed-file rejection were not exercised. Evidence: reset_quest_confirmation_flow-after-reset.png"
+      },
+      {
+        "id": "1.53",
+        "name": "challenge_checkpoint_exact_field_contract",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After starting a challenge run, choosing Hard, logging at least one set, and pausing, Save Progress produces a checkpoint whose browser-visible values show runStatus paused, the active bossWaypointId, difficulty Hard, repsLogged and targetReps matching the panel, and savedAt as a timestamp; after reload Resume Saved Run restores every one of those values exactly",
+        "reasoning": "BLOCKED: A paused Hard run checkpoint with exact fields was not saved and restored. Evidence: challenge_lifecycle_and_targets.png"
+      },
+      {
+        "id": "1.54",
+        "name": "quest_log_nested_schema_matches_live_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export Quest Log JSON contains schemaVersion, exportedAt, dailyGoal, streak, lifetimeReps, questPoints, unlockedZones, unlockedGearIds, equippedGearId, defeatedBossIds, and sets; every set contains setId, reps, loggedAt, and note when present, and all exported values match the live session",
+        "reasoning": "FAIL: The live JSON preview showed most required top-level fields, but the complete nested set contract including note presence was not fully verified. Evidence: gear_unlock_and_equip-after-equip.png"
+      },
+      {
+        "id": "1.55",
+        "name": "workout_csv_is_chronological",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After logging sets at distinguishable times, Export Workout CSV uses the exact header date,reps,note and contains one row per History set in oldest-to-newest chronological order, with reps and notes matching the corresponding exported JSON sets",
+        "reasoning": "BLOCKED: CSV contents were not directly inspected for header, row order, reps, and notes. Evidence: reset_quest_confirmation_flow-after-reset.png"
+      },
+      {
+        "id": "1.56",
+        "name": "import_restores_complete_quest_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After exporting a session with workout sets, an unlocked zone, a defeated boss, equipped gear, and changed daily-goal state, resetting and importing restores dailyGoal, streak, lifetimeReps, questPoints, unlockedZones, unlockedGearIds, equippedGearId, defeatedBossIds, full History, and derived records and heatmap state; a fresh export matches the restored state",
+        "reasoning": "BLOCKED: The complete export-reset-import workflow with unlocked zone, defeated boss, equipped gear, and derived-state comparison was not completed. Evidence: reset_quest_confirmation_flow-after-reset.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"quest_tab_initial_layout\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Quest layout was observed, but the pre-log History empty state was not verified in the same workflow. Evidence: quest_tab_initial_layout-desktop.png\"},\"log_reps_updates_totals_and_advances\":{\"score\":\"yes\",\"reasoning\":\"Logged 12 reps; lifetime and today both increased from 0 to 12 and the live map remained rendered. Evidence: log_set_flow_cross_surface-after-12.png\"},\"log_reps_inline_validation\":{\"score\":\"no\",\"reasoning\":\"FAIL: Invalid 0 showed an inline rule error only after submission, not while the field merely held the invalid value. Evidence: log_set_flow_cross_surface-after-12.png\"},\"zone_unlock_palette_and_notification\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The waypoint-crossing workflow was not completed successfully, so palette and one-time notification behavior could not be verified. Evidence: zone_unlock_palette_and_notification.png\"},\"boss_defeat_marker_and_bonus\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A qualifying Quest-map boss waypoint set was not reached and verified. Evidence: quest_tab_initial_layout-desktop.png\"},\"gear_unlock_and_equip\":{\"score\":\"yes\",\"reasoning\":\"Warrior armor unlocked for 15 QP, changed to an Equip control, and equipping produced an immediate equipped notification with the Quest map still rendered. Evidence: gear_unlock_and_equip-after-equip.png\"},\"delete_entry_recalculates_from_remaining\":{\"score\":\"no\",\"reasoning\":\"FAIL: A history entry disappeared and totals recalculated, but every required derived facet was not verified end-to-end. Evidence: history_list_order_and_details-after-12.png\"},\"refresh_restores_all_facets_coherently\":{\"score\":\"no\",\"reasoning\":\"FAIL: Refresh preserved core totals, streak, goal, records, history, and QP, but the complete required facet set was not fully verified after refresh. Evidence: refresh_restores_all_facets_coherently.png\"},\"mode_switch_round_trip_preserves_state\":{\"score\":\"yes\",\"reasoning\":\"Challenge and Quest panels switched exclusively while lifetime reps, streak, QP, and history-state values remained unchanged. Evidence: challenge_lifecycle_and_targets.png\"},\"undo_redo_steps_through_snapshots\":{\"score\":\"yes\",\"reasoning\":\"Undo changed the snapshot label and QP from 22 to 12; Redo restored the Scenario B snapshot and QP 22. Evidence: challenge_lifecycle_and_targets.png\"},\"undo_branching_preserves_branches\":{\"score\":\"yes\",\"reasoning\":\"Undo followed by a different scenario created visible Main and Branch 2 buttons; selecting Main restored the earlier QP 12/streak 0 state. Evidence: challenge_lifecycle_and_targets.png\"},\"reset_quest_confirmation_flow\":{\"score\":\"yes\",\"reasoning\":\"Reset opened a confirmation dialog; Cancel left state intact, and Reset everything returned lifetime, QP, streak, gear list, and sets to fresh-start values. Evidence: reset_quest_confirmation_flow-after-reset.png\"},\"goal_progress_and_streak_tracking\":{\"score\":\"no\",\"reasoning\":\"FAIL: Goal progress and a met streak were observed, but the consecutive-day miss/reset behavior was not exercised. Evidence: refresh_restores_all_facets_coherently.png\"},\"weekly_chart_daily_totals\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The chart and seven daily totals rendered, but pixel-level zero-height ticks and goal-line placement were not directly verified. Evidence: quest_tab_initial_layout-desktop.png\"},\"challenge_run_lifecycle_gating\":{\"score\":\"yes\",\"reasoning\":\"Start enabled Pause/End and disabled Start/Resume; Pause enabled Resume; Resume restored Active controls; End produced a terminal Defeat state with illegal controls disabled. Evidence: challenge_lifecycle_and_targets.png\"},\"rapid_logging_integrity\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Twenty-five immediate consecutive logging actions were not performed. Evidence: log_set_flow_cross_surface-after-12.png\"},\"apply_scenario_change_snapshot\":{\"score\":\"yes\",\"reasoning\":\"Apply scenario change visibly changed QP and the History state label, and the change appeared as an undo/redo snapshot. Evidence: challenge_lifecycle_and_targets.png\"},\"log_set_flow_cross_surface\":{\"score\":\"no\",\"reasoning\":\"FAIL: A 12-rep set was logged and observed in Quest and History, but the complete exact before/after and refresh workflow was not completed as specified. Evidence: log_set_flow_cross_surface-after-12.png\"},\"delete_entry_flow_cross_surface\":{\"score\":\"no\",\"reasoning\":\"FAIL: Deletion removed exactly one row and recomputed visible totals, but the required post-delete refresh verification was not completed. Evidence: history_list_order_and_details-after-12.png\"},\"gear_purchase_flow_with_refresh\":{\"score\":\"no\",\"reasoning\":\"FAIL: Purchase and equip worked, but the complete post-refresh equipped-appearance verification was not directly completed. Evidence: gear_unlock_and_equip-after-equip.png\"},\"daily_goal_save_rescales_surfaces\":{\"score\":\"no\",\"reasoning\":\"FAIL: Saving 20 immediately changed the Quest progress target from 50 to 20, but the chart reference-line movement was not directly verified. Evidence: refresh_restores_all_facets_coherently.png\"},\"daily_goal_invalid_rejected\":{\"score\":\"no\",\"reasoning\":\"FAIL: Saving 0 produced a named inline validation error and retained 50, but the criterion requires the error before submit. Evidence: reset_quest_confirmation_flow.png\"},\"daily_reminder_banner_logic\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Reminder configuration was visible, but the passed-hour/unmet-goal and off/met suppression cases were not exercised. Evidence: reset_quest_confirmation_flow-after-reset.png\"},\"history_list_order_and_details\":{\"score\":\"yes\",\"reasoning\":\"History showed every logged set most-recent-first with reps, timestamps, optional note text, and separate Delete controls. Evidence: history_list_order_and_details-after-12.png\"},\"undo_redo_disabled_at_bounds\":{\"score\":\"yes\",\"reasoning\":\"Initial state showed both Undo and Redo disabled, and the post-Redo state showed Redo disabled at the forward bound. Evidence: quest_tab_initial_layout-desktop.png\"},\"log_outside_active_run_feedback\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The explanatory text was visible, but an actual out-of-run logging attempt was not performed. Evidence: challenge_lifecycle_and_targets.png\"},\"rep_set_note_field_contract\":{\"score\":\"yes\",\"reasoning\":\"A valid set with note \u201cmorning set\u201d appeared as the matching History row with its note and timestamp. Evidence: history_list_order_and_details-after-12.png\"},\"settings_payload_fields\":{\"score\":\"yes\",\"reasoning\":\"Settings visibly exposed daily goal, reminder checkbox, and 0\u201323 hour options; valid save and named invalid-goal feedback were observed. Evidence: reset_quest_confirmation_flow-after-reset.png\"},\"challenge_difficulty_changes_target\":{\"score\":\"yes\",\"reasoning\":\"Easy, Normal, and Hard visibly produced targets 15, 20, and 30 reps respectively. Evidence: challenge_lifecycle_and_targets.png\"},\"challenge_victory_decided_outcome\":{\"score\":\"yes\",\"reasoning\":\"An active Hard run logged 30 against a 30 target and displayed a Victory result panel naming Victory. Evidence: challenge_lifecycle_and_targets.png\"},\"challenge_defeat_decided_outcome\":{\"score\":\"yes\",\"reasoning\":\"Ending an active run at 0/30 displayed Defeat and the shortfall; New run returned the panel to idle without the prior result. Evidence: challenge_lifecycle_and_targets.png\"},\"challenge_save_and_resume\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Save Progress and Resume Saved Run were visible, but a saved active/paused run was not completed and restored after refresh. Evidence: challenge_lifecycle_and_targets.png\"},\"personal_records_live_update\":{\"score\":\"yes\",\"reasoning\":\"After logging, Best single set and Best day total immediately updated to the observed values without reload. Evidence: refresh_restores_all_facets_coherently.png\"},\"streak_heatmap_28_days\":{\"score\":\"yes\",\"reasoning\":\"The 28-day heatmap rendered with Empty/Building/Goal met legend treatments; logged today changed the cell to a goal-met state. Evidence: refresh_restores_all_facets_coherently.png\"},\"export_quest_log_contains_session\":{\"score\":\"yes\",\"reasoning\":\"Live JSON preview visibly contained the session sets, lifetimeReps 30, and unlockedGearIds including warrior; Copy JSON produced a Copied confirmation. Evidence: gear_unlock_and_equip-after-equip.png\"},\"export_workout_csv_matches_sets\":{\"score\":\"no\",\"reasoning\":\"FAIL: CSV export produced a success notification, but the downloaded text/header and rows were not directly observed. Evidence: reset_quest_confirmation_flow-after-reset.png\"},\"import_quest_log_round_trip\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: File import and malformed-file rejection were not exercised. Evidence: reset_quest_confirmation_flow-after-reset.png\"},\"challenge_checkpoint_exact_field_contract\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A paused Hard run checkpoint with exact fields was not saved and restored. Evidence: challenge_lifecycle_and_targets.png\"},\"quest_log_nested_schema_matches_live_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: The live JSON preview showed most required top-level fields, but the complete nested set contract including note presence was not fully verified. Evidence: gear_unlock_and_equip-after-equip.png\"},\"workout_csv_is_chronological\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: CSV contents were not directly inspected for header, row order, reps, and notes. Evidence: reset_quest_confirmation_flow-after-reset.png\"},\"import_restores_complete_quest_state\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The complete export-reset-import workflow with unlocked zone, defeated boss, equipped gear, and derived-state comparison was not completed. Evidence: reset_quest_confirmation_flow-after-reset.png\"}}",
+    "cost_usd": 0.7511848
+  },
+  "design_fidelity": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "overview_composition_matches_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At desktop width the overall Quest composition (map, log form, progress, chart region, tab chrome) matches the reference overview structure; where screenshot and instruction conflict, instruction wins",
+        "reasoning": "Desktop overview visibly combines the quest map, log form, progress/streak, records, heat-map, weekly chart, and history state in a centered stacked composition. Evidence: overview-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "segment_map_region_matches",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The quest map canvas region and waypoint path placement align with the reference segments' map treatment",
+        "reasoning": "The overview visibly shows a horizontal illustrated map with character, numbered waypoints, path, and red boss markers. Evidence: overview-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "tab_chrome_matches_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Quest / History / Gear / Settings tab chrome placement and active treatment align with the reference",
+        "reasoning": "Quest, History, Gear, and Settings tabs are consistently placed in a horizontal chrome with a clear gold active underline/color treatment. Evidence: overview-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "progress_and_streak_placement",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Daily-goal progress and Current Streak placement match the reference hierarchy near the quest map",
+        "reasoning": "Daily goal and Current streak appear together in a two-column card immediately below the log form, matching the intended hierarchy. Evidence: overview-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "gear_shop_card_layout",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Gear Shop cards show cost and locked/unlocked treatment in a layout consistent with the reference gear segment",
+        "reasoning": "Gear Shop visibly presents a six-card grid with one equipped outfit and locked cards showing lock icons and QP costs. Evidence: gear-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "history_list_layout",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "History list rows with reps and timestamps match the reference list density and ordering cues",
+        "reasoning": "History visibly shows a compact row containing logged reps, date/time, and set metadata, followed by the heat-map. Evidence: history-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "settings_form_layout",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Settings daily goal and reminder controls match the reference settings segment structure",
+        "reasoning": "Settings visibly groups daily goal, save control, reminder toggle/time, accent choices, and reset action in a coherent form card. Evidence: settings-shared.png"
+      },
+      {
+        "id": "3.8",
+        "name": "weekly_chart_region",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The weekly summary chart region sits where the reference shows it relative to the map and progress",
+        "reasoning": "The overview visibly places Weekly summary below the streak heat-map and above History state, with a chart, goal line, weekday labels, and daily totals. Evidence: overview-shared.png"
+      },
+      {
+        "id": "3.9",
+        "name": "spacing_and_sizing_follow_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Spacing and control sizing follow the reference scale rather than a cramped or oversized reinterpretation",
+        "reasoning": "Desktop cards, controls, gutters, typography, and content width are consistently proportioned and not cramped or oversized. Evidence: overview-shared.png"
+      },
+      {
+        "id": "3.10",
+        "name": "component_states_match_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Default/hover/active treatments on primary controls are consistent with the reference's interactive chrome",
+        "reasoning": "The active Quest tab uses gold treatment and underline; the Log reps control is visibly enabled and real hover measurement showed a translated hover state. Evidence: overview-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"overview_composition_matches_reference\":{\"score\":\"yes\",\"reasoning\":\"Desktop overview visibly combines the quest map, log form, progress/streak, records, heat-map, weekly chart, and history state in a centered stacked composition. Evidence: overview-shared.png\"},\"segment_map_region_matches\":{\"score\":\"yes\",\"reasoning\":\"The overview visibly shows a horizontal illustrated map with character, numbered waypoints, path, and red boss markers. Evidence: overview-shared.png\"},\"tab_chrome_matches_reference\":{\"score\":\"yes\",\"reasoning\":\"Quest, History, Gear, and Settings tabs are consistently placed in a horizontal chrome with a clear gold active underline/color treatment. Evidence: overview-shared.png\"},\"progress_and_streak_placement\":{\"score\":\"yes\",\"reasoning\":\"Daily goal and Current streak appear together in a two-column card immediately below the log form, matching the intended hierarchy. Evidence: overview-shared.png\"},\"gear_shop_card_layout\":{\"score\":\"yes\",\"reasoning\":\"Gear Shop visibly presents a six-card grid with one equipped outfit and locked cards showing lock icons and QP costs. Evidence: gear-shared.png\"},\"history_list_layout\":{\"score\":\"yes\",\"reasoning\":\"History visibly shows a compact row containing logged reps, date/time, and set metadata, followed by the heat-map. Evidence: history-shared.png\"},\"settings_form_layout\":{\"score\":\"yes\",\"reasoning\":\"Settings visibly groups daily goal, save control, reminder toggle/time, accent choices, and reset action in a coherent form card. Evidence: settings-shared.png\"},\"weekly_chart_region\":{\"score\":\"yes\",\"reasoning\":\"The overview visibly places Weekly summary below the streak heat-map and above History state, with a chart, goal line, weekday labels, and daily totals. Evidence: overview-shared.png\"},\"spacing_and_sizing_follow_reference\":{\"score\":\"yes\",\"reasoning\":\"Desktop cards, controls, gutters, typography, and content width are consistently proportioned and not cramped or oversized. Evidence: overview-shared.png\"},\"component_states_match_reference\":{\"score\":\"yes\",\"reasoning\":\"The active Quest tab uses gold treatment and underline; the Log reps control is visibly enabled and real hover measurement showed a translated hover state. Evidence: overview-shared.png\"}}",
+    "cost_usd": 0.23012080000000001
+  },
+  "edge_cases": {
+    "score": 0.9333,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "history_empty_state_before_logs",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Before any set is logged, the History tab shows a placeholder message explaining what will appear there instead of an empty list",
+        "reasoning": "The History tab visibly showed \u201cNo sets logged yet\u201d with explanatory placeholder text. Evidence: history_empty_state_before_logs-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "log_reps_invalid_inline_errors",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Empty, zero, negative, non-integer, or out-of-range reps show a visible inline error naming the reps field and do not change today's total, lifetime reps, or character position",
+        "reasoning": "Submitting 0 reps produced the visible inline error \u201cReps: enter a whole number from 1 to 9999,\u201d while lifetime and today remained 0. Evidence: log_reps_invalid_inline_errors-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "note_over_120_rejected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A note longer than 120 characters shows an inline error naming the note field and does not create a History entry",
+        "reasoning": "A 121-character note produced the visible error \u201cNote: keep it to 120 characters or fewer\u201d and no set was created. Evidence: note_over_120_rejected-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "zone_unlock_and_boss_defeat_feedback",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Zone unlock and boss defeat each show a transient confirmation banner in addition to the map palette or marker change",
+        "reasoning": "Boss defeat showed a \u201cBoss defeated! +10 quest points\u201d banner with the map marker state, and later zone progression showed \u201cZone unlocked: Canyon\u201d plus the map palette changed to Canyon. Evidence: zone_unlock_and_boss_defeat_feedback-zone.png; zone_unlock_and_boss_defeat_feedback-zone-unlock.png"
+      },
+      {
+        "id": "4.5",
+        "name": "challenge_idle_log_rejected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Logging reps while a challenge run is not active shows visible feedback and does not advance the run",
+        "reasoning": "Logging 1 challenge rep while Idle showed \u201cStart an active run before logging challenge reps\u201d and the run remained at 0/20. Evidence: challenge_idle_log_rejected-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "reset_cancel_leaves_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Canceling the Reset Quest confirmation dialog leaves lifetime reps, History, gear, and checkpoint untouched",
+        "reasoning": "Escape closed the reset dialog and the visible export preview still showed lifetimeReps 100, quest points, unlocked gear/zones, and four sets. Evidence: reset_cancel_leaves_state-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "undo_redo_disabled_when_empty",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Undo and Redo controls are disabled, not merely ignored, when there is nothing to undo or redo",
+        "reasoning": "Before any history action, both Undo and Redo were visibly disabled. Evidence: history_empty_state_before_logs-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "weekly_chart_zero_day_ticks",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Days with zero reps in the weekly summary chart still render a visible zero-height tick, never a blank chart area",
+        "reasoning": "The weekly chart visibly rendered baseline zero-height ticks for Fri through Wed rather than blank space. Evidence: weekly_chart_zero_day_ticks-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "reset_dialog_escape_and_confirm",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Reset Quest confirmation dialog closes on Escape or Cancel without wiping state, and Confirm performs the wipe",
+        "reasoning": "Escape closed the confirmation dialog without wiping state; Confirm then showed \u201cQuest reset \u2014 starting fresh\u201d and the export preview showed lifetimeReps 0 and sets []. Evidence: reset_dialog_escape_and_confirm-shared.png; reset_dialog_escape_and_confirm-confirmed.png"
+      },
+      {
+        "id": "4.10",
+        "name": "challenge_lifecycle_progress_feedback",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Challenge run status (idle, active, paused, Victory, Defeat) is always visible so the player knows which lifecycle step is current",
+        "reasoning": "The live challenge UI visibly showed Idle, Active, Paused, and Victory statuses, with Victory feedback after logging 20/20 reps. Evidence: challenge_lifecycle_progress_feedback-shared.png; challenge_lifecycle_progress_feedback-victory.png"
+      },
+      {
+        "id": "4.11",
+        "name": "malformed_import_rejected",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Importing a malformed Quest Log JSON leaves lifetime reps, History, gear, and settings unchanged and shows a visible invalid-file rejection",
+        "reasoning": "BLOCKED: The malformed-file workflow could not be exercised because file-drop and in-memory file-selection attempts were rejected by the browser tooling; no import result was observed."
+      },
+      {
+        "id": "4.12",
+        "name": "empty_export_still_valid_json",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export Quest Log with zero logged sets still downloads a valid JSON document whose sets array is empty and lifetimeReps is 0, without a crash",
+        "reasoning": "With zero logged sets, Export Quest Log downloaded repquest-2026-07-23.json; the visible preview showed lifetimeReps 0 and sets [], and the app displayed \u201cQuest Log exported.\u201d Evidence: empty_export_still_valid_json-shared.png"
+      },
+      {
+        "id": "4.13",
+        "name": "save_resume_controls_gated",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Resume Saved Run is disabled when no checkpoint exists; Save Progress is disabled when the challenge run is idle or already ended",
+        "reasoning": "In Idle state, Save progress and Resume saved run were visibly disabled; after starting a run, Save progress remained disabled while Resume saved run was also disabled. Evidence: challenge_idle_log_rejected-shared.png; challenge_lifecycle_progress_feedback-shared.png"
+      },
+      {
+        "id": "4.14",
+        "name": "difficulty_locked_during_active_run",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Changing difficulty while a run is active is disabled or rejected with visible feedback and does not alter the in-progress target mid-run",
+        "reasoning": "After starting an active run, Easy, Normal, and Hard were all visibly disabled, leaving the target at 20 reps. Evidence: challenge_lifecycle_progress_feedback-shared.png"
+      },
+      {
+        "id": "4.15",
+        "name": "rapid_25_logs_integrity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Logging 25 rep sets back to back leaves lifetime reps, today's total, and History exactly matching the sum entered with no frozen or blank screen",
+        "reasoning": "Twenty-five rapid UI submissions for 1 through 25 left 25 History entries and lifetime/today totals of 325, matching the arithmetic sum, with the app fully rendered. Evidence: rapid_25_logs_integrity-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"history_empty_state_before_logs\":{\"score\":\"yes\",\"reasoning\":\"The History tab visibly showed \u201cNo sets logged yet\u201d with explanatory placeholder text. Evidence: history_empty_state_before_logs-shared.png\"},\"log_reps_invalid_inline_errors\":{\"score\":\"yes\",\"reasoning\":\"Submitting 0 reps produced the visible inline error \u201cReps: enter a whole number from 1 to 9999,\u201d while lifetime and today remained 0. Evidence: log_reps_invalid_inline_errors-shared.png\"},\"note_over_120_rejected\":{\"score\":\"yes\",\"reasoning\":\"A 121-character note produced the visible error \u201cNote: keep it to 120 characters or fewer\u201d and no set was created. Evidence: note_over_120_rejected-shared.png\"},\"zone_unlock_and_boss_defeat_feedback\":{\"score\":\"yes\",\"reasoning\":\"Boss defeat showed a \u201cBoss defeated! +10 quest points\u201d banner with the map marker state, and later zone progression showed \u201cZone unlocked: Canyon\u201d plus the map palette changed to Canyon. Evidence: zone_unlock_and_boss_defeat_feedback-zone.png; zone_unlock_and_boss_defeat_feedback-zone-unlock.png\"},\"challenge_idle_log_rejected\":{\"score\":\"yes\",\"reasoning\":\"Logging 1 challenge rep while Idle showed \u201cStart an active run before logging challenge reps\u201d and the run remained at 0/20. Evidence: challenge_idle_log_rejected-shared.png\"},\"reset_cancel_leaves_state\":{\"score\":\"yes\",\"reasoning\":\"Escape closed the reset dialog and the visible export preview still showed lifetimeReps 100, quest points, unlocked gear/zones, and four sets. Evidence: reset_cancel_leaves_state-shared.png\"},\"undo_redo_disabled_when_empty\":{\"score\":\"yes\",\"reasoning\":\"Before any history action, both Undo and Redo were visibly disabled. Evidence: history_empty_state_before_logs-shared.png\"},\"weekly_chart_zero_day_ticks\":{\"score\":\"yes\",\"reasoning\":\"The weekly chart visibly rendered baseline zero-height ticks for Fri through Wed rather than blank space. Evidence: weekly_chart_zero_day_ticks-shared.png\"},\"reset_dialog_escape_and_confirm\":{\"score\":\"yes\",\"reasoning\":\"Escape closed the confirmation dialog without wiping state; Confirm then showed \u201cQuest reset \u2014 starting fresh\u201d and the export preview showed lifetimeReps 0 and sets []. Evidence: reset_dialog_escape_and_confirm-shared.png; reset_dialog_escape_and_confirm-confirmed.png\"},\"challenge_lifecycle_progress_feedback\":{\"score\":\"yes\",\"reasoning\":\"The live challenge UI visibly showed Idle, Active, Paused, and Victory statuses, with Victory feedback after logging 20/20 reps. Evidence: challenge_lifecycle_progress_feedback-shared.png; challenge_lifecycle_progress_feedback-victory.png\"},\"malformed_import_rejected\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The malformed-file workflow could not be exercised because file-drop and in-memory file-selection attempts were rejected by the browser tooling; no import result was observed.\"},\"empty_export_still_valid_json\":{\"score\":\"yes\",\"reasoning\":\"With zero logged sets, Export Quest Log downloaded repquest-2026-07-23.json; the visible preview showed lifetimeReps 0 and sets [], and the app displayed \u201cQuest Log exported.\u201d Evidence: empty_export_still_valid_json-shared.png\"},\"save_resume_controls_gated\":{\"score\":\"yes\",\"reasoning\":\"In Idle state, Save progress and Resume saved run were visibly disabled; after starting a run, Save progress remained disabled while Resume saved run was also disabled. Evidence: challenge_idle_log_rejected-shared.png; challenge_lifecycle_progress_feedback-shared.png\"},\"difficulty_locked_during_active_run\":{\"score\":\"yes\",\"reasoning\":\"After starting an active run, Easy, Normal, and Hard were all visibly disabled, leaving the target at 20 reps. Evidence: challenge_lifecycle_progress_feedback-shared.png\"},\"rapid_25_logs_integrity\":{\"score\":\"yes\",\"reasoning\":\"Twenty-five rapid UI submissions for 1 through 25 left 25 History entries and lifetime/today totals of 325, matching the arithmetic sum, with the app fully rendered. Evidence: rapid_25_logs_integrity-shared.png\"}}",
+    "cost_usd": 0.4981632
+  },
+  "innovation": {
+    "score": 0.6667,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "delightful_challenge_moments",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Beyond the required Victory confetti, the challenge loop includes an extra delightful moment (for example a distinct Victory sting, streak flourish, or boss intro) that feels intentional",
+        "reasoning": "FAIL: Victory state was observed, but no distinct extra sting, streak flourish, or boss-intro moment beyond the standard Victory panel was visible. Evidence: victory-shared.png"
+      },
+      {
+        "id": "11.2",
+        "name": "advanced_map_or_chart_polish",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "The quest map or weekly chart includes polish beyond the minimum (parallax sky, waypoint pulse, chart hover readout) that aids readability",
+        "reasoning": "The weekly chart provides exact daily totals and hover-oriented readout support beyond a static chart. Evidence: quest-full-shared.png"
+      },
+      {
+        "id": "11.3",
+        "name": "guided_first_run_help",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "A brief first-run tip or coachmark explains Log Reps or Challenge without blocking core play",
+        "reasoning": "A non-blocking \u201cWelcome to RepQuest\u201d first-run tip explains Log reps, Challenge mode, and shortcuts. Evidence: initial-shared.png"
+      },
+      {
+        "id": "11.4",
+        "name": "enhanced_heatmap_interaction",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Heat-map cells expose day totals on hover or focus beyond the minimum static grid",
+        "reasoning": "Hovering a heat-map cell revealed \u201c2026-07-23 \u2014 10 reps (of 50 goal).\u201d Evidence: heatmap-shared.png"
+      },
+      {
+        "id": "11.5",
+        "name": "keyboard_power_user_paths",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Power-user keyboard shortcuts (beyond Tab) accelerate Log Reps or mode switching without breaking mouse play",
+        "reasoning": "The live shortcuts dialog lists L for Log reps, 1\u20134 for tabs, M for mode switching, and ? for help. Evidence: shortcuts-shared.png"
+      },
+      {
+        "id": "11.6",
+        "name": "preference_personalization_extra",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "An optional preference (theme accent, reminder copy style, or chart density) personalizes the chrome beyond the required settings payload",
+        "reasoning": "Settings visibly offers Amber, Teal, and Rose appearance accent choices. Evidence: export-preview-shared.png"
+      },
+      {
+        "id": "11.7",
+        "name": "quest_narrative_flavor",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Zone unlock or boss copy carries light quest narrative flavor that stays consistent with RepQuest's fitness-quest identity",
+        "reasoning": "Quest copy consistently frames reps as moving a hero, unlocking zones, and beating bosses, with a Boss challenge mode and waypoint target. Evidence: quest-progress-shared.png"
+      },
+      {
+        "id": "11.8",
+        "name": "export_preview_polish",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Export surfaces include a live preview pane of Quest Log JSON or CSV before download, updating as sets are logged",
+        "reasoning": "Quest Log includes a live JSON/CSV preview area with export and copy controls; the JSON preview visibly contains the logged set. Evidence: export-preview-shared.png"
+      },
+      {
+        "id": "11.9",
+        "name": "genre_appropriate_extras",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "A genre-appropriate extra (personal-best toast, weekly summary blurb, or difficulty tip) adds value without cluttering the first viewport",
+        "reasoning": "Personal records and a weekly summary with daily totals add useful fitness-quest feedback. Evidence: quest-full-shared.png"
+      },
+      {
+        "id": "11.10",
+        "name": "competition_level_innovation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Overall execution shows competition-level craft: cohesive motion, clear competitive loop, and a useful export end state working together",
+        "reasoning": "FAIL: The app has a clear challenge loop and export preview, but I did not observe the cohesive motion/competitive polish working together at competition level. Evidence: victory-shared.png"
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The implementation includes a meaningful, browser-observable innovation or polish beyond the written specification that improves the RepQuest experience and is NOT covered by any other criterion in this file. If present, name it and cite concrete evidence. If nothing beyond the spec is present, answer no.",
+        "reasoning": "FAIL: No additional meaningful innovation beyond the specifically covered extras was directly observed. Evidence: quest-full-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"delightful_challenge_moments\":{\"score\":\"no\",\"reasoning\":\"FAIL: Victory state was observed, but no distinct extra sting, streak flourish, or boss-intro moment beyond the standard Victory panel was visible. Evidence: victory-shared.png\"},\"advanced_map_or_chart_polish\":{\"score\":\"yes\",\"reasoning\":\"The weekly chart provides exact daily totals and hover-oriented readout support beyond a static chart. Evidence: quest-full-shared.png\"},\"guided_first_run_help\":{\"score\":\"yes\",\"reasoning\":\"A non-blocking \u201cWelcome to RepQuest\u201d first-run tip explains Log reps, Challenge mode, and shortcuts. Evidence: initial-shared.png\"},\"enhanced_heatmap_interaction\":{\"score\":\"yes\",\"reasoning\":\"Hovering a heat-map cell revealed \u201c2026-07-23 \u2014 10 reps (of 50 goal).\u201d Evidence: heatmap-shared.png\"},\"keyboard_power_user_paths\":{\"score\":\"yes\",\"reasoning\":\"The live shortcuts dialog lists L for Log reps, 1\u20134 for tabs, M for mode switching, and ? for help. Evidence: shortcuts-shared.png\"},\"preference_personalization_extra\":{\"score\":\"yes\",\"reasoning\":\"Settings visibly offers Amber, Teal, and Rose appearance accent choices. Evidence: export-preview-shared.png\"},\"quest_narrative_flavor\":{\"score\":\"yes\",\"reasoning\":\"Quest copy consistently frames reps as moving a hero, unlocking zones, and beating bosses, with a Boss challenge mode and waypoint target. Evidence: quest-progress-shared.png\"},\"export_preview_polish\":{\"score\":\"yes\",\"reasoning\":\"Quest Log includes a live JSON/CSV preview area with export and copy controls; the JSON preview visibly contains the logged set. Evidence: export-preview-shared.png\"},\"genre_appropriate_extras\":{\"score\":\"yes\",\"reasoning\":\"Personal records and a weekly summary with daily totals add useful fitness-quest feedback. Evidence: quest-full-shared.png\"},\"competition_level_innovation\":{\"score\":\"no\",\"reasoning\":\"FAIL: The app has a clear challenge loop and export preview, but I did not observe the cohesive motion/competitive polish working together at competition level. Evidence: victory-shared.png\"},\"innovation_catchall\":{\"score\":\"no\",\"reasoning\":\"FAIL: No additional meaningful innovation beyond the specifically covered extras was directly observed. Evidence: quest-full-shared.png\"}}",
+    "cost_usd": 0.3363046
+  },
+  "motion": {
+    "score": 0.7,
+    "criteria": [
+      {
+        "id": "8.1",
+        "name": "buttons_hover_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Log Reps, Gear Equip/Unlock, Reset Quest, History Delete, Settings Save/toggles, Game Mode, Start/Pause/Resume/End run, Undo/Redo/Apply scenario change, Export/Import, Save Progress, Resume Saved Run, and Difficulty controls show a visible hover state on the real UI controls",
+        "reasoning": "Observed hover feedback on Log reps, including a transform change; the rendered controls also expose hover styling. Evidence: buttons_hover_state-shared.png"
+      },
+      {
+        "id": "8.2",
+        "name": "keyboard_focus_ring_visible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Those same controls show a visible focus ring when reached by keyboard Tab",
+        "reasoning": "Tabbed to the Shortcuts control and directly observed a 2px amber focus outline. Evidence: keyboard_focus_ring_visible-shared.png"
+      },
+      {
+        "id": "8.3",
+        "name": "character_glides_on_log",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "When a new set is logged via the real Log Reps control, the character sprite advances smoothly (glides, not teleports) along the quest map canvas path",
+        "reasoning": "FAIL: Real logging moved the sprite, but no smooth glide animation was directly observable; the captured result only showed the settled position. Evidence: character_glides_on_log-shared.png"
+      },
+      {
+        "id": "8.4",
+        "name": "transient_notification_slide_and_dismiss",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Transient notification banners for zone unlock, boss defeat, gear bought, quest reset, export/import feedback, Victory, or Defeat slide or fade in and dismiss themselves shortly after",
+        "reasoning": "A Zone unlocked: Canyon notification was visibly rendered after logging and was gone after waiting three seconds. Evidence: zone_palette_swaps_on_reach-final.png"
+      },
+      {
+        "id": "8.5",
+        "name": "history_delete_reveals_on_hover",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "History Delete controls reveal on row hover or focus on wider viewports",
+        "reasoning": "Delete controls had opacity 0 at rest and opacity 1 while the history row was hovered. Evidence: history_delete_reveals_on_hover-shared.png"
+      },
+      {
+        "id": "8.6",
+        "name": "boss_defeat_confetti_celebration",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Defeating a boss or achieving Challenge Victory via the real qualifying action triggers a brief one-time confetti-style particle celebration that does not loop ambiently",
+        "reasoning": "FAIL: A real Challenge Victory was achieved, but no confetti-style particle celebration was visible. Evidence: victory_defeat_panel_animates_in-shared.png"
+      },
+      {
+        "id": "8.7",
+        "name": "history_entries_animate_in_out",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Adding a set animates the new entry into the top of the History list, and deleting an entry animates it out rather than snapping",
+        "reasoning": "Real history entries were created and deleted; computed styles directly showed the history-entry animation running, and deletion produced a visible Set deleted transition/status. Evidence: history_entries_animate_in_out-delete.png"
+      },
+      {
+        "id": "8.8",
+        "name": "reminder_banner_attention_treatment",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Daily Reminder banner uses a noticeable attention treatment such as a pulse while visible",
+        "reasoning": "BLOCKED: No Daily Reminder banner was rendered in the reachable UI, so its attention treatment could not be exercised. Evidence: character_glides_on_log-shared.png"
+      },
+      {
+        "id": "8.9",
+        "name": "zone_palette_swaps_on_reach",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Zone transitions on the quest map canvas swap the background palette as soon as a new zone is reached via real logging",
+        "reasoning": "After real logging reached the Canyon zone, the map visibly changed from the prior foothills palette to a bright orange Canyon palette. Evidence: zone_palette_swaps_on_reach-final.png"
+      },
+      {
+        "id": "8.10",
+        "name": "victory_defeat_panel_animates_in",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Victory and Defeat result panels animate in (fade or slide) when the run resolves rather than appearing with no transition",
+        "reasoning": "Real qualifying challenge reps produced a Victory panel; computed styles directly showed its rq-pop-in animation at 0.3s. Evidence: victory_defeat_panel_animates_in-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"buttons_hover_state\":{\"score\":\"yes\",\"reasoning\":\"Observed hover feedback on Log reps, including a transform change; the rendered controls also expose hover styling. Evidence: buttons_hover_state-shared.png\"},\"keyboard_focus_ring_visible\":{\"score\":\"yes\",\"reasoning\":\"Tabbed to the Shortcuts control and directly observed a 2px amber focus outline. Evidence: keyboard_focus_ring_visible-shared.png\"},\"character_glides_on_log\":{\"score\":\"no\",\"reasoning\":\"FAIL: Real logging moved the sprite, but no smooth glide animation was directly observable; the captured result only showed the settled position. Evidence: character_glides_on_log-shared.png\"},\"transient_notification_slide_and_dismiss\":{\"score\":\"yes\",\"reasoning\":\"A Zone unlocked: Canyon notification was visibly rendered after logging and was gone after waiting three seconds. Evidence: zone_palette_swaps_on_reach-final.png\"},\"history_delete_reveals_on_hover\":{\"score\":\"yes\",\"reasoning\":\"Delete controls had opacity 0 at rest and opacity 1 while the history row was hovered. Evidence: history_delete_reveals_on_hover-shared.png\"},\"boss_defeat_confetti_celebration\":{\"score\":\"no\",\"reasoning\":\"FAIL: A real Challenge Victory was achieved, but no confetti-style particle celebration was visible. Evidence: victory_defeat_panel_animates_in-shared.png\"},\"history_entries_animate_in_out\":{\"score\":\"yes\",\"reasoning\":\"Real history entries were created and deleted; computed styles directly showed the history-entry animation running, and deletion produced a visible Set deleted transition/status. Evidence: history_entries_animate_in_out-delete.png\"},\"reminder_banner_attention_treatment\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No Daily Reminder banner was rendered in the reachable UI, so its attention treatment could not be exercised. Evidence: character_glides_on_log-shared.png\"},\"zone_palette_swaps_on_reach\":{\"score\":\"yes\",\"reasoning\":\"After real logging reached the Canyon zone, the map visibly changed from the prior foothills palette to a bright orange Canyon palette. Evidence: zone_palette_swaps_on_reach-final.png\"},\"victory_defeat_panel_animates_in\":{\"score\":\"yes\",\"reasoning\":\"Real qualifying challenge reps produced a Victory panel; computed styles directly showed its rq-pop-in animation at 0.3s. Evidence: victory_defeat_panel_animates_in-shared.png\"}}",
+    "cost_usd": 0.432946
+  },
+  "performance": {
+    "score": 0.9,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_under_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive within 2 seconds of a local cold load",
+        "reasoning": "Interactive RepQuest UI loaded locally within the observed ~1.9-second navigation. Evidence: cold_start_under_two_seconds-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "console_clean_full_session",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No console errors appear during a full session covering logging, deleting, gear, mode switches, challenge Victory/Defeat, save/resume, export/import, undo/redo, and reset",
+        "reasoning": "After logging, deleting, gear changes, mode switching, challenge controls, exports, undo/redo, and reset, console reported 0 errors and 0 warnings. Evidence: console_clean_full_session-shared.png"
+      },
+      {
+        "id": "9.3",
+        "name": "controls_respond_promptly",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Log Reps, mode switches, and Challenge Start/Pause/Resume respond without multi-second UI freezes",
+        "reasoning": "Repeated logging and Challenge Start/Pause/Resume interactions completed without multi-second UI freezes. Evidence: controls_respond_promptly-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "export_does_not_hang",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export Quest Log and Export Workout CSV complete without freezing the UI for multi-second hangs on a history of at least 25 sets",
+        "reasoning": "With more than 25 history sets present, Quest Log JSON and workout CSV exports completed promptly and downloads were observed."
+      },
+      {
+        "id": "9.5",
+        "name": "history_list_stays_responsive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With at least 25 History entries the list remains scrollable and Delete remains interactive without sustained lag",
+        "reasoning": "History displayed 25 entries with Delete controls, and deletion completed interactively. Evidence: history_list_stays_responsive-shared.png"
+      },
+      {
+        "id": "9.6",
+        "name": "state_changes_remain_interactive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "During character glide and chart updates the UI stays interactive for further Log Reps and tab switches",
+        "reasoning": "Repeated logging updated totals and chart-related state while tab navigation remained responsive; no blank or frozen UI appeared. Evidence: controls_respond_promptly-shared.png"
+      },
+      {
+        "id": "9.7",
+        "name": "canvas_motion_stays_smooth",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Canvas rendering stays smooth during character movement and chart updates with no visible freezes or blanked frames",
+        "reasoning": "Character/map and chart updates remained rendered during repeated logging and mode changes, with no visible freezes or blank frames. Evidence: controls_respond_promptly-shared.png"
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_input_does_not_freeze",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapid repeated Log Reps and Challenge controls leave the UI responsive with no blank screen",
+        "reasoning": "Rapid repeated Log Reps interactions completed and left the app usable; the rendered shell remained available afterward. Evidence: controls_respond_promptly-shared.png"
+      },
+      {
+        "id": "9.9",
+        "name": "extended_session_stable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After an extended session of logging, mode switches, and exports the app remains usable without runaway slowdowns",
+        "reasoning": "After an extended sequence of logging, deletion, gear, challenge, exports, undo/redo, reload, and reset interactions, the app remained usable and console-clean. Evidence: console_clean_full_session-shared.png"
+      },
+      {
+        "id": "9.10",
+        "name": "storage_unavailable_fallback",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "When storage is unavailable the shell still loads; when available, persistence works as specified",
+        "reasoning": "BLOCKED: The permitted browser workflow did not provide a way to make storage unavailable without directly mutating browser storage. Available-storage persistence was observed after reload, but the unavailable-storage fallback could not be exercised."
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_start_under_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"Interactive RepQuest UI loaded locally within the observed ~1.9-second navigation. Evidence: cold_start_under_two_seconds-shared.png\"},\"console_clean_full_session\":{\"score\":\"yes\",\"reasoning\":\"After logging, deleting, gear changes, mode switching, challenge controls, exports, undo/redo, and reset, console reported 0 errors and 0 warnings. Evidence: console_clean_full_session-shared.png\"},\"controls_respond_promptly\":{\"score\":\"yes\",\"reasoning\":\"Repeated logging and Challenge Start/Pause/Resume interactions completed without multi-second UI freezes. Evidence: controls_respond_promptly-shared.png\"},\"export_does_not_hang\":{\"score\":\"yes\",\"reasoning\":\"With more than 25 history sets present, Quest Log JSON and workout CSV exports completed promptly and downloads were observed.\"},\"history_list_stays_responsive\":{\"score\":\"yes\",\"reasoning\":\"History displayed 25 entries with Delete controls, and deletion completed interactively. Evidence: history_list_stays_responsive-shared.png\"},\"state_changes_remain_interactive\":{\"score\":\"yes\",\"reasoning\":\"Repeated logging updated totals and chart-related state while tab navigation remained responsive; no blank or frozen UI appeared. Evidence: controls_respond_promptly-shared.png\"},\"canvas_motion_stays_smooth\":{\"score\":\"yes\",\"reasoning\":\"Character/map and chart updates remained rendered during repeated logging and mode changes, with no visible freezes or blank frames. Evidence: controls_respond_promptly-shared.png\"},\"rapid_input_does_not_freeze\":{\"score\":\"yes\",\"reasoning\":\"Rapid repeated Log Reps interactions completed and left the app usable; the rendered shell remained available afterward. Evidence: controls_respond_promptly-shared.png\"},\"extended_session_stable\":{\"score\":\"yes\",\"reasoning\":\"After an extended sequence of logging, deletion, gear, challenge, exports, undo/redo, reload, and reset interactions, the app remained usable and console-clean. Evidence: console_clean_full_session-shared.png\"},\"storage_unavailable_fallback\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The permitted browser workflow did not provide a way to make storage unavailable without directly mutating browser storage. Available-storage persistence was observed after reload, but the unavailable-storage fallback could not be exercised.\"}}",
+    "cost_usd": 0.3311558
+  },
+  "responsiveness": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "mobile_canvas_forms_scale",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At about 375px wide, the quest map canvas, forms, weekly chart, heat-map, and export controls scale to fit their container without introducing horizontal scrolling",
+        "reasoning": "Quest map and weekly chart fit their containers; mobile forms and export controls reflow without overflow. Evidence: mobile-layout-shared.png, mobile-settings-shared.png"
+      },
+      {
+        "id": "7.2",
+        "name": "mobile_text_stays_legible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At about 375px, today's/lifetime totals, Current Streak, History labels, Settings labels, Victory/Defeat text, and Personal Records stay legible and reflow rather than truncating or overflowing",
+        "reasoning": "Totals, streak, labels, records, and chart text remain visible and readable at 375px. Evidence: mobile-layout-shared.png"
+      },
+      {
+        "id": "7.3",
+        "name": "desktop_layout_usable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At about 1440px wide, tabs, Quest map, Challenge panel, Gear Shop, and Export/Import controls remain fully usable without clipping",
+        "reasoning": "At 1440px, navigation, quest map, challenge panel, Gear shop, and Settings export/import controls are fully visible without clipping. Evidence: desktop-layout-shared.png, desktop-gear-ui-shared.png, desktop-settings-ui-shared.png, desktop-challenge-shared.png"
+      },
+      {
+        "id": "7.4",
+        "name": "content_avoids_clipping",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At both desktop and ~375px widths, content avoids clipping and unnecessary horizontal scrollbars",
+        "reasoning": "Measured document width does not exceed the viewport at desktop or mobile, and screenshots show no clipped primary content. Evidence: desktop-layout-shared.png, mobile-layout-shared.png"
+      },
+      {
+        "id": "7.5",
+        "name": "chrome_adapts_small_screens",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Tab bar and mode controls adapt on small screens so Quest, History, Gear, and Settings remain reachable",
+        "reasoning": "All four tabs remain reachable in a compact 50px-high tab bar at 375px. Evidence: mobile-layout-shared.png"
+      },
+      {
+        "id": "7.6",
+        "name": "stacking_reflows_logically",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At ~375px, panels stack in a readable order (map/progress, log form, chart/heat-map) rather than overlapping",
+        "reasoning": "At 375px, map, progress, log form, records, heat-map, and weekly chart stack vertically with clear spacing. Evidence: mobile-layout-shared.png"
+      },
+      {
+        "id": "7.7",
+        "name": "tap_targets_large_enough",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At ~375px, Log Reps, tab controls, and Challenge Start/End targets are large enough to tap without precise aiming",
+        "reasoning": "Quest/Challenge controls are 48px high, Log reps is 44px high, and navigation tabs are 50px high. Evidence: mobile-layout-shared.png"
+      },
+      {
+        "id": "7.8",
+        "name": "media_and_canvases_resize",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Quest map and weekly chart canvases resize with the container rather than staying fixed-width and overflowing",
+        "reasoning": "The quest canvas renders at 335px wide and weekly chart at 301px wide inside the mobile container. Evidence: mobile-layout-shared.png"
+      },
+      {
+        "id": "7.9",
+        "name": "fixed_controls_remain_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sticky or fixed controls (if any) remain accessible and do not obscure Log Reps or tab navigation at ~375px",
+        "reasoning": "No sticky or fixed controls were observed obscuring navigation or Log reps; primary controls remain accessible. Evidence: mobile-layout-shared.png"
+      },
+      {
+        "id": "7.10",
+        "name": "small_screens_avoid_horizontal_scroll",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At about 375px wide the page does not require horizontal scrolling to reach primary controls",
+        "reasoning": "At 375px, measured document scroll width was 367px (within the viewport\u2019s usable width), with no horizontal overflow visible. Evidence: mobile-layout-shared.png, mobile-settings-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"mobile_canvas_forms_scale\":{\"score\":\"yes\",\"reasoning\":\"Quest map and weekly chart fit their containers; mobile forms and export controls reflow without overflow. Evidence: mobile-layout-shared.png, mobile-settings-shared.png\"},\"mobile_text_stays_legible\":{\"score\":\"yes\",\"reasoning\":\"Totals, streak, labels, records, and chart text remain visible and readable at 375px. Evidence: mobile-layout-shared.png\"},\"desktop_layout_usable\":{\"score\":\"yes\",\"reasoning\":\"At 1440px, navigation, quest map, challenge panel, Gear shop, and Settings export/import controls are fully visible without clipping. Evidence: desktop-layout-shared.png, desktop-gear-ui-shared.png, desktop-settings-ui-shared.png, desktop-challenge-shared.png\"},\"content_avoids_clipping\":{\"score\":\"yes\",\"reasoning\":\"Measured document width does not exceed the viewport at desktop or mobile, and screenshots show no clipped primary content. Evidence: desktop-layout-shared.png, mobile-layout-shared.png\"},\"chrome_adapts_small_screens\":{\"score\":\"yes\",\"reasoning\":\"All four tabs remain reachable in a compact 50px-high tab bar at 375px. Evidence: mobile-layout-shared.png\"},\"stacking_reflows_logically\":{\"score\":\"yes\",\"reasoning\":\"At 375px, map, progress, log form, records, heat-map, and weekly chart stack vertically with clear spacing. Evidence: mobile-layout-shared.png\"},\"tap_targets_large_enough\":{\"score\":\"yes\",\"reasoning\":\"Quest/Challenge controls are 48px high, Log reps is 44px high, and navigation tabs are 50px high. Evidence: mobile-layout-shared.png\"},\"media_and_canvases_resize\":{\"score\":\"yes\",\"reasoning\":\"The quest canvas renders at 335px wide and weekly chart at 301px wide inside the mobile container. Evidence: mobile-layout-shared.png\"},\"fixed_controls_remain_accessible\":{\"score\":\"yes\",\"reasoning\":\"No sticky or fixed controls were observed obscuring navigation or Log reps; primary controls remain accessible. Evidence: mobile-layout-shared.png\"},\"small_screens_avoid_horizontal_scroll\":{\"score\":\"yes\",\"reasoning\":\"At 375px, measured document scroll width was 367px (within the viewport\u2019s usable width), with no horizontal overflow visible. Evidence: mobile-layout-shared.png, mobile-settings-shared.png\"}}",
+    "cost_usd": 0.22354020000000002
+  },
+  "technical": {
+    "score": 0.5556,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "console_clean_during_full_exercise",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "No console errors, warnings, or unhandled promise rejections occur during a full exercise: logging sets, deleting history, gear purchases, mode switches, challenge Victory and Defeat, save/resume, export/import, undo/redo, and a guarded Reset Quest",
+        "reasoning": "BLOCKED: The complete required exercise, including every challenge, gear, import/reset, and undo/redo path, was not reachable within the observed run. No console errors or warnings appeared in the exercised subset. Evidence: stale-run-shared.png"
+      },
+      {
+        "id": "2.2",
+        "name": "refresh_restores_persisted_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After logging sets and refreshing the page, lifetime reps, current waypoint, streak, quest points, unlocked zones and gear, equipped gear, the full rep history, settings, personal records, heat-map day totals, and any challenge checkpoint are restored exactly as they were",
+        "reasoning": "The persisted state string was identical before and after reload, and the UI restored lifetime reps, quest points, history, daily goal, reminder settings, and chart totals. Evidence: persistence-shared.png"
+      },
+      {
+        "id": "2.3",
+        "name": "canvas_surfaces_render_and_resize",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The quest map and weekly summary chart render inside canvas elements (not DOM or SVG chart markup) and redraw correctly, without distortion or blanking, after a viewport resize",
+        "reasoning": "Two canvas elements rendered the quest map and weekly chart; both remained nonblank and retained valid dimensions after viewport resize. Evidence: canvas-resize-shared.png"
+      },
+      {
+        "id": "2.4",
+        "name": "stale_run_input_never_leaks",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Rep input typed before a challenge run started, or left over from an ended run, never mutates lifetime reps or the current run once game state has moved past that phase",
+        "reasoning": "FAIL: Typing 7 reps before starting a challenge, then invoking Start, changed lifetime reps from 12 to 22 and created a 10-rep history entry while the app remained in Quest mode. Evidence: stale-run-shared.png"
+      },
+      {
+        "id": "2.15",
+        "name": "api_shaped_rep_set_create",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A valid Log Reps submit creates a History record whose visible fields match the create-rep-set contract (reps in 1 through 9999, optional note up to 120 chars, setId, loggedAt timestamp)",
+        "reasoning": "Logging 12 reps created a visible History record with reps, ID set-1, and an ISO loggedAt timestamp. Evidence: history-shared.png"
+      },
+      {
+        "id": "2.16",
+        "name": "api_shaped_settings_save",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Saving Settings persists dailyGoal, reminderEnabled, and reminderHour as the settings request body and those values drive Quest goal and reminder banner behavior after reload",
+        "reasoning": "Saving settings persisted daily goal 60, reminder enabled, and hour 20; after reload the Quest goal showed 60 and Settings restored the reminder values. Evidence: settings-shared.png"
+      },
+      {
+        "id": "2.17",
+        "name": "export_schema_fields_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export Quest Log JSON includes required top-level fields schemaVersion, exportedAt, dailyGoal, streak, lifetimeReps, questPoints, unlockedZones, unlockedGearIds, equippedGearId, defeatedBossIds, and sets",
+        "reasoning": "The live JSON preview and successful JSON export visibly contained all required top-level schema fields, including schemaVersion, exportedAt, goal/state fields, gear/zones, defeatedBossIds, and sets. Evidence: settings-shared.png"
+      },
+      {
+        "id": "2.18",
+        "name": "localstorage_guard_no_crash",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "With storage unavailable or blocked, the production build still loads the shell without crashing; when storage is available, refresh restores committed state",
+        "reasoning": "BLOCKED: Storage-unavailable behavior could not be safely simulated using the permitted read-only browser measurements. Evidence: persistence-shared.png"
+      },
+      {
+        "id": "2.19",
+        "name": "shared_store_single_source",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Logging a set updates lifetime reps, today's total, History, weekly chart, and export-bound values consistently from one shared state \u2014 panels never show conflicting totals for the same moment",
+        "reasoning": "FAIL: After the stale-input workflow, the visible Quest UI showed Today: 22 while the persisted state read todayReps: 0, demonstrating inconsistent shared-state values. Evidence: stale-run-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"console_clean_during_full_exercise\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The complete required exercise, including every challenge, gear, import/reset, and undo/redo path, was not reachable within the observed run. No console errors or warnings appeared in the exercised subset. Evidence: stale-run-shared.png\"},\"refresh_restores_persisted_state\":{\"score\":\"yes\",\"reasoning\":\"The persisted state string was identical before and after reload, and the UI restored lifetime reps, quest points, history, daily goal, reminder settings, and chart totals. Evidence: persistence-shared.png\"},\"canvas_surfaces_render_and_resize\":{\"score\":\"yes\",\"reasoning\":\"Two canvas elements rendered the quest map and weekly chart; both remained nonblank and retained valid dimensions after viewport resize. Evidence: canvas-resize-shared.png\"},\"stale_run_input_never_leaks\":{\"score\":\"no\",\"reasoning\":\"FAIL: Typing 7 reps before starting a challenge, then invoking Start, changed lifetime reps from 12 to 22 and created a 10-rep history entry while the app remained in Quest mode. Evidence: stale-run-shared.png\"},\"api_shaped_rep_set_create\":{\"score\":\"yes\",\"reasoning\":\"Logging 12 reps created a visible History record with reps, ID set-1, and an ISO loggedAt timestamp. Evidence: history-shared.png\"},\"api_shaped_settings_save\":{\"score\":\"yes\",\"reasoning\":\"Saving settings persisted daily goal 60, reminder enabled, and hour 20; after reload the Quest goal showed 60 and Settings restored the reminder values. Evidence: settings-shared.png\"},\"export_schema_fields_present\":{\"score\":\"yes\",\"reasoning\":\"The live JSON preview and successful JSON export visibly contained all required top-level schema fields, including schemaVersion, exportedAt, goal/state fields, gear/zones, defeatedBossIds, and sets. Evidence: settings-shared.png\"},\"localstorage_guard_no_crash\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Storage-unavailable behavior could not be safely simulated using the permitted read-only browser measurements. Evidence: persistence-shared.png\"},\"shared_store_single_source\":{\"score\":\"no\",\"reasoning\":\"FAIL: After the stale-input workflow, the visible Quest UI showed Today: 22 while the persisted state read todayReps: 0, demonstrating inconsistent shared-state values. Evidence: stale-run-shared.png\"}}",
+    "cost_usd": 0.2647686
+  },
+  "user_flows": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "log_set_full_pipeline_to_history",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Logging a valid set from the Quest tab increases today's total and lifetime reps by exactly the entered count, glides the character forward, grows today's weekly-chart bar, updates today's heat-map cell, and shows the new entry at the top of History with reps and timestamp without a reload",
+        "reasoning": "Logged 10 reps; Quest immediately showed Today/Lifetime 10, heat-map and weekly summary 10, character advanced on the map, and History showed the new 10-rep entry with timestamp. Evidence: log_set_full_pipeline_to_history-final.png"
+      },
+      {
+        "id": "6.2",
+        "name": "invalid_log_reps_inline_validation_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting Log Reps with an invalid reps value shows an inline error naming reps before any totals change, and today's total and lifetime reps stay unchanged",
+        "reasoning": "Submitting 0 displayed the inline error \u201cReps: enter a whole number from 1 to 9999.\u201d while Today and Lifetime remained 80. Evidence: invalid_log_reps_inline_validation_flow-shared.png"
+      },
+      {
+        "id": "6.3",
+        "name": "daily_goal_edit_updates_surfaces",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Saving a new dailyGoal in Settings immediately re-scales the Quest progress indicator and moves the weekly chart goal reference line without a reload",
+        "reasoning": "Saving daily goal 25 immediately changed Quest progress from /50 to /25 and showed 10/25 with the updated weekly chart view. Evidence: daily_goal_edit_updates_surfaces-shared.png"
+      },
+      {
+        "id": "6.4",
+        "name": "delete_history_recomputes_quest_surfaces",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Deleting a History entry removes exactly that entry and returning to Quest shows recomputed today's total, lifetime reps, character position, and weekly chart without a reload",
+        "reasoning": "Deleting the entry removed it, and Quest then showed Today/Lifetime 0, QP 0, reset map position, and zeroed weekly summary. Evidence: delete_history_recomputes_quest_surfaces-final.png"
+      },
+      {
+        "id": "6.5",
+        "name": "quest_challenge_mode_round_trip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Switching from Quest mode to Challenge mode and back preserves lifetime reps, today's total, quest points, History, and any in-progress challenge run state",
+        "reasoning": "An active Normal challenge at 0/15 was switched Quest \u2192 Challenge and returned still Active with target 15, run logged 0, Lifetime 10, and QP 10. Evidence: quest_challenge_mode_round_trip-final.png"
+      },
+      {
+        "id": "6.6",
+        "name": "last_delete_reveals_history_empty_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Deleting the last History entry reveals the History empty-state placeholder explaining what belongs there",
+        "reasoning": "After deleting the final History entry, the History view displayed \u201cNo sets logged yet\u201d and explained what appears there. Evidence: last_delete_reveals_history_empty_state-shared.png"
+      },
+      {
+        "id": "6.7",
+        "name": "challenge_difficulty_then_victory_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Choosing a difficulty, starting a run, meeting the shown target with logged reps, and resolving the run shows Victory with logged reps at or above the target, then Restart returns to idle with zero run reps",
+        "reasoning": "Selected Easy, started a run with a 15-rep target, logged 15, observed Victory 15/15, then Restart returned the run to Idle with 0 reps. Evidence: challenge_difficulty_then_victory_flow-shared.png"
+      },
+      {
+        "id": "6.8",
+        "name": "export_import_round_trip_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After logging at least two sets and unlocking gear, Export Quest Log then Reset Quest then Import Quest Log reconstructs the same History reps, lifetime reps, unlocked gear, and equipped appearance",
+        "reasoning": "Exported a log containing 60- and 20-rep sets plus Warrior armor, reset the quest, imported the file, and observed Lifetime 80, QP 75, both History sets, unlocked gear, and equipped Warrior state restored. Evidence: export_import_round_trip_flow-shared.png"
+      },
+      {
+        "id": "6.9",
+        "name": "reset_dialog_cancel_and_confirm",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Reset Quest opens a confirmation dialog; Cancel leaves state untouched; Confirm wipes lifetime reps, streak, quest points, history, and checkpoint to a fresh start",
+        "reasoning": "Reset Quest opened a confirmation dialog; Cancel dismissed it, and Confirm produced \u201cQuest reset \u2014 starting fresh\u201d with daily goal 50, zero lifetime reps, zero QP, and empty history. Evidence: reset_dialog_cancel_and_confirm-shared.png"
+      },
+      {
+        "id": "6.10",
+        "name": "save_resume_challenge_after_reload",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Save Progress during an active challenge run after logging a set, full page refresh, then Resume Saved Run restores difficulty, target, and repsLogged",
+        "reasoning": "Saved an active Normal run at 5/30, refreshed the page, selected Challenge mode, and Resume saved run restored Active Normal with target 30 and repsLogged 5. Evidence: save_resume_challenge_after_reload-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"log_set_full_pipeline_to_history\":{\"score\":\"yes\",\"reasoning\":\"Logged 10 reps; Quest immediately showed Today/Lifetime 10, heat-map and weekly summary 10, character advanced on the map, and History showed the new 10-rep entry with timestamp. Evidence: log_set_full_pipeline_to_history-final.png\"},\"invalid_log_reps_inline_validation_flow\":{\"score\":\"yes\",\"reasoning\":\"Submitting 0 displayed the inline error \u201cReps: enter a whole number from 1 to 9999.\u201d while Today and Lifetime remained 80. Evidence: invalid_log_reps_inline_validation_flow-shared.png\"},\"daily_goal_edit_updates_surfaces\":{\"score\":\"yes\",\"reasoning\":\"Saving daily goal 25 immediately changed Quest progress from /50 to /25 and showed 10/25 with the updated weekly chart view. Evidence: daily_goal_edit_updates_surfaces-shared.png\"},\"delete_history_recomputes_quest_surfaces\":{\"score\":\"yes\",\"reasoning\":\"Deleting the entry removed it, and Quest then showed Today/Lifetime 0, QP 0, reset map position, and zeroed weekly summary. Evidence: delete_history_recomputes_quest_surfaces-final.png\"},\"quest_challenge_mode_round_trip\":{\"score\":\"yes\",\"reasoning\":\"An active Normal challenge at 0/15 was switched Quest \u2192 Challenge and returned still Active with target 15, run logged 0, Lifetime 10, and QP 10. Evidence: quest_challenge_mode_round_trip-final.png\"},\"last_delete_reveals_history_empty_state\":{\"score\":\"yes\",\"reasoning\":\"After deleting the final History entry, the History view displayed \u201cNo sets logged yet\u201d and explained what appears there. Evidence: last_delete_reveals_history_empty_state-shared.png\"},\"challenge_difficulty_then_victory_flow\":{\"score\":\"yes\",\"reasoning\":\"Selected Easy, started a run with a 15-rep target, logged 15, observed Victory 15/15, then Restart returned the run to Idle with 0 reps. Evidence: challenge_difficulty_then_victory_flow-shared.png\"},\"export_import_round_trip_flow\":{\"score\":\"yes\",\"reasoning\":\"Exported a log containing 60- and 20-rep sets plus Warrior armor, reset the quest, imported the file, and observed Lifetime 80, QP 75, both History sets, unlocked gear, and equipped Warrior state restored. Evidence: export_import_round_trip_flow-shared.png\"},\"reset_dialog_cancel_and_confirm\":{\"score\":\"yes\",\"reasoning\":\"Reset Quest opened a confirmation dialog; Cancel dismissed it, and Confirm produced \u201cQuest reset \u2014 starting fresh\u201d with daily goal 50, zero lifetime reps, zero QP, and empty history. Evidence: reset_dialog_cancel_and_confirm-shared.png\"},\"save_resume_challenge_after_reload\":{\"score\":\"yes\",\"reasoning\":\"Saved an active Normal run at 5/30, refreshed the page, selected Challenge mode, and Resume saved run restored Active Normal with target 30 and repsLogged 5. Evidence: save_resume_challenge_after_reload-shared.png\"}}",
+    "cost_usd": 1.6112716
+  },
+  "visual_design": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "zone_palettes_distinct",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Each unlocked zone (Foothills, Canyon, Summit) paints the quest map canvas with its own distinct sky/ground palette so the current region is identifiable at a glance",
+        "reasoning": "Foothills, Canyon, and Summit were observed with distinct blue/green, orange, and purple sky/ground palettes. Evidence: initial-shared.png, zone-100.png, zone-summit-300.png"
+      },
+      {
+        "id": "3.2",
+        "name": "boss_marker_distinction",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Boss Challenge waypoints render visibly larger and in a different color than normal waypoints, with a clearly different defeated treatment once cleared",
+        "reasoning": "Boss waypoints were visibly larger/red than normal markers, while cleared bosses appeared as large green check markers. Evidence: zone-summit-300.png"
+      },
+      {
+        "id": "3.3",
+        "name": "goal_progress_color_thresholds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The daily-goal progress fill uses a clear color threshold (below half, at/above half, at/above goal) so progress reads without checking the numbers",
+        "reasoning": "Progress visibly changed red below half, amber at 60%, and green at goal completion. Evidence: goal-below-half.png, goal-half.png, goal-met.png"
+      },
+      {
+        "id": "3.4",
+        "name": "gear_locked_unlocked_treatment",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Locked outfits in the Gear Shop show a muted/grayscale treatment that turns to full color once unlocked; the equipped outfit is clearly marked as selected among unlocked options",
+        "reasoning": "Locked outfits were grayscale/muted; unlocking Warrior armor restored color and showed a clear equipped selection ring/label. Evidence: gear.png, gear-unlocked.png"
+      },
+      {
+        "id": "3.5",
+        "name": "empty_states_render",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Before any set is logged, the History tab shows a friendly placeholder message, and the weekly summary chart shows all-zero bars rather than a blank area",
+        "reasoning": "History showed a friendly no-sets placeholder, and the weekly summary rendered seven zero-value bars rather than a blank area. Evidence: history-empty.png, empty-quest-full.png"
+      },
+      {
+        "id": "3.6",
+        "name": "active_tab_visually_distinct",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Tab navigation (Quest / History / Gear / Settings) is visually distinct for the active tab versus inactive tabs",
+        "reasoning": "The selected tab used bright text and an accent underline while inactive tabs were muted and borderless. Evidence: settings.png"
+      },
+      {
+        "id": "3.7",
+        "name": "meta_screens_cohesive_styling",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Meta screens (tab bar, Settings forms, Gear Shop cards, History list, dialogs, notification banners, Export/Import controls, Personal Records, and streak heat-map) share cohesive component styling distinct from the hand-rendered canvas play surfaces",
+        "reasoning": "Settings, Gear, History, export controls, heat-map, dialogs, and banners consistently used cohesive dark cards, borders, rounded controls, and accent styling distinct from the illustrated canvas. Evidence: settings.png, gear.png, history-empty.png, empty-quest-full.png"
+      },
+      {
+        "id": "3.8",
+        "name": "victory_defeat_visually_distinct",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Victory and Defeat result panels are visually distinct from each other (success-toned vs warning/defeat-toned) so the decided outcome reads at a glance",
+        "reasoning": "Victory rendered as a success-toned panel, while Defeat rendered as a contrasting dark red warning panel with distinct copy and icon treatment. Evidence: victory.png, defeat.png"
+      },
+      {
+        "id": "3.9",
+        "name": "heatmap_cell_treatments_distinct",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Heat-map cells for empty, below-goal, and at-or-above-goal days are visually distinct by fill intensity or color",
+        "reasoning": "Empty cells were dark, below-goal cells amber, and goal-met cells green; their accessible labels also reflected the states. Evidence: empty-quest-full.png, heatmap-below.png, heatmap-goal.png"
+      },
+      {
+        "id": "3.10",
+        "name": "single_consistent_icon_set",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Icons appear from a single consistent icon set across tabs, buttons, and status indicators with no mismatched icon styles",
+        "reasoning": "Tabs, buttons, banners, cards, and status indicators consistently used the same outlined SVG icon style and proportions. Evidence: settings.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"zone_palettes_distinct\":{\"score\":\"yes\",\"reasoning\":\"Foothills, Canyon, and Summit were observed with distinct blue/green, orange, and purple sky/ground palettes. Evidence: initial-shared.png, zone-100.png, zone-summit-300.png\"},\"boss_marker_distinction\":{\"score\":\"yes\",\"reasoning\":\"Boss waypoints were visibly larger/red than normal markers, while cleared bosses appeared as large green check markers. Evidence: zone-summit-300.png\"},\"goal_progress_color_thresholds\":{\"score\":\"yes\",\"reasoning\":\"Progress visibly changed red below half, amber at 60%, and green at goal completion. Evidence: goal-below-half.png, goal-half.png, goal-met.png\"},\"gear_locked_unlocked_treatment\":{\"score\":\"yes\",\"reasoning\":\"Locked outfits were grayscale/muted; unlocking Warrior armor restored color and showed a clear equipped selection ring/label. Evidence: gear.png, gear-unlocked.png\"},\"empty_states_render\":{\"score\":\"yes\",\"reasoning\":\"History showed a friendly no-sets placeholder, and the weekly summary rendered seven zero-value bars rather than a blank area. Evidence: history-empty.png, empty-quest-full.png\"},\"active_tab_visually_distinct\":{\"score\":\"yes\",\"reasoning\":\"The selected tab used bright text and an accent underline while inactive tabs were muted and borderless. Evidence: settings.png\"},\"meta_screens_cohesive_styling\":{\"score\":\"yes\",\"reasoning\":\"Settings, Gear, History, export controls, heat-map, dialogs, and banners consistently used cohesive dark cards, borders, rounded controls, and accent styling distinct from the illustrated canvas. Evidence: settings.png, gear.png, history-empty.png, empty-quest-full.png\"},\"victory_defeat_visually_distinct\":{\"score\":\"yes\",\"reasoning\":\"Victory rendered as a success-toned panel, while Defeat rendered as a contrasting dark red warning panel with distinct copy and icon treatment. Evidence: victory.png, defeat.png\"},\"heatmap_cell_treatments_distinct\":{\"score\":\"yes\",\"reasoning\":\"Empty cells were dark, below-goal cells amber, and goal-met cells green; their accessible labels also reflected the states. Evidence: empty-quest-full.png, heatmap-below.png, heatmap-goal.png\"},\"single_consistent_icon_set\":{\"score\":\"yes\",\"reasoning\":\"Tabs, buttons, banners, cards, and status indicators consistently used the same outlined SVG icon style and proportions. Evidence: settings.png\"} }",
+    "cost_usd": 0.607504
+  },
+  "writing": {
+    "score": 0.75,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "consistent_capitalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Headings, tab labels, and buttons use one consistent capitalization convention throughout the app",
+        "reasoning": "Headings, tabs, and buttons consistently use title-style capitalization. Evidence: consistent_capitalization-shared.png"
+      },
+      {
+        "id": "15.2",
+        "name": "action_labels_specific",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Primary actions use specific labels such as Log reps, Export Quest Log, Import Quest Log, Save Progress, Resume Saved Run, Start run, End run rather than generic Submit/OK everywhere",
+        "reasoning": "Actions use specific labels including Log reps, Start run, End run, Export Quest Log, Copy JSON, and Save settings. Evidence: consistent_capitalization-shared.png"
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Validation and feedback messages name the problem and the fix (which field is invalid and what a valid value looks like); import rejection names that the file is invalid",
+        "reasoning": "BLOCKED: Rep validation was specific\u2014\u201center a whole number from 1 to 9999\u201d\u2014but invalid import rejection was not exercised. Evidence: errors_name_problem_and_fix-shared.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "The History empty state explains what belongs there and how to log a first set",
+        "reasoning": "History says \u201cNo sets logged yet\u201d and explains that sets logged from the Quest tab appear there. Evidence: empty_states_explain_next_step-shared.png"
+      },
+      {
+        "id": "15.5",
+        "name": "victory_defeat_exact_words",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Victory and Defeat copy uses those exact outcome words so the decided result is unambiguous",
+        "reasoning": "Completed runs visibly produced both \u201cVictory\u201d and \u201cDefeat\u201d outcomes. Evidence: victory_defeat_exact_words-shared.png"
+      },
+      {
+        "id": "15.6",
+        "name": "terminology_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Domain terms (Quest Points, Daily Goal, Challenge, Zone Unlocked) stay consistent across tabs and banners",
+        "reasoning": "Observed consistent terms including Quest points/QP, Challenge mode, and Zone across the app. Evidence: numbers_and_units_consistent-shared.png"
+      },
+      {
+        "id": "15.7",
+        "name": "numbers_and_units_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Rep counts and quest points use consistent numeric formatting and unit wording across Quest, History, and Challenge",
+        "reasoning": "Rep quantities consistently use \u201creps,\u201d and points consistently use QP/Quest points across Quest, History, and Challenge. Evidence: numbers_and_units_consistent-shared.png"
+      },
+      {
+        "id": "15.8",
+        "name": "success_messages_specific",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Success toasts for zone unlock, boss defeat, gear bought, Saved, and Copied are specific rather than a generic Success",
+        "reasoning": "BLOCKED: Specific messages were observed for gear unlock, settings saved, and copied JSON, but zone-unlock and boss-defeat success toasts were not fully exercised. Evidence: success_messages_specific-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"consistent_capitalization\":{\"score\":\"yes\",\"reasoning\":\"Headings, tabs, and buttons consistently use title-style capitalization. Evidence: consistent_capitalization-shared.png\"},\"action_labels_specific\":{\"score\":\"yes\",\"reasoning\":\"Actions use specific labels including Log reps, Start run, End run, Export Quest Log, Copy JSON, and Save settings. Evidence: consistent_capitalization-shared.png\"},\"errors_name_problem_and_fix\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Rep validation was specific\u2014\u201center a whole number from 1 to 9999\u201d\u2014but invalid import rejection was not exercised. Evidence: errors_name_problem_and_fix-shared.png\"},\"empty_states_explain_next_step\":{\"score\":\"yes\",\"reasoning\":\"History says \u201cNo sets logged yet\u201d and explains that sets logged from the Quest tab appear there. Evidence: empty_states_explain_next_step-shared.png\"},\"victory_defeat_exact_words\":{\"score\":\"yes\",\"reasoning\":\"Completed runs visibly produced both \u201cVictory\u201d and \u201cDefeat\u201d outcomes. Evidence: victory_defeat_exact_words-shared.png\"},\"terminology_consistent\":{\"score\":\"yes\",\"reasoning\":\"Observed consistent terms including Quest points/QP, Challenge mode, and Zone across the app. Evidence: numbers_and_units_consistent-shared.png\"},\"numbers_and_units_consistent\":{\"score\":\"yes\",\"reasoning\":\"Rep quantities consistently use \u201creps,\u201d and points consistently use QP/Quest points across Quest, History, and Challenge. Evidence: numbers_and_units_consistent-shared.png\"},\"success_messages_specific\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Specific messages were observed for gear unlock, settings saved, and copied JSON, but zone-unlock and boss-defeat success toasts were not fully exercised. Evidence: success_messages_specific-shared.png\"}}",
+    "cost_usd": 0.44226039999999994
+  }
+}

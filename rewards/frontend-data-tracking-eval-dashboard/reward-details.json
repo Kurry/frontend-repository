@@ -1,0 +1,2722 @@
+{
+  "accessibility": {
+    "score": 0.6,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "controls_are_keyboard_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every interactive control \u2014 suite entries, toolbar controls including Export results, Import results, Undo, and Redo, table headers, row actions, step retry and pause/resume, and form fields \u2014 is reachable and operable with Tab, Shift+Tab, Enter, or Space",
+        "reasoning": "Native buttons, inputs, table-header buttons, suite entries, row actions, and step controls were present in the tab order. Evidence: ACCESS-INIT-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "modals_and_drawer_manage_focus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "New Suite, Edit Suite, confirmation modals, and the export drawer trap focus while open, close on Escape, and return focus to the control that opened them",
+        "reasoning": "FAIL: Opening New Suite, Import results, and Export results left focus outside the overlay instead of trapping focus; Escape did close and restore focus for New Suite. Evidence: MODAL-FOCUS-shared.png, IMPORT-MODAL-shared.png, EXPORT-DRAWER-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "icons_have_accessible_names",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Toolbar icons, step status icons, and moon badge affordances expose accessible names or labels rather than unlabeled icon-only controls",
+        "reasoning": "FAIL: Several icon-only controls, including night-mode switches and some row/step action buttons, had no accessible name; status SVGs were inconsistently labeled. Evidence: ACCESS-INIT-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "run_events_use_live_regions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Eval run completion and a step entering the failed state are announced through an aria-live region as well as shown visually",
+        "reasoning": "BLOCKED: Completion was announced in an assertive live region, but no failed step state could be reached and verified during the live run. Evidence: RUN-LIVE-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "forms_have_explicit_labels",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Suite name, prompt selection, night start/end time, and import fields have visible labels, and validation messages are associated with their fields",
+        "reasoning": "FAIL: Suite name, prompt selection, and import JSON had visible labels, but Night start time and Night end time were not associated with explicit labels; full form-label coverage therefore failed. Evidence: NIGHT-WINDOW-FORMS-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "headings_follow_logical_order",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "App title and panel headings follow a logical heading order without skips across the suite list, results, charts, and export drawer",
+        "reasoning": "The rendered hierarchy used one H1 for Eval Studio followed by H2 panel headings without skipped levels. Evidence: ACCESS-INIT-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "landmark_navigation_is_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The layout exposes navigation/sidebar and main content landmarks so keyboard and assistive-tech users can move between the suite list and results region",
+        "reasoning": "The page exposed banner, complementary sidebar, and main content landmarks, separating suite navigation from results. Evidence: ACCESS-INIT-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "text_and_controls_have_contrast",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Body text, table text, score badges, and toolbar controls meet readable contrast against their surfaces",
+        "reasoning": "Rendered body/table text and toolbar controls had strong foreground/background contrast; sampled values were dark text on light surfaces and light toolbar text on a dark header. Evidence: ACCESS-INIT-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "semantic_html_roles_are_used",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Suite entries, toolbar buttons, table headers, and dialog/drawer overlays use semantic controls or appropriate roles rather than clickable plain divs",
+        "reasoning": "Suite entries and toolbar controls were native buttons, sortable table headers were buttons inside TH elements, and dialogs used role=dialog with labeled overlays. Evidence: ACCESS-INIT-shared.png, EXPORT-DRAWER-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "reduced_motion_is_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, staggered result rows, chart bar growth, and drawer/modal transitions apply instantly / appear simultaneously as specified",
+        "reasoning": "In the reduced-motion browser, prefers-reduced-motion matched true; result rows had zero delay and ~0s duration, and chart transitions/animations were reduced to 1e-6s. Evidence: REDUCED-MOTION-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"controls_are_keyboard_accessible\":{\"score\":\"yes\",\"reasoning\":\"Native buttons, inputs, table-header buttons, suite entries, row actions, and step controls were present in the tab order. Evidence: ACCESS-INIT-shared.png\"},\"modals_and_drawer_manage_focus\":{\"score\":\"no\",\"reasoning\":\"FAIL: Opening New Suite, Import results, and Export results left focus outside the overlay instead of trapping focus; Escape did close and restore focus for New Suite. Evidence: MODAL-FOCUS-shared.png, IMPORT-MODAL-shared.png, EXPORT-DRAWER-shared.png\"},\"icons_have_accessible_names\":{\"score\":\"no\",\"reasoning\":\"FAIL: Several icon-only controls, including night-mode switches and some row/step action buttons, had no accessible name; status SVGs were inconsistently labeled. Evidence: ACCESS-INIT-shared.png\"},\"run_events_use_live_regions\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Completion was announced in an assertive live region, but no failed step state could be reached and verified during the live run. Evidence: RUN-LIVE-shared.png\"},\"forms_have_explicit_labels\":{\"score\":\"no\",\"reasoning\":\"FAIL: Suite name, prompt selection, and import JSON had visible labels, but Night start time and Night end time were not associated with explicit labels; full form-label coverage therefore failed. Evidence: NIGHT-WINDOW-FORMS-shared.png\"},\"headings_follow_logical_order\":{\"score\":\"yes\",\"reasoning\":\"The rendered hierarchy used one H1 for Eval Studio followed by H2 panel headings without skipped levels. Evidence: ACCESS-INIT-shared.png\"},\"landmark_navigation_is_present\":{\"score\":\"yes\",\"reasoning\":\"The page exposed banner, complementary sidebar, and main content landmarks, separating suite navigation from results. Evidence: ACCESS-INIT-shared.png\"},\"text_and_controls_have_contrast\":{\"score\":\"yes\",\"reasoning\":\"Rendered body/table text and toolbar controls had strong foreground/background contrast; sampled values were dark text on light surfaces and light toolbar text on a dark header. Evidence: ACCESS-INIT-shared.png\"},\"semantic_html_roles_are_used\":{\"score\":\"yes\",\"reasoning\":\"Suite entries and toolbar controls were native buttons, sortable table headers were buttons inside TH elements, and dialogs used role=dialog with labeled overlays. Evidence: ACCESS-INIT-shared.png, EXPORT-DRAWER-shared.png\"},\"reduced_motion_is_respected\":{\"score\":\"yes\",\"reasoning\":\"In the reduced-motion browser, prefers-reduced-motion matched true; result rows had zero delay and ~0s duration, and chart transitions/animations were reduced to 1e-6s. Evidence: REDUCED-MOTION-shared.png\"}}",
+    "cost_usd": 0.2889888
+  },
+  "behavioral": {
+    "score": 0.6667,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_reload_resets_seeded",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Multi-facet round-trip: create a suite, toggle Night Mode, sort results descending, open comparison, then reload \u2014 all facets coherently reset to the seeded baseline (seeded suites, historical runs, default view, no night-mode schedules), never a mix of persisted and reset state",
+        "reasoning": "Reload reset to 3 seeded suites, Customer care quality/results view, all Night Mode switches false, and no active schedule. Evidence: multi_facet_reload_resets_seeded-shared.png"
+      },
+      {
+        "id": "14.2",
+        "name": "score_sort_reversal",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sort-reversal proof: sort the results table by score ascending, note the order, then sort descending; the order reverses relative to ascending",
+        "reasoning": "Observed ascending scores 92, 93, 94, 96, 96, 99, then descending 99, 96, 96, 94, 93, 92. Evidence: score_sort_reversal-shared.png"
+      },
+      {
+        "id": "14.3",
+        "name": "charts_track_new_run",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Derived-view sensitivity: complete a new run and confirm the bar chart redraws with new per-model averages and the trend line gains a new point rather than redrawing identically",
+        "reasoning": "FAIL: The new run changed result rows, but the trend labels remained Jul 12\u2013Jul 18 with no new point; full chart redraw sensitivity was not satisfied. Evidence: charts_track_new_run-shared.png"
+      },
+      {
+        "id": "14.4",
+        "name": "comparison_echoes_results",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cross-view echo: note a prompt's score in the results table, switch to comparison, and confirm the same prompt/model cell shows that score without reload",
+        "reasoning": "Comparison view showed the same prompt/model scores as the results table without reload, including 93/92/96 and 94/96/99. Evidence: comparison_echoes_results-shared.png"
+      },
+      {
+        "id": "14.5",
+        "name": "suite_count_delta_exact",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Count-delta integrity: measure the suite list count immediately before and after a valid New Suite submit; the delta is exactly +1",
+        "reasoning": "FAIL: WebMCP creation returned success, but the visible suite count remained 3 rather than increasing to 4. Evidence: suite_count_delta_exact-shared.png"
+      },
+      {
+        "id": "14.6",
+        "name": "two_runs_differ",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Input-dependent output: run the same suite twice and confirm the two result sets are not byte-identical in scores and latencies",
+        "reasoning": "FAIL: Two runs of the same suite produced identical exported scores and latencies (93/951, 92/1178, 96/1689, 94/1965, 96/1063, 99/1354). Evidence: export_contains_session_run-shared.png"
+      },
+      {
+        "id": "14.7",
+        "name": "export_contains_session_run",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Full-pipeline export probe: complete a run, open Export results, and confirm the JSON results array length equals the visible table row count and each exported score matches the corresponding row",
+        "reasoning": "Export drawer visibly reported 6 result records, and its JSON contained six results whose scores matched the visible table rows. Evidence: export_contains_session_run-shared.png"
+      },
+      {
+        "id": "14.8",
+        "name": "import_export_round_trip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edge-state round-trip: export JSON after a run, overwrite latest results so the table differs, import the JSON, and confirm table, charts, suite badge, and a fresh export match the imported document",
+        "reasoning": "Imported JSON replaced the latest run; the table showed two imported rows, charts reflected average 80, the Engineering copilot badge remained active, and fresh export reported 2 result records with matching values. Evidence: import_export_round_trip-shared.png"
+      },
+      {
+        "id": "14.9",
+        "name": "undo_round_trip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Undo round-trip: create a suite, Undo removes it, Redo restores the same name and prompt count, and the suite count returns to the post-create value",
+        "reasoning": "After creating Undo Verifier, Undo removed it and restored the count to 3; Redo restored the same suite name, 1 prompt, and count 4. Evidence: undo_round_trip-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"multi_facet_reload_resets_seeded\":{\"score\":\"yes\",\"reasoning\":\"Reload reset to 3 seeded suites, Customer care quality/results view, all Night Mode switches false, and no active schedule. Evidence: multi_facet_reload_resets_seeded-shared.png\"},\"score_sort_reversal\":{\"score\":\"yes\",\"reasoning\":\"Observed ascending scores 92, 93, 94, 96, 96, 99, then descending 99, 96, 96, 94, 93, 92. Evidence: score_sort_reversal-shared.png\"},\"charts_track_new_run\":{\"score\":\"no\",\"reasoning\":\"FAIL: The new run changed result rows, but the trend labels remained Jul 12\u2013Jul 18 with no new point; full chart redraw sensitivity was not satisfied. Evidence: charts_track_new_run-shared.png\"},\"comparison_echoes_results\":{\"score\":\"yes\",\"reasoning\":\"Comparison view showed the same prompt/model scores as the results table without reload, including 93/92/96 and 94/96/99. Evidence: comparison_echoes_results-shared.png\"},\"suite_count_delta_exact\":{\"score\":\"no\",\"reasoning\":\"FAIL: WebMCP creation returned success, but the visible suite count remained 3 rather than increasing to 4. Evidence: suite_count_delta_exact-shared.png\"},\"two_runs_differ\":{\"score\":\"no\",\"reasoning\":\"FAIL: Two runs of the same suite produced identical exported scores and latencies (93/951, 92/1178, 96/1689, 94/1965, 96/1063, 99/1354). Evidence: export_contains_session_run-shared.png\"},\"export_contains_session_run\":{\"score\":\"yes\",\"reasoning\":\"Export drawer visibly reported 6 result records, and its JSON contained six results whose scores matched the visible table rows. Evidence: export_contains_session_run-shared.png\"},\"import_export_round_trip\":{\"score\":\"yes\",\"reasoning\":\"Imported JSON replaced the latest run; the table showed two imported rows, charts reflected average 80, the Engineering copilot badge remained active, and fresh export reported 2 result records with matching values. Evidence: import_export_round_trip-shared.png\"},\"undo_round_trip\":{\"score\":\"yes\",\"reasoning\":\"After creating Undo Verifier, Undo removed it and restored the count to 3; Redo restored the same suite name, 1 prompt, and count 4. Evidence: undo_round_trip-shared.png\"}}",
+    "cost_usd": 0.6385938
+  },
+  "core_features": {
+    "score": 0.4179,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "seeded_suite_list_complete",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On load, the left panel lists at least 3 seeded eval suites, and each entry shows a suite name, a prompt count, a last-run timestamp, and an average score badge",
+        "reasoning": "Three seeded suites visibly list names, prompt counts, last-run times, and average scores. Evidence: seeded_suite_list_complete-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "create_suite_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Clicking New Suite opens a modal with a suite name field and a prompt multi-select; the Submit control is disabled until a name is entered and at least one prompt is selected, and submitting a valid form closes the modal and adds exactly one new entry to the suite list",
+        "reasoning": "New Suite modal showed name and prompt selection, disabled Submit initially, then valid submission added exactly one suite. Evidence: create_suite_flow-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "invalid_create_validation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Attempting to submit New Suite with an empty suite name, a name longer than 80 characters, or zero prompts selected shows an inline validation message naming the offending field, and the suite list gains no entry",
+        "reasoning": "FAIL: Empty-name validation was visible, but longer-name and zero-prompt submission cases were not fully exercised. Evidence: create_suite_flow-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "edit_suite_prefilled_updates",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Choosing a suite entry's Edit action opens the form prefilled with that suite's name and prompt selection, and saving updates the entry's name and prompt count in the list without a page reload",
+        "reasoning": "Edit opened prefilled name and prompt selection; saving changed the suite name without reload. Evidence: edit_suite_prefilled_updates-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "delete_confirm_cancel",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Choosing a suite's Delete action opens a confirmation dialog; confirming removes exactly that suite from the list, while canceling leaves the suite intact",
+        "reasoning": "Delete opened confirmation, Cancel preserved the suite, and confirmation removed it. Evidence: edit_suite_prefilled_updates-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "run_steps_visible_progression",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Clicking Run Suite shows one visible step per prompt in the suite, each labeled with its prompt title, and step statuses advance visibly through pending, running, and complete (or failed) as the simulated run progresses",
+        "reasoning": "BLOCKED: Final complete state was observed, but pending/running progression was not directly observed. Evidence: run_steps_visible_progression-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "run_log_streams_progressively",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "During a run started from the real Run Suite control, the inline run log grows progressively \u2014 lines appear incrementally over the course of the run, not all at once \u2014 and a status affordance distinguishes waiting, running, and complete states",
+        "reasoning": "BLOCKED: The completed log showed multiple timestamped lines, but progressive growth during the run was not directly observed. Evidence: run_steps_visible_progression-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "retry_backoff_attempt_counter",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "When a simulated step failure occurs, the step shows a retrying state with a visible backoff countdown and an attempt counter (such as retry 2 of 3) before the retry executes",
+        "reasoning": "BLOCKED: No simulated retrying/backoff state was observed. Evidence: run_steps_visible_progression-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "failed_retry_resumes_from_step",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A step that exhausts its retries is marked failed with an inline error summary and a manual Retry control; activating that control resumes the run from that step, and steps completed earlier keep their original outputs and timestamps without re-executing",
+        "reasoning": "BLOCKED: No exhausted-retry failure or manual Retry workflow was observed. Evidence: run_steps_visible_progression-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "pause_resume_checkpoint",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Pausing a running suite freezes step progression at the current step; resuming continues from exactly that step, and steps completed before the pause remain unchanged",
+        "reasoning": "BLOCKED: Pause/resume was not exercised. Evidence: run_steps_visible_progression-shared.png"
+      },
+      {
+        "id": "1.11",
+        "name": "rollup_derives_from_steps",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A run-level rollup shows completed count out of total (n of m), overall elapsed duration, and failure count, and these values update live as step statuses advance during a run",
+        "reasoning": "FAIL: Rollup fields were visible, but live updates while steps advanced were not observed. Evidence: run_steps_visible_progression-shared.png"
+      },
+      {
+        "id": "1.12",
+        "name": "event_timeline_filter_highlight",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The run's event timeline lists step transitions in order with timestamps, filtering the timeline by status narrows the visible entries, and selecting a timeline entry highlights the corresponding step in the step list",
+        "reasoning": "BLOCKED: Timeline entries were visible, but filtering and selection highlighting were not exercised. Evidence: run_steps_visible_progression-shared.png"
+      },
+      {
+        "id": "1.13",
+        "name": "run_completion_updates_suite",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When a run finishes, the results panel populates with that run's rows, and the suite entry's last-run timestamp and average score badge update to reflect the new run without a reload",
+        "reasoning": "After completion, results populated and the suite entry showed updated timestamp and average score. Evidence: run_steps_visible_progression-shared.png"
+      },
+      {
+        "id": "1.14",
+        "name": "results_table_columns_pass_badge",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The results table shows columns for prompt title, model, score (0 to 100), latency in milliseconds, tokens used, and a pass/fail badge, and rows with a score of 70 or above show Pass while rows below 70 show Fail",
+        "reasoning": "Results visibly included prompt, model, score, latency, tokens, and Pass/Fail badges consistent with scores. Evidence: run_steps_visible_progression-shared.png"
+      },
+      {
+        "id": "1.15",
+        "name": "column_sort_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Clicking a results column header sorts the table by that column ascending, clicking the same header again reverses the order to descending, and the reordering is consistent with the visible cell values (proving sort derives from live data)",
+        "reasoning": "BLOCKED: Ascending and descending sort round-trip was not exercised. Evidence: run_steps_visible_progression-shared.png"
+      },
+      {
+        "id": "1.16",
+        "name": "detail_panel_with_disclosure",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Clicking a result row opens a detail panel showing the full prompt text, the model response, and a per-dimension scoring breakdown inside a collapsible region that is collapsed by default, expands on activation, and remembers its open state per result while the app is open",
+        "reasoning": "Selecting a row opened full prompt and response details; scoring breakdown was collapsed then expanded and showed dimensions. Evidence: detail_panel_with_disclosure-shared.png"
+      },
+      {
+        "id": "1.17",
+        "name": "charts_render_with_tooltip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A bar chart shows the average score per model for the selected suite's latest run and hovering a bar with the real pointer shows a tooltip with the model name and exact score; a line chart below it plots average score across the suite's last 7 runs with run dates on the x-axis",
+        "reasoning": "FAIL: Charts rendered, but pointer hover tooltip evidence was not observed. Evidence: seeded_suite_list_complete-shared.png"
+      },
+      {
+        "id": "1.18",
+        "name": "charts_update_on_new_run",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Completing a new run appends one new point to the trend line chart and redraws the bar chart to reflect the new run's per-model averages \u2014 the charts visibly change when their input data changes",
+        "reasoning": "BLOCKED: A second completed run and visible chart change were not observed. Evidence: run_steps_visible_progression-shared.png"
+      },
+      {
+        "id": "1.19",
+        "name": "comparison_view_coherent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The toolbar comparison toggle switches to a side-by-side table with one column per model and one row per prompt where each cell shows score and latency; the score in any comparison cell matches the results table for the same prompt and model, and toggling back restores the results view with the prior sort intact",
+        "reasoning": "Comparison view showed one column per model, prompt rows, and matching score/latency values from the results table. Evidence: comparison_view_coherent-shared.png"
+      },
+      {
+        "id": "1.20",
+        "name": "night_scheduling_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Night Window settings form saves startTime and endTime as HH:MM with end after start and shows the configured window in the toolbar, rejecting a missing time, a non-HH:MM value, or an end not after the start with inline messages naming the field; toggling Night Mode on a suite shows a moon icon badge on the entry and toggling it off removes the badge",
+        "reasoning": "FAIL: Valid save and toolbar window were observed, but invalid validation and night-mode badge on/off behavior were not fully exercised. Evidence: comparison_view_coherent-shared.png"
+      },
+      {
+        "id": "1.21",
+        "name": "suite_switch_swaps_context",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Selecting a different suite in the left panel swaps the results table, both charts, and the detail panel context to that suite's latest run without a full page reload",
+        "reasoning": "BLOCKED: Switching between suites and verifying all context surfaces was not exercised. Evidence: seeded_suite_list_complete-shared.png"
+      },
+      {
+        "id": "1.22",
+        "name": "double_activation_single_effect",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Rapidly double-activating Run Suite starts exactly one run (one step-list fill, one new trend point), and rapidly double-activating the New Suite Submit control creates exactly one suite (the count increases by exactly one)",
+        "reasoning": "BLOCKED: Rapid double activation tests were not exercised. Evidence: create_suite_flow-shared.png"
+      },
+      {
+        "id": "1.23",
+        "name": "empty_states_present",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A never-run suite shows an empty state in the results region explaining that running the suite populates results; deleting the currently selected suite clears the results panel and charts to an empty state with a message and a control to select or create a suite; filtering the event timeline to a status with no entries shows an empty state message",
+        "reasoning": "FAIL: Never-run empty state was observed, but filtered-empty timeline and post-delete empty chart state were not both verified. Evidence: create_suite_flow-shared.png"
+      },
+      {
+        "id": "1.24",
+        "name": "long_title_truncation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "A prompt title longer than 60 characters renders truncated with an ellipsis in the results table row and is shown in full in the detail panel",
+        "reasoning": "BLOCKED: A prompt title longer than 60 characters was not tested. Evidence: run_steps_visible_progression-shared.png"
+      },
+      {
+        "id": "1.25",
+        "name": "rerun_replaces_and_caps_trend",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Running the same suite a second time replaces the latest-run results, appends exactly one new trend point, and the trend chart never plots more than the last 7 runs",
+        "reasoning": "BLOCKED: A second run and trend cap behavior were not exercised. Evidence: run_steps_visible_progression-shared.png"
+      },
+      {
+        "id": "1.28",
+        "name": "suite_payload_field_contract",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A valid New Suite submit requires name (1 to 80 characters after trim) and at least one promptId; the new list entry shows that name and a prompt count matching the selected prompts",
+        "reasoning": "Valid creation used a trimmed name and selected prompt IDs; the resulting entry showed matching name and prompt count. Evidence: create_suite_flow-shared.png"
+      },
+      {
+        "id": "1.29",
+        "name": "export_results_json_csv_live",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After a completed run, Export results opens a drawer whose JSON tab shows version 1 with suite, run, and results fields matching the normative export shape, the CSV tab has header promptTitle,model,score,latencyMs,tokens,passFail, and the results array length and scores match the visible results table",
+        "reasoning": "Export drawer showed live JSON with version, suite, run, results and matching records; CSV showed the required header and rows. Evidence: export_results_json_csv_live-shared.png"
+      },
+      {
+        "id": "1.30",
+        "name": "export_download_and_copy",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "In the export drawer, Download JSON offers eval-run-results.json matching the JSON tab, Download CSV offers eval-run-results.csv matching the CSV tab, and Copy on the active tab shows a visible Copied confirmation that clears within 5 seconds",
+        "reasoning": "BLOCKED: Download controls and Copy confirmation were not activated. Evidence: export_results_json_csv_live-shared.png"
+      },
+      {
+        "id": "1.31",
+        "name": "import_results_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Importing a previously exported results JSON replaces the selected suite's latest-run results so the table, charts, suite average score badge, and a subsequent export match the imported document",
+        "reasoning": "BLOCKED: Import round-trip was not exercised. Evidence: export_results_json_csv_live-shared.png"
+      },
+      {
+        "id": "1.32",
+        "name": "import_rejects_invalid_payload",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Importing malformed JSON, a document missing required keys, a score outside 0 to 100, or a passFail that disagrees with its score shows an inline error naming the import field and leaves the current results unchanged",
+        "reasoning": "BLOCKED: Invalid import payload cases were not exercised. Evidence: export_results_json_csv_live-shared.png"
+      },
+      {
+        "id": "1.33",
+        "name": "undo_redo_suite_mutations",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After creating a suite, Undo removes that suite and decreases the list count by one; Redo restores the same suite name and prompt count",
+        "reasoning": "After creating a suite, Undo visibly reduced the list from four to three and enabled Redo; Redo was activated to restore the mutation. Evidence: create_suite_flow-shared.png"
+      },
+      {
+        "id": "1.34",
+        "name": "result_row_field_contract",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Each results table row exposes prompt title, model, score 0 to 100, latency in ms, tokens, and pass/fail consistent with score at or above 70 marking Pass; the detail panel shows promptText, response, and a scoringBreakdown with at least one dimension score",
+        "reasoning": "Rows exposed prompt title, model, bounded score, latency, tokens, and consistent pass/fail; detail showed prompt text, response, and dimension scores. Evidence: detail_panel_with_disclosure-shared.png"
+      },
+      {
+        "id": "1.36",
+        "name": "seed_depth_populates_charts_first_load",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On first load, without running anything, each seeded suite carries at least 5 prompts (visible in its prompt count) and at least 7 historical runs, so the selected suite's results table, bar chart, and trend line chart are all non-empty before any session run",
+        "reasoning": "Initial load showed seeded suites with 5\u20137 prompts, populated results, bar chart, and a seven-run trend. Evidence: seeded_suite_list_complete-shared.png"
+      },
+      {
+        "id": "1.37",
+        "name": "export_json_run_metadata_keys",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The export JSON tab's document carries the full normative run metadata: a suite object with name, promptCount, and nightMode; a run object with id, startedAt and finishedAt as ISO-8601 datetime strings, averageScore between 0 and 100 matching the suite's badge, passCount and failCount consistent with the visible Pass/Fail badges, and non-negative totalLatencyMs and totalTokens",
+        "reasoning": "JSON visibly contained suite name/promptCount/nightMode, ISO timestamps, averageScore, pass/fail counts, and non-negative latency/tokens. Evidence: export_results_json_csv_live-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"seeded_suite_list_complete\":{\"score\":\"yes\",\"reasoning\":\"Three seeded suites visibly list names, prompt counts, last-run times, and average scores. Evidence: seeded_suite_list_complete-shared.png\"},\"create_suite_flow\":{\"score\":\"yes\",\"reasoning\":\"New Suite modal showed name and prompt selection, disabled Submit initially, then valid submission added exactly one suite. Evidence: create_suite_flow-shared.png\"},\"invalid_create_validation\":{\"score\":\"no\",\"reasoning\":\"FAIL: Empty-name validation was visible, but longer-name and zero-prompt submission cases were not fully exercised. Evidence: create_suite_flow-shared.png\"},\"edit_suite_prefilled_updates\":{\"score\":\"yes\",\"reasoning\":\"Edit opened prefilled name and prompt selection; saving changed the suite name without reload. Evidence: edit_suite_prefilled_updates-shared.png\"},\"delete_confirm_cancel\":{\"score\":\"yes\",\"reasoning\":\"Delete opened confirmation, Cancel preserved the suite, and confirmation removed it. Evidence: edit_suite_prefilled_updates-shared.png\"},\"run_steps_visible_progression\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Final complete state was observed, but pending/running progression was not directly observed. Evidence: run_steps_visible_progression-shared.png\"},\"run_log_streams_progressively\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The completed log showed multiple timestamped lines, but progressive growth during the run was not directly observed. Evidence: run_steps_visible_progression-shared.png\"},\"retry_backoff_attempt_counter\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No simulated retrying/backoff state was observed. Evidence: run_steps_visible_progression-shared.png\"},\"failed_retry_resumes_from_step\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No exhausted-retry failure or manual Retry workflow was observed. Evidence: run_steps_visible_progression-shared.png\"},\"pause_resume_checkpoint\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Pause/resume was not exercised. Evidence: run_steps_visible_progression-shared.png\"},\"rollup_derives_from_steps\":{\"score\":\"no\",\"reasoning\":\"FAIL: Rollup fields were visible, but live updates while steps advanced were not observed. Evidence: run_steps_visible_progression-shared.png\"},\"event_timeline_filter_highlight\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Timeline entries were visible, but filtering and selection highlighting were not exercised. Evidence: run_steps_visible_progression-shared.png\"},\"run_completion_updates_suite\":{\"score\":\"yes\",\"reasoning\":\"After completion, results populated and the suite entry showed updated timestamp and average score. Evidence: run_steps_visible_progression-shared.png\"},\"results_table_columns_pass_badge\":{\"score\":\"yes\",\"reasoning\":\"Results visibly included prompt, model, score, latency, tokens, and Pass/Fail badges consistent with scores. Evidence: run_steps_visible_progression-shared.png\"},\"column_sort_round_trip\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Ascending and descending sort round-trip was not exercised. Evidence: run_steps_visible_progression-shared.png\"},\"detail_panel_with_disclosure\":{\"score\":\"yes\",\"reasoning\":\"Selecting a row opened full prompt and response details; scoring breakdown was collapsed then expanded and showed dimensions. Evidence: detail_panel_with_disclosure-shared.png\"},\"charts_render_with_tooltip\":{\"score\":\"no\",\"reasoning\":\"FAIL: Charts rendered, but pointer hover tooltip evidence was not observed. Evidence: seeded_suite_list_complete-shared.png\"},\"charts_update_on_new_run\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A second completed run and visible chart change were not observed. Evidence: run_steps_visible_progression-shared.png\"},\"comparison_view_coherent\":{\"score\":\"yes\",\"reasoning\":\"Comparison view showed one column per model, prompt rows, and matching score/latency values from the results table. Evidence: comparison_view_coherent-shared.png\"},\"night_scheduling_flow\":{\"score\":\"no\",\"reasoning\":\"FAIL: Valid save and toolbar window were observed, but invalid validation and night-mode badge on/off behavior were not fully exercised. Evidence: comparison_view_coherent-shared.png\"},\"suite_switch_swaps_context\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Switching between suites and verifying all context surfaces was not exercised. Evidence: seeded_suite_list_complete-shared.png\"},\"double_activation_single_effect\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Rapid double activation tests were not exercised. Evidence: create_suite_flow-shared.png\"},\"empty_states_present\":{\"score\":\"no\",\"reasoning\":\"FAIL: Never-run empty state was observed, but filtered-empty timeline and post-delete empty chart state were not both verified. Evidence: create_suite_flow-shared.png\"},\"long_title_truncation\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A prompt title longer than 60 characters was not tested. Evidence: run_steps_visible_progression-shared.png\"},\"rerun_replaces_and_caps_trend\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A second run and trend cap behavior were not exercised. Evidence: run_steps_visible_progression-shared.png\"},\"suite_payload_field_contract\":{\"score\":\"yes\",\"reasoning\":\"Valid creation used a trimmed name and selected prompt IDs; the resulting entry showed matching name and prompt count. Evidence: create_suite_flow-shared.png\"},\"export_results_json_csv_live\":{\"score\":\"yes\",\"reasoning\":\"Export drawer showed live JSON with version, suite, run, results and matching records; CSV showed the required header and rows. Evidence: export_results_json_csv_live-shared.png\"},\"export_download_and_copy\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Download controls and Copy confirmation were not activated. Evidence: export_results_json_csv_live-shared.png\"},\"import_results_round_trip\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Import round-trip was not exercised. Evidence: export_results_json_csv_live-shared.png\"},\"import_rejects_invalid_payload\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Invalid import payload cases were not exercised. Evidence: export_results_json_csv_live-shared.png\"},\"undo_redo_suite_mutations\":{\"score\":\"yes\",\"reasoning\":\"After creating a suite, Undo visibly reduced the list from four to three and enabled Redo; Redo was activated to restore the mutation. Evidence: create_suite_flow-shared.png\"},\"result_row_field_contract\":{\"score\":\"yes\",\"reasoning\":\"Rows exposed prompt title, model, bounded score, latency, tokens, and consistent pass/fail; detail showed prompt text, response, and dimension scores. Evidence: detail_panel_with_disclosure-shared.png\"},\"seed_depth_populates_charts_first_load\":{\"score\":\"yes\",\"reasoning\":\"Initial load showed seeded suites with 5\u20137 prompts, populated results, bar chart, and a seven-run trend. Evidence: seeded_suite_list_complete-shared.png\"},\"export_json_run_metadata_keys\":{\"score\":\"yes\",\"reasoning\":\"JSON visibly contained suite name/promptCount/nightMode, ISO timestamps, averageScore, pass/fail counts, and non-negative latency/tokens. Evidence: export_results_json_csv_live-shared.png\"}}",
+    "cost_usd": 0.5975248
+  },
+  "design_fidelity": {
+    "score": 0.9,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "spacing_follows_dashboard_rhythm",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Gaps between the sidebar, chart strip, results table, detail panel, and export drawer follow a regular spacing rhythm with no crowded or orphaned regions",
+        "reasoning": "Regular 28px outer gaps and aligned sidebar, chart, comparison, and table regions are visible. Evidence: initial-desktop.png"
+      },
+      {
+        "id": "3.2",
+        "name": "typography_hierarchy_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app title is larger than panel headings, which are larger than table body and label text, consistent across results, comparison, and export views",
+        "reasoning": "The app title and suite heading are visibly larger than panel headings, labels, and table text. Evidence: comparison.png"
+      },
+      {
+        "id": "3.3",
+        "name": "layout_matches_instruction_composition",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The composition matches the specified left suite sidebar plus main chart strip over results table, with step list and timeline alongside during a run",
+        "reasoning": "Desktop composition shows the left suite sidebar, chart strip above results/comparison, and run activity surfaces. Evidence: comparison.png"
+      },
+      {
+        "id": "3.4",
+        "name": "specified_state_changes_animate",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Specified transitions apply to result-row entry, chart bar growth, modal/drawer entry, and detail-panel slide when driven through real UI controls",
+        "reasoning": "FAIL: Result rows expose a transition, but chart bars had no observed transition or animation, so the full specified set was not satisfied. Evidence: run-complete.png"
+      },
+      {
+        "id": "3.5",
+        "name": "responsive_behavior_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sidebar collapse at 768px and no page-level horizontal scroll at 375px match the responsiveness specification",
+        "reasoning": "At 375px the sidebar is hidden and document width does not exceed the viewport; at 768px the sidebar is also collapsed. Evidence: mobile-375.png"
+      },
+      {
+        "id": "3.6",
+        "name": "score_badge_colors_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Average score badges use green for 80 to 100, yellow for 60 to 79, and red below 60 as specified",
+        "reasoning": "Observed green 92.4, warm yellow 76.9, and red 55.4 average-score badges. Evidence: initial-desktop.png"
+      },
+      {
+        "id": "3.7",
+        "name": "pass_fail_and_step_treatments_match",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Pass/Fail badge colors and distinct pending/running/retrying/failed/complete step treatments match the visual specification across table and timeline",
+        "reasoning": "Pass/fail tags use distinct green/red treatments, and the run view visibly distinguishes Running and Complete timeline states. Evidence: run-complete.png"
+      },
+      {
+        "id": "3.8",
+        "name": "chart_palette_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Model-to-color mapping stays consistent between the bar chart and the comparison view",
+        "reasoning": "The chart maps Granite to indigo, GPT-4.1 mini to teal, and Claude to orange; the comparison header repeats those model-color markers. Evidence: comparison.png"
+      },
+      {
+        "id": "3.9",
+        "name": "carbon_chrome_consistency",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Modals, data table, tags/badges, toolbar, notifications, and form controls read as one consistent Carbon-based chrome system",
+        "reasoning": "Toolbar, buttons, tags, tables, notifications, dialogs, and form controls consistently use the same Carbon-style chrome. Evidence: export-drawer.png"
+      },
+      {
+        "id": "3.10",
+        "name": "export_drawer_matches_overlay_language",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The export drawer tabs, preview, Download, and Copy affordances match the same overlay language as other dialogs",
+        "reasoning": "The export drawer uses the same scrim/overlay treatment, with JSON/CSV tabs, preview, Copy, and Download actions. Evidence: export-drawer.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"spacing_follows_dashboard_rhythm\":{\"score\":\"yes\",\"reasoning\":\"Regular 28px outer gaps and aligned sidebar, chart, comparison, and table regions are visible. Evidence: initial-desktop.png\"},\"typography_hierarchy_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"The app title and suite heading are visibly larger than panel headings, labels, and table text. Evidence: comparison.png\"},\"layout_matches_instruction_composition\":{\"score\":\"yes\",\"reasoning\":\"Desktop composition shows the left suite sidebar, chart strip above results/comparison, and run activity surfaces. Evidence: comparison.png\"},\"specified_state_changes_animate\":{\"score\":\"no\",\"reasoning\":\"FAIL: Result rows expose a transition, but chart bars had no observed transition or animation, so the full specified set was not satisfied. Evidence: run-complete.png\"},\"responsive_behavior_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"At 375px the sidebar is hidden and document width does not exceed the viewport; at 768px the sidebar is also collapsed. Evidence: mobile-375.png\"},\"score_badge_colors_match_spec\":{\"score\":\"yes\",\"reasoning\":\"Observed green 92.4, warm yellow 76.9, and red 55.4 average-score badges. Evidence: initial-desktop.png\"},\"pass_fail_and_step_treatments_match\":{\"score\":\"yes\",\"reasoning\":\"Pass/fail tags use distinct green/red treatments, and the run view visibly distinguishes Running and Complete timeline states. Evidence: run-complete.png\"},\"chart_palette_consistent\":{\"score\":\"yes\",\"reasoning\":\"The chart maps Granite to indigo, GPT-4.1 mini to teal, and Claude to orange; the comparison header repeats those model-color markers. Evidence: comparison.png\"},\"carbon_chrome_consistency\":{\"score\":\"yes\",\"reasoning\":\"Toolbar, buttons, tags, tables, notifications, dialogs, and form controls consistently use the same Carbon-style chrome. Evidence: export-drawer.png\"},\"export_drawer_matches_overlay_language\":{\"score\":\"yes\",\"reasoning\":\"The export drawer uses the same scrim/overlay treatment, with JSON/CSV tabs, preview, Copy, and Download actions. Evidence: export-drawer.png\"}}",
+    "cost_usd": 0.5498569999999999
+  },
+  "edge_cases": {
+    "score": 0.4,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "never_run_empty_and_export",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A never-run suite shows an empty state explaining that running populates results; Export results still opens with JSON version 1, suite metadata, an empty results array, and CSV with only the header line",
+        "reasoning": "Observed a never-run suite with \u201cNo results yet\u201d; JSON showed version 1, suite metadata, and results: [], while CSV showed only the header line. Evidence: screenshots/page-2026-07-23T04-30-45-679Z.yml"
+      },
+      {
+        "id": "4.2",
+        "name": "suite_name_and_prompt_validation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Submitting New Suite with empty name, name longer than 80 characters, or zero prompts shows inline validation naming the field and adds no suite",
+        "reasoning": "FAIL: Empty-name validation was observed, but the >80-character case did not produce an inline name error; the input appeared capped instead. Evidence: screenshots/page-2026-07-23T04-29-14-460Z.yml"
+      },
+      {
+        "id": "4.3",
+        "name": "night_window_cross_field_rules",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Night Window rejects missing times, non-HH:MM values, and endTime not after startTime with inline messages naming the field, and does not save",
+        "reasoning": "BLOCKED: Night Window time inputs were present in the DOM but not visible/interactable, so the required validation workflow could not be exercised. Evidence: screenshots/page-2026-07-23T04-31-06-848Z.yml"
+      },
+      {
+        "id": "4.4",
+        "name": "import_passfail_score_mismatch",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Importing JSON whose passFail is pass while score is below 70, or whose results omit promptTitle, shows an inline validation error and leaves current results unchanged",
+        "reasoning": "Observed inline import validation for pass with score 50 (\u201cImport passFail must be fail for score 50\u201d); the 15 existing result rows remained unchanged. Also observed missing promptTitle validation. Evidence: screenshots/page-2026-07-23T04-32-13-197Z.yml"
+      },
+      {
+        "id": "4.5",
+        "name": "double_run_single_effect",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Double-activating Run Suite starts exactly one run: one step-list fill, one results set, exactly one new trend point",
+        "reasoning": "FAIL: Double-clicking Run Suite left the run stuck with only 6 responses and multiple Running statuses, so one complete single-effect run was not achieved. Evidence: screenshots/page-2026-07-23T04-32-36-399Z.yml"
+      },
+      {
+        "id": "4.6",
+        "name": "double_create_single_suite",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Double-activating New Suite Submit creates exactly one suite; the suite count increases by exactly one",
+        "reasoning": "Observed baseline of 3 suites, double-activated Submit, and the suite count increased to exactly 4 with exactly one \u201cDouble Create Check\u201d suite. Evidence: screenshots/page-2026-07-23T04-30-26-175Z.yml"
+      },
+      {
+        "id": "4.7",
+        "name": "rerun_caps_trend_at_seven",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Running the same suite a second time replaces latest-run results, appends one trend point, and the trend chart never shows more than the last 7 runs",
+        "reasoning": "BLOCKED: The initial run did not complete, so a valid second run and seven-point trend-cap workflow could not be completed. Evidence: screenshots/page-2026-07-23T04-32-36-399Z.yml"
+      },
+      {
+        "id": "4.8",
+        "name": "long_title_truncation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A prompt title longer than 60 characters truncates with an ellipsis in the results row and shows in full in the detail panel",
+        "reasoning": "BLOCKED: A long-title suite could not be selected/run to reach the results row and detail panel; the active run workflow remained stuck. Evidence: screenshots/page-2026-07-23T04-32-36-399Z.yml"
+      },
+      {
+        "id": "4.9",
+        "name": "timeline_filter_empty_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Filtering the event timeline to a status with no entries shows an empty state message in the timeline region",
+        "reasoning": "BLOCKED: Applying the timeline filter through the registered action did not expose a reachable timeline region or empty-state message in the browser. Evidence: screenshots/page-2026-07-23T04-30-26-175Z.yml"
+      },
+      {
+        "id": "4.10",
+        "name": "undo_redo_noop_safe",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Undo with no prior suite mutation leaves the suite list unchanged; Redo with nothing to redo is a no-op",
+        "reasoning": "After a fresh navigation with no prior mutation in the new session, the suite list remained at 3 and both Undo and Redo were disabled, demonstrating safe no-op behavior. Evidence: screenshots/page-2026-07-23T04-31-06-848Z.yml"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"never_run_empty_and_export\":{\"score\":\"yes\",\"reasoning\":\"Observed a never-run suite with \u201cNo results yet\u201d; JSON showed version 1, suite metadata, and results: [], while CSV showed only the header line. Evidence: screenshots/page-2026-07-23T04-30-45-679Z.yml\"},\"suite_name_and_prompt_validation\":{\"score\":\"no\",\"reasoning\":\"FAIL: Empty-name validation was observed, but the >80-character case did not produce an inline name error; the input appeared capped instead. Evidence: screenshots/page-2026-07-23T04-29-14-460Z.yml\"},\"night_window_cross_field_rules\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Night Window time inputs were present in the DOM but not visible/interactable, so the required validation workflow could not be exercised. Evidence: screenshots/page-2026-07-23T04-31-06-848Z.yml\"},\"import_passfail_score_mismatch\":{\"score\":\"yes\",\"reasoning\":\"Observed inline import validation for pass with score 50 (\u201cImport passFail must be fail for score 50\u201d); the 15 existing result rows remained unchanged. Also observed missing promptTitle validation. Evidence: screenshots/page-2026-07-23T04-32-13-197Z.yml\"},\"double_run_single_effect\":{\"score\":\"no\",\"reasoning\":\"FAIL: Double-clicking Run Suite left the run stuck with only 6 responses and multiple Running statuses, so one complete single-effect run was not achieved. Evidence: screenshots/page-2026-07-23T04-32-36-399Z.yml\"},\"double_create_single_suite\":{\"score\":\"yes\",\"reasoning\":\"Observed baseline of 3 suites, double-activated Submit, and the suite count increased to exactly 4 with exactly one \u201cDouble Create Check\u201d suite. Evidence: screenshots/page-2026-07-23T04-30-26-175Z.yml\"},\"rerun_caps_trend_at_seven\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The initial run did not complete, so a valid second run and seven-point trend-cap workflow could not be completed. Evidence: screenshots/page-2026-07-23T04-32-36-399Z.yml\"},\"long_title_truncation\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A long-title suite could not be selected/run to reach the results row and detail panel; the active run workflow remained stuck. Evidence: screenshots/page-2026-07-23T04-32-36-399Z.yml\"},\"timeline_filter_empty_state\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Applying the timeline filter through the registered action did not expose a reachable timeline region or empty-state message in the browser. Evidence: screenshots/page-2026-07-23T04-30-26-175Z.yml\"},\"undo_redo_noop_safe\":{\"score\":\"yes\",\"reasoning\":\"After a fresh navigation with no prior mutation in the new session, the suite list remained at 3 and both Undo and Redo were disabled, demonstrating safe no-op behavior. Evidence: screenshots/page-2026-07-23T04-31-06-848Z.yml\"}}",
+    "cost_usd": 0.5900612000000001
+  },
+  "innovation": {
+    "score": 0.9091,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "delightful_microinteractions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Beyond required motion, the app adds a polished microinteraction such as a subtle pass-rate sparkline on suite entries or a satisfying Copied confirmation treatment",
+        "reasoning": "Observed pass-rate sparklines and a \u201cResult copied\u201d confirmation toast. Evidence: delightful_microinteractions-shared.png"
+      },
+      {
+        "id": "11.2",
+        "name": "advanced_run_visualization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Beyond the required bar and line charts, the app adds an extra operator-helpful visualization such as a pass-rate sparkline or run-diff highlight after import",
+        "reasoning": "Observed pass-rate sparklines alongside the required score charts. Evidence: delightful_microinteractions-shared.png"
+      },
+      {
+        "id": "11.3",
+        "name": "guided_operator_hints",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app offers optional coachmarks or shortcut hints for Undo/Redo or Export results that go beyond bare chrome labels",
+        "reasoning": "Observed visible keyboard shortcut hints for Undo, Redo, and Export. Evidence: delightful_microinteractions-shared.png"
+      },
+      {
+        "id": "11.4",
+        "name": "enhanced_interactive_graphics",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Charts or comparison cells provide extra usability such as click-to-filter from a bar or hover crosshair that is not strictly required",
+        "reasoning": "Clicked the chart bar and observed the results table filter to GPT-4.1 mini. Evidence: enhanced_interactive_graphics-shared.png"
+      },
+      {
+        "id": "11.5",
+        "name": "keyboard_power_user_paths",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app supports power-user keyboard shortcuts for Undo/Redo or opening Export that go beyond basic tab operability",
+        "reasoning": "Pressed Control+E and observed the Export results dialog open. Evidence: polished_empty_and_export_copy-shared.png"
+      },
+      {
+        "id": "11.6",
+        "name": "preference_personalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app provides an optional preference such as default sort column or compact density that persists for the session",
+        "reasoning": "Observed Comfortable/Compact density tabs explicitly labeled as a session-persistent preference. Evidence: delightful_microinteractions-shared.png"
+      },
+      {
+        "id": "11.7",
+        "name": "polished_empty_and_export_copy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Empty states and export helper copy feel productized and specific to eval operations rather than generic placeholders",
+        "reasoning": "Observed specific eval-oriented empty-state guidance and export copy describing JSON/CSV artifacts. Evidence: polished_empty_and_export_copy-empty.png; polished_empty_and_export_copy-shared.png"
+      },
+      {
+        "id": "11.8",
+        "name": "theme_polish_beyond_requirements",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app provides an optional density or accent personalization beyond the required Carbon chrome",
+        "reasoning": "Observed optional Compact density personalization beyond the Carbon-style chrome. Evidence: delightful_microinteractions-shared.png"
+      },
+      {
+        "id": "11.9",
+        "name": "operator_quality_of_life",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A quality-of-life affordance helpful to eval operators appears beyond the specification, such as copying a single result row or pinning a suite",
+        "reasoning": "Observed per-result-row Copy controls with a specific confirmation message. Evidence: delightful_microinteractions-shared.png"
+      },
+      {
+        "id": "11.10",
+        "name": "competition_level_innovation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Overall polish and optional operator tools read as competition-level rather than a bare checklist implementation",
+        "reasoning": "The live UI combines polished sparklines, interactive chart filtering, keyboard shortcuts, density preference, export tooling, and row-level copying. Evidence: delightful_microinteractions-shared.png; enhanced_interactive_graphics-shared.png"
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, delightful innovation or polish beyond the specification that is NOT covered by any other criterion in this file. If present, name it and cite the concrete evidence. If already covered by another criterion in this file, answer no here.",
+        "reasoning": "FAIL: No additional significant innovation was observed beyond the enhancements covered by the other criteria. Evidence: delightful_microinteractions-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"delightful_microinteractions\":{\"score\":\"yes\",\"reasoning\":\"Observed pass-rate sparklines and a \u201cResult copied\u201d confirmation toast. Evidence: delightful_microinteractions-shared.png\"},\"advanced_run_visualization\":{\"score\":\"yes\",\"reasoning\":\"Observed pass-rate sparklines alongside the required score charts. Evidence: delightful_microinteractions-shared.png\"},\"guided_operator_hints\":{\"score\":\"yes\",\"reasoning\":\"Observed visible keyboard shortcut hints for Undo, Redo, and Export. Evidence: delightful_microinteractions-shared.png\"},\"enhanced_interactive_graphics\":{\"score\":\"yes\",\"reasoning\":\"Clicked the chart bar and observed the results table filter to GPT-4.1 mini. Evidence: enhanced_interactive_graphics-shared.png\"},\"keyboard_power_user_paths\":{\"score\":\"yes\",\"reasoning\":\"Pressed Control+E and observed the Export results dialog open. Evidence: polished_empty_and_export_copy-shared.png\"},\"preference_personalization\":{\"score\":\"yes\",\"reasoning\":\"Observed Comfortable/Compact density tabs explicitly labeled as a session-persistent preference. Evidence: delightful_microinteractions-shared.png\"},\"polished_empty_and_export_copy\":{\"score\":\"yes\",\"reasoning\":\"Observed specific eval-oriented empty-state guidance and export copy describing JSON/CSV artifacts. Evidence: polished_empty_and_export_copy-empty.png; polished_empty_and_export_copy-shared.png\"},\"theme_polish_beyond_requirements\":{\"score\":\"yes\",\"reasoning\":\"Observed optional Compact density personalization beyond the Carbon-style chrome. Evidence: delightful_microinteractions-shared.png\"},\"operator_quality_of_life\":{\"score\":\"yes\",\"reasoning\":\"Observed per-result-row Copy controls with a specific confirmation message. Evidence: delightful_microinteractions-shared.png\"},\"competition_level_innovation\":{\"score\":\"yes\",\"reasoning\":\"The live UI combines polished sparklines, interactive chart filtering, keyboard shortcuts, density preference, export tooling, and row-level copying. Evidence: delightful_microinteractions-shared.png; enhanced_interactive_graphics-shared.png\"},\"innovation_catchall\":{\"score\":\"no\",\"reasoning\":\"FAIL: No additional significant innovation was observed beyond the enhancements covered by the other criteria. Evidence: delightful_microinteractions-shared.png\"}}",
+    "cost_usd": 0.2486714
+  },
+  "motion": {
+    "score": 0.8824,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "result_rows_staggered_entry",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "During a run started from the real Run Suite control, result rows animate into the table one by one roughly 80 milliseconds apart rather than appearing all at once",
+        "reasoning": "Rows from a real Run Suite showed 0.28s row-in animations with successive 0.08s and 0.16s delays. Evidence: result_rows_staggered_entry-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "chart_bars_grow_on_render",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When a suite's results first render (driven through the real UI, not a state shortcut), the bar chart's bars grow from zero height over roughly 400 milliseconds rather than snapping to full height",
+        "reasoning": "Rendered chart bars used the bar-grow animation with 0.45s duration. Evidence: result_rows_staggered_entry-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "step_status_transition_motion",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Step status changes animate during a real run: the running step shows a continuous activity indicator, a completing step's status transitions with a short fade rather than snapping, and the retry backoff countdown ticks visibly",
+        "reasoning": "A live run visibly showed Running and Complete step states plus retry timeline entries; running steps had live status presentation and state transitions. Evidence: step_status_transition_motion-early.png"
+      },
+      {
+        "id": "4.4",
+        "name": "hover_animations_required",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons ease background and shadow with a slight press effect on hover; suite entries, table rows, and timeline entries take a full-width hover wash; and form controls show focus rings",
+        "reasoning": "Real hover produced suite-entry and table-row washes, timeline-entry wash, and controls exposed transition styles; keyboard focus produced a visible 2px outline. Evidence: hover_animations_required-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "modal_and_panel_transitions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The New Suite and confirmation modals enter and exit with a short opacity-plus-scale transition of roughly 200 to 300 milliseconds, the detail panel slides in from the side when a row is clicked and slides out when closed, and the scoring-breakdown disclosure expands with its chevron rotating",
+        "reasoning": "The New Suite modal used a 0.26s opacity/scale transition, the result detail panel used a 0.3s slide transition, and the scoring disclosure expanded with a rotating chevron. Evidence: modal_and_panel_transitions-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "toasts_slide_autodismiss",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After creating a suite, deleting a suite, and completing a run, a feedback toast slides in, remains readable long enough to scan, and auto-dismisses with a fade",
+        "reasoning": "FAIL: After the observed run and suite-creation attempt, no visible feedback toast was present; the run surfaced an error notification instead, so the required create/delete/complete toast workflow was not fully observed. Evidence: toasts_slide_autodismiss.png"
+      },
+      {
+        "id": "4.7",
+        "name": "moon_badge_animates_in",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Toggling Night Mode on through the real toggle animates the moon icon badge into the suite entry rather than making it appear instantly",
+        "reasoning": "After toggling Night Mode off and back on through the real control, the suite displayed a moon-badge with the moon-pop animation at 0.45s. Evidence: moon_badge_animates_in-early.png"
+      },
+      {
+        "id": "4.8",
+        "name": "reduced_motion_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, result rows and chart bars appear simultaneously without staggering or growth animation and modal, panel, and toast transitions apply instantly",
+        "reasoning": "The reduced-motion browser confirmed prefers-reduced-motion=true; rows and bars had 1e-06s durations and zero delays, and transitions were likewise reduced to 1e-06s. Evidence: reduced_motion_respected-shared.png"
+      },
+      {
+        "id": "4.10",
+        "name": "export_drawer_slide",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Driven by the real Export results control, the export drawer slides in from the side rather than snapping open, and exits the same way",
+        "reasoning": "The real Export results control opened a drawer with a 0.3s transform transition and the drawer visibly occupied the right side. Evidence: export_drawer_slide-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"result_rows_staggered_entry\":{\"score\":\"yes\",\"reasoning\":\"Rows from a real Run Suite showed 0.28s row-in animations with successive 0.08s and 0.16s delays. Evidence: result_rows_staggered_entry-shared.png\"},\"chart_bars_grow_on_render\":{\"score\":\"yes\",\"reasoning\":\"Rendered chart bars used the bar-grow animation with 0.45s duration. Evidence: result_rows_staggered_entry-shared.png\"},\"step_status_transition_motion\":{\"score\":\"yes\",\"reasoning\":\"A live run visibly showed Running and Complete step states plus retry timeline entries; running steps had live status presentation and state transitions. Evidence: step_status_transition_motion-early.png\"},\"hover_animations_required\":{\"score\":\"yes\",\"reasoning\":\"Real hover produced suite-entry and table-row washes, timeline-entry wash, and controls exposed transition styles; keyboard focus produced a visible 2px outline. Evidence: hover_animations_required-shared.png\"},\"modal_and_panel_transitions\":{\"score\":\"yes\",\"reasoning\":\"The New Suite modal used a 0.26s opacity/scale transition, the result detail panel used a 0.3s slide transition, and the scoring disclosure expanded with a rotating chevron. Evidence: modal_and_panel_transitions-shared.png\"},\"toasts_slide_autodismiss\":{\"score\":\"no\",\"reasoning\":\"FAIL: After the observed run and suite-creation attempt, no visible feedback toast was present; the run surfaced an error notification instead, so the required create/delete/complete toast workflow was not fully observed. Evidence: toasts_slide_autodismiss.png\"},\"moon_badge_animates_in\":{\"score\":\"yes\",\"reasoning\":\"After toggling Night Mode off and back on through the real control, the suite displayed a moon-badge with the moon-pop animation at 0.45s. Evidence: moon_badge_animates_in-early.png\"},\"reduced_motion_respected\":{\"score\":\"yes\",\"reasoning\":\"The reduced-motion browser confirmed prefers-reduced-motion=true; rows and bars had 1e-06s durations and zero delays, and transitions were likewise reduced to 1e-06s. Evidence: reduced_motion_respected-shared.png\"},\"export_drawer_slide\":{\"score\":\"yes\",\"reasoning\":\"The real Export results control opened a drawer with a 0.3s transform transition and the drawer visibly occupied the right side. Evidence: export_drawer_slide-shared.png\"}}",
+    "cost_usd": 0.3740306
+  },
+  "performance": {
+    "score": 0.5789,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_is_under_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive (suite list and toolbar respond) within 2 seconds of a local cold load",
+        "reasoning": "Interactive dashboard loaded in about 1.7s; suite controls and toolbar were available. Evidence: cold_start_is_under_two_seconds-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "console_is_clean",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Browser console shows no errors or warnings on load or during create, run, export, import, undo, and view toggles",
+        "reasoning": "FAIL: 7 console errors occurred during the exercised workflows, all RangeError maximum call stack size exceeded. Evidence: cold_start_is_under_two_seconds-shared.png"
+      },
+      {
+        "id": "9.3",
+        "name": "export_drawer_opens_quickly",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening Export results and switching JSON/CSV tabs applies without visible freezing",
+        "reasoning": "Export drawer opened promptly and JSON/CSV switching completed without visible freezing. Evidence: export_drawer_opens_quickly-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "run_shows_streaming_progress",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "During a run, step statuses and the streaming run log provide progressive feedback rather than a blank wait",
+        "reasoning": "A live run showed running/retrying/pending/complete statuses, populated results, and a streaming run log. Evidence: run_shows_streaming_progress-shared.png"
+      },
+      {
+        "id": "9.5",
+        "name": "results_table_stays_responsive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sorting and suite switches on a seeded results table remain responsive without perceived lag",
+        "reasoning": "Seeded results remained populated while suite selection and sorting completed promptly. Evidence: export_drawer_opens_quickly-shared.png"
+      },
+      {
+        "id": "9.6",
+        "name": "state_changes_remain_interactive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "While a run is streaming, suite switches, sort clicks, and view toggles remain interactive",
+        "reasoning": "During a streaming run, suite selection, sorting, and export opening all remained responsive. Evidence: run_shows_streaming_progress-shared.png"
+      },
+      {
+        "id": "9.7",
+        "name": "chart_motion_stays_smooth",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Chart bar growth and result-row stagger maintain smooth motion without jank during a real run",
+        "reasoning": "BLOCKED: A real run and animated elements were observed, but the sampled browser evidence did not establish smooth motion throughout the chart and row animations. Evidence: chart_motion_stays_smooth-shared.png"
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_input_does_not_freeze",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Rapid suite switches, sort clicks, view toggles, and export-drawer opens do not hang or drop interactions",
+        "reasoning": "FAIL: Repeated export/import/run interactions completed, but generated repeated maximum-call-stack errors, so rapid input cannot be judged as reliably clean. Evidence: extended_sessions_avoid_resource_runaway-shared.png"
+      },
+      {
+        "id": "9.9",
+        "name": "extended_sessions_avoid_resource_runaway",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Running suites repeatedly with export/import exercises shows no obvious memory runaway or progressive slowdown in a short extended session",
+        "reasoning": "Three repeated run/export/import cycles completed in about 1.8s with no apparent progressive slowdown or runaway behavior. Evidence: extended_sessions_avoid_resource_runaway-shared.png"
+      },
+      {
+        "id": "9.10",
+        "name": "failed_step_stays_operable",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "When a step fails and shows Retry, the rest of the UI (pause/resume, suite list, export) remains operable",
+        "reasoning": "FAIL: A failed-step notification appeared, but no Retry control was reachable in the resulting UI; the failure workflow was not fully operable end-to-end. Evidence: run_shows_streaming_progress-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_start_is_under_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"Interactive dashboard loaded in about 1.7s; suite controls and toolbar were available. Evidence: cold_start_is_under_two_seconds-shared.png\"},\"console_is_clean\":{\"score\":\"no\",\"reasoning\":\"FAIL: 7 console errors occurred during the exercised workflows, all RangeError maximum call stack size exceeded. Evidence: cold_start_is_under_two_seconds-shared.png\"},\"export_drawer_opens_quickly\":{\"score\":\"yes\",\"reasoning\":\"Export drawer opened promptly and JSON/CSV switching completed without visible freezing. Evidence: export_drawer_opens_quickly-shared.png\"},\"run_shows_streaming_progress\":{\"score\":\"yes\",\"reasoning\":\"A live run showed running/retrying/pending/complete statuses, populated results, and a streaming run log. Evidence: run_shows_streaming_progress-shared.png\"},\"results_table_stays_responsive\":{\"score\":\"yes\",\"reasoning\":\"Seeded results remained populated while suite selection and sorting completed promptly. Evidence: export_drawer_opens_quickly-shared.png\"},\"state_changes_remain_interactive\":{\"score\":\"yes\",\"reasoning\":\"During a streaming run, suite selection, sorting, and export opening all remained responsive. Evidence: run_shows_streaming_progress-shared.png\"},\"chart_motion_stays_smooth\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A real run and animated elements were observed, but the sampled browser evidence did not establish smooth motion throughout the chart and row animations. Evidence: chart_motion_stays_smooth-shared.png\"},\"rapid_input_does_not_freeze\":{\"score\":\"no\",\"reasoning\":\"FAIL: Repeated export/import/run interactions completed, but generated repeated maximum-call-stack errors, so rapid input cannot be judged as reliably clean. Evidence: extended_sessions_avoid_resource_runaway-shared.png\"},\"extended_sessions_avoid_resource_runaway\":{\"score\":\"yes\",\"reasoning\":\"Three repeated run/export/import cycles completed in about 1.8s with no apparent progressive slowdown or runaway behavior. Evidence: extended_sessions_avoid_resource_runaway-shared.png\"},\"failed_step_stays_operable\":{\"score\":\"no\",\"reasoning\":\"FAIL: A failed-step notification appeared, but no Retry control was reachable in the resulting UI; the failure workflow was not fully operable end-to-end. Evidence: run_shows_streaming_progress-shared.png\"}}",
+    "cost_usd": 0.18648699999999999
+  },
+  "responsiveness": {
+    "score": 0.8,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "layout_adapts_desktop_to_mobile",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At desktop widths the suite sidebar is open by default beside the chart strip and results table; at 768px and below the sidebar collapses behind a toggle that opens it as an overlay",
+        "reasoning": "Desktop shows an open sidebar beside charts/results; at 375px it collapses behind an Open suite navigation toggle and opens as an overlay. Evidence: layout_adapts_desktop_to_mobile-shared.png"
+      },
+      {
+        "id": "7.2",
+        "name": "mobile_tap_targets_are_large_enough",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px width, toolbar controls including Export results, Import results, Undo, Redo, and suite row actions remain usable tap targets",
+        "reasoning": "At 375px toolbar controls are 44px high and suite-row action buttons are 44px square. Evidence: mobile_tap_targets_are_large_enough-shared.png"
+      },
+      {
+        "id": "7.3",
+        "name": "typography_resizes_across_breakpoints",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "App title, panel headings, and table body text remain readable from desktop down to 375px without overlapping",
+        "reasoning": "Title, headings, and table text remain visible without overlap; mobile measurements show 16px title and 12px table body text. Evidence: typography_resizes_across_breakpoints-shared.png"
+      },
+      {
+        "id": "7.4",
+        "name": "content_avoids_clipping_and_overflow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At 375px width no content clips or overflows the viewport and no page-level horizontal scrolling appears",
+        "reasoning": "FAIL: The narrow export drawer extends off-screen; its right-side controls render beyond the 375px viewport. Evidence: export_drawer_usable_on_narrow-shared.png"
+      },
+      {
+        "id": "7.5",
+        "name": "sidebar_collapses_below_768",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At widths of 768 pixels and below, the suite sidebar collapses behind a toggle control that opens it as an overlay",
+        "reasoning": "At 375px the sidebar is hidden until Open suite navigation is clicked, then appears as a 310px overlay. Evidence: sidebar_collapses_below_768-shared.png"
+      },
+      {
+        "id": "7.6",
+        "name": "tables_scroll_in_containers",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px the results and comparison tables scroll within their own containers rather than forcing page-level horizontal scroll",
+        "reasoning": "Results and comparison tables are wider than the viewport but each is inside a container with overflow-x:auto; page scroll width remains 360px at 375px. Evidence: tables_scroll_in_containers-shared.png"
+      },
+      {
+        "id": "7.7",
+        "name": "export_drawer_usable_on_narrow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The export drawer, import control, and Undo/Redo stay fully visible and operable at 375px rather than rendering off-screen",
+        "reasoning": "FAIL: The export drawer is positioned partly off-screen at 375px, with Download JSON rendered beyond the viewport; Import, Undo, and Redo remain visible but the drawer workflow is not fully operable. Evidence: export_drawer_usable_on_narrow-shared.png"
+      },
+      {
+        "id": "7.8",
+        "name": "small_screens_avoid_horizontal_scroll",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px there is no page-level horizontal scrolling while browsing suites, results, comparison, and export",
+        "reasoning": "At 375px document and body scroll width remain 360px, so no page-level horizontal scrolling appears while viewing results/comparison/export. Evidence: charts_resize_to_width-shared.png"
+      },
+      {
+        "id": "7.9",
+        "name": "charts_resize_to_width",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Bar and line charts resize to fit the main column at desktop and 375px without overflowing",
+        "reasoning": "At 375px both chart SVGs fit within the 338px main column at 324px wide; desktop chart cards also fit the main column. Evidence: charts_resize_to_width-shared.png"
+      },
+      {
+        "id": "7.10",
+        "name": "toolbar_remains_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Fixed or sticky toolbar controls remain accessible at desktop and 375px widths",
+        "reasoning": "Toolbar controls are visible within the viewport at both desktop and 375px; mobile controls use 44px-high targets. Evidence: toolbar_remains_accessible-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"layout_adapts_desktop_to_mobile\":{\"score\":\"yes\",\"reasoning\":\"Desktop shows an open sidebar beside charts/results; at 375px it collapses behind an Open suite navigation toggle and opens as an overlay. Evidence: layout_adapts_desktop_to_mobile-shared.png\"},\"mobile_tap_targets_are_large_enough\":{\"score\":\"yes\",\"reasoning\":\"At 375px toolbar controls are 44px high and suite-row action buttons are 44px square. Evidence: mobile_tap_targets_are_large_enough-shared.png\"},\"typography_resizes_across_breakpoints\":{\"score\":\"yes\",\"reasoning\":\"Title, headings, and table text remain visible without overlap; mobile measurements show 16px title and 12px table body text. Evidence: typography_resizes_across_breakpoints-shared.png\"},\"content_avoids_clipping_and_overflow\":{\"score\":\"no\",\"reasoning\":\"FAIL: The narrow export drawer extends off-screen; its right-side controls render beyond the 375px viewport. Evidence: export_drawer_usable_on_narrow-shared.png\"},\"sidebar_collapses_below_768\":{\"score\":\"yes\",\"reasoning\":\"At 375px the sidebar is hidden until Open suite navigation is clicked, then appears as a 310px overlay. Evidence: sidebar_collapses_below_768-shared.png\"},\"tables_scroll_in_containers\":{\"score\":\"yes\",\"reasoning\":\"Results and comparison tables are wider than the viewport but each is inside a container with overflow-x:auto; page scroll width remains 360px at 375px. Evidence: tables_scroll_in_containers-shared.png\"},\"export_drawer_usable_on_narrow\":{\"score\":\"no\",\"reasoning\":\"FAIL: The export drawer is positioned partly off-screen at 375px, with Download JSON rendered beyond the viewport; Import, Undo, and Redo remain visible but the drawer workflow is not fully operable. Evidence: export_drawer_usable_on_narrow-shared.png\"},\"small_screens_avoid_horizontal_scroll\":{\"score\":\"yes\",\"reasoning\":\"At 375px document and body scroll width remain 360px, so no page-level horizontal scrolling appears while viewing results/comparison/export. Evidence: charts_resize_to_width-shared.png\"},\"charts_resize_to_width\":{\"score\":\"yes\",\"reasoning\":\"At 375px both chart SVGs fit within the 338px main column at 324px wide; desktop chart cards also fit the main column. Evidence: charts_resize_to_width-shared.png\"},\"toolbar_remains_accessible\":{\"score\":\"yes\",\"reasoning\":\"Toolbar controls are visible within the viewport at both desktop and 375px; mobile controls use 44px-high targets. Evidence: toolbar_remains_accessible-shared.png\"} }",
+    "cost_usd": 0.1456348
+  },
+  "technical": {
+    "score": 0.0909,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "shared_state_coherence",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "All surfaces derive from one shared state: a step advancing during a run updates the step list, the event timeline, and the rollup together; a completed run updates the suite entry, results table, both charts, and the export preview together; suite edit/delete and undo/redo are reflected in every view where the suite appears, all without a reload",
+        "reasoning": "FAIL: Creating a suite and starting a run returned success, but the visible suite list and results did not update. Evidence: create-shared.png"
+      },
+      {
+        "id": "2.2",
+        "name": "no_storage_reload_seeded",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "No browser storage is used: localStorage and sessionStorage remain empty after creating, editing, deleting, running, pausing, scheduling, exporting, importing, and undoing suites, and a page reload returns the app to its seeded state (seeded suites, historical runs, default view, no night-mode schedules)",
+        "reasoning": "FAIL: Storage was empty and reload restored seeded state, but the complete required workflow was not successfully exercised. Evidence: reload-shared.png"
+      },
+      {
+        "id": "2.5",
+        "name": "console_clean",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The console is free of errors and warnings on first load and stays clean while creating, editing, deleting, running, pausing, retrying, scheduling, exporting, importing, undoing, and redoing suites and switching views",
+        "reasoning": "FAIL: No warnings/errors were observed in the sampled interactions, but the full required workflow was not completed. Evidence: reload-shared.png"
+      },
+      {
+        "id": "2.6",
+        "name": "cold_load_interactive_2s",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive (suite list and toolbar controls respond) within 2 seconds of a local cold load",
+        "reasoning": "The cold navigation completed in about 1.1 seconds and rendered an interactive suite list and toolbar. Evidence: reload-shared.png"
+      },
+      {
+        "id": "2.7",
+        "name": "responsive_during_streaming",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "While a run is streaming its log and advancing steps, the UI stays responsive under rapid repeated input \u2014 quick suite switches, rapid sort clicks, fast view toggles \u2014 with no hangs, dropped interactions, or views showing stale data another view already updated",
+        "reasoning": "FAIL: Starting a run did not expose a streaming state, so responsive streaming behavior could not be demonstrated. Evidence: run-shared.png"
+      },
+      {
+        "id": "2.8",
+        "name": "keyboard_operability_focus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Every interactive control \u2014 suite entries, toolbar controls including Export results, Import results, Undo, and Redo, table headers, row actions, step retry and pause/resume controls, form fields \u2014 is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), with a visible focus indicator at each stop",
+        "reasoning": "BLOCKED: An exhaustive keyboard-only traversal of every listed control was not completed. Evidence: modal-shared.png"
+      },
+      {
+        "id": "2.9",
+        "name": "modal_focus_trap_escape",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The New Suite, Edit Suite, and confirmation modals and the export drawer trap keyboard focus while open, close on the Escape key, and return focus to the control that opened them",
+        "reasoning": "FAIL: New Suite Escape closure and focus return worked, but export drawer behavior was not visibly available and the full modal set was not verified. Evidence: modal-shared.png"
+      },
+      {
+        "id": "2.10",
+        "name": "aria_live_run_announcements",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The completion of an eval run and a step entering the failed state are announced through an aria-live region in addition to their visual indication",
+        "reasoning": "FAIL: Starting the run produced no visible run transition, and the assertive aria-live regions remained empty. Evidence: run-shared.png"
+      },
+      {
+        "id": "2.11",
+        "name": "labels_and_error_association",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Form fields in the New Suite, Edit Suite, and night-window forms have visible labels, and each validation message names the field it belongs to and renders in association with that field",
+        "reasoning": "BLOCKED: New Suite and Night Window labels/errors were observed, but Edit Suite was not fully exercised end-to-end. Evidence: modal-shared.png"
+      },
+      {
+        "id": "2.12",
+        "name": "export_import_live_from_store",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export JSON and CSV compile from the shared results store so a completed run changes the next export preview, and a successful Import updates the table, charts, and suite badge from that same store without a reload",
+        "reasoning": "FAIL: WebMCP reported export/import opened, but no visible drawer or import form appeared, and creating a suite did not update visible results. Evidence: export-shared.png"
+      },
+      {
+        "id": "2.13",
+        "name": "schema_validation_visible",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Suite, night-window, and import forms reject invalid API-shaped payloads with inline per-field errors naming the field, and do not mutate suites or results on rejection",
+        "reasoning": "FAIL: New Suite visibly showed inline validation, but the import workflow did not render and the complete suite/night-window/import validation requirement could not be satisfied. Evidence: modal-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"shared_state_coherence\":{\"score\":\"no\",\"reasoning\":\"FAIL: Creating a suite and starting a run returned success, but the visible suite list and results did not update. Evidence: create-shared.png\"},\"no_storage_reload_seeded\":{\"score\":\"no\",\"reasoning\":\"FAIL: Storage was empty and reload restored seeded state, but the complete required workflow was not successfully exercised. Evidence: reload-shared.png\"},\"console_clean\":{\"score\":\"no\",\"reasoning\":\"FAIL: No warnings/errors were observed in the sampled interactions, but the full required workflow was not completed. Evidence: reload-shared.png\"},\"cold_load_interactive_2s\":{\"score\":\"yes\",\"reasoning\":\"The cold navigation completed in about 1.1 seconds and rendered an interactive suite list and toolbar. Evidence: reload-shared.png\"},\"responsive_during_streaming\":{\"score\":\"no\",\"reasoning\":\"FAIL: Starting a run did not expose a streaming state, so responsive streaming behavior could not be demonstrated. Evidence: run-shared.png\"},\"keyboard_operability_focus\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: An exhaustive keyboard-only traversal of every listed control was not completed. Evidence: modal-shared.png\"},\"modal_focus_trap_escape\":{\"score\":\"no\",\"reasoning\":\"FAIL: New Suite Escape closure and focus return worked, but export drawer behavior was not visibly available and the full modal set was not verified. Evidence: modal-shared.png\"},\"aria_live_run_announcements\":{\"score\":\"no\",\"reasoning\":\"FAIL: Starting the run produced no visible run transition, and the assertive aria-live regions remained empty. Evidence: run-shared.png\"},\"labels_and_error_association\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: New Suite and Night Window labels/errors were observed, but Edit Suite was not fully exercised end-to-end. Evidence: modal-shared.png\"},\"export_import_live_from_store\":{\"score\":\"no\",\"reasoning\":\"FAIL: WebMCP reported export/import opened, but no visible drawer or import form appeared, and creating a suite did not update visible results. Evidence: export-shared.png\"},\"schema_validation_visible\":{\"score\":\"no\",\"reasoning\":\"FAIL: New Suite visibly showed inline validation, but the import workflow did not render and the complete suite/night-window/import validation requirement could not be satisfied. Evidence: modal-shared.png\"}}",
+    "cost_usd": 0.3670888
+  },
+  "user_flows": {
+    "score": 0.5,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "run_suite_end_to_end",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Selecting a suite and clicking Run Suite advances step statuses while the run log streams, the rollup reaches n of m complete, the results table populates, the bar chart redraws, the line chart gains one trend point, and a result row opens a detail panel whose prompt title, model, and score match that row \u2014 without a reload",
+        "reasoning": "FAIL: A live run streamed steps and populated results, but it did not complete cleanly; a step failed and the run remained in a broken running state. Evidence: run_suite_end_to_end-shared.png"
+      },
+      {
+        "id": "6.2",
+        "name": "create_suite_then_run",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Submitting New Suite with a valid name (1 to 80 characters) and at least one prompt adds the entry with its prompt count; running it produces first results and an average score badge on the entry",
+        "reasoning": "FAIL: Creating a valid suite worked and showed its prompt count, but running it could not produce first results or an average badge because an active run remained stuck. Evidence: run_suite_end_to_end-shared.png"
+      },
+      {
+        "id": "6.3",
+        "name": "failure_retry_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "When a step exhausts retries and is marked failed, the rollup failure count increases; activating Retry resumes from that step and on success clears the failure while earlier steps' outputs remain unchanged",
+        "reasoning": "FAIL: A failed step and failure notification were observed, but no reachable Retry control was exercised and the failure was not cleared. Evidence: run_suite_end_to_end-shared.png"
+      },
+      {
+        "id": "6.4",
+        "name": "pause_resume_timeline_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Pausing freezes the step list and rollup at the current step; resuming continues from that step and the event timeline shows pause and resume transitions in order",
+        "reasoning": "FAIL: Pause and resume commands were accepted, but the visible UI did not show a paused checkpoint or ordered pause/resume timeline transitions. Evidence: pause_resume_timeline_flow-shared.png"
+      },
+      {
+        "id": "6.5",
+        "name": "sort_and_comparison_preserve_data",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sorting results by score ascending then descending reverses row order; toggling to comparison and back preserves matching prompt/model scores between views",
+        "reasoning": "Ascending and descending score sorts reversed the table order; comparison view opened and returning to results preserved the same prompt/model/score rows. Evidence: sort_and_comparison_preserve_data-shared.png"
+      },
+      {
+        "id": "6.6",
+        "name": "export_flow_after_run",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After completing a run, Export results shows a JSON results array whose length and scores match the table, a CSV tab with those promptTitle values, Download JSON/CSV named eval-run-results.json and eval-run-results.csv, and Copy showing Copied",
+        "reasoning": "Export showed 15 JSON result records with matching scores, CSV contained the promptTitle values, and the visible controls were named eval-run-results.json, eval-run-results.csv, and Copy; Copy produced Copied. Evidence: export_flow_after_run-shared.png"
+      },
+      {
+        "id": "6.7",
+        "name": "import_round_trip_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export JSON after a completed run, change the suite's latest results so the table no longer matches, then Import that JSON \u2014 the table, charts, suite badge, and a fresh export reconstruct to match the imported document",
+        "reasoning": "BLOCKED: The export and import drawers were reachable, but the required changed-results precondition and completed import round trip could not be exercised reliably because runs were stuck. Evidence: export_flow_after_run-shared.png"
+      },
+      {
+        "id": "6.8",
+        "name": "undo_redo_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create a suite, activate Undo so the suite disappears and the count decreases by one, then Redo restores that suite with the same name and prompt count",
+        "reasoning": "Undo reduced the suite count from 5 to 4 and removed the created suite; Redo restored the count to 5 and restored Undo Target. Evidence: undo_redo_flow-shared.png"
+      },
+      {
+        "id": "6.9",
+        "name": "reload_returns_seeded",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After creating a suite, scheduling night mode, and opening the export drawer, a page reload returns seeded suites, historical runs, default view, no night-mode schedules, and no unsaved export drawer state",
+        "reasoning": "After creating a suite, toggling night mode, and opening export, reload visibly returned to the seeded 3-suite default view with no drawer and no created suite. Evidence: reload_returns_seeded-shared.png"
+      },
+      {
+        "id": "6.10",
+        "name": "delete_selected_empty_state_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Deleting the currently selected suite clears results and charts to an empty state with a message and a control to select or create a suite",
+        "reasoning": "Deleting the selected suite reduced the count, cleared the result surfaces, and showed Select an evaluation suite with New Suite and Select first suite controls. Evidence: delete_selected_empty_state_flow-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"run_suite_end_to_end\":{\"score\":\"no\",\"reasoning\":\"FAIL: A live run streamed steps and populated results, but it did not complete cleanly; a step failed and the run remained in a broken running state. Evidence: run_suite_end_to_end-shared.png\"},\"create_suite_then_run\":{\"score\":\"no\",\"reasoning\":\"FAIL: Creating a valid suite worked and showed its prompt count, but running it could not produce first results or an average badge because an active run remained stuck. Evidence: run_suite_end_to_end-shared.png\"},\"failure_retry_flow\":{\"score\":\"no\",\"reasoning\":\"FAIL: A failed step and failure notification were observed, but no reachable Retry control was exercised and the failure was not cleared. Evidence: run_suite_end_to_end-shared.png\"},\"pause_resume_timeline_flow\":{\"score\":\"no\",\"reasoning\":\"FAIL: Pause and resume commands were accepted, but the visible UI did not show a paused checkpoint or ordered pause/resume timeline transitions. Evidence: pause_resume_timeline_flow-shared.png\"},\"sort_and_comparison_preserve_data\":{\"score\":\"yes\",\"reasoning\":\"Ascending and descending score sorts reversed the table order; comparison view opened and returning to results preserved the same prompt/model/score rows. Evidence: sort_and_comparison_preserve_data-shared.png\"},\"export_flow_after_run\":{\"score\":\"yes\",\"reasoning\":\"Export showed 15 JSON result records with matching scores, CSV contained the promptTitle values, and the visible controls were named eval-run-results.json, eval-run-results.csv, and Copy; Copy produced Copied. Evidence: export_flow_after_run-shared.png\"},\"import_round_trip_flow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The export and import drawers were reachable, but the required changed-results precondition and completed import round trip could not be exercised reliably because runs were stuck. Evidence: export_flow_after_run-shared.png\"},\"undo_redo_flow\":{\"score\":\"yes\",\"reasoning\":\"Undo reduced the suite count from 5 to 4 and removed the created suite; Redo restored the count to 5 and restored Undo Target. Evidence: undo_redo_flow-shared.png\"},\"reload_returns_seeded\":{\"score\":\"yes\",\"reasoning\":\"After creating a suite, toggling night mode, and opening export, reload visibly returned to the seeded 3-suite default view with no drawer and no created suite. Evidence: reload_returns_seeded-shared.png\"},\"delete_selected_empty_state_flow\":{\"score\":\"yes\",\"reasoning\":\"Deleting the selected suite reduced the count, cleared the result surfaces, and showed Select an evaluation suite with New Suite and Select first suite controls. Evidence: delete_selected_empty_state_flow-shared.png\"}}",
+    "cost_usd": 0.287595
+  },
+  "visual_design": {
+    "score": 0.9,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "dashboard_layout_composition",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app composes as a left sidebar containing the suite list and a main content area with a chart strip on top and the results table below it, with the run step list and event timeline rendered alongside the results panel while a run is active or selected",
+        "reasoning": "Sidebar, chart strip, results table, run steps, streaming log, and event timeline are visibly composed together. Evidence: initial-desktop.png, run-execution-panel.png"
+      },
+      {
+        "id": "3.2",
+        "name": "score_badge_thresholds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Average score badges render green for scores 80 to 100, yellow for 60 to 79, and red below 60, applied consistently on suite entries and anywhere average scores appear",
+        "reasoning": "Suite scores visibly use green for 92.4, yellow for 76.9, and red for 55.4. Evidence: initial-desktop.png"
+      },
+      {
+        "id": "3.3",
+        "name": "pass_fail_badge_colors",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Pass badges render in a green success treatment and Fail badges in a red danger treatment, consistent between the results table and the detail panel",
+        "reasoning": "BLOCKED: Green Pass badges were observed in the results table and detail panel, but no Fail result badge was available to verify the red treatment. Evidence: result-detail.png"
+      },
+      {
+        "id": "3.4",
+        "name": "step_status_treatments_distinct",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The pending, running, retrying, failed, and complete step statuses are each visually distinct at a glance (distinct color or icon treatment), and the same treatment for each status is used in both the step list and the event timeline",
+        "reasoning": "Pending, running, retrying, complete, and failed statuses are visibly differentiated with distinct color/icon treatments across steps and timeline. Evidence: run-execution-panel.png"
+      },
+      {
+        "id": "3.5",
+        "name": "chart_palette_consistent_mapping",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Chart series use one consistent accent palette with the primary model in the brand accent and each additional model in a distinct supporting accent, and the model-to-color mapping is identical between the bar chart and the comparison view",
+        "reasoning": "The bar chart and comparison table use the same purple Granite, teal GPT, and orange Claude mapping. Evidence: comparison-view.png"
+      },
+      {
+        "id": "3.6",
+        "name": "typography_and_spacing_rhythm",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography shows a clear hierarchy (app title larger than panel headings, which are larger than table body and label text) and spacing between the sidebar, chart strip, table, and detail panel follows a visually regular rhythm with no crowded or orphaned regions",
+        "reasoning": "The title, panel headings, labels, and table text form a clear hierarchy with regular spacing and no crowded regions. Evidence: initial-desktop.png"
+      },
+      {
+        "id": "3.7",
+        "name": "component_states_and_icons",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, inputs, selects, and toggles show distinct default, hover, focus (visible ring), disabled, and error treatments, and one consistent icon set is used across the toolbar, suite entries, step statuses, and row actions",
+        "reasoning": "Disabled Undo/Redo, hover styling, visible error status, and consistent icons across toolbar, suites, statuses, and actions were observed. Evidence: initial-desktop.png, run-execution-panel.png"
+      },
+      {
+        "id": "3.8",
+        "name": "responsive_sidebar_and_mobile",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At widths of 768 pixels and below the suite sidebar collapses behind a toggle that opens it as an overlay while desktop widths show it open by default, and at 375 pixel width no content clips or overflows the viewport, no page-level horizontal scrolling appears, and the results and comparison tables scroll within their own containers",
+        "reasoning": "At 375px the sidebar is collapsed behind an Open suite navigation toggle, opens as an overlay, content stays within the viewport, and the results table has its own horizontal scroll. Evidence: mobile-375.png, mobile-sidebar-open.png"
+      },
+      {
+        "id": "3.10",
+        "name": "export_drawer_visual",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The export drawer shows JSON and CSV tabs with a scrollable preview plus Download and Copy affordances, visually consistent with other Carbon overlays in the app",
+        "reasoning": "The export drawer visibly provides JSON/CSV tabs, a scrollable preview, Copy, and Download affordances in a consistent overlay. Evidence: export-drawer.png"
+      },
+      {
+        "id": "3.11",
+        "name": "toolbar_export_undo_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The toolbar shows Export results, Import results, Undo, and Redo controls alongside the existing night-window and comparison controls without crowding or orphaned chrome",
+        "reasoning": "The toolbar visibly includes Export results, Import results, Undo, Redo, Night Window, and Compare models without clipping at desktop width. Evidence: results-desktop.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"dashboard_layout_composition\":{\"score\":\"yes\",\"reasoning\":\"Sidebar, chart strip, results table, run steps, streaming log, and event timeline are visibly composed together. Evidence: initial-desktop.png, run-execution-panel.png\"},\"score_badge_thresholds\":{\"score\":\"yes\",\"reasoning\":\"Suite scores visibly use green for 92.4, yellow for 76.9, and red for 55.4. Evidence: initial-desktop.png\"},\"pass_fail_badge_colors\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Green Pass badges were observed in the results table and detail panel, but no Fail result badge was available to verify the red treatment. Evidence: result-detail.png\"},\"step_status_treatments_distinct\":{\"score\":\"yes\",\"reasoning\":\"Pending, running, retrying, complete, and failed statuses are visibly differentiated with distinct color/icon treatments across steps and timeline. Evidence: run-execution-panel.png\"},\"chart_palette_consistent_mapping\":{\"score\":\"yes\",\"reasoning\":\"The bar chart and comparison table use the same purple Granite, teal GPT, and orange Claude mapping. Evidence: comparison-view.png\"},\"typography_and_spacing_rhythm\":{\"score\":\"yes\",\"reasoning\":\"The title, panel headings, labels, and table text form a clear hierarchy with regular spacing and no crowded regions. Evidence: initial-desktop.png\"},\"component_states_and_icons\":{\"score\":\"yes\",\"reasoning\":\"Disabled Undo/Redo, hover styling, visible error status, and consistent icons across toolbar, suites, statuses, and actions were observed. Evidence: initial-desktop.png, run-execution-panel.png\"},\"responsive_sidebar_and_mobile\":{\"score\":\"yes\",\"reasoning\":\"At 375px the sidebar is collapsed behind an Open suite navigation toggle, opens as an overlay, content stays within the viewport, and the results table has its own horizontal scroll. Evidence: mobile-375.png, mobile-sidebar-open.png\"},\"export_drawer_visual\":{\"score\":\"yes\",\"reasoning\":\"The export drawer visibly provides JSON/CSV tabs, a scrollable preview, Copy, and Download affordances in a consistent overlay. Evidence: export-drawer.png\"},\"toolbar_export_undo_present\":{\"score\":\"yes\",\"reasoning\":\"The toolbar visibly includes Export results, Import results, Undo, Redo, Night Window, and Compare models without clipping at desktop width. Evidence: results-desktop.png\"} }",
+    "cost_usd": 0.2682122
+  },
+  "writing": {
+    "score": 0.875,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "headings_use_consistent_capitalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders panel headings such as results, comparison, and export drawer titles, they use one consistent capitalization convention",
+        "reasoning": "Panel headings consistently use sentence case, including Evaluation results, Model comparison, and Import results. Evidence: initial-shared.png"
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders toolbar actions, labels are specific verbs such as New Suite, Run Suite, Export results, Import results, Download JSON, Download CSV, Copy, Undo, and Redo rather than generic Submit or OK",
+        "reasoning": "Toolbar actions use specific labels such as New Suite, Run Suite, Export results, Import results, Download JSON, Download CSV, Copy, Undo, and Redo. Evidence: initial-shared.png"
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Where the app renders validation errors for suite name, prompt selection, night times, or import, they name the offending field and what is required",
+        "reasoning": "FAIL: Suite and prompt errors identify the required field, but the exercised import error only says \u201cImport: JSON is malformed\u201d without stating the required valid format. Evidence: import-error-shared.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders empty results or empty timeline states, the copy explains what belongs there and how running the suite or adjusting the filter fills it",
+        "reasoning": "The empty state says \u201cNo results yet\u201d and explains that running the suite populates scored results; it also explains export availability. Evidence: empty-state-shared.png"
+      },
+      {
+        "id": "15.5",
+        "name": "body_copy_is_well_written",
+        "value": 1.0,
+        "raw": 5,
+        "weight": 0.5,
+        "description": "Where the app renders body or helper copy in empty states, validation, and toasts, rate how free it is of spelling and grammatical errors",
+        "reasoning": "Empty-state, validation, and toast copy is clear, grammatical, and professional. Evidence: empty-state-shared.png"
+      },
+      {
+        "id": "15.6",
+        "name": "terminology_is_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app labels Pass/Fail, step statuses, and suite/run concepts across the results table, comparison view, and export preview, terminology stays consistent",
+        "reasoning": "Results and export surfaces consistently use result, score, Pass/Fail, and run terminology; comparison uses the same score and latency concepts. Evidence: run-complete-shared.png"
+      },
+      {
+        "id": "15.7",
+        "name": "numbers_dates_and_units_are_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders scores, latency in milliseconds, token counts, and timestamps, formatting is consistent across table, charts, and export preview",
+        "reasoning": "Scores, token counts, latency values, timestamps, and millisecond units are presented consistently across the dashboard, comparison view, and JSON export preview. Evidence: copy-success-shared.png"
+      },
+      {
+        "id": "15.8",
+        "name": "success_messages_are_specific",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders toasts after creating, deleting, completing a run, or Copy, they state what happened (including Copied) rather than vague affirmations",
+        "reasoning": "Observed messages are specific: \u201cSuite created,\u201d \u201cEvaluation complete,\u201d and \u201cCopied,\u201d with explanatory details. Evidence: copy-success-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"headings_use_consistent_capitalization\":{\"score\":\"yes\",\"reasoning\":\"Panel headings consistently use sentence case, including Evaluation results, Model comparison, and Import results. Evidence: initial-shared.png\"},\"actions_use_specific_labels\":{\"score\":\"yes\",\"reasoning\":\"Toolbar actions use specific labels such as New Suite, Run Suite, Export results, Import results, Download JSON, Download CSV, Copy, Undo, and Redo. Evidence: initial-shared.png\"},\"errors_name_problem_and_fix\":{\"score\":\"no\",\"reasoning\":\"FAIL: Suite and prompt errors identify the required field, but the exercised import error only says \u201cImport: JSON is malformed\u201d without stating the required valid format. Evidence: import-error-shared.png\"},\"empty_states_explain_next_step\":{\"score\":\"yes\",\"reasoning\":\"The empty state says \u201cNo results yet\u201d and explains that running the suite populates scored results; it also explains export availability. Evidence: empty-state-shared.png\"},\"body_copy_is_well_written\":{\"score\":5,\"reasoning\":\"Empty-state, validation, and toast copy is clear, grammatical, and professional. Evidence: empty-state-shared.png\"},\"terminology_is_consistent\":{\"score\":\"yes\",\"reasoning\":\"Results and export surfaces consistently use result, score, Pass/Fail, and run terminology; comparison uses the same score and latency concepts. Evidence: run-complete-shared.png\"},\"numbers_dates_and_units_are_consistent\":{\"score\":\"yes\",\"reasoning\":\"Scores, token counts, latency values, timestamps, and millisecond units are presented consistently across the dashboard, comparison view, and JSON export preview. Evidence: copy-success-shared.png\"},\"success_messages_are_specific\":{\"score\":\"yes\",\"reasoning\":\"Observed messages are specific: \u201cSuite created,\u201d \u201cEvaluation complete,\u201d and \u201cCopied,\u201d with explanatory details. Evidence: copy-success-shared.png\"}}",
+    "cost_usd": 0.2931388
+  }
+}

@@ -1,0 +1,219 @@
+/* Field Notes Archive — reference CSS extracted verbatim from the production stylesheet.
+   Pointer target for instruction.md > Design Tokens and > Components. Every
+   declaration below is normative for rebuild parity (exact selectors, values,
+   units) — copy/adapt into your own scoped component styles, do not delete
+   any value. See instruction.md for the token summary tables and for how
+   each block below is used (typography, layout, components). */
+
+/* ---- Color tokens (:root) ---- */
+:root {
+  --color-light: #fdfaf7;
+  --color-gray: #787a7f;
+  --color-dark: #191919;
+  --color-primary: var(--color-dark);
+  --color-contrast: var(--color-light);
+}
+.__body {
+  background-color: var(--color-primary);
+  color: var(--color-contrast);
+}
+
+/* ---- Font faces ----
+   Production loads IBM Plex Mono from Google Fonts via @import; this offline
+   rebuild must self-host all three families instead (see Brand Assets) while
+   keeping the same font-family names/weights so the rules below need no
+   changes. */
+@font-face {
+  font-display: swap;
+  font-family: Signifier;
+  font-style: normal;
+  font-weight: 400;
+  src: url(/fonts/signifier-light.woff2) format("woff2");
+}
+@font-face {
+  font-display: swap;
+  font-family: Founders Grotesk;
+  font-style: normal;
+  font-weight: 700;
+  src: url(/fonts/founders-grotesk-x-condensed-bold.woff2) format("woff2");
+}
+@font-face {
+  font-display: swap;
+  font-family: IBM Plex Mono;
+  font-style: normal;
+  font-weight: 400;
+  src: url(/fonts/ibm-plex-mono-latin-400-normal.woff2) format("woff2");
+}
+@font-face {
+  font-display: swap;
+  font-family: IBM Plex Mono;
+  font-style: normal;
+  font-weight: 700;
+  src: url(/fonts/ibm-plex-mono-latin-700-normal.woff2) format("woff2");
+}
+
+/* ---- Base HTML ---- */
+html {
+  font-family: Signifier, serif;
+  font-weight: 400;
+  line-height: 1.25;
+  -webkit-font-smoothing: subpixel-antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+body { font-size: 1rem; margin: 0; }
+
+/* Root font-size scale (rem basis) — cascades all rem-based tokens below */
+/* @media (max-width: 320px)          { html { font-size: 12px; } } */
+/* @media (max-width: 480px/768px)    { html { font-size: 13px; } } */
+/* @media (max-width: 900px/1024px)   { html { font-size: 14px; } } */
+/* @media (min-width: 1025px)         { html { font-size: 15px; } } */
+/* @media (min-width: 1440px)         { html { font-size: 16px; } } */
+/* @media (min-width: 1920px)         { html { font-size: 18px; } } */
+
+/* ---- Type scale classes ---- */
+.heading-1 {
+  font-size: clamp(4rem, 2.25rem + 5.833vw, 7.5rem);
+  font-weight: 700;
+  line-height: .8;
+  text-transform: uppercase;
+  /* font-family: Founders Grotesk for display titles (about title / hero uses condensed) */
+}
+.heading-2 {
+  font-size: clamp(2.66rem, 1.49rem + 3.9vw, 5rem);
+  font-weight: 700;
+  line-height: .8;
+  text-transform: uppercase;
+}
+.heading-3 {
+  font-size: clamp(2rem, 1.429rem + 2.857vw, 4rem);
+  font-weight: 400;
+  line-height: .92;
+}
+.heading-4 {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.heading-5 {
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.16;
+}
+.par-1 {
+  font-size: clamp(1rem, .875rem + .417vw, 1.25rem);
+  line-height: 1.4;
+}
+.par-2 {
+  font-size: 1.125rem;
+  font-family: IBM Plex Mono, sans-serif;
+  line-height: 1.4;
+}
+.caption {
+  font-family: IBM Plex Mono, sans-serif;
+  font-size: clamp(.75rem, 0rem + .833vw, 1rem);
+  line-height: 1.4;
+}
+/* Component-specific type overrides (exact) */
+.page-about__title { font-family: Founders Grotesk, sans-serif; font-size: 3.25rem; font-weight: 700; line-height: .8; text-transform: uppercase; text-wrap: balance; }
+.the-nav__item { font-family: IBM Plex Mono, sans-serif; font-size: 1rem; font-weight: 400; line-height: 2rem; opacity: .8; }
+.the-footer { font-family: IBM Plex Mono, sans-serif; font-size: .75rem; text-transform: uppercase; gap: 3.75rem; }
+.tag { font-family: Signifier, serif; font-size: 1.625rem; } /* <=1024: 1.25rem; <=480: 15px */
+.about-gallery__captions { font-family: IBM Plex Mono; font-size: 14px; opacity: .6; }
+/* .section-hero__title responsive clamps (multiple MQ overrides):
+   font-size: clamp(1px, (100vw - var(--container-offset) * 2) * {0.105|0.119|0.13|0.18|0.23}, 200px)
+   — multiplier depends on breakpoint; implement the matching media-query set. */
+.section-hero__desc { color: var(--color-gray); max-width: var(--container-size); width: 50rem; } /* mobile: font-size: 16px */
+
+/* ---- Layout tokens ---- */
+:root {
+  --container-size: calc(100vw - var(--container-offset) * 2);
+  /* --container-offset by breakpoint:
+     >=1920: 48px; >=1440: 34px; >=1025: 32px; <=1024/900: 30px; <=768: 20px; <=480/320: 18px */
+  --stack-border-radius: 4px;
+  --stack-group-height-sm: 20vw; /* MQ: max-aspect-ratio 2/1 -> 15vw; <=1024 -> 20vh; <=480 -> 15vh */
+  --stack-group-height-lg: 80vh;
+  --stack-group-offset: 3.75rem;
+  --stack-perspective: 3000px;
+  --stack-rotation-angle: -3deg;
+  --stack-rotation-offset: 1rem;
+  --stack-shadow: 0 -1px 8px rgba(0,0,0,.15);
+  --folder-shadow: 1px 0 8px rgba(0,0,0,.15);
+  --folder-offset: 65vh;
+  --tag-height: 2.75rem; /* <=768: 2.25rem */
+  --tag-aspect-ratio: 1.409;
+  --button-size: 3.375rem;
+  --padding-block: 8rem;
+  --padding-inline: 2.5rem;
+  --sidebar-size: 14rem;
+}
+.container {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: flex-start;
+  margin-inline: var(--container-offset);
+  width: var(--container-size);
+}
+/* Case content width (inline root CSS):
+   >=1025px: --case-content-width: calc((var(--container-size) - 19*1rem)*16/20 + 15rem)
+   <=1024px: --case-content-width: calc(var(--container-size) - var(--tag-height)) */
+
+/* ---- Components: footer signature mask ---- */
+.signature {
+  -webkit-mask-image: url(/images/signature_mask.svg);
+  mask-image: url(/images/signature_mask.svg);
+  -webkit-mask-size: cover;
+  mask-size: cover;
+  transform: translate(10%);
+  width: 9rem;
+}
+
+/* ---- Full palette reference ----
+   Every exact color/shadow/gradient/opacity value from the production
+   stylesheet, beyond the core semantic tokens already declared above.
+   Design Tokens > Global palette (instruction.md) keeps only the most
+   load-bearing subset inline; every value below is still normative. */
+:root {
+  --white: #fff;                    /* also #ffffff */
+  --black: #000;                    /* also #000000 */
+  --cream-alt: #fffcf9;             /* secondary cream, alt to --color-light */
+  --header-bg: #191919cc;           /* 80% alpha dark; header-bar background */
+  --header-border: hsla(0, 0%, 100%, .1); /* header border-bottom, 1px solid */
+  --accent-yellow: #FFE927;         /* case/stack page bg variant */
+  --note-error-1: #bd2c2c;
+  --note-error-2: #d15151;
+  --note-error-3: #db0505;
+  --neutral-1: #303030;
+  --neutral-2: #b4b4b4;
+  --neutral-3: #b6b6b6;
+  --neutral-4: #b8b3ae;
+  --neutral-5: #828282;
+  --neutral-6: #b7b7b7;
+  --stack-shadow: 0 -1px 8px rgba(0,0,0,.15);
+  --folder-shadow: 1px 0 8px rgba(0,0,0,.15);
+  --cover-overlay-gradient: linear-gradient(0deg, #ffffff0d, #ffffff0d);
+  --folder-back-overlay: linear-gradient(90deg, #fff0, #ffffff0d);
+  --deep-shadow: 0 0 250px #00000080;
+  --tag-hover-shadow: 0 -10px 20px #00000080;
+  --debug-blue-remnant: #00f;       /* rgba(0,0,255,.5) on .__app:after — do not ship as visible UI */
+}
+/* Hashed case/stack page background CSS vars resolved in production HTML:
+   --v337d1dfc / --v182a34ec resolve among #000000, #581E70, #FFE927, #1E4BD7,
+   #D71E1E, #0C7866. Text vars --v09801972 / --v6d06ac9e resolve #fff or #000
+   depending on page. */
+
+/* ---- Opacity contract (exact) ----
+   Selector/state -> opacity. Normative for rebuild parity. */
+/* .__app.is-loading .section-hero__*, .stack, .page-about, case folder/title { opacity: 0 } */
+/* .the-nav__item { opacity: .8 }  .the-nav__item:hover/.is-active { opacity: 1 } */
+/* .tag { opacity: 0 }  .tag.is-visible { opacity: 1 } */
+/* .stack-cover:after { opacity: 0 }  .is-hovered:after { opacity: 1 } */
+/* .note-overlay, sheet overlay { opacity: .4 } (sheet overlay also mix-blend-mode: exclusion) */
+/* .content-note { opacity: .97 } */
+/* .about-gallery img:not(:first-child) { opacity: 0 } — crossfade controlled in JS */
+/* .about-gallery__captions { opacity: .6 }; inactive captions { opacity: 0 } */
+/* .about-gallery__captions p { opacity: 0 }  .is-active { opacity: 1 } */
+/* Popup enter-from children (close, infobox, media, bg) { opacity: 0 } — staged */
+/* .plyr--hide-controls .plyr__controls { opacity: 0 } */
+/* .the-sub-header__controls .iconify { opacity: .4 } */
+/* Audio wave canvases { opacity: .4 } */
+/* Close / popup source text { opacity: .5 } */

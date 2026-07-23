@@ -1,0 +1,17 @@
+{
+  "accessibility": 0.8462,
+  "behavioral": 0.5455,
+  "core_features": 0.2535,
+  "design_fidelity": 0.7,
+  "edge_cases": 0.7391,
+  "innovation": 0.5333,
+  "motion": 0.2308,
+  "performance": 1.0,
+  "responsiveness": 0.6364,
+  "technical": 0.5789,
+  "user_flows": 0.25,
+  "visual_design": 0.931,
+  "writing": 1.0,
+  "reward": 0.6251,
+  "pass": 0.0
+}

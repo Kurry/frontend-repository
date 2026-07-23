@@ -31,8 +31,16 @@ export function useModalEscapeReturn(open, close) {
   const priorFocusRef = useRef(null)
   closeRef.current = close
   useEffect(() => {
+    if (open) {
+      priorFocusRef.current = document.activeElement
+    } else if (priorFocusRef.current) {
+      const el = priorFocusRef.current
+      priorFocusRef.current = null
+      window.setTimeout(() => el?.focus?.(), 50)
+    }
+  }, [open])
+  useEffect(() => {
     if (!open) return
-    priorFocusRef.current = document.activeElement
     const escape = (event) => {
       if (event.key !== 'Escape') return
       event.preventDefault()
@@ -40,9 +48,6 @@ export function useModalEscapeReturn(open, close) {
       closeRef.current()
     }
     document.addEventListener('keydown', escape, true)
-    return () => {
-      document.removeEventListener('keydown', escape, true)
-      window.setTimeout(() => priorFocusRef.current?.focus?.(), 0)
-    }
+    return () => document.removeEventListener('keydown', escape, true)
   }, [open])
 }

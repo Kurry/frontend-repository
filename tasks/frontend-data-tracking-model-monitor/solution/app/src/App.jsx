@@ -445,7 +445,7 @@ function LogUsageModal() {
     window.setTimeout(() => { lock.current = false }, 350)
   }
   if (!mounted) return null
-  const show = (name) => anyTouched && Boolean(errors[name])
+  const show = (name) => Boolean(errors[name])
   const message = (name) => (show(name) ? errors[name].message : undefined)
   return (
     <Modal
@@ -465,8 +465,15 @@ function LogUsageModal() {
       <p className="modal-intro">Record one inference event. Cost is computed from the selected model&apos;s current catalog rates and cannot be overridden.</p>
       <div className="form-stack">
         <Field id="usage-model" label="Model" hint="Must exactly match a catalog model name" error={message('model')}>
-          <Select id="usage-model" labelText="Model" hideLabel {...a11yProps('usage-model', show('model'), true)} {...register('model')}>
-            <SelectItem value="" text="Select a model" />
+          <Select
+            id="usage-model"
+            labelText="Model"
+            hideLabel
+            defaultValue=""
+            {...a11yProps('usage-model', show('model'), true)}
+            {...register('model')}
+          >
+            <SelectItem value="" text="Select a catalog model…" disabled hidden />
             {activeModels.map((item) => <SelectItem key={item.name} value={item.name} text={`${item.name} · ${item.provider}`} />)}
           </Select>
         </Field>

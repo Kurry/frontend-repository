@@ -1,0 +1,2947 @@
+{
+  "accessibility": {
+    "score": 0.5,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "all_controls_keyboard_operable",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Every interactive control \u2014 portfolio rows and filters, gate cards and evidence links, re-run/retry/pause controls, trial and criterion selectors, diff pickers, fix checkboxes, recommendation controls, the override toggle and form, stepper controls, export and import controls, and the copy, download, and bundling controls \u2014 is reachable and operable with Tab, Shift+Tab, Enter, or Space, with a visible focus indicator at each stop",
+        "reasoning": "FAIL: Tab traversal reached visible controls with focus indicators, but the full workflow controls\u2014including later override, diff, recommendation, and bundling controls\u2014were not all reachable and verified end-to-end. Evidence: workspace-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "modals_manage_focus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The override justification form, diff picker, export drawer, and import surface trap focus while open, close on Escape, and return focus to the control that opened them",
+        "reasoning": "FAIL: Import and export surfaces trapped focus, closed on Escape, and returned focus correctly; the override and diff-picker surfaces were not reached for verification. Evidence: modals-manage-focus-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "icons_and_badges_have_names",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Icon-only controls and status badges (gate chips, warning badges, valid/invalid badges, category tags) expose descriptive accessible names or labels",
+        "reasoning": "Accessible snapshots showed descriptive names for icon-only buttons and textual names for gate statuses, hero states, and category badges. Evidence: gate-board-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "live_region_announcements",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A gate status change from a re-run, the completion of bundling, and a recommendation becoming disallowed are announced through an aria-live region as well as shown visually",
+        "reasoning": "FAIL: Re-run status changes were announced in an aria-live status and shown visually, but bundling completion and recommendation-disallowed announcements were not observed. Evidence: live-region-rerun-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "forms_have_explicit_labels",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The override justification field, step notes fields, import package field, and filter controls have visible labels, and each validation or import error message is associated with its field so it names the field it belongs to",
+        "reasoning": "FAIL: Filter and step-notes fields had labels, but the import textarea exposed the generic label \u201cpackageText,\u201d and complete import-error field association was not verified. Evidence: modals-manage-focus-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "headings_follow_logical_order",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Headings follow a logical order across the portfolio and workspace with no skipped levels",
+        "reasoning": "Observed headings progress without skipped levels across portfolio and workspace views: H1, then H2, with H3 beneath gate sections. Evidence: initial-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "breadcrumb_is_navigation_landmark",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The breadcrumb renders as a navigation landmark whose segments are keyboard-operable links, and skip-to-content or landmark structure (nav, main) is present",
+        "reasoning": "The breadcrumb was observed as a navigation landmark with keyboard-operable Portfolio and bundle links, alongside a main landmark. Evidence: initial-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "text_and_controls_have_contrast",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "All text and controls \u2014 including text on hero banners, status chips, and highlight treatments \u2014 have sufficient color contrast",
+        "reasoning": "FAIL: Rendered contrast measurements found sub-4.5:1 text/control combinations, including muted body text and the green export button. Evidence: workspace-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "status_never_color_only",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Hero states, gate statuses, check outcomes, and category tags each carry a text label or icon in addition to their color treatment",
+        "reasoning": "Hero states, gate statuses, and category tags visibly included text labels such as READY FOR THE BENCHMARK, pass, FIX, and RERUN in addition to color. Evidence: gate-board-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "reduced_motion_is_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, animations are removed while every state change still lands visibly",
+        "reasoning": "In the reduced-motion browser, prefers-reduced-motion matched true; opening the import dialog still landed visibly, while sampled elements had no animation or transition duration. Evidence: reduced-motion-state-change.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"all_controls_keyboard_operable\":{\"score\":\"no\",\"reasoning\":\"FAIL: Tab traversal reached visible controls with focus indicators, but the full workflow controls\u2014including later override, diff, recommendation, and bundling controls\u2014were not all reachable and verified end-to-end. Evidence: workspace-shared.png\"},\"modals_manage_focus\":{\"score\":\"no\",\"reasoning\":\"FAIL: Import and export surfaces trapped focus, closed on Escape, and returned focus correctly; the override and diff-picker surfaces were not reached for verification. Evidence: modals-manage-focus-shared.png\"},\"icons_and_badges_have_names\":{\"score\":\"yes\",\"reasoning\":\"Accessible snapshots showed descriptive names for icon-only buttons and textual names for gate statuses, hero states, and category badges. Evidence: gate-board-shared.png\"},\"live_region_announcements\":{\"score\":\"no\",\"reasoning\":\"FAIL: Re-run status changes were announced in an aria-live status and shown visually, but bundling completion and recommendation-disallowed announcements were not observed. Evidence: live-region-rerun-shared.png\"},\"forms_have_explicit_labels\":{\"score\":\"no\",\"reasoning\":\"FAIL: Filter and step-notes fields had labels, but the import textarea exposed the generic label \u201cpackageText,\u201d and complete import-error field association was not verified. Evidence: modals-manage-focus-shared.png\"},\"headings_follow_logical_order\":{\"score\":\"yes\",\"reasoning\":\"Observed headings progress without skipped levels across portfolio and workspace views: H1, then H2, with H3 beneath gate sections. Evidence: initial-shared.png\"},\"breadcrumb_is_navigation_landmark\":{\"score\":\"yes\",\"reasoning\":\"The breadcrumb was observed as a navigation landmark with keyboard-operable Portfolio and bundle links, alongside a main landmark. Evidence: initial-shared.png\"},\"text_and_controls_have_contrast\":{\"score\":\"no\",\"reasoning\":\"FAIL: Rendered contrast measurements found sub-4.5:1 text/control combinations, including muted body text and the green export button. Evidence: workspace-shared.png\"},\"status_never_color_only\":{\"score\":\"yes\",\"reasoning\":\"Hero states, gate statuses, and category tags visibly included text labels such as READY FOR THE BENCHMARK, pass, FIX, and RERUN in addition to color. Evidence: gate-board-shared.png\"},\"reduced_motion_is_respected\":{\"score\":\"yes\",\"reasoning\":\"In the reduced-motion browser, prefers-reduced-motion matched true; opening the import dialog still landed visibly, while sampled elements had no animation or transition duration. Evidence: reduced-motion-state-change.png\"}}",
+    "cost_usd": 0.40524679999999996
+  },
+  "behavioral": {
+    "score": 0.4167,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_reload_resets_seeds",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Multi-facet round-trip: resolve a fix item on one bundle, record a recommendation on it, write a step note, mark a step done, and apply a portfolio filter, then reload the page. All facets coherently reset to the seeded baseline \u2014 12 seeded bundles with seeded gate results, unset recommendations, empty notes, no done steps, no active filters, closed export/import surfaces \u2014 never a mix of surviving and reset facets",
+        "reasoning": "FAIL: Reload restored the seeded portfolio and reset the observed fix/gate/step state, but the complete required pre-reload combination including recommendation, notes, and active filter was not completed. Evidence: multi_facet_reload_resets_seeds-shared.png"
+      },
+      {
+        "id": "14.2",
+        "name": "timeline_filter_derives_live",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Derived-filter proof: filter a bundle's event timeline to one event kind and note the visible entries, then switch to a different kind; the visible set changes to exactly the entries of the new kind, and clearing the filter restores the full ordered timeline \u2014 proving the filtered views derive from one live log rather than hardcoded lists",
+        "reasoning": "Observed gate-status filter showing exactly one gate-status entry, re-run-step filter showing only re-run-step entries, and clearing restored the full ordered log. Evidence: timeline_filter_derives_live-shared.png"
+      },
+      {
+        "id": "14.3",
+        "name": "rerun_full_pipeline_recompute",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Full-pipeline probe: on ember-relay-router, record the hero banner, the Difficulty \u2014 Quartz-Mini chip on the portfolio row, the allowed recommendation set, and the constraint explanation; run Re-run gate on that gate to completion through the real control. Confirm the gate leaves inconclusive AND the hero banner, the portfolio row's chip and hero state, the rollup counts, the allowed recommendation set, and the constraint explanation all recompute to values consistent with the new gate status, without a reload",
+        "reasoning": "Re-ran Difficulty \u2014 Quartz-Mini through the real control; transient progress appeared, then the gate changed to pass, hero changed to READY, allowed recommendations recomputed, and portfolio rollups changed consistently. Evidence: rerun_full_pipeline_recompute-shared.png"
+      },
+      {
+        "id": "14.4",
+        "name": "cross_view_echo_fix_resolution",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cross-view echo: resolve a REDESIGN fix item on a flag-free AT RISK bundle in the workspace, then open the portfolio. The bundle's row shows the recomputed hero state per the mapping, and returning to the workspace shows the same recomputed hero banner \u2014 the same datum agrees across structurally different views without reload",
+        "reasoning": "Resolved the REDESIGN item on moss-graph-redesign; the portfolio row changed to NOT READY \u2014 BUT FIXABLE and returning to the workspace showed the same hero state. Evidence: cross_view_echo_fix_resolution-shared.png"
+      },
+      {
+        "id": "14.5",
+        "name": "count_delta_is_exact",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Count-delta integrity: note the rollup count for a hero state immediately before an action that changes one bundle's hero state (a gate-flipping re-run or a REDESIGN resolution), then immediately after; exactly one count decreases by one and exactly one count increases by one, with the total still 12",
+        "reasoning": "Before/after portfolio rollups showed total 12, Ready increasing from 4 to 5, and Fixable decreasing from 5 to 4 after one bundle\u2019s hero state changed. Evidence: count_delta_is_exact-shared.png"
+      },
+      {
+        "id": "14.6",
+        "name": "different_inputs_change_outcomes",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Input-dependent output: record an in-set recommendation on one bundle and an override recommendation with a distinct justification on another; each bundle's Bundle summary shows its own recommendation and (for the override) its own justification text \u2014 the two summaries differ in the ways the inputs dictate",
+        "reasoning": "BLOCKED: The required two-bundle recommendation and override-justification workflow was not completed and verified in rendered Bundle summaries."
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_bundles_isolated",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Interleaved-flow integrity: start a re-run on bundle A, switch to bundle B and resolve a fix item and write a step note, then return to bundle A. The re-run progressed or completed correctly with its own timeline entries, and bundle B's fix state and note are intact \u2014 neither bundle's state leaked into the other",
+        "reasoning": "BLOCKED: The required interleaved re-run and second-bundle mutation workflow was not completed end-to-end."
+      },
+      {
+        "id": "14.8",
+        "name": "resolve_all_then_unresolve_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Edge-state round-trip: on an all-gates-pass bundle with unresolved RERUN/FIX items, resolve every item and confirm the allowed set becomes APPROVE and APPROVE WITH CAVEATS with the explanation saying all items are resolved; unresolve one item and confirm the allowed set and explanation revert \u2014 derived surfaces track through both transitions",
+        "reasoning": "FAIL: All items were resolved and the allowed set changed to APPROVE / APPROVE WITH CAVEATS; after unresolving one item the allowed set reverted, but the required explicit constraint explanation text was not observed. Evidence: resolve_all_then_unresolve_round_trip-shared.png"
+      },
+      {
+        "id": "14.9",
+        "name": "bundle_summary_contains_session_values",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "End-to-end summary probe: after flipping ember-relay-router's Difficulty \u2014 Quartz-Mini gate via re-run, recording a recommendation, resolving at least one fix item, and writing a distinctive step note, open the Bundle step. The rendered summary text contains the bundle's current hero state label, the exact recommendation chosen, the flipped gate's current status in the gates table, the resolved item's resolved state, and the distinctive note text \u2014 the document is generated from actual session state, not a static template",
+        "reasoning": "BLOCKED: The required complete session was not advanced to and verified in the rendered Bundle summary."
+      },
+      {
+        "id": "14.10",
+        "name": "diff_outcomes_derive_from_trials",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Diff sensitivity: diff trial A against trial B and note the flipped checks and flip count, then diff trial A against trial C; the flipped set and count change to match C's actual check outcomes \u2014 the diff derives from the selected trials rather than a hardcoded comparison",
+        "reasoning": "Trial 1 versus trial 2 showed 0 flipped checks; trial 1 versus trial 3 showed 1 flipped check, with the flipped set changing accordingly. Evidence: diff_outcomes_derive_from_trials-shared.png"
+      },
+      {
+        "id": "14.11",
+        "name": "mutation_to_export_contains_session",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "End-to-end export probe: after flipping ember-relay-router via re-run, recording a recommendation with distinctive overrideJustification, resolving a fix item, writing a distinctive step note, and completing bundling, open Export. The Review Package JSON preview contains schemaVersion review-certification/v1 and that bundle's current heroState, recommendation, overrideJustification, resolved fix item, note text, and bundled true \u2014 compiled from actual session state",
+        "reasoning": "BLOCKED: The required complete mutation workflow and rendered Export JSON preview were not reached."
+      },
+      {
+        "id": "14.12",
+        "name": "export_import_behavioral_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export/import behavioral round-trip: after the mutation-to-export session work, Copy the Review Package JSON, reload to seeds, Import that text, and confirm portfolio Bundled badge, workspace recommendation/justification/notes/fix resolution, and the next Export preview all match the pre-export mutated package",
+        "reasoning": "BLOCKED: The required export, reload, import, and post-import verification workflow was not completed."
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"multi_facet_reload_resets_seeds\":{\"score\":\"no\",\"reasoning\":\"FAIL: Reload restored the seeded portfolio and reset the observed fix/gate/step state, but the complete required pre-reload combination including recommendation, notes, and active filter was not completed. Evidence: multi_facet_reload_resets_seeds-shared.png\"},\"timeline_filter_derives_live\":{\"score\":\"yes\",\"reasoning\":\"Observed gate-status filter showing exactly one gate-status entry, re-run-step filter showing only re-run-step entries, and clearing restored the full ordered log. Evidence: timeline_filter_derives_live-shared.png\"},\"rerun_full_pipeline_recompute\":{\"score\":\"yes\",\"reasoning\":\"Re-ran Difficulty \u2014 Quartz-Mini through the real control; transient progress appeared, then the gate changed to pass, hero changed to READY, allowed recommendations recomputed, and portfolio rollups changed consistently. Evidence: rerun_full_pipeline_recompute-shared.png\"},\"cross_view_echo_fix_resolution\":{\"score\":\"yes\",\"reasoning\":\"Resolved the REDESIGN item on moss-graph-redesign; the portfolio row changed to NOT READY \u2014 BUT FIXABLE and returning to the workspace showed the same hero state. Evidence: cross_view_echo_fix_resolution-shared.png\"},\"count_delta_is_exact\":{\"score\":\"yes\",\"reasoning\":\"Before/after portfolio rollups showed total 12, Ready increasing from 4 to 5, and Fixable decreasing from 5 to 4 after one bundle\u2019s hero state changed. Evidence: count_delta_is_exact-shared.png\"},\"different_inputs_change_outcomes\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The required two-bundle recommendation and override-justification workflow was not completed and verified in rendered Bundle summaries.\"},\"interleaved_bundles_isolated\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The required interleaved re-run and second-bundle mutation workflow was not completed end-to-end.\"},\"resolve_all_then_unresolve_round_trip\":{\"score\":\"no\",\"reasoning\":\"FAIL: All items were resolved and the allowed set changed to APPROVE / APPROVE WITH CAVEATS; after unresolving one item the allowed set reverted, but the required explicit constraint explanation text was not observed. Evidence: resolve_all_then_unresolve_round_trip-shared.png\"},\"bundle_summary_contains_session_values\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The required complete session was not advanced to and verified in the rendered Bundle summary.\"},\"diff_outcomes_derive_from_trials\":{\"score\":\"yes\",\"reasoning\":\"Trial 1 versus trial 2 showed 0 flipped checks; trial 1 versus trial 3 showed 1 flipped check, with the flipped set changing accordingly. Evidence: diff_outcomes_derive_from_trials-shared.png\"},\"mutation_to_export_contains_session\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The required complete mutation workflow and rendered Export JSON preview were not reached.\"},\"export_import_behavioral_round_trip\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The required export, reload, import, and post-import verification workflow was not completed.\"}}",
+    "cost_usd": 1.1934076
+  },
+  "core_features": {
+    "score": 0.4679,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "portfolio_lists_twelve_bundles",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On first load the portfolio lists 12 seeded review bundles, each row showing a fictional task slug (including ember-relay-router, juniper-lint-fixer, and drift-ledger-repair), a verdict hero state, six per-gate status chips, and a review-progress indicator for the 5 reviewer steps",
+        "reasoning": "12 seeded rows and the named slugs were visible. Evidence: portfolio_lists_twelve_bundles-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "hero_state_distribution",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every bundle carries exactly one of the three verdict hero states rendered as a labeled banner treatment, and the seeds distribute as 4 READY FOR THE BENCHMARK, 5 NOT READY \u2014 BUT FIXABLE, and 3 AT RISK \u2014 MAY NEED A RESTART",
+        "reasoning": "Rollup and rows showed 4 Ready, 5 Fixable, and 3 At Risk. Evidence: portfolio_lists_twelve_bundles-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "rollup_counts_match_table",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The rollup strip shows a live count of bundles per hero state plus a count of bundles carrying at least one stop-early flag, and each count equals what the portfolio table currently shows",
+        "reasoning": "Visible rollup counts matched the table distribution and Stop-Early count of 2. Evidence: portfolio_lists_twelve_bundles-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "portfolio_filters_combine",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The hero-state filter and the gate-plus-status filter each narrow the visible rows, active filters render as removable chips, applying both together narrows further, and clearing all filters restores all 12 rows",
+        "reasoning": "Hero filtering narrowed to 4, combined filters narrowed to 0 with active chips and an empty-state Clear filters control. Evidence: screenshots/page-2026-07-23T04-56-28-039Z.yml"
+      },
+      {
+        "id": "1.5",
+        "name": "calibration_strip_per_bundle",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The portfolio's calibration strip shows one cell per bundle with the Sable-4 valid-trial count out of total Sable-4 trials for that bundle plus an overall Sable-4 validity percentage, and hovering a cell with the real pointer shows the bundle slug with its valid/total figures",
+        "reasoning": "FAIL: Strip counts and overall percentage were visible, but the required pointer-hover verification was not completed. Evidence: portfolio_lists_twelve_bundles-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "stop_early_flags_named",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Bundles seeded with stop-early flags show a warning badge on their portfolio row, and hovering or focusing the badge reveals the flag's name (agent solved without runtime evidence, or oracle contradicts the task description)",
+        "reasoning": "The two stop-early rows visibly exposed their flag names. Evidence: portfolio_lists_twelve_bundles-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "bundle_open_and_return",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Selecting a bundle row opens that bundle's review workspace without a full page reload, and a persistent control returns to the portfolio",
+        "reasoning": "Opening ember-relay-router changed to the workspace without a reload and the persistent Portfolio control was visible. Evidence: screenshots/page-2026-07-23T04-56-49-509Z.yml"
+      },
+      {
+        "id": "1.8",
+        "name": "gate_board_six_gates",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A bundle's gate board shows six gates in the fixed order Admission, No-op, Oracle, Difficulty \u2014 Sable-4, Difficulty \u2014 Quartz-Mini, Analysis, each card showing a status of pass, fail, errored, inconclusive, or missing, a one-line summary, and an expandable reasons list",
+        "reasoning": "The board rendered six ordered cards with statuses, summaries, evidence controls, and Reasons controls. Evidence: screenshots/page-2026-07-23T04-57-24-488Z.yml"
+      },
+      {
+        "id": "1.9",
+        "name": "thresholds_visible_on_board",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The gate board displays the certification thresholds as visible reference values \u2014 the 0.80 difficulty bar, the 0.90 oracle comprehensiveness bar, and the minimum of 3 valid trials \u2014 with each difficulty gate's measured score shown next to the 0.80 bar and the Oracle gate's comprehensiveness value shown next to the 0.90 bar",
+        "reasoning": "The board visibly showed 0.80, 0.90, minimum 3 trials, and measured scores beside difficulty/oracle bars. Evidence: screenshots/page-2026-07-23T04-57-24-488Z.yml"
+      },
+      {
+        "id": "1.10",
+        "name": "gate_evidence_links_jump",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Activating a gate card's evidence link jumps to the exact record backing that gate \u2014 a difficulty gate's link opens the trial inspector on that gate's trials and the Oracle gate's link opens its oracle transcript record \u2014 with the target visibly highlighted on arrival",
+        "reasoning": "FAIL: Evidence controls were visible, but the jump-and-highlight behavior was not completed. Evidence: screenshots/page-2026-07-23T04-57-24-488Z.yml"
+      },
+      {
+        "id": "1.11",
+        "name": "difficulty_status_derivation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Difficulty gate statuses are consistent with their displayed evidence: a gate whose score meets the 0.80 bar with at least 3 valid trials shows pass, a gate with fewer than 3 valid trials shows inconclusive, and a gate whose score misses the bar with 3 or more valid trials shows fail; ember-relay-router's Difficulty \u2014 Quartz-Mini gate ships inconclusive with exactly 2 valid trials",
+        "reasoning": "Ember initially showed Quartz-Mini 0.78 with exactly 2 valid trials and inconclusive; after rerun it showed 0.84 with 3 valid trials and pass. Evidence: screenshots/page-2026-07-23T04-57-24-488Z.yml"
+      },
+      {
+        "id": "1.12",
+        "name": "hero_derives_from_gates_and_flags",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Each bundle's verdict hero state matches the stated mapping: all six gates passing yields READY FOR THE BENCHMARK, a non-passing gate with no stop-early flag and no unresolved REDESIGN fix item yields NOT READY \u2014 BUT FIXABLE, and a stop-early flag or an unresolved REDESIGN item yields AT RISK \u2014 MAY NEED A RESTART",
+        "reasoning": "Workspace hero changed from Fixable to Ready when the Quartz-Mini gate changed to pass, with allowed-set text updating too. Evidence: screenshots/page-2026-07-23T04-57-24-488Z.yml"
+      },
+      {
+        "id": "1.14",
+        "name": "rerun_four_named_steps",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Activating Re-run gate starts a simulated re-evaluation showing four named steps in order \u2014 provision harness, collect trials, evaluate checks, publish result \u2014 whose statuses advance visibly through pending, running, and complete or failed",
+        "reasoning": "Observed provision harness, collect trials, evaluate checks, and publish result advancing through running/complete states. Evidence: screenshots/page-2026-07-23T04-57-38-504Z.yml"
+      },
+      {
+        "id": "1.15",
+        "name": "retry_backoff_attempt_counter",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A simulated step failure retries automatically with a visible backoff countdown and an attempt counter (such as retry 2 of 3), and a step that exhausts its retries is marked failed with an inline error summary and a manual Retry control",
+        "reasoning": "FAIL: The retry-failure demo was not completed. Evidence: screenshots/page-2026-07-23T04-57-38-504Z.yml"
+      },
+      {
+        "id": "1.16",
+        "name": "manual_retry_resumes_from_step",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Activating a failed step's Retry control resumes the re-run from that step, and steps already complete keep their original timestamps and outputs without re-executing",
+        "reasoning": "FAIL: No exhausted retry step and manual Retry round trip was observed. Evidence: screenshots/page-2026-07-23T04-57-38-504Z.yml"
+      },
+      {
+        "id": "1.17",
+        "name": "pause_resume_checkpoint",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Pausing a running re-run freezes progression at the current step, and resuming continues from exactly that step with completed steps unchanged",
+        "reasoning": "FAIL: Pause was visible, but pause/resume checkpoint behavior was not completed. Evidence: screenshots/page-2026-07-23T04-57-27-435Z.yml"
+      },
+      {
+        "id": "1.18",
+        "name": "rerun_flips_gate_in_place",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When the publish result step completes, the gate receives a fresh result that can change its status \u2014 re-running ember-relay-router's Difficulty \u2014 Quartz-Mini gate gathers additional valid trials so it leaves inconclusive \u2014 and the gate card's status chip, summary, and score update in place",
+        "reasoning": "The Quartz-Mini card updated in place from inconclusive/0.78/2 valid to pass/0.84/3 valid. Evidence: screenshots/page-2026-07-23T04-57-24-488Z.yml"
+      },
+      {
+        "id": "1.19",
+        "name": "rerun_recomputes_dependents",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A gate status change from a completed re-run recomputes, without a reload, the bundle's verdict hero banner, the allowed recommendation set and its explanation, the portfolio row's hero state and gate chips, the rollup counts, and the calibration strip when trial validity changed",
+        "reasoning": "Rerun recomputed hero state, open fix items, allowed recommendations, timeline, and portfolio row state without reload. Evidence: screenshots/page-2026-07-23T04-57-24-488Z.yml"
+      },
+      {
+        "id": "1.20",
+        "name": "event_timeline_records_and_filters",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The bundle's event timeline lists timestamped entries for re-run step transitions, gate status changes, fix-item check-offs, recommendation changes, reviewer step completions, and bundling; it is filterable by event kind and new entries appear without a reload",
+        "reasoning": "FAIL: Timeline entries were observed, but event-kind filtering was not completed. Evidence: screenshots/page-2026-07-23T04-57-55-392Z.yml"
+      },
+      {
+        "id": "1.21",
+        "name": "trials_list_with_validity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening a difficulty gate's evidence shows a selectable trial list with at least 4 trials per scoring model for the bundle, each labeled with its scoring model (Sable-4 or Quartz-Mini), trial number, and a valid or invalid badge",
+        "reasoning": "Quartz-Mini inspector showed four trials, model labels, trial numbers, and valid/invalid badges. Evidence: screenshots/page-2026-07-23T04-57-44-417Z.yml"
+      },
+      {
+        "id": "1.22",
+        "name": "three_pane_inspector_content",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The trial inspector shows three panes for the selected trial: a criterion list of at least 6 rubric criteria each with id, name, weight, and a negated marker where inverted; the scorer's per-criterion reasoning with a pass, fail, or not-applicable outcome chip per criterion; and the agent's answer text",
+        "reasoning": "Inspector showed rubric criteria, scorer reasoning, and agent answer panes. Evidence: screenshots/page-2026-07-23T04-57-44-417Z.yml"
+      },
+      {
+        "id": "1.23",
+        "name": "eight_named_checks_rendered",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The inspector renders the trial's eight named validity checks each with an outcome chip: answer-determinacy, runtime-evidence-used, grounded-in-trajectory, comprehensiveness-near-miss, difficulty-crux, honest-uncertainty, refusals, and low-timeout",
+        "reasoning": "All eight named validity checks and outcome chips were visible. Evidence: screenshots/page-2026-07-23T04-57-44-417Z.yml"
+      },
+      {
+        "id": "1.24",
+        "name": "trial_validity_derives_from_checks",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Each trial's valid or invalid badge is consistent with its displayed checks: the badge reads valid exactly when the trial's answer-determinacy, refusals, and low-timeout checks all show pass",
+        "reasoning": "Trial 1 was labeled valid and its answer-determinacy, refusals, and low-timeout checks all showed pass. Evidence: screenshots/page-2026-07-23T04-57-44-417Z.yml"
+      },
+      {
+        "id": "1.25",
+        "name": "criterion_selection_links_panes",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Selecting a criterion in the left pane highlights that criterion's reasoning block in the middle pane and highlights the cited passages in the agent's answer in the right pane, and selecting a different criterion moves both highlights",
+        "reasoning": "FAIL: Criterion controls were visible, but selection movement across all three panes was not completed. Evidence: screenshots/page-2026-07-23T04-57-44-417Z.yml"
+      },
+      {
+        "id": "1.26",
+        "name": "reasoning_selection_reflects_back",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Selecting a reasoning block in the middle pane selects the corresponding criterion in the left pane so all three panes agree on the selected criterion",
+        "reasoning": "FAIL: Reasoning blocks were visible, but reverse selection synchronization was not completed. Evidence: screenshots/page-2026-07-23T04-57-44-417Z.yml"
+      },
+      {
+        "id": "1.27",
+        "name": "evidence_highlight_treatments",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Cited passages in the agent's answer carry a visible highlight treatment distinct from body text, and the passage cited by the currently selected criterion is visually distinct from other cited passages",
+        "reasoning": "FAIL: Cited passages were visible, but active-versus-other citation highlighting was not directly verified. Evidence: screenshots/page-2026-07-23T04-57-44-417Z.yml"
+      },
+      {
+        "id": "1.28",
+        "name": "trial_diff_side_by_side",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Compare trials control enters a diff mode where two trials of the same gate render their check outcomes side by side \u2014 one column per trial, one row per named check \u2014 with every differing check flagged by a visible flip marker and a summary stating how many of the eight checks flipped",
+        "reasoning": "Diff mode showed two trial columns, all eight check rows, and a flipped-check summary. Evidence: screenshots/page-2026-07-23T04-57-55-392Z.yml"
+      },
+      {
+        "id": "1.29",
+        "name": "diff_exit_restores_selection",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Leaving diff mode restores the single-trial three-pane view on the previously selected trial",
+        "reasoning": "Leaving diff mode returned to the single-trial inspector with Trial 1 selected and breadcrumb preserved. Evidence: screenshots/page-2026-07-23T04-58-00-277Z.yml"
+      },
+      {
+        "id": "1.30",
+        "name": "fix_list_item_anatomy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every fix-list item shows its position number, a category tag of RERUN, FIX, REDESIGN, or TALK-TO-LEAD, a title, a detail sentence, a remediation sentence, and an evidence link that jumps to its backing record; every non-READY bundle shows at least 3 items",
+        "reasoning": "Ember showed numbered FIX/RERUN items with title, detail, remediation, evidence, and expand controls. Evidence: screenshots/page-2026-07-23T04-57-11-469Z.yml"
+      },
+      {
+        "id": "1.31",
+        "name": "fix_resolve_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Checking a fix item's resolve checkbox marks it resolved with a visible struck or dimmed treatment and unchecking restores it, with position numbers staying sequential and REDESIGN items ordered above FIX and RERUN items",
+        "reasoning": "FAIL: The resolve checkbox round trip was not completed. Evidence: screenshots/page-2026-07-23T04-57-11-469Z.yml"
+      },
+      {
+        "id": "1.32",
+        "name": "fix_resolution_recomputes_constraint",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Resolving or unresolving a fix item immediately recomputes the allowed recommendation set and the visible constraint explanation, and resolving an unresolved REDESIGN item on a flag-free bundle updates the verdict hero banner and portfolio row per the hero mapping",
+        "reasoning": "FAIL: Manual fix resolve/unresolve recomputation was not completed. Evidence: screenshots/page-2026-07-23T04-58-29-438Z.yml"
+      },
+      {
+        "id": "1.33",
+        "name": "recommendation_allowed_set_enforced",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Verdict step shows APPROVE, APPROVE WITH CAVEATS, MAJOR CHANGES NEEDED, and REJECT-ESCALATE with only the currently allowed set enabled and the rest visibly disabled, and the enabled set matches the ordered rules (all-pass plus all-resolved allows APPROVE and APPROVE WITH CAVEATS; all-pass with only RERUN/FIX unresolved allows APPROVE WITH CAVEATS and MAJOR CHANGES NEEDED; a non-passing gate or unresolved REDESIGN allows MAJOR CHANGES NEEDED and REJECT-ESCALATE; an unresolved TALK-TO-LEAD allows only REJECT-ESCALATE)",
+        "reasoning": "Verdict panel visibly enabled only APPROVE WITH CAVEATS and MAJOR CHANGES NEEDED, with APPROVE and REJECT-ESCALATE disabled. Evidence: screenshots/page-2026-07-23T04-58-29-438Z.yml"
+      },
+      {
+        "id": "1.34",
+        "name": "constraint_explanation_names_triggers",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The constraint explanation panel states in plain language which rule currently applies and names the specific gates or fix items triggering it, and the explanation text changes when the triggering conditions change",
+        "reasoning": "Explanation named the active passing-with-fixes rule and the specific unresolved fix item. Evidence: screenshots/page-2026-07-23T04-58-29-438Z.yml"
+      },
+      {
+        "id": "1.35",
+        "name": "recommendation_recorded_in_header",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Selecting an allowed recommendation records it and shows it as the bundle's current recommendation in the workspace header",
+        "reasoning": "FAIL: No allowed recommendation was successfully saved and observed in the header. Evidence: screenshots/page-2026-07-23T04-58-29-438Z.yml"
+      },
+      {
+        "id": "1.36",
+        "name": "override_requires_justification",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Choosing a recommendation outside the allowed set requires the Override constraint toggle plus a written justification of at least 20 characters; a shorter or whitespace-only submission shows an inline message naming the justification field and saves nothing, while a valid justification saves, shows an Override badge, and keeps the justification retrievable from the verdict panel",
+        "reasoning": "FAIL: Override mode and the 20\u20132000 character validation were visible, but a valid save was not completed. Evidence: screenshots/page-2026-07-23T04-58-50-771Z.yml"
+      },
+      {
+        "id": "1.37",
+        "name": "override_toggle_off_reverts",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Turning the override toggle off while an out-of-set recommendation is saved reverts the recommendation to unset and removes the Override badge",
+        "reasoning": "FAIL: Override toggle-off reversion was not completed. Evidence: screenshots/page-2026-07-23T04-58-50-771Z.yml"
+      },
+      {
+        "id": "1.38",
+        "name": "stepper_locks_until_done",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The 5 reviewer steps Resolve, Gate, Audit, Verdict, Bundle render as a stepper where each step shows done or not-done at a glance, and a step is locked \u2014 its content shows a locked notice naming the prerequisite step and its done control is disabled \u2014 until every earlier step is done",
+        "reasoning": "Stepper showed Resolve available and later steps locked; locked controls were disabled and prerequisites were apparent. Evidence: screenshots/page-2026-07-23T04-56-49-509Z.yml"
+      },
+      {
+        "id": "1.39",
+        "name": "step_done_unlock_and_relock",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Marking a step done unlocks the next step and updates the portfolio row's review-progress indicator, and un-marking a done step re-locks all later steps while preserving their notes",
+        "reasoning": "FAIL: Unlocking was observed, but unmarking and relocking later steps was not completed. Evidence: screenshots/page-2026-07-23T04-58-17-487Z.yml"
+      },
+      {
+        "id": "1.40",
+        "name": "step_notes_survive_navigation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Text entered in a step's notes field persists across navigating to the portfolio and back, and to another bundle and back, along with the step's done flag",
+        "reasoning": "FAIL: Notes persistence across navigation was not completed. Evidence: screenshots/page-2026-07-23T04-58-29-438Z.yml"
+      },
+      {
+        "id": "1.41",
+        "name": "summary_document_complete",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Bundle step renders a review summary containing the verdict hero state, the chosen recommendation with the override justification when one exists, a gates table listing all six gates with their current statuses, the ordered fix list with each item's category tag, resolved state, and remediation, and a reviewer notes checklist of the 5 steps with done flags and notes",
+        "reasoning": "FAIL: Bundle summary was not reached and verified. Evidence: portfolio_final-shared.png"
+      },
+      {
+        "id": "1.42",
+        "name": "summary_reflects_live_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Changing a fix item, the recommendation, or a step note and returning to the Bundle step shows the changed values in the rendered summary document",
+        "reasoning": "FAIL: Live-state changes were not verified in the Bundle summary. Evidence: portfolio_final-shared.png"
+      },
+      {
+        "id": "1.43",
+        "name": "copy_summary_confirmation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Copy summary control places the summary text on the clipboard and shows a visible confirmation",
+        "reasoning": "FAIL: Summary copy was not exercised. Evidence: portfolio_final-shared.png"
+      },
+      {
+        "id": "1.44",
+        "name": "bundling_gated_and_stamped",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Complete bundling is enabled only when the Verdict step is done and a recommendation is recorded; activating it marks the Bundle step done, appends a timestamped bundling event to the event timeline, and flips the bundle's portfolio row to show the Bundled badge",
+        "reasoning": "FAIL: Bundling completion and Bundled badge were not observed. Evidence: portfolio_final-shared.png"
+      },
+      {
+        "id": "1.45",
+        "name": "breadcrumb_tracks_selection",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The address-style breadcrumb extends as the reviewer descends (Portfolio / bundle slug / gate name / trial number / criterion id), and selecting any gate, trial, or criterion anywhere updates it to that exact path",
+        "reasoning": "FAIL: Breadcrumb path was visible through trial selection, but criterion-level selection updates were not fully exercised. Evidence: screenshots/page-2026-07-23T04-57-44-417Z.yml"
+      },
+      {
+        "id": "1.46",
+        "name": "breadcrumb_segments_navigate",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Activating a breadcrumb segment navigates to that level with the corresponding record selected and highlighted",
+        "reasoning": "FAIL: Breadcrumb segments were visible, but activating them was not completed. Evidence: screenshots/page-2026-07-23T04-57-44-417Z.yml"
+      },
+      {
+        "id": "1.47",
+        "name": "cross_entry_selection_identical",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Reaching the same record from different entry points \u2014 a portfolio gate chip, the gate card, an evidence link, or the breadcrumb \u2014 lands on the identical selection state and breadcrumb path",
+        "reasoning": "FAIL: Multiple-entry selection equivalence was not completed. Evidence: screenshots/page-2026-07-23T04-57-44-417Z.yml"
+      },
+      {
+        "id": "1.48",
+        "name": "double_rerun_single_execution",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Rapidly double-activating a Re-run gate control starts exactly one re-run (one step sequence, one publish event, one timeline start entry), and activating Re-run while that gate's re-run is running leaves the running re-run untouched",
+        "reasoning": "FAIL: Only a single rerun activation was exercised; rapid double activation was not tested. Evidence: screenshots/page-2026-07-23T04-57-27-435Z.yml"
+      },
+      {
+        "id": "1.49",
+        "name": "empty_states_designed",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A portfolio filter combination matching nothing shows an empty state naming the active filters with a Clear filters control; a timeline filtered to an empty event kind shows an empty state message; and a READY bundle with no fix items shows a fix-list empty state saying no fixes are required",
+        "reasoning": "FAIL: Portfolio no-match and READY no-fixes states were observed, but the empty timeline-kind state was not. Evidence: screenshots/page-2026-07-23T04-56-28-039Z.yml"
+      },
+      {
+        "id": "1.50",
+        "name": "self_diff_prevented",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "In diff mode the second trial picker excludes the already-picked trial or shows an inline message, and no self-diff of a trial against itself renders",
+        "reasoning": "Diff picker visibly defaulted to different trials and provided separate first/second selectors; no self-diff rendered. Evidence: screenshots/page-2026-07-23T04-57-48-882Z.yml"
+      },
+      {
+        "id": "1.51",
+        "name": "long_title_truncation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "A fix-item title longer than 80 characters renders truncated with an ellipsis in the list and shows in full in the item's expanded detail",
+        "reasoning": "FAIL: Long title truncation was visible, but expanded full-title verification was not completed. Evidence: screenshots/page-2026-07-23T04-57-11-469Z.yml"
+      },
+      {
+        "id": "1.52",
+        "name": "unmark_verdict_relocks_bundle",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Un-marking the Verdict step done after bundling re-locks the Bundle step and removes its done state while the timeline keeps the historical bundling event",
+        "reasoning": "FAIL: Bundling was not completed, so unmarking Verdict after bundling was not testable. Evidence: portfolio_final-shared.png"
+      },
+      {
+        "id": "1.56",
+        "name": "recommendation_override_field_contract",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Saving an out-of-set recommendation requires overrideJustification of 20\u20132000 trimmed characters under the recommendation/override field contract: shorter, empty, or whitespace-only input shows an inline error naming the justification field and saves nothing; a valid save records the recommendation and justification",
+        "reasoning": "FAIL: The field and validation message were visible, but valid contract save was not completed. Evidence: screenshots/page-2026-07-23T04-58-50-771Z.yml"
+      },
+      {
+        "id": "1.57",
+        "name": "export_package_json_field_contract",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export certification package shows a live Review Package JSON preview whose visible text includes schemaVersion exactly review-certification/v1, exportedAt ending in Z, portfolioSummary with totalBundles/readyCount/notReadyCount/atRiskCount/stopEarlyCount/sable4ValidityPercent, and a bundles array carrying slug, heroState, recommendation, overrideJustification, bundled, gates, fixItems, reviewerSteps, and timeline keys",
+        "reasoning": "Read-only DOM observation found schemaVersion review-certification/v1, exportedAt ending Z, all portfolio summary fields, and bundle keys including gates, fixItems, reviewerSteps, and timeline. Evidence: screenshots/page-2026-07-23T04-59-16-490Z.yml"
+      },
+      {
+        "id": "1.58",
+        "name": "export_reflects_session_mutations",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After recording a recommendation with a distinctive overrideJustification, resolving a fix item, writing a distinctive step note, and completing bundling, reopening Export shows those exact values under the affected bundle in Review Package JSON without a reload",
+        "reasoning": "FAIL: Export reflected rerun and reviewer-step mutations, but distinctive recommendation, override, note, resolved-fix, and bundled values were not all created and verified. Evidence: screenshots/page-2026-07-23T04-59-16-490Z.yml"
+      },
+      {
+        "id": "1.59",
+        "name": "export_copy_and_download",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On the active export format, Copy places the exact visible preview text on the clipboard with a visible confirmation, and Download starts a .json or .md file download whose contents match that preview text",
+        "reasoning": "Copy produced visible \u201cExport preview copied.\u201d confirmation; Download produced review-certification-package.json. Evidence: screenshots/page-2026-07-23T04-59-29-172Z.yml"
+      },
+      {
+        "id": "1.60",
+        "name": "import_round_trip_restores_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Importing valid Review Package JSON after a reload restores the mutated recommendation, overrideJustification, resolved fix state, notes, and Bundled badge so portfolio/workspace and the next Export preview match the imported document",
+        "reasoning": "FAIL: A valid mutated package was not imported and verified after reload. Evidence: portfolio_final-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"portfolio_lists_twelve_bundles\":{\"score\":\"yes\",\"reasoning\":\"12 seeded rows and the named slugs were visible. Evidence: portfolio_lists_twelve_bundles-shared.png\"},\"hero_state_distribution\":{\"score\":\"yes\",\"reasoning\":\"Rollup and rows showed 4 Ready, 5 Fixable, and 3 At Risk. Evidence: portfolio_lists_twelve_bundles-shared.png\"},\"rollup_counts_match_table\":{\"score\":\"yes\",\"reasoning\":\"Visible rollup counts matched the table distribution and Stop-Early count of 2. Evidence: portfolio_lists_twelve_bundles-shared.png\"},\"portfolio_filters_combine\":{\"score\":\"yes\",\"reasoning\":\"Hero filtering narrowed to 4, combined filters narrowed to 0 with active chips and an empty-state Clear filters control. Evidence: screenshots/page-2026-07-23T04-56-28-039Z.yml\"},\"calibration_strip_per_bundle\":{\"score\":\"no\",\"reasoning\":\"FAIL: Strip counts and overall percentage were visible, but the required pointer-hover verification was not completed. Evidence: portfolio_lists_twelve_bundles-shared.png\"},\"stop_early_flags_named\":{\"score\":\"yes\",\"reasoning\":\"The two stop-early rows visibly exposed their flag names. Evidence: portfolio_lists_twelve_bundles-shared.png\"},\"bundle_open_and_return\":{\"score\":\"yes\",\"reasoning\":\"Opening ember-relay-router changed to the workspace without a reload and the persistent Portfolio control was visible. Evidence: screenshots/page-2026-07-23T04-56-49-509Z.yml\"},\"gate_board_six_gates\":{\"score\":\"yes\",\"reasoning\":\"The board rendered six ordered cards with statuses, summaries, evidence controls, and Reasons controls. Evidence: screenshots/page-2026-07-23T04-57-24-488Z.yml\"},\"thresholds_visible_on_board\":{\"score\":\"yes\",\"reasoning\":\"The board visibly showed 0.80, 0.90, minimum 3 trials, and measured scores beside difficulty/oracle bars. Evidence: screenshots/page-2026-07-23T04-57-24-488Z.yml\"},\"gate_evidence_links_jump\":{\"score\":\"no\",\"reasoning\":\"FAIL: Evidence controls were visible, but the jump-and-highlight behavior was not completed. Evidence: screenshots/page-2026-07-23T04-57-24-488Z.yml\"},\"difficulty_status_derivation\":{\"score\":\"yes\",\"reasoning\":\"Ember initially showed Quartz-Mini 0.78 with exactly 2 valid trials and inconclusive; after rerun it showed 0.84 with 3 valid trials and pass. Evidence: screenshots/page-2026-07-23T04-57-24-488Z.yml\"},\"hero_derives_from_gates_and_flags\":{\"score\":\"yes\",\"reasoning\":\"Workspace hero changed from Fixable to Ready when the Quartz-Mini gate changed to pass, with allowed-set text updating too. Evidence: screenshots/page-2026-07-23T04-57-24-488Z.yml\"},\"rerun_four_named_steps\":{\"score\":\"yes\",\"reasoning\":\"Observed provision harness, collect trials, evaluate checks, and publish result advancing through running/complete states. Evidence: screenshots/page-2026-07-23T04-57-38-504Z.yml\"},\"retry_backoff_attempt_counter\":{\"score\":\"no\",\"reasoning\":\"FAIL: The retry-failure demo was not completed. Evidence: screenshots/page-2026-07-23T04-57-38-504Z.yml\"},\"manual_retry_resumes_from_step\":{\"score\":\"no\",\"reasoning\":\"FAIL: No exhausted retry step and manual Retry round trip was observed. Evidence: screenshots/page-2026-07-23T04-57-38-504Z.yml\"},\"pause_resume_checkpoint\":{\"score\":\"no\",\"reasoning\":\"FAIL: Pause was visible, but pause/resume checkpoint behavior was not completed. Evidence: screenshots/page-2026-07-23T04-57-27-435Z.yml\"},\"rerun_flips_gate_in_place\":{\"score\":\"yes\",\"reasoning\":\"The Quartz-Mini card updated in place from inconclusive/0.78/2 valid to pass/0.84/3 valid. Evidence: screenshots/page-2026-07-23T04-57-24-488Z.yml\"},\"rerun_recomputes_dependents\":{\"score\":\"yes\",\"reasoning\":\"Rerun recomputed hero state, open fix items, allowed recommendations, timeline, and portfolio row state without reload. Evidence: screenshots/page-2026-07-23T04-57-24-488Z.yml\"},\"event_timeline_records_and_filters\":{\"score\":\"no\",\"reasoning\":\"FAIL: Timeline entries were observed, but event-kind filtering was not completed. Evidence: screenshots/page-2026-07-23T04-57-55-392Z.yml\"},\"trials_list_with_validity\":{\"score\":\"yes\",\"reasoning\":\"Quartz-Mini inspector showed four trials, model labels, trial numbers, and valid/invalid badges. Evidence: screenshots/page-2026-07-23T04-57-44-417Z.yml\"},\"three_pane_inspector_content\":{\"score\":\"yes\",\"reasoning\":\"Inspector showed rubric criteria, scorer reasoning, and agent answer panes. Evidence: screenshots/page-2026-07-23T04-57-44-417Z.yml\"},\"eight_named_checks_rendered\":{\"score\":\"yes\",\"reasoning\":\"All eight named validity checks and outcome chips were visible. Evidence: screenshots/page-2026-07-23T04-57-44-417Z.yml\"},\"trial_validity_derives_from_checks\":{\"score\":\"yes\",\"reasoning\":\"Trial 1 was labeled valid and its answer-determinacy, refusals, and low-timeout checks all showed pass. Evidence: screenshots/page-2026-07-23T04-57-44-417Z.yml\"},\"criterion_selection_links_panes\":{\"score\":\"no\",\"reasoning\":\"FAIL: Criterion controls were visible, but selection movement across all three panes was not completed. Evidence: screenshots/page-2026-07-23T04-57-44-417Z.yml\"},\"reasoning_selection_reflects_back\":{\"score\":\"no\",\"reasoning\":\"FAIL: Reasoning blocks were visible, but reverse selection synchronization was not completed. Evidence: screenshots/page-2026-07-23T04-57-44-417Z.yml\"},\"evidence_highlight_treatments\":{\"score\":\"no\",\"reasoning\":\"FAIL: Cited passages were visible, but active-versus-other citation highlighting was not directly verified. Evidence: screenshots/page-2026-07-23T04-57-44-417Z.yml\"},\"trial_diff_side_by_side\":{\"score\":\"yes\",\"reasoning\":\"Diff mode showed two trial columns, all eight check rows, and a flipped-check summary. Evidence: screenshots/page-2026-07-23T04-57-55-392Z.yml\"},\"diff_exit_restores_selection\":{\"score\":\"yes\",\"reasoning\":\"Leaving diff mode returned to the single-trial inspector with Trial 1 selected and breadcrumb preserved. Evidence: screenshots/page-2026-07-23T04-58-00-277Z.yml\"},\"fix_list_item_anatomy\":{\"score\":\"yes\",\"reasoning\":\"Ember showed numbered FIX/RERUN items with title, detail, remediation, evidence, and expand controls. Evidence: screenshots/page-2026-07-23T04-57-11-469Z.yml\"},\"fix_resolve_round_trip\":{\"score\":\"no\",\"reasoning\":\"FAIL: The resolve checkbox round trip was not completed. Evidence: screenshots/page-2026-07-23T04-57-11-469Z.yml\"},\"fix_resolution_recomputes_constraint\":{\"score\":\"no\",\"reasoning\":\"FAIL: Manual fix resolve/unresolve recomputation was not completed. Evidence: screenshots/page-2026-07-23T04-58-29-438Z.yml\"},\"recommendation_allowed_set_enforced\":{\"score\":\"yes\",\"reasoning\":\"Verdict panel visibly enabled only APPROVE WITH CAVEATS and MAJOR CHANGES NEEDED, with APPROVE and REJECT-ESCALATE disabled. Evidence: screenshots/page-2026-07-23T04-58-29-438Z.yml\"},\"constraint_explanation_names_triggers\":{\"score\":\"yes\",\"reasoning\":\"Explanation named the active passing-with-fixes rule and the specific unresolved fix item. Evidence: screenshots/page-2026-07-23T04-58-29-438Z.yml\"},\"recommendation_recorded_in_header\":{\"score\":\"no\",\"reasoning\":\"FAIL: No allowed recommendation was successfully saved and observed in the header. Evidence: screenshots/page-2026-07-23T04-58-29-438Z.yml\"},\"override_requires_justification\":{\"score\":\"no\",\"reasoning\":\"FAIL: Override mode and the 20\u20132000 character validation were visible, but a valid save was not completed. Evidence: screenshots/page-2026-07-23T04-58-50-771Z.yml\"},\"override_toggle_off_reverts\":{\"score\":\"no\",\"reasoning\":\"FAIL: Override toggle-off reversion was not completed. Evidence: screenshots/page-2026-07-23T04-58-50-771Z.yml\"},\"stepper_locks_until_done\":{\"score\":\"yes\",\"reasoning\":\"Stepper showed Resolve available and later steps locked; locked controls were disabled and prerequisites were apparent. Evidence: screenshots/page-2026-07-23T04-56-49-509Z.yml\"},\"step_done_unlock_and_relock\":{\"score\":\"no\",\"reasoning\":\"FAIL: Unlocking was observed, but unmarking and relocking later steps was not completed. Evidence: screenshots/page-2026-07-23T04-58-17-487Z.yml\"},\"step_notes_survive_navigation\":{\"score\":\"no\",\"reasoning\":\"FAIL: Notes persistence across navigation was not completed. Evidence: screenshots/page-2026-07-23T04-58-29-438Z.yml\"},\"summary_document_complete\":{\"score\":\"no\",\"reasoning\":\"FAIL: Bundle summary was not reached and verified. Evidence: portfolio_final-shared.png\"},\"summary_reflects_live_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: Live-state changes were not verified in the Bundle summary. Evidence: portfolio_final-shared.png\"},\"copy_summary_confirmation\":{\"score\":\"no\",\"reasoning\":\"FAIL: Summary copy was not exercised. Evidence: portfolio_final-shared.png\"},\"bundling_gated_and_stamped\":{\"score\":\"no\",\"reasoning\":\"FAIL: Bundling completion and Bundled badge were not observed. Evidence: portfolio_final-shared.png\"},\"breadcrumb_tracks_selection\":{\"score\":\"no\",\"reasoning\":\"FAIL: Breadcrumb path was visible through trial selection, but criterion-level selection updates were not fully exercised. Evidence: screenshots/page-2026-07-23T04-57-44-417Z.yml\"},\"breadcrumb_segments_navigate\":{\"score\":\"no\",\"reasoning\":\"FAIL: Breadcrumb segments were visible, but activating them was not completed. Evidence: screenshots/page-2026-07-23T04-57-44-417Z.yml\"},\"cross_entry_selection_identical\":{\"score\":\"no\",\"reasoning\":\"FAIL: Multiple-entry selection equivalence was not completed. Evidence: screenshots/page-2026-07-23T04-57-44-417Z.yml\"},\"double_rerun_single_execution\":{\"score\":\"no\",\"reasoning\":\"FAIL: Only a single rerun activation was exercised; rapid double activation was not tested. Evidence: screenshots/page-2026-07-23T04-57-27-435Z.yml\"},\"empty_states_designed\":{\"score\":\"no\",\"reasoning\":\"FAIL: Portfolio no-match and READY no-fixes states were observed, but the empty timeline-kind state was not. Evidence: screenshots/page-2026-07-23T04-56-28-039Z.yml\"},\"self_diff_prevented\":{\"score\":\"yes\",\"reasoning\":\"Diff picker visibly defaulted to different trials and provided separate first/second selectors; no self-diff rendered. Evidence: screenshots/page-2026-07-23T04-57-48-882Z.yml\"},\"long_title_truncation\":{\"score\":\"no\",\"reasoning\":\"FAIL: Long title truncation was visible, but expanded full-title verification was not completed. Evidence: screenshots/page-2026-07-23T04-57-11-469Z.yml\"},\"unmark_verdict_relocks_bundle\":{\"score\":\"no\",\"reasoning\":\"FAIL: Bundling was not completed, so unmarking Verdict after bundling was not testable. Evidence: portfolio_final-shared.png\"},\"recommendation_override_field_contract\":{\"score\":\"no\",\"reasoning\":\"FAIL: The field and validation message were visible, but valid contract save was not completed. Evidence: screenshots/page-2026-07-23T04-58-50-771Z.yml\"},\"export_package_json_field_contract\":{\"score\":\"yes\",\"reasoning\":\"Read-only DOM observation found schemaVersion review-certification/v1, exportedAt ending Z, all portfolio summary fields, and bundle keys including gates, fixItems, reviewerSteps, and timeline. Evidence: screenshots/page-2026-07-23T04-59-16-490Z.yml\"},\"export_reflects_session_mutations\":{\"score\":\"no\",\"reasoning\":\"FAIL: Export reflected rerun and reviewer-step mutations, but distinctive recommendation, override, note, resolved-fix, and bundled values were not all created and verified. Evidence: screenshots/page-2026-07-23T04-59-16-490Z.yml\"},\"export_copy_and_download\":{\"score\":\"yes\",\"reasoning\":\"Copy produced visible \u201cExport preview copied.\u201d confirmation; Download produced review-certification-package.json. Evidence: screenshots/page-2026-07-23T04-59-29-172Z.yml\"},\"import_round_trip_restores_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: A valid mutated package was not imported and verified after reload. Evidence: portfolio_final-shared.png\"}}",
+    "cost_usd": 0.8869220000000001
+  },
+  "design_fidelity": {
+    "score": 0.5,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "spacing_and_sizing_follow_scale",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Spacing and sizing follow one consistent scale across the portfolio, gate board, inspector, and stepper \u2014 no arbitrary one-off values visible in computed styles",
+        "reasoning": "FAIL: Computed styles expose one-off values such as 3px and 5.333px padding alongside the otherwise 8px/10px control scale. Evidence: specified_layout_implemented-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "specified_layout_implemented",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The specified compositions are implemented as written: rollup strip and calibration strip above the portfolio table with Export/Import certification package controls; workspace header with slug, hero banner, recommendation, and breadcrumb; left-rail stepper; six gate cards in the fixed order; three-pane inspector; export drawer with monospaced preview",
+        "reasoning": "The portfolio, rollup/calibration strips, workspace header, breadcrumb, horizontal reviewer stepper, six-gate board, trial inspector, and export drawer with monospaced preview were all observed. Evidence: specified_layout_implemented-shared.png; trial_inspector-shared.png; export_drawer-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "specified_vocabulary_rendered_exactly",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The fixed vocabulary renders exactly as specified: the three hero states, five gate statuses, four fix categories, four recommendations, eight check names, four re-run step names, and the five reviewer step names Resolve, Gate, Audit, Verdict, Bundle",
+        "reasoning": "The six gates, hero states, gate statuses, fix categories, recommendations, trial/check vocabulary, re-run labels, and Resolve/Gate/Audit/Verdict/Bundle reviewer steps were rendered in the live UI/export preview. Evidence: specified_vocabulary_rendered_exactly-shared.png; export_drawer-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "specified_state_changes_animate",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The state changes the spec calls out animate as described \u2014 gate flip emphasis, hero cross-fade, fix-item resolve ease, step unlock expand, list enters and exits",
+        "reasoning": "BLOCKED: Some transition and animation styles were observed, but the complete set of specified transient behaviors was not directly verified during each live state change. Evidence: specified_vocabulary_rendered_exactly-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "responsive_behavior_matches_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Responsive behavior matches the specified patterns: inspector stacks at 1024px and below, stepper goes horizontal and the table becomes cards at 768px and below, no overflow at 375px",
+        "reasoning": "FAIL: At 1024px the inspector stacked and at 375px there was no overflow, but at 768px the portfolio still rendered a table element rather than switching to cards. Evidence: responsive_behavior_matches_spec-1024.png; responsive_behavior_matches_spec-portfolio-768-final.png; responsive_behavior_matches_spec-375.png"
+      },
+      {
+        "id": "3.6",
+        "name": "control_styling_is_coherent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Button and form radii, padding, and shadows are coherent across the app \u2014 controls of the same kind share one treatment",
+        "reasoning": "Like controls share consistent rounded treatments, padding, borders, and state-dependent shadows across the portfolio, workspace, gate board, and drawer. Evidence: status_color_semantics_match_spec-shared.png; export_drawer-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "typography_has_clear_hierarchy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography carries the specified four-level hierarchy (app title, view titles, card headings, body/labels) distinguishably",
+        "reasoning": "The app title, large view titles, section/card headings, and body labels are visibly distinct in size, weight, and capitalization. Evidence: status_color_semantics_match_spec-shared.png; specified_layout_implemented-shared.png"
+      },
+      {
+        "id": "3.8",
+        "name": "component_states_match_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Component states \u2014 default, hover, focus ring, disabled, error \u2014 appear as specified, including the beyond-color-alone treatment for disabled recommendations",
+        "reasoning": "BLOCKED: Disabled locked steps and active/focused controls were observed, but the complete required default, hover, focus-ring, disabled, and error set was not directly exercised and verified. Evidence: specified_vocabulary_rendered_exactly-shared.png"
+      },
+      {
+        "id": "3.9",
+        "name": "status_color_semantics_match_spec",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Color semantics match the spec exactly: hero green/amber/red, gate pass green, fail red, errored purple, inconclusive amber, missing gray, applied wherever those states render",
+        "reasoning": "BLOCKED: Green pass/ready and amber inconclusive/not-ready states were directly observed, but purple errored and gray missing treatments were not directly verified in a rendered state. Evidence: status_color_semantics_match_spec-shared.png; specified_vocabulary_rendered_exactly-shared.png"
+      },
+      {
+        "id": "3.10",
+        "name": "threshold_markers_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The 0.80 and 0.90 threshold markers and the minimum-3-valid-trials reference render beside their measured values as the spec describes",
+        "reasoning": "The live UI rendered Difficulty bar 0.80, Oracle bar 0.90, and Minimum 3 valid trials beside measured values, including score/trial evidence. Evidence: specified_vocabulary_rendered_exactly-shared.png; status_color_semantics_match_spec-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"spacing_and_sizing_follow_scale\":{\"score\":\"no\",\"reasoning\":\"FAIL: Computed styles expose one-off values such as 3px and 5.333px padding alongside the otherwise 8px/10px control scale. Evidence: specified_layout_implemented-shared.png\"},\"specified_layout_implemented\":{\"score\":\"yes\",\"reasoning\":\"The portfolio, rollup/calibration strips, workspace header, breadcrumb, horizontal reviewer stepper, six-gate board, trial inspector, and export drawer with monospaced preview were all observed. Evidence: specified_layout_implemented-shared.png; trial_inspector-shared.png; export_drawer-shared.png\"},\"specified_vocabulary_rendered_exactly\":{\"score\":\"yes\",\"reasoning\":\"The six gates, hero states, gate statuses, fix categories, recommendations, trial/check vocabulary, re-run labels, and Resolve/Gate/Audit/Verdict/Bundle reviewer steps were rendered in the live UI/export preview. Evidence: specified_vocabulary_rendered_exactly-shared.png; export_drawer-shared.png\"},\"specified_state_changes_animate\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Some transition and animation styles were observed, but the complete set of specified transient behaviors was not directly verified during each live state change. Evidence: specified_vocabulary_rendered_exactly-shared.png\"},\"responsive_behavior_matches_spec\":{\"score\":\"no\",\"reasoning\":\"FAIL: At 1024px the inspector stacked and at 375px there was no overflow, but at 768px the portfolio still rendered a table element rather than switching to cards. Evidence: responsive_behavior_matches_spec-1024.png; responsive_behavior_matches_spec-portfolio-768-final.png; responsive_behavior_matches_spec-375.png\"},\"control_styling_is_coherent\":{\"score\":\"yes\",\"reasoning\":\"Like controls share consistent rounded treatments, padding, borders, and state-dependent shadows across the portfolio, workspace, gate board, and drawer. Evidence: status_color_semantics_match_spec-shared.png; export_drawer-shared.png\"},\"typography_has_clear_hierarchy\":{\"score\":\"yes\",\"reasoning\":\"The app title, large view titles, section/card headings, and body labels are visibly distinct in size, weight, and capitalization. Evidence: status_color_semantics_match_spec-shared.png; specified_layout_implemented-shared.png\"},\"component_states_match_spec\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Disabled locked steps and active/focused controls were observed, but the complete required default, hover, focus-ring, disabled, and error set was not directly exercised and verified. Evidence: specified_vocabulary_rendered_exactly-shared.png\"},\"status_color_semantics_match_spec\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Green pass/ready and amber inconclusive/not-ready states were directly observed, but purple errored and gray missing treatments were not directly verified in a rendered state. Evidence: status_color_semantics_match_spec-shared.png; specified_vocabulary_rendered_exactly-shared.png\"},\"threshold_markers_match_spec\":{\"score\":\"yes\",\"reasoning\":\"The live UI rendered Difficulty bar 0.80, Oracle bar 0.90, and Minimum 3 valid trials beside measured values, including score/trial evidence. Evidence: specified_vocabulary_rendered_exactly-shared.png; status_color_semantics_match_spec-shared.png\"}}",
+    "cost_usd": 0.2893554
+  },
+  "edge_cases": {
+    "score": 0.7273,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "empty_states_present_everywhere",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Empty states render where the spec calls for them: a no-match portfolio filter shows an empty state naming the active filters with a Clear filters control, a timeline filtered to an empty event kind shows an empty state message, and a READY bundle with no fix items states that no fixes are required",
+        "reasoning": "All required empty states were observed, including active-filter no-match messaging, empty timeline messaging, and READY bundle no-fixes messaging. Evidence: empty_states_present_everywhere-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "override_form_validates_inline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The override justification form validates inline before saving: an empty, under-20-character, or whitespace-only justification shows a message naming the justification field and saves nothing",
+        "reasoning": "Empty and short justifications showed the field-specific minimum-length validation before saving. Evidence: actions_show_confirmation-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "errors_are_actionable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Validation and locked-state messages are actionable: the justification error states the minimum length, and a locked step's notice names the step that must be finished first",
+        "reasoning": "Errors named the justification field and minimum length; locked Bundle messaging named Verdict as the prerequisite. Evidence: actions_show_confirmation-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "actions_show_confirmation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Copying the summary, copying or downloading an export, completing bundling, saving an override, importing a package, and a re-run finishing each produce a visible confirmation (toast, badge change, or timeline entry)",
+        "reasoning": "Confirmation statuses were observed for saves, bundling, copy/download, valid import, and re-run completion. Evidence: actions_show_confirmation-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "rerun_shows_progress_affordances",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The simulated re-run shows deliberate progress affordances throughout: pending/running step indicators, the backoff countdown while retrying, and a completing publish step \u2014 never a frozen or blank region while work is simulated",
+        "reasoning": "During re-run, pending/running states and the publish sequence were visibly present. Evidence: rerun_shows_progress_affordances-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "destructive_or_reverting_actions_are_guarded",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Reverting actions behave safely: turning the override toggle off with an out-of-set recommendation saved reverts to unset with the Override badge removed, and un-marking Verdict after bundling re-locks Bundle while the timeline keeps the historical bundling event",
+        "reasoning": "FAIL: disabling an override reverted correctly, but un-marking Verdict after bundling left Bundle marked Done and accessible instead of re-locking it; historical events remained. Evidence: destructive_or_reverting_actions_are_guarded-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "double_activation_is_idempotent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapidly double-activating Re-run gate starts exactly one re-run, and activating it while that gate's re-run is running leaves the running re-run untouched instead of restarting it",
+        "reasoning": "A rapid double activation produced one visible running sequence with one running step and no duplicate restart. Evidence: double_activation_is_idempotent-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "self_diff_prevented",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "In trial diff mode the second picker excludes the already-picked trial or shows an inline message, and no self-diff of a trial against itself renders",
+        "reasoning": "Selecting the same trial produced the inline message \u201cChoose two different trials.\u201d and no self-diff rendered. Evidence: actions_show_confirmation-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "long_text_handled",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A fix-item title longer than 80 characters truncates with an ellipsis in the list and shows in full in the item's expanded detail, and long reasoning or answer text scrolls within its pane rather than breaking the layout",
+        "reasoning": "FAIL: the long fix title truncated and expanded to full text, but no scroll-contained long reasoning/answer pane was observed. Evidence: destructive_or_reverting_actions_are_guarded-shared.png"
+      },
+      {
+        "id": "4.10",
+        "name": "overlays_close_all_paths",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Overlay surfaces (override form, diff picker, export drawer, import surface, confirmations) close via their close control, the Escape key, and \u2014 where a dimmed backdrop exists \u2014 a backdrop click, without saving partial state",
+        "reasoning": "BLOCKED: close controls and Escape were tested, but backdrop-click dismissal was not directly exercised for a dimmed overlay. Evidence: overlays_close_all_paths-shared.png"
+      },
+      {
+        "id": "4.11",
+        "name": "import_field_contract_rejects_invalid",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Importing malformed Review Package JSON or a document that breaks the field contract (wrong schemaVersion, missing required keys, closed-set violations, negative trial counts) shows an inline import error naming the problem, leaves bundle counts and session facets unchanged, and does not refresh the Export preview as a success",
+        "reasoning": "Malformed import JSON showed schemaVersion/contract errors without changing the bundle counts or session facets. Evidence: import_field_contract_rejects_invalid-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"empty_states_present_everywhere\":{\"score\":\"yes\",\"reasoning\":\"All required empty states were observed, including active-filter no-match messaging, empty timeline messaging, and READY bundle no-fixes messaging. Evidence: empty_states_present_everywhere-shared.png\"},\"override_form_validates_inline\":{\"score\":\"yes\",\"reasoning\":\"Empty and short justifications showed the field-specific minimum-length validation before saving. Evidence: actions_show_confirmation-shared.png\"},\"errors_are_actionable\":{\"score\":\"yes\",\"reasoning\":\"Errors named the justification field and minimum length; locked Bundle messaging named Verdict as the prerequisite. Evidence: actions_show_confirmation-shared.png\"},\"actions_show_confirmation\":{\"score\":\"yes\",\"reasoning\":\"Confirmation statuses were observed for saves, bundling, copy/download, valid import, and re-run completion. Evidence: actions_show_confirmation-shared.png\"},\"rerun_shows_progress_affordances\":{\"score\":\"yes\",\"reasoning\":\"During re-run, pending/running states and the publish sequence were visibly present. Evidence: rerun_shows_progress_affordances-shared.png\"},\"destructive_or_reverting_actions_are_guarded\":{\"score\":\"no\",\"reasoning\":\"FAIL: disabling an override reverted correctly, but un-marking Verdict after bundling left Bundle marked Done and accessible instead of re-locking it; historical events remained. Evidence: destructive_or_reverting_actions_are_guarded-shared.png\"},\"double_activation_is_idempotent\":{\"score\":\"yes\",\"reasoning\":\"A rapid double activation produced one visible running sequence with one running step and no duplicate restart. Evidence: double_activation_is_idempotent-shared.png\"},\"self_diff_prevented\":{\"score\":\"yes\",\"reasoning\":\"Selecting the same trial produced the inline message \u201cChoose two different trials.\u201d and no self-diff rendered. Evidence: actions_show_confirmation-shared.png\"},\"long_text_handled\":{\"score\":\"no\",\"reasoning\":\"FAIL: the long fix title truncated and expanded to full text, but no scroll-contained long reasoning/answer pane was observed. Evidence: destructive_or_reverting_actions_are_guarded-shared.png\"},\"overlays_close_all_paths\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: close controls and Escape were tested, but backdrop-click dismissal was not directly exercised for a dimmed overlay. Evidence: overlays_close_all_paths-shared.png\"},\"import_field_contract_rejects_invalid\":{\"score\":\"yes\",\"reasoning\":\"Malformed import JSON showed schemaVersion/contract errors without changing the bundle counts or session facets. Evidence: import_field_contract_rejects_invalid-shared.png\"}}",
+    "cost_usd": 2.4774952000000003
+  },
+  "innovation": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "reviewer_keyboard_palette",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Optional bonus: a reviewer-facing keyboard palette or shortcut layer for moving between gates, trials, and criteria beyond the required breadcrumb and selectors",
+        "reasoning": "yes \u2014 Opened the palette and observed searchable shortcuts for portfolio, gates, trials, criteria, and timeline. Evidence: reviewer_keyboard_palette.png"
+      },
+      {
+        "id": "11.2",
+        "name": "dependency_chain_minimap",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Optional bonus: a visual mini-map of the gate-to-fix-item-to-recommendation dependency chain that updates live as gates and fix items change",
+        "reasoning": "yes \u2014 Workspace shows a live gate \u2192 fix-item \u2192 recommendation dependency chain that updates from 3 to 2 open fixes after resolving one. Evidence: dependency_chain_minimap-shared.png"
+      },
+      {
+        "id": "11.3",
+        "name": "dark_mode_toggle",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Optional bonus: a dark color mode toggle covering portfolio, workspace, inspector, and export/import surfaces consistently",
+        "reasoning": "yes \u2014 Dark mode toggled successfully and was visible across workspace, portfolio, inspector, and export/import surfaces. Evidence: dark_mode_toggle-shared.png"
+      },
+      {
+        "id": "11.4",
+        "name": "review_duration_readout",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Optional bonus: a per-bundle review-duration readout derived from the event timeline",
+        "reasoning": "yes \u2014 Workspace duration changed from not started to active minutes and explicitly references session timeline activity. Evidence: dependency_chain_minimap-shared.png"
+      },
+      {
+        "id": "11.5",
+        "name": "export_diff_or_package_compare",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Optional bonus: a package compare or diff affordance that highlights what changed between two Review Package JSON snapshots",
+        "reasoning": "yes \u2014 Export drawer snapshot comparison reported 2 changed fields after a live fix-item update. Evidence: export_diff_or_package_compare-shared.png"
+      },
+      {
+        "id": "11.6",
+        "name": "calibration_drilldown",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Optional bonus: calibration-strip drilldown that opens the matching bundle's trial validity context beyond the required hover figures",
+        "reasoning": "yes \u2014 Clicking a calibration-strip bundle opened the Sable-4 Trial Inspector with selectable trials and evidence panes. Evidence: calibration_drilldown-shared.png"
+      },
+      {
+        "id": "11.7",
+        "name": "timeline_scrubber",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Optional bonus: a timeline scrubber or jump-to-event control that lands the workspace on the related gate, fix item, or verdict state",
+        "reasoning": "yes \u2014 Event Timeline lists ordered events with \u201cJump to workspace\u201d controls for related states. Evidence: timeline_scrubber-shared.png"
+      },
+      {
+        "id": "11.8",
+        "name": "print_friendly_summary",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Optional bonus: a printable review summary layout reachable from the export drawer that restates portfolio and bundle outcomes without changing store state",
+        "reasoning": "yes \u2014 Export drawer provides Print summary and a Markdown preview restating portfolio totals and bundle outcomes. Evidence: print_friendly_summary-shared.png"
+      },
+      {
+        "id": "11.9",
+        "name": "coachmarks_for_review_loop",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Optional bonus: a dismissible coachmarks tour highlighting portfolio, gate re-run, and Export certification package without blocking the primary review loop",
+        "reasoning": "yes \u2014 Dismissible coachmarks explicitly highlight portfolio, gate re-run, and export workflow, and were successfully dismissed. Evidence: reviewer_keyboard_palette-shared.png"
+      },
+      {
+        "id": "11.10",
+        "name": "competition_level_review_polish",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Optional bonus: competition-level polish visible in the review loop beyond the required surfaces \u2014 for example coordinated status storytelling across hero, chips, and export",
+        "reasoning": "yes \u2014 Coordinated hero status, live dependency messaging, duration, timeline count, and export summary were visible across the review loop. Evidence: dependency_chain_minimap-shared.png"
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "yes \u2014 Trial Inspector includes a separate two-trial \u201cTrial Check Diff\u201d workflow with a diff picker beyond the listed bonus features. Evidence: innovation_trial_diff.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"reviewer_keyboard_palette\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Opened the palette and observed searchable shortcuts for portfolio, gates, trials, criteria, and timeline. Evidence: reviewer_keyboard_palette.png\"},\"dependency_chain_minimap\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Workspace shows a live gate \u2192 fix-item \u2192 recommendation dependency chain that updates from 3 to 2 open fixes after resolving one. Evidence: dependency_chain_minimap-shared.png\"},\"dark_mode_toggle\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Dark mode toggled successfully and was visible across workspace, portfolio, inspector, and export/import surfaces. Evidence: dark_mode_toggle-shared.png\"},\"review_duration_readout\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Workspace duration changed from not started to active minutes and explicitly references session timeline activity. Evidence: dependency_chain_minimap-shared.png\"},\"export_diff_or_package_compare\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Export drawer snapshot comparison reported 2 changed fields after a live fix-item update. Evidence: export_diff_or_package_compare-shared.png\"},\"calibration_drilldown\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Clicking a calibration-strip bundle opened the Sable-4 Trial Inspector with selectable trials and evidence panes. Evidence: calibration_drilldown-shared.png\"},\"timeline_scrubber\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Event Timeline lists ordered events with \u201cJump to workspace\u201d controls for related states. Evidence: timeline_scrubber-shared.png\"},\"print_friendly_summary\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Export drawer provides Print summary and a Markdown preview restating portfolio totals and bundle outcomes. Evidence: print_friendly_summary-shared.png\"},\"coachmarks_for_review_loop\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Dismissible coachmarks explicitly highlight portfolio, gate re-run, and export workflow, and were successfully dismissed. Evidence: reviewer_keyboard_palette-shared.png\"},\"competition_level_review_polish\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Coordinated hero status, live dependency messaging, duration, timeline count, and export summary were visible across the review loop. Evidence: dependency_chain_minimap-shared.png\"},\"innovation_catchall\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Trial Inspector includes a separate two-trial \u201cTrial Check Diff\u201d workflow with a diff picker beyond the listed bonus features. Evidence: innovation_trial_diff.png\"}}",
+    "cost_usd": 0.642832
+  },
+  "motion": {
+    "score": 0.3,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "hover_animations_required",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Buttons ease background and shadow with a slight press effect on hover; portfolio rows, gate cards, trial entries, fix items, and timeline entries take a full-width hover wash; and form controls show focus rings \u2014 verified with the real pointer while hovering",
+        "reasoning": "FAIL: A fix row showed hover transform and transition styles, but the full required set of portfolio, gate, trial, timeline, button, and focus-ring behaviors was not fully observed. Evidence: hover_animations_required-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "rerun_step_status_motion",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "During a re-run started from the real Re-run gate control, the running step shows a continuous activity indicator, a completing step's status transitions with a short fade rather than snapping, and the retry backoff countdown ticks visibly",
+        "reasoning": "FAIL: The live re-run showed running/completed steps and animated status styles, but a visibly ticking retry backoff countdown was not observed. Evidence: rerun_step_status_motion-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "gate_flip_emphasis_and_hero_crossfade",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When a completed re-run flips a gate, the gate card's status chip transitions with a brief emphasis animation and the verdict hero banner cross-fades to its new state rather than snapping \u2014 driven through the real re-run, not a state shortcut",
+        "reasoning": "The real re-run changed Quartz-Mini from inconclusive to pass; live inspection showed chip-emphasis and hero-crossfade animations. Evidence: gate_flip_emphasis_and_hero_crossfade-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "fix_and_recommendation_transitions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Checking a fix item eases its resolved (struck or dimmed) treatment in, and the recommendation controls transition their enabled or disabled state with a short fade when the allowed set changes",
+        "reasoning": "A real fix checkbox eased into its resolved state, and the allowed recommendation state changed after remediation with short button transitions. Evidence: fix_and_recommendation_transitions-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "inspector_highlight_motion",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Selecting a criterion with a real click animates the highlight into the reasoning block and cited answer passages with a short ease, and moving the selection moves the highlights smoothly rather than jumping instantly",
+        "reasoning": "A real criterion click selected C3; criterion, reasoning, and cited passage elements showed coordinated 0.22s transitions and shifted highlights. Evidence: inspector_highlight_motion-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "stepper_and_unlock_motion",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The stepper's active-step indicator slides between steps, and unlocking a step animates its content in with a short expand",
+        "reasoning": "FAIL: Completing Resolve visibly unlocked Gate, but the active-step slide and unlock expand animation were not both directly measured. Evidence: stepper_and_unlock_motion-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "list_change_animations",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "New timeline entries animate into the list at their position, and portfolio rows animate in and out when filters change rather than snapping",
+        "reasoning": "FAIL: Timeline entries visibly used timeline-in animation, but the portfolio filter did not visibly change the row set, so required filter enter/exit behavior was not demonstrated. Evidence: list_change_animations-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "overlay_transitions_timed",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The override justification form, the diff-mode picker, the export drawer, and the import surface enter with a short opacity plus scale or slide transition of roughly 200 to 300 milliseconds and exit the same way",
+        "reasoning": "FAIL: The export drawer showed a 0.25s opacity/transform transition, but the override, diff picker, and import surfaces were not all exercised and verified. Evidence: overlay_transitions_timed-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "toasts_slide_autodismiss",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Copy summary, Copy export, Download, and Import confirmation toasts slide in, remain readable long enough to scan, and auto-dismiss with a fade",
+        "reasoning": "FAIL: The export-copy confirmation appeared, but it remained present after roughly six seconds and no slide/fade autodismiss was observed. Evidence: toasts_slide_autodismiss-shared.png"
+      },
+      {
+        "id": "4.10",
+        "name": "reduced_motion_respected",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, transitions apply instantly and no element animates, while every state change (gate flips, unlocks, resolutions, toasts) still lands",
+        "reasoning": "FAIL: Reduced motion was confirmed and transitions were none while navigation state still landed, but all specified gate, unlock, resolution, and toast state changes were not fully verified in that browser. Evidence: reduced_motion_respected-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"hover_animations_required\":{\"score\":\"no\",\"reasoning\":\"FAIL: A fix row showed hover transform and transition styles, but the full required set of portfolio, gate, trial, timeline, button, and focus-ring behaviors was not fully observed. Evidence: hover_animations_required-shared.png\"},\"rerun_step_status_motion\":{\"score\":\"no\",\"reasoning\":\"FAIL: The live re-run showed running/completed steps and animated status styles, but a visibly ticking retry backoff countdown was not observed. Evidence: rerun_step_status_motion-shared.png\"},\"gate_flip_emphasis_and_hero_crossfade\":{\"score\":\"yes\",\"reasoning\":\"The real re-run changed Quartz-Mini from inconclusive to pass; live inspection showed chip-emphasis and hero-crossfade animations. Evidence: gate_flip_emphasis_and_hero_crossfade-shared.png\"},\"fix_and_recommendation_transitions\":{\"score\":\"yes\",\"reasoning\":\"A real fix checkbox eased into its resolved state, and the allowed recommendation state changed after remediation with short button transitions. Evidence: fix_and_recommendation_transitions-shared.png\"},\"inspector_highlight_motion\":{\"score\":\"yes\",\"reasoning\":\"A real criterion click selected C3; criterion, reasoning, and cited passage elements showed coordinated 0.22s transitions and shifted highlights. Evidence: inspector_highlight_motion-shared.png\"},\"stepper_and_unlock_motion\":{\"score\":\"no\",\"reasoning\":\"FAIL: Completing Resolve visibly unlocked Gate, but the active-step slide and unlock expand animation were not both directly measured. Evidence: stepper_and_unlock_motion-shared.png\"},\"list_change_animations\":{\"score\":\"no\",\"reasoning\":\"FAIL: Timeline entries visibly used timeline-in animation, but the portfolio filter did not visibly change the row set, so required filter enter/exit behavior was not demonstrated. Evidence: list_change_animations-shared.png\"},\"overlay_transitions_timed\":{\"score\":\"no\",\"reasoning\":\"FAIL: The export drawer showed a 0.25s opacity/transform transition, but the override, diff picker, and import surfaces were not all exercised and verified. Evidence: overlay_transitions_timed-shared.png\"},\"toasts_slide_autodismiss\":{\"score\":\"no\",\"reasoning\":\"FAIL: The export-copy confirmation appeared, but it remained present after roughly six seconds and no slide/fade autodismiss was observed. Evidence: toasts_slide_autodismiss-shared.png\"},\"reduced_motion_respected\":{\"score\":\"no\",\"reasoning\":\"FAIL: Reduced motion was confirmed and transitions were none while navigation state still landed, but all specified gate, unlock, resolution, and toast state changes were not fully verified in that browser. Evidence: reduced_motion_respected-shared.png\"}}",
+    "cost_usd": 0.7211752
+  },
+  "performance": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_is_under_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive \u2014 portfolio rows and filters respond \u2014 within 2 seconds of a local cold load",
+        "reasoning": "Interactive portfolio loaded with 150 ms DOM/load timing and responsive filters. Evidence: cold_start_is_under_two_seconds-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "console_is_clean",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Browser devtools show no errors or warnings on load or during a full exercise of the app, including opening Export and Import",
+        "reasoning": "After exercising navigation plus Export and Import surfaces, console reported 0 errors and 0 warnings. Evidence: console_is_clean-shared.png"
+      },
+      {
+        "id": "9.3",
+        "name": "transitions_respond_under_100ms",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "View switches \u2014 portfolio to workspace, step to step, trial to trial \u2014 begin responding in under 100ms with no perceptible lag",
+        "reasoning": "Workspace and multiple review destinations responded immediately through rapid navigation. Evidence: transitions_respond_under_100ms-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "rerun_shows_progress_indicators",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Simulated re-run latency is covered by visible progress affordances (step statuses, activity indicator, backoff countdown) rather than a frozen interface",
+        "reasoning": "Gate re-run produced visible status updates and timeline events for running/completed steps rather than a frozen UI. Evidence: rerun_shows_progress_indicators-shared.png"
+      },
+      {
+        "id": "9.5",
+        "name": "dense_views_render_without_lag",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Dense views \u2014 the 12-row portfolio with chips and strips, trial lists with 8-plus trials, long timelines, and the three-pane inspector \u2014 render and scroll without perceived lag",
+        "reasoning": "Portfolio rendered 12 trial chips and dense bundle rows; scrolling remained responsive. Evidence: dense_views_render_without_lag-portfolio.png"
+      },
+      {
+        "id": "9.6",
+        "name": "state_changes_remain_interactive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The UI remains interactive during state changes: filters, selection, and navigation respond while a re-run advances and while lists animate",
+        "reasoning": "Navigation to Timeline remained responsive immediately after starting another re-run. Evidence: state_changes_remain_interactive-shared.png"
+      },
+      {
+        "id": "9.7",
+        "name": "animations_maintain_smooth_frame_rate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Animations \u2014 hero cross-fades, list enters and exits, highlight moves, stepper slides \u2014 hold a smooth frame rate with no visible hitching",
+        "reasoning": "Observed interactions showed no visible hitching; read-only frame sampling measured approximately 60 FPS with a 16.8 ms maximum frame gap. Evidence: transitions_respond_under_100ms-shared.png"
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_input_does_not_freeze",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapid repeated input \u2014 quick bundle switches, rapid filter toggles, fast criterion selection changes, repeated diff entry and exit \u2014 causes no hangs or dropped interactions",
+        "reasoning": "Rapid destination changes and filter application completed successfully, leaving the timeline view usable. Evidence: rapid_input_does_not_freeze-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_start_is_under_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"Interactive portfolio loaded with 150 ms DOM/load timing and responsive filters. Evidence: cold_start_is_under_two_seconds-shared.png\"},\"console_is_clean\":{\"score\":\"yes\",\"reasoning\":\"After exercising navigation plus Export and Import surfaces, console reported 0 errors and 0 warnings. Evidence: console_is_clean-shared.png\"},\"transitions_respond_under_100ms\":{\"score\":\"yes\",\"reasoning\":\"Workspace and multiple review destinations responded immediately through rapid navigation. Evidence: transitions_respond_under_100ms-shared.png\"},\"rerun_shows_progress_indicators\":{\"score\":\"yes\",\"reasoning\":\"Gate re-run produced visible status updates and timeline events for running/completed steps rather than a frozen UI. Evidence: rerun_shows_progress_indicators-shared.png\"},\"dense_views_render_without_lag\":{\"score\":\"yes\",\"reasoning\":\"Portfolio rendered 12 trial chips and dense bundle rows; scrolling remained responsive. Evidence: dense_views_render_without_lag-portfolio.png\"},\"state_changes_remain_interactive\":{\"score\":\"yes\",\"reasoning\":\"Navigation to Timeline remained responsive immediately after starting another re-run. Evidence: state_changes_remain_interactive-shared.png\"},\"animations_maintain_smooth_frame_rate\":{\"score\":\"yes\",\"reasoning\":\"Observed interactions showed no visible hitching; read-only frame sampling measured approximately 60 FPS with a 16.8 ms maximum frame gap. Evidence: transitions_respond_under_100ms-shared.png\"},\"rapid_input_does_not_freeze\":{\"score\":\"yes\",\"reasoning\":\"Rapid destination changes and filter application completed successfully, leaving the timeline view usable. Evidence: rapid_input_does_not_freeze-shared.png\"}}",
+    "cost_usd": 0.1977958
+  },
+  "responsiveness": {
+    "score": 0.7778,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "layout_adapts_desktop_to_mobile",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The portfolio and bundle workspace adapt gracefully from 1440px desktop to 375px mobile with all content and controls still reachable",
+        "reasoning": "Desktop and mobile layouts reflow into reachable content and card-based mobile views. Evidence: layout_adapts_desktop_to_mobile-shared.png"
+      },
+      {
+        "id": "7.2",
+        "name": "inspector_stacks_below_1024",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At widths of 1024 pixels and below, the trial inspector's three panes reflow to a stacked arrangement, and selecting a criterion still scrolls and highlights the other panes (pane linkage intact)",
+        "reasoning": "At 1024px the inspector panes stack vertically; selecting C3 scrolled to and highlighted linked panes. Evidence: inspector_stacks_below_1024-shared.png"
+      },
+      {
+        "id": "7.3",
+        "name": "stepper_and_table_reflow_at_768",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At widths of 768 pixels and below, the left-rail stepper collapses to a horizontal compact stepper above the main area, and the portfolio table condenses to per-bundle cards carrying the same hero state, gate chips, and progress indicator",
+        "reasoning": "The stepper becomes horizontal and the portfolio table becomes per-bundle cards with hero states, gate chips, and progress indicators. Evidence: stepper_and_table_reflow_at_768-full.png"
+      },
+      {
+        "id": "7.4",
+        "name": "no_viewport_overflow_at_375",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375 pixel width no content clips or overflows the viewport and no page-level horizontal scrolling appears; wide tables (gates table, diff table) scroll within their own containers",
+        "reasoning": "At 375px document width stays within the viewport, with no page-level horizontal overflow; the inspector\u2019s wide content uses an internal scroller. Evidence: no_viewport_overflow_at_375-shared.png"
+      },
+      {
+        "id": "7.5",
+        "name": "mobile_tap_targets_are_large_enough",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Interactive controls \u2014 gate chips, resolve checkboxes, stepper controls, breadcrumb segments \u2014 are tap targets of at least 44px on mobile widths",
+        "reasoning": "Mobile stepper controls and breadcrumb-style controls observed at compact widths are at least 44px tall; card controls remain comfortably tappable. Evidence: mobile_tap_targets_are_large_enough-shared.png"
+      },
+      {
+        "id": "7.6",
+        "name": "typography_resizes_across_breakpoints",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography remains readable and hierarchy is preserved at both desktop and mobile widths, with no unreadably small labels on chips or badges",
+        "reasoning": "Headings and supporting text preserve hierarchy and remain readable on desktop and mobile; compact chips remain legible. Evidence: layout_adapts_desktop_to_mobile-shared.png"
+      },
+      {
+        "id": "7.7",
+        "name": "stacking_reflows_logically",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Stacking order at narrow widths follows the reading order \u2014 header, stepper, main content, then supporting panels \u2014 with no orphaned or out-of-context regions",
+        "reasoning": "Narrow layouts follow header, main content/stepper, cards or inspector panes, then supporting content without orphaned regions. Evidence: stepper_and_table_reflow_at_768-full.png"
+      },
+      {
+        "id": "7.8",
+        "name": "fixed_controls_remain_accessible",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Persistent chrome (the portfolio return control, the breadcrumb, the workspace header) remains visible or reachable at every width without obscuring content",
+        "reasoning": "FAIL: At 375px the workspace\u2019s Portfolio return control is not rendered as an accessible visible/reachable control in the observed DOM, while the mobile header is otherwise present. Evidence: fixed_controls_remain_accessible-shared.png"
+      },
+      {
+        "id": "7.9",
+        "name": "resize_preserves_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Resizing between 1440px and 375px mid-session preserves the current selection, notes, filters, and re-run progress \u2014 reflow never resets state",
+        "reasoning": "FAIL: Selection and filter state were observed across resizing, but the complete required preservation of notes and re-run progress was not directly verified end-to-end. Evidence: resize_preserves_state-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"layout_adapts_desktop_to_mobile\":{\"score\":\"yes\",\"reasoning\":\"Desktop and mobile layouts reflow into reachable content and card-based mobile views. Evidence: layout_adapts_desktop_to_mobile-shared.png\"},\"inspector_stacks_below_1024\":{\"score\":\"yes\",\"reasoning\":\"At 1024px the inspector panes stack vertically; selecting C3 scrolled to and highlighted linked panes. Evidence: inspector_stacks_below_1024-shared.png\"},\"stepper_and_table_reflow_at_768\":{\"score\":\"yes\",\"reasoning\":\"The stepper becomes horizontal and the portfolio table becomes per-bundle cards with hero states, gate chips, and progress indicators. Evidence: stepper_and_table_reflow_at_768-full.png\"},\"no_viewport_overflow_at_375\":{\"score\":\"yes\",\"reasoning\":\"At 375px document width stays within the viewport, with no page-level horizontal overflow; the inspector\u2019s wide content uses an internal scroller. Evidence: no_viewport_overflow_at_375-shared.png\"},\"mobile_tap_targets_are_large_enough\":{\"score\":\"yes\",\"reasoning\":\"Mobile stepper controls and breadcrumb-style controls observed at compact widths are at least 44px tall; card controls remain comfortably tappable. Evidence: mobile_tap_targets_are_large_enough-shared.png\"},\"typography_resizes_across_breakpoints\":{\"score\":\"yes\",\"reasoning\":\"Headings and supporting text preserve hierarchy and remain readable on desktop and mobile; compact chips remain legible. Evidence: layout_adapts_desktop_to_mobile-shared.png\"},\"stacking_reflows_logically\":{\"score\":\"yes\",\"reasoning\":\"Narrow layouts follow header, main content/stepper, cards or inspector panes, then supporting content without orphaned regions. Evidence: stepper_and_table_reflow_at_768-full.png\"},\"fixed_controls_remain_accessible\":{\"score\":\"no\",\"reasoning\":\"FAIL: At 375px the workspace\u2019s Portfolio return control is not rendered as an accessible visible/reachable control in the observed DOM, while the mobile header is otherwise present. Evidence: fixed_controls_remain_accessible-shared.png\"},\"resize_preserves_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: Selection and filter state were observed across resizing, but the complete required preservation of notes and re-run progress was not directly verified end-to-end. Evidence: resize_preserves_state-shared.png\"}}",
+    "cost_usd": 0.2949438
+  },
+  "technical": {
+    "score": 0.4444,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "single_store_coherence",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "All surfaces derive from one shared state: a gate flip from a re-run updates the gate card, hero banner, constraint explanation, portfolio row, rollups, and timeline together; a fix-item resolution, recommendation change, or step completion is reflected in every view where that fact appears, all without a reload",
+        "reasoning": "FAIL: The rerun updated the visible gate, hero, dependency chain, fix count, and timeline, but a later WebMCP navigation targeting ember-relay-router rendered juniper-lint-fixer instead. Evidence: selection-state-single-source-shared.png"
+      },
+      {
+        "id": "2.2",
+        "name": "no_storage_reload_seeded",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "No browser storage is used: localStorage and sessionStorage remain empty after re-running gates, resolving fix items, saving overrides, writing notes, bundling, exporting, and importing, and a page reload returns the app to its seeded state \u2014 the 12 seeded bundles with seeded gate results, unset recommendations, empty notes, and no Bundled badges; persistence is the exportable Review Package JSON plus MCP",
+        "reasoning": "BLOCKED: Storage remained empty and reload restored 12 seeded bundles, but the complete required sequence including a saved override was not exercised. Evidence: no-storage-reload-seeded-shared.png"
+      },
+      {
+        "id": "2.5",
+        "name": "console_clean_through_flows",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The console is free of errors and warnings on first load and stays clean while filtering the portfolio, re-running gates, pausing and retrying steps, inspecting and diffing trials, resolving fix items, saving an override, and bundling",
+        "reasoning": "FAIL: Console inspection showed 0 errors and 0 warnings, but the full required pause/retry, diff, and override sequence was not completed. Evidence: app-serves-documented-path-shared.png"
+      },
+      {
+        "id": "2.6",
+        "name": "cold_load_interactive_2s",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive (portfolio rows and filters respond) within 2 seconds of a local cold load",
+        "reasoning": "Observed a local load completing in under 1 second with rendered portfolio rows and responsive filter/navigation interaction. Evidence: cold-load-interactive-2s-shared.png"
+      },
+      {
+        "id": "2.7",
+        "name": "responsive_during_rerun",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "While a re-run simulation is advancing, the UI stays responsive under rapid repeated input \u2014 quick bundle switches, rapid filter toggles, fast criterion selection changes \u2014 with no hangs, dropped interactions, or views showing stale data another view already updated",
+        "reasoning": "During a live rerun, rapid portfolio/workspace/gate navigation completed without hangs; the gate showed active progress and then completed. Evidence: responsive-during-rerun-shared.png"
+      },
+      {
+        "id": "2.8",
+        "name": "selection_state_single_source",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The breadcrumb, pane highlights, and gate/trial/criterion selections always agree: no interaction sequence produces a breadcrumb path that names one record while the panes highlight another",
+        "reasoning": "FAIL: A request targeting ember-relay-router / Difficulty \u2014 Sable-4 returned that selection, while the rendered breadcrumb, heading, and panes showed juniper-lint-fixer. Evidence: derived-values-arithmetically-consistent-shared.png"
+      },
+      {
+        "id": "2.9",
+        "name": "derived_values_arithmetically_consistent",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Displayed derived values are internally consistent: rollup counts sum to 12, each calibration cell's valid count never exceeds its total, difficulty gate statuses agree with their displayed score and valid-trial count, and the diff flip count equals the number of visibly flagged rows",
+        "reasoning": "BLOCKED: Initial rollups and difficulty score/trial relationships were visible and consistent, but the required diff flip-count versus flagged-row verification was not exercised. Evidence: app-serves-documented-path-shared.png"
+      },
+      {
+        "id": "2.12",
+        "name": "app_serves_documented_path",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app serves on port 3000 via its documented start path and renders the portfolio without a blank or broken page",
+        "reasoning": "The app served at http://localhost:3000, rendered a nonblank portfolio with 12 bundles, filters, rollups, and review rows. Evidence: app-serves-documented-path-shared.png"
+      },
+      {
+        "id": "2.14",
+        "name": "export_import_share_field_contract",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A successful recommendation/override save creates the same request-body shape that appears under that bundle in Review Package JSON, and a successful import accepts only documents that satisfy the review-certification/v1 field contract",
+        "reasoning": "A saved APPROVE WITH CAVEATS recommendation appeared in exported Review Package JSON under ember-relay-router; invalid `{}` import was rejected for schemaVersion, and a 42,549-character current JSON package was accepted by import. Evidence: no-storage-reload-seeded-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"single_store_coherence\":{\"score\":\"no\",\"reasoning\":\"FAIL: The rerun updated the visible gate, hero, dependency chain, fix count, and timeline, but a later WebMCP navigation targeting ember-relay-router rendered juniper-lint-fixer instead. Evidence: selection-state-single-source-shared.png\"},\"no_storage_reload_seeded\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Storage remained empty and reload restored 12 seeded bundles, but the complete required sequence including a saved override was not exercised. Evidence: no-storage-reload-seeded-shared.png\"},\"console_clean_through_flows\":{\"score\":\"no\",\"reasoning\":\"FAIL: Console inspection showed 0 errors and 0 warnings, but the full required pause/retry, diff, and override sequence was not completed. Evidence: app-serves-documented-path-shared.png\"},\"cold_load_interactive_2s\":{\"score\":\"yes\",\"reasoning\":\"Observed a local load completing in under 1 second with rendered portfolio rows and responsive filter/navigation interaction. Evidence: cold-load-interactive-2s-shared.png\"},\"responsive_during_rerun\":{\"score\":\"yes\",\"reasoning\":\"During a live rerun, rapid portfolio/workspace/gate navigation completed without hangs; the gate showed active progress and then completed. Evidence: responsive-during-rerun-shared.png\"},\"selection_state_single_source\":{\"score\":\"no\",\"reasoning\":\"FAIL: A request targeting ember-relay-router / Difficulty \u2014 Sable-4 returned that selection, while the rendered breadcrumb, heading, and panes showed juniper-lint-fixer. Evidence: derived-values-arithmetically-consistent-shared.png\"},\"derived_values_arithmetically_consistent\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Initial rollups and difficulty score/trial relationships were visible and consistent, but the required diff flip-count versus flagged-row verification was not exercised. Evidence: app-serves-documented-path-shared.png\"},\"app_serves_documented_path\":{\"score\":\"yes\",\"reasoning\":\"The app served at http://localhost:3000, rendered a nonblank portfolio with 12 bundles, filters, rollups, and review rows. Evidence: app-serves-documented-path-shared.png\"},\"export_import_share_field_contract\":{\"score\":\"yes\",\"reasoning\":\"A saved APPROVE WITH CAVEATS recommendation appeared in exported Review Package JSON under ember-relay-router; invalid `{}` import was rejected for schemaVersion, and a 42,549-character current JSON package was accepted by import. Evidence: no-storage-reload-seeded-shared.png\"}}",
+    "cost_usd": 0.3599558
+  },
+  "user_flows": {
+    "score": 0.0833,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "clean_bundle_certification_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Certifying a clean bundle end to end: opening juniper-lint-fixer (all gates pass) shows the READY FOR THE BENCHMARK hero; marking Resolve, Gate, and Audit done in order unlocks Verdict where APPROVE is enabled; selecting APPROVE, marking Verdict done, and opening Bundle shows a summary whose hero line reads READY FOR THE BENCHMARK and whose recommendation reads APPROVE; completing bundling stamps the timeline and the portfolio row gains the Bundled badge \u2014 all without a reload",
+        "reasoning": "FAIL: The clean bundle was not visibly completed end to end; after the attempted mutations, the portfolio still showed juniper at 0 of 5 steps with no Bundled badge. Evidence: juniper-bundled-shared.png"
+      },
+      {
+        "id": "6.2",
+        "name": "gate_flip_rerun_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Flipping a gate through a re-run: on ember-relay-router the Difficulty \u2014 Quartz-Mini gate starts inconclusive with 2 valid trials; Re-run gate advances the four named steps with visible statuses, and on publish the gate leaves inconclusive while the hero banner, constraint explanation, allowed recommendation set, portfolio row gate chip and hero state, and calibration context all update in the same session",
+        "reasoning": "BLOCKED: The Quartz-Mini re-run control and publish result were not reached and verified in the browser. Evidence: portfolio-initial-shared.png"
+      },
+      {
+        "id": "6.3",
+        "name": "trial_audit_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Auditing a suspect trial: a difficulty gate's evidence link opens the trial inspector on that gate's trials; selecting an invalid trial shows which of its eight checks failed; selecting a negated criterion highlights the scorer's reasoning for it and the cited answer passages; entering diff mode against a valid trial flags the flipped checks with a flip count",
+        "reasoning": "The live inspector showed invalid trial 4, failed validity checks, C5 selection, cited passages, and diff mode with 2 flipped checks out of 8. Evidence: trial-audit-diff-shared.png"
+      },
+      {
+        "id": "6.4",
+        "name": "fix_list_to_approval_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Working the fix list toward approval: on an all-gates-pass bundle with unresolved RERUN and FIX items, the allowed set shows APPROVE WITH CAVEATS and MAJOR CHANGES NEEDED with an explanation naming the unresolved items; resolving every item live changes the allowed set to APPROVE and APPROVE WITH CAVEATS and the explanation updates to say all items are resolved",
+        "reasoning": "BLOCKED: The unresolved fix list was visible, but the complete resolve-all-items workflow and resulting approval set were not reached. Evidence: juniper-workspace-initial-shared.png"
+      },
+      {
+        "id": "6.5",
+        "name": "honest_override_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Overriding the constraint honestly: with APPROVE excluded from the allowed set, toggling Override constraint and choosing APPROVE demands a justification of at least 20 characters \u2014 a shorter submission shows an inline message naming the justification field and saves nothing; a valid justification saves, shows the Override badge, and the Bundle summary prints the justification under the recommendation",
+        "reasoning": "BLOCKED: The override justification form and its short/valid submission outcomes were not reached. Evidence: juniper-workspace-initial-shared.png"
+      },
+      {
+        "id": "6.6",
+        "name": "step_gating_flow_integrity",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The 5-step gating holds through a full pass: each of Resolve, Gate, Audit, Verdict, Bundle stays locked with a named prerequisite notice until the earlier steps are done, and un-marking an earlier step re-locks the later ones while preserving their notes",
+        "reasoning": "BLOCKED: Locked later steps were observed, but named prerequisite notices and re-locking after unmarking were not fully exercised. Evidence: juniper-workspace-initial-shared.png"
+      },
+      {
+        "id": "6.7",
+        "name": "portfolio_filter_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Filtering the portfolio by hero state and by a gate-plus-status combination narrows the rows to matching bundles with removable filter chips shown, and clearing the filters restores all 12 rows with the rollup strip still matching what is visible overall",
+        "reasoning": "FAIL: The gate-plus-status filter invocation reported success, but the browser still showed 12 of 12 rows and no active filter chips; the required narrowing behavior was not visible. Evidence: portfolio-hero-filter-shared.png"
+      },
+      {
+        "id": "6.8",
+        "name": "breadcrumb_navigation_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Descending from the portfolio into a bundle, a gate, a trial, and a criterion extends the breadcrumb path at each step, and activating an earlier breadcrumb segment returns to that level with the corresponding record selected and highlighted, with workflow continuity preserved",
+        "reasoning": "BLOCKED: A deep breadcrumb path through bundle, gate, trial, and criterion was visible, but activating earlier breadcrumb segments and verifying restored selection was not completed. Evidence: trial-audit-diff-shared.png"
+      },
+      {
+        "id": "6.9",
+        "name": "overlays_support_expected_flows",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Overlay surfaces \u2014 the override justification form, the diff-mode trial picker, and any confirmation \u2014 open from their controls, complete their flow, and close cleanly, returning the reviewer to the surface they came from",
+        "reasoning": "BLOCKED: Diff-picker and export overlays opened, but the override form and clean close/return behavior for all required overlays were not fully verified. Evidence: export-package-overlay-shared.png"
+      },
+      {
+        "id": "6.10",
+        "name": "flow_recovers_without_reload",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Recovery without reload: canceling the override form, leaving diff mode, clearing filters, and navigating back from any depth via the breadcrumb or portfolio control all return to a working prior state with no dead ends",
+        "reasoning": "BLOCKED: Clearing filters and portfolio navigation worked, but canceling override, leaving diff mode, and complete recovery from depth were not all exercised. Evidence: trial-audit-diff-shared.png"
+      },
+      {
+        "id": "6.11",
+        "name": "mutation_to_export_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Mutation-to-export: after recording a recommendation with a distinctive overrideJustification, resolving a fix item, writing a distinctive step note, and completing bundling, Export certification package Review Package JSON shows schemaVersion review-certification/v1 and those session values under the bundle, with Copy and Download available",
+        "reasoning": "FAIL: Export visibly offered Review Package JSON with schemaVersion review-certification/v1 plus Copy and Download, but the required distinctive session mutations were not visibly present under a bundle. Evidence: export-package-overlay-shared.png"
+      },
+      {
+        "id": "6.12",
+        "name": "export_import_round_trip_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export then import round-trip: after session mutations, Copy or Download Review Package JSON, reload to seeds, Import that JSON, and confirm portfolio/workspace restore the mutated recommendation, overrideJustification, resolved fix state, notes, and Bundled badge with the next Export matching",
+        "reasoning": "BLOCKED: Import after reload and restoration of mutated recommendation, justification, fix state, notes, and Bundled badge were not exercised. Evidence: export-package-overlay-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"clean_bundle_certification_flow\":{\"score\":\"no\",\"reasoning\":\"FAIL: The clean bundle was not visibly completed end to end; after the attempted mutations, the portfolio still showed juniper at 0 of 5 steps with no Bundled badge. Evidence: juniper-bundled-shared.png\"},\"gate_flip_rerun_flow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The Quartz-Mini re-run control and publish result were not reached and verified in the browser. Evidence: portfolio-initial-shared.png\"},\"trial_audit_flow\":{\"score\":\"yes\",\"reasoning\":\"The live inspector showed invalid trial 4, failed validity checks, C5 selection, cited passages, and diff mode with 2 flipped checks out of 8. Evidence: trial-audit-diff-shared.png\"},\"fix_list_to_approval_flow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The unresolved fix list was visible, but the complete resolve-all-items workflow and resulting approval set were not reached. Evidence: juniper-workspace-initial-shared.png\"},\"honest_override_flow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The override justification form and its short/valid submission outcomes were not reached. Evidence: juniper-workspace-initial-shared.png\"},\"step_gating_flow_integrity\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Locked later steps were observed, but named prerequisite notices and re-locking after unmarking were not fully exercised. Evidence: juniper-workspace-initial-shared.png\"},\"portfolio_filter_flow\":{\"score\":\"no\",\"reasoning\":\"FAIL: The gate-plus-status filter invocation reported success, but the browser still showed 12 of 12 rows and no active filter chips; the required narrowing behavior was not visible. Evidence: portfolio-hero-filter-shared.png\"},\"breadcrumb_navigation_flow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A deep breadcrumb path through bundle, gate, trial, and criterion was visible, but activating earlier breadcrumb segments and verifying restored selection was not completed. Evidence: trial-audit-diff-shared.png\"},\"overlays_support_expected_flows\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Diff-picker and export overlays opened, but the override form and clean close/return behavior for all required overlays were not fully verified. Evidence: export-package-overlay-shared.png\"},\"flow_recovers_without_reload\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Clearing filters and portfolio navigation worked, but canceling override, leaving diff mode, and complete recovery from depth were not all exercised. Evidence: trial-audit-diff-shared.png\"},\"mutation_to_export_flow\":{\"score\":\"no\",\"reasoning\":\"FAIL: Export visibly offered Review Package JSON with schemaVersion review-certification/v1 plus Copy and Download, but the required distinctive session mutations were not visibly present under a bundle. Evidence: export-package-overlay-shared.png\"},\"export_import_round_trip_flow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Import after reload and restoration of mutated recommendation, justification, fix state, notes, and Bundled badge were not exercised. Evidence: export-package-overlay-shared.png\"}}",
+    "cost_usd": 0.4739392
+  },
+  "visual_design": {
+    "score": 0.7273,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "portfolio_and_workspace_composition",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The portfolio composes as a full-width bundle table under a rollup strip and calibration strip, and the bundle workspace composes as a persistent header (bundle slug, hero banner, current recommendation, breadcrumb), a left-rail 5-step stepper, and a main area whose content follows the active step",
+        "reasoning": "PASS \u2014 Portfolio shows rollup/calibration/table composition; workspace shows persistent bundle header, breadcrumb, five-step rail, and active-step content. Evidence: portfolio-clean.png, workspace-inspector.png"
+      },
+      {
+        "id": "3.2",
+        "name": "hero_state_treatments_fixed",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The three verdict hero states use three fixed, distinct treatments \u2014 green success for READY FOR THE BENCHMARK, amber caution for NOT READY \u2014 BUT FIXABLE, red alarm for AT RISK \u2014 MAY NEED A RESTART \u2014 applied identically on portfolio rows, workspace headers, and the summary document",
+        "reasoning": "PASS \u2014 Green READY, amber FIXABLE, and red AT RISK treatments are visibly distinct across portfolio/workspace headers; the summary reproduces the green hero treatment. Evidence: portfolio-clean.png, workspace-inspector.png, moss-fix-list.png, summary-view.png"
+      },
+      {
+        "id": "3.3",
+        "name": "gate_status_chip_palette",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Gate status chips use five distinct treatments (pass green, fail red, errored purple, inconclusive amber, missing gray) that are identical between portfolio rows, gate cards, the summary's gates table, and timeline entries",
+        "reasoning": "PASS \u2014 Portfolio visibly contains differentiated pass, fail, errored, inconclusive, and missing gate states, with matching status treatment in the summary gates table. Evidence: portfolio-clean.png, summary-view.png"
+      },
+      {
+        "id": "3.4",
+        "name": "category_and_check_chip_treatments",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Fix-list category tags use four distinct treatments for RERUN, FIX, REDESIGN, and TALK-TO-LEAD consistent between the fix list and the summary, and check outcome chips use distinct pass, fail, and not-applicable treatments with the trial valid/invalid badges reusing the pass/fail pair",
+        "reasoning": "FAIL: FIX, RERUN, REDESIGN, and TALK-TO-LEAD tags are visible, but a distinct not-applicable check outcome chip was not observed. Evidence: moss-fix-list.png, orchid-fix-list.png, workspace-inspector.png"
+      },
+      {
+        "id": "3.5",
+        "name": "threshold_markers_read_at_a_glance",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The 0.80 difficulty bar and 0.90 oracle bar render as reference markers beside their measured values with a visible met-or-missed relationship readable at a glance",
+        "reasoning": "FAIL: 0.80 and 0.90 markers are visible, but the portfolio calibration strip does not show separate measured difficulty/oracle values or a clear met/missed relationship. Evidence: portfolio-clean.png"
+      },
+      {
+        "id": "3.6",
+        "name": "typography_hierarchy",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Typography shows a clear hierarchy \u2014 app title larger than view titles, larger than card headings, larger than table body and label text \u2014 consistent across the portfolio and workspace",
+        "reasoning": "FAIL: The app title in the header is visibly smaller than the portfolio/workspace view titles, contrary to the specified hierarchy. Evidence: portfolio-clean.png, workspace-inspector.png"
+      },
+      {
+        "id": "3.7",
+        "name": "spacing_rhythm_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Gaps between the rollup strip, calibration strip, table, gate cards, inspector panes, and stepper are visually regular with no crowded or orphaned regions",
+        "reasoning": "PASS \u2014 Rollups, calibration, filters, tables, inspector panes, stepper, and summary sections use regular spacing with clear separation. Evidence: portfolio-clean.png, workspace-inspector.png, summary-view.png"
+      },
+      {
+        "id": "3.8",
+        "name": "control_states_distinct",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, inputs, checkboxes, toggles, and segmented controls show distinct default, hover, focus (visible ring), disabled, and error treatments, and disabled recommendations are visibly distinct from enabled ones beyond color alone",
+        "reasoning": "PASS \u2014 Hover/focus styling, disabled controls, locked stepper items, invalid badges, and enabled controls are visibly differentiated. Evidence: portfolio-clean.png, workspace-inspector.png, summary-view.png"
+      },
+      {
+        "id": "3.9",
+        "name": "single_icon_set",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "One consistent icon set is used across the toolbar, gate cards, stepper, fix list, timeline, and badges, with no mixed icon styles",
+        "reasoning": "PASS \u2014 Toolbar, stepper, gate chips, fix list, timeline, and badges use a consistent outlined icon language. Evidence: workspace-inspector.png, moss-fix-list.png, summary-view.png"
+      },
+      {
+        "id": "3.10",
+        "name": "inspector_three_column_composition",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At desktop width the trial inspector holds a stable three-column composition with the criterion list narrower than the reasoning pane and visibly separated pane boundaries",
+        "reasoning": "PASS \u2014 Desktop inspector visibly maintains three columns; the criterion list is narrower than the reasoning pane and pane boundaries are clear. Evidence: workspace-inspector.png"
+      },
+      {
+        "id": "3.15",
+        "name": "export_drawer_monospace_preview",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The export drawer and import surface render a scrollable monospaced preview with format tabs or equivalent chrome, visually distinct from body UI, and Copy/Download controls sit with that preview",
+        "reasoning": "PASS \u2014 Export drawer shows format tabs, scrollable dark monospace JSON/Markdown previews, and Copy/Download controls. Evidence: export-drawer.png, summary-markdown.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"portfolio_and_workspace_composition\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Portfolio shows rollup/calibration/table composition; workspace shows persistent bundle header, breadcrumb, five-step rail, and active-step content. Evidence: portfolio-clean.png, workspace-inspector.png\"},\"hero_state_treatments_fixed\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Green READY, amber FIXABLE, and red AT RISK treatments are visibly distinct across portfolio/workspace headers; the summary reproduces the green hero treatment. Evidence: portfolio-clean.png, workspace-inspector.png, moss-fix-list.png, summary-view.png\"},\"gate_status_chip_palette\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Portfolio visibly contains differentiated pass, fail, errored, inconclusive, and missing gate states, with matching status treatment in the summary gates table. Evidence: portfolio-clean.png, summary-view.png\"},\"category_and_check_chip_treatments\":{\"score\":\"no\",\"reasoning\":\"FAIL: FIX, RERUN, REDESIGN, and TALK-TO-LEAD tags are visible, but a distinct not-applicable check outcome chip was not observed. Evidence: moss-fix-list.png, orchid-fix-list.png, workspace-inspector.png\"},\"threshold_markers_read_at_a_glance\":{\"score\":\"no\",\"reasoning\":\"FAIL: 0.80 and 0.90 markers are visible, but the portfolio calibration strip does not show separate measured difficulty/oracle values or a clear met/missed relationship. Evidence: portfolio-clean.png\"},\"typography_hierarchy\":{\"score\":\"no\",\"reasoning\":\"FAIL: The app title in the header is visibly smaller than the portfolio/workspace view titles, contrary to the specified hierarchy. Evidence: portfolio-clean.png, workspace-inspector.png\"},\"spacing_rhythm_consistent\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Rollups, calibration, filters, tables, inspector panes, stepper, and summary sections use regular spacing with clear separation. Evidence: portfolio-clean.png, workspace-inspector.png, summary-view.png\"},\"control_states_distinct\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Hover/focus styling, disabled controls, locked stepper items, invalid badges, and enabled controls are visibly differentiated. Evidence: portfolio-clean.png, workspace-inspector.png, summary-view.png\"},\"single_icon_set\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Toolbar, stepper, gate chips, fix list, timeline, and badges use a consistent outlined icon language. Evidence: workspace-inspector.png, moss-fix-list.png, summary-view.png\"},\"inspector_three_column_composition\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Desktop inspector visibly maintains three columns; the criterion list is narrower than the reasoning pane and pane boundaries are clear. Evidence: workspace-inspector.png\"},\"export_drawer_monospace_preview\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Export drawer shows format tabs, scrollable dark monospace JSON/Markdown previews, and Copy/Download controls. Evidence: export-drawer.png, summary-markdown.png\"}}",
+    "cost_usd": 0.7870191999999999
+  },
+  "writing": {
+    "score": 0.7188,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "headings_use_consistent_capitalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders headings, step names, and gate names, they use consistent capitalization (one convention throughout), and the fixed verdict and recommendation vocabulary (READY FOR THE BENCHMARK, NOT READY \u2014 BUT FIXABLE, AT RISK \u2014 MAY NEED A RESTART, APPROVE, APPROVE WITH CAVEATS, MAJOR CHANGES NEEDED, REJECT-ESCALATE) renders exactly and uppercase wherever it appears.",
+        "reasoning": "Title-case headings and step names are consistent, while fixed verdict vocabulary appears uppercase. Evidence: initial-shared.png"
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders button or action labels, they are specific verbs ('Re-run gate', 'Compare trials', 'Copy summary', 'Export certification package', 'Import certification package', 'Copy', 'Download', 'Complete bundling'), not generic ('Submit', 'OK') when a specific label is possible.",
+        "reasoning": "Observed labels include Re-run gate, Open trial evidence, Import Certification Package, Export Certification Package, Copy, Download, and Mark Verdict done. Evidence: import-surface-shared.png"
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders error or blocked-state messages \u2014 the override justification validation, import field-contract errors, and locked-step notices \u2014 they name the problem and the fix (the minimum length, the broken schema key, the prerequisite step), not just a rejection ('Invalid').",
+        "reasoning": "Import validation explicitly identifies the schemaVersion problem and required fix; locked-step messaging names the prerequisite Resolve step. Evidence: import-error-shared.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders empty states, the copy explains what belongs there and how to add it.",
+        "reasoning": "No empty-state surface was rendered in the observed workflows, so this conditional criterion is satisfied by default. Evidence: initial-shared.png"
+      },
+      {
+        "id": "15.5",
+        "name": "body_copy_is_well_written",
+        "value": 0.75,
+        "raw": 4,
+        "weight": 0.5,
+        "description": "Where the app renders review prose \u2014 gate summaries, reasons, fix-item details and remediations, scoring reasoning, agent answers, and the constraint explanation \u2014 rate how well it reads as realistic, bundle-specific prose free of spelling and grammatical errors and of repeated filler shared across bundles.",
+        "reasoning": "Review prose is specific, grammatical, and realistic, with minor repetition in remediation wording. Evidence: initial-shared.png"
+      },
+      {
+        "id": "15.6",
+        "name": "terminology_is_consistent",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Where the app renders labels for the same concept in multiple places \u2014 bundle, gate, trial, criterion, check, fix item, recommendation \u2014 terminology is consistent (not 'bundle' here and 'package' there).",
+        "reasoning": "The same certification concept is called both a bundle and a package across the interface, such as TASK BUNDLE versus Review Package JSON and Import Certification Package. Evidence: import-surface-shared.png"
+      },
+      {
+        "id": "15.7",
+        "name": "numbers_dates_and_units_are_consistent",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled).",
+        "reasoning": "Counts use mixed formats such as 0 OF 5, 0/4, 3/4, and 1 event, reducing formatting consistency. Evidence: initial-shared.png"
+      },
+      {
+        "id": "15.8",
+        "name": "success_messages_are_specific",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations.",
+        "reasoning": "No vague confirmation or success message was rendered during the observed flows; this conditional criterion is therefore satisfied. Evidence: import-error-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"headings_use_consistent_capitalization\":{\"score\":\"yes\",\"reasoning\":\"Title-case headings and step names are consistent, while fixed verdict vocabulary appears uppercase. Evidence: initial-shared.png\"},\"actions_use_specific_labels\":{\"score\":\"yes\",\"reasoning\":\"Observed labels include Re-run gate, Open trial evidence, Import Certification Package, Export Certification Package, Copy, Download, and Mark Verdict done. Evidence: import-surface-shared.png\"},\"errors_name_problem_and_fix\":{\"score\":\"yes\",\"reasoning\":\"Import validation explicitly identifies the schemaVersion problem and required fix; locked-step messaging names the prerequisite Resolve step. Evidence: import-error-shared.png\"},\"empty_states_explain_next_step\":{\"score\":\"yes\",\"reasoning\":\"No empty-state surface was rendered in the observed workflows, so this conditional criterion is satisfied by default. Evidence: initial-shared.png\"},\"body_copy_is_well_written\":{\"score\":4,\"reasoning\":\"Review prose is specific, grammatical, and realistic, with minor repetition in remediation wording. Evidence: initial-shared.png\"},\"terminology_is_consistent\":{\"score\":\"no\",\"reasoning\":\"The same certification concept is called both a bundle and a package across the interface, such as TASK BUNDLE versus Review Package JSON and Import Certification Package. Evidence: import-surface-shared.png\"},\"numbers_dates_and_units_are_consistent\":{\"score\":\"no\",\"reasoning\":\"Counts use mixed formats such as 0 OF 5, 0/4, 3/4, and 1 event, reducing formatting consistency. Evidence: initial-shared.png\"},\"success_messages_are_specific\":{\"score\":\"yes\",\"reasoning\":\"No vague confirmation or success message was rendered during the observed flows; this conditional criterion is therefore satisfied. Evidence: import-error-shared.png\"}}",
+    "cost_usd": 0.1888658
+  }
+}

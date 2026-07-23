@@ -105,6 +105,16 @@ export function parseRecipe(text: string, base: RenderSettings): RecipeParseResu
   }
   const r = data as Record<string, unknown>
 
+  for (const key of RECIPE_KEYS) {
+    if (key === 'backgroundPreset' || key === 'customBackground') continue
+    if (!(key in r)) {
+      return { ok: false, error: `${key}: ${key} is required.` }
+    }
+  }
+  if (!('backgroundPreset' in r) && !('customBackground' in r)) {
+    return { ok: false, error: 'backgroundPreset: backgroundPreset or customBackground is required.' }
+  }
+
   // Cross-field background rule: exactly one of the two is set.
   const bp = r.backgroundPreset
   const cb = r.customBackground

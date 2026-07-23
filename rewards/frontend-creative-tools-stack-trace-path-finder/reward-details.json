@@ -1,0 +1,3015 @@
+{
+  "accessibility": {
+    "score": 0.619,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "controls_are_keyboard_accessible",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space.",
+        "reasoning": "FAIL: The Import file control is a hidden, zero-size input activated through a non-focusable label, so it is not reliably keyboard reachable. Evidence: accessibility-catchall-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "modals_manage_focus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Modal dialogs trap focus and return it to the originating control on close.",
+        "reasoning": "FAIL: Opening Keyboard shortcuts left focus on the opener, and Tab moved focus to the background Tour button instead of trapping focus. Evidence: modals_manage_focus-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "images_and_icons_have_alt_text",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "All images and icons have descriptive alt text.",
+        "reasoning": "FAIL: Multiple rendered SVG icons have neither alt text nor accessible labels. Evidence: accessibility-catchall-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "feedback_uses_live_regions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Errors and notifications are conveyed both visually and via ARIA live regions.",
+        "reasoning": "PASS: Copy produced a visible notification exposed through role=status and aria-live=polite. Evidence: feedback_uses_live_regions-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "forms_have_explicit_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "All form elements use explicit label elements.",
+        "reasoning": "PASS: Every observed input, select, and textarea has an associated label element. Evidence: accessibility-catchall-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "headings_follow_logical_order",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Headings follow a logical order with no skips, such as H1 to H2 to H3.",
+        "reasoning": "PASS: Observed heading order is H1, H2, H2, H3, H3, H3, H4 with no skipped levels. Evidence: accessibility-catchall-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "landmark_navigation_is_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Skip-to-content or landmark navigation is present.",
+        "reasoning": "PASS: A Skip to content link and banner, main, section, and complementary landmarks are present. Evidence: accessibility-catchall-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "text_and_controls_have_contrast",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "All text and controls have sufficient color contrast.",
+        "reasoning": "FAIL: Several gray text elements compute to approximately 4.34:1 contrast against the dark background, below the 4.5:1 normal-text threshold. Evidence: accessibility-catchall-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "semantic_html_roles_are_used",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Semantic HTML roles such as nav, main, and button are used.",
+        "reasoning": "PASS: The app uses semantic banner/main/section/aside landmarks, native buttons, a dialog, and labeled form controls. Evidence: accessibility-catchall-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "reduced_motion_is_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Animations respect the prefers-reduced-motion setting.",
+        "reasoning": "PASS: In the reduced-motion browser, prefers-reduced-motion matched true and observed animations/transitions were disabled. Evidence: reduced_motion-shared.png"
+      },
+      {
+        "id": "1.n1",
+        "name": "controls_unreachable_by_keyboard",
+        "value": 0.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Controls cannot be activated or reached via keyboard.",
+        "reasoning": "FAIL condition present: The Import action is represented by a non-focusable label while its associated file input is display:none and zero-size. Evidence: accessibility-catchall-shared.png",
+        "negate": true
+      },
+      {
+        "id": "1.n2",
+        "name": "focus_indicators_missing_or_obscured",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Focus indicators are missing or obscured.",
+        "reasoning": "PASS condition absent: A keyboard-focused button showed a visible 2px automatic outline. Evidence: focus_indicators_missing_or_obscured-shared.png",
+        "negate": true
+      },
+      {
+        "id": "1.n3",
+        "name": "custom_controls_lack_semantics",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Custom components use non-semantic tags and lack ARIA roles or labels.",
+        "reasoning": "PASS condition absent: The observed custom graph controls expose role=button and accessible names, while Import has an associated label. Evidence: accessibility-catchall-shared.png",
+        "negate": true
+      },
+      {
+        "id": "1.n4",
+        "name": "state_uses_color_only",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Color-only indicators are used for error or state.",
+        "reasoning": "PASS condition absent: States are conveyed with text such as noise, unresolved, confidence percentages, and diagnostic messages, not color alone. Evidence: accessibility-catchall-shared.png",
+        "negate": true
+      },
+      {
+        "id": "1.n5",
+        "name": "modals_fail_to_trap_focus",
+        "value": 0.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Modals do not trap keyboard focus.",
+        "reasoning": "FAIL condition present: Tab from the open Keyboard shortcuts dialog moved focus to the background Tour control. Evidence: modals_manage_focus-shared.png",
+        "negate": true
+      },
+      {
+        "id": "1.n6",
+        "name": "poor_contrast_makes_text_unreadable",
+        "value": 0.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Text is unreadable due to poor contrast.",
+        "reasoning": "FAIL condition present: Secondary gray text was measured at approximately 4.34:1 contrast, below the normal-text AA threshold. Evidence: accessibility-catchall-shared.png",
+        "negate": true
+      },
+      {
+        "id": "1.n7",
+        "name": "errors_are_visual_only",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Error feedback is visual only and is not screen-reader accessible.",
+        "reasoning": "PASS condition absent: The observed notification is exposed through a polite live region; no exercised error was shown to be visual-only. Evidence: feedback_uses_live_regions-shared.png",
+        "negate": true
+      },
+      {
+        "id": "1.n8",
+        "name": "media_is_missing_alt_text",
+        "value": 0.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Icon or image content is missing alt text.",
+        "reasoning": "FAIL condition present: Numerous icon SVGs lack alt text, aria-label, or an equivalent accessible name. Evidence: accessibility-catchall-shared.png",
+        "negate": true
+      },
+      {
+        "id": "1.n9",
+        "name": "heading_order_is_skipped",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Headings are skipped or unordered, such as jumping from H1 to H3.",
+        "reasoning": "PASS condition absent: The observed heading sequence contains no skipped level. Evidence: accessibility-catchall-shared.png",
+        "negate": true
+      },
+      {
+        "id": "1.n10",
+        "name": "animations_ignore_reduced_motion",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Animations ignore reduced-motion settings.",
+        "reasoning": "PASS condition absent: With reduced motion forced, computed animations were none and button transitions were none. Evidence: reduced_motion-shared.png",
+        "negate": true
+      },
+      {
+        "id": "accessibility.catchall",
+        "name": "accessibility_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "PASS condition absent: The significant observed issues are covered by the specific keyboard, focus, contrast, modal, and alt-text criteria. Evidence: accessibility-catchall-shared.png",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"controls_are_keyboard_accessible\":{\"score\":\"no\",\"reasoning\":\"FAIL: The Import file control is a hidden, zero-size input activated through a non-focusable label, so it is not reliably keyboard reachable. Evidence: accessibility-catchall-shared.png\"},\"modals_manage_focus\":{\"score\":\"no\",\"reasoning\":\"FAIL: Opening Keyboard shortcuts left focus on the opener, and Tab moved focus to the background Tour button instead of trapping focus. Evidence: modals_manage_focus-shared.png\"},\"images_and_icons_have_alt_text\":{\"score\":\"no\",\"reasoning\":\"FAIL: Multiple rendered SVG icons have neither alt text nor accessible labels. Evidence: accessibility-catchall-shared.png\"},\"feedback_uses_live_regions\":{\"score\":\"yes\",\"reasoning\":\"PASS: Copy produced a visible notification exposed through role=status and aria-live=polite. Evidence: feedback_uses_live_regions-shared.png\"},\"forms_have_explicit_labels\":{\"score\":\"yes\",\"reasoning\":\"PASS: Every observed input, select, and textarea has an associated label element. Evidence: accessibility-catchall-shared.png\"},\"headings_follow_logical_order\":{\"score\":\"yes\",\"reasoning\":\"PASS: Observed heading order is H1, H2, H2, H3, H3, H3, H4 with no skipped levels. Evidence: accessibility-catchall-shared.png\"},\"landmark_navigation_is_present\":{\"score\":\"yes\",\"reasoning\":\"PASS: A Skip to content link and banner, main, section, and complementary landmarks are present. Evidence: accessibility-catchall-shared.png\"},\"text_and_controls_have_contrast\":{\"score\":\"no\",\"reasoning\":\"FAIL: Several gray text elements compute to approximately 4.34:1 contrast against the dark background, below the 4.5:1 normal-text threshold. Evidence: accessibility-catchall-shared.png\"},\"semantic_html_roles_are_used\":{\"score\":\"yes\",\"reasoning\":\"PASS: The app uses semantic banner/main/section/aside landmarks, native buttons, a dialog, and labeled form controls. Evidence: accessibility-catchall-shared.png\"},\"reduced_motion_is_respected\":{\"score\":\"yes\",\"reasoning\":\"PASS: In the reduced-motion browser, prefers-reduced-motion matched true and observed animations/transitions were disabled. Evidence: reduced_motion-shared.png\"},\"controls_unreachable_by_keyboard\":{\"score\":\"yes\",\"reasoning\":\"FAIL condition present: The Import action is represented by a non-focusable label while its associated file input is display:none and zero-size. Evidence: accessibility-catchall-shared.png\"},\"focus_indicators_missing_or_obscured\":{\"score\":\"no\",\"reasoning\":\"PASS condition absent: A keyboard-focused button showed a visible 2px automatic outline. Evidence: focus_indicators_missing_or_obscured-shared.png\"},\"custom_controls_lack_semantics\":{\"score\":\"no\",\"reasoning\":\"PASS condition absent: The observed custom graph controls expose role=button and accessible names, while Import has an associated label. Evidence: accessibility-catchall-shared.png\"},\"state_uses_color_only\":{\"score\":\"no\",\"reasoning\":\"PASS condition absent: States are conveyed with text such as noise, unresolved, confidence percentages, and diagnostic messages, not color alone. Evidence: accessibility-catchall-shared.png\"},\"modals_fail_to_trap_focus\":{\"score\":\"yes\",\"reasoning\":\"FAIL condition present: Tab from the open Keyboard shortcuts dialog moved focus to the background Tour control. Evidence: modals_manage_focus-shared.png\"},\"poor_contrast_makes_text_unreadable\":{\"score\":\"yes\",\"reasoning\":\"FAIL condition present: Secondary gray text was measured at approximately 4.34:1 contrast, below the normal-text AA threshold. Evidence: accessibility-catchall-shared.png\"},\"errors_are_visual_only\":{\"score\":\"no\",\"reasoning\":\"PASS condition absent: The observed notification is exposed through a polite live region; no exercised error was shown to be visual-only. Evidence: feedback_uses_live_regions-shared.png\"},\"media_is_missing_alt_text\":{\"score\":\"yes\",\"reasoning\":\"FAIL condition present: Numerous icon SVGs lack alt text, aria-label, or an equivalent accessible name. Evidence: accessibility-catchall-shared.png\"},\"heading_order_is_skipped\":{\"score\":\"no\",\"reasoning\":\"PASS condition absent: The observed heading sequence contains no skipped level. Evidence: accessibility-catchall-shared.png\"},\"animations_ignore_reduced_motion\":{\"score\":\"no\",\"reasoning\":\"PASS condition absent: With reduced motion forced, computed animations were none and button transitions were none. Evidence: reduced_motion-shared.png\"},\"accessibility_catchall\":{\"score\":\"no\",\"reasoning\":\"PASS condition absent: The significant observed issues are covered by the specific keyboard, focus, contrast, modal, and alt-text criteria. Evidence: accessibility-catchall-shared.png\"}}",
+    "cost_usd": 0.1927852
+  },
+  "behavioral": {
+    "score": 0.8462,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_round_trip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline \u2014 never a mix.",
+        "reasoning": "Configured frame order and a mapped route, then reloaded; both reverted together to the seeded baseline with no route. Evidence: multi_facet_round_trip-before.png, multi_facet_round_trip-after.png"
+      },
+      {
+        "id": "14.2",
+        "name": "sort_reversal_proves_live_data",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders.",
+        "reasoning": "BLOCKED: No ascending/descending sort control or sortable collection was available."
+      },
+      {
+        "id": "14.3",
+        "name": "derived_view_responds_to_input",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input.",
+        "reasoning": "Mapping different frames changed the committed route and source excerpts from n1 to n1 \u2192 n2 \u2192 n3. Evidence: cross_view_echo_without_reload-shared.png, derived_view_responds_to_input-shared.png"
+      },
+      {
+        "id": "14.4",
+        "name": "cross_view_echo_without_reload",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list \u2194 detail, board \u2194 stats) without reload.",
+        "reasoning": "Mapping a candidate updated Graph Route and Source Excerpts immediately without reload. Evidence: cross_view_echo_without_reload-shared.png"
+      },
+      {
+        "id": "14.5",
+        "name": "count_delta_is_exact",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter.",
+        "reasoning": "Immediately before mapping there was no route; immediately after, the committed route contained exactly n1. Evidence: count_delta_is_exact-shared.png"
+      },
+      {
+        "id": "14.6",
+        "name": "different_inputs_change_outcomes",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate.",
+        "reasoning": "Two different stack-trace inputs produced different parsed-frame structures: one noise frame versus unresolved plus frame entries. Evidence: different_inputs_change_outcomes-first.png, different_inputs_change_outcomes-second.png"
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_flows_preserve_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state.",
+        "reasoning": "BLOCKED: No two independent concurrent creation or view flows were available to interleave."
+      },
+      {
+        "id": "14.8",
+        "name": "empty_to_repopulated_round_trip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions.",
+        "reasoning": "Observed the empty no-route state, then mapped a frame and observed the route and derived source surface repopulate. Evidence: multi_facet_round_trip-after.png, count_delta_is_exact-shared.png"
+      },
+      {
+        "id": "14.n1",
+        "name": "partial_persistence_is_incoherent",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence.",
+        "reasoning": "FAIL: Partial persistence was not observed; the mapped route and reordered frame state reset coherently together after reload. Evidence: multi_facet_round_trip-before.png, multi_facet_round_trip-after.png",
+        "negate": true
+      },
+      {
+        "id": "14.n2",
+        "name": "derived_surface_ignores_inputs",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A derived surface renders identically regardless of its inputs.",
+        "reasoning": "FAIL: The derived route and source excerpts changed when different frames were mapped.",
+        "negate": true
+      },
+      {
+        "id": "14.n3",
+        "name": "different_inputs_produce_identical_output",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Repeating an action with different inputs yields byte-identical output.",
+        "reasoning": "FAIL: Different stack-trace inputs produced visibly different parsed frame counts and classifications. Evidence: different_inputs_change_outcomes-first.png, different_inputs_change_outcomes-second.png",
+        "negate": true
+      },
+      {
+        "id": "14.n4",
+        "name": "cross_view_state_is_stale",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "State changes appear in one view but not another until reload.",
+        "reasoning": "FAIL: Graph Route and Source Excerpts updated in the same live interaction without reload. Evidence: cross_view_echo_without_reload-shared.png",
+        "negate": true
+      },
+      {
+        "id": "behavioral.catchall",
+        "name": "behavioral_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "FAIL: No additional significant browser-observable behavioral defect was found beyond the covered criteria.",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"multi_facet_round_trip\":{\"score\":\"yes\",\"reasoning\":\"Configured frame order and a mapped route, then reloaded; both reverted together to the seeded baseline with no route. Evidence: multi_facet_round_trip-before.png, multi_facet_round_trip-after.png\"},\"sort_reversal_proves_live_data\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No ascending/descending sort control or sortable collection was available.\"},\"derived_view_responds_to_input\":{\"score\":\"yes\",\"reasoning\":\"Mapping different frames changed the committed route and source excerpts from n1 to n1 \u2192 n2 \u2192 n3. Evidence: cross_view_echo_without_reload-shared.png, derived_view_responds_to_input-shared.png\"},\"cross_view_echo_without_reload\":{\"score\":\"yes\",\"reasoning\":\"Mapping a candidate updated Graph Route and Source Excerpts immediately without reload. Evidence: cross_view_echo_without_reload-shared.png\"},\"count_delta_is_exact\":{\"score\":\"yes\",\"reasoning\":\"Immediately before mapping there was no route; immediately after, the committed route contained exactly n1. Evidence: count_delta_is_exact-shared.png\"},\"different_inputs_change_outcomes\":{\"score\":\"yes\",\"reasoning\":\"Two different stack-trace inputs produced different parsed-frame structures: one noise frame versus unresolved plus frame entries. Evidence: different_inputs_change_outcomes-first.png, different_inputs_change_outcomes-second.png\"},\"interleaved_flows_preserve_state\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No two independent concurrent creation or view flows were available to interleave.\"},\"empty_to_repopulated_round_trip\":{\"score\":\"yes\",\"reasoning\":\"Observed the empty no-route state, then mapped a frame and observed the route and derived source surface repopulate. Evidence: multi_facet_round_trip-after.png, count_delta_is_exact-shared.png\"},\"partial_persistence_is_incoherent\":{\"score\":\"no\",\"reasoning\":\"FAIL: Partial persistence was not observed; the mapped route and reordered frame state reset coherently together after reload. Evidence: multi_facet_round_trip-before.png, multi_facet_round_trip-after.png\"},\"derived_surface_ignores_inputs\":{\"score\":\"no\",\"reasoning\":\"FAIL: The derived route and source excerpts changed when different frames were mapped.\"},\"different_inputs_produce_identical_output\":{\"score\":\"no\",\"reasoning\":\"FAIL: Different stack-trace inputs produced visibly different parsed frame counts and classifications. Evidence: different_inputs_change_outcomes-first.png, different_inputs_change_outcomes-second.png\"},\"cross_view_state_is_stale\":{\"score\":\"no\",\"reasoning\":\"FAIL: Graph Route and Source Excerpts updated in the same live interaction without reload. Evidence: cross_view_echo_without_reload-shared.png\"},\"behavioral_catchall\":{\"score\":\"no\",\"reasoning\":\"FAIL: No additional significant browser-observable behavioral defect was found beyond the covered criteria.\"}}",
+    "cost_usd": 0.15851
+  },
+  "core_features": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "parse_edit_map",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Parse/edit, weight, map, route, collapse, compare, locate, annotate, and export produces a unique valid hypothesis and exact unresolved frame result.",
+        "reasoning": "yes \u2014 Parsed and mapped the trace, collapsed frames, selected a graph node, added an annotation, saved and compared two valid hypotheses, and exported the artifact. The final UI showed \u201cUnique valid hypothesis\u201d with route n3\u2192n4\u2192n5\u2192n6\u2192n7\u2192n8 and exact unresolved result f7 \u2014 \u201cUnresolved frame missing logic\u201d; download completed successfully. Evidence: parse_edit_map-final.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Parsed and mapped the trace, collapsed frames, selected a graph node, added an annotation, saved and compared two valid hypotheses, and exported the artifact. The final UI showed \u201cUnique valid hypothesis\u201d with route n3\u2192n4\u2192n5\u2192n6\u2192n7\u2192n8 and exact unresolved result f7 \u2014 \u201cUnresolved frame missing logic\u201d; download completed successfully. Evidence: parse_edit_map-final.png\"}",
+    "cost_usd": 0.1730772
+  },
+  "design_fidelity": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "spacing_and_sizing_follow_scale",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles.",
+        "reasoning": "Consistent compact spacing and control sizing are visible across the desktop and mobile layouts. Evidence: layout-desktop.png; layout-mobile.png"
+      },
+      {
+        "id": "3.2",
+        "name": "typography_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography matches the spec for all headings and body copy.",
+        "reasoning": "The rendered interface uses a consistent monospace typographic treatment with distinct heading and body sizes. Evidence: layout-desktop.png"
+      },
+      {
+        "id": "3.3",
+        "name": "layout_matches_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity.",
+        "reasoning": "Desktop two-column composition and compact single-column stacking render coherently. Evidence: layout-desktop.png; layout-mobile.png"
+      },
+      {
+        "id": "3.4",
+        "name": "specified_state_changes_animate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Transitions or animations are applied to the state changes the spec calls out, such as add, delete, filter, or view switch.",
+        "reasoning": "The Copy control exposes a 0.2s transition, and its hover color changes in the live browser. Evidence: hover-copy.png"
+      },
+      {
+        "id": "3.5",
+        "name": "responsive_behavior_matches_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Responsive behavior matches reference patterns.",
+        "reasoning": "At 390px the header controls wrap and the workbench stacks vertically without horizontal overflow. Evidence: layout-mobile.png"
+      },
+      {
+        "id": "3.6",
+        "name": "control_styling_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Button and form radii, padding, and shadows conform to the spec.",
+        "reasoning": "Buttons and form controls use custom colors, borders, padding, and radii rather than browser defaults. Evidence: layout-desktop.png"
+      },
+      {
+        "id": "3.7",
+        "name": "typography_has_clear_hierarchy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography has a clear hierarchy that distinguishes section and body text.",
+        "reasoning": "The title, section headings, explanatory copy, and frame text are visibly differentiated. Evidence: layout-desktop.png"
+      },
+      {
+        "id": "3.8",
+        "name": "component_states_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Component states (default, hover, active, disabled) match the spec where specified.",
+        "reasoning": "Hover feedback is directly observable on Copy, and disabled Compare/Annotate controls are visibly distinct. Evidence: hover-copy.png; layout-desktop.png"
+      },
+      {
+        "id": "3.9",
+        "name": "surface_treatments_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Color, depth, and border treatments are precise per the design.",
+        "reasoning": "Dark panels, borders, muted text, and blue/green action accents are consistently applied; the live contrast toggle also changes the surface treatment. Evidence: contrast-high.png"
+      },
+      {
+        "id": "3.10",
+        "name": "microinteractions_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Microinteraction feedback for hover and press follows the spec in duration and motion.",
+        "reasoning": "Hover feedback changes the Copy button color and uses a declared transition. Evidence: hover-copy.png"
+      },
+      {
+        "id": "3.n1",
+        "name": "sizing_or_spacing_contradicts_scale",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Visible sizing or spacing values contradict the specified scale.",
+        "reasoning": "No visibly arbitrary or contradictory spacing/sizing was observed. Evidence: layout-desktop.png; layout-mobile.png",
+        "negate": true
+      },
+      {
+        "id": "3.n2",
+        "name": "colors_fall_outside_palette",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Colors appear outside the specified palette.",
+        "reasoning": "The rendered colors remain within the dark neutral, blue, green, and accent contrast palette. Evidence: contrast-high.png",
+        "negate": true
+      },
+      {
+        "id": "3.n3",
+        "name": "sizing_mismatches_spec",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Sizing mismatches the spec.",
+        "reasoning": "No clear sizing mismatch was observed at the tested desktop and compact viewports. Evidence: layout-desktop.png; layout-mobile.png",
+        "negate": true
+      },
+      {
+        "id": "3.n4",
+        "name": "required_animations_missing_or_wrong",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Animations are missing or incorrect where the spec requires them.",
+        "reasoning": "No required animation was directly observed missing or behaving incorrectly; the tested hover transition worked. Evidence: hover-copy.png",
+        "negate": true
+      },
+      {
+        "id": "3.n5",
+        "name": "specified_controls_use_browser_defaults",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Form or button controls use browser default styles when the spec styles them.",
+        "reasoning": "Controls are visibly custom-styled with consistent dark surfaces, borders, padding, and branded action colors. Evidence: layout-desktop.png",
+        "negate": true
+      },
+      {
+        "id": "3.n6",
+        "name": "layout_misaligned_at_breakpoints",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The grid or layout is misaligned at reference breakpoints.",
+        "reasoning": "The desktop grid aligns cleanly and the mobile layout reflows without visible misalignment. Evidence: layout-desktop.png; layout-mobile.png",
+        "negate": true
+      },
+      {
+        "id": "3.n7",
+        "name": "elements_are_clipped_or_offscreen",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Elements render off-screen or clipped.",
+        "reasoning": "No meaningful content is clipped horizontally or forced offscreen in the tested viewports. Evidence: layout-mobile.png",
+        "negate": true
+      },
+      {
+        "id": "3.n8",
+        "name": "structure_deviates_from_reference",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Section order, content, or structure deviates from the reference on fidelity tasks.",
+        "reasoning": "The visible structure contains the expected editor, route, graph, excerpts, annotations, hypotheses, and guided-tour regions. Evidence: layout-desktop.png",
+        "negate": true
+      },
+      {
+        "id": "3.n9",
+        "name": "heading_and_body_text_undifferentiated",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Heading and body text have no distinction.",
+        "reasoning": "Headings are larger and heavier than body copy, with clear section hierarchy. Evidence: layout-desktop.png",
+        "negate": true
+      },
+      {
+        "id": "3.n10",
+        "name": "microinteractions_deviate_from_reference",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Microinteractions are missing or deviate from the provided reference.",
+        "reasoning": "The directly tested hover microinteraction provides visible color feedback with a transition. Evidence: hover-copy.png",
+        "negate": true
+      },
+      {
+        "id": "design_fidelity.catchall",
+        "name": "design_fidelity_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable defect in fidelity to the spec or reference that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "No additional significant browser-observable fidelity defect was found beyond the evaluated criteria. Evidence: layout-desktop.png; layout-mobile.png",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"spacing_and_sizing_follow_scale\":{\"score\":\"yes\",\"reasoning\":\"Consistent compact spacing and control sizing are visible across the desktop and mobile layouts. Evidence: layout-desktop.png; layout-mobile.png\"},\"typography_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"The rendered interface uses a consistent monospace typographic treatment with distinct heading and body sizes. Evidence: layout-desktop.png\"},\"layout_matches_reference\":{\"score\":\"yes\",\"reasoning\":\"Desktop two-column composition and compact single-column stacking render coherently. Evidence: layout-desktop.png; layout-mobile.png\"},\"specified_state_changes_animate\":{\"score\":\"yes\",\"reasoning\":\"The Copy control exposes a 0.2s transition, and its hover color changes in the live browser. Evidence: hover-copy.png\"},\"responsive_behavior_matches_reference\":{\"score\":\"yes\",\"reasoning\":\"At 390px the header controls wrap and the workbench stacks vertically without horizontal overflow. Evidence: layout-mobile.png\"},\"control_styling_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"Buttons and form controls use custom colors, borders, padding, and radii rather than browser defaults. Evidence: layout-desktop.png\"},\"typography_has_clear_hierarchy\":{\"score\":\"yes\",\"reasoning\":\"The title, section headings, explanatory copy, and frame text are visibly differentiated. Evidence: layout-desktop.png\"},\"component_states_match_spec\":{\"score\":\"yes\",\"reasoning\":\"Hover feedback is directly observable on Copy, and disabled Compare/Annotate controls are visibly distinct. Evidence: hover-copy.png; layout-desktop.png\"},\"surface_treatments_match_spec\":{\"score\":\"yes\",\"reasoning\":\"Dark panels, borders, muted text, and blue/green action accents are consistently applied; the live contrast toggle also changes the surface treatment. Evidence: contrast-high.png\"},\"microinteractions_match_spec\":{\"score\":\"yes\",\"reasoning\":\"Hover feedback changes the Copy button color and uses a declared transition. Evidence: hover-copy.png\"},\"sizing_or_spacing_contradicts_scale\":{\"score\":\"no\",\"reasoning\":\"No visibly arbitrary or contradictory spacing/sizing was observed. Evidence: layout-desktop.png; layout-mobile.png\"},\"colors_fall_outside_palette\":{\"score\":\"no\",\"reasoning\":\"The rendered colors remain within the dark neutral, blue, green, and accent contrast palette. Evidence: contrast-high.png\"},\"sizing_mismatches_spec\":{\"score\":\"no\",\"reasoning\":\"No clear sizing mismatch was observed at the tested desktop and compact viewports. Evidence: layout-desktop.png; layout-mobile.png\"},\"required_animations_missing_or_wrong\":{\"score\":\"no\",\"reasoning\":\"No required animation was directly observed missing or behaving incorrectly; the tested hover transition worked. Evidence: hover-copy.png\"},\"specified_controls_use_browser_defaults\":{\"score\":\"no\",\"reasoning\":\"Controls are visibly custom-styled with consistent dark surfaces, borders, padding, and branded action colors. Evidence: layout-desktop.png\"},\"layout_misaligned_at_breakpoints\":{\"score\":\"no\",\"reasoning\":\"The desktop grid aligns cleanly and the mobile layout reflows without visible misalignment. Evidence: layout-desktop.png; layout-mobile.png\"},\"elements_are_clipped_or_offscreen\":{\"score\":\"no\",\"reasoning\":\"No meaningful content is clipped horizontally or forced offscreen in the tested viewports. Evidence: layout-mobile.png\"},\"structure_deviates_from_reference\":{\"score\":\"no\",\"reasoning\":\"The visible structure contains the expected editor, route, graph, excerpts, annotations, hypotheses, and guided-tour regions. Evidence: layout-desktop.png\"},\"heading_and_body_text_undifferentiated\":{\"score\":\"no\",\"reasoning\":\"Headings are larger and heavier than body copy, with clear section hierarchy. Evidence: layout-desktop.png\"},\"microinteractions_deviate_from_reference\":{\"score\":\"no\",\"reasoning\":\"The directly tested hover microinteraction provides visible color feedback with a transition. Evidence: hover-copy.png\"},\"design_fidelity_catchall\":{\"score\":\"no\",\"reasoning\":\"No additional significant browser-observable fidelity defect was found beyond the evaluated criteria. Evidence: layout-desktop.png; layout-mobile.png\"}}",
+    "cost_usd": 0.14189639999999998
+  },
+  "edge_cases": {
+    "score": 0.8571,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "empty_state_is_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Empty state UI is present and renders when a collection is empty.",
+        "reasoning": "The empty Hypotheses collection visibly shows \u201cNo hypotheses saved yet.\u201d Evidence: empty_state_is_present-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "forms_validate_inline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Inline validation appears on all forms before submit.",
+        "reasoning": "Clearing the Stack Trace immediately displayed an inline alert explaining the required input. Evidence: validation_feedback_missing_or_delayed-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "errors_are_actionable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Error messages are clear and actionable rather than only saying 'Invalid'.",
+        "reasoning": "The error identifies the cause and gives an example of valid stack-trace syntax. Evidence: validation_feedback_missing_or_delayed-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "actions_show_confirmation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Success or confirmation feedback appears after actions.",
+        "reasoning": "Mapping changed the control to \u201cMapped\u201d and populated the Graph Route and Source Excerpts; rejection changed the control to \u201cRejected.\u201d Evidence: actions_show_confirmation-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "async_work_shows_loading_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Loading spinners or indicators are shown for async or simulated-async work.",
+        "reasoning": "FAIL: Observed actions completed without any visible loading spinner or progress indicator. Evidence: actions_show_confirmation-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "destructive_actions_support_undo_or_cancel",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Undo or cancel options are available where destructive actions exist.",
+        "reasoning": "FAIL: Reject and Mark noise controls are available, but no undo, cancel, or recovery option was observed after rejection. Evidence: destructive_actions_lack_warning-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "non_obvious_controls_have_help",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Help or tooltips are present for non-obvious controls.",
+        "reasoning": "The app provides a Keyboard shortcuts dialog and a four-step guided tour. Evidence: modal_supports_close_paths-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "controls_use_semantic_tags",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, inputs, and labels use semantic tags.",
+        "reasoning": "Observed interactive controls use native buttons, inputs, select, textarea, and labels. Evidence: empty_state_is_present-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "modal_supports_close_paths",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Modal close controls and background clicks both close the overlay.",
+        "reasoning": "The Keyboard shortcuts dialog closed via Escape and also closed after clicking the background. Evidence: modal_close-after-background.png"
+      },
+      {
+        "id": "4.10",
+        "name": "long_flows_show_progress",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Long task flows provide progress or feedback steps.",
+        "reasoning": "The guided tour visibly reports \u201cStep 2 of 4\u201d with Back and Next controls. Evidence: long_flows_show_progress-shared.png"
+      },
+      {
+        "id": "4.n1",
+        "name": "empty_collection_has_no_feedback",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "An empty collection shows nothing and provides no UI feedback.",
+        "reasoning": "The empty Hypotheses collection provides explicit feedback: \u201cNo hypotheses saved yet.\u201d Evidence: empty_state_is_present-shared.png",
+        "negate": true
+      },
+      {
+        "id": "4.n2",
+        "name": "errors_only_reach_console",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Errors are surfaced only in the browser console.",
+        "reasoning": "The validation error was rendered visibly as an inline alert, not only logged to the console. Evidence: validation_feedback_missing_or_delayed-shared.png",
+        "negate": true
+      },
+      {
+        "id": "4.n3",
+        "name": "actions_lack_visible_feedback",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Actions lack visible feedback and silently succeed or fail.",
+        "reasoning": "Map and Reject visibly changed their labels and updated the route/frame state. Evidence: actions_show_confirmation-shared.png",
+        "negate": true
+      },
+      {
+        "id": "4.n4",
+        "name": "destructive_actions_lack_warning",
+        "value": 0.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Destructive actions have no warnings.",
+        "reasoning": "Reject changed the candidate to \u201cRejected\u201d immediately, with no warning dialog or confirmation step. Evidence: destructive_actions_lack_warning-shared.png",
+        "negate": true
+      },
+      {
+        "id": "4.n5",
+        "name": "interactive_elements_use_nonsemantic_tags",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Non-semantic div or span tags wrap interactive elements.",
+        "reasoning": "No div or span with interactive role, tabindex, onclick, or pointer cursor was observed; controls were native elements. Evidence: empty_state_is_present-shared.png",
+        "negate": true
+      },
+      {
+        "id": "4.n6",
+        "name": "modal_not_keyboard_dismissible",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Modal overlays cannot be dismissed via keyboard.",
+        "reasoning": "The Keyboard shortcuts modal closed successfully when Escape was pressed. Evidence: modal_close-after-background.png",
+        "negate": true
+      },
+      {
+        "id": "4.n7",
+        "name": "validation_feedback_missing_or_delayed",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Validation feedback is missing or delayed with no UI indication.",
+        "reasoning": "Clearing the form produced immediate visible validation feedback with actionable text. Evidence: validation_feedback_missing_or_delayed-shared.png",
+        "negate": true
+      },
+      {
+        "id": "4.n8",
+        "name": "button_text_ambiguous_or_missing",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Button text is ambiguous or missing.",
+        "reasoning": "Visible controls use descriptive text or accessible labels such as Map, Reject, Copy, Download, and Keyboard shortcuts. Evidence: empty_state_is_present-shared.png",
+        "negate": true
+      },
+      {
+        "id": "4.n9",
+        "name": "non_obvious_flows_lack_guidance",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Non-obvious flows have no in-app guidance at all.",
+        "reasoning": "The app includes a guided tour and contextual instructions for mapping frames and using shortcuts. Evidence: long_flows_show_progress-shared.png",
+        "negate": true
+      },
+      {
+        "id": "4.n10",
+        "name": "affordances_hidden_or_inaccessible",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Interactive affordances are visually hidden or inaccessible.",
+        "reasoning": "Primary actions and controls were visibly rendered and reachable through the browser UI. Evidence: empty_state_is_present-shared.png",
+        "negate": true
+      },
+      {
+        "id": "edge_cases.catchall",
+        "name": "edge_cases_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "No additional significant browser-observable defect outside the covered criteria was observed. Evidence: actions_show_confirmation-shared.png",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"empty_state_is_present\":{\"score\":\"yes\",\"reasoning\":\"The empty Hypotheses collection visibly shows \u201cNo hypotheses saved yet.\u201d Evidence: empty_state_is_present-shared.png\"},\"forms_validate_inline\":{\"score\":\"yes\",\"reasoning\":\"Clearing the Stack Trace immediately displayed an inline alert explaining the required input. Evidence: validation_feedback_missing_or_delayed-shared.png\"},\"errors_are_actionable\":{\"score\":\"yes\",\"reasoning\":\"The error identifies the cause and gives an example of valid stack-trace syntax. Evidence: validation_feedback_missing_or_delayed-shared.png\"},\"actions_show_confirmation\":{\"score\":\"yes\",\"reasoning\":\"Mapping changed the control to \u201cMapped\u201d and populated the Graph Route and Source Excerpts; rejection changed the control to \u201cRejected.\u201d Evidence: actions_show_confirmation-shared.png\"},\"async_work_shows_loading_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: Observed actions completed without any visible loading spinner or progress indicator. Evidence: actions_show_confirmation-shared.png\"},\"destructive_actions_support_undo_or_cancel\":{\"score\":\"no\",\"reasoning\":\"FAIL: Reject and Mark noise controls are available, but no undo, cancel, or recovery option was observed after rejection. Evidence: destructive_actions_lack_warning-shared.png\"},\"non_obvious_controls_have_help\":{\"score\":\"yes\",\"reasoning\":\"The app provides a Keyboard shortcuts dialog and a four-step guided tour. Evidence: modal_supports_close_paths-shared.png\"},\"controls_use_semantic_tags\":{\"score\":\"yes\",\"reasoning\":\"Observed interactive controls use native buttons, inputs, select, textarea, and labels. Evidence: empty_state_is_present-shared.png\"},\"modal_supports_close_paths\":{\"score\":\"yes\",\"reasoning\":\"The Keyboard shortcuts dialog closed via Escape and also closed after clicking the background. Evidence: modal_close-after-background.png\"},\"long_flows_show_progress\":{\"score\":\"yes\",\"reasoning\":\"The guided tour visibly reports \u201cStep 2 of 4\u201d with Back and Next controls. Evidence: long_flows_show_progress-shared.png\"},\"empty_collection_has_no_feedback\":{\"score\":\"no\",\"reasoning\":\"The empty Hypotheses collection provides explicit feedback: \u201cNo hypotheses saved yet.\u201d Evidence: empty_state_is_present-shared.png\"},\"errors_only_reach_console\":{\"score\":\"no\",\"reasoning\":\"The validation error was rendered visibly as an inline alert, not only logged to the console. Evidence: validation_feedback_missing_or_delayed-shared.png\"},\"actions_lack_visible_feedback\":{\"score\":\"no\",\"reasoning\":\"Map and Reject visibly changed their labels and updated the route/frame state. Evidence: actions_show_confirmation-shared.png\"},\"destructive_actions_lack_warning\":{\"score\":\"yes\",\"reasoning\":\"Reject changed the candidate to \u201cRejected\u201d immediately, with no warning dialog or confirmation step. Evidence: destructive_actions_lack_warning-shared.png\"},\"interactive_elements_use_nonsemantic_tags\":{\"score\":\"no\",\"reasoning\":\"No div or span with interactive role, tabindex, onclick, or pointer cursor was observed; controls were native elements. Evidence: empty_state_is_present-shared.png\"},\"modal_not_keyboard_dismissible\":{\"score\":\"no\",\"reasoning\":\"The Keyboard shortcuts modal closed successfully when Escape was pressed. Evidence: modal_close-after-background.png\"},\"validation_feedback_missing_or_delayed\":{\"score\":\"no\",\"reasoning\":\"Clearing the form produced immediate visible validation feedback with actionable text. Evidence: validation_feedback_missing_or_delayed-shared.png\"},\"button_text_ambiguous_or_missing\":{\"score\":\"no\",\"reasoning\":\"Visible controls use descriptive text or accessible labels such as Map, Reject, Copy, Download, and Keyboard shortcuts. Evidence: empty_state_is_present-shared.png\"},\"non_obvious_flows_lack_guidance\":{\"score\":\"no\",\"reasoning\":\"The app includes a guided tour and contextual instructions for mapping frames and using shortcuts. Evidence: long_flows_show_progress-shared.png\"},\"affordances_hidden_or_inaccessible\":{\"score\":\"no\",\"reasoning\":\"Primary actions and controls were visibly rendered and reachable through the browser UI. Evidence: empty_state_is_present-shared.png\"},\"edge_cases_catchall\":{\"score\":\"no\",\"reasoning\":\"No additional significant browser-observable defect outside the covered criteria was observed. Evidence: actions_show_confirmation-shared.png\"}}",
+    "cost_usd": 0.20519919999999997
+  },
+  "innovation": {
+    "score": 0.8095,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "delightful_microinteractions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app has unique, delightful microinteractions.",
+        "reasoning": "Mapped route produces a green committed-path state, hypothesis callout, and synchronized scrubber. Evidence: mapped-route-shared.png"
+      },
+      {
+        "id": "11.2",
+        "name": "advanced_motion_mechanics",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app has advanced animation or transition mechanics such as parallax or scroll storytelling.",
+        "reasoning": "FAIL: No parallax, scroll storytelling, or similarly advanced motion mechanic was observed. Evidence: initial-shared.png"
+      },
+      {
+        "id": "11.3",
+        "name": "guided_onboarding",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app has a narrative or guided onboarding flow.",
+        "reasoning": "A multi-step \u201cWelcome to Path Finder\u201d tour was directly advanced in the live app. Evidence: guided-onboarding-shared.png"
+      },
+      {
+        "id": "11.4",
+        "name": "enhanced_interactive_graphics",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Data visualizations or interactive graphics provide extra usability.",
+        "reasoning": "The live app provides an interactive 26-node code graph with mapped nodes highlighted and route scrubbing. Evidence: mapped-route-shared.png"
+      },
+      {
+        "id": "11.5",
+        "name": "alternative_input_support",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app supports voice, gesture, or another alternative input.",
+        "reasoning": "A live keyboard-shortcuts dialog documents keyboard equivalents for frame movement, scrubbing, selection, and dialogs. Evidence: keyboard-shortcuts-shared.png"
+      },
+      {
+        "id": "11.6",
+        "name": "preference_personalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app provides personalization features for user preferences.",
+        "reasoning": "Users can adjust motion, contrast, and text size through visible controls. Evidence: contrast-mode-shared.png"
+      },
+      {
+        "id": "11.7",
+        "name": "polished_brand_narrative",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app presents polished storytelling or a branding narrative.",
+        "reasoning": "The app presents a coherent \u201cTrace the fault. Prove the path. Ship the locus.\u201d identity supported by a guided tour and domain-specific UI. Evidence: initial-shared.png"
+      },
+      {
+        "id": "11.8",
+        "name": "dynamic_theming_beyond_requirements",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app provides dynamic theming or a color mode beyond requirements.",
+        "reasoning": "The visible Contrast control switched the interface from standard to a high-contrast black/white/orange theme. Evidence: contrast-mode-shared.png"
+      },
+      {
+        "id": "11.9",
+        "name": "genre_appropriate_platform_features",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app uses web platform features such as PWA or offline support where the genre allows.",
+        "reasoning": "FAIL: No PWA or offline-support behavior was directly observed. Evidence: initial-shared.png"
+      },
+      {
+        "id": "11.10",
+        "name": "competition_level_innovation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Competition-level innovation is visible to users.",
+        "reasoning": "FAIL: The experience is polished and interactive, but no clearly competition-level breakthrough was directly observed. Evidence: mapped-route-shared.png"
+      },
+      {
+        "id": "11.n1",
+        "name": "demo_is_bare_spec_only",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The demo is purely spec-compliant, barebones, and unenhanced.",
+        "reasoning": "no \u2014 The live app includes onboarding, keyboard parity, high contrast, a graph route, scrubbing, and hypothesis feedback. Evidence: mapped-route-shared.png",
+        "negate": true
+      },
+      {
+        "id": "11.n2",
+        "name": "experience_is_generic_or_copied",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Interactions and visuals are generic, templated, or copied.",
+        "reasoning": "no \u2014 The interface is specialized around stack-trace diagnosis with a code graph, unresolved-frame handling, and route mapping. Evidence: mapped-route-shared.png",
+        "negate": true
+      },
+      {
+        "id": "11.n3",
+        "name": "experience_lacks_polish_guidance_story",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app has no polish, guidance, or story.",
+        "reasoning": "no \u2014 The app visibly includes branded narrative copy, a guided tour, structured explanations, and clear route feedback. Evidence: guided-onboarding-shared.png",
+        "negate": true
+      },
+      {
+        "id": "11.n4",
+        "name": "experience_lacks_extra_polish",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app has no extra visual or interactive polish.",
+        "reasoning": "no \u2014 High contrast, keyboard shortcuts, animated tour states, route highlighting, and scrub controls provide extra polish. Evidence: keyboard-shortcuts-shared.png",
+        "negate": true
+      },
+      {
+        "id": "11.n5",
+        "name": "interface_is_flat_and_static",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The UI is flat and static with no immersion.",
+        "reasoning": "no \u2014 The graph changes after mapping, route nodes glow green, and the app exposes interactive scrubbing and dialogs. Evidence: mapped-route-shared.png",
+        "negate": true
+      },
+      {
+        "id": "11.n6",
+        "name": "helpful_platform_capabilities_ignored",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Modern platform capabilities are ignored where they would clearly help.",
+        "reasoning": "no \u2014 Visible controls use clipboard copy, download/import, keyboard shortcuts, responsive scrolling, and accessibility-oriented contrast/text settings. Evidence: initial-shared.png",
+        "negate": true
+      },
+      {
+        "id": "11.n7",
+        "name": "personalization_is_impossible",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Personalization is impossible.",
+        "reasoning": "no \u2014 Motion, contrast, and text-size preferences are directly available. Evidence: contrast-mode-shared.png",
+        "negate": true
+      },
+      {
+        "id": "11.n8",
+        "name": "delightful_moments_are_absent",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app has no new or delightful user moments.",
+        "reasoning": "no \u2014 The guided welcome tour and \u201cUnique valid hypothesis\u201d route result are observable user moments beyond a basic form. Evidence: mapped-route-shared.png",
+        "negate": true
+      },
+      {
+        "id": "11.n9",
+        "name": "design_has_no_twist",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The design repeats well-trod patterns without a twist.",
+        "reasoning": "no \u2014 The stack-trace editor is paired with a graph-based fault-path mapping and route scrubber, providing a distinct product twist. Evidence: mapped-route-shared.png",
+        "negate": true
+      },
+      {
+        "id": "11.n10",
+        "name": "effort_stops_at_mvp",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app shows minimal effort beyond the MVP or deliverable.",
+        "reasoning": "no \u2014 The app visibly goes beyond MVP with onboarding, graph visualization, annotations, hypotheses, import/export, contrast modes, and keyboard parity. Evidence: keyboard-shortcuts-shared.png",
+        "negate": true
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "no \u2014 No separate enhancement beyond those already represented by onboarding, interactive graphics, personalization, and platform-accessibility criteria was directly observed. Evidence: mapped-route-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"delightful_microinteractions\":{\"score\":\"yes\",\"reasoning\":\"Mapped route produces a green committed-path state, hypothesis callout, and synchronized scrubber. Evidence: mapped-route-shared.png\"},\"advanced_motion_mechanics\":{\"score\":\"no\",\"reasoning\":\"FAIL: No parallax, scroll storytelling, or similarly advanced motion mechanic was observed. Evidence: initial-shared.png\"},\"guided_onboarding\":{\"score\":\"yes\",\"reasoning\":\"A multi-step \u201cWelcome to Path Finder\u201d tour was directly advanced in the live app. Evidence: guided-onboarding-shared.png\"},\"enhanced_interactive_graphics\":{\"score\":\"yes\",\"reasoning\":\"The live app provides an interactive 26-node code graph with mapped nodes highlighted and route scrubbing. Evidence: mapped-route-shared.png\"},\"alternative_input_support\":{\"score\":\"yes\",\"reasoning\":\"A live keyboard-shortcuts dialog documents keyboard equivalents for frame movement, scrubbing, selection, and dialogs. Evidence: keyboard-shortcuts-shared.png\"},\"preference_personalization\":{\"score\":\"yes\",\"reasoning\":\"Users can adjust motion, contrast, and text size through visible controls. Evidence: contrast-mode-shared.png\"},\"polished_brand_narrative\":{\"score\":\"yes\",\"reasoning\":\"The app presents a coherent \u201cTrace the fault. Prove the path. Ship the locus.\u201d identity supported by a guided tour and domain-specific UI. Evidence: initial-shared.png\"},\"dynamic_theming_beyond_requirements\":{\"score\":\"yes\",\"reasoning\":\"The visible Contrast control switched the interface from standard to a high-contrast black/white/orange theme. Evidence: contrast-mode-shared.png\"},\"genre_appropriate_platform_features\":{\"score\":\"no\",\"reasoning\":\"FAIL: No PWA or offline-support behavior was directly observed. Evidence: initial-shared.png\"},\"competition_level_innovation\":{\"score\":\"no\",\"reasoning\":\"FAIL: The experience is polished and interactive, but no clearly competition-level breakthrough was directly observed. Evidence: mapped-route-shared.png\"},\"demo_is_bare_spec_only\":{\"score\":\"no\",\"reasoning\":\"no \u2014 The live app includes onboarding, keyboard parity, high contrast, a graph route, scrubbing, and hypothesis feedback. Evidence: mapped-route-shared.png\"},\"experience_is_generic_or_copied\":{\"score\":\"no\",\"reasoning\":\"no \u2014 The interface is specialized around stack-trace diagnosis with a code graph, unresolved-frame handling, and route mapping. Evidence: mapped-route-shared.png\"},\"experience_lacks_polish_guidance_story\":{\"score\":\"no\",\"reasoning\":\"no \u2014 The app visibly includes branded narrative copy, a guided tour, structured explanations, and clear route feedback. Evidence: guided-onboarding-shared.png\"},\"experience_lacks_extra_polish\":{\"score\":\"no\",\"reasoning\":\"no \u2014 High contrast, keyboard shortcuts, animated tour states, route highlighting, and scrub controls provide extra polish. Evidence: keyboard-shortcuts-shared.png\"},\"interface_is_flat_and_static\":{\"score\":\"no\",\"reasoning\":\"no \u2014 The graph changes after mapping, route nodes glow green, and the app exposes interactive scrubbing and dialogs. Evidence: mapped-route-shared.png\"},\"helpful_platform_capabilities_ignored\":{\"score\":\"no\",\"reasoning\":\"no \u2014 Visible controls use clipboard copy, download/import, keyboard shortcuts, responsive scrolling, and accessibility-oriented contrast/text settings. Evidence: initial-shared.png\"},\"personalization_is_impossible\":{\"score\":\"no\",\"reasoning\":\"no \u2014 Motion, contrast, and text-size preferences are directly available. Evidence: contrast-mode-shared.png\"},\"delightful_moments_are_absent\":{\"score\":\"no\",\"reasoning\":\"no \u2014 The guided welcome tour and \u201cUnique valid hypothesis\u201d route result are observable user moments beyond a basic form. Evidence: mapped-route-shared.png\"},\"design_has_no_twist\":{\"score\":\"no\",\"reasoning\":\"no \u2014 The stack-trace editor is paired with a graph-based fault-path mapping and route scrubber, providing a distinct product twist. Evidence: mapped-route-shared.png\"},\"effort_stops_at_mvp\":{\"score\":\"no\",\"reasoning\":\"no \u2014 The app visibly goes beyond MVP with onboarding, graph visualization, annotations, hypotheses, import/export, contrast modes, and keyboard parity. Evidence: keyboard-shortcuts-shared.png\"},\"innovation_catchall\":{\"score\":\"no\",\"reasoning\":\"no \u2014 No separate enhancement beyond those already represented by onboarding, interactive graphics, personalization, and platform-accessibility criteria was directly observed. Evidence: mapped-route-shared.png\"}}",
+    "cost_usd": 0.1797376
+  },
+  "motion": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "reorder_commit",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Reorder, commit, reroute, reject, compare, and scrub in normal/reduced modes \u2192 causal transitions and final routes agree.",
+        "reasoning": "PASS \u2014 In normal and reduced-motion browsers, real UI interactions successfully reordered frames, committed and rerouted valid paths, rejected a candidate, scrubbed the route, and compared two saved valid hypotheses with matching routes. Evidence: reorder_commit-shared.png, reorder_commit-reduced.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 In normal and reduced-motion browsers, real UI interactions successfully reordered frames, committed and rerouted valid paths, rejected a candidate, scrubbed the route, and compared two saved valid hypotheses with matching routes. Evidence: reorder_commit-shared.png, reorder_commit-reduced.png\"}",
+    "cost_usd": 0.33605179999999996
+  },
+  "performance": {
+    "score": 0.9474,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_is_under_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cold start to interactive is under 2 seconds on local render.",
+        "reasoning": "Load completed in 397ms with 53 interactive buttons. Evidence: performance-catchall-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "console_is_clean",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Browser devtools show no errors or warnings.",
+        "reasoning": "Primary browser console showed 0 errors and 0 warnings after fresh navigation. Evidence: performance-catchall-shared.png"
+      },
+      {
+        "id": "9.3",
+        "name": "transitions_respond_under_100ms",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "UI transitions respond in under 100ms.",
+        "reasoning": "FAIL: Observed button transition durations of 150\u2013200ms. Evidence: transitions-respond-under-100ms-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "async_work_has_loading_indicators",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Loading indicators are shown for async or simulated delays.",
+        "reasoning": "No async or simulated-delay workflow was present to require a loading indicator. Evidence: performance-catchall-shared.png"
+      },
+      {
+        "id": "9.5",
+        "name": "large_collections_render_without_lag",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Large collections render without perceived lag.",
+        "reasoning": "Desktop view rendered 26 graph nodes and 8 parsed frames while remaining interactive. Evidence: large-collections-render-without-lag-shared.png"
+      },
+      {
+        "id": "9.6",
+        "name": "state_changes_remain_interactive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The UI remains interactive during state changes.",
+        "reasoning": "Editor expansion, large trace input, and multiple settings changes completed with the UI responsive. Evidence: rapid-input-does-not-freeze-shared.png"
+      },
+      {
+        "id": "9.7",
+        "name": "animations_maintain_smooth_frame_rate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Animations maintain a smooth 60fps; games maintain a stable frame rate during play.",
+        "reasoning": "No blocking long-task behavior was observed, and reduced-motion mode loaded successfully. Evidence: animations-maintain-smooth-frame-rate-shared.png"
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_input_does_not_freeze",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app does not hang or freeze even under rapid user input.",
+        "reasoning": "A large rapid trace input completed and the page remained loaded and interactive. Evidence: rapid-input-does-not-freeze-shared.png"
+      },
+      {
+        "id": "9.n1",
+        "name": "local_load_exceeds_two_seconds",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "More than 2 seconds pass before interaction is possible on local render.",
+        "reasoning": "FAIL: Fresh local load completed in 397ms, so it did not exceed two seconds. Evidence: performance-catchall-shared.png",
+        "negate": true
+      },
+      {
+        "id": "9.n2",
+        "name": "console_errors_during_flows",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Errors or warnings are present in the console during flows.",
+        "reasoning": "FAIL: No errors or warnings were observed during primary-browser flows. Evidence: rapid-input-does-not-freeze-shared.png",
+        "negate": true
+      },
+      {
+        "id": "9.n3",
+        "name": "transitions_block_or_lag",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Transitions block or lag.",
+        "reasoning": "FAIL: Transitions were visible but did not block interaction or cause observable lag. Evidence: transitions-respond-under-100ms-shared.png",
+        "negate": true
+      },
+      {
+        "id": "9.n4",
+        "name": "async_work_hangs_ui",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Async or simulated-async work causes the UI to hang or freeze.",
+        "reasoning": "FAIL: No async or simulated-async workflow was present, and no UI hang was observed. Evidence: performance-catchall-shared.png",
+        "negate": true
+      },
+      {
+        "id": "9.n5",
+        "name": "large_data_kills_frame_rate",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Large data sets kill the frame rate.",
+        "reasoning": "FAIL: Large trace input and the 26-node graph rendered without observable frame-rate failure. Evidence: large-collections-render-without-lag-shared.png",
+        "negate": true
+      },
+      {
+        "id": "9.n6",
+        "name": "animation_blocks_input",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Input becomes unresponsive during animation.",
+        "reasoning": "FAIL: Input remained responsive during animated UI changes. Evidence: rapid-input-does-not-freeze-shared.png",
+        "negate": true
+      },
+      {
+        "id": "9.n7",
+        "name": "resource_load_blocks_rendering",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The UI blocks rendering while loading resources.",
+        "reasoning": "FAIL: Meaningful UI rendered immediately; resource loading did not block rendering. Evidence: performance-catchall-shared.png",
+        "negate": true
+      },
+      {
+        "id": "9.n8",
+        "name": "browser_resources_run_away",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Memory leaks or runaway browser resource usage occur.",
+        "reasoning": "FAIL: No runaway resource behavior was observed; the page remained stable with normal resource usage. Evidence: performance-catchall-shared.png",
+        "negate": true
+      },
+      {
+        "id": "9.n9",
+        "name": "loading_state_is_blank",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Nothing is displayed while data is loading.",
+        "reasoning": "FAIL: The app displayed meaningful UI on load rather than a blank loading state. Evidence: performance-catchall-shared.png",
+        "negate": true
+      },
+      {
+        "id": "9.n10",
+        "name": "rapid_or_edge_use_crashes",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app crashes under rapid or edge-case use.",
+        "reasoning": "FAIL: Rapid large-text input and repeated control changes did not crash the app. Evidence: rapid-input-does-not-freeze-shared.png",
+        "negate": true
+      },
+      {
+        "id": "performance.catchall",
+        "name": "performance_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "FAIL: No significant performance or stability defect outside the covered transition-duration issue was observed. Evidence: performance-catchall-shared.png",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_start_is_under_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"Load completed in 397ms with 53 interactive buttons. Evidence: performance-catchall-shared.png\"},\"console_is_clean\":{\"score\":\"yes\",\"reasoning\":\"Primary browser console showed 0 errors and 0 warnings after fresh navigation. Evidence: performance-catchall-shared.png\"},\"transitions_respond_under_100ms\":{\"score\":\"no\",\"reasoning\":\"FAIL: Observed button transition durations of 150\u2013200ms. Evidence: transitions-respond-under-100ms-shared.png\"},\"async_work_has_loading_indicators\":{\"score\":\"yes\",\"reasoning\":\"No async or simulated-delay workflow was present to require a loading indicator. Evidence: performance-catchall-shared.png\"},\"large_collections_render_without_lag\":{\"score\":\"yes\",\"reasoning\":\"Desktop view rendered 26 graph nodes and 8 parsed frames while remaining interactive. Evidence: large-collections-render-without-lag-shared.png\"},\"state_changes_remain_interactive\":{\"score\":\"yes\",\"reasoning\":\"Editor expansion, large trace input, and multiple settings changes completed with the UI responsive. Evidence: rapid-input-does-not-freeze-shared.png\"},\"animations_maintain_smooth_frame_rate\":{\"score\":\"yes\",\"reasoning\":\"No blocking long-task behavior was observed, and reduced-motion mode loaded successfully. Evidence: animations-maintain-smooth-frame-rate-shared.png\"},\"rapid_input_does_not_freeze\":{\"score\":\"yes\",\"reasoning\":\"A large rapid trace input completed and the page remained loaded and interactive. Evidence: rapid-input-does-not-freeze-shared.png\"},\"local_load_exceeds_two_seconds\":{\"score\":\"no\",\"reasoning\":\"FAIL: Fresh local load completed in 397ms, so it did not exceed two seconds. Evidence: performance-catchall-shared.png\"},\"console_errors_during_flows\":{\"score\":\"no\",\"reasoning\":\"FAIL: No errors or warnings were observed during primary-browser flows. Evidence: rapid-input-does-not-freeze-shared.png\"},\"transitions_block_or_lag\":{\"score\":\"no\",\"reasoning\":\"FAIL: Transitions were visible but did not block interaction or cause observable lag. Evidence: transitions-respond-under-100ms-shared.png\"},\"async_work_hangs_ui\":{\"score\":\"no\",\"reasoning\":\"FAIL: No async or simulated-async workflow was present, and no UI hang was observed. Evidence: performance-catchall-shared.png\"},\"large_data_kills_frame_rate\":{\"score\":\"no\",\"reasoning\":\"FAIL: Large trace input and the 26-node graph rendered without observable frame-rate failure. Evidence: large-collections-render-without-lag-shared.png\"},\"animation_blocks_input\":{\"score\":\"no\",\"reasoning\":\"FAIL: Input remained responsive during animated UI changes. Evidence: rapid-input-does-not-freeze-shared.png\"},\"resource_load_blocks_rendering\":{\"score\":\"no\",\"reasoning\":\"FAIL: Meaningful UI rendered immediately; resource loading did not block rendering. Evidence: performance-catchall-shared.png\"},\"browser_resources_run_away\":{\"score\":\"no\",\"reasoning\":\"FAIL: No runaway resource behavior was observed; the page remained stable with normal resource usage. Evidence: performance-catchall-shared.png\"},\"loading_state_is_blank\":{\"score\":\"no\",\"reasoning\":\"FAIL: The app displayed meaningful UI on load rather than a blank loading state. Evidence: performance-catchall-shared.png\"},\"rapid_or_edge_use_crashes\":{\"score\":\"no\",\"reasoning\":\"FAIL: Rapid large-text input and repeated control changes did not crash the app. Evidence: rapid-input-does-not-freeze-shared.png\"},\"performance_catchall\":{\"score\":\"no\",\"reasoning\":\"FAIL: No significant performance or stability defect outside the covered transition-duration issue was observed. Evidence: performance-catchall-shared.png\"}}",
+    "cost_usd": 0.22900279999999998
+  },
+  "responsiveness": {
+    "score": 0.8571,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "layout_adapts_desktop_to_mobile",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Layout adapts gracefully from 1440px desktop to 375px mobile.",
+        "reasoning": "Desktop uses a two-column layout; at 375px the interface stacks vertically and remains usable. Evidence: desktop-responsive.png, mobile-responsive.png"
+      },
+      {
+        "id": "7.2",
+        "name": "mobile_tap_targets_are_large_enough",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "UI controls are tap targets at least 44px on mobile.",
+        "reasoning": "FAIL: Several mobile controls are narrower than 44px, including A\u2212 (38.4px), A+ (39.4px), and the keyboard button (40px). Evidence: mobile-responsive.png"
+      },
+      {
+        "id": "7.3",
+        "name": "typography_resizes_across_breakpoints",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography resizes for both mobile and desktop.",
+        "reasoning": "The h1 changes from 21.6px desktop to 16.8px mobile, while body text remains readable at 16px. Evidence: desktop-responsive.png, mobile-responsive.png"
+      },
+      {
+        "id": "7.4",
+        "name": "content_avoids_clipping_and_overflow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Content never clips or overflows the viewport.",
+        "reasoning": "Measured document width does not exceed the viewport at mobile, and content visibly fits within the stacked layout. Evidence: mobile-responsive.png"
+      },
+      {
+        "id": "7.5",
+        "name": "chrome_adapts_to_small_screens",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Collapsible chrome such as sidebars and menus adapts for smaller screens.",
+        "reasoning": "Header controls wrap across rows on mobile and remain visible. Evidence: mobile-responsive.png"
+      },
+      {
+        "id": "7.6",
+        "name": "stacking_reflows_logically",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Layout stacking order reflows logically at narrow widths.",
+        "reasoning": "Editor content appears first, followed by graph, excerpts, annotations, and hypotheses in a logical vertical order. Evidence: mobile-full-responsive.png"
+      },
+      {
+        "id": "7.7",
+        "name": "mobile_touch_gestures_work",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Touch gestures such as swipe and tap work on mobile where present.",
+        "reasoning": "A real tap on the mobile Show editor control completed successfully; no swipe-specific interaction is present. Evidence: mobile-responsive.png"
+      },
+      {
+        "id": "7.8",
+        "name": "small_screens_avoid_horizontal_scroll",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Small screens have no horizontal scrolling.",
+        "reasoning": "At 375px, measured document scroll width is 360px, so no horizontal overflow is present. Evidence: mobile-responsive.png"
+      },
+      {
+        "id": "7.9",
+        "name": "media_and_canvases_resize",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Images, grids, and canvases size responsively to fit the layout.",
+        "reasoning": "The code graph scales down to fit the mobile content column without overflowing. Evidence: mobile-full-responsive.png"
+      },
+      {
+        "id": "7.10",
+        "name": "fixed_controls_remain_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Fixed controls remain accessible on all devices.",
+        "reasoning": "The fixed onboarding panel remains within the mobile viewport and its controls are reachable. Evidence: mobile-responsive.png"
+      },
+      {
+        "id": "7.n1",
+        "name": "layout_breaks_at_breakpoints",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Layout breaks or overflows at common breakpoints.",
+        "reasoning": "No breakpoint layout failure was observed at desktop, tablet, or mobile widths. Evidence: desktop-responsive.png, tablet-responsive.png, mobile-responsive.png",
+        "negate": true
+      },
+      {
+        "id": "7.n2",
+        "name": "mobile_controls_too_small_or_misaligned",
+        "value": 0.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Controls are too small or misaligned on mobile.",
+        "reasoning": "FAIL: A\u2212, A+, and the keyboard shortcut control are visibly narrower than the surrounding 44px controls. Evidence: mobile-responsive.png",
+        "negate": true
+      },
+      {
+        "id": "7.n3",
+        "name": "text_too_small_on_devices",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Text is too small to read on some devices.",
+        "reasoning": "Mobile body text measures 16px and remains readable; no generally undersized device typography was observed. Evidence: mobile-responsive.png",
+        "negate": true
+      },
+      {
+        "id": "7.n4",
+        "name": "content_cropped_or_unnecessary_scrollbars",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Content is cropped or scrollbars appear unnecessarily.",
+        "reasoning": "Only normal vertical scrolling for the long editor page is present; no unnecessary horizontal scrollbar or cropped main content was observed. Evidence: mobile-full-responsive.png",
+        "negate": true
+      },
+      {
+        "id": "7.n5",
+        "name": "sidebar_or_menu_breaks_by_width",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The sidebar or menu is unresponsive or missing at some widths.",
+        "reasoning": "The editor/sidebar region reflows into a full-width stacked section rather than disappearing or becoming unresponsive. Evidence: tablet-responsive.png, mobile-responsive.png",
+        "negate": true
+      },
+      {
+        "id": "7.n6",
+        "name": "fixed_positions_obscure_content",
+        "value": 0.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Fixed positions obscure content.",
+        "reasoning": "FAIL: The fixed onboarding panel visibly covers editor content near the bottom of the mobile viewport. Evidence: mobile-responsive.png",
+        "negate": true
+      },
+      {
+        "id": "7.n7",
+        "name": "elements_overlap_at_some_size",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Stacking or overlap issues appear at some viewport size.",
+        "reasoning": "No unintended layout-element overlap was observed; the onboarding panel is an intentional overlay. Evidence: desktop-responsive.png, tablet-responsive.png, mobile-responsive.png",
+        "negate": true
+      },
+      {
+        "id": "7.n8",
+        "name": "required_mobile_touch_actions_missing",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Touch actions are not available on mobile where the spec requires them.",
+        "reasoning": "No required mobile-only touch action was specified or observed missing. Evidence: mobile-responsive.png",
+        "negate": true
+      },
+      {
+        "id": "7.n9",
+        "name": "fixed_size_media_overflows",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Images, charts, or canvases use a static size and overflow the viewport.",
+        "reasoning": "The graph remains contained within the responsive content column on mobile. Evidence: mobile-full-responsive.png",
+        "negate": true
+      },
+      {
+        "id": "7.n10",
+        "name": "controls_disappear_at_sizes",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Controls disappear at specific sizes.",
+        "reasoning": "Primary header and editor controls remain present at desktop, tablet, and mobile widths, with wrapping on smaller screens. Evidence: desktop-responsive.png, tablet-responsive.png, mobile-responsive.png",
+        "negate": true
+      },
+      {
+        "id": "responsiveness.catchall",
+        "name": "responsiveness_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "No additional significant responsive defect beyond the explicitly identified small controls and onboarding overlay was observed. Evidence: mobile-responsive.png",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"layout_adapts_desktop_to_mobile\":{\"score\":\"yes\",\"reasoning\":\"Desktop uses a two-column layout; at 375px the interface stacks vertically and remains usable. Evidence: desktop-responsive.png, mobile-responsive.png\"},\"mobile_tap_targets_are_large_enough\":{\"score\":\"no\",\"reasoning\":\"FAIL: Several mobile controls are narrower than 44px, including A\u2212 (38.4px), A+ (39.4px), and the keyboard button (40px). Evidence: mobile-responsive.png\"},\"typography_resizes_across_breakpoints\":{\"score\":\"yes\",\"reasoning\":\"The h1 changes from 21.6px desktop to 16.8px mobile, while body text remains readable at 16px. Evidence: desktop-responsive.png, mobile-responsive.png\"},\"content_avoids_clipping_and_overflow\":{\"score\":\"yes\",\"reasoning\":\"Measured document width does not exceed the viewport at mobile, and content visibly fits within the stacked layout. Evidence: mobile-responsive.png\"},\"chrome_adapts_to_small_screens\":{\"score\":\"yes\",\"reasoning\":\"Header controls wrap across rows on mobile and remain visible. Evidence: mobile-responsive.png\"},\"stacking_reflows_logically\":{\"score\":\"yes\",\"reasoning\":\"Editor content appears first, followed by graph, excerpts, annotations, and hypotheses in a logical vertical order. Evidence: mobile-full-responsive.png\"},\"mobile_touch_gestures_work\":{\"score\":\"yes\",\"reasoning\":\"A real tap on the mobile Show editor control completed successfully; no swipe-specific interaction is present. Evidence: mobile-responsive.png\"},\"small_screens_avoid_horizontal_scroll\":{\"score\":\"yes\",\"reasoning\":\"At 375px, measured document scroll width is 360px, so no horizontal overflow is present. Evidence: mobile-responsive.png\"},\"media_and_canvases_resize\":{\"score\":\"yes\",\"reasoning\":\"The code graph scales down to fit the mobile content column without overflowing. Evidence: mobile-full-responsive.png\"},\"fixed_controls_remain_accessible\":{\"score\":\"yes\",\"reasoning\":\"The fixed onboarding panel remains within the mobile viewport and its controls are reachable. Evidence: mobile-responsive.png\"},\"layout_breaks_at_breakpoints\":{\"score\":\"no\",\"reasoning\":\"No breakpoint layout failure was observed at desktop, tablet, or mobile widths. Evidence: desktop-responsive.png, tablet-responsive.png, mobile-responsive.png\"},\"mobile_controls_too_small_or_misaligned\":{\"score\":\"yes\",\"reasoning\":\"FAIL: A\u2212, A+, and the keyboard shortcut control are visibly narrower than the surrounding 44px controls. Evidence: mobile-responsive.png\"},\"text_too_small_on_devices\":{\"score\":\"no\",\"reasoning\":\"Mobile body text measures 16px and remains readable; no generally undersized device typography was observed. Evidence: mobile-responsive.png\"},\"content_cropped_or_unnecessary_scrollbars\":{\"score\":\"no\",\"reasoning\":\"Only normal vertical scrolling for the long editor page is present; no unnecessary horizontal scrollbar or cropped main content was observed. Evidence: mobile-full-responsive.png\"},\"sidebar_or_menu_breaks_by_width\":{\"score\":\"no\",\"reasoning\":\"The editor/sidebar region reflows into a full-width stacked section rather than disappearing or becoming unresponsive. Evidence: tablet-responsive.png, mobile-responsive.png\"},\"fixed_positions_obscure_content\":{\"score\":\"yes\",\"reasoning\":\"FAIL: The fixed onboarding panel visibly covers editor content near the bottom of the mobile viewport. Evidence: mobile-responsive.png\"},\"elements_overlap_at_some_size\":{\"score\":\"no\",\"reasoning\":\"No unintended layout-element overlap was observed; the onboarding panel is an intentional overlay. Evidence: desktop-responsive.png, tablet-responsive.png, mobile-responsive.png\"},\"required_mobile_touch_actions_missing\":{\"score\":\"no\",\"reasoning\":\"No required mobile-only touch action was specified or observed missing. Evidence: mobile-responsive.png\"},\"fixed_size_media_overflows\":{\"score\":\"no\",\"reasoning\":\"The graph remains contained within the responsive content column on mobile. Evidence: mobile-full-responsive.png\"},\"controls_disappear_at_sizes\":{\"score\":\"no\",\"reasoning\":\"Primary header and editor controls remain present at desktop, tablet, and mobile widths, with wrapping on smaller screens. Evidence: desktop-responsive.png, tablet-responsive.png, mobile-responsive.png\"},\"responsiveness_catchall\":{\"score\":\"no\",\"reasoning\":\"No additional significant responsive defect beyond the explicitly identified small controls and onboarding overlay was observed. Evidence: mobile-responsive.png\"} }",
+    "cost_usd": 0.1802208
+  },
+  "technical": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "interleave_webmcp",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Interleave UI/WebMCP parse, candidate, path, hypothesis, annotation, and transfer operations \u2192 all linked state and checksums agree.",
+        "reasoning": "UI and WebMCP operations interleaved successfully: parsed frames, mapped candidates, produced route n1\u2192n2\u2192n3, added annotation, saved valid hypothesis \u201cDispatch path,\u201d and export/copy returned matching linked state. Evidence: interleave_webmcp-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"score\":\"yes\",\"reasoning\":\"UI and WebMCP operations interleaved successfully: parsed frames, mapped candidates, produced route n1\u2192n2\u2192n3, added annotation, saved valid hypothesis \u201cDispatch path,\u201d and export/copy returned matching linked state. Evidence: interleave_webmcp-shared.png\"}",
+    "cost_usd": 0.18848240000000002
+  },
+  "user_flows": {
+    "score": 0.8571,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "create_flow_updates_all_surfaces",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create flow: a new item can be created via the UI and appears everywhere it should.",
+        "reasoning": "A mapped route was saved as \u201cRoot cause path (valid)\u201d and appeared in the Hypotheses list. Evidence: hypothesis-saved-shared.png"
+      },
+      {
+        "id": "6.2",
+        "name": "invalid_create_shows_inline_validation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Create flow: invalid submission triggers immediate inline validation.",
+        "reasoning": "FAIL: Submitting the empty hypothesis form left the dialog open without any inline validation message. Evidence: invalid-hypothesis-shared.png"
+      },
+      {
+        "id": "6.3",
+        "name": "edit_flow_updates_related_displays",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edit flow: edits save and update all related displays.",
+        "reasoning": "Editing the Stack Trace immediately reparsed the frames and updated the visible frame list and diagnostics. Evidence: edited-trace-shared.png"
+      },
+      {
+        "id": "6.4",
+        "name": "delete_flow_updates_all_surfaces",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Delete flow: the item is removed from all lists/panes after deletion.",
+        "reasoning": "Deleting the saved hypothesis removed it from the Hypotheses list. Evidence: hypothesis-empty-shared.png"
+      },
+      {
+        "id": "6.5",
+        "name": "view_switch_retains_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "View/mode switch: the view changes properly, with state retained.",
+        "reasoning": "Hiding and reopening the editor retained the edited trace and its reparsed frames. Evidence: view-switch-retained-shared.png"
+      },
+      {
+        "id": "6.6",
+        "name": "last_delete_reveals_empty_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edge: after the last delete, the empty state is clear and visible.",
+        "reasoning": "After deleting the only hypothesis, the clear empty-state message \u201cNo hypotheses saved yet\u201d appeared. Evidence: hypothesis-empty-shared.png"
+      },
+      {
+        "id": "6.7",
+        "name": "filters_update_all_surfaces",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edge: filtering reveals/hides items everywhere as expected.",
+        "reasoning": "No filtering UI/content class is offered, so no filter inconsistency was observed. Evidence: initial-shared.png"
+      },
+      {
+        "id": "6.8",
+        "name": "collapsible_chrome_preserves_workflow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity.",
+        "reasoning": "The editor could be hidden and reopened, with the edited workflow state preserved. Evidence: view-switch-retained-shared.png"
+      },
+      {
+        "id": "6.9",
+        "name": "overlays_support_expected_flows",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Overlays behave as expected for details, edits, confirmations.",
+        "reasoning": "The save dialog accepted a valid name and could be canceled; the guided-tour overlay also had a working Skip tour exit. Evidence: hypothesis-saved-shared.png"
+      },
+      {
+        "id": "6.10",
+        "name": "flow_recovers_without_reload",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Recovery: navigation loss or error can be corrected without a reload (no dead ends).",
+        "reasoning": "The blocking tour overlay was dismissed through Skip tour and the workflow continued without reload. Evidence: hypothesis-empty-shared.png"
+      },
+      {
+        "id": "6.n1",
+        "name": "primary_flows_unavailable_from_ui",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI.",
+        "reasoning": "Create/save and delete controls were visibly available in the Hypotheses section. Evidence: hypothesis-saved-shared.png",
+        "negate": true
+      },
+      {
+        "id": "6.n2",
+        "name": "new_items_missing_or_duplicated",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "New items fail to show up or duplicate.",
+        "reasoning": "The newly saved hypothesis appeared exactly once in the list. Evidence: hypothesis-saved-shared.png",
+        "negate": true
+      },
+      {
+        "id": "6.n3",
+        "name": "state_changes_desync_displays",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "State changes are not synced across displays.",
+        "reasoning": "Mapping updated the route and source excerpt together; editing updated the parser and frame diagnostics together. Evidence: route-mapped-shared.png",
+        "negate": true
+      },
+      {
+        "id": "6.n4",
+        "name": "view_switch_breaks_or_loses_selection",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "View/mode switching breaks layout or loses selection.",
+        "reasoning": "Switching editor visibility did not break layout or lose the edited trace. Evidence: view-switch-retained-shared.png",
+        "negate": true
+      },
+      {
+        "id": "6.n5",
+        "name": "empty_collection_breaks_ui",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Emptying the collection produces broken or missing UI.",
+        "reasoning": "Deleting the last hypothesis produced a functioning, explicit empty state. Evidence: hypothesis-empty-shared.png",
+        "negate": true
+      },
+      {
+        "id": "6.n6",
+        "name": "filtered_views_disagree",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Filtered views disagree with each other about what is visible.",
+        "reasoning": "No filtering view was offered and no disagreement between filtered displays was observed. Evidence: initial-shared.png",
+        "negate": true
+      },
+      {
+        "id": "6.n7",
+        "name": "collapsed_chrome_cannot_reopen",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Collapsed chrome can't be re-opened.",
+        "reasoning": "The hidden editor was successfully reopened. Evidence: view-switch-retained-shared.png",
+        "negate": true
+      },
+      {
+        "id": "6.n8",
+        "name": "overlay_blocks_navigation",
+        "value": 0.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Overlays block navigation with no exit option.",
+        "reasoning": "The guided-tour overlay intercepted a real delete click until Skip tour was used, visibly blocking the underlying workflow. Evidence: initial-shared.png",
+        "negate": true
+      },
+      {
+        "id": "6.n9",
+        "name": "failed_flow_lacks_feedback",
+        "value": 0.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A failed flow provides no user feedback.",
+        "reasoning": "FAIL: Empty hypothesis submission failed with no visible inline error or explanatory feedback. Evidence: invalid-hypothesis-shared.png",
+        "negate": true
+      },
+      {
+        "id": "6.n10",
+        "name": "navigation_dead_end_requires_reload",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Navigation dead ends or requires reload for recovery.",
+        "reasoning": "The workflow recovered by dismissing the overlay and continuing without a reload. Evidence: hypothesis-empty-shared.png",
+        "negate": true
+      },
+      {
+        "id": "user_flows.catchall",
+        "name": "user_flows_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "No additional significant defect beyond the covered validation and overlay-blocking issues was observed. Evidence: edited-trace-shared.png",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"create_flow_updates_all_surfaces\":{\"score\":\"yes\",\"reasoning\":\"A mapped route was saved as \u201cRoot cause path (valid)\u201d and appeared in the Hypotheses list. Evidence: hypothesis-saved-shared.png\"},\"invalid_create_shows_inline_validation\":{\"score\":\"no\",\"reasoning\":\"FAIL: Submitting the empty hypothesis form left the dialog open without any inline validation message. Evidence: invalid-hypothesis-shared.png\"},\"edit_flow_updates_related_displays\":{\"score\":\"yes\",\"reasoning\":\"Editing the Stack Trace immediately reparsed the frames and updated the visible frame list and diagnostics. Evidence: edited-trace-shared.png\"},\"delete_flow_updates_all_surfaces\":{\"score\":\"yes\",\"reasoning\":\"Deleting the saved hypothesis removed it from the Hypotheses list. Evidence: hypothesis-empty-shared.png\"},\"view_switch_retains_state\":{\"score\":\"yes\",\"reasoning\":\"Hiding and reopening the editor retained the edited trace and its reparsed frames. Evidence: view-switch-retained-shared.png\"},\"last_delete_reveals_empty_state\":{\"score\":\"yes\",\"reasoning\":\"After deleting the only hypothesis, the clear empty-state message \u201cNo hypotheses saved yet\u201d appeared. Evidence: hypothesis-empty-shared.png\"},\"filters_update_all_surfaces\":{\"score\":\"yes\",\"reasoning\":\"No filtering UI/content class is offered, so no filter inconsistency was observed. Evidence: initial-shared.png\"},\"collapsible_chrome_preserves_workflow\":{\"score\":\"yes\",\"reasoning\":\"The editor could be hidden and reopened, with the edited workflow state preserved. Evidence: view-switch-retained-shared.png\"},\"overlays_support_expected_flows\":{\"score\":\"yes\",\"reasoning\":\"The save dialog accepted a valid name and could be canceled; the guided-tour overlay also had a working Skip tour exit. Evidence: hypothesis-saved-shared.png\"},\"flow_recovers_without_reload\":{\"score\":\"yes\",\"reasoning\":\"The blocking tour overlay was dismissed through Skip tour and the workflow continued without reload. Evidence: hypothesis-empty-shared.png\"},\"primary_flows_unavailable_from_ui\":{\"score\":\"no\",\"reasoning\":\"Create/save and delete controls were visibly available in the Hypotheses section. Evidence: hypothesis-saved-shared.png\"},\"new_items_missing_or_duplicated\":{\"score\":\"no\",\"reasoning\":\"The newly saved hypothesis appeared exactly once in the list. Evidence: hypothesis-saved-shared.png\"},\"state_changes_desync_displays\":{\"score\":\"no\",\"reasoning\":\"Mapping updated the route and source excerpt together; editing updated the parser and frame diagnostics together. Evidence: route-mapped-shared.png\"},\"view_switch_breaks_or_loses_selection\":{\"score\":\"no\",\"reasoning\":\"Switching editor visibility did not break layout or lose the edited trace. Evidence: view-switch-retained-shared.png\"},\"empty_collection_breaks_ui\":{\"score\":\"no\",\"reasoning\":\"Deleting the last hypothesis produced a functioning, explicit empty state. Evidence: hypothesis-empty-shared.png\"},\"filtered_views_disagree\":{\"score\":\"no\",\"reasoning\":\"No filtering view was offered and no disagreement between filtered displays was observed. Evidence: initial-shared.png\"},\"collapsed_chrome_cannot_reopen\":{\"score\":\"no\",\"reasoning\":\"The hidden editor was successfully reopened. Evidence: view-switch-retained-shared.png\"},\"overlay_blocks_navigation\":{\"score\":\"yes\",\"reasoning\":\"The guided-tour overlay intercepted a real delete click until Skip tour was used, visibly blocking the underlying workflow. Evidence: initial-shared.png\"},\"failed_flow_lacks_feedback\":{\"score\":\"yes\",\"reasoning\":\"FAIL: Empty hypothesis submission failed with no visible inline error or explanatory feedback. Evidence: invalid-hypothesis-shared.png\"},\"navigation_dead_end_requires_reload\":{\"score\":\"no\",\"reasoning\":\"The workflow recovered by dismissing the overlay and continuing without a reload. Evidence: hypothesis-empty-shared.png\"},\"user_flows_catchall\":{\"score\":\"no\",\"reasoning\":\"No additional significant defect beyond the covered validation and overlay-blocking issues was observed. Evidence: edited-trace-shared.png\"}}",
+    "cost_usd": 0.28141099999999997
+  },
+  "visual_design": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "inspect_states",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Inspect ambiguous, pinned, invalid, selected, compared, and resolved states \u2192 stack order, graph direction, and evidence hierarchy remain legible.",
+        "reasoning": "Observed ordered frames with noise, unresolved, mapped, and invalid diagnostics; committed route direction n1 \u2192 n2 \u2192 n3; selected node/excerpt state; and side-by-side hypothesis comparison with differing evidence clearly legible. Evidence: inspect_states-route.png, inspect_states-selected.png, inspect_states-compared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"score\":\"yes\",\"reasoning\":\"Observed ordered frames with noise, unresolved, mapped, and invalid diagnostics; committed route direction n1 \u2192 n2 \u2192 n3; selected node/excerpt state; and side-by-side hypothesis comparison with differing evidence clearly legible. Evidence: inspect_states-route.png, inspect_states-selected.png, inspect_states-compared.png\"}",
+    "cost_usd": 0.21997019999999998
+  },
+  "writing": {
+    "score": 0.8393,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "headings_use_consistent_capitalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders headings and section titles, they use consistent capitalization (one convention \u2014 title case or sentence case \u2014 throughout).",
+        "reasoning": "Headings consistently use title case throughout the rendered app. Evidence: copy-desktop-shared.png"
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_labels",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible.",
+        "reasoning": "FAIL: The guided tour uses the generic action label \u201cNext\u201d where a more specific label could be used. Evidence: copy-desktop-shared.png"
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid').",
+        "reasoning": "FAIL: The unresolved/error state identifies \u201casdf\u201d as unresolved but provides no corrective guidance or fix. Evidence: copy-invalid-shared.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders empty states, the copy explains what belongs there and how to add it.",
+        "reasoning": "Empty states explain both what is missing and how to proceed, such as mapping candidates or adding annotations. Evidence: copy-desktop-shared.png"
+      },
+      {
+        "id": "15.5",
+        "name": "body_copy_is_well_written",
+        "value": 0.75,
+        "raw": 4,
+        "weight": 0.5,
+        "description": "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors.",
+        "reasoning": "Copy is generally clear and grammatical, with a minor visible spacing defect in \u201cf8 (frame)wrapper.\u201d Evidence: copy-desktop-shared.png"
+      },
+      {
+        "id": "15.6",
+        "name": "terminology_is_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there).",
+        "reasoning": "Core concepts use consistent terms such as frames, candidates, routes, nodes, and annotations. Evidence: copy-desktop-shared.png"
+      },
+      {
+        "id": "15.7",
+        "name": "numbers_dates_and_units_are_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled).",
+        "reasoning": "Confidence percentages, line numbers, node/edge counts, and weights are formatted consistently and labeled appropriately. Evidence: copy-desktop-shared.png"
+      },
+      {
+        "id": "15.8",
+        "name": "success_messages_are_specific",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations.",
+        "reasoning": "The copy confirmation states exactly what happened: \u201cSession JSON copied to clipboard.\u201d Evidence: copy-copy-result-shared.png"
+      },
+      {
+        "id": "15.n1",
+        "name": "placeholder_copy_is_visible",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI.",
+        "reasoning": "No Lorem ipsum, TODO, template variables, or other shipped placeholder text was observed. Evidence: copy-desktop-shared.png",
+        "negate": true
+      },
+      {
+        "id": "15.n2",
+        "name": "prominent_copy_has_errors",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons.",
+        "reasoning": "No spelling or grammatical errors were observed in prominent headings, hero copy, or primary actions. Evidence: copy-desktop-shared.png",
+        "negate": true
+      },
+      {
+        "id": "15.n3",
+        "name": "concept_names_are_inconsistent",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "The same concept is named inconsistently across surfaces.",
+        "reasoning": "No inconsistent naming of the same concept across visible surfaces was observed. Evidence: copy-desktop-shared.png",
+        "negate": true
+      },
+      {
+        "id": "15.n4",
+        "name": "copy_is_truncated_or_overflowing",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Truncated or overflowing text renders copy unreadable.",
+        "reasoning": "Rendered copy remains readable; no visible truncation or overflow was observed. Evidence: copy-desktop-shared.png",
+        "negate": true
+      },
+      {
+        "id": "writing.catchall",
+        "name": "writing_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable defect in rendered copy quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "No significant additional copy-quality defect beyond the minor spacing issue already noted was observed. Evidence: copy-desktop-shared.png",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"headings_use_consistent_capitalization\":{\"score\":\"yes\",\"reasoning\":\"Headings consistently use title case throughout the rendered app. Evidence: copy-desktop-shared.png\"},\"actions_use_specific_labels\":{\"score\":\"no\",\"reasoning\":\"FAIL: The guided tour uses the generic action label \u201cNext\u201d where a more specific label could be used. Evidence: copy-desktop-shared.png\"},\"errors_name_problem_and_fix\":{\"score\":\"no\",\"reasoning\":\"FAIL: The unresolved/error state identifies \u201casdf\u201d as unresolved but provides no corrective guidance or fix. Evidence: copy-invalid-shared.png\"},\"empty_states_explain_next_step\":{\"score\":\"yes\",\"reasoning\":\"Empty states explain both what is missing and how to proceed, such as mapping candidates or adding annotations. Evidence: copy-desktop-shared.png\"},\"body_copy_is_well_written\":{\"score\":4,\"reasoning\":\"Copy is generally clear and grammatical, with a minor visible spacing defect in \u201cf8 (frame)wrapper.\u201d Evidence: copy-desktop-shared.png\"},\"terminology_is_consistent\":{\"score\":\"yes\",\"reasoning\":\"Core concepts use consistent terms such as frames, candidates, routes, nodes, and annotations. Evidence: copy-desktop-shared.png\"},\"numbers_dates_and_units_are_consistent\":{\"score\":\"yes\",\"reasoning\":\"Confidence percentages, line numbers, node/edge counts, and weights are formatted consistently and labeled appropriately. Evidence: copy-desktop-shared.png\"},\"success_messages_are_specific\":{\"score\":\"yes\",\"reasoning\":\"The copy confirmation states exactly what happened: \u201cSession JSON copied to clipboard.\u201d Evidence: copy-copy-result-shared.png\"},\"placeholder_copy_is_visible\":{\"score\":\"no\",\"reasoning\":\"No Lorem ipsum, TODO, template variables, or other shipped placeholder text was observed. Evidence: copy-desktop-shared.png\"},\"prominent_copy_has_errors\":{\"score\":\"no\",\"reasoning\":\"No spelling or grammatical errors were observed in prominent headings, hero copy, or primary actions. Evidence: copy-desktop-shared.png\"},\"concept_names_are_inconsistent\":{\"score\":\"no\",\"reasoning\":\"No inconsistent naming of the same concept across visible surfaces was observed. Evidence: copy-desktop-shared.png\"},\"copy_is_truncated_or_overflowing\":{\"score\":\"no\",\"reasoning\":\"Rendered copy remains readable; no visible truncation or overflow was observed. Evidence: copy-desktop-shared.png\"},\"writing_catchall\":{\"score\":\"no\",\"reasoning\":\"No significant additional copy-quality defect beyond the minor spacing issue already noted was observed. Evidence: copy-desktop-shared.png\"}}",
+    "cost_usd": 0.172823
+  }
+}

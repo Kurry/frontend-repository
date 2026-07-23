@@ -197,9 +197,9 @@ kbd {
 /* ---------------------------------------------------------------------------
    Catalog controls, chips, insight strip
 --------------------------------------------------------------------------- */
-.catalog-controls { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 12px; }
-.catalog-controls .cds--search { flex: 1 1 260px; }
-.catalog-controls .cds--select { flex: 0 1 210px; }
+.catalog-controls { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 12px; max-width: 100%; }
+.catalog-controls .cds--search { flex: 1 1 200px; max-width: 100%; }
+.catalog-controls .cds--select { flex: 1 1 140px; max-width: 100%; }
 .catalog-controls .cds--search-input, .catalog-controls .cds--select-input {
   background: var(--ink-1); border-color: var(--line-strong); color: var(--text-1);
 }
@@ -273,8 +273,14 @@ kbd {
 .name-copy { display: flex; flex-direction: column; line-height: 1.2; }
 .name-copy strong { color: var(--text-1); font-size: 13px; font-weight: 600; }
 .name-copy small { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal); }
-.model-departing .name-copy strong { text-decoration: line-through; text-decoration-color: var(--red); color: var(--text-3); }
+.model-departing, .model-departing td, .model-departing strong {
+  text-decoration: line-through !important;
+  text-decoration-color: var(--red) !important;
+  transition: opacity 4.5s ease, text-decoration 4.5s ease;
+}
+.model-departing .name-copy strong { color: var(--text-3); }
 .model-departing .name-copy small { color: var(--red); }
+.rollup-row { border-bottom: 1px solid var(--line) !important; }
 
 .provider-cell { display: flex; flex-direction: column; gap: 2px; }
 .provider-name { color: var(--text-2); font-size: 12.5px; }

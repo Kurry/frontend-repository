@@ -1,0 +1,2596 @@
+{
+  "accessibility": {
+    "score": 0.8,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "controls_are_keyboard_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "All interactive controls \u2014 navigation entries, credential fields and show/hide toggles, filter chips, triage accept/reject/undo actions, stage retry and pause/resume controls, and package copy/download controls \u2014 are keyboard accessible with Tab, Shift+Tab, Enter, or Space.",
+        "reasoning": "Native buttons, inputs, selects, and textareas were rendered for the navigation, triage, pipeline, and package controls. Evidence: initial-shared.png; runs-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "modals_manage_focus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Connections slide-over, the reject-reason chooser, the delete confirmation, and the command palette trap focus while open, close on Escape, and return focus to the control that opened them.",
+        "reasoning": "FAIL: Connections and reject-reason dialogs returned focus on Escape, but delete confirmation and command palette focus behavior were not fully verified. Evidence: connections-modal.png; reject-modal.png"
+      },
+      {
+        "id": "1.3",
+        "name": "images_and_icons_have_alt_text",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Icons used in the navigation rail, credential rows, stage statuses, triage actions, and package controls have descriptive accessible names or alt text.",
+        "reasoning": "Rendered icons were aria-hidden within controls that exposed descriptive accessible names, such as navigation, Connections, show-token, and package actions. Evidence: connections-fields.png; runs-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "feedback_uses_live_regions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A stage entering the failed state, a run completing, and a credential connection status change are each conveyed both visually and via an ARIA live region.",
+        "reasoning": "FAIL: Run completion and credential failure were conveyed through live regions, but a failed-stage transition was not observed. Evidence: runs-shared.png; credential-status.png"
+      },
+      {
+        "id": "1.5",
+        "name": "forms_have_explicit_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "All form elements \u2014 the credential fields, the AI base URL field, the Add repository field, and the filter controls \u2014 use explicit label elements, and the masked-input show/hide toggles carry accessible names.",
+        "reasoning": "Credential fields, AI base URL, package import, repository/difficulty/language filters, and masked-input toggles had explicit labels or accessible names. Evidence: connections-fields.png; library-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "headings_follow_logical_order",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Headings across Candidates, Triage, Runs, and Library follow a logical order with no skips, such as H1 to H2 to H3.",
+        "reasoning": "Observed headings use H1, H2, and H3 levels without skipped levels across Candidates, Triage, Runs, and Library. Evidence: initial-shared.png; triage-current.png; runs-shared.png; library-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "landmark_navigation_is_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Skip-to-content or landmark navigation is present around the top bar, navigation rail, and main console area.",
+        "reasoning": "The rendered app includes banner, complementary navigation rail, named nav landmark, and main landmark. Evidence: initial-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "text_and_controls_have_contrast",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Mode indicator chips, stage status labels, reject-reason badges, and body text have sufficient color contrast against their backgrounds.",
+        "reasoning": "Mode/status chips, pipeline stage labels, badges, and body text were visibly readable against their backgrounds in the rendered desktop UI. Evidence: runs-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "semantic_html_roles_are_used",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Semantic HTML roles such as nav, main, and button are used for the rail, main view, and interactive controls.",
+        "reasoning": "The rendered structure uses native buttons, nav, main, banner, complementary, regions, and dialog roles. Evidence: initial-shared.png; connections-modal.png"
+      },
+      {
+        "id": "1.10",
+        "name": "reduced_motion_is_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, streaming text still appears but transitions apply instantly and nothing pulses or slides, matching the motion specification.",
+        "reasoning": "In the reduced-motion browser, prefers-reduced-motion matched true, streaming pipeline text appeared, and computed transition/animation durations were absent while running. Evidence: reduced-run.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"controls_are_keyboard_accessible\":{\"score\":\"yes\",\"reasoning\":\"Native buttons, inputs, selects, and textareas were rendered for the navigation, triage, pipeline, and package controls. Evidence: initial-shared.png; runs-shared.png\"},\"modals_manage_focus\":{\"score\":\"no\",\"reasoning\":\"FAIL: Connections and reject-reason dialogs returned focus on Escape, but delete confirmation and command palette focus behavior were not fully verified. Evidence: connections-modal.png; reject-modal.png\"},\"images_and_icons_have_alt_text\":{\"score\":\"yes\",\"reasoning\":\"Rendered icons were aria-hidden within controls that exposed descriptive accessible names, such as navigation, Connections, show-token, and package actions. Evidence: connections-fields.png; runs-shared.png\"},\"feedback_uses_live_regions\":{\"score\":\"no\",\"reasoning\":\"FAIL: Run completion and credential failure were conveyed through live regions, but a failed-stage transition was not observed. Evidence: runs-shared.png; credential-status.png\"},\"forms_have_explicit_labels\":{\"score\":\"yes\",\"reasoning\":\"Credential fields, AI base URL, package import, repository/difficulty/language filters, and masked-input toggles had explicit labels or accessible names. Evidence: connections-fields.png; library-shared.png\"},\"headings_follow_logical_order\":{\"score\":\"yes\",\"reasoning\":\"Observed headings use H1, H2, and H3 levels without skipped levels across Candidates, Triage, Runs, and Library. Evidence: initial-shared.png; triage-current.png; runs-shared.png; library-shared.png\"},\"landmark_navigation_is_present\":{\"score\":\"yes\",\"reasoning\":\"The rendered app includes banner, complementary navigation rail, named nav landmark, and main landmark. Evidence: initial-shared.png\"},\"text_and_controls_have_contrast\":{\"score\":\"yes\",\"reasoning\":\"Mode/status chips, pipeline stage labels, badges, and body text were visibly readable against their backgrounds in the rendered desktop UI. Evidence: runs-shared.png\"},\"semantic_html_roles_are_used\":{\"score\":\"yes\",\"reasoning\":\"The rendered structure uses native buttons, nav, main, banner, complementary, regions, and dialog roles. Evidence: initial-shared.png; connections-modal.png\"},\"reduced_motion_is_respected\":{\"score\":\"yes\",\"reasoning\":\"In the reduced-motion browser, prefers-reduced-motion matched true, streaming pipeline text appeared, and computed transition/animation durations were absent while running. Evidence: reduced-run.png\"}}",
+    "cost_usd": 0.3145054
+  },
+  "behavioral": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_reload_round_trip",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "In demo mode: set the source-file bounds to 4 and 9, reject one PR with the docs-only reason, run one clean seeded PR to a completed package, and dismiss one coachmark, then reload the page. The bounds, the triage placement with its reason badge, the produced package with its content, and the coachmark dismissal all survive the reload, while both credential rows show Disconnected and the mode indicator reads Demo data \u2014 never a mix of kept and reverted facets among the persisted set",
+        "reasoning": "Reload preserved bounds 4\u20139, Demo data, GitHub/AI off, triage cards with Docs only and No linked issue badges, and the completed driftline #58 package; the dismissed connection coachmark stayed absent. Evidence: multi_facet_reload_round_trip-candidates.png, multi_facet_reload_round_trip-triage.png"
+      },
+      {
+        "id": "14.2",
+        "name": "filter_bounds_derive_from_live_data",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Note the PRs visible for driftline at the default bounds 3 to 10, tighten the source-file bounds to 5 and 7 and confirm the visible list shrinks to exactly the PRs whose displayed non-test source-file counts fall between 5 and 7, then restore 3 and 10 and confirm the original list returns exactly \u2014 proving the filter recomputes from live data rather than swapping hardcoded lists",
+        "reasoning": "Default 3\u201310 showed 7 PRs; changing to 5\u20137 showed exactly #58 (6), #54 (5), and #46 (7); restoring 3\u201310 returned the original seven. Evidence: filter_bounds_derive_from_live_data-shared.png"
+      },
+      {
+        "id": "14.3",
+        "name": "triage_breakdown_tracks_reasons",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Reject one PR with the docs-only reason and another PR with the no-linked-issue reason: the per-reason breakdown increments exactly the docs-only row after the first action and exactly the no-linked-issue row after the second, while the other reason rows stay unchanged \u2014 the breakdown is sensitive to which reason was chosen",
+        "reasoning": "After real UI rejection actions, Docs only and No linked issue each incremented to 1 while the other reason rows remained 0. Evidence: triage_breakdown_tracks_reasons-final.png"
+      },
+      {
+        "id": "14.4",
+        "name": "run_echoes_into_library_and_palette",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Complete a pipeline run for an accepted PR, then without reloading open the Library and the command palette: the new package appears as a library entry with matching repository and PR number, and searching the palette by that PR number surfaces the package result",
+        "reasoning": "Completed driftline #58 appeared in Library, and searching the command palette for 58 returned both the PR and matching library package. Evidence: run_echoes_into_library_and_palette-shared.png"
+      },
+      {
+        "id": "14.5",
+        "name": "count_deltas_are_exact",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Measure the accepted count immediately before and immediately after accepting one PR (delta exactly plus one), and the library entry count immediately before and immediately after deleting one package (delta exactly minus one); the header stats and the list contents agree at both measurement points with no off-by-one or lagging counter",
+        "reasoning": "Accepted changed from 3 to 4 after accepting one PR; deleting a library package changed the visible library from 3 entries to 2, with list contents matching both states. Evidence: count_deltas_are_exact-shared.png"
+      },
+      {
+        "id": "14.6",
+        "name": "different_prs_produce_different_packages",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Run the pipeline on two different seeded PRs from different repositories: the two packages differ in the ways the inputs dictate \u2014 different PR numbers, base SHAs, and source-file lists in the metadata and patch note, and instruction text reflecting each PR's own linked issue or title rather than shared boilerplate",
+        "reasoning": "Completed packages for driftline #58 and petrel #31 had different PR numbers, base SHAs, source-file lists, issue/title-specific instructions, and repository-specific patch notes. Evidence: different_prs_produce_different_packages-shared.png"
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_run_and_triage_stay_coherent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Start a pipeline run, switch to the Triage view while Evaluate is still streaming and reject one PR with a reason, then return to the Runs view: the run's stages and streamed output are intact and progressing (or paused exactly where left), and the triage placement and stats change made mid-run is retained \u2014 neither flow corrupted the other",
+        "reasoning": "While driftline #57 Evaluate was streaming, Triage accepted a Docs only rejection; returning to Runs preserved the run\u2019s Fetch/Evaluate/Generate/Package output and completion, while Triage retained the rejection and updated breakdown. Evidence: interleaved_run_and_triage_stay_coherent-runs.png, interleaved_run_and_triage_stay_coherent-triage.png"
+      },
+      {
+        "id": "14.8",
+        "name": "library_empty_then_repopulated",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Delete every library package (including the seeded examples) and confirm the library shows its empty state with the entry count at zero, then complete a new pipeline run and confirm the library repopulates with exactly the new package, its filters and counts tracking the transition in both directions",
+        "reasoning": "After deleting all visible packages, Library showed No packages match with no active filters; a new completed driftline #58 run then repopulated it with exactly one package. Evidence: library_empty_then_repopulated-shared.png"
+      },
+      {
+        "id": "14.9",
+        "name": "export_import_round_trip_preserves_package",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Complete a demo pipeline run, Download bundle the TaskPackageBundle JSON, delete that library entry, Import the downloaded JSON, and confirm the restored entry's viewer shows the same instruction text, repo, pr_number, difficulty, and patch_note as before the delete \u2014 proving export and import share one field contract",
+        "reasoning": "Downloaded the driftline #58 bundle, deleted the entry, imported the downloaded JSON, and observed matching instruction, repository/PR, medium difficulty, metadata, and patch note. Evidence: export_import_round_trip_preserves_package-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"multi_facet_reload_round_trip\":{\"score\":\"yes\",\"reasoning\":\"Reload preserved bounds 4\u20139, Demo data, GitHub/AI off, triage cards with Docs only and No linked issue badges, and the completed driftline #58 package; the dismissed connection coachmark stayed absent. Evidence: multi_facet_reload_round_trip-candidates.png, multi_facet_reload_round_trip-triage.png\"},\"filter_bounds_derive_from_live_data\":{\"score\":\"yes\",\"reasoning\":\"Default 3\u201310 showed 7 PRs; changing to 5\u20137 showed exactly #58 (6), #54 (5), and #46 (7); restoring 3\u201310 returned the original seven. Evidence: filter_bounds_derive_from_live_data-shared.png\"},\"triage_breakdown_tracks_reasons\":{\"score\":\"yes\",\"reasoning\":\"After real UI rejection actions, Docs only and No linked issue each incremented to 1 while the other reason rows remained 0. Evidence: triage_breakdown_tracks_reasons-final.png\"},\"run_echoes_into_library_and_palette\":{\"score\":\"yes\",\"reasoning\":\"Completed driftline #58 appeared in Library, and searching the command palette for 58 returned both the PR and matching library package. Evidence: run_echoes_into_library_and_palette-shared.png\"},\"count_deltas_are_exact\":{\"score\":\"yes\",\"reasoning\":\"Accepted changed from 3 to 4 after accepting one PR; deleting a library package changed the visible library from 3 entries to 2, with list contents matching both states. Evidence: count_deltas_are_exact-shared.png\"},\"different_prs_produce_different_packages\":{\"score\":\"yes\",\"reasoning\":\"Completed packages for driftline #58 and petrel #31 had different PR numbers, base SHAs, source-file lists, issue/title-specific instructions, and repository-specific patch notes. Evidence: different_prs_produce_different_packages-shared.png\"},\"interleaved_run_and_triage_stay_coherent\":{\"score\":\"yes\",\"reasoning\":\"While driftline #57 Evaluate was streaming, Triage accepted a Docs only rejection; returning to Runs preserved the run\u2019s Fetch/Evaluate/Generate/Package output and completion, while Triage retained the rejection and updated breakdown. Evidence: interleaved_run_and_triage_stay_coherent-runs.png, interleaved_run_and_triage_stay_coherent-triage.png\"},\"library_empty_then_repopulated\":{\"score\":\"yes\",\"reasoning\":\"After deleting all visible packages, Library showed No packages match with no active filters; a new completed driftline #58 run then repopulated it with exactly one package. Evidence: library_empty_then_repopulated-shared.png\"},\"export_import_round_trip_preserves_package\":{\"score\":\"yes\",\"reasoning\":\"Downloaded the driftline #58 bundle, deleted the entry, imported the downloaded JSON, and observed matching instruction, repository/PR, medium difficulty, metadata, and patch note. Evidence: export_import_round_trip_preserves_package-shared.png\"}}",
+    "cost_usd": 2.6326644000000003
+  },
+  "core_features": {
+    "score": 0.4783,
+    "criteria": [
+      {
+        "id": "5.1",
+        "name": "demo_mode_default_populated",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On first load with no credentials entered, a clearly visible mode indicator in the top bar reads Demo data, and the Candidates view lists the 3 seeded repositories (nimbusworks/driftline, cobalt-labs/loomdb, fernfield/petrel) each showing its name, primary language, and merged-PR count",
+        "reasoning": "Demo data indicator and all 3 seeded repositories with language and merged-PR counts were visible. Evidence: demo_mode_default_populated-shared.png"
+      },
+      {
+        "id": "5.2",
+        "name": "connections_panel_masked_credentials",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Connections control opens a slide-over panel containing a GitHub token field, an AI base URL field prefilled with https://api.nimbus-ai.com, and an AI API key field; both key fields are masked by default and each has a show/hide toggle that reveals the value only while active",
+        "reasoning": "FAIL: The panel and masked fields were observed, and GitHub reveal worked, but the AI show/hide toggle was not exercised end-to-end. Evidence: connections_panel_masked_credentials-shared.png"
+      },
+      {
+        "id": "5.3",
+        "name": "credential_connect_lifecycle",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Entering a GitHub token (any value works for this probe) and activating Connect triggers a visible checking status on that credential row, followed by either Connected with an account login or a visible error carrying the failure status or message with the row remaining Disconnected; after a failed check the fixture repositories, PRs, and packages remain in place and every demo flow still works",
+        "reasoning": "FAIL: Connect produced a visible 401 error and preserved demo data, but the checking status was not directly observed. Evidence: connections_panel_masked_credentials-shared.png"
+      },
+      {
+        "id": "5.4",
+        "name": "pr_list_columns_and_paging",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Selecting a seeded repository lists its merged pull requests (at least 8 exist per seeded repo) showing per PR the number, title, merged date, a linked-issue indicator, the changed-file count, and a non-test source-file count; the list loads in pages of 5 with a visible control to load the next page and a running count of loaded versus total PRs",
+        "reasoning": "PR rows showed numbers, titles, dates, issue indicators, changed-file counts, source counts, and a visible 5-of-7 page with Load next page. Evidence: pr_list_columns_and_paging-shared.png"
+      },
+      {
+        "id": "5.5",
+        "name": "source_file_filter_and_issue_toggle",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The source-file filter with minimum and maximum bounds (defaults 3 and 10) narrows the PR list to PRs whose non-test source-file count is inside the bounds, and the require-linked-issue toggle further narrows to PRs with a linked issue; active filters render as removable chips and clearing them restores the full list exactly",
+        "reasoning": "FAIL: Bounds, linked-issue filtering, and removable chips worked, but Clear all did not restore the original unfiltered state in the observed workflow. Evidence: pr_list_columns_and_paging-shared.png"
+      },
+      {
+        "id": "5.6",
+        "name": "pr_detail_changed_files_test_exclusion",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening a PR's detail shows the full title, body text, the linked issue with number and title (or an explicit No linked issue notice), and a changed-files table listing each filename with its additions and deletions; files in test directories or with test-style filenames are visibly tagged as test files and are excluded from the PR's source-file count",
+        "reasoning": "Detail showed title, body, linked issue, additions/deletions, a tagged test file, and 6 non-test source files out of 7 changed. Evidence: pr_detail_changed_files_test_exclusion-shared.png"
+      },
+      {
+        "id": "5.7",
+        "name": "triage_columns_and_reject_taxonomy",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Triage view shows Inbox, Accepted, and Rejected columns; Accept moves a card to Accepted, Reject requires choosing exactly one reason from too-few-files, too-many-files, docs-only, and no-linked-issue before completing, the rejected card shows its reason as a labeled badge, and the Rejected column can be filtered by reason",
+        "reasoning": "FAIL: Inbox, Accepted, Rejected, accept, reject reason selection, and reason badge were observed, but rejected-by-reason filtering was not completed. Evidence: triage_columns_and_reject_taxonomy-shared.png"
+      },
+      {
+        "id": "5.8",
+        "name": "triage_stats_derive_live",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The triage header stats (total candidates, accepted count, rejected count, and the per-reason rejected breakdown) update immediately after each accept or reject action without a reload, and the displayed counts match the actual cards in each column",
+        "reasoning": "FAIL: Stats changed immediately and column totals matched, but the full per-reason breakdown update was not directly verified. Evidence: triage_stats_derive_live-shared.png"
+      },
+      {
+        "id": "5.9",
+        "name": "triage_undo_reverts_exactly",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After an accept or reject, an Undo affordance (toast or inline control) is available for at least the most recent action; activating it returns the card to its previous column and reverts the header stats to their prior values exactly",
+        "reasoning": "FAIL: Undo appeared after acceptance, but activating it and verifying exact restoration was not completed. Evidence: triage_columns_and_reject_taxonomy-shared.png"
+      },
+      {
+        "id": "5.10",
+        "name": "pipeline_four_stages_with_statuses",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Starting Run pipeline from an accepted PR shows four stages in order \u2014 Fetch, Evaluate, Generate, Package \u2014 each advancing visibly through pending, running, and complete or failed; a retrying stage shows a retrying status with an attempt counter such as attempt 2 of 3",
+        "reasoning": "Fetch, Evaluate, Generate, and Package appeared in order with complete/running/pending states, and retries showed attempt counters. Evidence: pipeline_four_stages_with_statuses-shared.png"
+      },
+      {
+        "id": "5.11",
+        "name": "evaluate_streams_and_ends_with_verdict",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Evaluate stage streams its assessment text progressively (text appears incrementally, not all at once) and ends with a visible verdict of substantial or trivial plus a one-line reason citing the PR's non-test source-file count against the 3-to-10 window",
+        "reasoning": "Evaluate text was observed partial while running, then completed with a substantial verdict and a reason citing 4 files within the 3-to-10 window. Evidence: pipeline_four_stages_with_statuses-shared.png"
+      },
+      {
+        "id": "5.12",
+        "name": "generate_streams_instruction_text",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Generate stage streams the task instruction text as it is produced, the text references the selected PR's linked issue or title content, and the final streamed text is what appears as the package's instruction document",
+        "reasoning": "Generate text appeared partial while running and completed with instruction text referencing the PR title, issue, repository, and source files. Evidence: pipeline_four_stages_with_statuses-shared.png"
+      },
+      {
+        "id": "5.13",
+        "name": "stage_retry_resumes_from_failure",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A failed stage surfaces its error inline with a status code and message plus a Retry control, and activating Retry resumes the run from that stage: fernfield/petrel PR 31 fails Generate across 3 attempts with visible backoff, is marked failed with an inline error summary, and completes after a manual Retry with the Fetch and Evaluate outputs and timestamps unchanged",
+        "reasoning": "Petrel PR 31 failed Generate after 3 attempts with 503/backoff details; Retry Generate resumed from Generate while Fetch/Evaluate outputs remained unchanged and the run completed. Evidence: pipeline_four_stages_with_statuses-shared.png"
+      },
+      {
+        "id": "5.14",
+        "name": "rate_limit_countdown_auto_retry",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Running nimbusworks/driftline PR 58 in demo mode hits a simulated rate limit on Evaluate's first attempt showing a 429 status and a visible reset countdown that ticks down; when the countdown reaches zero the stage retries automatically, the attempt counter increments, and the run succeeds",
+        "reasoning": "PR 58 showed 429, a ticking reset countdown, retrying 1/3, then automatic retry with attempt 2 and continued progression. Evidence: rate_limit_countdown_auto_retry-shared.png"
+      },
+      {
+        "id": "5.15",
+        "name": "pause_resume_and_event_timeline",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A running pipeline can be paused (stage progression freezes) and resumed (it continues from exactly the same stage with earlier outputs unchanged), and the run's event timeline lists stage transitions in order with timestamps, supports filtering by status, and selecting a timeline entry highlights the corresponding stage",
+        "reasoning": "FAIL: Pause and Resume controls plus a timestamped/filterable timeline were visible, but exact stage freezing and unchanged outputs across pause/resume were not fully verified. Evidence: pipeline_four_stages_with_statuses-shared.png"
+      },
+      {
+        "id": "5.16",
+        "name": "trivial_verdict_ends_run_without_package",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Running a PR whose Evaluate verdict is trivial (for example the seeded docs-only PR) ends the run after Evaluate with a visible trivial outcome naming the reason, and no package is produced for that run",
+        "reasoning": "BLOCKED: The docs-only PR 52 session start did not expose a visible trivial run, so the no-package end state could not be exercised. Evidence: pipeline_four_stages_with_statuses-shared.png"
+      },
+      {
+        "id": "5.17",
+        "name": "package_four_parts_and_difficulty",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A completed run's package viewer shows four parts \u2014 the instruction document, a TOML-shaped task config, a metadata summary with repository, PR number, base commit SHA, language, difficulty, and source-file count, and a bug-patch placeholder note naming the PR's non-test source files \u2014 and the difficulty matches the source-file count mapping (3 to 4 easy, 5 to 7 medium, 8 to 10 hard) with the count shown",
+        "reasoning": "Completed package viewer exposed instruction, task config, metadata, patch note, and bundle parts; metadata showed easy difficulty for 4 source files. Evidence: package_four_parts_and_difficulty-shared.png"
+      },
+      {
+        "id": "5.18",
+        "name": "package_copy_and_downloads_work",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The package viewer offers per-part copy controls that give a visible copied confirmation, individual file downloads for the instruction document and the task config, and a Download bundle control that downloads one TaskPackageBundle JSON file whose visible keys include schemaVersion exactly live-task-package-v1, repo, pr_number, base_sha, language, difficulty, source_file_count, created_at, instruction, task_config, and patch_note",
+        "reasoning": "FAIL: Copy confirmation and download controls were visible, but individual downloads and bundle JSON download contents were not actually exercised. Evidence: package_four_parts_and_difficulty-shared.png"
+      },
+      {
+        "id": "5.19",
+        "name": "batch_run_and_bucketed_report",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The batch composer queues 2 or more accepted PRs and runs them sequentially with per-item stage progression under an n-of-m progress indicator; the finished batch shows a run report placing every queued PR in exactly one bucket among packaged, trivial, failed, and skipped, with per-bucket counts summing to the batch total, and the report downloads as BatchRunReport JSON with total, packaged, trivial, failed, skipped, and items",
+        "reasoning": "FAIL: Four-item sequential batch completed with 3 packaged and 1 skipped, but report download was not exercised. Evidence: batch_run_and_bucketed_report-shared.png"
+      },
+      {
+        "id": "5.20",
+        "name": "library_listing_filters_and_reexport",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Library lists every produced package plus at least 2 seeded example packages showing repository, PR number, difficulty, language, and created date; filters by repository, difficulty, and language combine as removable chips; opening an entry reopens the full package viewer with working copy and download controls; deleting asks for confirmation and removes exactly that entry; re-export downloads the stored TaskPackageBundle content",
+        "reasoning": "FAIL: Listing, combined removable filters, viewer, confirmation delete, and re-export control were observed, but re-export download was not completed. Evidence: package_four_parts_and_difficulty-shared.png"
+      },
+      {
+        "id": "5.21",
+        "name": "import_bundle_validated_per_field",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Import bundle control adds a valid TaskPackageBundle JSON (schemaVersion live-task-package-v1 and all required fields) to the library, while an invalid bundle \u2014 missing required fields, schemaVersion other than live-task-package-v1, or violating field formats \u2014 is rejected with per-field errors naming each offending field and adds nothing",
+        "reasoning": "Invalid {} was rejected with named per-field errors; a valid live-task-package-v1 bundle was then imported and opened as a library package. Evidence: import_bundle_validated_per_field-invalid.png"
+      },
+      {
+        "id": "5.23",
+        "name": "export_import_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After a completed demo pipeline run, downloading the TaskPackageBundle and importing that same JSON reconstructs a library entry whose viewer shows the same instruction text, repo, pr_number, difficulty, and patch_note as the pre-import package",
+        "reasoning": "FAIL: A valid bundle was imported, but the imported instruction was shortened rather than verified identical to the pre-import package. Evidence: import_bundle_validated_per_field-shared.png"
+      },
+      {
+        "id": "5.22",
+        "name": "command_palette_and_coachmarks",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Pressing Cmd+K or Ctrl+K opens a command palette searching repositories, PRs by number or title, and library packages with results grouped by kind; selecting a result navigates to it and Escape closes the palette; on first run dismissible coachmark tips point out the Connections panel, the Triage board, and the pipeline runner, each dismissing individually, and a Reset tips control in the Connections panel restores them",
+        "reasoning": "Command palette grouped repositories, PRs, and library packages; selecting a result navigated, Escape closed it, and coachmarks plus Connections Reset tips were visible. Evidence: command_palette_and_coachmarks-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"demo_mode_default_populated\":{\"score\":\"yes\",\"reasoning\":\"Demo data indicator and all 3 seeded repositories with language and merged-PR counts were visible. Evidence: demo_mode_default_populated-shared.png\"},\"connections_panel_masked_credentials\":{\"score\":\"no\",\"reasoning\":\"FAIL: The panel and masked fields were observed, and GitHub reveal worked, but the AI show/hide toggle was not exercised end-to-end. Evidence: connections_panel_masked_credentials-shared.png\"},\"credential_connect_lifecycle\":{\"score\":\"no\",\"reasoning\":\"FAIL: Connect produced a visible 401 error and preserved demo data, but the checking status was not directly observed. Evidence: connections_panel_masked_credentials-shared.png\"},\"pr_list_columns_and_paging\":{\"score\":\"yes\",\"reasoning\":\"PR rows showed numbers, titles, dates, issue indicators, changed-file counts, source counts, and a visible 5-of-7 page with Load next page. Evidence: pr_list_columns_and_paging-shared.png\"},\"source_file_filter_and_issue_toggle\":{\"score\":\"no\",\"reasoning\":\"FAIL: Bounds, linked-issue filtering, and removable chips worked, but Clear all did not restore the original unfiltered state in the observed workflow. Evidence: pr_list_columns_and_paging-shared.png\"},\"pr_detail_changed_files_test_exclusion\":{\"score\":\"yes\",\"reasoning\":\"Detail showed title, body, linked issue, additions/deletions, a tagged test file, and 6 non-test source files out of 7 changed. Evidence: pr_detail_changed_files_test_exclusion-shared.png\"},\"triage_columns_and_reject_taxonomy\":{\"score\":\"no\",\"reasoning\":\"FAIL: Inbox, Accepted, Rejected, accept, reject reason selection, and reason badge were observed, but rejected-by-reason filtering was not completed. Evidence: triage_columns_and_reject_taxonomy-shared.png\"},\"triage_stats_derive_live\":{\"score\":\"no\",\"reasoning\":\"FAIL: Stats changed immediately and column totals matched, but the full per-reason breakdown update was not directly verified. Evidence: triage_stats_derive_live-shared.png\"},\"triage_undo_reverts_exactly\":{\"score\":\"no\",\"reasoning\":\"FAIL: Undo appeared after acceptance, but activating it and verifying exact restoration was not completed. Evidence: triage_columns_and_reject_taxonomy-shared.png\"},\"pipeline_four_stages_with_statuses\":{\"score\":\"yes\",\"reasoning\":\"Fetch, Evaluate, Generate, and Package appeared in order with complete/running/pending states, and retries showed attempt counters. Evidence: pipeline_four_stages_with_statuses-shared.png\"},\"evaluate_streams_and_ends_with_verdict\":{\"score\":\"yes\",\"reasoning\":\"Evaluate text was observed partial while running, then completed with a substantial verdict and a reason citing 4 files within the 3-to-10 window. Evidence: pipeline_four_stages_with_statuses-shared.png\"},\"generate_streams_instruction_text\":{\"score\":\"yes\",\"reasoning\":\"Generate text appeared partial while running and completed with instruction text referencing the PR title, issue, repository, and source files. Evidence: pipeline_four_stages_with_statuses-shared.png\"},\"stage_retry_resumes_from_failure\":{\"score\":\"yes\",\"reasoning\":\"Petrel PR 31 failed Generate after 3 attempts with 503/backoff details; Retry Generate resumed from Generate while Fetch/Evaluate outputs remained unchanged and the run completed. Evidence: pipeline_four_stages_with_statuses-shared.png\"},\"rate_limit_countdown_auto_retry\":{\"score\":\"yes\",\"reasoning\":\"PR 58 showed 429, a ticking reset countdown, retrying 1/3, then automatic retry with attempt 2 and continued progression. Evidence: rate_limit_countdown_auto_retry-shared.png\"},\"pause_resume_and_event_timeline\":{\"score\":\"no\",\"reasoning\":\"FAIL: Pause and Resume controls plus a timestamped/filterable timeline were visible, but exact stage freezing and unchanged outputs across pause/resume were not fully verified. Evidence: pipeline_four_stages_with_statuses-shared.png\"},\"trivial_verdict_ends_run_without_package\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The docs-only PR 52 session start did not expose a visible trivial run, so the no-package end state could not be exercised. Evidence: pipeline_four_stages_with_statuses-shared.png\"},\"package_four_parts_and_difficulty\":{\"score\":\"yes\",\"reasoning\":\"Completed package viewer exposed instruction, task config, metadata, patch note, and bundle parts; metadata showed easy difficulty for 4 source files. Evidence: package_four_parts_and_difficulty-shared.png\"},\"package_copy_and_downloads_work\":{\"score\":\"no\",\"reasoning\":\"FAIL: Copy confirmation and download controls were visible, but individual downloads and bundle JSON download contents were not actually exercised. Evidence: package_four_parts_and_difficulty-shared.png\"},\"batch_run_and_bucketed_report\":{\"score\":\"no\",\"reasoning\":\"FAIL: Four-item sequential batch completed with 3 packaged and 1 skipped, but report download was not exercised. Evidence: batch_run_and_bucketed_report-shared.png\"},\"library_listing_filters_and_reexport\":{\"score\":\"no\",\"reasoning\":\"FAIL: Listing, combined removable filters, viewer, confirmation delete, and re-export control were observed, but re-export download was not completed. Evidence: package_four_parts_and_difficulty-shared.png\"},\"import_bundle_validated_per_field\":{\"score\":\"yes\",\"reasoning\":\"Invalid {} was rejected with named per-field errors; a valid live-task-package-v1 bundle was then imported and opened as a library package. Evidence: import_bundle_validated_per_field-invalid.png\"},\"export_import_round_trip\":{\"score\":\"no\",\"reasoning\":\"FAIL: A valid bundle was imported, but the imported instruction was shortened rather than verified identical to the pre-import package. Evidence: import_bundle_validated_per_field-shared.png\"},\"command_palette_and_coachmarks\":{\"score\":\"yes\",\"reasoning\":\"Command palette grouped repositories, PRs, and library packages; selecting a result navigated, Escape closed it, and coachmarks plus Connections Reset tips were visible. Evidence: command_palette_and_coachmarks-shared.png\"}}",
+    "cost_usd": 1.5853517999999998
+  },
+  "design_fidelity": {
+    "score": 0.9,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "spacing_and_sizing_follow_scale",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Spacing and sizing across the top bar, rail, triage columns, stage list, and package viewer follow one consistent scale with no arbitrary one-off gaps",
+        "reasoning": "Consistent spacing and sizing are visible across the desktop top bar, rail, triage columns, runner, and package viewer. Evidence: layout-shared.png, triage-shared.png, runner-shared.png."
+      },
+      {
+        "id": "3.2",
+        "name": "typography_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography matches the specified hierarchy: app title larger than view headings, which are larger than card, table, and label text",
+        "reasoning": "The app title is visibly larger than view headings, which are larger than body, card, and label text. Evidence: layout-shared.png."
+      },
+      {
+        "id": "3.3",
+        "name": "layout_matches_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No reference screenshots ship with this task; the layout matches the specified console anatomy at desktop width \u2014 top bar with mode indicator and status chips, left navigation rail with Candidates, Triage, Runs, and Library, three triage columns, the four-stage runner, and the four-part package viewer",
+        "reasoning": "Desktop anatomy includes the top bar, mode/status chips, left rail, three triage columns, four-stage runner, and library/package viewer. Evidence: layout-shared.png, triage-shared.png, runner-shared.png, library-shared.png."
+      },
+      {
+        "id": "3.4",
+        "name": "specified_state_changes_animate",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Transitions are applied to the state changes the spec calls out: triage card column moves, filter chip enter/exit, library entry appearance after a run, and palette/slide-over open/close",
+        "reasoning": "FAIL: Triage cards expose a 0.2s transition and runner stages animate, but filter/package state changes were not fully observed with decisive transient evidence; some relevant surfaces report zero-duration transitions. Evidence: triage-after-shared.png, runner-shared.png."
+      },
+      {
+        "id": "3.5",
+        "name": "responsive_behavior_matches_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Responsive behavior matches the specified patterns: the rail collapses behind a toggle at 768 pixels and below, triage columns stack, and nothing overflows at 375 pixels",
+        "reasoning": "At 375px the rail is off-canvas behind an Open navigation toggle, triage content stacks vertically, and measured document width does not exceed the viewport. Evidence: responsive-shared.png."
+      },
+      {
+        "id": "3.6",
+        "name": "control_styling_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, inputs, selects, toggles, and cards show the specified default, hover, focus, disabled, and error treatments rather than unstyled browser defaults",
+        "reasoning": "Buttons, inputs, selects, cards, disabled controls, and error feedback are visibly custom-styled rather than browser defaults. Evidence: library-shared.png, component-states-shared.png, runner-shared.png."
+      },
+      {
+        "id": "3.7",
+        "name": "typography_has_clear_hierarchy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography has a clear hierarchy that distinguishes the app title, view headings, and body/card text",
+        "reasoning": "The visual hierarchy clearly distinguishes the TaskFoundry title, page headings, section headings, and card/body text. Evidence: layout-shared.png."
+      },
+      {
+        "id": "3.8",
+        "name": "component_states_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Component states (default, hover, focus ring, disabled, error) match the visual_design specification where specified",
+        "reasoning": "Observed default, active navigation, hover styling, disabled batch control, and validation error states are visually differentiated. Evidence: component-states-shared.png, library-shared.png, runs-shared.png."
+      },
+      {
+        "id": "3.9",
+        "name": "surface_treatments_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Mode indicator Demo data versus Live treatments, stage status colors, reject-reason badge hues, and substantial/trivial verdict treatments match the specified visual language",
+        "reasoning": "Demo data mode, connection status chips, stage status colors, reject-reason hues, and runner verdict/status treatments use a consistent visual language. Evidence: triage-shared.png, runner-shared.png, connections-shared.png."
+      },
+      {
+        "id": "3.10",
+        "name": "microinteractions_match_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Hover wash on rows/cards, button press feedback, and toast slide/dismiss follow the motion specification in duration and feel",
+        "reasoning": "Button transitions and triage card hover/state transitions are present, and toast/notice treatments are visibly styled and dismissible. Evidence: triage-after-shared.png, component-states-shared.png."
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"spacing_and_sizing_follow_scale\":{\"score\":\"yes\",\"reasoning\":\"Consistent spacing and sizing are visible across the desktop top bar, rail, triage columns, runner, and package viewer. Evidence: layout-shared.png, triage-shared.png, runner-shared.png.\"},\"typography_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"The app title is visibly larger than view headings, which are larger than body, card, and label text. Evidence: layout-shared.png.\"},\"layout_matches_reference\":{\"score\":\"yes\",\"reasoning\":\"Desktop anatomy includes the top bar, mode/status chips, left rail, three triage columns, four-stage runner, and library/package viewer. Evidence: layout-shared.png, triage-shared.png, runner-shared.png, library-shared.png.\"},\"specified_state_changes_animate\":{\"score\":\"no\",\"reasoning\":\"FAIL: Triage cards expose a 0.2s transition and runner stages animate, but filter/package state changes were not fully observed with decisive transient evidence; some relevant surfaces report zero-duration transitions. Evidence: triage-after-shared.png, runner-shared.png.\"},\"responsive_behavior_matches_reference\":{\"score\":\"yes\",\"reasoning\":\"At 375px the rail is off-canvas behind an Open navigation toggle, triage content stacks vertically, and measured document width does not exceed the viewport. Evidence: responsive-shared.png.\"},\"control_styling_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"Buttons, inputs, selects, cards, disabled controls, and error feedback are visibly custom-styled rather than browser defaults. Evidence: library-shared.png, component-states-shared.png, runner-shared.png.\"},\"typography_has_clear_hierarchy\":{\"score\":\"yes\",\"reasoning\":\"The visual hierarchy clearly distinguishes the TaskFoundry title, page headings, section headings, and card/body text. Evidence: layout-shared.png.\"},\"component_states_match_spec\":{\"score\":\"yes\",\"reasoning\":\"Observed default, active navigation, hover styling, disabled batch control, and validation error states are visually differentiated. Evidence: component-states-shared.png, library-shared.png, runs-shared.png.\"},\"surface_treatments_match_spec\":{\"score\":\"yes\",\"reasoning\":\"Demo data mode, connection status chips, stage status colors, reject-reason hues, and runner verdict/status treatments use a consistent visual language. Evidence: triage-shared.png, runner-shared.png, connections-shared.png.\"},\"microinteractions_match_spec\":{\"score\":\"yes\",\"reasoning\":\"Button transitions and triage card hover/state transitions are present, and toast/notice treatments are visibly styled and dismissible. Evidence: triage-after-shared.png, component-states-shared.png.\"}}",
+    "cost_usd": 0.2673202
+  },
+  "edge_cases": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "empty_states_are_designed",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every empty condition renders a designed empty state: a repository whose PR list matches none of the active filters names those filters with a clear-filters control, an emptied library explains what belongs there, and an empty timeline filter result shows a message rather than a blank area",
+        "reasoning": "Observed designed empty states for filtered library results, rejected triage, and a timeline filter with no matches; each explains the condition and offers recovery. Evidence: empty_states_are_designed-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "forms_validate_inline_before_submit",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Add repository form (AddRepository field contract), the reject-reason chooser (RejectAction field contract), the connection panel fields, and the TaskPackageBundle import all surface inline validation before any submission takes effect, each message tied to its field",
+        "reasoning": "Observed field-tied inline validation for repository, GitHub/AI credentials, reject reason, and bundle import fields before completion. Evidence: invalid_schema_version_rejected-shared.png"
+      },
+      {
+        "id": "4.11",
+        "name": "invalid_schema_version_rejected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Importing a bundle whose schemaVersion is missing or not exactly live-task-package-v1 lists schemaVersion (or an equivalent per-field message naming it) among the errors and adds nothing to the library",
+        "reasoning": "Invalid import visibly rejected with a schemaVersion-specific error and no library addition. Evidence: invalid_schema_version_rejected-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "errors_carry_status_and_fix",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Error surfaces are actionable: a failed credential check shows the failure status or message on its row, a failed stage shows its status code and message with a Retry control, and validation messages name the field and the required shape rather than only saying invalid",
+        "reasoning": "Observed 401 credential failure guidance and a failed Generate stage showing 503, retry history, and Retry Generate. Evidence: errors_carry_status_and_fix-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "actions_confirm_visibly",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Copying a package part, undoing a triage action, completing a run, and importing a bundle each produce visible confirmation feedback such as a toast or inline confirmation",
+        "reasoning": "Observed Copy confirmation, triage Undo confirmation, run completion/package feedback, and import rejection feedback. Evidence: actions_confirm_visibly-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "async_work_shows_activity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Simulated or live async work shows a visible activity affordance: the credential checking status, the streaming indicator on Evaluate and Generate, the rate-limit countdown, and the batch n-of-m progress indicator",
+        "reasoning": "Observed credential Checking status, streaming indicators, rate-limit countdown, retry attempts, and batch progress. Evidence: async_work_shows_activity-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "destructive_actions_guarded",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Destructive or consequential actions are guarded: deleting a library package requires confirmation, and triage actions offer Undo for at least the most recent action",
+        "reasoning": "Delete package opened an explicit confirmation dialog, and triage provided a visible Undo action. Evidence: actions_confirm_visibly-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "guidance_for_non_obvious_controls",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Non-obvious surfaces carry in-app guidance: first-run coachmarks point out the Connections panel, the Triage board, and the pipeline runner, and the Reset tips control restores them",
+        "reasoning": "Observed first-run guidance for Connections, Triage, and Runs/pipeline, plus Reset tips in Connections. Evidence: async_work_shows_activity-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "controls_use_semantic_tags",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, inputs, selects, and labels across the console use semantic tags rather than generic clickable divs or spans",
+        "reasoning": "Rendered controls were semantic buttons, inputs, switches, comboboxes, tabs, and labels; no generic role-button/clickable elements were found. Evidence: controls_use_semantic_tags-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "overlays_close_by_multiple_paths",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Connections slide-over, the reject-reason chooser, the delete confirmation, and the command palette each close via their close control, via Escape, and \u2014 where an overlay backdrop exists \u2014 via clicking the backdrop",
+        "reasoning": "Observed close controls and Escape for overlays; the Connections backdrop was also directly clickable and closed the overlay. Evidence: actions_confirm_visibly-shared.png"
+      },
+      {
+        "id": "4.10",
+        "name": "long_flows_show_progress",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Long flows expose progress throughout: a pipeline run shows per-stage statuses advancing in order, and a batch shows per-item progression under the overall n-of-m indicator",
+        "reasoning": "Pipeline stages visibly advanced through Fetch, Evaluate, Generate, and Package with event timeline entries; batch showed overall n-of-m and per-item statuses. Evidence: async_work_shows_activity-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"empty_states_are_designed\":{\"score\":\"yes\",\"reasoning\":\"Observed designed empty states for filtered library results, rejected triage, and a timeline filter with no matches; each explains the condition and offers recovery. Evidence: empty_states_are_designed-shared.png\"},\"forms_validate_inline_before_submit\":{\"score\":\"yes\",\"reasoning\":\"Observed field-tied inline validation for repository, GitHub/AI credentials, reject reason, and bundle import fields before completion. Evidence: invalid_schema_version_rejected-shared.png\"},\"invalid_schema_version_rejected\":{\"score\":\"yes\",\"reasoning\":\"Invalid import visibly rejected with a schemaVersion-specific error and no library addition. Evidence: invalid_schema_version_rejected-shared.png\"},\"errors_carry_status_and_fix\":{\"score\":\"yes\",\"reasoning\":\"Observed 401 credential failure guidance and a failed Generate stage showing 503, retry history, and Retry Generate. Evidence: errors_carry_status_and_fix-shared.png\"},\"actions_confirm_visibly\":{\"score\":\"yes\",\"reasoning\":\"Observed Copy confirmation, triage Undo confirmation, run completion/package feedback, and import rejection feedback. Evidence: actions_confirm_visibly-shared.png\"},\"async_work_shows_activity\":{\"score\":\"yes\",\"reasoning\":\"Observed credential Checking status, streaming indicators, rate-limit countdown, retry attempts, and batch progress. Evidence: async_work_shows_activity-shared.png\"},\"destructive_actions_guarded\":{\"score\":\"yes\",\"reasoning\":\"Delete package opened an explicit confirmation dialog, and triage provided a visible Undo action. Evidence: actions_confirm_visibly-shared.png\"},\"guidance_for_non_obvious_controls\":{\"score\":\"yes\",\"reasoning\":\"Observed first-run guidance for Connections, Triage, and Runs/pipeline, plus Reset tips in Connections. Evidence: async_work_shows_activity-shared.png\"},\"controls_use_semantic_tags\":{\"score\":\"yes\",\"reasoning\":\"Rendered controls were semantic buttons, inputs, switches, comboboxes, tabs, and labels; no generic role-button/clickable elements were found. Evidence: controls_use_semantic_tags-shared.png\"},\"overlays_close_by_multiple_paths\":{\"score\":\"yes\",\"reasoning\":\"Observed close controls and Escape for overlays; the Connections backdrop was also directly clickable and closed the overlay. Evidence: actions_confirm_visibly-shared.png\"},\"long_flows_show_progress\":{\"score\":\"yes\",\"reasoning\":\"Pipeline stages visibly advanced through Fetch, Evaluate, Generate, and Package with event timeline entries; batch showed overall n-of-m and per-item statuses. Evidence: async_work_shows_activity-shared.png\"} }",
+    "cost_usd": 1.078619
+  },
+  "innovation": {
+    "score": 0.7273,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "delightful_microinteractions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Optional enhancement beyond the spec: unique delightful microinteractions \u2014 for example a celebratory flourish when a package completes or distinctive stage-complete treatments",
+        "reasoning": "FAIL: Run completion showed a standard completion toast, but no distinctive celebratory flourish or similarly unique microinteraction was observed. Evidence: advanced_motion_mechanics-shared.png"
+      },
+      {
+        "id": "11.2",
+        "name": "advanced_motion_mechanics",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Optional enhancement beyond the spec: advanced animation such as choreographed stage sequences or richer triage card physics",
+        "reasoning": "Observed a live pipeline with staged Fetch/Evaluate/Generate/Package choreography and event-log progression over time. Evidence: advanced_motion_mechanics-shared.png"
+      },
+      {
+        "id": "11.3",
+        "name": "guided_onboarding",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Optional enhancement beyond the required coachmarks: a richer guided onboarding or first-run narrative for the factory console",
+        "reasoning": "Observed a three-step first-run tour; activating Next advanced from Candidate discovery into the Pipeline runner. Evidence: delightful_microinteractions-shared.png"
+      },
+      {
+        "id": "11.4",
+        "name": "enhanced_interactive_graphics",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Optional enhancement beyond the spec: richer PR diff previews or visual file-change summaries in the PR detail",
+        "reasoning": "PR detail displayed a visual changed-files summary with total additions/deletions and per-file change profiles. Evidence: enhanced_interactive_graphics-shared.png"
+      },
+      {
+        "id": "11.5",
+        "name": "keyboard_driven_triage_bonus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Optional enhancement beyond the spec: keyboard-driven triage or additional command-palette actions that speed accept/reject without degrading required flows",
+        "reasoning": "FAIL: The command palette was exercised, but it exposed repository, PR, and library search only; no keyboard accept/reject triage actions were observed. Evidence: keyboard_driven_triage_bonus-shared.png"
+      },
+      {
+        "id": "11.6",
+        "name": "preference_personalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Optional enhancement beyond the spec: personalization such as a themed dark mode toggle or saved display preferences",
+        "reasoning": "The theme toggle switched to dark mode, and after reload the control reported \u201cSwitch to light theme,\u201d demonstrating persistence. Evidence: preference_personalization-shared.png"
+      },
+      {
+        "id": "11.7",
+        "name": "polished_brand_narrative",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Optional enhancement: a polished product identity for the task factory rather than a generic admin shell",
+        "reasoning": "Observed a cohesive TaskFoundry identity with product-specific narrative, branded sections, and copy such as Candidate discovery, Decision board, Pipeline runner, and Portable by design. Evidence: delightful_microinteractions-shared.png"
+      },
+      {
+        "id": "11.8",
+        "name": "dynamic_theming_beyond_requirements",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Optional enhancement beyond the spec: dynamic theming or a color mode toggle",
+        "reasoning": "Observed and exercised a working light/dark color-mode toggle. Evidence: preference_personalization-shared.png"
+      },
+      {
+        "id": "11.9",
+        "name": "package_comparison_bonus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Optional enhancement beyond the spec: a package comparison view that helps operators contrast two library entries",
+        "reasoning": "Selected two library entries and observed a Package comparison region comparing repository, PR, difficulty, source-file count, and instruction length side by side. Evidence: package_comparison_bonus-shared.png"
+      },
+      {
+        "id": "11.10",
+        "name": "competition_level_innovation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Competition-level innovation is visible to users and executed without interfering with required behaviors",
+        "reasoning": "Observed multiple user-facing enhancements working together: guided onboarding, staged pipeline choreography, persistent library comparison, and theme personalization. Evidence: advanced_motion_mechanics-shared.png"
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "FAIL: No additional noteworthy enhancement outside the covered onboarding, motion, graphics, theming, search, branding, and comparison categories was directly verified. Evidence: package_comparison_bonus-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"delightful_microinteractions\":{\"score\":\"no\",\"reasoning\":\"FAIL: Run completion showed a standard completion toast, but no distinctive celebratory flourish or similarly unique microinteraction was observed. Evidence: advanced_motion_mechanics-shared.png\"},\"advanced_motion_mechanics\":{\"score\":\"yes\",\"reasoning\":\"Observed a live pipeline with staged Fetch/Evaluate/Generate/Package choreography and event-log progression over time. Evidence: advanced_motion_mechanics-shared.png\"},\"guided_onboarding\":{\"score\":\"yes\",\"reasoning\":\"Observed a three-step first-run tour; activating Next advanced from Candidate discovery into the Pipeline runner. Evidence: delightful_microinteractions-shared.png\"},\"enhanced_interactive_graphics\":{\"score\":\"yes\",\"reasoning\":\"PR detail displayed a visual changed-files summary with total additions/deletions and per-file change profiles. Evidence: enhanced_interactive_graphics-shared.png\"},\"keyboard_driven_triage_bonus\":{\"score\":\"no\",\"reasoning\":\"FAIL: The command palette was exercised, but it exposed repository, PR, and library search only; no keyboard accept/reject triage actions were observed. Evidence: keyboard_driven_triage_bonus-shared.png\"},\"preference_personalization\":{\"score\":\"yes\",\"reasoning\":\"The theme toggle switched to dark mode, and after reload the control reported \u201cSwitch to light theme,\u201d demonstrating persistence. Evidence: preference_personalization-shared.png\"},\"polished_brand_narrative\":{\"score\":\"yes\",\"reasoning\":\"Observed a cohesive TaskFoundry identity with product-specific narrative, branded sections, and copy such as Candidate discovery, Decision board, Pipeline runner, and Portable by design. Evidence: delightful_microinteractions-shared.png\"},\"dynamic_theming_beyond_requirements\":{\"score\":\"yes\",\"reasoning\":\"Observed and exercised a working light/dark color-mode toggle. Evidence: preference_personalization-shared.png\"},\"package_comparison_bonus\":{\"score\":\"yes\",\"reasoning\":\"Selected two library entries and observed a Package comparison region comparing repository, PR, difficulty, source-file count, and instruction length side by side. Evidence: package_comparison_bonus-shared.png\"},\"competition_level_innovation\":{\"score\":\"yes\",\"reasoning\":\"Observed multiple user-facing enhancements working together: guided onboarding, staged pipeline choreography, persistent library comparison, and theme personalization. Evidence: advanced_motion_mechanics-shared.png\"},\"innovation_catchall\":{\"score\":\"no\",\"reasoning\":\"FAIL: No additional noteworthy enhancement outside the covered onboarding, motion, graphics, theming, search, branding, and comparison categories was directly verified. Evidence: package_comparison_bonus-shared.png\"}}",
+    "cost_usd": 0.3497496
+  },
+  "motion": {
+    "score": 0.8889,
+    "criteria": [
+      {
+        "id": "8.1",
+        "name": "hover_system_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Verified through real pointer hovering with computed styles inspected while hovering: buttons ease background and shadow with a slight press effect, repo entries, PR rows, triage cards, and library rows take a full-width hover wash, and form controls show focus rings",
+        "reasoning": "Real hover changed button background/shadow and library-row background; focused select showed a 2px outline ring. Evidence: hover_system_present-shared.png"
+      },
+      {
+        "id": "8.2",
+        "name": "streaming_affordance_active_then_stops",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "While the Evaluate or Generate stage streams (driven by the real Run pipeline control), an active streaming affordance such as a pulsing cursor or indicator is visible alongside the incrementally appearing text, and it stops when the stage completes",
+        "reasoning": "FAIL: The live run showed incrementally changing stage content, but no visible pulsing cursor or comparable streaming indicator was observed alongside it. Evidence: streaming_affordance_active_then_stops-shared.png"
+      },
+      {
+        "id": "8.3",
+        "name": "stage_transitions_and_countdown_tick",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Stage status changes animate through the real run path: the running indicator shows continuous activity, a completing stage's status transitions with a short fade rather than snapping, and the rate-limit reset countdown on driftline PR 58 visibly ticks down second by second",
+        "reasoning": "Live retry flow showed an animated running orbit, stage-node transitions, and countdown changing from 19s to 17s. Evidence: stage_transitions_and_countdown_tick-shared.png"
+      },
+      {
+        "id": "8.4",
+        "name": "triage_cards_animate_between_columns",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Accepting or rejecting through the real triage controls moves the card between columns with a short transition rather than teleporting, and activating Undo animates the card back to its previous column",
+        "reasoning": "Real Accept and Restore-last-triage-move controls changed board totals and produced card-move animations plus an undo toast. Evidence: triage_cards_animate_between_columns-shared.png"
+      },
+      {
+        "id": "8.5",
+        "name": "list_changes_animate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "List mutations use a brief enter or exit transition through the real controls: PR rows appearing when the next page loads, a new library entry appearing after a run completes, and filter chips appearing and clearing",
+        "reasoning": "Real Load next page added PR rows with staggered row-in animations, and library rows visibly used row-in animations. Evidence: list_changes_animate-shared.png"
+      },
+      {
+        "id": "8.6",
+        "name": "palette_and_slideover_transitions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The command palette (opened with the real Cmd+K or Ctrl+K keystroke) and the Connections slide-over open with a short opacity and translate transition of roughly 150 to 250 milliseconds and close the same way rather than snapping",
+        "reasoning": "Real Cmd/Ctrl-K and Connections interactions showed palette-in/palette-out and sheet-in/sheet-out animations around 0.2s. Evidence: palette_and_slideover_transitions-shared.png"
+      },
+      {
+        "id": "8.7",
+        "name": "toasts_slide_and_auto_dismiss",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Toasts for copied confirmations, undo, and run completion slide in, remain readable, and auto-dismiss with a fade",
+        "reasoning": "A real acceptance toast displayed readable Undo content with 0.45s toast-in and delayed toast-out animation, then auto-dismissed. Evidence: toasts_slide_and_auto_dismiss-shared.png"
+      },
+      {
+        "id": "8.8",
+        "name": "reduced_motion_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, streamed text still appears but transitions apply instantly and nothing pulses or slides, while all functionality remains available",
+        "reasoning": "Reduced-motion browser confirmed prefers-reduced-motion, retained working run functionality and rendered stage output, with no active animations or transitions. Evidence: reduced_motion_respected-shared.png"
+      },
+      {
+        "id": "8.9",
+        "name": "batch_progress_fills_continuously",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "During a real batch run of 2 or more accepted PRs, the overall batch progress indicator fills continuously as items complete rather than jumping from empty to full",
+        "reasoning": "A real 4-item batch progressed from a 20.5px fill to 482px after 2 seconds with a linear width transition, demonstrating continuous progress. Evidence: batch_progress_fills_continuously-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"hover_system_present\":{\"score\":\"yes\",\"reasoning\":\"Real hover changed button background/shadow and library-row background; focused select showed a 2px outline ring. Evidence: hover_system_present-shared.png\"},\"streaming_affordance_active_then_stops\":{\"score\":\"no\",\"reasoning\":\"FAIL: The live run showed incrementally changing stage content, but no visible pulsing cursor or comparable streaming indicator was observed alongside it. Evidence: streaming_affordance_active_then_stops-shared.png\"},\"stage_transitions_and_countdown_tick\":{\"score\":\"yes\",\"reasoning\":\"Live retry flow showed an animated running orbit, stage-node transitions, and countdown changing from 19s to 17s. Evidence: stage_transitions_and_countdown_tick-shared.png\"},\"triage_cards_animate_between_columns\":{\"score\":\"yes\",\"reasoning\":\"Real Accept and Restore-last-triage-move controls changed board totals and produced card-move animations plus an undo toast. Evidence: triage_cards_animate_between_columns-shared.png\"},\"list_changes_animate\":{\"score\":\"yes\",\"reasoning\":\"Real Load next page added PR rows with staggered row-in animations, and library rows visibly used row-in animations. Evidence: list_changes_animate-shared.png\"},\"palette_and_slideover_transitions\":{\"score\":\"yes\",\"reasoning\":\"Real Cmd/Ctrl-K and Connections interactions showed palette-in/palette-out and sheet-in/sheet-out animations around 0.2s. Evidence: palette_and_slideover_transitions-shared.png\"},\"toasts_slide_and_auto_dismiss\":{\"score\":\"yes\",\"reasoning\":\"A real acceptance toast displayed readable Undo content with 0.45s toast-in and delayed toast-out animation, then auto-dismissed. Evidence: toasts_slide_and_auto_dismiss-shared.png\"},\"reduced_motion_respected\":{\"score\":\"yes\",\"reasoning\":\"Reduced-motion browser confirmed prefers-reduced-motion, retained working run functionality and rendered stage output, with no active animations or transitions. Evidence: reduced_motion_respected-shared.png\"},\"batch_progress_fills_continuously\":{\"score\":\"yes\",\"reasoning\":\"A real 4-item batch progressed from a 20.5px fill to 482px after 2 seconds with a linear width transition, demonstrating continuous progress. Evidence: batch_progress_fills_continuously-shared.png\"}}",
+    "cost_usd": 0.5644958
+  },
+  "performance": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_is_under_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive within 2 seconds of a local cold load",
+        "reasoning": "PASS: Local navigation rendered an interactive workbench within the observed load interval. Evidence: initial-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "console_is_clean",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No console errors or warnings appear on load or during a full exercise of connections, candidates, triage, a pipeline run, library, and the palette",
+        "reasoning": "PASS: After exercising connections, candidates, triage, pipeline, library, and palette, console inspection reported 0 errors and 0 warnings. Evidence: initial-shared.png"
+      },
+      {
+        "id": "9.3",
+        "name": "transitions_respond_under_100ms",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "UI transitions such as view switches, filter chip updates, and overlay open/close respond without perceptible lag under normal use",
+        "reasoning": "PASS: View switches, filter updates, and palette open/close responded immediately without perceptible lag. Evidence: library-filter-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "async_work_has_loading_indicators",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Async or simulated-async work shows visible activity: the credential checking status, the streaming affordance on Evaluate and Generate, the rate-limit countdown, and the batch n-of-m progress indicator",
+        "reasoning": "PASS: Observed AI credential Checking, streaming Evaluate progress, a rate-limit Reset countdown, and batch Overall progress (0 of 4 complete). Evidence: credential-checking-shared.png, async-run-shared.png, batch-progress-shared.png"
+      },
+      {
+        "id": "9.5",
+        "name": "large_collections_render_without_lag",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The paginated PR lists, the triage board, and the filtered library render and update without perceived lag as pages load and filters change",
+        "reasoning": "PASS: Candidate PR pagination, the 24-card triage inbox, and filtered library results rendered and updated promptly. Evidence: desktop-initial-shared.png, triage-shared.png, library-filter-shared.png"
+      },
+      {
+        "id": "9.6",
+        "name": "state_changes_remain_interactive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The UI remains interactive while a run is streaming: switching views, filtering lists, and opening the command palette all work during an active pipeline run",
+        "reasoning": "PASS: While a pipeline was actively streaming, Candidates navigation and the command palette both opened successfully. Evidence: streaming-interaction-shared.png"
+      },
+      {
+        "id": "9.7",
+        "name": "animations_maintain_smooth_frame_rate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Streaming text, triage card moves, and list enter/exit transitions maintain a smooth frame rate without visible hitching",
+        "reasoning": "PASS: Streaming text, triage card movement, and list updates were observed without visible hitching during active interactions. Evidence: async-run-shared.png, triage-move-shared.png"
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_input_does_not_freeze",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapid repeated input \u2014 quick filter toggles, fast triage actions, repeated palette open and close \u2014 never hangs or freezes the app, including while a run is streaming",
+        "reasoning": "PASS: Repeated palette open/close input completed successfully and the app remained responsive. Evidence: rapid-input-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_start_is_under_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"PASS: Local navigation rendered an interactive workbench within the observed load interval. Evidence: initial-shared.png\"},\"console_is_clean\":{\"score\":\"yes\",\"reasoning\":\"PASS: After exercising connections, candidates, triage, pipeline, library, and palette, console inspection reported 0 errors and 0 warnings. Evidence: initial-shared.png\"},\"transitions_respond_under_100ms\":{\"score\":\"yes\",\"reasoning\":\"PASS: View switches, filter updates, and palette open/close responded immediately without perceptible lag. Evidence: library-filter-shared.png\"},\"async_work_has_loading_indicators\":{\"score\":\"yes\",\"reasoning\":\"PASS: Observed AI credential Checking, streaming Evaluate progress, a rate-limit Reset countdown, and batch Overall progress (0 of 4 complete). Evidence: credential-checking-shared.png, async-run-shared.png, batch-progress-shared.png\"},\"large_collections_render_without_lag\":{\"score\":\"yes\",\"reasoning\":\"PASS: Candidate PR pagination, the 24-card triage inbox, and filtered library results rendered and updated promptly. Evidence: desktop-initial-shared.png, triage-shared.png, library-filter-shared.png\"},\"state_changes_remain_interactive\":{\"score\":\"yes\",\"reasoning\":\"PASS: While a pipeline was actively streaming, Candidates navigation and the command palette both opened successfully. Evidence: streaming-interaction-shared.png\"},\"animations_maintain_smooth_frame_rate\":{\"score\":\"yes\",\"reasoning\":\"PASS: Streaming text, triage card movement, and list updates were observed without visible hitching during active interactions. Evidence: async-run-shared.png, triage-move-shared.png\"},\"rapid_input_does_not_freeze\":{\"score\":\"yes\",\"reasoning\":\"PASS: Repeated palette open/close input completed successfully and the app remained responsive. Evidence: rapid-input-shared.png\"}}",
+    "cost_usd": 0.2934222
+  },
+  "responsiveness": {
+    "score": 0.7,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "layout_adapts_desktop_to_mobile",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The layout adapts gracefully from 1440px desktop to 375px mobile: top bar, navigation rail, triage board, pipeline stages, and package viewer all remain usable",
+        "reasoning": "Desktop and 375px observations show the top bar, collapsed rail, stacked triage sections, and usable package viewer reflow across widths. Evidence: layout-adapts-desktop-shared.png, chrome-adapts-to-small-screens-shared.png"
+      },
+      {
+        "id": "7.2",
+        "name": "mobile_tap_targets_are_large_enough",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Interactive controls \u2014 navigation entries, triage actions, filter chips, stage retry/pause/resume, and package copy/download \u2014 present tap targets of at least 44px at mobile widths",
+        "reasoning": "Measured mobile navigation, triage, package, and persistent controls were generally 44px high or larger. Evidence: chrome-adapts-to-small-screens-shared.png, fixed-controls-remain-accessible-shared.png"
+      },
+      {
+        "id": "7.3",
+        "name": "typography_resizes_across_breakpoints",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography stays legible at both desktop and mobile widths, with the app title, view headings, and card/table text hierarchy preserved",
+        "reasoning": "Desktop and mobile headings visibly resize while preserving readable hierarchy for the app title, view headings, and card text. Evidence: layout-adapts-desktop-shared.png, content-avoids-clipping-and-overflow-shared.png"
+      },
+      {
+        "id": "7.4",
+        "name": "content_avoids_clipping_and_overflow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At 375px width no content clips or overflows the viewport, and no page-level horizontal scrolling appears",
+        "reasoning": "FAIL: The changed-files detail at 375px produced document/body scrollWidth 627px against a 375px viewport, with a 575px table and visible overflow outside its container. Evidence: small-screens-avoid-horizontal-scroll-shared.png"
+      },
+      {
+        "id": "7.5",
+        "name": "chrome_adapts_to_small_screens",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At widths of 768 pixels and below the navigation rail collapses behind a toggle that opens it as an overlay, and the triage columns stack vertically while retaining all accept, reject, and undo actions",
+        "reasoning": "At 768px and 375px the rail collapsed behind an Open navigation toggle; triage content stacked vertically and retained Accept/Reject actions. Evidence: chrome-adapts-to-small-screens-shared.png"
+      },
+      {
+        "id": "7.6",
+        "name": "stacking_reflows_logically",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At narrow widths the Candidates, Triage, Runs, and Library content stacks vertically in a readable order with every control still reachable",
+        "reasoning": "Candidates, triage Inbox, Accepted, and Rejected sections rendered in a readable vertical order at narrow widths, with controls still present. Evidence: chrome-adapts-to-small-screens-shared.png"
+      },
+      {
+        "id": "7.7",
+        "name": "mobile_touch_gestures_work",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At mobile width, tapping triage actions, filter chips, navigation entries, and package controls operates them exactly as clicking does at desktop width",
+        "reasoning": "Real mobile clicks successfully opened navigation, switched views, accepted a triage card, cleared a filter, and copied a package bundle. Evidence: chrome-adapts-to-small-screens-shared.png, fixed-controls-remain-accessible-shared.png"
+      },
+      {
+        "id": "7.8",
+        "name": "small_screens_avoid_horizontal_scroll",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At 375 pixel width there is no page-level horizontal scrolling; the changed-files table and the monospaced package parts scroll within their own containers instead",
+        "reasoning": "FAIL: The changed-files table was wider than its 336px container and caused page-level horizontal overflow; measured document/body scrollWidth was 627px at 375px. Evidence: small-screens-avoid-horizontal-scroll-shared.png"
+      },
+      {
+        "id": "7.9",
+        "name": "dense_tables_resize",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The changed-files table, PR list, and library list resize to fit their containers across widths without overflowing or collapsing to unreadable size",
+        "reasoning": "FAIL: PR and library lists fit mobile containers, but the changed-files table remained 575px wide at 375px and overflowed its 336px container. Evidence: small-screens-avoid-horizontal-scroll-shared.png"
+      },
+      {
+        "id": "7.10",
+        "name": "fixed_controls_remain_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Persistent controls (the rail toggle, Connections, Download bundle, Import bundle) remain visible and reachable at every width",
+        "reasoning": "At mobile widths, Open navigation and Connections remained reachable; Import file was visible in Library and Download bundle was visible in the package viewer. Evidence: fixed-controls-remain-accessible-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"layout_adapts_desktop_to_mobile\":{\"score\":\"yes\",\"reasoning\":\"Desktop and 375px observations show the top bar, collapsed rail, stacked triage sections, and usable package viewer reflow across widths. Evidence: layout-adapts-desktop-shared.png, chrome-adapts-to-small-screens-shared.png\"},\"mobile_tap_targets_are_large_enough\":{\"score\":\"yes\",\"reasoning\":\"Measured mobile navigation, triage, package, and persistent controls were generally 44px high or larger. Evidence: chrome-adapts-to-small-screens-shared.png, fixed-controls-remain-accessible-shared.png\"},\"typography_resizes_across_breakpoints\":{\"score\":\"yes\",\"reasoning\":\"Desktop and mobile headings visibly resize while preserving readable hierarchy for the app title, view headings, and card text. Evidence: layout-adapts-desktop-shared.png, content-avoids-clipping-and-overflow-shared.png\"},\"content_avoids_clipping_and_overflow\":{\"score\":\"no\",\"reasoning\":\"FAIL: The changed-files detail at 375px produced document/body scrollWidth 627px against a 375px viewport, with a 575px table and visible overflow outside its container. Evidence: small-screens-avoid-horizontal-scroll-shared.png\"},\"chrome_adapts_to_small_screens\":{\"score\":\"yes\",\"reasoning\":\"At 768px and 375px the rail collapsed behind an Open navigation toggle; triage content stacked vertically and retained Accept/Reject actions. Evidence: chrome-adapts-to-small-screens-shared.png\"},\"stacking_reflows_logically\":{\"score\":\"yes\",\"reasoning\":\"Candidates, triage Inbox, Accepted, and Rejected sections rendered in a readable vertical order at narrow widths, with controls still present. Evidence: chrome-adapts-to-small-screens-shared.png\"},\"mobile_touch_gestures_work\":{\"score\":\"yes\",\"reasoning\":\"Real mobile clicks successfully opened navigation, switched views, accepted a triage card, cleared a filter, and copied a package bundle. Evidence: chrome-adapts-to-small-screens-shared.png, fixed-controls-remain-accessible-shared.png\"},\"small_screens_avoid_horizontal_scroll\":{\"score\":\"no\",\"reasoning\":\"FAIL: The changed-files table was wider than its 336px container and caused page-level horizontal overflow; measured document/body scrollWidth was 627px at 375px. Evidence: small-screens-avoid-horizontal-scroll-shared.png\"},\"dense_tables_resize\":{\"score\":\"no\",\"reasoning\":\"FAIL: PR and library lists fit mobile containers, but the changed-files table remained 575px wide at 375px and overflowed its 336px container. Evidence: small-screens-avoid-horizontal-scroll-shared.png\"},\"fixed_controls_remain_accessible\":{\"score\":\"yes\",\"reasoning\":\"At mobile widths, Open navigation and Connections remained reachable; Import file was visible in Library and Download bundle was visible in the package viewer. Evidence: fixed-controls-remain-accessible-shared.png\"}}",
+    "cost_usd": 0.5879173999999999
+  },
+  "technical": {
+    "score": 0.8,
+    "criteria": [
+      {
+        "id": "10.1",
+        "name": "serves_and_runs_clean",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app serves from its documented start path on port 3000, renders the console, and a full exercise of the app (connections, candidates, triage, a pipeline run, library, palette) produces no console errors or unhandled promise rejections",
+        "reasoning": "Full browser exercise reached candidates, triage, runs, library, connections, and palette; pipeline completed and console errors reported 0. Evidence: run-complete-shared.png"
+      },
+      {
+        "id": "10.2",
+        "name": "demo_mode_makes_zero_outbound_requests",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "With no credential ever entered, a full exercise of demo mode \u2014 browsing PRs, triaging, running a full pipeline, downloading a bundle \u2014 shows zero outbound network requests to any external host in the network log (same-origin app asset loads excepted)",
+        "reasoning": "BLOCKED: The credential-free precondition could not be preserved because fake credentials were entered during grading; the observed network log alone cannot establish the required end-to-end condition."
+      },
+      {
+        "id": "10.3",
+        "name": "credentials_held_in_memory_only",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After typing credentials and activating Connect, no browser storage (localStorage, sessionStorage, cookies, IndexedDB) contains the token or key material, and after a page reload both credential rows show Disconnected and the mode indicator reads Demo data",
+        "reasoning": "After fake credentials were submitted, storage contained no token/key material; reload showed Demo data with GitHub off and AI off. Evidence: connections-shared.png"
+      },
+      {
+        "id": "10.4",
+        "name": "exports_carry_no_credential_material",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After entering a distinctive fake token and key (for example ghp_SENTINEL123 and sk-SENTINEL456), the downloaded bundle JSON, the run report, and every copied text contain no trace of either value",
+        "reasoning": "BLOCKED: Bundle download/copy was exercised and showed no sentinel values, but a run-report export was not exercised, so the full criterion cannot be verified."
+      },
+      {
+        "id": "10.5",
+        "name": "persistence_split_matches_contract",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A page reload preserves produced and imported packages, triage placements with reject reasons, the source-file filter settings, the configured AI base URL, and coachmark dismissals, while credentials and connection statuses reset to Disconnected",
+        "reasoning": "Reload preserved four packages, triage acceptance, source filters, AI base URL, and all coachmark dismissals; credentials remained disconnected. Evidence: persistence-reload-shared.png"
+      },
+      {
+        "id": "10.6",
+        "name": "shared_state_coherence_across_views",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A change made in one view is immediately reflected in every other view showing that data without a reload: a triage action updates the header stats and the accepted PR set the runner offers, and a completed run's package appears in the Library and in command-palette results",
+        "reasoning": "Accepting PR #57 updated triage totals, the runs chooser offered driftline #57, the completed package appeared in Library, and palette results listed it. Evidence: triage-accepted-shared.png"
+      },
+      {
+        "id": "10.7",
+        "name": "forms_validate_per_field_before_submit",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Add repository form shows an inline error naming the repository field for an empty or malformed value (not matching owner/name with exactly one slash) before any submission takes effect, and the connection panel surfaces inline per-field validation for its fields",
+        "reasoning": "Malformed repository input displayed a repository-specific inline error; empty GitHub token and AI key displayed separate per-field errors. Evidence: connection-validation-shared.png"
+      },
+      {
+        "id": "10.8",
+        "name": "import_enforces_bundle_schema",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Importing a bundle that violates the TaskPackageBundle field contract \u2014 schemaVersion other than live-task-package-v1, a base_sha that is not 40-character lowercase hex, a difficulty outside easy, medium, and hard, a non-positive pr_number, source_file_count outside 3\u201310, or empty instruction \u2014 is rejected with errors naming each offending field, and importing a conforming bundle succeeds",
+        "reasoning": "Invalid import visibly named schemaVersion, pr_number, base_sha, difficulty, source_file_count, and instruction errors; a conforming bundle imported successfully. Evidence: import-validation-shared.png"
+      },
+      {
+        "id": "10.9",
+        "name": "fixture_data_is_api_shaped",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rendered PR data is consistent with the PullRequest field contract: merged dates render as real dates, the base commit SHA renders as 40-character lowercase hex, additions and deletions are non-negative integers, and PR numbers are positive integers, across the seeded repositories; downloaded TaskPackageBundle JSON shows schemaVersion live-task-package-v1 and the required keys",
+        "reasoning": "Rendered fixtures showed real merged dates, positive PR numbers, non-negative additions/deletions, and valid source counts; Bundle JSON visibly showed live-task-package-v1 and required keys. Evidence: bundle-json-shared.png"
+      },
+      {
+        "id": "10.10",
+        "name": "demo_runs_are_deterministic",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Running the same fixture PR twice in demo mode streams the same evaluation text and the same instruction text both times, producing packages with identical instruction content",
+        "reasoning": "The same demo PR was run twice; both completed with identical instruction text and package content. Evidence: run-complete-shared.png and determinism-second-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"serves_and_runs_clean\":{\"score\":\"yes\",\"reasoning\":\"Full browser exercise reached candidates, triage, runs, library, connections, and palette; pipeline completed and console errors reported 0. Evidence: run-complete-shared.png\"},\"demo_mode_makes_zero_outbound_requests\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The credential-free precondition could not be preserved because fake credentials were entered during grading; the observed network log alone cannot establish the required end-to-end condition.\"},\"credentials_held_in_memory_only\":{\"score\":\"yes\",\"reasoning\":\"After fake credentials were submitted, storage contained no token/key material; reload showed Demo data with GitHub off and AI off. Evidence: connections-shared.png\"},\"exports_carry_no_credential_material\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Bundle download/copy was exercised and showed no sentinel values, but a run-report export was not exercised, so the full criterion cannot be verified.\"},\"persistence_split_matches_contract\":{\"score\":\"yes\",\"reasoning\":\"Reload preserved four packages, triage acceptance, source filters, AI base URL, and all coachmark dismissals; credentials remained disconnected. Evidence: persistence-reload-shared.png\"},\"shared_state_coherence_across_views\":{\"score\":\"yes\",\"reasoning\":\"Accepting PR #57 updated triage totals, the runs chooser offered driftline #57, the completed package appeared in Library, and palette results listed it. Evidence: triage-accepted-shared.png\"},\"forms_validate_per_field_before_submit\":{\"score\":\"yes\",\"reasoning\":\"Malformed repository input displayed a repository-specific inline error; empty GitHub token and AI key displayed separate per-field errors. Evidence: connection-validation-shared.png\"},\"import_enforces_bundle_schema\":{\"score\":\"yes\",\"reasoning\":\"Invalid import visibly named schemaVersion, pr_number, base_sha, difficulty, source_file_count, and instruction errors; a conforming bundle imported successfully. Evidence: import-validation-shared.png\"},\"fixture_data_is_api_shaped\":{\"score\":\"yes\",\"reasoning\":\"Rendered fixtures showed real merged dates, positive PR numbers, non-negative additions/deletions, and valid source counts; Bundle JSON visibly showed live-task-package-v1 and required keys. Evidence: bundle-json-shared.png\"},\"demo_runs_are_deterministic\":{\"score\":\"yes\",\"reasoning\":\"The same demo PR was run twice; both completed with identical instruction text and package content. Evidence: run-complete-shared.png and determinism-second-shared.png\"}}",
+    "cost_usd": 0.481814
+  },
+  "user_flows": {
+    "score": 0.4545,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "demo_pipeline_flow_ends_at_bundle",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Full demo flow with no credentials entered: filter driftline's PR list to bounds 3 to 10 with linked issues required, accept a PR on the triage board, run its pipeline through Fetch, Evaluate, Generate, and Package while the assessment and instruction text stream, then download the bundle \u2014 the downloaded JSON contains the same instruction text that streamed during Generate and metadata naming that repository and PR number",
+        "reasoning": "FAIL: The complete pipeline and bundle download succeeded for driftline PR #57, but the run was performed after changing the source-file bound to 3\u20135 and removing the linked-issue filter rather than the required 3\u201310 + linked-issue setup. Evidence: demo-pipeline-bundle-shared.png"
+      },
+      {
+        "id": "6.2",
+        "name": "invalid_inputs_validated_inline_in_flows",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Mid-flow invalid input triggers immediate inline validation: a malformed Add repository value shows an error naming the repository field, and a reject attempt without a chosen reason is blocked with an inline message before the card moves",
+        "reasoning": "yes \u2014 malformed repository input showed an inline repository error, and rejecting PR #57 without a reason showed an inline required-reason error while the card stayed in place. Evidence: invalid-inputs-shared-after.png"
+      },
+      {
+        "id": "6.3",
+        "name": "filter_changes_update_related_displays",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Changing the source-file bounds or the require-linked-issue toggle updates the PR list, the active filter chips, and the loaded-versus-total count together, and removing a chip restores exactly the state that chip represented",
+        "reasoning": "FAIL: Changing bounds and the linked-issue toggle updated the PR list, chips, and loaded count, but removing the linked-issue chip left a non-removable \u201cLinked issue required\u201d label behind. Evidence: filter-changes-shared.png"
+      },
+      {
+        "id": "6.4",
+        "name": "package_delete_flow_updates_all_surfaces",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Deleting a library package after its confirmation removes it from the library list, from active filter results, and from command-palette search results without a reload",
+        "reasoning": "yes \u2014 confirmed deletion removed the package from Library without reload; the final command palette showed repositories and PRs but no Library packages. Evidence: package-delete-search-empty-shared.png"
+      },
+      {
+        "id": "6.5",
+        "name": "view_switches_retain_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Switching between Candidates, Triage, Runs, and Library and back retains the selected repository, the PR detail selection, active filters, and any in-progress run exactly as they were",
+        "reasoning": "FAIL: Repository selection, PR detail, and source-file filters survived switching across Candidates, Triage, Runs, and Library, but retention of an in-progress run through the same sequence was not fully demonstrated. Evidence: view-switch-retain-shared.png"
+      },
+      {
+        "id": "6.6",
+        "name": "emptied_library_shows_empty_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After deleting the last library package, the Library shows a clear empty state explaining what belongs there instead of a blank region, and producing a new package replaces the empty state with the entry",
+        "reasoning": "yes \u2014 after deleting the last package, Library showed a clear \u201cNo packages match\u201d state explaining that bundles can be imported; importing a bundle restored a package entry. Evidence: library-empty-final-shared.png"
+      },
+      {
+        "id": "6.7",
+        "name": "filters_agree_across_surfaces",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Library filters by repository, difficulty, and language narrow the list consistently: the visible entries, the entry count, and the removable chips agree, and a combination matching nothing shows the empty state naming the active filters with a working clear-filters control",
+        "reasoning": "FAIL: Repository, difficulty, and language chips agreed with the no-match empty state and working Clear filters control, but no explicit filtered entry count was rendered/observed. Evidence: library-filter-empty-shared.png"
+      },
+      {
+        "id": "6.8",
+        "name": "collapsible_chrome_preserves_workflow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At 768 pixels and below the navigation rail collapses behind a toggle and reopens as an overlay, and the Connections slide-over can be closed and reopened, all without losing the active view, selections, or a running pipeline",
+        "reasoning": "FAIL: At 767px the navigation rail was offscreen, the toggle opened it as an overlay, and Connections opened/closed while selection and filters remained; retention of a running pipeline through this compact workflow was not demonstrated. Evidence: compact-connections-shared.png"
+      },
+      {
+        "id": "6.9",
+        "name": "overlays_support_expected_flows",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Connections slide-over, the reject-reason chooser, the delete confirmation, and the command palette each open, complete their action or cancel, and close as expected, returning the user to the surface they started from",
+        "reasoning": "yes \u2014 Connections, reject-reason chooser, delete confirmation, and command palette all opened; reject/delete actions and overlay cancellation returned to usable surfaces. Evidence: overlays-connections-shared.png"
+      },
+      {
+        "id": "6.10",
+        "name": "failures_recover_without_reload",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Recovery paths need no reload: a failed Generate stage recovers through its Retry control, a failed credential check leaves every demo flow usable, and closing any overlay returns to a working screen \u2014 no dead ends",
+        "reasoning": "yes \u2014 Generate failed after three attempts, Retry Generate resumed from Generate and completed the package; invalid GitHub credentials showed a 401 error while demo data remained usable, and closing Connections returned to the package screen. Evidence: generate-retry-shared.png"
+      },
+      {
+        "id": "6.11",
+        "name": "export_import_round_trip_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After a completed demo pipeline run, Download bundle the TaskPackageBundle JSON, delete that library entry, Import the downloaded JSON, and confirm the library entry returns with the same instruction text, repo, pr_number, difficulty, and patch_note",
+        "reasoning": "FAIL: A completed bundle was downloaded, the library entry was deleted, and an equivalent bundle was pasted/imported back with matching visible fields, but the downloaded file itself was not uploaded through the file-import control. Evidence: export-import-roundtrip-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"demo_pipeline_flow_ends_at_bundle\":{\"score\":\"no\",\"reasoning\":\"FAIL: The complete pipeline and bundle download succeeded for driftline PR #57, but the run was performed after changing the source-file bound to 3\u20135 and removing the linked-issue filter rather than the required 3\u201310 + linked-issue setup. Evidence: demo-pipeline-bundle-shared.png\"},\"invalid_inputs_validated_inline_in_flows\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 malformed repository input showed an inline repository error, and rejecting PR #57 without a reason showed an inline required-reason error while the card stayed in place. Evidence: invalid-inputs-shared-after.png\"},\"filter_changes_update_related_displays\":{\"score\":\"no\",\"reasoning\":\"FAIL: Changing bounds and the linked-issue toggle updated the PR list, chips, and loaded count, but removing the linked-issue chip left a non-removable \u201cLinked issue required\u201d label behind. Evidence: filter-changes-shared.png\"},\"package_delete_flow_updates_all_surfaces\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 confirmed deletion removed the package from Library without reload; the final command palette showed repositories and PRs but no Library packages. Evidence: package-delete-search-empty-shared.png\"},\"view_switches_retain_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: Repository selection, PR detail, and source-file filters survived switching across Candidates, Triage, Runs, and Library, but retention of an in-progress run through the same sequence was not fully demonstrated. Evidence: view-switch-retain-shared.png\"},\"emptied_library_shows_empty_state\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 after deleting the last package, Library showed a clear \u201cNo packages match\u201d state explaining that bundles can be imported; importing a bundle restored a package entry. Evidence: library-empty-final-shared.png\"},\"filters_agree_across_surfaces\":{\"score\":\"no\",\"reasoning\":\"FAIL: Repository, difficulty, and language chips agreed with the no-match empty state and working Clear filters control, but no explicit filtered entry count was rendered/observed. Evidence: library-filter-empty-shared.png\"},\"collapsible_chrome_preserves_workflow\":{\"score\":\"no\",\"reasoning\":\"FAIL: At 767px the navigation rail was offscreen, the toggle opened it as an overlay, and Connections opened/closed while selection and filters remained; retention of a running pipeline through this compact workflow was not demonstrated. Evidence: compact-connections-shared.png\"},\"overlays_support_expected_flows\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Connections, reject-reason chooser, delete confirmation, and command palette all opened; reject/delete actions and overlay cancellation returned to usable surfaces. Evidence: overlays-connections-shared.png\"},\"failures_recover_without_reload\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Generate failed after three attempts, Retry Generate resumed from Generate and completed the package; invalid GitHub credentials showed a 401 error while demo data remained usable, and closing Connections returned to the package screen. Evidence: generate-retry-shared.png\"},\"export_import_round_trip_flow\":{\"score\":\"no\",\"reasoning\":\"FAIL: A completed bundle was downloaded, the library entry was deleted, and an equivalent bundle was pasted/imported back with matching visible fields, but the downloaded file itself was not uploaded through the file-import control. Evidence: export-import-roundtrip-shared.png\"}}",
+    "cost_usd": 0.9619768
+  },
+  "visual_design": {
+    "score": 0.25,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "console_layout_anatomy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The console renders a fixed top bar carrying the app name, the mode indicator, the credential status chips, and the Connections control, a left navigation rail with entries for Candidates, Triage, Runs, and Library, and a main area showing the active view",
+        "reasoning": "The rendered console visibly includes the top bar, mode/status controls, Connections button, left rail with Candidates/Triage/Runs/Library, and active main view. Evidence: console_layout_anatomy-shared.png"
+      },
+      {
+        "id": "2.2",
+        "name": "mode_indicator_visually_unmistakable",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The mode indicator is a filled chip that is always visible in the top bar, rendered in a neutral treatment reading Demo data and switching to a distinct accent treatment reading Live when a credential connects",
+        "reasoning": "FAIL: Demo data is visibly shown as a filled chip, but credential connection visibly failed and the required Live accent state was not observed. Evidence: console_layout_anatomy-shared.png"
+      },
+      {
+        "id": "2.3",
+        "name": "stage_status_treatments_distinct",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Pending, running, retrying, failed, and complete stage statuses each carry a visually distinct color or icon treatment, and the treatment for each status is consistent between the stage list and the event timeline",
+        "reasoning": "FAIL: Pending, running, retrying, and complete were observed, but a failed status was not reached, so all required statuses and consistent treatments could not be verified. Evidence: stage_status_treatments-shared.png"
+      },
+      {
+        "id": "2.4",
+        "name": "reject_reason_badges_consistent",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Reject-reason badges (too-few-files, too-many-files, docs-only, no-linked-issue) share one badge treatment with a distinct hue per reason, identical wherever they appear: triage cards, the rejected-column filter, and the stats breakdown",
+        "reasoning": "FAIL: Reject-reason counts and filter controls are visible, but a rejected card with matching reason badges across all required locations was not observed. Evidence: reject_reason_badges-rejected.png"
+      },
+      {
+        "id": "2.5",
+        "name": "monospace_package_parts_labeled",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The instruction document and the TOML-shaped task config render in monospaced blocks, each with a visible part label and its copy and download controls adjacent to the block",
+        "reasoning": "FAIL: Instruction and task.toml are labeled and rendered as code-like blocks, but copy/download controls were not visibly adjacent to both individual blocks. Evidence: monospace_package_parts-labeled-shared.png"
+      },
+      {
+        "id": "2.6",
+        "name": "verdict_treatments_semantic",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The substantial verdict renders with a success treatment and the trivial verdict with a warning treatment, consistently in the Evaluate stage output and in the batch run report buckets",
+        "reasoning": "FAIL: Substantial and trivial verdicts were observed in Evaluate, but the batch result did not expose corresponding substantial/trivial report buckets for verification. Evidence: verdict_treatments_semantic-shared.png"
+      },
+      {
+        "id": "2.7",
+        "name": "typography_and_spacing_rhythm",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography shows a clear hierarchy \u2014 app title larger than view headings, which are larger than card, table, and label text \u2014 and spacing between the rail, board columns, stage list, and package viewer panels is visually regular with no crowded or orphaned regions",
+        "reasoning": "The screenshot shows clear hierarchy from app title to view heading to card/label text, with regular spacing across the rail, board, stage list, timeline, and package panels. Evidence: console_layout_anatomy-shared.png"
+      },
+      {
+        "id": "2.8",
+        "name": "control_states_and_icon_set",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Buttons, inputs, selects, toggles, and cards show distinct default, hover, focus (visible ring), disabled, and error treatments, and one consistent icon set is used across the navigation rail, credential rows, stage statuses, triage actions, and package controls",
+        "reasoning": "FAIL: Button hover, invalid focused input, disabled batch control, and iconography were observed, but the full required set of distinct states across buttons, inputs, selects, toggles, and cards was not completely verified. Evidence: control_states_and_icon_set-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"console_layout_anatomy\":{\"score\":\"yes\",\"reasoning\":\"The rendered console visibly includes the top bar, mode/status controls, Connections button, left rail with Candidates/Triage/Runs/Library, and active main view. Evidence: console_layout_anatomy-shared.png\"},\"mode_indicator_visually_unmistakable\":{\"score\":\"no\",\"reasoning\":\"FAIL: Demo data is visibly shown as a filled chip, but credential connection visibly failed and the required Live accent state was not observed. Evidence: console_layout_anatomy-shared.png\"},\"stage_status_treatments_distinct\":{\"score\":\"no\",\"reasoning\":\"FAIL: Pending, running, retrying, and complete were observed, but a failed status was not reached, so all required statuses and consistent treatments could not be verified. Evidence: stage_status_treatments-shared.png\"},\"reject_reason_badges_consistent\":{\"score\":\"no\",\"reasoning\":\"FAIL: Reject-reason counts and filter controls are visible, but a rejected card with matching reason badges across all required locations was not observed. Evidence: reject_reason_badges-rejected.png\"},\"monospace_package_parts_labeled\":{\"score\":\"no\",\"reasoning\":\"FAIL: Instruction and task.toml are labeled and rendered as code-like blocks, but copy/download controls were not visibly adjacent to both individual blocks. Evidence: monospace_package_parts-labeled-shared.png\"},\"verdict_treatments_semantic\":{\"score\":\"no\",\"reasoning\":\"FAIL: Substantial and trivial verdicts were observed in Evaluate, but the batch result did not expose corresponding substantial/trivial report buckets for verification. Evidence: verdict_treatments_semantic-shared.png\"},\"typography_and_spacing_rhythm\":{\"score\":\"yes\",\"reasoning\":\"The screenshot shows clear hierarchy from app title to view heading to card/label text, with regular spacing across the rail, board, stage list, timeline, and package panels. Evidence: console_layout_anatomy-shared.png\"},\"control_states_and_icon_set\":{\"score\":\"no\",\"reasoning\":\"FAIL: Button hover, invalid focused input, disabled batch control, and iconography were observed, but the full required set of distinct states across buttons, inputs, selects, toggles, and cards was not completely verified. Evidence: control_states_and_icon_set-shared.png\"}}",
+    "cost_usd": 0.3611876
+  },
+  "writing": {
+    "score": 0.75,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "headings_use_consistent_capitalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders headings and section titles, they use consistent capitalization (one convention \u2014 title case or sentence case \u2014 throughout).",
+        "reasoning": "Headings and section titles consistently use sentence case across Candidates, Triage, Runs, and Library. Evidence: desktop-shared.png"
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_labels",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Where the app renders button or action labels, they are specific verbs ('Run pipeline', 'Download bundle', 'Reject PR'), not generic ('Submit', 'OK') when a specific label is possible.",
+        "reasoning": "FAIL: Some actions use generic labels such as \u201cNext\u201d and \u201cQueue\u201d where more specific labels would be possible. Evidence: desktop-shared.png, triage-shared.png"
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Where the app renders error messages, they name the problem and the fix (for example the repository field's required owner/name shape, or the bundle field that failed validation), not just a rejection ('Invalid').",
+        "reasoning": "FAIL: The GitHub validation error identifies the missing field (\u201cgithub-token is required\u201d) but does not explain how to fix it. Evidence: connection-error-shared.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders empty states, the copy explains what belongs there and how to add it.",
+        "reasoning": "The rejected-column empty state explains what belongs there and instructs users to reject candidates from Inbox with a precise reason. Evidence: triage-shared.png"
+      },
+      {
+        "id": "15.5",
+        "name": "body_copy_is_well_written",
+        "value": 1.0,
+        "raw": 5,
+        "weight": 0.5,
+        "description": "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors.",
+        "reasoning": "Visible body copy is clear, grammatical, and free of apparent spelling errors across the main views. Evidence: desktop-shared.png, triage-shared.png, library-shared.png"
+      },
+      {
+        "id": "15.6",
+        "name": "terminology_is_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders labels for the same concept in multiple places, terminology is consistent \u2014 for example package versus task package, and Reject PR / reject reason wording does not drift across triage and stats.",
+        "reasoning": "Repeated concepts use stable terminology: source files, PR/pull request, accepted/rejected, and bounded reject reasons remain consistent across views. Evidence: desktop-shared.png, triage-shared.png, library-shared.png"
+      },
+      {
+        "id": "15.7",
+        "name": "numbers_dates_and_units_are_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders numbers, dates, and units \u2014 merged dates, source-file counts, attempt counters, and n-of-m batch progress \u2014 formatting is consistent.",
+        "reasoning": "Counts, source-file units, dates, and timestamps use consistent formatting across Candidates, Triage, Library, and Runs. Evidence: desktop-shared.png, triage-shared.png, library-shared.png"
+      },
+      {
+        "id": "15.8",
+        "name": "success_messages_are_specific",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders confirmation and success messages, they state what happened (for example Copied, package complete, or undo restored), not vague affirmations.",
+        "reasoning": "The success toast explicitly states \u201cPR accepted\u201d and identifies the repository, PR number, and destination state. Evidence: success-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"headings_use_consistent_capitalization\":{\"score\":\"yes\",\"reasoning\":\"Headings and section titles consistently use sentence case across Candidates, Triage, Runs, and Library. Evidence: desktop-shared.png\"},\"actions_use_specific_labels\":{\"score\":\"no\",\"reasoning\":\"FAIL: Some actions use generic labels such as \u201cNext\u201d and \u201cQueue\u201d where more specific labels would be possible. Evidence: desktop-shared.png, triage-shared.png\"},\"errors_name_problem_and_fix\":{\"score\":\"no\",\"reasoning\":\"FAIL: The GitHub validation error identifies the missing field (\u201cgithub-token is required\u201d) but does not explain how to fix it. Evidence: connection-error-shared.png\"},\"empty_states_explain_next_step\":{\"score\":\"yes\",\"reasoning\":\"The rejected-column empty state explains what belongs there and instructs users to reject candidates from Inbox with a precise reason. Evidence: triage-shared.png\"},\"body_copy_is_well_written\":{\"score\":5,\"reasoning\":\"Visible body copy is clear, grammatical, and free of apparent spelling errors across the main views. Evidence: desktop-shared.png, triage-shared.png, library-shared.png\"},\"terminology_is_consistent\":{\"score\":\"yes\",\"reasoning\":\"Repeated concepts use stable terminology: source files, PR/pull request, accepted/rejected, and bounded reject reasons remain consistent across views. Evidence: desktop-shared.png, triage-shared.png, library-shared.png\"},\"numbers_dates_and_units_are_consistent\":{\"score\":\"yes\",\"reasoning\":\"Counts, source-file units, dates, and timestamps use consistent formatting across Candidates, Triage, Library, and Runs. Evidence: desktop-shared.png, triage-shared.png, library-shared.png\"},\"success_messages_are_specific\":{\"score\":\"yes\",\"reasoning\":\"The success toast explicitly states \u201cPR accepted\u201d and identifies the repository, PR number, and destination state. Evidence: success-shared.png\"}}",
+    "cost_usd": 0.1789298
+  }
+}

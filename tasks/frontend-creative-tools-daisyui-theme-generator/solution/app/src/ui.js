@@ -75,10 +75,10 @@ export function buildShell() {
           <span class="hold-label"><span class="hold-icon" aria-hidden="true">&#43;</span> Hold to add theme</span>
         </button>
         <div class="my-themes-block">
-          <h3 id="my-themes-h" class="side-h">My Themes <span class="count-pill" id="my-count">0</span></h3>
+          <h3 id="my-themes-h" class="side-h">My themes <span class="count-pill" id="my-count">0</span></h3>
           <ul id="my-themes" class="theme-list" aria-labelledby="my-themes-h"></ul>
         </div>
-        <h3 id="builtin-themes-h" class="side-h">Built-in Themes</h3>
+        <h3 id="builtin-themes-h" class="side-h">Built-in themes</h3>
         <ul id="builtin-themes" class="theme-list" aria-labelledby="builtin-themes-h">
           ${BUILTINS.map((t) => themeRowHTML(t)).join('')}
         </ul>
@@ -102,11 +102,11 @@ export function buildShell() {
           <label class="field-label" for="theme-name">Name</label>
           <input id="theme-name" class="text-input" type="text" placeholder="mytheme" autocomplete="off"
                  aria-describedby="name-hint name-error" spellcheck="false" />
-          <p id="name-hint" class="hint">2–30 chars · lowercase letter first · a–z, 0–9, - and _</p>
+          <p id="name-hint" class="hint">2–30 chars · starts with a letter · letters, numbers, spaces, - and _</p>
           <p id="name-error" class="field-error" aria-live="polite"></p>
         </div>
 
-        <h3 class="side-h">Change Colors</h3>
+        <h3 class="side-h">Change colors</h3>
         <div class="color-grid">
           <div class="color-base">
             ${BASE_KEYS.map((k) => colorControlHTML(k)).join('')}
@@ -136,13 +136,25 @@ export function buildShell() {
         </div>
         <button id="btn-reset" class="mini-btn" type="button">Reset tokens</button>
 
-        <h3 class="side-h">Font Family</h3>
+        <h3 class="side-h">Font family</h3>
         <div class="seg" role="group" aria-label="Font family" data-seg="font">
           ${FONT_FAMILIES.map((f) => `<button class="seg-btn" type="button" data-font="${f.id}" aria-pressed="false" aria-label="Font family ${f.label}">${f.label}</button>`).join('')}
         </div>
 
-        <h3 class="side-h">Contrast Matrix</h3>
+        <h3 class="side-h">Contrast matrix</h3>
+        <div class="matrix-tools">
+          <p class="hint">AA checks update with every color edit.</p>
+          <button id="btn-fix-contrast" class="mini-btn" type="button">Fix failing contrast</button>
+        </div>
         <div id="contrast-matrix" class="matrix" aria-live="off"></div>
+
+        <h3 class="side-h">Token relationships</h3>
+        <div class="token-explorer" aria-label="Interactive token relationship explorer">
+          <div class="seg token-explorer-tabs" role="tablist" aria-label="Semantic token relationship">
+            ${['primary', 'success', 'error'].map((name, i) => `<button class="seg-btn" type="button" role="tab" data-relation="${name}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}">${name[0].toUpperCase() + name.slice(1)}</button>`).join('')}
+          </div>
+          <svg id="token-relationship" class="token-relationship" viewBox="0 0 320 104" role="img" aria-label="Primary token relationship diagram"></svg>
+        </div>
 
         <div class="editor-actions">
           <button id="btn-css" class="primary-btn" type="button">CSS <span class="btn-sub">Artifact center</span></button>
@@ -151,7 +163,7 @@ export function buildShell() {
 
       <section class="panel preview-panel" aria-labelledby="preview-h">
         <div class="preview-chrome">
-          <h2 id="preview-h">Live Preview</h2>
+          <h2 id="preview-h">Live preview</h2>
           <div class="tabs" role="tablist" aria-label="Preview tabs">
             ${PREVIEW_TABS.map((t, i) => `<button class="tab" role="tab" type="button" id="tab-${t.id}" aria-selected="${i === 0}" aria-controls="tabpanel-${t.id}" tabindex="${i === 0 ? 0 : -1}" data-tab="${t.id}">${t.label}</button>`).join('')}
           </div>
@@ -167,7 +179,7 @@ export function buildShell() {
               <button id="btn-compare" class="switch" role="switch" aria-checked="false" type="button" aria-label="Before and after compare"></button>
               <span>Before / After</span>
             </label>
-            <button id="btn-snap" class="mini-btn" type="button">Save Snapshot</button>
+            <button id="btn-snap" class="mini-btn" type="button">Save snapshot</button>
           </div>
         </div>
         <div id="diff-callout" class="diff-callout" hidden>
@@ -191,7 +203,7 @@ export function buildShell() {
     <div class="artifact-overlay" id="artifact-overlay" hidden>
       <div class="artifact" role="dialog" aria-modal="true" aria-labelledby="artifact-h">
         <div class="artifact-head">
-          <h2 id="artifact-h">Artifact Center</h2>
+          <h2 id="artifact-h">Artifact center</h2>
           <button class="icon-btn" id="artifact-close" type="button" aria-label="Close artifact center">&#10005;</button>
         </div>
         <div class="artifact-tabs" role="tablist" aria-label="Artifact formats">
@@ -205,13 +217,13 @@ export function buildShell() {
           <button id="btn-download" class="mini-btn" type="button">Download theme.css</button>
         </div>
         <div class="import-block">
-          <h3 class="side-h" id="import-h">Import Theme</h3>
+          <h3 class="side-h" id="import-h">Import theme</h3>
           <label class="field-label" for="import-src">Declared-theme JSON</label>
           <textarea id="import-src" class="import-src" rows="5" aria-describedby="import-hint import-msg"
-            placeholder='{"name":"my-theme","colors":{"--color-primary":"#4b28d7", ...},"radius":{...},"size":{...},"effects":{...},"options":{...},"generatedAt":"...Z"}'></textarea>
+            placeholder='{"name":"my-theme","colors":{"--color-primary":"#4b28d7", ...},"radius":{...},"size":{...},"depth":1,"noise":0,"options":{...},"generatedAt":"...Z"}'></textarea>
           <p id="import-hint" class="hint">Paste an exported theme JSON — the same request-body contract the JSON tab emits.</p>
           <ul id="import-msg" class="field-error-list" role="alert"></ul>
-          <button id="btn-import" class="mini-btn" type="button">Import Theme</button>
+          <button id="btn-import" class="mini-btn" type="button">Import theme</button>
         </div>
       </div>
     </div>
@@ -278,12 +290,21 @@ let els = {};
 function refreshThemeLists() {
   els.myCount.textContent = String(state.customs.length);
   const mine = state.customs.map((t) => themeRowHTML(t)).join('');
-  const ghosts = [...leavingRows.values()].map((t) => `<li class="theme-row-wrap row-leaving" aria-hidden="true">
+  // Ghost rows render EXPANDED, then collapse next frame so removal animates
+  // (inserting them pre-collapsed would snap the row away instantly).
+  const ghosts = [...leavingRows.values()].map((t) => `<li class="theme-row-wrap row-ghost" data-row="${t.id}" aria-hidden="true">
     <span class="theme-row theme-row-ghost"><span class="chip">${CHIP_KEYS.map((k) => `<i style="background:${t.colors[k]}"></i>`).join('')}</span>
     <span class="tname">${esc(t.name)}</span></span></li>`).join('');
-  els.myThemes.innerHTML = state.customs.length || leavingRows.size
-    ? mine + ghosts
-    : `<li class="empty-state">Themes you create appear here.<br />Press and hold <strong>Hold to add theme</strong> for about three seconds, or fork a built-in by editing one of its tokens.</li>`;
+  const emptyHint = state.customs.length === 0
+    ? `<li class="empty-state">Themes you create appear here.<br />Press and hold <strong>Hold to add theme</strong> for about three seconds, or fork a built-in by editing one of its tokens.</li>`
+    : '';
+  els.myThemes.innerHTML = mine + ghosts + emptyHint;
+  const ghostNodes = $$('.row-ghost:not(.row-leaving)', els.myThemes);
+  if (ghostNodes.length) {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      for (const g of ghostNodes) g.classList.add('row-leaving');
+    }));
+  }
   // built-in rows: refresh pressed state + chips only
   for (const t of BUILTINS) {
     const btn = $(`[data-select="${t.id}"]`, els.builtinThemes);
@@ -335,6 +356,8 @@ function refreshEditorControls() {
   setSwitch('darkColorScheme', !!t.options.darkColorScheme);
   els.undoBtn.disabled = !state.past.length;
   els.redoBtn.disabled = !state.future.length;
+  els.cbFilter.value = state.colorBlind;
+  els.viewport.dataset.cb = state.colorBlind;
 }
 
 function syncSeg(kind, group, value) {
@@ -389,12 +412,27 @@ function updateSurfaces() {
     if (chip) chip.setAttribute('aria-label', `color preview for ${th.name}: ` + CHIP_KEYS.map((k) => `${k.replace('--color-', '')} ${th.colors[k]}`).join(', '));
   }
   updateMatrix(t);
+  updateTokenRelationship(t);
   updatePalette(t);
   updateArtifactText();
   updateDiffCallout();
   if (state.compareOn) refreshCompareStage();
   els.undoBtn.disabled = !state.past.length;
   els.redoBtn.disabled = !state.future.length;
+}
+
+let activeRelationship = 'primary';
+
+function updateTokenRelationship(t) {
+  const semantic = `--color-${activeRelationship}`;
+  const content = `${semantic}-content`;
+  const base = '--color-base-100';
+  els.tokenRelationship.setAttribute('aria-label', `${activeRelationship} token relationship diagram`);
+  els.tokenRelationship.innerHTML = `
+    <path class="relation-line" d="M78 52 H142 M178 52 H242" />
+    <g data-relation-node="${base}"><circle cx="46" cy="52" r="30" fill="${t.colors[base]}"/><text x="46" y="49">Base</text><text x="46" y="64">${t.colors[base]}</text></g>
+    <g data-relation-node="${semantic}"><circle cx="160" cy="52" r="30" fill="${t.colors[semantic]}"/><text x="160" y="49">${activeRelationship}</text><text x="160" y="64">${t.colors[semantic]}</text></g>
+    <g data-relation-node="${content}"><circle cx="274" cy="52" r="30" fill="${t.colors[content]}"/><text x="274" y="49">Content</text><text x="274" y="64">${t.colors[content]}</text></g>`;
 }
 
 function updateMatrix(t) {
@@ -451,8 +489,10 @@ function updateArtifactText() {
 }
 
 function updateDiffCallout() {
-  const diffs = state.compareOn ? diffAgainstSnapshot() : [];
-  els.diffCallout.hidden = !(state.compareOn && diffs.length);
+  // Token-diff callout: visible whenever the live edit has drifted from the
+  // latest snapshot (not only while compare is on) so the aid is discoverable.
+  const diffs = state.snapshots.length ? diffAgainstSnapshot() : [];
+  els.diffCallout.hidden = !diffs.length;
   els.diffList.innerHTML = diffs.slice(0, 8).map((d) =>
     `<li><code>${esc(d.token)}</code> <span class="diff-arrow">${esc(d.from)} &#8594; ${esc(d.to)}</span></li>`).join('')
     + (diffs.length > 8 ? `<li>…and ${diffs.length - 8} more token${diffs.length - 8 > 1 ? 's' : ''}</li>` : '');
@@ -460,13 +500,19 @@ function updateDiffCallout() {
 
 // ------------------------------------------------------------ overlays -----
 let lastOverlayOpener = null;
+let overlayHideTimer = 0;
 
 function openArtifact(tab = state.artifactTab, { focus = true } = {}) {
   state.artifactTab = tab;
   state.artifactOpen = true;
   syncArtifactTabs();
   els.artifactCode.textContent = artifactText(tab);
+  clearTimeout(overlayHideTimer);
+  // Un-hide, force layout, then add the class so the enter opacity/scale
+  // transition runs (a transition can't start from display:none).
   els.overlay.hidden = false;
+  void els.overlay.offsetWidth;
+  els.overlay.classList.add('open');
   document.body.classList.add('modal-open');
   if (focus) {
     lastOverlayOpener = document.activeElement;
@@ -476,7 +522,9 @@ function openArtifact(tab = state.artifactTab, { focus = true } = {}) {
 
 function closeArtifact() {
   state.artifactOpen = false;
-  els.overlay.hidden = true;
+  els.overlay.classList.remove('open');
+  clearTimeout(overlayHideTimer);
+  overlayHideTimer = setTimeout(() => { els.overlay.hidden = true; }, 200);
   document.body.classList.remove('modal-open');
   (lastOverlayOpener || els.cssBtn)?.focus?.();
   lastOverlayOpener = null;
@@ -511,7 +559,7 @@ function closeAllMenus(except) {
     if (dd === except) continue;
     const menu = $('.dd-menu', dd);
     const trig = $('.dd-trigger', dd);
-    if (menu && !menu.hidden) { menu.hidden = true; trig.setAttribute('aria-expanded', 'false'); }
+    if (menu && !menu.hidden) { menu.classList.remove('menu-in'); menu.hidden = true; trig.setAttribute('aria-expanded', 'false'); }
   }
 }
 
@@ -520,12 +568,19 @@ function toggleMenu(dd, open) {
   const trig = $('.dd-trigger', dd);
   const willOpen = open ?? menu.hidden;
   closeAllMenus(willOpen ? dd : null);
-  menu.hidden = !willOpen;
-  trig.setAttribute('aria-expanded', String(willOpen));
   if (willOpen) {
+    // Un-hide first, force a layout, then add the class so the brief
+    // opacity/scale transition actually runs (display:none can't animate).
+    menu.hidden = false;
+    menu.classList.remove('menu-in');
+    void menu.offsetWidth;
     menu.classList.add('menu-in');
     $('.dd-item', menu)?.focus();
+  } else {
+    menu.classList.remove('menu-in');
+    menu.hidden = true;
   }
+  trig.setAttribute('aria-expanded', String(willOpen));
 }
 
 // --------------------------------------------------------- hold to add -----
@@ -584,11 +639,11 @@ function finishHold(completed) {
 
 // ----------------------------------------------------------- comparison ----
 function setCompare(on) {
-  state.compareOn = !!on;
   if (on && !state.snapshots.length) {
-    const snap = saveSnapshot();
-    showToast(`Snapshot saved — ${snap.name}`);
+    showToast("No snapshots yet \u2014 save one to compare");
+    return;
   }
+  state.compareOn = !!on;
   els.compareBtn.setAttribute('aria-checked', String(state.compareOn));
   els.compareBtn.classList.toggle('is-on', state.compareOn);
   if (state.compareOn) refreshCompareStage();
@@ -624,6 +679,7 @@ export function initUI() {
     resetBtn: $('#btn-reset'), cssBtn: $('#btn-css'),
     matrix: $('#contrast-matrix'),
     stage: $('#preview-stage'), compareStage: $('#compare-stage'), viewport: $('.preview-viewport'),
+    tokenRelationship: $('#token-relationship'),
     compareBtn: $('#btn-compare'), snapBtn: $('#btn-snap'), diffCallout: $('#diff-callout'), diffList: $('#diff-list'),
     cbFilter: $('#cb-filter'),
     holdBtn: $('#hold-add'), holdFill: $('#hold-add .hold-fill'),
@@ -655,11 +711,14 @@ export function initUI() {
   wireCoach();
   wireShortcuts();
 
-  loadFromHash();
+  // Only write a #theme= hash back when the boot URL actually carried a
+  // decodable payload — a hashless (or malformed-hash) load must stay
+  // hashless so a plain reload returns to the seeded baseline URL.
+  const appliedHash = loadFromHash();
   refreshThemeLists();
   refreshEditorControls();
   updateSurfaces();
-  syncHash();
+  if (appliedHash) syncHash();
   watchHash();
   document.documentElement.classList.add('app-ready');
 }
@@ -711,6 +770,7 @@ function wireChrome() {
 }
 
 function wireThemeLists() {
+  let lastRemoveActivation = 0;
   document.addEventListener('click', (e) => {
     const sel = e.target.closest('[data-select]');
     if (sel && !e.target.closest('[data-remove]')) {
@@ -719,6 +779,9 @@ function wireThemeLists() {
     }
     const rm = e.target.closest('[data-remove]');
     if (rm) {
+      const now = performance.now();
+      if (now - lastRemoveActivation < 300) return;
+      lastRemoveActivation = now;
       const id = rm.dataset.remove;
       const t = [...BUILTINS, ...state.customs].find((x) => x.id === id);
       const res = removeTheme(id);
@@ -796,6 +859,16 @@ function wireEditor() {
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('.seg-btn');
     if (!btn) return;
+    if (btn.dataset.relation) {
+      activeRelationship = btn.dataset.relation;
+      for (const tab of $$('.token-explorer-tabs [role="tab"]')) {
+        const selected = tab === btn;
+        tab.setAttribute('aria-selected', String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+      }
+      updateTokenRelationship(activeTheme());
+      return;
+    }
     const seg = btn.closest('.seg');
     if (btn.getAttribute('aria-pressed') === 'true') return;
     applySeg(seg, btn.dataset);
@@ -850,6 +923,24 @@ function wireEditor() {
     if (e.target.closest('#btn-reset')) {
       if (resetActive()) showToast('Tokens reset to defaults');
       else showToast('Built-in themes are already pristine');
+      return;
+    }
+    if (e.target.closest('#btn-fix-contrast')) {
+      const before = snapshotState();
+      let fixes = 0;
+      const pairs = [
+        ['--color-base-100', '--color-base-content'],
+        ...SEMANTIC_NAMES.map((name) => [`--color-${name}`, `--color-${name}-content`]),
+      ];
+      for (const [faceKey, contentKey] of pairs) {
+        const t = activeTheme();
+        if (contrastOf(t.colors[faceKey], t.colors[contentKey]) >= 4.5) continue;
+        const replacement = contrastOf(t.colors[faceKey], '#000000') >= contrastOf(t.colors[faceKey], '#ffffff') ? '#000000' : '#ffffff';
+        setColor(contentKey, replacement);
+        fixes += 1;
+      }
+      pushExternalHistory(before);
+      showToast(fixes ? `Fixed ${fixes} failing contrast pair${fixes === 1 ? '' : 's'} — Undo is available` : 'All contrast pairs already meet AA');
       return;
     }
     if (e.target.closest('#btn-css')) { openArtifact('css'); return; }
@@ -955,6 +1046,7 @@ function wireArtifact() {
   });
 }
 
+let copyResetTimer = 0;
 export async function copyArtifact(fmt) {
   const text = artifactText(fmt);
   let ok = false;
@@ -975,6 +1067,16 @@ export async function copyArtifact(fmt) {
     } catch { ok = false; }
   }
   showToast(`${FMT_LABEL[fmt]} copied to clipboard`);
+  // Brief confirmation on the Copy control itself that resets shortly after.
+  if (els.copyBtn) {
+    els.copyBtn.classList.add('is-copied');
+    els.copyBtn.textContent = 'Copied ✓';
+    clearTimeout(copyResetTimer);
+    copyResetTimer = setTimeout(() => {
+      els.copyBtn.classList.remove('is-copied');
+      els.copyBtn.textContent = `Copy ${FMT_LABEL[state.artifactTab]}`;
+    }, 1500);
+  }
   return ok;
 }
 

@@ -1,8 +1,8 @@
 <template>
   <DialogRoot :open="isOpen" @update:open="isOpen = $event">
     <DialogPortal>
-      <DialogOverlay class="fixed inset-0 z-50 bg-ink/40" />
-      <DialogContent class="fixed left-1/2 top-1/4 z-50 w-full max-w-lg -translate-x-1/2 rounded-xl bg-surface shadow-xl" :aria-describedby="undefined">
+      <DialogOverlay class="fixed inset-0 z-50 bg-ink/40 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0" />
+      <DialogContent class="fixed left-1/2 top-1/4 z-50 w-full max-w-lg -translate-x-1/2 rounded-xl bg-surface shadow-xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95 data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[24%] data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[24%]" :aria-describedby="undefined">
         <DialogTitle class="sr-only">Command Palette</DialogTitle>
         <ComboboxRoot v-model="selectedAction" @update:modelValue="handleAction">
           <ComboboxInput

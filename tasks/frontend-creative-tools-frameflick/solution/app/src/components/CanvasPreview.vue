@@ -278,8 +278,10 @@ onMounted(() => {
 }
 .canvas-container.is-dragging {
   cursor: grabbing;
-  outline-color: #2563eb;
-  box-shadow: 0 12px 40px rgba(37, 99, 235, 0.35);
+  outline: 4px solid #2563eb !important;
+  outline-color: #2563eb !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 4px #2563eb, 0 12px 40px rgba(37, 99, 235, 0.35) !important;
 }
 .layer {
   display: block;

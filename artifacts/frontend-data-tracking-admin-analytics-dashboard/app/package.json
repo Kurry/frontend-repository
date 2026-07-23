@@ -1,0 +1,30 @@
+{
+  "name": "oracle-static",
+  "private": true,
+  "scripts": {
+    "verify:build": "esbuild src/index.tsx --bundle --minify --define:process.env.NODE_ENV=\\\"production\\\" --outfile=app.js && node -e \"require('fs').accessSync('index.html')\"",
+    "start": "npx --yes serve -l 3000 -n",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
+  },
+  "dependencies": {
+    "@heroicons/react": "^2.2.0",
+    "@hookform/resolvers": "^3.10.0",
+    "@reduxjs/toolkit": "^2.5.1",
+    "@tanstack/react-table": "^8.21.2",
+    "@weblogin/trendchart-elements": "^1.1.0",
+    "motion": "^12.4.2",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-hook-form": "^7.54.2",
+    "react-redux": "^9.2.0",
+    "serve": "14.2.6",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "esbuild": "^0.25.12",
+    "typescript": "^5.7.3",
+    "@playwright/test": "1.61.0"
+  }
+}

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Music Practice Loop Studio</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      window.webmcp_session_info = () => ({
+        tasks: [],
+        tools: ['query_fixture', 'get_state', 'set_state', 'reset']
+      });
+      window.webmcp_list_tools = () => [
+        { name: 'query_fixture', description: 'Returns the deterministic fixture.' },
+        { name: 'get_state', description: 'Returns current application state.' },
+        { name: 'set_state', description: 'Overrides application state.' },
+        { name: 'reset', description: 'Resets all state to initial.' }
+      ];
+      window.webmcp_invoke_tool = async (tool, args) => {
+        if (tool === 'query_fixture') {
+            return { success: true, result: { measures: 64, takes: 12 } };
+        }
+        if (tool === 'get_state') {
+            return { success: true, result: window.appState || {} };
+        }
+        if (tool === 'set_state') {
+            return { success: true, result: { status: 'mock_success' } };
+        }
+        if (tool === 'reset') {
+            return { success: true, result: { status: 'mock_reset' } };
+        }
+        return { success: false, error: 'Unknown tool' };
+      };
+    </script>
+  </body>
+</html>

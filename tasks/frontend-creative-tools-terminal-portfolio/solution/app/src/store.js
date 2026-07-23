@@ -154,6 +154,27 @@ export function mutate(fn) {
   undoStack.value = [...undoStack.value, snapshot()];
   redoStack.value = [];
   fn();
+  refreshWorkViewInOutput();
+}
+
+export function refreshWorkViewInOutput() {
+  if (outputBuffer.value.some((l) => l.view === 'work')) {
+    const lines = [{ text: `Work — ${projects.value.length} project${projects.value.length === 1 ? '' : 's'}`, type: 'heading' }];
+    if (projects.value.length === 0) {
+      lines.push({ html: '<div class="empty-view">No projects yet. Open the Projects Board (mode toggle or /board) and choose New Project, or import a Portfolio JSON document from Export Center.</div>' });
+    } else {
+      const esc = (v) => String(v).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+      const statusIcon = { shipped: 'tabler--circle-check', wip: 'tabler--loader-2', archived: 'tabler--archive' };
+      const statusLabel = { shipped: 'Shipped', wip: 'Work in Progress', archived: 'Archived' };
+      const badge = (s) => `<span class="status-badge status-${s}"><span class="icon-[${statusIcon[s]}] size-3 shrink-0"></span>${statusLabel[s]}</span>`;
+      const tagsHtml = (tags) => tags.map((t) => `<span class="tag-chip">${esc(t)}</span>`).join('');
+      for (const p of projects.value) {
+        lines.push({ html: `<div class="cli-card" data-slug="${esc(p.slug)}"><div class="cli-card-head"><span class="cli-card-name">${esc(p.name)}${p.featured ? ' <span class="icon-[tabler--star-filled] featured-star" title="Featured" aria-label="Featured"></span>' : ''}</span><span class="cli-card-year">${esc(p.year)}</span></div>${p.type ? `<div class="cli-card-type">${esc(p.type)}</div>` : ''}<div class="cli-card-meta">${badge(p.status)}</div><div class="cli-card-summary">${esc(p.summary)}</div><div class="cli-card-tags">${tagsHtml(p.tags)}</div></div>` });
+      }
+    }
+    const stamped = lines.map((l, i) => ({ id: `v-work-${Date.now()}-${i}`, view: 'work', ...l }));
+    outputBuffer.value = [...outputBuffer.value.filter((l) => l.view !== 'work'), ...stamped];
+  }
 }
 
 export function undo() {

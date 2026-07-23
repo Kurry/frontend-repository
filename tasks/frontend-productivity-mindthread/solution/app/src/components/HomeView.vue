@@ -318,7 +318,7 @@ function sparkMatchesTags(spark: Spark): boolean {
 
 function threadMatchesTags(thread: Thread): boolean {
   if (activeTags.value.length === 0) return true
-  return sparks.value.some(spark => spark.threadId === thread.id && sparkMatchesTags(spark))
+  return sparks.value.some(spark => spark.threadId === thread.id && activeTags.value.some(tag => spark.tags.includes(tag)))
 }
 
 const filteredUnthreaded = computed(() => unthreadedSparks.value.filter(sparkMatchesTags))

@@ -1,0 +1,2624 @@
+{
+  "accessibility": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "controls_are_keyboard_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every interactive control \u2014 toolbar buttons, repository row actions and checkboxes, scan controls, filter checkboxes, pattern toggles, document rows, timeline entries, Export format tabs, Import, Undo, Redo, and command palette rows \u2014 is reachable and operable with the keyboard alone, with a visible focus indicator",
+        "reasoning": "All observed controls are native buttons, inputs, switches, or checkboxes with keyboard focus; command-palette focus traversal remained inside the dialog. Evidence: scanner-initial-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "modals_manage_focus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The Add repository modal, Export panel, and command palette use role dialog with aria-modal true, trap focus while open, close on Escape, and return focus to the control that opened them",
+        "reasoning": "Add repository, export, and command palette use aria-modal dialogs; focus enters them, Tab stays within the palette, Escape closes, and Add repository focus returns to its opener. Evidence: modals-forms-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "icons_have_accessible_names",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Icon-only toolbar and row actions expose accessible names (aria-label or equivalent) identifying Add repository, Scan Now, Export, Import, Undo, Redo, and Remove",
+        "reasoning": "Toolbar and row icon actions expose accessible names such as Undo, Redo, Remove Design system, and Close through accessible labels/tooltips. Evidence: scanner-initial-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "feedback_uses_live_regions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Import validation, copy confirmation, and scan step failure summaries are announced through an aria-live region (or role alert) as well as shown visually",
+        "reasoning": "Malformed import, copy confirmation, and scan failure/retry summaries were both visible and announced through alert/status live regions. Evidence: import-validation-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "forms_have_explicit_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Add repository path and display name fields have visible labels; validation messages are associated with their fields so each message names the field it belongs to",
+        "reasoning": "Add repository visibly presents Local path and Display name labels; validation uses associated described-by error IDs. Evidence: modals-forms-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "headings_follow_logical_order",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Panel titles and section headings follow a logical heading order without skipping levels in the scanner chrome",
+        "reasoning": "Visible scanner headings follow H1, H2 section, and H3 subsection hierarchy without skipped levels. Evidence: scanner-initial-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "landmark_navigation_is_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The scanner exposes landmark regions (for example main, complementary, or labelled sections) so the repository list, tree/viewer, and scan panel can be reached by landmark navigation",
+        "reasoning": "The app exposes main, banner, footer, and labelled regions for repositories, scan configuration, documents, guidance topology, and scan workflow. Evidence: scanner-initial-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "text_and_controls_have_contrast",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Body text, status chip labels, and toolbar controls meet readable contrast against their surfaces",
+        "reasoning": "Rendered body text, toolbar controls, headings, and status labels are clearly readable against their backgrounds in the observed desktop view. Evidence: scanner-initial-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "status_not_color_alone",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Scan step status is conveyed by text labels as well as color; failed steps are not color-only",
+        "reasoning": "Scan steps visibly use text statuses including Complete, Retrying, and Failed, with failure summaries also announced textually. Evidence: failure-summary-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "reduced_motion_is_respected",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, decorative row/modal/palette animations apply instantly while keyboard operability remains intact",
+        "reasoning": "In the reduced-motion browser, prefers-reduced-motion matched true, sampled durations/animations were effectively 1e-06s, and the command palette remained keyboard-operable. Evidence: reduced-motion-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"controls_are_keyboard_accessible\":{\"score\":\"yes\",\"reasoning\":\"All observed controls are native buttons, inputs, switches, or checkboxes with keyboard focus; command-palette focus traversal remained inside the dialog. Evidence: scanner-initial-shared.png\"},\"modals_manage_focus\":{\"score\":\"yes\",\"reasoning\":\"Add repository, export, and command palette use aria-modal dialogs; focus enters them, Tab stays within the palette, Escape closes, and Add repository focus returns to its opener. Evidence: modals-forms-shared.png\"},\"icons_have_accessible_names\":{\"score\":\"yes\",\"reasoning\":\"Toolbar and row icon actions expose accessible names such as Undo, Redo, Remove Design system, and Close through accessible labels/tooltips. Evidence: scanner-initial-shared.png\"},\"feedback_uses_live_regions\":{\"score\":\"yes\",\"reasoning\":\"Malformed import, copy confirmation, and scan failure/retry summaries were both visible and announced through alert/status live regions. Evidence: import-validation-shared.png\"},\"forms_have_explicit_labels\":{\"score\":\"yes\",\"reasoning\":\"Add repository visibly presents Local path and Display name labels; validation uses associated described-by error IDs. Evidence: modals-forms-shared.png\"},\"headings_follow_logical_order\":{\"score\":\"yes\",\"reasoning\":\"Visible scanner headings follow H1, H2 section, and H3 subsection hierarchy without skipped levels. Evidence: scanner-initial-shared.png\"},\"landmark_navigation_is_present\":{\"score\":\"yes\",\"reasoning\":\"The app exposes main, banner, footer, and labelled regions for repositories, scan configuration, documents, guidance topology, and scan workflow. Evidence: scanner-initial-shared.png\"},\"text_and_controls_have_contrast\":{\"score\":\"yes\",\"reasoning\":\"Rendered body text, toolbar controls, headings, and status labels are clearly readable against their backgrounds in the observed desktop view. Evidence: scanner-initial-shared.png\"},\"status_not_color_alone\":{\"score\":\"yes\",\"reasoning\":\"Scan steps visibly use text statuses including Complete, Retrying, and Failed, with failure summaries also announced textually. Evidence: failure-summary-shared.png\"},\"reduced_motion_is_respected\":{\"score\":\"yes\",\"reasoning\":\"In the reduced-motion browser, prefers-reduced-motion matched true, sampled durations/animations were effectively 1e-06s, and the command palette remained keyboard-operable. Evidence: reduced-motion-shared.png\"}}",
+    "cost_usd": 0.3439512
+  },
+  "behavioral": {
+    "score": 0.7,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_reload_resets_to_seed",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Multi-facet round-trip (in-memory): add a repository, run a scan, disable a pattern, expand a findings disclosure, select two checkboxes, and open Export; then reload. Confirm every facet coherently resets to the seeded baseline \u2014 at least 3 repositories with at least 8 documents each, default patterns enabled, empty undo/redo stacks, no scan running, no import overlay \u2014 never a mix of surviving and reverted facets.",
+        "reasoning": "Reload restored the seeded three repositories, 24 documents, enabled patterns, zero selections, and no active scan/import overlay. Evidence: multi_facet_reload_baseline.png"
+      },
+      {
+        "id": "14.2",
+        "name": "type_filter_reversal_proves_live_tree",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Filter-reversal proof (genre stand-in for sort reversal): check only CLAUDE.md and note the narrowed tree and counts, then check only README and note a different set, then uncheck all types. Confirm the full tree returns \u2014 proving the tree is derived from the live documents index, not two hardcoded snapshots.",
+        "reasoning": "CLAUDE-only and README-only filters each showed six different documents, and clearing filters restored the full tree. Evidence: type_filter_claude.png; type_filter_readme_only.png"
+      },
+      {
+        "id": "14.3",
+        "name": "pattern_toggle_derived_scan_sensitivity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Derived-view sensitivity: disable the README pattern, rescan a repository, and confirm the tree shows no README documents for that repository afterward; re-enable the pattern, rescan, and confirm README documents return \u2014 not an identical tree regardless of pattern input.",
+        "reasoning": "After disabling README and rescanning, the repository showed no README documents; re-enabling and rescanning restored them. Evidence: pattern_readme_disabled_rescan.png; pattern_readme_reenabled_rescan.png"
+      },
+      {
+        "id": "14.4",
+        "name": "rename_echoes_across_list_and_export",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cross-view echo: rename a repository display name; without reload confirm the new name appears in the repository row and in the Export Scan Index JSON / Inventory Markdown previews that reference that repository.",
+        "reasoning": "Renaming the repository to Design Renamed updated the repository list and export-related visible content without reload. Evidence: rename_export_echo.png"
+      },
+      {
+        "id": "14.5",
+        "name": "add_repository_count_delta_exact",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Count-delta integrity: measure the repository row count, submit one valid Add repository form, and re-measure immediately \u2014 the count increases by exactly one (no off-by-one, no lagging counter).",
+        "reasoning": "The repository row count changed immediately from 3 to 4 after one valid add. Evidence: add_repository_delta.png"
+      },
+      {
+        "id": "14.6",
+        "name": "different_paths_different_export",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Input-dependent output: add repository path A, export and note JSON/Markdown text; remove it (or undo), add a clearly different path B, export again. Confirm the two export texts differ in the ways the paths dictate.",
+        "reasoning": "Exports visibly contained /workspace/delta-repo before deletion and /workspace/other-repo-B afterward, demonstrating path-dependent output. Evidence: different_paths_export.png"
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_scan_and_filter_flows",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Interleaved-flow integrity: start a scan on one repository, switch type filters while it runs, open a document from another repository in the viewer, then pause the scan; confirm the filter and viewer state persist and the scan panel still matches the active scan without corrupting either flow.",
+        "reasoning": "FAIL: The scan started, filter changes and pause succeeded, but opening the document viewer failed because the live scan/export modal intercepted the document interaction. Evidence: interleaved_scan_filter_viewer_pause.png"
+      },
+      {
+        "id": "14.8",
+        "name": "empty_then_repopulate_repositories",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edge-state round-trip: remove every repository (list and tree empty states visible), then add two valid repositories and scan one; confirm empty states clear, both rows appear, and the tree shows documents for the scanned repository.",
+        "reasoning": "All repositories were removed and the empty list/tree states appeared; adding two repositories and scanning one cleared the empty states and showed documents for the scanned repository. Evidence: empty_repositories.png; repopulate_scanned.png"
+      },
+      {
+        "id": "14.9",
+        "name": "export_import_round_trip_preserves_index",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Mutate \u2192 derived \u2192 export \u2192 import: add a distinctive-path repository, complete a scan so its document count is non-zero, confirm Export JSON/Markdown reflect it; Download Scan Index JSON; mutate state away; Import the downloaded JSON; confirm list, tree, patterns, and Export return to the imported values.",
+        "reasoning": "FAIL: After the attempted distinctive-path setup and export, the requested /workspace/import-distinctive repository was not visibly present after closing the export view, and no successful post-mutation import restoration was observed. Evidence: export_import_roundtrip.png"
+      },
+      {
+        "id": "14.10",
+        "name": "undo_round_trip_restores_all_surfaces",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Undo round-trip: add a repository (list and Export update), Undo removes it and restores prior Export text everywhere those surfaces show repositories, Redo restores the same path and display name \u2014 never a surface left stale.",
+        "reasoning": "FAIL: Undo and redo changed the row count, but the restored visible repository was QA Distinctive rather than the requested /workspace/undo-roundtrip path/display name, so full surface restoration was not proven. Evidence: undo_removed.png; redo_restored.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"multi_facet_reload_resets_to_seed\":{\"score\":\"yes\",\"reasoning\":\"Reload restored the seeded three repositories, 24 documents, enabled patterns, zero selections, and no active scan/import overlay. Evidence: multi_facet_reload_baseline.png\"},\"type_filter_reversal_proves_live_tree\":{\"score\":\"yes\",\"reasoning\":\"CLAUDE-only and README-only filters each showed six different documents, and clearing filters restored the full tree. Evidence: type_filter_claude.png; type_filter_readme_only.png\"},\"pattern_toggle_derived_scan_sensitivity\":{\"score\":\"yes\",\"reasoning\":\"After disabling README and rescanning, the repository showed no README documents; re-enabling and rescanning restored them. Evidence: pattern_readme_disabled_rescan.png; pattern_readme_reenabled_rescan.png\"},\"rename_echoes_across_list_and_export\":{\"score\":\"yes\",\"reasoning\":\"Renaming the repository to Design Renamed updated the repository list and export-related visible content without reload. Evidence: rename_export_echo.png\"},\"add_repository_count_delta_exact\":{\"score\":\"yes\",\"reasoning\":\"The repository row count changed immediately from 3 to 4 after one valid add. Evidence: add_repository_delta.png\"},\"different_paths_different_export\":{\"score\":\"yes\",\"reasoning\":\"Exports visibly contained /workspace/delta-repo before deletion and /workspace/other-repo-B afterward, demonstrating path-dependent output. Evidence: different_paths_export.png\"},\"interleaved_scan_and_filter_flows\":{\"score\":\"no\",\"reasoning\":\"FAIL: The scan started, filter changes and pause succeeded, but opening the document viewer failed because the live scan/export modal intercepted the document interaction. Evidence: interleaved_scan_filter_viewer_pause.png\"},\"empty_then_repopulate_repositories\":{\"score\":\"yes\",\"reasoning\":\"All repositories were removed and the empty list/tree states appeared; adding two repositories and scanning one cleared the empty states and showed documents for the scanned repository. Evidence: empty_repositories.png; repopulate_scanned.png\"},\"export_import_round_trip_preserves_index\":{\"score\":\"no\",\"reasoning\":\"FAIL: After the attempted distinctive-path setup and export, the requested /workspace/import-distinctive repository was not visibly present after closing the export view, and no successful post-mutation import restoration was observed. Evidence: export_import_roundtrip.png\"},\"undo_round_trip_restores_all_surfaces\":{\"score\":\"no\",\"reasoning\":\"FAIL: Undo and redo changed the row count, but the restored visible repository was QA Distinctive rather than the requested /workspace/undo-roundtrip path/display name, so full surface restoration was not proven. Evidence: undo_removed.png; redo_restored.png\"}}",
+    "cost_usd": 0.3290594
+  },
+  "core_features": {
+    "score": 0.5,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "add_repository_form_validation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The toolbar Add repository button opens a modal with a required local path input and an optional display name input; the submit control stays disabled while the path is empty, and an empty, whitespace-only, over-260-character, or otherwise invalid path shows an inline message naming the path field before submit",
+        "reasoning": "Required local-path validation was visible in the Add repository modal, including a disabled submit button and inline path error. Evidence: add-create-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "add_repository_creates_exactly_one",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Submitting a valid Add repository form closes the modal and adds exactly one row to the repository list (row count delta measured immediately around the action is one, even when the submit control is double-activated)",
+        "reasoning": "A valid create action increased the repository count from 3 to 4 and produced one new row. Evidence: add-create-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "repository_row_anatomy_and_seed",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At least 3 seeded repositories are listed on first load, each row showing a checkbox, path, display name, last-scanned timestamp, document count, and a Scan Now button, with at least 8 documents per seeded repository reachable in the document tree",
+        "reasoning": "First load showed 3 repositories, each with checkbox, path, name, timestamp, document count, and Scan now; the document tree showed 8 documents per seeded repository. Evidence: initial-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "rename_and_remove_repository",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Rename edits a repository's display name in place under the displayName field contract and the new name appears everywhere the repository is referenced; Remove asks for confirmation and then deletes the repository row and removes its documents from the document tree in the same interaction",
+        "reasoning": "FAIL: Rename worked and propagated, but the remove-confirm-delete-and-tree-removal workflow was not completed."
+      },
+      {
+        "id": "1.5",
+        "name": "scan_now_inline_loading_and_row_update",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Clicking Scan Now shows an inline loading indicator in that repository's row while the simulated scan runs, and after completion the row's document count and last-scanned timestamp both update",
+        "reasoning": "FAIL: Scanning and completion were observed, but an inline loading indicator in the repository row was not visibly confirmed."
+      },
+      {
+        "id": "1.6",
+        "name": "progress_bar_files_scanned",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "During a scan the scan panel shows a progress bar labeled files scanned / total files that fills from 0 to 100 percent over the scan duration, with the label numbers advancing alongside the bar",
+        "reasoning": "The scan panel visibly showed advancing files scanned counts and percentage progress, including 5/8 and later 8/8. Evidence: progress-steps-timeline-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "per_document_step_statuses",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The active scan decomposes into named per-document steps whose statuses advance visibly from pending to running to complete during the run, with failed and retrying states appearing on the simulated failure path",
+        "reasoning": "Named document steps visibly progressed through running and complete, and the failure demo showed retrying and failed states. Evidence: progress-steps-timeline-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "retry_backoff_countdown",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A failing step retries automatically showing a visible attempt count and a backoff countdown (for example waiting 3s before retry 2 of 3) whose countdown text updates each second while waiting",
+        "reasoning": "The failure path visibly showed \u201cWaiting 3s before retry 2 of 3,\u201d later advancing to retry 3 of 3. Evidence: progress-steps-timeline-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "manual_retry_resumes_from_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A step that exhausts its retries shows a failed status with an inline error summary and a manual Retry step control; activating it resumes the scan from that step, and already-completed steps keep their original timestamps and outputs without re-running",
+        "reasoning": "An exhausted step displayed an inline parser error and Retry step control; activating it queued and resumed that step while earlier steps retained completion timestamps. Evidence: progress-steps-timeline-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "pause_resume_from_checkpoint",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Pausing a running scan freezes step progression and the progress bar; Resume continues from the exact step where it stopped, previously completed steps never re-execute, and the scan then completes normally",
+        "reasoning": "FAIL: Pause and Resume preserved the 4/8 checkpoint, but the exercised failure-demo scan ultimately failed rather than completing normally."
+      },
+      {
+        "id": "1.11",
+        "name": "live_rollups_track_steps",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The scan panel shows rollups \u2014 steps complete of total, failure count, and elapsed duration \u2014 that update live as steps advance and always match what the step list shows",
+        "reasoning": "The scan panel visibly showed matching steps-complete, failures, elapsed, and workflow-status rollups alongside the step list. Evidence: progress-steps-timeline-shared.png"
+      },
+      {
+        "id": "1.12",
+        "name": "event_timeline_filter_highlight",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Each scan has an ordered event timeline of step transitions with timestamps; filtering the timeline by status narrows the visible entries, and selecting a timeline entry highlights the matching step in the step list",
+        "reasoning": "FAIL: An event timeline was visible, but filtering and selecting an entry to verify matching-step highlighting were not completed."
+      },
+      {
+        "id": "1.13",
+        "name": "document_tree_grouped_by_type",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The document tree groups detected files by type \u2014 CLAUDE.md, AGENTS.md, .cursorrules, and README \u2014 in accordion sections whose headers show the per-group document count; each document carries path, type, content, and findings under the document field contract",
+        "reasoning": "The tree visibly grouped documents into CLAUDE.md, AGENTS.md, .cursorrules, and README accordion sections with counts, paths, previews, and findings. Evidence: initial-shared.png"
+      },
+      {
+        "id": "1.14",
+        "name": "file_viewer_readonly_line_numbers",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Clicking a document entry opens a read-only viewer showing the file content in monospace type with line numbers, and its copy control gives visible confirmation when activated",
+        "reasoning": "Opening a document showed a read-only monospace viewer with line numbers; Copy was activated from the viewer."
+      },
+      {
+        "id": "1.15",
+        "name": "document_hover_preview",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Hovering a document row reveals a compact preview with the file name, a type glyph, and the first lines of content, without opening the full viewer",
+        "reasoning": "FAIL: Preview tooltip content was present in the rendered tree, but the required real hover interaction was not directly exercised."
+      },
+      {
+        "id": "1.16",
+        "name": "findings_disclosure_remembered",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Each document row has a findings disclosure collapsed by default; expanding it reveals that document's scan findings with a rotating chevron cue, and each row's open state is remembered after switching panels while the app stays open",
+        "reasoning": "FAIL: Findings controls were visible, but expansion and remembered state after switching panels were not successfully verified."
+      },
+      {
+        "id": "1.17",
+        "name": "type_filter_checkboxes",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Checking type filter checkboxes narrows the tree to only the checked document types with visible document and group counts updating, and unchecking all types shows all documents again",
+        "reasoning": "FAIL: The type filter controls were exercised, but checking CLAUDE.md did not visibly narrow the tree or update counts."
+      },
+      {
+        "id": "1.18",
+        "name": "pattern_toggles_affect_future_scans",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Toggling a document pattern off in the scan configuration excludes that type from future scans \u2014 rescanning a repository afterward yields no documents of the disabled type while documents from earlier scans remain until rescan \u2014 and toggling off the last enabled pattern shows an inline validation message naming the problem",
+        "reasoning": "FAIL: Pattern switches were toggled, but the complete disable/rescan exclusion workflow and last-pattern validation were not directly verified."
+      },
+      {
+        "id": "1.19",
+        "name": "no_concurrent_scan_same_repo",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Clicking Scan Now on a repository that is already scanning does not start a second concurrent scan of that repository (no duplicated steps, progress bars, or timeline entries)",
+        "reasoning": "FAIL: Concurrent activation on the same actively scanning repository was not directly tested."
+      },
+      {
+        "id": "1.20",
+        "name": "batch_select_and_scan_selected",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Selecting one or more repository checkboxes enables Scan selected; activating it scans each selected repository in sequence and updates each row's document count and last-scanned timestamp; with none selected Scan selected starts no scans; Select all / Clear selection toggles every visible checkbox with the toolbar selected count matching checked rows",
+        "reasoning": "FAIL: Select all visibly checked 5 repositories and enabled Scan selected, but the scan-selected action returned \u201cNo repositories selected\u201d and the batch workflow did not complete."
+      },
+      {
+        "id": "1.21",
+        "name": "undo_redo_repository_mutations",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Undo reverses add, rename, remove, and pattern-toggle mutations restoring the prior repositories list, document tree, and pattern configuration; Redo reapplies the undone step; after Undo a new mutation clears the redo stack; Undo and Redo are disabled at empty-stack boundaries",
+        "reasoning": "FAIL: Undo was visible and enabled after mutations, but full add/rename/remove/pattern undo-redo coverage and stack-boundary behavior were not completed."
+      },
+      {
+        "id": "1.22",
+        "name": "command_palette_actions_and_jump",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening the command palette via Cmd/Ctrl+K or the toolbar control shows filterable actions including Add repository, Scan selected, Export scan index, Import scan index, Undo, Redo, and jump-to entries for tracked repositories; activating an action closes the palette and performs it or focuses the matching row; Escape closes without changes",
+        "reasoning": "The command palette opened and visibly listed Add repository, Scan selected, Export, Import, Undo, Redo, and jump-to repository entries. Evidence: initial-shared.png"
+      },
+      {
+        "id": "1.23",
+        "name": "export_scan_index_json_field_contract",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export opens with Scan Index JSON and Inventory Markdown tabs regenerated live from the store; Scan Index JSON preview shows required schemaVersion repo-scan-index/v1, exportedAt, patterns (claude-md/agents-md/cursorrules/readme booleans with at least one true), and repositories array objects under the declared field contract",
+        "reasoning": "Export visibly showed Scan Index JSON with repo-scan-index/v1, exportedAt, all four pattern booleans, and repository objects containing the declared fields. Evidence: add-create-shared.png"
+      },
+      {
+        "id": "1.24",
+        "name": "export_contains_session_mutations",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After adding a repository with a distinctive path and completing a scan that changes its document count, both Export format previews contain that path and the updated count; Copy shows a brief confirmation and Download is available on the active tab",
+        "reasoning": "FAIL: Export showed scanned repository data and updated counts, but the requested distinctive added path was not observed in both export previews with Copy confirmation."
+      },
+      {
+        "id": "1.25",
+        "name": "import_scan_index_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Downloading Scan Index JSON then Importing that same document reconstructs the same visible repositories, tree groups, findings, and pattern toggles; malformed JSON or a payload failing the field contract (wrong schemaVersion, all patterns false, illegal document type, empty path) leaves state unchanged and shows validation naming the offending field",
+        "reasoning": "FAIL: Current-export import returned success, but the full download/import reconstruction and malformed-payload validation workflows were not directly completed."
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"add_repository_form_validation\":{\"score\":\"yes\",\"reasoning\":\"Required local-path validation was visible in the Add repository modal, including a disabled submit button and inline path error. Evidence: add-create-shared.png\"},\"add_repository_creates_exactly_one\":{\"score\":\"yes\",\"reasoning\":\"A valid create action increased the repository count from 3 to 4 and produced one new row. Evidence: add-create-shared.png\"},\"repository_row_anatomy_and_seed\":{\"score\":\"yes\",\"reasoning\":\"First load showed 3 repositories, each with checkbox, path, name, timestamp, document count, and Scan now; the document tree showed 8 documents per seeded repository. Evidence: initial-shared.png\"},\"rename_and_remove_repository\":{\"score\":\"no\",\"reasoning\":\"FAIL: Rename worked and propagated, but the remove-confirm-delete-and-tree-removal workflow was not completed.\"},\"scan_now_inline_loading_and_row_update\":{\"score\":\"no\",\"reasoning\":\"FAIL: Scanning and completion were observed, but an inline loading indicator in the repository row was not visibly confirmed.\"},\"progress_bar_files_scanned\":{\"score\":\"yes\",\"reasoning\":\"The scan panel visibly showed advancing files scanned counts and percentage progress, including 5/8 and later 8/8. Evidence: progress-steps-timeline-shared.png\"},\"per_document_step_statuses\":{\"score\":\"yes\",\"reasoning\":\"Named document steps visibly progressed through running and complete, and the failure demo showed retrying and failed states. Evidence: progress-steps-timeline-shared.png\"},\"retry_backoff_countdown\":{\"score\":\"yes\",\"reasoning\":\"The failure path visibly showed \u201cWaiting 3s before retry 2 of 3,\u201d later advancing to retry 3 of 3. Evidence: progress-steps-timeline-shared.png\"},\"manual_retry_resumes_from_step\":{\"score\":\"yes\",\"reasoning\":\"An exhausted step displayed an inline parser error and Retry step control; activating it queued and resumed that step while earlier steps retained completion timestamps. Evidence: progress-steps-timeline-shared.png\"},\"pause_resume_from_checkpoint\":{\"score\":\"no\",\"reasoning\":\"FAIL: Pause and Resume preserved the 4/8 checkpoint, but the exercised failure-demo scan ultimately failed rather than completing normally.\"},\"live_rollups_track_steps\":{\"score\":\"yes\",\"reasoning\":\"The scan panel visibly showed matching steps-complete, failures, elapsed, and workflow-status rollups alongside the step list. Evidence: progress-steps-timeline-shared.png\"},\"event_timeline_filter_highlight\":{\"score\":\"no\",\"reasoning\":\"FAIL: An event timeline was visible, but filtering and selecting an entry to verify matching-step highlighting were not completed.\"},\"document_tree_grouped_by_type\":{\"score\":\"yes\",\"reasoning\":\"The tree visibly grouped documents into CLAUDE.md, AGENTS.md, .cursorrules, and README accordion sections with counts, paths, previews, and findings. Evidence: initial-shared.png\"},\"file_viewer_readonly_line_numbers\":{\"score\":\"yes\",\"reasoning\":\"Opening a document showed a read-only monospace viewer with line numbers; Copy was activated from the viewer.\"},\"document_hover_preview\":{\"score\":\"no\",\"reasoning\":\"FAIL: Preview tooltip content was present in the rendered tree, but the required real hover interaction was not directly exercised.\"},\"findings_disclosure_remembered\":{\"score\":\"no\",\"reasoning\":\"FAIL: Findings controls were visible, but expansion and remembered state after switching panels were not successfully verified.\"},\"type_filter_checkboxes\":{\"score\":\"no\",\"reasoning\":\"FAIL: The type filter controls were exercised, but checking CLAUDE.md did not visibly narrow the tree or update counts.\"},\"pattern_toggles_affect_future_scans\":{\"score\":\"no\",\"reasoning\":\"FAIL: Pattern switches were toggled, but the complete disable/rescan exclusion workflow and last-pattern validation were not directly verified.\"},\"no_concurrent_scan_same_repo\":{\"score\":\"no\",\"reasoning\":\"FAIL: Concurrent activation on the same actively scanning repository was not directly tested.\"},\"batch_select_and_scan_selected\":{\"score\":\"no\",\"reasoning\":\"FAIL: Select all visibly checked 5 repositories and enabled Scan selected, but the scan-selected action returned \u201cNo repositories selected\u201d and the batch workflow did not complete.\"},\"undo_redo_repository_mutations\":{\"score\":\"no\",\"reasoning\":\"FAIL: Undo was visible and enabled after mutations, but full add/rename/remove/pattern undo-redo coverage and stack-boundary behavior were not completed.\"},\"command_palette_actions_and_jump\":{\"score\":\"yes\",\"reasoning\":\"The command palette opened and visibly listed Add repository, Scan selected, Export, Import, Undo, Redo, and jump-to repository entries. Evidence: initial-shared.png\"},\"export_scan_index_json_field_contract\":{\"score\":\"yes\",\"reasoning\":\"Export visibly showed Scan Index JSON with repo-scan-index/v1, exportedAt, all four pattern booleans, and repository objects containing the declared fields. Evidence: add-create-shared.png\"},\"export_contains_session_mutations\":{\"score\":\"no\",\"reasoning\":\"FAIL: Export showed scanned repository data and updated counts, but the requested distinctive added path was not observed in both export previews with Copy confirmation.\"},\"import_scan_index_round_trip\":{\"score\":\"no\",\"reasoning\":\"FAIL: Current-export import returned success, but the full download/import reconstruction and malformed-payload validation workflows were not directly completed.\"}}",
+    "cost_usd": 0.7154707999999999
+  },
+  "design_fidelity": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "spacing_follows_consistent_rhythm",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Padding and gaps across the repository list, scan panel, tree, and export chrome follow a consistent spacing rhythm rather than arbitrary one-off gaps",
+        "reasoning": "Consistent panel padding, row heights, and repeated gaps are visible across the repository and document areas. Evidence: spacing_follows_consistent_rhythm-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "typography_matches_instruction_hierarchy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Panel titles are visibly larger/heavier than row text as specified; repository, document, and timeline rows share one compact body size",
+        "reasoning": "Panel headings are visibly larger/heavier than compact repository and document row text, with consistent body sizing. Evidence: spacing_follows_consistent_rhythm-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "two_panel_layout_matches_instruction",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The desktop composition matches the specified left repository list / right tree-or-viewer workspace rather than an unrelated marketing or card-grid layout",
+        "reasoning": "Desktop view visibly uses a left Repositories panel and right Documents/tree workspace. Evidence: spacing_follows_consistent_rhythm-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "specified_state_changes_animate",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Specified state changes \u2014 row enter/exit, progress fill, disclosure open/close, modal/export/palette enter \u2014 animate as described rather than hard-cutting",
+        "reasoning": "Live scan progress visibly updates, and observed computed styles include progress width transitions, row transitions, disclosure height/opacity transitions, and modal entrance animation. Evidence: specified_state_changes_animate-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "responsive_behavior_matches_instruction",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The 1024px side-by-side vs stacked behavior and 375px no-page-horizontal-scroll rule match the instruction",
+        "reasoning": "At 1024px the repository/document panels remain side-by-side; at 375px they stack vertically and document scroll width does not exceed the viewport. Evidence: responsive_behavior_matches_instruction-1024.png and responsive_behavior_matches_instruction-375.png"
+      },
+      {
+        "id": "3.6",
+        "name": "control_styling_matches_carbon_shell",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Structured list, modal, progress, checkboxes, and toggles read as one coherent Carbon-based control system rather than mixed default browser widgets",
+        "reasoning": "Buttons, dialogs, progress indicators, checkboxes, toggles, and tabs visibly share a coherent Carbon-style system with IBM Plex Sans and Carbon classes. Evidence: export_surface_matches_spec-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "status_chips_match_specified_language",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Pending/running/complete/failed/retrying chips match the specified distinct labelled language",
+        "reasoning": "Live scan states visibly use distinct labels and treatments for pending, running, complete, failed, and retrying. Evidence: status_chips_match_specified_language-shared.png"
+      },
+      {
+        "id": "3.8",
+        "name": "export_surface_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export presents format tabs, scrollable preview, and Copy/Download as specified rather than a bare download-only link with no preview",
+        "reasoning": "Export opens a modal with JSON/Markdown format tabs, a scrollable preview area, and Copy/Download controls. Evidence: export_surface_matches_spec-shared.png"
+      },
+      {
+        "id": "3.9",
+        "name": "danger_and_focus_treatments_match",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Failed steps and validation messages share one danger treatment; focus rings are visible on interactive controls as specified",
+        "reasoning": "Failed steps and validation feedback use red danger styling, while keyboard focus visibly produces a blue focus ring on controls. Evidence: danger_and_focus_treatments_match-shared.png"
+      },
+      {
+        "id": "3.10",
+        "name": "iconography_matches_single_set",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Toolbar, rows, steps, timeline, export, and palette icons come from one consistent set at consistent sizes",
+        "reasoning": "Toolbar, repository, workflow, export, and timeline controls use consistent Carbon-style SVG iconography at consistent compact sizes. Evidence: spacing_follows_consistent_rhythm-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"spacing_follows_consistent_rhythm\":{\"score\":\"yes\",\"reasoning\":\"Consistent panel padding, row heights, and repeated gaps are visible across the repository and document areas. Evidence: spacing_follows_consistent_rhythm-shared.png\"},\"typography_matches_instruction_hierarchy\":{\"score\":\"yes\",\"reasoning\":\"Panel headings are visibly larger/heavier than compact repository and document row text, with consistent body sizing. Evidence: spacing_follows_consistent_rhythm-shared.png\"},\"two_panel_layout_matches_instruction\":{\"score\":\"yes\",\"reasoning\":\"Desktop view visibly uses a left Repositories panel and right Documents/tree workspace. Evidence: spacing_follows_consistent_rhythm-shared.png\"},\"specified_state_changes_animate\":{\"score\":\"yes\",\"reasoning\":\"Live scan progress visibly updates, and observed computed styles include progress width transitions, row transitions, disclosure height/opacity transitions, and modal entrance animation. Evidence: specified_state_changes_animate-shared.png\"},\"responsive_behavior_matches_instruction\":{\"score\":\"yes\",\"reasoning\":\"At 1024px the repository/document panels remain side-by-side; at 375px they stack vertically and document scroll width does not exceed the viewport. Evidence: responsive_behavior_matches_instruction-1024.png and responsive_behavior_matches_instruction-375.png\"},\"control_styling_matches_carbon_shell\":{\"score\":\"yes\",\"reasoning\":\"Buttons, dialogs, progress indicators, checkboxes, toggles, and tabs visibly share a coherent Carbon-style system with IBM Plex Sans and Carbon classes. Evidence: export_surface_matches_spec-shared.png\"},\"status_chips_match_specified_language\":{\"score\":\"yes\",\"reasoning\":\"Live scan states visibly use distinct labels and treatments for pending, running, complete, failed, and retrying. Evidence: status_chips_match_specified_language-shared.png\"},\"export_surface_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"Export opens a modal with JSON/Markdown format tabs, a scrollable preview area, and Copy/Download controls. Evidence: export_surface_matches_spec-shared.png\"},\"danger_and_focus_treatments_match\":{\"score\":\"yes\",\"reasoning\":\"Failed steps and validation feedback use red danger styling, while keyboard focus visibly produces a blue focus ring on controls. Evidence: danger_and_focus_treatments_match-shared.png\"},\"iconography_matches_single_set\":{\"score\":\"yes\",\"reasoning\":\"Toolbar, repository, workflow, export, and timeline controls use consistent Carbon-style SVG iconography at consistent compact sizes. Evidence: spacing_follows_consistent_rhythm-shared.png\"}}",
+    "cost_usd": 0.33169360000000003
+  },
+  "edge_cases": {
+    "score": 0.6,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "empty_states_for_list_and_tree",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Removing every repository shows designed empty states in the repository list and document tree; when type filters plus disabled patterns match no documents, the tree shows an empty-state message instead of a blank area.",
+        "reasoning": "Removed all repositories and observed designed \u201cNo repositories tracked\u201d and \u201cNo documents\u201d states. Evidence: empty_states_for_list_and_tree-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "path_field_validates_inline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Empty, whitespace-only, and over-260-character paths show inline validation naming the path field before submit and add no row.",
+        "reasoning": "Whitespace-only and 261-character paths showed inline Local path validation with no submission. Evidence: path_field_validates_inline-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "import_and_pattern_errors_actionable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Import payloads that fail the Scan Index field contract and toggling off the last enabled pattern show actionable messages naming the offending field or problem.",
+        "reasoning": "Invalid imported JSON showed \u201cScan Index JSON contains malformed JSON\u201d; disabling the last enabled pattern showed \u201cat least one document pattern must remain enabled.\u201d Evidence: import_and_pattern_errors_actionable-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "remove_asks_confirmation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Remove asks for confirmation before deleting a repository; canceling leaves the row and its documents intact.",
+        "reasoning": "Remove opened a confirmation dialog; Cancel returned to the repository list with the repository intact. Evidence: remove_asks_confirmation-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "scan_shows_loading_and_progress",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Scan Now shows an inline loading indicator and the scan panel progress bar / step statuses while the simulated scan runs.",
+        "reasoning": "FAIL: Scan completed before a loading/progress state could be directly observed during the real Scan Now interaction. Evidence: scan_shows_loading_and_progress-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "destructive_and_undo_paths",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Destructive Remove supports cancel; Undo/Redo are disabled at empty-stack boundaries and never throw or corrupt repositories when activated there; a new mutation after Undo clears redo.",
+        "reasoning": "FAIL: Undo and Redo boundaries were disabled initially and activated without errors, but after Undo followed by a new mutation, Redo remained enabled instead of clearing. Evidence: no_concurrent_scan_and_empty_batch-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "no_concurrent_scan_and_empty_batch",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Clicking Scan Now on a repository that is already scanning does not start a second concurrent scan; Scan selected with no checkboxes selected starts no scans.",
+        "reasoning": "FAIL: Scan selected was disabled with no selections, but a directly observable in-browser concurrent-scan prevention state was not established. Evidence: no_concurrent_scan_and_empty_batch-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "controls_use_semantic_interactive_tags",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Toolbar buttons, checkboxes, pattern toggles, Export tabs, and palette rows use semantic interactive elements (button, input, checkbox) rather than clickable bare divs without roles.",
+        "reasoning": "Observed toolbar and content controls implemented as buttons, checkboxes, and switches; no bare onclick elements were found. Evidence: controls_use_semantic_interactive_tags-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "modals_support_escape_and_focus_return",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Add repository, Export, and command palette close on Escape and return focus to the control that opened them.",
+        "reasoning": "Add repository, Export, and command palette closed with Escape and focus returned to their opener controls. Evidence: modals_support_escape_and_focus_return-shared.png"
+      },
+      {
+        "id": "4.10",
+        "name": "long_scan_shows_progress_and_rollups",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "During a long simulated scan the progress bar, step list, and live rollups remain visible and update rather than leaving a blank waiting screen.",
+        "reasoning": "FAIL: A completed scan showed rollups, but a long-running state with visibly updating progress and live rollups was not directly observed. Evidence: long_scan_shows_progress_and_rollups-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"empty_states_for_list_and_tree\":{\"score\":\"yes\",\"reasoning\":\"Removed all repositories and observed designed \u201cNo repositories tracked\u201d and \u201cNo documents\u201d states. Evidence: empty_states_for_list_and_tree-shared.png\"},\"path_field_validates_inline\":{\"score\":\"yes\",\"reasoning\":\"Whitespace-only and 261-character paths showed inline Local path validation with no submission. Evidence: path_field_validates_inline-shared.png\"},\"import_and_pattern_errors_actionable\":{\"score\":\"yes\",\"reasoning\":\"Invalid imported JSON showed \u201cScan Index JSON contains malformed JSON\u201d; disabling the last enabled pattern showed \u201cat least one document pattern must remain enabled.\u201d Evidence: import_and_pattern_errors_actionable-shared.png\"},\"remove_asks_confirmation\":{\"score\":\"yes\",\"reasoning\":\"Remove opened a confirmation dialog; Cancel returned to the repository list with the repository intact. Evidence: remove_asks_confirmation-shared.png\"},\"scan_shows_loading_and_progress\":{\"score\":\"no\",\"reasoning\":\"FAIL: Scan completed before a loading/progress state could be directly observed during the real Scan Now interaction. Evidence: scan_shows_loading_and_progress-shared.png\"},\"destructive_and_undo_paths\":{\"score\":\"no\",\"reasoning\":\"FAIL: Undo and Redo boundaries were disabled initially and activated without errors, but after Undo followed by a new mutation, Redo remained enabled instead of clearing. Evidence: no_concurrent_scan_and_empty_batch-shared.png\"},\"no_concurrent_scan_and_empty_batch\":{\"score\":\"no\",\"reasoning\":\"FAIL: Scan selected was disabled with no selections, but a directly observable in-browser concurrent-scan prevention state was not established. Evidence: no_concurrent_scan_and_empty_batch-shared.png\"},\"controls_use_semantic_interactive_tags\":{\"score\":\"yes\",\"reasoning\":\"Observed toolbar and content controls implemented as buttons, checkboxes, and switches; no bare onclick elements were found. Evidence: controls_use_semantic_interactive_tags-shared.png\"},\"modals_support_escape_and_focus_return\":{\"score\":\"yes\",\"reasoning\":\"Add repository, Export, and command palette closed with Escape and focus returned to their opener controls. Evidence: modals_support_escape_and_focus_return-shared.png\"},\"long_scan_shows_progress_and_rollups\":{\"score\":\"no\",\"reasoning\":\"FAIL: A completed scan showed rollups, but a long-running state with visibly updating progress and live rollups was not directly observed. Evidence: long_scan_shows_progress_and_rollups-shared.png\"}}",
+    "cost_usd": 0.8308377999999998
+  },
+  "innovation": {
+    "score": 0.7273,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "delightful_scan_microinteractions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Optional: beyond required motion, the scanner adds delightful microinteractions around scan completion, export success, or palette selection that feel intentional and on-brand",
+        "reasoning": "FAIL: Scan completion is visually polished, but no distinct completion/export-success microinteraction or transient feedback was observed. Evidence: scan-run-shared.png"
+      },
+      {
+        "id": "11.2",
+        "name": "advanced_motion_mechanics",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Optional: motion goes beyond the required row/progress/disclosure set with polished choreography that still respects reduced-motion",
+        "reasoning": "FAIL: The observed motion surface is limited to standard progress, row, disclosure, and timeline states; no clearly additional choreography was observed. Evidence: scan-run-shared.png"
+      },
+      {
+        "id": "11.3",
+        "name": "guided_first_scan_onboarding",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Optional: a guided first-scan coachmark or empty-state walkthrough helps a new user complete their first repository scan without blocking required flows",
+        "reasoning": "A visible \u201cFirst scan tip\u201d coachmark guides the user to select a repository and choose Scan now without blocking the interface. Evidence: initial-shared.png"
+      },
+      {
+        "id": "11.4",
+        "name": "richer_findings_visualization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Optional: findings severity visualization goes beyond the required disclosure list with clearer hierarchy or grouping while remaining readable",
+        "reasoning": "Findings are grouped by document type and repository, with expanded finding rows using severity-colored visual treatment alongside topology/risk summaries. Evidence: export-open-shared.png"
+      },
+      {
+        "id": "11.5",
+        "name": "keyboard_chord_hints_in_palette",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Optional: the command palette shows keyboard chord hints for actions beyond the required Cmd/Ctrl+K open shortcut",
+        "reasoning": "The live command palette shows action-specific hints including A, S, E, I, \u2318Z, and \u21e7\u2318Z beyond the open shortcut. Evidence: palette-shared.png"
+      },
+      {
+        "id": "11.6",
+        "name": "preference_personalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Optional: a non-required preference (density, timeline default filter, or export default tab) personalizes the scanner without breaking seeded reload behavior",
+        "reasoning": "Compact density changes to Comfortable density with a pressed state and reduced document height, demonstrating a working density preference. Evidence: compact-preference-shared.png"
+      },
+      {
+        "id": "11.7",
+        "name": "polished_empty_state_illustration",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Optional: empty states use polished illustration or composition work that stays on-brand with the Carbon shell",
+        "reasoning": "No empty-state content was rendered in the exercised app views, so this self-scoping criterion is not applicable. Evidence: initial-shared.png"
+      },
+      {
+        "id": "11.8",
+        "name": "dynamic_theming_beyond_requirements",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Optional: a theme or contrast preference beyond the required surfaces improves readability without violating in-memory genre rules",
+        "reasoning": "The High contrast preference toggles to Standard contrast and exposes a pressed state, providing an additional readability personalization surface. Evidence: high-contrast-shared.png"
+      },
+      {
+        "id": "11.9",
+        "name": "genre_appropriate_platform_features",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Optional: platform flourishes appropriate to a repo scanner (richer inventory markdown sections, finding severity filters in export, or multi-repo compare hints) appear beyond the written spec",
+        "reasoning": "The scanner includes a multi-repository guidance topology, severity-bearing findings in the index, and a dedicated Inventory Markdown export with repository sections and findings. Evidence: markdown-export-shared.png"
+      },
+      {
+        "id": "11.10",
+        "name": "competition_level_innovation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Optional: overall polish and inventiveness reach competition-level quality while still delivering every required flow",
+        "reasoning": "The live app combines a polished Carbon-style shell, guidance topology comparison, scan workflow timeline, command palette, preferences, and dual-format artifact export into a cohesive scanner experience. Evidence: scan-run-shared.png"
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Optional catch-all: the build demonstrates a significant innovative enhancement beyond the specification that is NOT covered by any other criterion in this file. If present, name the enhancement and cite concrete browser evidence. If nothing beyond the other criteria applies, answer no.",
+        "reasoning": "FAIL: No additional significant enhancement was observed beyond the covered onboarding, visualization, palette, preference, export, and topology features. Evidence: initial-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"delightful_scan_microinteractions\":{\"score\":\"no\",\"reasoning\":\"FAIL: Scan completion is visually polished, but no distinct completion/export-success microinteraction or transient feedback was observed. Evidence: scan-run-shared.png\"},\"advanced_motion_mechanics\":{\"score\":\"no\",\"reasoning\":\"FAIL: The observed motion surface is limited to standard progress, row, disclosure, and timeline states; no clearly additional choreography was observed. Evidence: scan-run-shared.png\"},\"guided_first_scan_onboarding\":{\"score\":\"yes\",\"reasoning\":\"A visible \u201cFirst scan tip\u201d coachmark guides the user to select a repository and choose Scan now without blocking the interface. Evidence: initial-shared.png\"},\"richer_findings_visualization\":{\"score\":\"yes\",\"reasoning\":\"Findings are grouped by document type and repository, with expanded finding rows using severity-colored visual treatment alongside topology/risk summaries. Evidence: export-open-shared.png\"},\"keyboard_chord_hints_in_palette\":{\"score\":\"yes\",\"reasoning\":\"The live command palette shows action-specific hints including A, S, E, I, \u2318Z, and \u21e7\u2318Z beyond the open shortcut. Evidence: palette-shared.png\"},\"preference_personalization\":{\"score\":\"yes\",\"reasoning\":\"Compact density changes to Comfortable density with a pressed state and reduced document height, demonstrating a working density preference. Evidence: compact-preference-shared.png\"},\"polished_empty_state_illustration\":{\"score\":\"yes\",\"reasoning\":\"No empty-state content was rendered in the exercised app views, so this self-scoping criterion is not applicable. Evidence: initial-shared.png\"},\"dynamic_theming_beyond_requirements\":{\"score\":\"yes\",\"reasoning\":\"The High contrast preference toggles to Standard contrast and exposes a pressed state, providing an additional readability personalization surface. Evidence: high-contrast-shared.png\"},\"genre_appropriate_platform_features\":{\"score\":\"yes\",\"reasoning\":\"The scanner includes a multi-repository guidance topology, severity-bearing findings in the index, and a dedicated Inventory Markdown export with repository sections and findings. Evidence: markdown-export-shared.png\"},\"competition_level_innovation\":{\"score\":\"yes\",\"reasoning\":\"The live app combines a polished Carbon-style shell, guidance topology comparison, scan workflow timeline, command palette, preferences, and dual-format artifact export into a cohesive scanner experience. Evidence: scan-run-shared.png\"},\"innovation_catchall\":{\"score\":\"no\",\"reasoning\":\"FAIL: No additional significant enhancement was observed beyond the covered onboarding, visualization, palette, preference, export, and topology features. Evidence: initial-shared.png\"}}",
+    "cost_usd": 0.44202579999999997
+  },
+  "motion": {
+    "score": 0.7647,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "repository_row_animate_in_out",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Via the real Add repository / Remove UI controls (not a WebMCP shortcut): new repository rows animate in from opacity 0 over roughly 200 milliseconds on add, and a removed row animates out rather than vanishing instantly",
+        "reasoning": "PASS \u2014 Real Add repository and Remove controls produced rows with 0.2s opacity/transform transitions; removal was still present mid-transition. Evidence: repository-row-animate-in-out-shared.png"
+      },
+      {
+        "id": "4.2",
+        "name": "progress_bar_smooth_fill",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Via the real Scan Now UI path: the progress bar fills with a smooth linear transition tied to scan progress percentage, never jumping backward",
+        "reasoning": "PASS \u2014 Real scan showed progress at 63%, then 100%, with computed 0.45s linear transform/width transitions and no backward jump. Evidence: screenshots/page-2026-07-23T04-33-21-646Z.yml"
+      },
+      {
+        "id": "4.3",
+        "name": "step_status_chip_transitions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Via the real scan UI path: step status chips transition visibly between pending, running, and complete rather than swapping instantly, and newly appearing timeline entries slide in at the top of the log",
+        "reasoning": "FAIL: Scan statuses changed, but observed step/timeline transitions were only background/border transitions; no visible status-chip transition or top-entry slide-in was observed. Evidence: screenshots/page-2026-07-23T04-33-44-572Z.yml"
+      },
+      {
+        "id": "4.4",
+        "name": "disclosure_and_accordion_transitions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Via the real UI controls: findings disclosures and accordion groups open and close with a short height-and-opacity transition and a rotating chevron cue",
+        "reasoning": "PASS \u2014 Real accordion interaction showed height/opacity 0.2s transitions and a chevron with a 0.18s transform rotation during collapse. Evidence: screenshots/page-2026-07-23T04-33-44-572Z.yml"
+      },
+      {
+        "id": "4.5",
+        "name": "modal_export_palette_enter_exit",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Via the real UI controls on a fresh interaction: the Add repository modal, Export panel, and command palette enter and exit with a short opacity-and-scale (or fade) transition of roughly 200 milliseconds",
+        "reasoning": "PASS \u2014 Add repository modal, Export panel, and command palette each showed active opacity/scale or transform transitions during fresh opening interactions. Evidence: screenshots/page-2026-07-23T04-34-25-130Z.yml"
+      },
+      {
+        "id": "4.6",
+        "name": "hover_wash_system",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons ease background and shadow with a slight press effect; repository rows, document rows, and timeline entries take a visible hover wash; the document hover preview fades in; form controls show focus rings \u2014 verified via computed style while hovering",
+        "reasoning": "PASS \u2014 Real hover measurements showed repository/document/timeline background washes, shadows, and a document preview opacity transition; controls also exposed focus-ring styles. Evidence: hover-wash-system-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "countdown_ticks_visibly",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Via the real failure-path scan UI: the backoff countdown text updates each second while waiting (Playwright-observed ticking)",
+        "reasoning": "FAIL: Failure demo was exercised and countdown text appeared, but the observed readings did not show a one-second decrement; it changed from a 3s retry-2 message to another 3s retry-3 message. Evidence: countdown-ticks-visibly-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "reduced_motion_fallback",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, the progress bar jumps to its current value instantly and row, disclosure, modal, palette, and export animations apply instantly while flows remain completable",
+        "reasoning": "PASS \u2014 Reduced-motion browser confirmed prefers-reduced-motion, with row and accordion transitions reduced to 1e-06s and modal animation reduced to 1e-06s while the UI remained usable. Evidence: reduced-motion-fallback-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "export_copy_download_confirmation_motion",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Via the real Export Copy and Download controls: a short confirmation appears before resetting",
+        "reasoning": "PASS \u2014 Real Copy and Download controls produced visible \u201cScan Index JSON copied\u201d and \u201cScan Index JSON downloaded\u201d confirmations immediately after activation. Evidence: export-copy-download-confirmation-motion-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"repository_row_animate_in_out\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Real Add repository and Remove controls produced rows with 0.2s opacity/transform transitions; removal was still present mid-transition. Evidence: repository-row-animate-in-out-shared.png\"},\"progress_bar_smooth_fill\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Real scan showed progress at 63%, then 100%, with computed 0.45s linear transform/width transitions and no backward jump. Evidence: screenshots/page-2026-07-23T04-33-21-646Z.yml\"},\"step_status_chip_transitions\":{\"score\":\"no\",\"reasoning\":\"FAIL: Scan statuses changed, but observed step/timeline transitions were only background/border transitions; no visible status-chip transition or top-entry slide-in was observed. Evidence: screenshots/page-2026-07-23T04-33-44-572Z.yml\"},\"disclosure_and_accordion_transitions\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Real accordion interaction showed height/opacity 0.2s transitions and a chevron with a 0.18s transform rotation during collapse. Evidence: screenshots/page-2026-07-23T04-33-44-572Z.yml\"},\"modal_export_palette_enter_exit\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Add repository modal, Export panel, and command palette each showed active opacity/scale or transform transitions during fresh opening interactions. Evidence: screenshots/page-2026-07-23T04-34-25-130Z.yml\"},\"hover_wash_system\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Real hover measurements showed repository/document/timeline background washes, shadows, and a document preview opacity transition; controls also exposed focus-ring styles. Evidence: hover-wash-system-shared.png\"},\"countdown_ticks_visibly\":{\"score\":\"no\",\"reasoning\":\"FAIL: Failure demo was exercised and countdown text appeared, but the observed readings did not show a one-second decrement; it changed from a 3s retry-2 message to another 3s retry-3 message. Evidence: countdown-ticks-visibly-shared.png\"},\"reduced_motion_fallback\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Reduced-motion browser confirmed prefers-reduced-motion, with row and accordion transitions reduced to 1e-06s and modal animation reduced to 1e-06s while the UI remained usable. Evidence: reduced-motion-fallback-shared.png\"},\"export_copy_download_confirmation_motion\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Real Copy and Download controls produced visible \u201cScan Index JSON copied\u201d and \u201cScan Index JSON downloaded\u201d confirmations immediately after activation. Evidence: export-copy-download-confirmation-motion-shared.png\"}}",
+    "cost_usd": 0.8379538
+  },
+  "performance": {
+    "score": 0.7895,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_is_under_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive within 2 seconds of a local cold load",
+        "reasoning": "Initial navigation returned a live RepoScan Studio page in about 1.6s with interactive controls and seeded content. Evidence: cold_start_is_under_two_seconds-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "console_is_clean",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No console errors or warnings appear on load or during a full exercise including scan failure path, batch scan, export, import, undo, and rapid filter toggling",
+        "reasoning": "Console inspection after load, scans, failure/retry flow, export, malformed import, and rapid interactions reported 0 errors and 0 warnings. Evidence: console_is_clean-shared.png"
+      },
+      {
+        "id": "9.3",
+        "name": "filter_and_panel_transitions_responsive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Type filter toggles and tree/viewer panel switches respond under roughly 100ms of perceived lag without blocking the UI thread",
+        "reasoning": "Document filtering, export-panel opening, and document preview responded immediately without UI hangs. Evidence: state_changes_remain_interactive-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "async_scan_has_loading_indicators",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "While a scan is running, the inline loading indicator and progress bar are visible so async work is never a blank wait",
+        "reasoning": "During an active scan, the repository showed Running/Scanning text and a visible progressbar with aria-valuenow 88. Evidence: async_scan_has_loading_indicators-shared.png"
+      },
+      {
+        "id": "9.5",
+        "name": "seeded_tree_renders_without_lag",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The seeded repositories and document tree (at least 3 repos \u00d7 8 documents) render without multi-second freezes on first paint",
+        "reasoning": "The initial view rendered 3 repositories, 24 documents, and the expanded document tree without a multi-second freeze. Evidence: cold_start_is_under_two_seconds-shared.png"
+      },
+      {
+        "id": "9.6",
+        "name": "state_changes_remain_interactive",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "While a scan is running, filtering, opening documents, pausing, and opening Export remain interactive without hangs or dropped clicks",
+        "reasoning": "FAIL: Filtering, export opening, and pause worked during scanning, but opening a document could not be observed during the active scan because document-open controls were unavailable on that path. Evidence: state_changes_remain_interactive-shared.png"
+      },
+      {
+        "id": "9.7",
+        "name": "progress_animation_stays_smooth",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "The progress bar fill and step status transitions maintain smooth motion without sustained frame drops during a normal scan",
+        "reasoning": "A 900ms requestAnimationFrame sample captured 53 frames with progress advancing from 0 to 13 and no sustained frame loss. Evidence: async_scan_has_loading_indicators-shared.png"
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_input_does_not_freeze",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Rapid repeated filter toggling, checkbox selection, and command-palette filtering cause no hangs, duplicated rows, or dropped interactions",
+        "reasoning": "Repeated checkbox toggling and rapid command-palette filtering completed successfully, leaving the palette responsive with a valid no-results state. Evidence: rapid_input_does_not_freeze-shared.png"
+      },
+      {
+        "id": "9.9",
+        "name": "extended_scan_session_stable",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Completing multiple scans, exports, and undos in one session does not produce growing console errors or an unresponsive UI",
+        "reasoning": "FAIL: Multiple scans, exports, failure/retry, and import interactions remained responsive, but the required undo workflow could not be completed because Undo remained unavailable/disabled. Evidence: console_is_clean-shared.png"
+      },
+      {
+        "id": "9.10",
+        "name": "import_failure_stays_responsive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Importing malformed Scan Index JSON shows validation without freezing or blanking the scanner",
+        "reasoning": "Entering malformed JSON visibly marked the Scan Index JSON field invalid, showed \u201cScan Index JSON contains malformed JSON,\u201d disabled import, and left the scanner rendered and interactive. Evidence: import_failure_stays_responsive-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_start_is_under_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"Initial navigation returned a live RepoScan Studio page in about 1.6s with interactive controls and seeded content. Evidence: cold_start_is_under_two_seconds-shared.png\"},\"console_is_clean\":{\"score\":\"yes\",\"reasoning\":\"Console inspection after load, scans, failure/retry flow, export, malformed import, and rapid interactions reported 0 errors and 0 warnings. Evidence: console_is_clean-shared.png\"},\"filter_and_panel_transitions_responsive\":{\"score\":\"yes\",\"reasoning\":\"Document filtering, export-panel opening, and document preview responded immediately without UI hangs. Evidence: state_changes_remain_interactive-shared.png\"},\"async_scan_has_loading_indicators\":{\"score\":\"yes\",\"reasoning\":\"During an active scan, the repository showed Running/Scanning text and a visible progressbar with aria-valuenow 88. Evidence: async_scan_has_loading_indicators-shared.png\"},\"seeded_tree_renders_without_lag\":{\"score\":\"yes\",\"reasoning\":\"The initial view rendered 3 repositories, 24 documents, and the expanded document tree without a multi-second freeze. Evidence: cold_start_is_under_two_seconds-shared.png\"},\"state_changes_remain_interactive\":{\"score\":\"no\",\"reasoning\":\"FAIL: Filtering, export opening, and pause worked during scanning, but opening a document could not be observed during the active scan because document-open controls were unavailable on that path. Evidence: state_changes_remain_interactive-shared.png\"},\"progress_animation_stays_smooth\":{\"score\":\"yes\",\"reasoning\":\"A 900ms requestAnimationFrame sample captured 53 frames with progress advancing from 0 to 13 and no sustained frame loss. Evidence: async_scan_has_loading_indicators-shared.png\"},\"rapid_input_does_not_freeze\":{\"score\":\"yes\",\"reasoning\":\"Repeated checkbox toggling and rapid command-palette filtering completed successfully, leaving the palette responsive with a valid no-results state. Evidence: rapid_input_does_not_freeze-shared.png\"},\"extended_scan_session_stable\":{\"score\":\"no\",\"reasoning\":\"FAIL: Multiple scans, exports, failure/retry, and import interactions remained responsive, but the required undo workflow could not be completed because Undo remained unavailable/disabled. Evidence: console_is_clean-shared.png\"},\"import_failure_stays_responsive\":{\"score\":\"yes\",\"reasoning\":\"Entering malformed JSON visibly marked the Scan Index JSON field invalid, showed \u201cScan Index JSON contains malformed JSON,\u201d disabled import, and left the scanner rendered and interactive. Evidence: import_failure_stays_responsive-shared.png\"}}",
+    "cost_usd": 0.559499
+  },
+  "responsiveness": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "layout_adapts_desktop_to_stack",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 1024 pixels and above the repository list and the tree/viewer panel sit side by side; below 1024 pixels they stack vertically with the repository list first",
+        "reasoning": "At 1280px the repository list and document/viewer panels are side by side; at 1023px the repository panel expands to full width and stacks before the lower panels. Evidence: layout_adapts_desktop_to_stack-shared.png"
+      },
+      {
+        "id": "7.2",
+        "name": "mobile_tap_targets_are_large_enough",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px width primary controls (Add repository, Scan Now, checkboxes, Export) present adequately large tap targets rather than tiny overlapping hit areas",
+        "reasoning": "At 375px Add repository, scan, export, and related primary controls use wide, separated hit areas without overlap. Evidence: content_avoids_clipping_and_overflow-shared.png"
+      },
+      {
+        "id": "7.3",
+        "name": "typography_remains_readable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At narrow widths panel titles and row text remain readable without shrinking into illegible sizes",
+        "reasoning": "Narrow-screen headings remain about 22\u201324px and row text about 14\u201316px; visible text is readable and not illegibly shrunk. Evidence: mobile_layout-shared.png"
+      },
+      {
+        "id": "7.4",
+        "name": "content_avoids_clipping_and_overflow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375 pixel width no content clips or overflows the viewport and no page-level horizontal scrolling appears; the file viewer scrolls its long lines within its own container",
+        "reasoning": "The 375px full-page render stays within the viewport with no page-level horizontal overflow; the viewer/export code areas contain their own scrolling. Evidence: content_avoids_clipping_and_overflow-shared.png"
+      },
+      {
+        "id": "7.5",
+        "name": "chrome_adapts_to_small_screens",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Toolbar actions, Export tabs, Copy, Download, and the command palette stay fully visible and operable at small widths rather than rendering off-screen",
+        "reasoning": "Toolbar actions become full-width rows, export Copy/Download and tabs remain visible, and the command palette fits within the viewport. Evidence: chrome_adapts_to_small_screens-shared.png"
+      },
+      {
+        "id": "7.6",
+        "name": "stacking_reflows_logically",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Below 1024px the stacked order keeps the repository list first, then tree/viewer, with scan panel chrome still reachable",
+        "reasoning": "At compact width the repository collection appears before scan configuration and the document/viewer content, while scan-panel controls remain reachable lower on the page. Evidence: content_avoids_clipping_and_overflow-shared.png"
+      },
+      {
+        "id": "7.7",
+        "name": "narrow_width_controls_operable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px width Scan selected, pattern toggles, and type filters remain operable without requiring horizontal page scroll",
+        "reasoning": "At 375px Scan selected, pattern controls, document-type filters, and timeline filters are laid out within the page width without horizontal navigation. Evidence: content_avoids_clipping_and_overflow-shared.png"
+      },
+      {
+        "id": "7.8",
+        "name": "small_screens_avoid_horizontal_scroll",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px width the document does not introduce page-level horizontal scrolling",
+        "reasoning": "At 375px document and body scroll widths remain within the viewport; the full-page render shows no page-level horizontal clipping. Evidence: content_avoids_clipping_and_overflow-shared.png"
+      },
+      {
+        "id": "7.9",
+        "name": "viewer_scrolls_internally",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Long lines in the file viewer scroll within the viewer container rather than forcing page-level overflow",
+        "reasoning": "The mobile viewer content container reports overflow-x:auto with scrollWidth greater than clientWidth while document scroll width remains constrained, and the viewer visibly contains its code area. Evidence: viewer_scrolls_internally-shared.png"
+      },
+      {
+        "id": "7.10",
+        "name": "fixed_overlays_remain_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export panel and command palette remain fully on-screen and closable at 375px width",
+        "reasoning": "At 375px the export panel fits on-screen with visible Close, Copy, Download, and format tabs; the command palette also fits within the viewport and was closed with Escape. Evidence: fixed_overlays_remain_accessible-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"layout_adapts_desktop_to_stack\":{\"score\":\"yes\",\"reasoning\":\"At 1280px the repository list and document/viewer panels are side by side; at 1023px the repository panel expands to full width and stacks before the lower panels. Evidence: layout_adapts_desktop_to_stack-shared.png\"},\"mobile_tap_targets_are_large_enough\":{\"score\":\"yes\",\"reasoning\":\"At 375px Add repository, scan, export, and related primary controls use wide, separated hit areas without overlap. Evidence: content_avoids_clipping_and_overflow-shared.png\"},\"typography_remains_readable\":{\"score\":\"yes\",\"reasoning\":\"Narrow-screen headings remain about 22\u201324px and row text about 14\u201316px; visible text is readable and not illegibly shrunk. Evidence: mobile_layout-shared.png\"},\"content_avoids_clipping_and_overflow\":{\"score\":\"yes\",\"reasoning\":\"The 375px full-page render stays within the viewport with no page-level horizontal overflow; the viewer/export code areas contain their own scrolling. Evidence: content_avoids_clipping_and_overflow-shared.png\"},\"chrome_adapts_to_small_screens\":{\"score\":\"yes\",\"reasoning\":\"Toolbar actions become full-width rows, export Copy/Download and tabs remain visible, and the command palette fits within the viewport. Evidence: chrome_adapts_to_small_screens-shared.png\"},\"stacking_reflows_logically\":{\"score\":\"yes\",\"reasoning\":\"At compact width the repository collection appears before scan configuration and the document/viewer content, while scan-panel controls remain reachable lower on the page. Evidence: content_avoids_clipping_and_overflow-shared.png\"},\"narrow_width_controls_operable\":{\"score\":\"yes\",\"reasoning\":\"At 375px Scan selected, pattern controls, document-type filters, and timeline filters are laid out within the page width without horizontal navigation. Evidence: content_avoids_clipping_and_overflow-shared.png\"},\"small_screens_avoid_horizontal_scroll\":{\"score\":\"yes\",\"reasoning\":\"At 375px document and body scroll widths remain within the viewport; the full-page render shows no page-level horizontal clipping. Evidence: content_avoids_clipping_and_overflow-shared.png\"},\"viewer_scrolls_internally\":{\"score\":\"yes\",\"reasoning\":\"The mobile viewer content container reports overflow-x:auto with scrollWidth greater than clientWidth while document scroll width remains constrained, and the viewer visibly contains its code area. Evidence: viewer_scrolls_internally-shared.png\"},\"fixed_overlays_remain_accessible\":{\"score\":\"yes\",\"reasoning\":\"At 375px the export panel fits on-screen with visible Close, Copy, Download, and format tabs; the command palette also fits within the viewport and was closed with Escape. Evidence: fixed_overlays_remain_accessible-shared.png\"} }",
+    "cost_usd": 0.427574
+  },
+  "technical": {
+    "score": 0.7647,
+    "criteria": [
+      {
+        "id": "5.1",
+        "name": "serves_clean_and_interactive_fast",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app serves from its documented start path, renders the full scanner UI (not a blank or broken page), and is interactive within 2 seconds of a local cold load",
+        "reasoning": "The app loaded as RepoScan Studio with a complete scanner UI and interactive controls at localhost:3000. Evidence: serves_clean_and_interactive_fast-shared.png"
+      },
+      {
+        "id": "5.2",
+        "name": "console_clean_full_exercise",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise of the app, including a scan with the failure path, pause/resume, batch scan, filters, pattern toggles, export, import, undo/redo, command palette, and the viewer",
+        "reasoning": "FAIL: No console errors or warnings were observed, but the full required exercise was not completed end-to-end. Evidence: console_clean_full_exercise-shared.png"
+      },
+      {
+        "id": "5.4",
+        "name": "reload_returns_seeded_baseline",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After changing several facets (add a repository, run a scan, disable a pattern, select rows, open Export, expand disclosures) a page reload returns the app to its seeded baseline: at least 3 seeded repositories with at least 8 documents each, default patterns enabled, empty undo/redo stacks, and no scan running \u2014 all facets reset coherently, never a mix",
+        "reasoning": "After adding a repository, scanning, filtering, and opening Export, reload returned to 3 seeded repositories, 24 documents, no selection, no visible modal, and the default pattern configuration. Evidence: reload_returns_seeded_baseline-shared.png"
+      },
+      {
+        "id": "5.5",
+        "name": "cross_view_state_coherence",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A change made in one view is immediately reflected everywhere the datum appears without a reload: a completed scan updates the repository row, document tree, rollups, and Export previews together; renaming a repository updates every reference; timeline, step list, and rollups never disagree",
+        "reasoning": "The completed scan appeared in the repository/export state with consistent repository path, last-scanned timestamp, document count, documents, and findings. Evidence: cross-view-state-coherence-shared.png"
+      },
+      {
+        "id": "5.7",
+        "name": "responsive_during_scan",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "While a scan is running, filtering the tree, opening documents, pausing, and opening Export all respond without hangs, dropped interactions, or view desyncs, and rapid repeated input causes no runtime exceptions in the console",
+        "reasoning": "FAIL: Filtering and Export responded, but the attempted document opening used an invalid document ID and pause observed the scan already complete, so the required running-scan workflow was not fully demonstrated. Evidence: cross-view-state-coherence-shared.png"
+      },
+      {
+        "id": "5.9",
+        "name": "webmcp_registry_matches_ui",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "The page exposes window.webmcp_session_info, window.webmcp_list_tools, and window.webmcp_invoke_tool, and invoking a state-changing tool produces the same rendered result, step statuses, timeline trail, and export preview state as the equivalent visible control",
+        "reasoning": "The WebMCP tool registry was present; invoking repository creation, scanning, filtering, and export produced corresponding rendered repository, scan, filter, and export states. Evidence: cross-view-state-coherence-shared.png",
+        "optional": true
+      },
+      {
+        "id": "5.10",
+        "name": "export_import_share_field_contracts",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export Scan Index JSON and Import validate against the same visible field contract (schemaVersion, patterns, repository path, document type enum); a payload that fails those rules is rejected with named-field feedback and does not partially apply",
+        "reasoning": "Export showed the contract fields, and invalid import input produced named schemaVersion validation feedback while the Import button remained disabled. Evidence: export_import_share_field_contracts-shared.png"
+      },
+      {
+        "id": "5.11",
+        "name": "scan_index_repository_contract_exact",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Scan Index JSON is one object with schemaVersion exactly repo-scan-index/v1, non-empty ISO-8601 exportedAt, patterns containing exactly boolean keys claude-md, agents-md, cursorrules, and readme with at least one true, and repositories; each repository has a trimmed non-empty path at most 260 characters, non-negative integer documentCount exactly matching its documents length, a documents array, optional trimmed displayName at most 80 characters, and optional lastScanned that is ISO-8601 or null",
+        "reasoning": "The visible exported JSON parsed successfully with schemaVersion repo-scan-index/v1, ISO exportedAt, exactly the four boolean pattern keys with true values, and all repository contract checks passing. Evidence: cross-view-state-coherence-shared.png"
+      },
+      {
+        "id": "5.12",
+        "name": "scan_index_document_and_finding_contract_exact",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Every exported document has a trimmed non-empty path, type exactly CLAUDE.md, AGENTS.md, .cursorrules, or README, string content, and a findings array; every finding has severity exactly info, warning, or error, a trimmed non-empty message, and when line is present it is a positive integer",
+        "reasoning": "The visible exported JSON contained valid document types, paths, string content, findings arrays, and findings with allowed severities, non-empty messages, and positive integer lines; all checks passed. Evidence: cross-view-state-coherence-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"serves_clean_and_interactive_fast\":{\"score\":\"yes\",\"reasoning\":\"The app loaded as RepoScan Studio with a complete scanner UI and interactive controls at localhost:3000. Evidence: serves_clean_and_interactive_fast-shared.png\"},\"console_clean_full_exercise\":{\"score\":\"no\",\"reasoning\":\"FAIL: No console errors or warnings were observed, but the full required exercise was not completed end-to-end. Evidence: console_clean_full_exercise-shared.png\"},\"reload_returns_seeded_baseline\":{\"score\":\"yes\",\"reasoning\":\"After adding a repository, scanning, filtering, and opening Export, reload returned to 3 seeded repositories, 24 documents, no selection, no visible modal, and the default pattern configuration. Evidence: reload_returns_seeded_baseline-shared.png\"},\"cross_view_state_coherence\":{\"score\":\"yes\",\"reasoning\":\"The completed scan appeared in the repository/export state with consistent repository path, last-scanned timestamp, document count, documents, and findings. Evidence: cross-view-state-coherence-shared.png\"},\"responsive_during_scan\":{\"score\":\"no\",\"reasoning\":\"FAIL: Filtering and Export responded, but the attempted document opening used an invalid document ID and pause observed the scan already complete, so the required running-scan workflow was not fully demonstrated. Evidence: cross-view-state-coherence-shared.png\"},\"webmcp_registry_matches_ui\":{\"score\":\"yes\",\"reasoning\":\"The WebMCP tool registry was present; invoking repository creation, scanning, filtering, and export produced corresponding rendered repository, scan, filter, and export states. Evidence: cross-view-state-coherence-shared.png\"},\"export_import_share_field_contracts\":{\"score\":\"yes\",\"reasoning\":\"Export showed the contract fields, and invalid import input produced named schemaVersion validation feedback while the Import button remained disabled. Evidence: export_import_share_field_contracts-shared.png\"},\"scan_index_repository_contract_exact\":{\"score\":\"yes\",\"reasoning\":\"The visible exported JSON parsed successfully with schemaVersion repo-scan-index/v1, ISO exportedAt, exactly the four boolean pattern keys with true values, and all repository contract checks passing. Evidence: cross-view-state-coherence-shared.png\"},\"scan_index_document_and_finding_contract_exact\":{\"score\":\"yes\",\"reasoning\":\"The visible exported JSON contained valid document types, paths, string content, findings arrays, and findings with allowed severities, non-empty messages, and positive integer lines; all checks passed. Evidence: cross-view-state-coherence-shared.png\"}}",
+    "cost_usd": 0.2071802
+  },
+  "user_flows": {
+    "score": 0.9,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "add_and_scan_end_to_end",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Create/scan flow: submitting Add repository with a valid path adds exactly one row, clicking Scan Now runs the stepped simulated scan to completion, the row's document count and last-scanned timestamp update, and the new repository's documents appear grouped in the document tree \u2014 all without a reload.",
+        "reasoning": "FAIL: A valid create/scan attempt did not visibly add a repository or update the tree; the UI remained at the prior repository/document totals. Evidence: add_and_scan_end_to_end-shared.png"
+      },
+      {
+        "id": "6.2",
+        "name": "invalid_path_inline_validation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create flow: submitting Add repository with an empty, whitespace-only, or over-260-character path shows an immediate inline validation message naming the path field, and the repository count is unchanged.",
+        "reasoning": "Whitespace submission showed immediate path-field validation while the repository count stayed unchanged. Evidence: invalid_path_inline_validation-shared.png"
+      },
+      {
+        "id": "6.3",
+        "name": "rename_updates_list_and_export",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edit flow: renaming a repository display name updates that row everywhere it is referenced and updates Export Scan Index JSON / Inventory Markdown previews that name the repository \u2014 without reload.",
+        "reasoning": "Renaming updated the repository list, references, document tree, and export JSON preview without reload. Evidence: rename_updates_list_and_export-shared.png"
+      },
+      {
+        "id": "6.4",
+        "name": "remove_updates_list_and_tree",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Delete flow: confirming Remove deletes the repository row and removes its documents from the document tree in the same interaction.",
+        "reasoning": "After confirmation, the repository row disappeared and its documents were removed from the tree in the same interaction. Evidence: remove_updates_list_and_tree-shared.png"
+      },
+      {
+        "id": "6.5",
+        "name": "tree_viewer_switch_retains_document",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "View/mode switch: opening a document switches the right panel to the file viewer without a full page reload; returning to the document tree retains the repositories and filter state.",
+        "reasoning": "Opening a document showed the read-only viewer, and returning restored the document tree without reload. Evidence: tree_viewer_switch_retains_document-shared.png"
+      },
+      {
+        "id": "6.6",
+        "name": "last_remove_reveals_empty_states",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edge: after removing every repository, the repository list shows an empty state naming what belongs there with Add repository, and the document tree shows its own empty state.",
+        "reasoning": "Removing the final repository revealed both the repository empty state with Add repository and the separate document-tree empty state. Evidence: last_remove_reveals_empty_states-shared.png"
+      },
+      {
+        "id": "6.7",
+        "name": "type_filters_update_tree_counts",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Filter flow: checking only one document type narrows the tree to that group with matching counts; unchecking all types restores every document; opening a document from the filtered tree shows its content in the viewer.",
+        "reasoning": "Filtering to CLAUDE.md reduced the tree to that group with matching counts; opening a filtered document showed content, and clearing filters restored all documents. Evidence: type_filters_update_tree_counts-filtered.png"
+      },
+      {
+        "id": "6.8",
+        "name": "failure_retry_and_pause_resume_flows",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Durable-scan flows: on the simulated failure path the failing step shows retrying with attempt count and live backoff countdown, then failed with Retry step which completes the scan while earlier steps keep timestamps; Pause freezes progress and Resume continues from the checkpoint with rollups matching the step list.",
+        "reasoning": "The failure path showed retry attempts and a live countdown, then failed with Retry step; retry completed while prior timestamps remained. Pause froze the run and Resume continued from the checkpoint to completion. Evidence: failure_retry_and_pause_resume_flows-shared.png"
+      },
+      {
+        "id": "6.9",
+        "name": "export_artifact_copy_download_dismiss",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Artifact end-state overlay: Export opens with Scan Index JSON and Inventory Markdown tabs regenerated from the session; Copy confirms on the active tab; Download is available; Escape or close dismisses and returns to the scanner.",
+        "reasoning": "Export opened JSON/Markdown tabs, Copy produced confirmation, Download produced the JSON artifact, and Escape dismissed the overlay back to the scanner. Evidence: export_artifact_copy_download_dismiss-shared.png"
+      },
+      {
+        "id": "6.10",
+        "name": "batch_undo_palette_and_import_recover",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Recovery without reload: Scan selected on two checked repositories updates both rows; Undo then Redo restore add/rename mutations; command palette jump-to focuses a seeded repository; Import of a valid previously exported Scan Index JSON reconstructs list/tree/patterns \u2014 no dead end requiring a page reload.",
+        "reasoning": "Scanning two selected repositories completed both rows, Undo restored a repository, the command palette jumped to a seeded repository, and importing the exported JSON reconstructed the seeded list and document tree without reload. Evidence: batch_undo_palette_and_import_recover-after-import.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"add_and_scan_end_to_end\":{\"score\":\"no\",\"reasoning\":\"FAIL: A valid create/scan attempt did not visibly add a repository or update the tree; the UI remained at the prior repository/document totals. Evidence: add_and_scan_end_to_end-shared.png\"},\"invalid_path_inline_validation\":{\"score\":\"yes\",\"reasoning\":\"Whitespace submission showed immediate path-field validation while the repository count stayed unchanged. Evidence: invalid_path_inline_validation-shared.png\"},\"rename_updates_list_and_export\":{\"score\":\"yes\",\"reasoning\":\"Renaming updated the repository list, references, document tree, and export JSON preview without reload. Evidence: rename_updates_list_and_export-shared.png\"},\"remove_updates_list_and_tree\":{\"score\":\"yes\",\"reasoning\":\"After confirmation, the repository row disappeared and its documents were removed from the tree in the same interaction. Evidence: remove_updates_list_and_tree-shared.png\"},\"tree_viewer_switch_retains_document\":{\"score\":\"yes\",\"reasoning\":\"Opening a document showed the read-only viewer, and returning restored the document tree without reload. Evidence: tree_viewer_switch_retains_document-shared.png\"},\"last_remove_reveals_empty_states\":{\"score\":\"yes\",\"reasoning\":\"Removing the final repository revealed both the repository empty state with Add repository and the separate document-tree empty state. Evidence: last_remove_reveals_empty_states-shared.png\"},\"type_filters_update_tree_counts\":{\"score\":\"yes\",\"reasoning\":\"Filtering to CLAUDE.md reduced the tree to that group with matching counts; opening a filtered document showed content, and clearing filters restored all documents. Evidence: type_filters_update_tree_counts-filtered.png\"},\"failure_retry_and_pause_resume_flows\":{\"score\":\"yes\",\"reasoning\":\"The failure path showed retry attempts and a live countdown, then failed with Retry step; retry completed while prior timestamps remained. Pause froze the run and Resume continued from the checkpoint to completion. Evidence: failure_retry_and_pause_resume_flows-shared.png\"},\"export_artifact_copy_download_dismiss\":{\"score\":\"yes\",\"reasoning\":\"Export opened JSON/Markdown tabs, Copy produced confirmation, Download produced the JSON artifact, and Escape dismissed the overlay back to the scanner. Evidence: export_artifact_copy_download_dismiss-shared.png\"},\"batch_undo_palette_and_import_recover\":{\"score\":\"yes\",\"reasoning\":\"Scanning two selected repositories completed both rows, Undo restored a repository, the command palette jumped to a seeded repository, and importing the exported JSON reconstructed the seeded list and document tree without reload. Evidence: batch_undo_palette_and_import_recover-after-import.png\"} }",
+    "cost_usd": 1.2083764
+  },
+  "visual_design": {
+    "score": 0.7778,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "two_panel_composition",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At desktop width the left panel is the repository list with consistent row anatomy including checkboxes, and the right panel switches between the document tree and the file viewer without a full page reload",
+        "reasoning": "Desktop view visibly shows repositories in a left panel and documents/file viewer switching in the right panel without URL reload. Evidence: two_panel_composition-shared.png"
+      },
+      {
+        "id": "2.2",
+        "name": "progress_and_inline_loading_render",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Scan progress renders as a determinate progress bar in the scan panel plus an inline loading indicator in the scanning repository's row",
+        "reasoning": "FAIL: A determinate progress bar and running scan state were observed, but the scanning repository row did not visibly show an inline loading indicator. Evidence: progress_and_inline_loading_render-shared.png"
+      },
+      {
+        "id": "2.3",
+        "name": "accordion_groups_with_counts",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Document type groups render as accordion sections in the tree panel with rotating chevrons and per-group counts",
+        "reasoning": "Document groups visibly use expandable accordion headers with chevrons and counts such as \u201cCLAUDE.md 6\u201d and \u201cAGENTS.md 6\u201d. Evidence: two_panel_composition-shared.png"
+      },
+      {
+        "id": "2.4",
+        "name": "code_viewer_monospace_surface",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The file viewer renders content in a monospace type treatment with visible line numbers on a contrasting code surface",
+        "reasoning": "The live file viewer visibly shows line numbers, a contrasting dark code surface, and computed IBM Plex Mono typography. Evidence: code_viewer_monospace_surface-shared.png"
+      },
+      {
+        "id": "2.5",
+        "name": "status_chip_language_with_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Step statuses use one consistent chip and icon language: pending, running, complete, failed, and retrying are each visually distinct and carry a visible text label, not color alone",
+        "reasoning": "Live scan steps visibly distinguish and label Pending, Running, Retrying, Complete, and Failed states; failure demo exercised retry and failure states. Evidence: status_chip_language_with_labels-shared.png"
+      },
+      {
+        "id": "2.6",
+        "name": "typography_hierarchy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography keeps a clear hierarchy: panel titles visibly larger and heavier than row text; repository rows, document rows, and timeline entries share one compact body size",
+        "reasoning": "Panel headings are visibly larger/heavier than compact repository and document row text; computed styles confirmed 22px heading text versus 15\u201316px row text. Evidence: two_panel_composition-shared.png"
+      },
+      {
+        "id": "2.7",
+        "name": "focus_ring_and_danger_treatment",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "All interactive controls show a visible focus ring on keyboard focus; failed steps and validation messages use one consistent danger red treatment",
+        "reasoning": "FAIL: A keyboard-focused control showed a visible blue focus ring and retry/failure states used consistent red treatment, but the criterion requires verification for all interactive controls and that was not fully established. Evidence: focus_ring_and_danger_treatment-shared.png"
+      },
+      {
+        "id": "2.8",
+        "name": "single_icon_set_consistency",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "One icon set is used consistently across toolbar, rows, steps, timeline entries, export, and palette",
+        "reasoning": "Rendered toolbar, repository, scan, timeline, export, and palette controls consistently use the same SVG icon treatment. Evidence: two_panel_composition-shared.png"
+      },
+      {
+        "id": "2.9",
+        "name": "export_and_palette_surfaces",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export appears as a panel or modal with format tabs (Scan Index JSON / Inventory Markdown), a scrollable preview block, and Copy/Download affordances; the command palette renders as a centered overlay with a filter input and highlighted action list",
+        "reasoning": "The live export dialog visibly provides JSON/Markdown tabs, a scrollable preview, Copy and Download; the command palette visibly provides a centered overlay, filter input, and highlighted action list. Evidence: export_and_palette_surfaces-export.png and export_and_palette_surfaces-palette.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"two_panel_composition\":{\"score\":\"yes\",\"reasoning\":\"Desktop view visibly shows repositories in a left panel and documents/file viewer switching in the right panel without URL reload. Evidence: two_panel_composition-shared.png\"},\"progress_and_inline_loading_render\":{\"score\":\"no\",\"reasoning\":\"FAIL: A determinate progress bar and running scan state were observed, but the scanning repository row did not visibly show an inline loading indicator. Evidence: progress_and_inline_loading_render-shared.png\"},\"accordion_groups_with_counts\":{\"score\":\"yes\",\"reasoning\":\"Document groups visibly use expandable accordion headers with chevrons and counts such as \u201cCLAUDE.md 6\u201d and \u201cAGENTS.md 6\u201d. Evidence: two_panel_composition-shared.png\"},\"code_viewer_monospace_surface\":{\"score\":\"yes\",\"reasoning\":\"The live file viewer visibly shows line numbers, a contrasting dark code surface, and computed IBM Plex Mono typography. Evidence: code_viewer_monospace_surface-shared.png\"},\"status_chip_language_with_labels\":{\"score\":\"yes\",\"reasoning\":\"Live scan steps visibly distinguish and label Pending, Running, Retrying, Complete, and Failed states; failure demo exercised retry and failure states. Evidence: status_chip_language_with_labels-shared.png\"},\"typography_hierarchy\":{\"score\":\"yes\",\"reasoning\":\"Panel headings are visibly larger/heavier than compact repository and document row text; computed styles confirmed 22px heading text versus 15\u201316px row text. Evidence: two_panel_composition-shared.png\"},\"focus_ring_and_danger_treatment\":{\"score\":\"no\",\"reasoning\":\"FAIL: A keyboard-focused control showed a visible blue focus ring and retry/failure states used consistent red treatment, but the criterion requires verification for all interactive controls and that was not fully established. Evidence: focus_ring_and_danger_treatment-shared.png\"},\"single_icon_set_consistency\":{\"score\":\"yes\",\"reasoning\":\"Rendered toolbar, repository, scan, timeline, export, and palette controls consistently use the same SVG icon treatment. Evidence: two_panel_composition-shared.png\"},\"export_and_palette_surfaces\":{\"score\":\"yes\",\"reasoning\":\"The live export dialog visibly provides JSON/Markdown tabs, a scrollable preview, Copy and Download; the command palette visibly provides a centered overlay, filter input, and highlighted action list. Evidence: export_and_palette_surfaces-export.png and export_and_palette_surfaces-palette.png\"}}",
+    "cost_usd": 0.33613980000000004
+  },
+  "writing": {
+    "score": 0.875,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "headings_use_consistent_capitalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders headings, toolbar labels, and buttons, they use one consistent capitalization convention throughout",
+        "reasoning": "yes \u2014 Rendered headings and controls consistently use sentence case. Evidence: initial.png"
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders button or action labels, they are specific verbs \u2014 Add repository, Scan Now, Scan selected, Retry step, Export scan index, Import scan index, Copy, Download, Undo, Redo \u2014 rather than generic labels where a specific one is possible",
+        "reasoning": "yes \u2014 Actions use specific labels such as Add repository, Scan selected, Scan now, Import scan index, Export scan index, Copy, and Download. Evidence: initial.png"
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders validation or Import errors, messages name the field/problem and the fix rather than a generic failure string",
+        "reasoning": "yes \u2014 Validation identifies the field and required correction, e.g. \u201cPath is required\u2026\u201d and \u201cschemaVersion must equal repo-scan-index/v1.\u201d Evidence: error-validation.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders empty states for the repository list or document tree, copy explains what belongs there and how to add or scan",
+        "reasoning": "yes \u2014 No repository-list or document-tree empty state is rendered in the observed app, so this conditional criterion is not applicable. Evidence: initial.png"
+      },
+      {
+        "id": "15.5",
+        "name": "body_copy_is_well_written",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders helper or status copy (scan rollups, timeline filters, export hints), the prose is clear and free of placeholder/lorem text",
+        "reasoning": "yes \u2014 Helper and status copy is clear and actionable, with no placeholder or lorem text. Evidence: initial.png"
+      },
+      {
+        "id": "15.6",
+        "name": "terminology_is_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app names repositories, documents, scans, and export, it uses one consistent term set rather than mixing synonyms for the same control",
+        "reasoning": "yes \u2014 Repository, document, finding, scan, and export terminology is used consistently across the visible UI and export panel. Evidence: export-panel.png"
+      },
+      {
+        "id": "15.7",
+        "name": "numbers_dates_and_units_are_consistent",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Where the app renders document counts, files-scanned fractions, and last-scanned timestamps, number/date formatting is consistent across list, rollups, and export previews",
+        "reasoning": "FAIL: Document counts are consistent, but timestamps use different formats: the list shows \u201c2026-07-20, 08:42:00 UTC\u201d while the export preview uses ISO format \u201c2026-07-20T08:42:00.000Z.\u201d Evidence: export-panel.png"
+      },
+      {
+        "id": "15.8",
+        "name": "success_messages_are_specific",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders copy/download/import success confirmations, they name the action completed rather than a vague OK",
+        "reasoning": "yes \u2014 No copy, download, or import success confirmation was rendered in the observed flows, so the conditional criterion is not applicable. Evidence: export-panel.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"headings_use_consistent_capitalization\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Rendered headings and controls consistently use sentence case. Evidence: initial.png\"},\"actions_use_specific_labels\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Actions use specific labels such as Add repository, Scan selected, Scan now, Import scan index, Export scan index, Copy, and Download. Evidence: initial.png\"},\"errors_name_problem_and_fix\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Validation identifies the field and required correction, e.g. \u201cPath is required\u2026\u201d and \u201cschemaVersion must equal repo-scan-index/v1.\u201d Evidence: error-validation.png\"},\"empty_states_explain_next_step\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 No repository-list or document-tree empty state is rendered in the observed app, so this conditional criterion is not applicable. Evidence: initial.png\"},\"body_copy_is_well_written\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Helper and status copy is clear and actionable, with no placeholder or lorem text. Evidence: initial.png\"},\"terminology_is_consistent\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Repository, document, finding, scan, and export terminology is used consistently across the visible UI and export panel. Evidence: export-panel.png\"},\"numbers_dates_and_units_are_consistent\":{\"score\":\"no\",\"reasoning\":\"FAIL: Document counts are consistent, but timestamps use different formats: the list shows \u201c2026-07-20, 08:42:00 UTC\u201d while the export preview uses ISO format \u201c2026-07-20T08:42:00.000Z.\u201d Evidence: export-panel.png\"},\"success_messages_are_specific\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 No copy, download, or import success confirmation was rendered in the observed flows, so the conditional criterion is not applicable. Evidence: export-panel.png\"}}",
+    "cost_usd": 0.2723712
+  }
+}

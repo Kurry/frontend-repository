@@ -1,0 +1,2839 @@
+{
+  "accessibility": {
+    "score": 0.8,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "controls_are_keyboard_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sidebar items, header controls, table row actions, form fields, pagination, and export drawer controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space and show a visible focus indicator",
+        "reasoning": "Tab focused a Dashboard button with a visible 2px blue outline; controls were exposed as native buttons, fields, selects, and pagination controls. Evidence: controls_are_keyboard_accessible-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "modals_manage_focus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export drawer traps focus while open and returns it to the originating control on Escape or close; popovers return focus similarly",
+        "reasoning": "The export drawer exposed a modal dialog with aria-modal=true, trapped Tab focus within the dialog, and Escape returned focus to the Open export drawer control. Evidence: modals_manage_focus-shared.png"
+      },
+      {
+        "id": "1.3",
+        "name": "images_and_icons_have_alt_text",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Avatar images and icon-only buttons have descriptive alt text or accessible names",
+        "reasoning": "Avatar images had descriptive alt text, and icon-only buttons had accessible aria-label names such as Open navigation, Open notifications, and Close export drawer. Evidence: controls_are_keyboard_accessible-shared.png"
+      },
+      {
+        "id": "1.4",
+        "name": "feedback_uses_live_regions",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Validation errors and create/delete/export/import confirmations are conveyed visually and via aria-live polite regions",
+        "reasoning": "Submitting the empty Add User form displayed validation errors and a polite live region containing the complete validation message. Evidence: feedback_uses_live_regions-shared.png"
+      },
+      {
+        "id": "1.5",
+        "name": "forms_have_explicit_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Add/Edit form fields use visible labels associated with their controls",
+        "reasoning": "Add User fields used visible label elements explicitly associated with controls by matching for/id values. Evidence: forms_have_explicit_labels-shared.png"
+      },
+      {
+        "id": "1.6",
+        "name": "headings_follow_logical_order",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Headings in Operations Overview and Users views follow a logical order without skips that break structure",
+        "reasoning": "FAIL: The Add User view used an h1 followed by Profile, Access, Account Settings, and Permissions headings at level h3, skipping h2. Evidence: forms_have_explicit_labels-shared.png"
+      },
+      {
+        "id": "1.7",
+        "name": "landmark_navigation_is_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sidebar navigation and main canvas use semantic landmarks (nav/main) so regions are discoverable",
+        "reasoning": "The rendered page included complementary primary navigation, a nav landmark for administration sections, and a main landmark. Evidence: controls_are_keyboard_accessible-shared.png"
+      },
+      {
+        "id": "1.8",
+        "name": "text_and_controls_have_contrast",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Text and controls across light and dark themes have sufficient color contrast",
+        "reasoning": "FAIL: In the observed light theme, secondary navigation text measured approximately 3.53:1 against its background, below the 4.5:1 normal-text threshold; the dark theme was also observed separately. Evidence: text_and_controls_have_contrast-shared.png"
+      },
+      {
+        "id": "1.9",
+        "name": "semantic_html_roles_are_used",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Semantic HTML roles such as nav, main, and button are used for chrome and actions",
+        "reasoning": "Navigation used nav/aside/main landmarks and actions were native button elements; the export drawer exposed a semantic dialog, tablist, and tabs. Evidence: modals_manage_focus-shared.png"
+      },
+      {
+        "id": "1.10",
+        "name": "status_role_not_color_only",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Status and role badges convey state with text labels in addition to color",
+        "reasoning": "User status and role badges visibly included text labels such as Active, Invited, Suspended, Admin, Manager, Member, and Viewer in addition to styling. Evidence: controls_are_keyboard_accessible-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"controls_are_keyboard_accessible\":{\"score\":\"yes\",\"reasoning\":\"Tab focused a Dashboard button with a visible 2px blue outline; controls were exposed as native buttons, fields, selects, and pagination controls. Evidence: controls_are_keyboard_accessible-shared.png\"},\"modals_manage_focus\":{\"score\":\"yes\",\"reasoning\":\"The export drawer exposed a modal dialog with aria-modal=true, trapped Tab focus within the dialog, and Escape returned focus to the Open export drawer control. Evidence: modals_manage_focus-shared.png\"},\"images_and_icons_have_alt_text\":{\"score\":\"yes\",\"reasoning\":\"Avatar images had descriptive alt text, and icon-only buttons had accessible aria-label names such as Open navigation, Open notifications, and Close export drawer. Evidence: controls_are_keyboard_accessible-shared.png\"},\"feedback_uses_live_regions\":{\"score\":\"yes\",\"reasoning\":\"Submitting the empty Add User form displayed validation errors and a polite live region containing the complete validation message. Evidence: feedback_uses_live_regions-shared.png\"},\"forms_have_explicit_labels\":{\"score\":\"yes\",\"reasoning\":\"Add User fields used visible label elements explicitly associated with controls by matching for/id values. Evidence: forms_have_explicit_labels-shared.png\"},\"headings_follow_logical_order\":{\"score\":\"no\",\"reasoning\":\"FAIL: The Add User view used an h1 followed by Profile, Access, Account Settings, and Permissions headings at level h3, skipping h2. Evidence: forms_have_explicit_labels-shared.png\"},\"landmark_navigation_is_present\":{\"score\":\"yes\",\"reasoning\":\"The rendered page included complementary primary navigation, a nav landmark for administration sections, and a main landmark. Evidence: controls_are_keyboard_accessible-shared.png\"},\"text_and_controls_have_contrast\":{\"score\":\"no\",\"reasoning\":\"FAIL: In the observed light theme, secondary navigation text measured approximately 3.53:1 against its background, below the 4.5:1 normal-text threshold; the dark theme was also observed separately. Evidence: text_and_controls_have_contrast-shared.png\"},\"semantic_html_roles_are_used\":{\"score\":\"yes\",\"reasoning\":\"Navigation used nav/aside/main landmarks and actions were native button elements; the export drawer exposed a semantic dialog, tablist, and tabs. Evidence: modals_manage_focus-shared.png\"},\"status_role_not_color_only\":{\"score\":\"yes\",\"reasoning\":\"User status and role badges visibly included text labels such as Active, Invited, Suspended, Admin, Manager, Member, and Viewer in addition to styling. Evidence: controls_are_keyboard_accessible-shared.png\"}}",
+    "cost_usd": 0.30591440000000003
+  },
+  "behavioral": {
+    "score": 0.4444,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_reload_resets_seeded",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Multi-facet round-trip: create a user, apply a status filter, switch sort, toggle theme, and open Export, then reload \u2014 all facets coherently reset to the seeded baseline (at least 8 users, default theme, default view), never a mix of kept and reset state",
+        "reasoning": "Reload returned to Operations Overview with dark/default theme, no visible export drawer, and a coherent baseline view. Evidence: multi_facet_reload_resets_seeded-shared.png"
+      },
+      {
+        "id": "14.2",
+        "name": "sort_reversal_proves_live_data",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sort-reversal proof: sort All Users by Name A-Z, note the order, then sort by Newest; the order differs correctly relative to Name A-Z, proving sort is derived from live data rather than two hardcoded orders",
+        "reasoning": "Name A-Z produced Ada Lovelace, Alan Turing, Barbara Liskov first; Newest then produced Tim Berners-Lee, Hedy Lamarr, Donald Knuth first, with different orders. Evidence: sort_reversal_proves_live_data-shared.png"
+      },
+      {
+        "id": "14.3",
+        "name": "export_preview_tracks_user_mutations",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Derived-view sensitivity: create a user named Probe Alpha then open Export \u2014 Session JSON and Users CSV both contain Probe Alpha; delete that user and both previews no longer contain that name",
+        "reasoning": "Session JSON visibly included Probe Alpha and probe.alpha@example.com after creation; after deletion, JSON and Users CSV previews showed 10 users and no Probe Alpha. Evidence: export_preview_tracks_user_mutations-shared.png"
+      },
+      {
+        "id": "14.4",
+        "name": "edit_echoes_list_kpi_export",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Cross-view echo: edit a user's name and status and confirm the new values appear in the table row, KPI strip, and both export previews without reload",
+        "reasoning": "BLOCKED: an edit workflow was not completed and verified across the list, KPI strip, JSON, and CSV previews. Evidence: export_preview_tracks_user_mutations-shared.png"
+      },
+      {
+        "id": "14.5",
+        "name": "create_count_delta_is_exact",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Count-delta integrity: measure All Users row count and KPI Total immediately before and after Add User; both deltas are exactly one",
+        "reasoning": "The All Users view showed Total 10 before creation and Total 11 with 11 rows after creating Probe Alpha, an exact +1 delta in both measures. Evidence: export_preview_tracks_user_mutations-shared.png"
+      },
+      {
+        "id": "14.6",
+        "name": "different_emails_change_exports",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Input-dependent output: create two users with different emails and confirm both distinct emails appear in All Users and in Session JSON / Users CSV",
+        "reasoning": "FAIL: two distinct email creations were invoked, but the resulting emails were not observed in the rendered All Users/export views. Evidence: multi_facet_reload_resets_seeded-shared.png"
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_create_and_overview",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Interleaved-flow integrity: start Add User, switch to Operations Overview and back, finish Create, then confirm the new user exists and overview remains usable",
+        "reasoning": "BLOCKED: the interleaved Add User \u2192 Overview \u2192 Add User \u2192 Create workflow was not completed and verified end-to-end. Evidence: multi_facet_reload_resets_seeded-shared.png"
+      },
+      {
+        "id": "14.8",
+        "name": "empty_to_repopulated_tracks_kpi_export",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Edge-state round-trip: delete every user (empty state + KPI Total 0), then create one valid user; the KPI strip and export user list track through both transitions",
+        "reasoning": "BLOCKED: deleting every user and then repopulating from the empty state was not completed and verified. Evidence: export_preview_tracks_user_mutations-shared.png"
+      },
+      {
+        "id": "14.9",
+        "name": "export_import_pipeline_end_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Full pipeline: mutate (create or edit), open Export, confirm Session JSON contains the mutation with schemaVersion pineapple-admin-analytics-v1, Import that JSON after a further local change if needed, and confirm users, KPIs, and both export previews match the imported session",
+        "reasoning": "BLOCKED: a complete export \u2192 local mutation \u2192 import \u2192 end-state verification was not completed. Evidence: export_preview_tracks_user_mutations-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"multi_facet_reload_resets_seeded\":{\"score\":\"yes\",\"reasoning\":\"Reload returned to Operations Overview with dark/default theme, no visible export drawer, and a coherent baseline view. Evidence: multi_facet_reload_resets_seeded-shared.png\"},\"sort_reversal_proves_live_data\":{\"score\":\"yes\",\"reasoning\":\"Name A-Z produced Ada Lovelace, Alan Turing, Barbara Liskov first; Newest then produced Tim Berners-Lee, Hedy Lamarr, Donald Knuth first, with different orders. Evidence: sort_reversal_proves_live_data-shared.png\"},\"export_preview_tracks_user_mutations\":{\"score\":\"yes\",\"reasoning\":\"Session JSON visibly included Probe Alpha and probe.alpha@example.com after creation; after deletion, JSON and Users CSV previews showed 10 users and no Probe Alpha. Evidence: export_preview_tracks_user_mutations-shared.png\"},\"edit_echoes_list_kpi_export\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: an edit workflow was not completed and verified across the list, KPI strip, JSON, and CSV previews. Evidence: export_preview_tracks_user_mutations-shared.png\"},\"create_count_delta_is_exact\":{\"score\":\"yes\",\"reasoning\":\"The All Users view showed Total 10 before creation and Total 11 with 11 rows after creating Probe Alpha, an exact +1 delta in both measures. Evidence: export_preview_tracks_user_mutations-shared.png\"},\"different_emails_change_exports\":{\"score\":\"no\",\"reasoning\":\"FAIL: two distinct email creations were invoked, but the resulting emails were not observed in the rendered All Users/export views. Evidence: multi_facet_reload_resets_seeded-shared.png\"},\"interleaved_create_and_overview\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: the interleaved Add User \u2192 Overview \u2192 Add User \u2192 Create workflow was not completed and verified end-to-end. Evidence: multi_facet_reload_resets_seeded-shared.png\"},\"empty_to_repopulated_tracks_kpi_export\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: deleting every user and then repopulating from the empty state was not completed and verified. Evidence: export_preview_tracks_user_mutations-shared.png\"},\"export_import_pipeline_end_state\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: a complete export \u2192 local mutation \u2192 import \u2192 end-state verification was not completed. Evidence: export_preview_tracks_user_mutations-shared.png\"}}",
+    "cost_usd": 0.6124566
+  },
+  "core_features": {
+    "score": 0.2381,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "seeded_users_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "On load, All Users (or the default Users list) contains at least 8 seeded user rows with name, role, and status visible per row; rows reachable by paging through the table's pagination controls count as present",
+        "reasoning": "yes \u2014 All Users visibly showed 10 seeded rows with names, roles, and statuses. Evidence: all-users-toolbar-chrome-shared.png"
+      },
+      {
+        "id": "1.2",
+        "name": "create_user_appears_in_list",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After creating a user with first name Ada, last name Lovelace, and a valid email that satisfies the UserCreate field contract, the text Ada Lovelace (or equivalent full name) is visible in the All Users list",
+        "reasoning": "FAIL: A newly created Ada user was not exercised; Ada was already seeded."
+      },
+      {
+        "id": "1.3",
+        "name": "create_count_delta_matches",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After adding 3 new users on top of the seed set with valid UserCreate payloads, the All Users table shows exactly 3 more rows than the initial seeded count",
+        "reasoning": "BLOCKED: The required three-user creation delta was not completed."
+      },
+      {
+        "id": "1.4",
+        "name": "status_change_updates_badge",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After changing a user's status from Active to Suspended, that user shows a Suspended badge/state that is visually distinct from Active users",
+        "reasoning": "FAIL: The attempted WebMCP status update returned target_id not found, so the badge change was not observed."
+      },
+      {
+        "id": "1.5",
+        "name": "edit_updates_name_in_list",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After editing a user's name from the seeded value to Evening Runner, the text Evening Runner is visible in the list and the previous name is not",
+        "reasoning": "BLOCKED: Edit workflow was not completed."
+      },
+      {
+        "id": "1.6",
+        "name": "delete_removes_user_row",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After deleting a user, that user's name is no longer visible anywhere in the All Users list",
+        "reasoning": "BLOCKED: Delete workflow was not completed."
+      },
+      {
+        "id": "1.7",
+        "name": "empty_state_after_delete_all",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After deleting all users, an empty state message is visible and no user data rows remain in the list",
+        "reasoning": "BLOCKED: Delete-all workflow was not completed."
+      },
+      {
+        "id": "1.8",
+        "name": "invalid_submit_adds_no_row",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After submitting Create user with an empty required firstName or email field, or with firstName longer than 40 characters, the users count in the list does not increase and validation feedback naming the field is visible",
+        "reasoning": "BLOCKED: Invalid form submission was not completed."
+      },
+      {
+        "id": "1.9",
+        "name": "status_filter_narrows_list",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After filtering All Users by status Suspended (with at least one Suspended and one Active user present), only Suspended users remain visible in the list",
+        "reasoning": "BLOCKED: A valid filtered All Users state was not observed."
+      },
+      {
+        "id": "1.10",
+        "name": "sidebar_view_switch_no_reload",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After switching from Operations Overview to All Users via the sidebar, the main canvas shows the users table/KPIs (not the overview mosaic), and switching back restores Operations Overview without a full page navigation",
+        "reasoning": "FAIL: WebMCP reported views opened, but subsequent navigation rendered Operations Overview instead of the requested Users view."
+      },
+      {
+        "id": "1.11",
+        "name": "additional_users_modes_render",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After opening at least two additional Users modes from Roles, Permissions, User Logs, User Stats, User Payments, or User Products via the sidebar, each opened mode shows its domain UI (filters/tables) and the URL does not navigate to an external origin",
+        "reasoning": "yes \u2014 Roles and User Stats both rendered domain tables while URL stayed on localhost:3000. Evidence: additional_users_modes_render-shared.png"
+      },
+      {
+        "id": "1.12",
+        "name": "theme_toggle_recolors",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After clicking the sun/moon theme swap, data-theme flips between light and dark and surfaces recolor without reload",
+        "reasoning": "FAIL: The real theme gesture could not be completed because the visible icon intercepted the checkbox click."
+      },
+      {
+        "id": "1.13",
+        "name": "hover_feedback_on_chrome",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "When hovering primary buttons, table rows, or sidebar nav items, a visible hover wash, underline, or shadow change appears",
+        "reasoning": "BLOCKED: Hover styles were not measured with a real pointer."
+      },
+      {
+        "id": "1.14",
+        "name": "bulk_action_applies_to_selection",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After selecting multiple All Users rows and running a bulk action (Change status, Change role, or Delete), the selected users update or disappear together in the list and KPIs reflect the change",
+        "reasoning": "BLOCKED: Bulk selection/action workflow was not completed."
+      },
+      {
+        "id": "1.15",
+        "name": "console_clean_during_session",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session",
+        "reasoning": "yes \u2014 Browser console reported 0 errors and 0 warnings."
+      },
+      {
+        "id": "1.16",
+        "name": "crud_updates_kpis_from_shared_state",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Users collection supports create, edit, and delete with list rows and KPI counts updating from shared application state",
+        "reasoning": "FAIL: Create updated the list and KPIs, but edit and delete were not successfully completed."
+      },
+      {
+        "id": "1.18",
+        "name": "domain_state_beyond_crud",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Domain state beyond CRUD is implemented: status badges, role assignment, list filters/sort that recompute visible users, and bulk status/role/delete on selected rows",
+        "reasoning": "FAIL: Status badges and filters were present, but bulk status/role/delete behavior was not completed."
+      },
+      {
+        "id": "1.22",
+        "name": "sidebar_nav_structure_complete",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The sidebar shows Pineapple Tech branding, at least 14 collapsible nav groups including a Users group containing All Users, Add User, Roles, Permissions, User Logs, User Stats, User Payments, and User Products, a top-level Dashboard item, and a sticky account footer (online avatar, name, role) whose click opens a popover that expands upward",
+        "reasoning": "yes \u2014 Sidebar visibly showed Pineapple Tech, Dashboard, 14+ navigation groups, the complete Users submenu, and Ari Lane/Admin account footer."
+      },
+      {
+        "id": "1.23",
+        "name": "header_utilities_functional",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The utility header contains a search field that narrows the All Users list as text is typed, a notifications popover seeded with 4 avatar rows plus an error indicator on the bell icon, and a profile popover listing Profile, Inbox (with a badge), Settings, and Logout entries",
+        "reasoning": "yes \u2014 Notifications opened with four avatar rows; searchbox, theme control, and profile control were present. Evidence: header_utilities_functional-shared.png"
+      },
+      {
+        "id": "1.24",
+        "name": "user_row_columns_complete",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Each All Users row shows name, email, a role badge, a status badge (Active, Invited, or Suspended), a payments total, a products count, a last-active label, and row actions",
+        "reasoning": "yes \u2014 Rows visibly contained name/email, role, status, payments, products, last-active, and edit/delete actions. Evidence: all-users-toolbar-chrome-shared.png"
+      },
+      {
+        "id": "1.25",
+        "name": "all_users_toolbar_chrome",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The All Users view shows a KPI strip (Total / Active / Paying / Suspended), role and status filters, a sort control offering Last active, Newest, Highest spend, and Name A-Z, bulk action controls (Export / Change status / Change role / Delete), and pagination chrome",
+        "reasoning": "yes \u2014 KPI strip, role/status filters, four sort options, bulk controls, Export/Delete, and pagination were visible. Evidence: all-users-toolbar-chrome-shared.png"
+      },
+      {
+        "id": "1.26",
+        "name": "add_user_form_groups_inline_validation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Add User form presents grouped sections \u2014 Profile (firstName, lastName, email, phone, notes), Access (temporaryPassword, accountSegment, send invitation), Account settings (status, role, 2FA / product-access toggles), and Permissions checkboxes \u2014 and validates the UserCreate field contract inline: each invalid field shows a per-field message naming that field before submit, and the submit control stays disabled until required fields are valid",
+        "reasoning": "BLOCKED: Add User form did not render after navigation attempt, so grouped fields and inline validation were not observed."
+      },
+      {
+        "id": "1.27",
+        "name": "edit_form_prefilled",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Choosing a row's Edit action opens the user form prefilled with that user's existing name, email, role, and status values",
+        "reasoning": "BLOCKED: Edit form was not opened."
+      },
+      {
+        "id": "1.28",
+        "name": "overview_sections_seeded",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Operations Overview renders breadcrumbs and actions, KPI stats, chart cards (revenue/demand column, order-status pie, a primary inverse revenue run-rate column card, acquisition mix pie, marketing line, fulfillment line), and operational panels (activity table, governance radial and progress, priority queue, promotions, uptime bars, satisfaction, inventory, plugins, automation, security watch, cash movement), all non-empty from seeded data",
+        "reasoning": "yes \u2014 Overview visibly rendered seeded KPIs, charts, activity, governance, priority, promotions, uptime, satisfaction, inventory, plugins, automation, security, and cash panels. Evidence: seeded_users_present-shared.png"
+      },
+      {
+        "id": "1.29",
+        "name": "chart_tooltip_on_hover",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Hovering a column, pie slice, or line point on an overview chart with the real pointer shows a tooltip containing the underlying value from that chart's seeded series",
+        "reasoning": "BLOCKED: Chart hover tooltip was not measured."
+      },
+      {
+        "id": "1.30",
+        "name": "charts_recolor_on_theme_toggle",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Toggling the theme through the header control redraws every overview chart in the new theme's accent colors without a page reload, and toggling back restores the original accents",
+        "reasoning": "BLOCKED: Theme gesture could not be completed."
+      },
+      {
+        "id": "1.31",
+        "name": "create_flow_kpi_search_chain",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Scripted probe: on All Users, record the visible row count and the KPI Total; submit Add User with a valid UserCreate payload for a new Active user named Nora Quinn; confirm All Users gains exactly one row, the KPI Total increases by exactly one, the Active KPI increases by exactly one, and typing Nora into the header search narrows the table to that row \u2014 all without a page reload",
+        "reasoning": "FAIL: Nora creation succeeded and KPIs updated, but the required complete probe chain was not observed in one stable All Users session."
+      },
+      {
+        "id": "1.32",
+        "name": "status_change_kpi_filter_chain",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Scripted probe: record the Active and Suspended KPI values, change one user's status from Active to Suspended, and confirm in the same session that the row's badge flips to Suspended, the Active KPI decreases by one, the Suspended KPI increases by one, and applying the Active status filter no longer shows that row \u2014 all without a reload",
+        "reasoning": "FAIL: Status update returned target_id not found; badge/KPI/filter chain did not complete."
+      },
+      {
+        "id": "1.33",
+        "name": "delete_flow_selection_kpi_chain",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Scripted probe: select a user's row checkbox, record the visible row count and KPI Total, then delete that user; confirm the row disappears, the checkbox selection no longer includes it, the KPI Total decreases by one, and the visible row count decreases by exactly one in the same interaction",
+        "reasoning": "BLOCKED: Required checkbox selection and delete chain was not completed."
+      },
+      {
+        "id": "1.34",
+        "name": "sort_round_trip_restores_order",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Scripted probe: note the row order, switch the sort control to Name A-Z, confirm the same rows reorder without any change in visible row count, then switch to Newest and back; the ordering under each sort is consistent and differs between the two options, proving sort derives from live data rather than fixed markup",
+        "reasoning": "BLOCKED: Sort round-trip was not completed."
+      },
+      {
+        "id": "1.35",
+        "name": "bulk_status_three_rows_kpi_delta",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Scripted probe: select exactly three rows by checkbox and run a bulk Change status; all three rows' status badges update in one action and the affected status KPIs shift by exactly three",
+        "reasoning": "BLOCKED: Three-row bulk status workflow was not completed."
+      },
+      {
+        "id": "1.36",
+        "name": "edit_propagates_all_surfaces",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Scripted probe: save the Edit form with a changed name and status for one user, then confirm the table row, the KPI strip counts, and a role/status-filtered view where that user appears all show the updated values in the same session without a reload",
+        "reasoning": "BLOCKED: Edit propagation workflow was not completed."
+      },
+      {
+        "id": "1.37",
+        "name": "double_submit_creates_one_user",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Rapidly double-activating the Add User submit control creates exactly one user: the visible count increases by one and exactly one new row appears",
+        "reasoning": "BLOCKED: Rapid double-submit workflow was not completed."
+      },
+      {
+        "id": "1.38",
+        "name": "cancel_leaves_collection_unchanged",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Using Cancel on the Add User or Edit form leaves the users collection unchanged: the row count and KPI values are identical before and after",
+        "reasoning": "BLOCKED: Cancel workflow was not completed."
+      },
+      {
+        "id": "1.39",
+        "name": "empty_state_on_no_match",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "When filters and search combine to match zero users, the list region shows an empty state message instead of an empty or broken table",
+        "reasoning": "BLOCKED: Zero-match filters/search state was not observed."
+      },
+      {
+        "id": "1.40",
+        "name": "reload_resets_all_facets_to_seed",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Scripted probe: toggle the theme to the non-default theme, switch to a Users view, create one user, and change one sort or filter setting; then reload the page and confirm every facet coherently returns to the seeded baseline \u2014 at least 8 seeded users with the created user gone, the default theme, and the default view \u2014 never a mix of reset and surviving facets",
+        "reasoning": "FAIL: Reload reset to seeded view, but the full theme/view/create/filter mutation sequence was not completed and verified."
+      },
+      {
+        "id": "1.41",
+        "name": "export_drawer_session_json_contract",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening Export session shows Session JSON and Users CSV tabs; Session JSON preview includes schemaVersion exactly pineapple-admin-analytics-v1, exportedAt, users, kpis, filters, sort, theme, and activeView",
+        "reasoning": "yes \u2014 Export drawer visibly showed Session JSON and Users CSV tabs; JSON preview contained the required schemaVersion, exportedAt, users, kpis, filters, sort, theme, and activeView. Evidence: all-users-toolbar-chrome-shared.png"
+      },
+      {
+        "id": "1.42",
+        "name": "export_contains_session_mutations",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After creating a user with a distinctive email and deleting another user, reopening Export shows the new email under users, omits the deleted user, and kpis match the on-screen KPI strip; Users CSV includes the new firstName",
+        "reasoning": "yes \u2014 Export preview visibly included the created Nora Quinn email and matching KPI total 11."
+      },
+      {
+        "id": "1.43",
+        "name": "export_copy_download_and_import_roundtrip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Copy writes the visible export preview to the clipboard with confirmation and Download starts a file download of that same text; importing previously exported Session JSON restores users, KPIs, and both export previews to the pre-export mutated state",
+        "reasoning": "BLOCKED: Copy, download, and import round-trip were not completed."
+      },
+      {
+        "id": "1.44",
+        "name": "users_csv_exact_header_and_rows",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Users CSV preview starts with the exact header line firstName,lastName,email,phone,role,status,payments,products,lastActive and includes one data line per user; after creating a user with a distinctive firstName, that firstName appears in a CSV data line before copy or download",
+        "reasoning": "BLOCKED: Users CSV preview was not opened and verified."
+      },
+      {
+        "id": "1.45",
+        "name": "users_csv_import_updates_collection",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Importing pasted Users CSV text whose rows satisfy the UserCreate field names and enums merges or replaces the users collection so All Users and the next Users CSV preview match the imported rows; malformed CSV or rows violating the enums show an inline error naming the field and leave the users count unchanged",
+        "reasoning": "BLOCKED: CSV import and malformed-row validation were not completed."
+      },
+      {
+        "id": "1.46",
+        "name": "exported_at_timestamp_regenerates",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Session JSON exportedAt field is an ISO-8601 timestamp string that updates when the preview regenerates: after a further user mutation, reopening Export shows a newer exportedAt value than the earlier preview",
+        "reasoning": "BLOCKED: Two completed export previews around a further mutation were not verified."
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"seeded_users_present\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 All Users visibly showed 10 seeded rows with names, roles, and statuses. Evidence: all-users-toolbar-chrome-shared.png\"},\"create_user_appears_in_list\":{\"score\":\"no\",\"reasoning\":\"FAIL: A newly created Ada user was not exercised; Ada was already seeded.\"},\"create_count_delta_matches\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The required three-user creation delta was not completed.\"},\"status_change_updates_badge\":{\"score\":\"no\",\"reasoning\":\"FAIL: The attempted WebMCP status update returned target_id not found, so the badge change was not observed.\"},\"edit_updates_name_in_list\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Edit workflow was not completed.\"},\"delete_removes_user_row\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Delete workflow was not completed.\"},\"empty_state_after_delete_all\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Delete-all workflow was not completed.\"},\"invalid_submit_adds_no_row\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Invalid form submission was not completed.\"},\"status_filter_narrows_list\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: A valid filtered All Users state was not observed.\"},\"sidebar_view_switch_no_reload\":{\"score\":\"no\",\"reasoning\":\"FAIL: WebMCP reported views opened, but subsequent navigation rendered Operations Overview instead of the requested Users view.\"},\"additional_users_modes_render\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Roles and User Stats both rendered domain tables while URL stayed on localhost:3000. Evidence: additional_users_modes_render-shared.png\"},\"theme_toggle_recolors\":{\"score\":\"no\",\"reasoning\":\"FAIL: The real theme gesture could not be completed because the visible icon intercepted the checkbox click.\"},\"hover_feedback_on_chrome\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Hover styles were not measured with a real pointer.\"},\"bulk_action_applies_to_selection\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Bulk selection/action workflow was not completed.\"},\"console_clean_during_session\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Browser console reported 0 errors and 0 warnings.\"},\"crud_updates_kpis_from_shared_state\":{\"score\":\"no\",\"reasoning\":\"FAIL: Create updated the list and KPIs, but edit and delete were not successfully completed.\"},\"domain_state_beyond_crud\":{\"score\":\"no\",\"reasoning\":\"FAIL: Status badges and filters were present, but bulk status/role/delete behavior was not completed.\"},\"sidebar_nav_structure_complete\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Sidebar visibly showed Pineapple Tech, Dashboard, 14+ navigation groups, the complete Users submenu, and Ari Lane/Admin account footer.\"},\"header_utilities_functional\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Notifications opened with four avatar rows; searchbox, theme control, and profile control were present. Evidence: header_utilities_functional-shared.png\"},\"user_row_columns_complete\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Rows visibly contained name/email, role, status, payments, products, last-active, and edit/delete actions. Evidence: all-users-toolbar-chrome-shared.png\"},\"all_users_toolbar_chrome\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 KPI strip, role/status filters, four sort options, bulk controls, Export/Delete, and pagination were visible. Evidence: all-users-toolbar-chrome-shared.png\"},\"add_user_form_groups_inline_validation\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Add User form did not render after navigation attempt, so grouped fields and inline validation were not observed.\"},\"edit_form_prefilled\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Edit form was not opened.\"},\"overview_sections_seeded\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Overview visibly rendered seeded KPIs, charts, activity, governance, priority, promotions, uptime, satisfaction, inventory, plugins, automation, security, and cash panels. Evidence: seeded_users_present-shared.png\"},\"chart_tooltip_on_hover\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Chart hover tooltip was not measured.\"},\"charts_recolor_on_theme_toggle\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Theme gesture could not be completed.\"},\"create_flow_kpi_search_chain\":{\"score\":\"no\",\"reasoning\":\"FAIL: Nora creation succeeded and KPIs updated, but the required complete probe chain was not observed in one stable All Users session.\"},\"status_change_kpi_filter_chain\":{\"score\":\"no\",\"reasoning\":\"FAIL: Status update returned target_id not found; badge/KPI/filter chain did not complete.\"},\"delete_flow_selection_kpi_chain\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Required checkbox selection and delete chain was not completed.\"},\"sort_round_trip_restores_order\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Sort round-trip was not completed.\"},\"bulk_status_three_rows_kpi_delta\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Three-row bulk status workflow was not completed.\"},\"edit_propagates_all_surfaces\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Edit propagation workflow was not completed.\"},\"double_submit_creates_one_user\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Rapid double-submit workflow was not completed.\"},\"cancel_leaves_collection_unchanged\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Cancel workflow was not completed.\"},\"empty_state_on_no_match\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Zero-match filters/search state was not observed.\"},\"reload_resets_all_facets_to_seed\":{\"score\":\"no\",\"reasoning\":\"FAIL: Reload reset to seeded view, but the full theme/view/create/filter mutation sequence was not completed and verified.\"},\"export_drawer_session_json_contract\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Export drawer visibly showed Session JSON and Users CSV tabs; JSON preview contained the required schemaVersion, exportedAt, users, kpis, filters, sort, theme, and activeView. Evidence: all-users-toolbar-chrome-shared.png\"},\"export_contains_session_mutations\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Export preview visibly included the created Nora Quinn email and matching KPI total 11.\"},\"export_copy_download_and_import_roundtrip\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Copy, download, and import round-trip were not completed.\"},\"users_csv_exact_header_and_rows\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Users CSV preview was not opened and verified.\"},\"users_csv_import_updates_collection\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: CSV import and malformed-row validation were not completed.\"},\"exported_at_timestamp_regenerates\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Two completed export previews around a further mutation were not verified.\"}}",
+    "cost_usd": 0.24651699999999996
+  },
+  "design_fidelity": {
+    "score": 0.9,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "spacing_and_sizing_follow_scale",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Spacing and sizing in the drawer shell, KPI strip, and overview mosaic follow a consistent scale, with no arbitrary one-off gaps that break the dense ops-dashboard rhythm visible in the reference screenshots",
+        "reasoning": "Consistent dense card, KPI, table, and drawer spacing is visible at 1440px. Evidence: overview-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "typography_matches_spec",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography hierarchy for sidebar labels, KPI titles, table headers, and overview panel titles matches the dense admin register shown in the reference screenshots",
+        "reasoning": "Compact admin-style hierarchy is consistently applied across sidebar labels, KPI titles, table headers, and panel titles. Evidence: users-shared.png"
+      },
+      {
+        "id": "3.3",
+        "name": "layout_matches_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 1440px, Operations Overview mosaic composition and Users table chrome match the reference screenshots to within a small tolerance for section order and card span mix; text instruction wins on conflicts",
+        "reasoning": "Overview uses the asymmetric mosaic and Users uses the expected KPI/filter/table composition at 1440px. Evidence: overview-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "specified_state_changes_animate",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Transitions are applied to the state changes the instruction calls out \u2014 create/delete row motion, sort reorder, theme toggle, and export drawer slide",
+        "reasoning": "FAIL: Export drawer has a measured transform transition, but observed table rows expose only background transition; create/delete and sort reorder motion were not demonstrated. Evidence: export-drawer-shared.png"
+      },
+      {
+        "id": "3.5",
+        "name": "color_palette_matches_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Light/dark surfaces, chart accents (teal/amber/sky/rose/orange), and badge treatments align with the reference screenshot palette language",
+        "reasoning": "Dark surfaces, teal charts, and amber, sky, rose, and orange status accents are visibly present and coherent. Evidence: overview-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "component_styling_matches_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Drawer, stats, badges, tables, popovers, and form controls use the dense DaisyUI-style admin treatments shown in the reference rather than unstyled browser defaults",
+        "reasoning": "Drawer, KPI cards, badges, tables, filters, buttons, and controls use polished dense admin treatments rather than browser defaults. Evidence: users-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "iconography_matches_reference",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sidebar and header iconography matches the reference's consistent icon family treatment; avatars render as local images",
+        "reasoning": "Sidebar/header icons use a consistent outlined treatment, and avatars visibly load from localhost assets. Evidence: overview-shared.png"
+      },
+      {
+        "id": "3.8",
+        "name": "overview_mosaic_fidelity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Operations Overview keeps the asymmetric mosaic and primary inverse Revenue run rate spotlight visible in the reference screenshots",
+        "reasoning": "The asymmetric Operations Overview mosaic is visible, including the prominent inverse Revenue Run Rate spotlight. Evidence: overview-shared.png"
+      },
+      {
+        "id": "3.9",
+        "name": "users_table_fidelity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "All Users KPI strip, filters, and table columns match the dense admin register composition in the reference screenshots",
+        "reasoning": "All Users shows the four-card KPI strip, filters, density controls, selection actions, and expected User/Role/Status/Payments/Products/Last Active columns. Evidence: users-shared.png"
+      },
+      {
+        "id": "3.10",
+        "name": "export_drawer_does_not_break_fidelity",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "When Export is closed, the shell still matches the reference; when open, the drawer overlays without destroying the underlying mosaic/table structure",
+        "reasoning": "Closed shell remains intact, and the open drawer overlays the page with a dimmed underlying table while preserving its structure. Evidence: export-drawer-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"spacing_and_sizing_follow_scale\":{\"score\":\"yes\",\"reasoning\":\"Consistent dense card, KPI, table, and drawer spacing is visible at 1440px. Evidence: overview-shared.png\"},\"typography_matches_spec\":{\"score\":\"yes\",\"reasoning\":\"Compact admin-style hierarchy is consistently applied across sidebar labels, KPI titles, table headers, and panel titles. Evidence: users-shared.png\"},\"layout_matches_reference\":{\"score\":\"yes\",\"reasoning\":\"Overview uses the asymmetric mosaic and Users uses the expected KPI/filter/table composition at 1440px. Evidence: overview-shared.png\"},\"specified_state_changes_animate\":{\"score\":\"no\",\"reasoning\":\"FAIL: Export drawer has a measured transform transition, but observed table rows expose only background transition; create/delete and sort reorder motion were not demonstrated. Evidence: export-drawer-shared.png\"},\"color_palette_matches_reference\":{\"score\":\"yes\",\"reasoning\":\"Dark surfaces, teal charts, and amber, sky, rose, and orange status accents are visibly present and coherent. Evidence: overview-shared.png\"},\"component_styling_matches_reference\":{\"score\":\"yes\",\"reasoning\":\"Drawer, KPI cards, badges, tables, filters, buttons, and controls use polished dense admin treatments rather than browser defaults. Evidence: users-shared.png\"},\"iconography_matches_reference\":{\"score\":\"yes\",\"reasoning\":\"Sidebar/header icons use a consistent outlined treatment, and avatars visibly load from localhost assets. Evidence: overview-shared.png\"},\"overview_mosaic_fidelity\":{\"score\":\"yes\",\"reasoning\":\"The asymmetric Operations Overview mosaic is visible, including the prominent inverse Revenue Run Rate spotlight. Evidence: overview-shared.png\"},\"users_table_fidelity\":{\"score\":\"yes\",\"reasoning\":\"All Users shows the four-card KPI strip, filters, density controls, selection actions, and expected User/Role/Status/Payments/Products/Last Active columns. Evidence: users-shared.png\"},\"export_drawer_does_not_break_fidelity\":{\"score\":\"yes\",\"reasoning\":\"Closed shell remains intact, and the open drawer overlays the page with a dimmed underlying table while preserving its structure. Evidence: export-drawer-shared.png\"}}",
+    "cost_usd": 0.1801046
+  },
+  "edge_cases": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "empty_state_is_present",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Empty state UI is present and renders when all users are deleted or filters match nothing",
+        "reasoning": "Search for a nonexistent user rendered \u201cNo Matching Users\u201d with guidance and an Add User action. Evidence: empty-state-ui.png"
+      },
+      {
+        "id": "4.2",
+        "name": "forms_enforce_usercreate_contract",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Add User and Edit User show inline per-field validation for the UserCreate field contract before submit, and submit stays blocked while invalid",
+        "reasoning": "Submitting an empty Add User form showed inline per-field errors for required fields and did not leave the form. Evidence: form-errors-shared.png"
+      },
+      {
+        "id": "4.3",
+        "name": "errors_are_actionable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Validation and import error messages name the offending field and the violated rule rather than only saying Invalid",
+        "reasoning": "Validation messages named fields and rules, and import failure identified the exact CSV header requirement. Evidence: form-errors-shared.png, import-error-shared.png"
+      },
+      {
+        "id": "4.4",
+        "name": "actions_show_confirmation",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create, delete, export Copy, and successful import show visible confirmation or toast feedback",
+        "reasoning": "Create, delete, Copy, and successful import each produced visible confirmation/toast feedback. Evidence: create-confirmation-shared.png, delete-confirmation-shared.png, import-success-shared.png"
+      },
+      {
+        "id": "4.5",
+        "name": "export_preview_regenerates_without_blank",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening Export session and switching Session JSON / Users CSV shows a regenerated preview rather than a blank or stuck panel",
+        "reasoning": "Export drawer showed populated Session JSON and Users CSV previews after switching tabs. Evidence: export-tabs-shared.png"
+      },
+      {
+        "id": "4.6",
+        "name": "cancel_and_bulk_zero_selection_safe",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cancel on Add/Edit leaves the collection unchanged; bulk Change status/role/Delete with zero selected is disabled or a no-op",
+        "reasoning": "Cancel returned to the directory with the same 11-user count; zero-selection status/role/delete controls were disabled. Evidence: cancel-safe-shared.png, all-users-shared.png"
+      },
+      {
+        "id": "4.7",
+        "name": "export_import_controls_discoverable",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export session and Import session controls are labeled so their purpose is discoverable",
+        "reasoning": "The drawer visibly labeled \u201cExport Session\u201d and \u201cImport Session,\u201d with Session JSON and Users CSV tabs. Evidence: export-tabs-shared.png"
+      },
+      {
+        "id": "4.8",
+        "name": "controls_use_semantic_tags",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Buttons, inputs, labels, checkboxes, and export controls use semantic interactive elements",
+        "reasoning": "Browser inspection found native button, input checkbox/search, select, and button-based tab/export controls. Evidence: all-users-shared.png"
+      },
+      {
+        "id": "4.9",
+        "name": "modal_supports_close_paths",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export drawer and popovers close via explicit close and Escape",
+        "reasoning": "The export drawer closed via its explicit Close export drawer button and Escape, with no visible drawer remaining. Evidence: export-close-shared.png"
+      },
+      {
+        "id": "4.10",
+        "name": "bulk_and_create_feedback_steps",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Bulk actions and create provide visible progress or completion feedback rather than a silent wait",
+        "reasoning": "Create showed a User Added confirmation, and a bulk status change showed Status Changed with the affected count. Evidence: create-confirmation-shared.png, bulk-feedback-shared.png"
+      },
+      {
+        "id": "4.11",
+        "name": "bulk_export_zero_selected_opens_drawer",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "With zero rows checkbox-selected, activating bulk Export still opens the export drawer with both format tabs available",
+        "reasoning": "With 0 selected and bulk Export activated, the drawer opened with both format tabs and a populated preview. Evidence: bulk-export-zero-shared.png"
+      },
+      {
+        "id": "4.12",
+        "name": "correcting_field_clears_inline_error",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After an invalid Add User submit attempt, correcting the offending field clears that field's inline error without a reload and submit becomes available once all required fields are valid",
+        "reasoning": "After invalid submission, filling the required fields removed the inline errors and left Create User available; submitting created the user. Evidence: form-errors-shared.png, create-confirmation-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"empty_state_is_present\":{\"score\":\"yes\",\"reasoning\":\"Search for a nonexistent user rendered \u201cNo Matching Users\u201d with guidance and an Add User action. Evidence: empty-state-ui.png\"},\"forms_enforce_usercreate_contract\":{\"score\":\"yes\",\"reasoning\":\"Submitting an empty Add User form showed inline per-field errors for required fields and did not leave the form. Evidence: form-errors-shared.png\"},\"errors_are_actionable\":{\"score\":\"yes\",\"reasoning\":\"Validation messages named fields and rules, and import failure identified the exact CSV header requirement. Evidence: form-errors-shared.png, import-error-shared.png\"},\"actions_show_confirmation\":{\"score\":\"yes\",\"reasoning\":\"Create, delete, Copy, and successful import each produced visible confirmation/toast feedback. Evidence: create-confirmation-shared.png, delete-confirmation-shared.png, import-success-shared.png\"},\"export_preview_regenerates_without_blank\":{\"score\":\"yes\",\"reasoning\":\"Export drawer showed populated Session JSON and Users CSV previews after switching tabs. Evidence: export-tabs-shared.png\"},\"cancel_and_bulk_zero_selection_safe\":{\"score\":\"yes\",\"reasoning\":\"Cancel returned to the directory with the same 11-user count; zero-selection status/role/delete controls were disabled. Evidence: cancel-safe-shared.png, all-users-shared.png\"},\"export_import_controls_discoverable\":{\"score\":\"yes\",\"reasoning\":\"The drawer visibly labeled \u201cExport Session\u201d and \u201cImport Session,\u201d with Session JSON and Users CSV tabs. Evidence: export-tabs-shared.png\"},\"controls_use_semantic_tags\":{\"score\":\"yes\",\"reasoning\":\"Browser inspection found native button, input checkbox/search, select, and button-based tab/export controls. Evidence: all-users-shared.png\"},\"modal_supports_close_paths\":{\"score\":\"yes\",\"reasoning\":\"The export drawer closed via its explicit Close export drawer button and Escape, with no visible drawer remaining. Evidence: export-close-shared.png\"},\"bulk_and_create_feedback_steps\":{\"score\":\"yes\",\"reasoning\":\"Create showed a User Added confirmation, and a bulk status change showed Status Changed with the affected count. Evidence: create-confirmation-shared.png, bulk-feedback-shared.png\"},\"bulk_export_zero_selected_opens_drawer\":{\"score\":\"yes\",\"reasoning\":\"With 0 selected and bulk Export activated, the drawer opened with both format tabs and a populated preview. Evidence: bulk-export-zero-shared.png\"},\"correcting_field_clears_inline_error\":{\"score\":\"yes\",\"reasoning\":\"After invalid submission, filling the required fields removed the inline errors and left Create User available; submitting created the user. Evidence: form-errors-shared.png, create-confirmation-shared.png\"}}",
+    "cost_usd": 0.6954606
+  },
+  "innovation": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "export_summary_strip_bonus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Beyond the required export drawer, a structured export summary strip names user count and KPI Total above the preview so operators can trust the artifact at a glance",
+        "reasoning": "PASS \u2014 Export drawer visibly shows users, KPI total, active, and suspended summary metrics. Evidence: export_summary_strip_bonus-shared.png"
+      },
+      {
+        "id": "11.2",
+        "name": "last_mutation_chip_bonus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A compact chip or status line shows the last mutating action (for example Created user or Exported session) and updates after create, delete, status change, or export copy",
+        "reasoning": "PASS \u2014 After creating Test Operator, the header visibly showed \u201cCreated Test Operator.\u201d Evidence: last_mutation_chip_bonus-shared.png"
+      },
+      {
+        "id": "11.3",
+        "name": "field_contract_checklist_bonus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A live field-contract checklist beside Add User lights each UserCreate rule as the payload becomes valid",
+        "reasoning": "PASS \u2014 Filling the valid user fields visibly changed every checklist rule to \u2713. Evidence: field_contract_checklist_bonus-shared.png"
+      },
+      {
+        "id": "11.4",
+        "name": "export_copy_polish_bonus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export Copy feedback includes an extra polished microinteraction beyond a bare copied state",
+        "reasoning": "PASS \u2014 Copy interaction changed the button to \u201cCopied!\u201d and showed a clipboard toast. Evidence: export_copy_polish_bonus-shared.png"
+      },
+      {
+        "id": "11.5",
+        "name": "overview_chart_extra_affordance",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Overview charts offer an extra usability affordance beyond required tooltips \u2014 for example a brush, legend toggle, or comparison marker that remains browser-observable",
+        "reasoning": "PASS \u2014 Overview donut charts expose browser-observable legend toggle buttons such as Toggle Delivered and Toggle Organic. Evidence: overview_chart_extra_affordance-shared.png"
+      },
+      {
+        "id": "11.6",
+        "name": "operator_density_preferences_bonus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A density preference changes the visible compactness of All Users rows beyond the required layout",
+        "reasoning": "PASS \u2014 Compact density is a visible preference and reduced table row height to about 49.7px. Evidence: operator_density_preferences_bonus-shared.png"
+      },
+      {
+        "id": "11.7",
+        "name": "ops_dashboard_brand_polish_bonus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The dashboard presents a polished Pineapple Tech ops identity (distinct title treatment or header composition) beyond bare generic admin chrome",
+        "reasoning": "PASS \u2014 The dashboard has a distinct Pineapple Tech identity with PT mark, branded sidebar, and Pineapple Tech title treatment. Evidence: export_summary_strip_bonus-shared.png"
+      },
+      {
+        "id": "11.8",
+        "name": "theme_accent_customization_bonus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Beyond required light/dark themes, an accent preference recolors badges or chart accents without breaking theme toggle",
+        "reasoning": "PASS \u2014 Accent controls visibly switch among teal, amber, sky, and rose; amber became selected with changed styling. Evidence: theme_accent_customization_bonus-shared.png"
+      },
+      {
+        "id": "11.9",
+        "name": "print_or_share_session_bonus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "A print-friendly or share-oriented session summary view is available beyond the required Session JSON / Users CSV export",
+        "reasoning": "PASS \u2014 Export drawer visibly provides a Print / Share Summary action beyond JSON/CSV export. Evidence: export_summary_strip_bonus-shared.png"
+      },
+      {
+        "id": "11.10",
+        "name": "competition_level_ops_polish",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Competition-level polish is visible: the session artifact path (mutate \u2192 export preview \u2192 copy/download) feels operator-ready rather than demo-thin",
+        "reasoning": "PASS \u2014 The live path is operator-ready: mutation status, export summary, structured preview, Copy/Copied!, Download, and Print/Share controls are all visible. Evidence: export_copy_polish_bonus-shared.png"
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "PASS \u2014 The export drawer also provides an Import Session workflow, a useful session-management enhancement not covered by the other criteria. Evidence: export_copy_polish_bonus-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"export_summary_strip_bonus\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Export drawer visibly shows users, KPI total, active, and suspended summary metrics. Evidence: export_summary_strip_bonus-shared.png\"},\"last_mutation_chip_bonus\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 After creating Test Operator, the header visibly showed \u201cCreated Test Operator.\u201d Evidence: last_mutation_chip_bonus-shared.png\"},\"field_contract_checklist_bonus\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Filling the valid user fields visibly changed every checklist rule to \u2713. Evidence: field_contract_checklist_bonus-shared.png\"},\"export_copy_polish_bonus\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Copy interaction changed the button to \u201cCopied!\u201d and showed a clipboard toast. Evidence: export_copy_polish_bonus-shared.png\"},\"overview_chart_extra_affordance\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Overview donut charts expose browser-observable legend toggle buttons such as Toggle Delivered and Toggle Organic. Evidence: overview_chart_extra_affordance-shared.png\"},\"operator_density_preferences_bonus\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Compact density is a visible preference and reduced table row height to about 49.7px. Evidence: operator_density_preferences_bonus-shared.png\"},\"ops_dashboard_brand_polish_bonus\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 The dashboard has a distinct Pineapple Tech identity with PT mark, branded sidebar, and Pineapple Tech title treatment. Evidence: export_summary_strip_bonus-shared.png\"},\"theme_accent_customization_bonus\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Accent controls visibly switch among teal, amber, sky, and rose; amber became selected with changed styling. Evidence: theme_accent_customization_bonus-shared.png\"},\"print_or_share_session_bonus\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 Export drawer visibly provides a Print / Share Summary action beyond JSON/CSV export. Evidence: export_summary_strip_bonus-shared.png\"},\"competition_level_ops_polish\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 The live path is operator-ready: mutation status, export summary, structured preview, Copy/Copied!, Download, and Print/Share controls are all visible. Evidence: export_copy_polish_bonus-shared.png\"},\"innovation_catchall\":{\"score\":\"yes\",\"reasoning\":\"PASS \u2014 The export drawer also provides an Import Session workflow, a useful session-management enhancement not covered by the other criteria. Evidence: export_copy_polish_bonus-shared.png\"}}",
+    "cost_usd": 0.3185756
+  },
+  "motion": {
+    "score": 0.5,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "hover_press_breadcrumb_focus_states",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Verified with the real pointer and keyboard: hovering buttons eases their background/border/shadow with a slight press effect on activation, hovering breadcrumbs underlines them, table rows, list rows, and sidebar items take a full-width hover wash, and focusing form controls shows a visible focus ring",
+        "reasoning": "FAIL: Button hover and focus-ring feedback were observed, but the real breadcrumb hover remained without underline. Evidence: hover_press_breadcrumb_focus_states-breadcrumb.png"
+      },
+      {
+        "id": "4.2",
+        "name": "view_switch_keeps_hover_feedback",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "View switches update the main canvas without full reload and keep interactive chrome hover feedback",
+        "reasoning": "The All Users view switched in-place without URL reload, and interactive chrome remained available with hover styling. Evidence: view_switch_keeps_hover_feedback-users.png"
+      },
+      {
+        "id": "4.4",
+        "name": "theme_icon_crossfade_rotate",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Clicking the theme toggle with the real pointer cross-fades and rotates the sun/moon icons over roughly 0.2s while surfaces recolor, rather than swapping icons instantly with no transition",
+        "reasoning": "FAIL: Clicking the real theme toggle changed the theme, but the observed icon transition was instant with no crossfade/rotation evidence. Evidence: theme_icon_crossfade_rotate.png"
+      },
+      {
+        "id": "4.5",
+        "name": "popover_enter_exit_animation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The notifications, profile, and sidebar account popovers open anchored to their triggers with a short opacity-plus-scale enter/exit transition, the account menu opens upward from the sticky footer, and menu rows highlight on hover and keyboard focus",
+        "reasoning": "FAIL: Notifications, profile, and account menus opened anchored, but no transient opacity-plus-scale animation was observed; settled styles showed transform none/transition all. Evidence: popover_enter_exit_animation-sidebar-account.png"
+      },
+      {
+        "id": "4.6",
+        "name": "sidebar_accordion_motion",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sidebar nav groups expand/collapse exclusively (opening one closes the previously open group), the group chevron rotates on open and close, and group summaries and items take a hover wash",
+        "reasoning": "Users collapsed with a rotating chevron transition, and the accordion navigation remained operable. Evidence: sidebar_accordion_motion.png"
+      },
+      {
+        "id": "4.7",
+        "name": "list_row_microinteractions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Driven through the real UI controls (never a state-shortcut tool call): a newly created user's row animates into the table, a deleted row animates out, and changing the sort control animates rows to their new positions rather than snapping",
+        "reasoning": "FAIL: Real create and delete workflows worked, but rows exposed only background transitions and no row enter/exit or sort-position animation was observed. Evidence: list_row_microinteractions-sort.png"
+      },
+      {
+        "id": "4.8",
+        "name": "toasts_slide_and_autodismiss",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After create, delete, and bulk actions, a feedback toast slides in, remains readable long enough to scan, and auto-dismisses with a fade",
+        "reasoning": "Create, delete, and bulk status actions produced readable toasts; the bulk toast was present immediately and gone after four seconds. Evidence: toasts_slide_and_autodismiss-bulk.png"
+      },
+      {
+        "id": "4.9",
+        "name": "drawer_overlay_slide_small_viewport",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At a small viewport, activating the hamburger control slides the sidebar in with an overlay scrim rather than snapping it open; on a 1440px viewport the sidebar stays open without the overlay",
+        "reasoning": "At 500px the real hamburger opened the sidebar with a mobile overlay and transform transition; at 1440px the sidebar stayed open with overlay display none. Evidence: drawer_overlay_slide_small_viewport-small.png"
+      },
+      {
+        "id": "4.10",
+        "name": "status_ping_and_bell_indicator",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The security-watch status dots show a ping animation and the notification bell keeps a static error indicator that does not animate",
+        "reasoning": "FAIL: The notification bell had no animated indicator, and no ping/pulse animation was observed on the security-watch status elements. Evidence: status_ping_and_bell_indicator.png"
+      },
+      {
+        "id": "4.11",
+        "name": "export_drawer_slide_in",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Driven through the real UI Export control: the export drawer slides in from the side rather than snapping open",
+        "reasoning": "The real Export control opened a side drawer with a 0.28s transform transition from the right. Evidence: export_drawer_slide_in.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"hover_press_breadcrumb_focus_states\":{\"score\":\"no\",\"reasoning\":\"FAIL: Button hover and focus-ring feedback were observed, but the real breadcrumb hover remained without underline. Evidence: hover_press_breadcrumb_focus_states-breadcrumb.png\"},\"view_switch_keeps_hover_feedback\":{\"score\":\"yes\",\"reasoning\":\"The All Users view switched in-place without URL reload, and interactive chrome remained available with hover styling. Evidence: view_switch_keeps_hover_feedback-users.png\"},\"theme_icon_crossfade_rotate\":{\"score\":\"no\",\"reasoning\":\"FAIL: Clicking the real theme toggle changed the theme, but the observed icon transition was instant with no crossfade/rotation evidence. Evidence: theme_icon_crossfade_rotate.png\"},\"popover_enter_exit_animation\":{\"score\":\"no\",\"reasoning\":\"FAIL: Notifications, profile, and account menus opened anchored, but no transient opacity-plus-scale animation was observed; settled styles showed transform none/transition all. Evidence: popover_enter_exit_animation-sidebar-account.png\"},\"sidebar_accordion_motion\":{\"score\":\"yes\",\"reasoning\":\"Users collapsed with a rotating chevron transition, and the accordion navigation remained operable. Evidence: sidebar_accordion_motion.png\"},\"list_row_microinteractions\":{\"score\":\"no\",\"reasoning\":\"FAIL: Real create and delete workflows worked, but rows exposed only background transitions and no row enter/exit or sort-position animation was observed. Evidence: list_row_microinteractions-sort.png\"},\"toasts_slide_and_autodismiss\":{\"score\":\"yes\",\"reasoning\":\"Create, delete, and bulk status actions produced readable toasts; the bulk toast was present immediately and gone after four seconds. Evidence: toasts_slide_and_autodismiss-bulk.png\"},\"drawer_overlay_slide_small_viewport\":{\"score\":\"yes\",\"reasoning\":\"At 500px the real hamburger opened the sidebar with a mobile overlay and transform transition; at 1440px the sidebar stayed open with overlay display none. Evidence: drawer_overlay_slide_small_viewport-small.png\"},\"status_ping_and_bell_indicator\":{\"score\":\"no\",\"reasoning\":\"FAIL: The notification bell had no animated indicator, and no ping/pulse animation was observed on the security-watch status elements. Evidence: status_ping_and_bell_indicator.png\"},\"export_drawer_slide_in\":{\"score\":\"yes\",\"reasoning\":\"The real Export control opened a side drawer with a 0.28s transform transition from the right. Evidence: export_drawer_slide_in.png\"}}",
+    "cost_usd": 0.6987331999999999
+  },
+  "performance": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_is_under_two_seconds",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cold start to interactive is under 2 seconds on local render",
+        "reasoning": "Initial navigation completed in under 1 second with a fully rendered interactive dashboard. Evidence: cold_start_is_under_two_seconds-shared.png"
+      },
+      {
+        "id": "9.2",
+        "name": "console_is_clean",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Browser devtools show no errors, warnings, or hydration mismatch messages on load or during a full exercise including export/import",
+        "reasoning": "Console inspection after navigation and full create/delete/filter/sort/theme/export/import exercise reported 0 errors and 0 warnings. Evidence: post_hydration_no_flash-shared.png"
+      },
+      {
+        "id": "9.3",
+        "name": "view_and_export_transitions_responsive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "View switches and export drawer open/tab switches respond without multi-second lag",
+        "reasoning": "View navigation and export JSON/CSV switching completed responsively, with measured tool responses under 60 ms. Evidence: export_preview_has_no_long_freeze-shared.png"
+      },
+      {
+        "id": "9.4",
+        "name": "export_preview_has_no_long_freeze",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Opening the export drawer and switching Session JSON / Users CSV regenerates the preview without freezing the UI",
+        "reasoning": "Session JSON and Users CSV previews regenerated successfully without UI freezing; measured transitions completed in 52 ms and 18 ms. Evidence: export_preview_has_no_long_freeze-shared.png"
+      },
+      {
+        "id": "9.5",
+        "name": "seeded_users_table_responsive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The seeded users table (at least 8 rows with pagination) renders and filters without perceived lag",
+        "reasoning": "Desktop viewport showed 10 seeded user rows and pagination; filtering, sorting, and clearing completed responsively. Evidence: seeded_users_table_responsive-shared.png"
+      },
+      {
+        "id": "9.6",
+        "name": "state_changes_remain_interactive",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The UI remains interactive during create, delete, filter, sort, and theme changes",
+        "reasoning": "Create and delete workflows completed, returning the table from 10 to 11 and back to 10 rows; rapid theme changes also completed while the UI remained usable. Evidence: state_changes_remain_interactive-shared.png"
+      },
+      {
+        "id": "9.7",
+        "name": "list_animations_maintain_smoothness",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create/delete/sort row animations remain smooth enough not to block interaction",
+        "reasoning": "Create and delete row transitions completed without blocking interaction, with actions finishing in approximately 0.6 seconds and the table remaining responsive. Evidence: state_changes_remain_interactive-shared.png"
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_input_does_not_freeze",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app does not hang or freeze under rapid filter toggling, sort switches, or theme toggles",
+        "reasoning": "Six rapid theme toggles all completed successfully in roughly 0.6\u20130.7 seconds each, with the document remaining complete and interactive. Evidence: rapid_input_does_not_freeze-shared.png"
+      },
+      {
+        "id": "9.10",
+        "name": "post_hydration_no_flash",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "After first paint there is no post-hydration content flash as the app becomes interactive",
+        "reasoning": "Fresh navigation settled directly into a complete Operations Overview UI with no visible content flash or hydration warning. Evidence: post_hydration_no_flash-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"cold_start_is_under_two_seconds\":{\"score\":\"yes\",\"reasoning\":\"Initial navigation completed in under 1 second with a fully rendered interactive dashboard. Evidence: cold_start_is_under_two_seconds-shared.png\"},\"console_is_clean\":{\"score\":\"yes\",\"reasoning\":\"Console inspection after navigation and full create/delete/filter/sort/theme/export/import exercise reported 0 errors and 0 warnings. Evidence: post_hydration_no_flash-shared.png\"},\"view_and_export_transitions_responsive\":{\"score\":\"yes\",\"reasoning\":\"View navigation and export JSON/CSV switching completed responsively, with measured tool responses under 60 ms. Evidence: export_preview_has_no_long_freeze-shared.png\"},\"export_preview_has_no_long_freeze\":{\"score\":\"yes\",\"reasoning\":\"Session JSON and Users CSV previews regenerated successfully without UI freezing; measured transitions completed in 52 ms and 18 ms. Evidence: export_preview_has_no_long_freeze-shared.png\"},\"seeded_users_table_responsive\":{\"score\":\"yes\",\"reasoning\":\"Desktop viewport showed 10 seeded user rows and pagination; filtering, sorting, and clearing completed responsively. Evidence: seeded_users_table_responsive-shared.png\"},\"state_changes_remain_interactive\":{\"score\":\"yes\",\"reasoning\":\"Create and delete workflows completed, returning the table from 10 to 11 and back to 10 rows; rapid theme changes also completed while the UI remained usable. Evidence: state_changes_remain_interactive-shared.png\"},\"list_animations_maintain_smoothness\":{\"score\":\"yes\",\"reasoning\":\"Create and delete row transitions completed without blocking interaction, with actions finishing in approximately 0.6 seconds and the table remaining responsive. Evidence: state_changes_remain_interactive-shared.png\"},\"rapid_input_does_not_freeze\":{\"score\":\"yes\",\"reasoning\":\"Six rapid theme toggles all completed successfully in roughly 0.6\u20130.7 seconds each, with the document remaining complete and interactive. Evidence: rapid_input_does_not_freeze-shared.png\"},\"post_hydration_no_flash\":{\"score\":\"yes\",\"reasoning\":\"Fresh navigation settled directly into a complete Operations Overview UI with no visible content flash or hydration warning. Evidence: post_hydration_no_flash-shared.png\"} }",
+    "cost_usd": 0.25170800000000004
+  },
+  "responsiveness": {
+    "score": 0.5,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "layout_adapts_desktop_to_mobile",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Layout adapts gracefully from 1440px desktop drawer-open shell to 375px mobile with hamburger overlay",
+        "reasoning": "FAIL: Mobile uses the hamburger overlay, but the layout still produces horizontal overflow and a table extending far beyond the viewport. Evidence: mobile-shared.png"
+      },
+      {
+        "id": "7.2",
+        "name": "mobile_tap_targets_are_large_enough",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sidebar hamburger, header icon buttons, and primary table actions are tap targets at least 44px on mobile",
+        "reasoning": "Hamburger and header controls measure 44\u00d744px; table row actions measure 44\u00d744px. Evidence: mobile-shared.png"
+      },
+      {
+        "id": "7.3",
+        "name": "typography_resizes_across_breakpoints",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Typography remains readable at both 1440px and 375px without unreadably tiny labels in the KPI strip or export drawer",
+        "reasoning": "Mobile KPI typography remains readable at 14px, and export drawer labels/content remain legible. Evidence: mobile-export-open-shared.png"
+      },
+      {
+        "id": "7.4",
+        "name": "content_avoids_clipping_and_overflow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At 375px no content clips or overflows the viewport and no page-level horizontal scrolling appears",
+        "reasoning": "FAIL: At 375px, document scroll width is 577px and the users table is about 902px wide, extending beyond the viewport. Evidence: mobile-shared.png"
+      },
+      {
+        "id": "7.5",
+        "name": "chrome_adapts_to_small_screens",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Collapsible sidebar adapts for smaller screens via hamburger + overlay drawer",
+        "reasoning": "The sidebar collapses off-canvas and opens through a visible hamburger with an overlay drawer. Evidence: mobile-nav-open-shared.png"
+      },
+      {
+        "id": "7.6",
+        "name": "stacking_reflows_logically",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At narrow widths the KPI strip, table, and export drawer reflow logically rather than overlapping unreadably",
+        "reasoning": "FAIL: KPI cards stack, but the dense users table remains a 902px-wide layout rather than reflowing or being contained in an internal scroller. Evidence: mobile-shared.png"
+      },
+      {
+        "id": "7.7",
+        "name": "export_drawer_operable_on_mobile",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px the export drawer, Add User form, and All Users KPI strip stay fully visible and operable",
+        "reasoning": "The export drawer opens as a full-width 360px dialog with visible tabs, summary, preview, Copy, and Download controls; the Add User form is also 327px wide and visible. Evidence: mobile-export-open-shared.png"
+      },
+      {
+        "id": "7.8",
+        "name": "small_screens_avoid_horizontal_scroll",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Small screens have no page-level horizontal scrolling; dense tables scroll within their own containers",
+        "reasoning": "FAIL: At 375px, document and body scroll width measure 577px, indicating page-level horizontal overflow. Evidence: mobile-shared.png"
+      },
+      {
+        "id": "7.9",
+        "name": "charts_and_tables_resize",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Overview charts and data tables size responsively to fit the layout at desktop and mobile widths",
+        "reasoning": "FAIL: The users table remains approximately 902px wide at 375px, with no containing horizontal-scroll region observed; responsive table sizing therefore fails. Evidence: mobile-shared.png"
+      },
+      {
+        "id": "7.10",
+        "name": "fixed_controls_remain_accessible",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Sticky account footer and utility header controls remain accessible on all viewport sizes",
+        "reasoning": "The mobile header utility controls are visible at 44\u00d744px, and the account footer is visible when the navigation overlay is opened. Evidence: mobile-nav-open-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"layout_adapts_desktop_to_mobile\":{\"score\":\"no\",\"reasoning\":\"FAIL: Mobile uses the hamburger overlay, but the layout still produces horizontal overflow and a table extending far beyond the viewport. Evidence: mobile-shared.png\"},\"mobile_tap_targets_are_large_enough\":{\"score\":\"yes\",\"reasoning\":\"Hamburger and header controls measure 44\u00d744px; table row actions measure 44\u00d744px. Evidence: mobile-shared.png\"},\"typography_resizes_across_breakpoints\":{\"score\":\"yes\",\"reasoning\":\"Mobile KPI typography remains readable at 14px, and export drawer labels/content remain legible. Evidence: mobile-export-open-shared.png\"},\"content_avoids_clipping_and_overflow\":{\"score\":\"no\",\"reasoning\":\"FAIL: At 375px, document scroll width is 577px and the users table is about 902px wide, extending beyond the viewport. Evidence: mobile-shared.png\"},\"chrome_adapts_to_small_screens\":{\"score\":\"yes\",\"reasoning\":\"The sidebar collapses off-canvas and opens through a visible hamburger with an overlay drawer. Evidence: mobile-nav-open-shared.png\"},\"stacking_reflows_logically\":{\"score\":\"no\",\"reasoning\":\"FAIL: KPI cards stack, but the dense users table remains a 902px-wide layout rather than reflowing or being contained in an internal scroller. Evidence: mobile-shared.png\"},\"export_drawer_operable_on_mobile\":{\"score\":\"yes\",\"reasoning\":\"The export drawer opens as a full-width 360px dialog with visible tabs, summary, preview, Copy, and Download controls; the Add User form is also 327px wide and visible. Evidence: mobile-export-open-shared.png\"},\"small_screens_avoid_horizontal_scroll\":{\"score\":\"no\",\"reasoning\":\"FAIL: At 375px, document and body scroll width measure 577px, indicating page-level horizontal overflow. Evidence: mobile-shared.png\"},\"charts_and_tables_resize\":{\"score\":\"no\",\"reasoning\":\"FAIL: The users table remains approximately 902px wide at 375px, with no containing horizontal-scroll region observed; responsive table sizing therefore fails. Evidence: mobile-shared.png\"},\"fixed_controls_remain_accessible\":{\"score\":\"yes\",\"reasoning\":\"The mobile header utility controls are visible at 44\u00d744px, and the account footer is visible when the navigation overlay is opened. Evidence: mobile-nav-open-shared.png\"} }",
+    "cost_usd": 0.1377986
+  },
+  "technical": {
+    "score": 0.9,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "shared_state_coherence",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "All views derive from one shared collection: a status/role edit, create, or delete made in any view is immediately reflected in every other place it appears (table rows, badges, KPI counts, filtered views, export previews) without a reload, and filters/sort/bulk actions recompute the same visible list",
+        "reasoning": "Created, updated, and deleted users; KPI counts, table rows, and export previews reflected each mutation live. Evidence: escape_closes_returns_focus-open.png"
+      },
+      {
+        "id": "2.2",
+        "name": "no_storage_reload_seeded",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No browser storage is used: localStorage and sessionStorage remain empty after seeding, creating, editing, and deleting users and toggling theme, and a page reload returns the app to its seeded state",
+        "reasoning": "After create/edit/delete/theme flows, storage lengths remained 0; reload returned seeded dashboard with no Zoe/Zelda records. Evidence: no_storage_reload_seeded-shared.png"
+      },
+      {
+        "id": "2.6",
+        "name": "hydration_clean_console",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The console is free of errors, warnings, and hydration mismatch messages on first load and stays clean after switching views and exercising create, edit, delete, filter, sort, export, import, and theme flows",
+        "reasoning": "Console reported 0 errors and 0 warnings after navigation, CRUD, filtering, sorting, export/import, and theme flows. Evidence: hydration_clean_console-shared.png"
+      },
+      {
+        "id": "2.7",
+        "name": "direct_load_full_shell",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Loading the served URL directly in a fresh tab always renders the complete dashboard shell (sidebar, header, main canvas) with its seeded data \u2014 never a blank page, half-rendered shell, or 404",
+        "reasoning": "Fresh direct load rendered the complete desktop shell with sidebar, header, dashboard canvas, and seeded content. Evidence: direct_load_full_shell-desktop.png"
+      },
+      {
+        "id": "2.9",
+        "name": "cold_load_interactive_2s",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The app is interactive (sidebar and header controls respond) within 2 seconds of a local cold load",
+        "reasoning": "Local navigation completed in under one second and controls were immediately interactable. Evidence: direct_load_full_shell-desktop.png"
+      },
+      {
+        "id": "2.10",
+        "name": "rapid_input_stability",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Under rapid repeated input (fast theme toggles, quick view switches, rapid filter changes, export tab switches), the UI stays responsive with no hangs and no view showing stale data another view already updated",
+        "reasoning": "Rapid filter/sort changes and repeated theme toggles completed without hangs or stale visible data. Evidence: hydration_clean_console-shared.png"
+      },
+      {
+        "id": "2.11",
+        "name": "keyboard_operability_focus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Every interactive control \u2014 sidebar items, header controls, table row actions, form fields, pagination, export drawer \u2014 is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), showing a visible focus indicator at each stop",
+        "reasoning": "FAIL: the full set of controls could not be verified as keyboard-operable with visible focus; the theme checkbox itself was visually hidden and direct interaction with it was intercepted by its visual control. Evidence: direct_load_full_shell-desktop.png"
+      },
+      {
+        "id": "2.12",
+        "name": "escape_closes_returns_focus",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Open popovers and the export drawer close on the Escape key and return keyboard focus to the control that opened them",
+        "reasoning": "Escape closed the export drawer and focus returned to the Open export drawer control. Evidence: escape_closes_returns_focus-open.png"
+      },
+      {
+        "id": "2.13",
+        "name": "labels_and_error_association",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Add/Edit form fields have visible labels, and each validation message names the field it belongs to and renders in association with that field",
+        "reasoning": "Add User showed visible field labels; submitting empty fields produced named validation alerts beside the corresponding fields. Evidence: labels_and_error_association-shared.png"
+      },
+      {
+        "id": "2.14",
+        "name": "export_end_state_live_compile",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Session JSON and Users CSV compile live from the current store: after a create or delete, reopening Export shows the mutation without requiring a reload",
+        "reasoning": "Export preview showed the created user, then after deletion reopened with the reduced count and updated JSON payload without reload. Evidence: escape_closes_returns_focus-open.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"shared_state_coherence\":{\"score\":\"yes\",\"reasoning\":\"Created, updated, and deleted users; KPI counts, table rows, and export previews reflected each mutation live. Evidence: escape_closes_returns_focus-open.png\"},\"no_storage_reload_seeded\":{\"score\":\"yes\",\"reasoning\":\"After create/edit/delete/theme flows, storage lengths remained 0; reload returned seeded dashboard with no Zoe/Zelda records. Evidence: no_storage_reload_seeded-shared.png\"},\"hydration_clean_console\":{\"score\":\"yes\",\"reasoning\":\"Console reported 0 errors and 0 warnings after navigation, CRUD, filtering, sorting, export/import, and theme flows. Evidence: hydration_clean_console-shared.png\"},\"direct_load_full_shell\":{\"score\":\"yes\",\"reasoning\":\"Fresh direct load rendered the complete desktop shell with sidebar, header, dashboard canvas, and seeded content. Evidence: direct_load_full_shell-desktop.png\"},\"cold_load_interactive_2s\":{\"score\":\"yes\",\"reasoning\":\"Local navigation completed in under one second and controls were immediately interactable. Evidence: direct_load_full_shell-desktop.png\"},\"rapid_input_stability\":{\"score\":\"yes\",\"reasoning\":\"Rapid filter/sort changes and repeated theme toggles completed without hangs or stale visible data. Evidence: hydration_clean_console-shared.png\"},\"keyboard_operability_focus\":{\"score\":\"no\",\"reasoning\":\"FAIL: the full set of controls could not be verified as keyboard-operable with visible focus; the theme checkbox itself was visually hidden and direct interaction with it was intercepted by its visual control. Evidence: direct_load_full_shell-desktop.png\"},\"escape_closes_returns_focus\":{\"score\":\"yes\",\"reasoning\":\"Escape closed the export drawer and focus returned to the Open export drawer control. Evidence: escape_closes_returns_focus-open.png\"},\"labels_and_error_association\":{\"score\":\"yes\",\"reasoning\":\"Add User showed visible field labels; submitting empty fields produced named validation alerts beside the corresponding fields. Evidence: labels_and_error_association-shared.png\"},\"export_end_state_live_compile\":{\"score\":\"yes\",\"reasoning\":\"Export preview showed the created user, then after deletion reopened with the reduced count and updated JSON payload without reload. Evidence: escape_closes_returns_focus-open.png\"}}",
+    "cost_usd": 0.7827135999999999
+  },
+  "user_flows": {
+    "score": 0.6667,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "create_flow_updates_list_kpi_export",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Create flow: submitting Add User with a valid UserCreate payload adds exactly one All Users row, increases KPI Total by one, and both Session JSON and Users CSV previews include the new user without a reload",
+        "reasoning": "FAIL: Valid creation added Zelda and raised the list KPI from 10 to 11, but the first live export preview remained stale and both JSON/CSV previews were not fully verified together. Evidence: create_flow_updates_list_kpi_export.png"
+      },
+      {
+        "id": "6.2",
+        "name": "invalid_create_shows_field_contract_errors",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Create flow: invalid submission (empty required fields, firstName over 40, email missing domain dot, temporaryPassword under 8) shows immediate inline validation naming the field and adds no row",
+        "reasoning": "Empty and malformed submissions showed inline field-specific errors for required fields, firstName length, email domain dot, and password length without adding a row. Evidence: invalid_create_shows_field_contract_errors.png"
+      },
+      {
+        "id": "6.3",
+        "name": "edit_flow_updates_related_displays",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edit flow: saving Edit updates the table row, KPI strip, filtered views, and both export previews in the same session",
+        "reasoning": "Editing Tim\u2019s last name updated the table and produced the toast \u201csaved across all views\u201d; subsequent JSON/CSV exports reflected the edited record. Evidence: edit_flow_updates_related_displays.png"
+      },
+      {
+        "id": "6.4",
+        "name": "delete_flow_updates_all_surfaces",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Delete flow: the user is removed from All Users, selection, KPI counts, and both export previews after deletion",
+        "reasoning": "Deleting the selected user completed through confirmation, reduced the table to 10 users, and showed \u201cremoved from list, KPIs, and export previews.\u201d Evidence: delete_flow_updates_all_surfaces_after.png"
+      },
+      {
+        "id": "6.5",
+        "name": "view_switch_retains_filters_theme",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "View/mode switch: switching Operations Overview \u2194 All Users keeps theme and previously set filters/sort until reload, with no full page navigation",
+        "reasoning": "Switching Operations Overview and All Users preserved Member/Active filters, newest sort, and dark theme without navigation reload. Evidence: view_switch_retains_filters_theme.png"
+      },
+      {
+        "id": "6.6",
+        "name": "last_user_delete_or_zero_filter_empty_state",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edge: after deleting all users, or when filters and search match nothing, the list region shows an empty-state message explaining what belongs there instead of an empty/broken table.",
+        "reasoning": "A real no-match search produced \u201cNo Matching Users\u201d with explanatory recovery text and an Add User action. Evidence: last_user_delete_or_zero_filter_empty_state.png"
+      },
+      {
+        "id": "6.7",
+        "name": "filters_update_list_and_export",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Edge: filtering by role or status reveals/hides items in All Users and Session JSON filters object reflects the active filter",
+        "reasoning": "UI role/status filters reduced the list to Zelda only, and the Session JSON preview contained the active filter object with role Member and status Active. Evidence: filters_update_list_and_export.png"
+      },
+      {
+        "id": "6.8",
+        "name": "drawer_chrome_preserves_workflow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Collapsible chrome: on a small viewport the sidebar hamburger can be hidden and reopened with workflow continuity",
+        "reasoning": "FAIL: At the compact viewport the sidebar opened, but its overlay intercepted the hamburger and other main-content interactions, so close/reopen continuity could not be completed. Evidence: drawer_chrome_preserves_workflow.png"
+      },
+      {
+        "id": "6.9",
+        "name": "overlays_support_export_and_popovers",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Overlays: notifications, profile, account, and export drawer open from their triggers, support expected close paths, and do not trap the user",
+        "reasoning": "FAIL: Notifications and profile menus opened, and export opened, but the full account/export close-path workflow was not reliably operable; the export drawer could also remain offscreen at smaller widths. Evidence: overlays_support_export_and_popovers.png"
+      },
+      {
+        "id": "6.10",
+        "name": "import_recovers_exported_session",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Recovery: after mutating then exporting Session JSON, a further local change can be corrected by Import of that JSON without requiring a full page reload",
+        "reasoning": "After exporting, changing Tim again, and importing the saved Session JSON, the app reported \u201cimported 10 user(s)\u201d and restored the exported mutated session without reload. Evidence: import_recovers_exported_session.png"
+      },
+      {
+        "id": "6.11",
+        "name": "mutation_to_export_pipeline",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Mutation-to-export: create a distinctive-email user, delete another, open Export, and confirm schemaVersion pineapple-admin-analytics-v1, the new email present, deleted user absent, and KPI match",
+        "reasoning": "FAIL: Creation and export schema/KPI behavior worked, but the completed workflow did not delete a different pre-existing user while retaining the distinctive created email in the final export. Evidence: create_flow_updates_list_kpi_export.png"
+      },
+      {
+        "id": "6.12",
+        "name": "export_import_round_trip_flow",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Export then import round-trip: after create/edit plus delete, Import the exported Session JSON and confirm All Users, KPIs, and both export previews match the pre-export mutated state",
+        "reasoning": "After create/edit/delete mutations, Session JSON import restored 10 users and KPI total 10; subsequent JSON and CSV previews both showed 10 users and the edited Tim record, with the deleted Zelda absent. Evidence: export_import_round_trip_flow.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"create_flow_updates_list_kpi_export\":{\"score\":\"no\",\"reasoning\":\"FAIL: Valid creation added Zelda and raised the list KPI from 10 to 11, but the first live export preview remained stale and both JSON/CSV previews were not fully verified together. Evidence: create_flow_updates_list_kpi_export.png\"},\"invalid_create_shows_field_contract_errors\":{\"score\":\"yes\",\"reasoning\":\"Empty and malformed submissions showed inline field-specific errors for required fields, firstName length, email domain dot, and password length without adding a row. Evidence: invalid_create_shows_field_contract_errors.png\"},\"edit_flow_updates_related_displays\":{\"score\":\"yes\",\"reasoning\":\"Editing Tim\u2019s last name updated the table and produced the toast \u201csaved across all views\u201d; subsequent JSON/CSV exports reflected the edited record. Evidence: edit_flow_updates_related_displays.png\"},\"delete_flow_updates_all_surfaces\":{\"score\":\"yes\",\"reasoning\":\"Deleting the selected user completed through confirmation, reduced the table to 10 users, and showed \u201cremoved from list, KPIs, and export previews.\u201d Evidence: delete_flow_updates_all_surfaces_after.png\"},\"view_switch_retains_filters_theme\":{\"score\":\"yes\",\"reasoning\":\"Switching Operations Overview and All Users preserved Member/Active filters, newest sort, and dark theme without navigation reload. Evidence: view_switch_retains_filters_theme.png\"},\"last_user_delete_or_zero_filter_empty_state\":{\"score\":\"yes\",\"reasoning\":\"A real no-match search produced \u201cNo Matching Users\u201d with explanatory recovery text and an Add User action. Evidence: last_user_delete_or_zero_filter_empty_state.png\"},\"filters_update_list_and_export\":{\"score\":\"yes\",\"reasoning\":\"UI role/status filters reduced the list to Zelda only, and the Session JSON preview contained the active filter object with role Member and status Active. Evidence: filters_update_list_and_export.png\"},\"drawer_chrome_preserves_workflow\":{\"score\":\"no\",\"reasoning\":\"FAIL: At the compact viewport the sidebar opened, but its overlay intercepted the hamburger and other main-content interactions, so close/reopen continuity could not be completed. Evidence: drawer_chrome_preserves_workflow.png\"},\"overlays_support_export_and_popovers\":{\"score\":\"no\",\"reasoning\":\"FAIL: Notifications and profile menus opened, and export opened, but the full account/export close-path workflow was not reliably operable; the export drawer could also remain offscreen at smaller widths. Evidence: overlays_support_export_and_popovers.png\"},\"import_recovers_exported_session\":{\"score\":\"yes\",\"reasoning\":\"After exporting, changing Tim again, and importing the saved Session JSON, the app reported \u201cimported 10 user(s)\u201d and restored the exported mutated session without reload. Evidence: import_recovers_exported_session.png\"},\"mutation_to_export_pipeline\":{\"score\":\"no\",\"reasoning\":\"FAIL: Creation and export schema/KPI behavior worked, but the completed workflow did not delete a different pre-existing user while retaining the distinctive created email in the final export. Evidence: create_flow_updates_list_kpi_export.png\"},\"export_import_round_trip_flow\":{\"score\":\"yes\",\"reasoning\":\"After create/edit/delete mutations, Session JSON import restored 10 users and KPI total 10; subsequent JSON and CSV previews both showed 10 users and the edited Tim record, with the deleted Zelda absent. Evidence: export_import_round_trip_flow.png\"}}",
+    "cost_usd": 0.8354214
+  },
+  "visual_design": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "overview_mosaic_asymmetric",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Operations Overview keeps an asymmetric 12-column mosaic with mixed wide/medium/narrow card spans and one primary inverse Revenue run rate spotlight card; Users views use dense admin tables, filter toolbars, and form layouts",
+        "reasoning": "Asymmetric multi-span dashboard mosaic with a prominent inverse Revenue Run Rate card and dense Users table/form views observed. Evidence: overview_mosaic_asymmetric-shared.png"
+      },
+      {
+        "id": "3.2",
+        "name": "badge_and_empty_state_styling",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Role and status use distinct badge treatments; empty list state is visually present when the collection or filter result is empty",
+        "reasoning": "Role and status badges use distinct treatments, and the empty state visibly explains how to clear filters or add a user. Evidence: badge_and_empty_state_styling-users-all.png, badge_and_empty_state_styling-shared.png"
+      },
+      {
+        "id": "3.4",
+        "name": "theme_surfaces_accent_wash",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Both light and dark themes render coherent surface colors, and the main canvas shows a soft radial accent wash rather than a flat single-color background",
+        "reasoning": "Both dark and light themes rendered, with a computed radial-gradient canvas wash. Evidence: overview_mosaic_asymmetric-shared.png, theme_surfaces_accent_wash-light.png"
+      },
+      {
+        "id": "3.5",
+        "name": "chart_accent_palette",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Overview chart cards draw from the specified accent palette (teal, amber, sky, rose, orange) rather than default or arbitrary chart colors",
+        "reasoning": "Charts visibly use teal, amber, sky, rose, and orange accents. Evidence: overview_mosaic_asymmetric-shared.png"
+      },
+      {
+        "id": "3.6",
+        "name": "card_shadow_hairline_density",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Cards across the dashboard show subtle layered shadows and hairline borders, and the composition uses stats, badges, progress, radial-progress, tables, and list rows for a dense ops-dashboard feel",
+        "reasoning": "Cards visibly use subtle borders/shadows and dense stats, badges, progress, radial charts, tables, and list rows. Evidence: overview_mosaic_asymmetric-shared.png"
+      },
+      {
+        "id": "3.7",
+        "name": "consistent_icons_local_avatars",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "One consistent icon set is used throughout the chrome, avatar images render from local assets, and the utility header shows a search pill plus circular ghost icon buttons",
+        "reasoning": "Chrome uses a consistent outlined icon style; avatars rendered from localhost assets, with search and circular utility buttons present. Evidence: overview_mosaic_asymmetric-shared.png"
+      },
+      {
+        "id": "3.8",
+        "name": "responsive_drawer_breakpoints",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At a 1440px-wide viewport the drawer sidebar is open by default; at a narrow viewport the sidebar collapses to a hamburger control that opens an overlay drawer",
+        "reasoning": "At 1440px the sidebar was visible; at 375px it collapsed and the hamburger opened an overlay drawer. Evidence: overview_mosaic_asymmetric-shared.png, responsive_drawer_breakpoints-narrow-closed.png, responsive_drawer_breakpoints-narrow-open.png"
+      },
+      {
+        "id": "3.10",
+        "name": "tables_scroll_in_containers",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "At 375px viewport width, dense data tables scroll horizontally within their own containers rather than stretching the page",
+        "reasoning": "At 375px the table wrapper measured 325px wide with 902px scroll width and overflow-x:auto. Evidence: tables_scroll_in_containers-shared.png"
+      },
+      {
+        "id": "3.11",
+        "name": "export_drawer_visual_chrome",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The export drawer shows Session JSON and Users CSV tabs with a monospaced preview and Copy/Download actions",
+        "reasoning": "Export drawer visibly provided Session JSON and Users CSV tabs, monospaced previews, Copy, and format-specific Download actions. Evidence: export_drawer_visual_chrome-shared.png, export_drawer_visual_chrome-csv.png"
+      },
+      {
+        "id": "3.12",
+        "name": "consistent_capitalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Headings, buttons, and menu items follow one consistent capitalization convention (title case or sentence case) throughout the app",
+        "reasoning": "Headings, navigation items, and action buttons consistently use title case. Evidence: overview_mosaic_asymmetric-shared.png"
+      },
+      {
+        "id": "3.13",
+        "name": "specific_action_labels",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Action labels are specific verbs (Add user, Change status, Export session) rather than generic labels (Submit, OK) where a specific label is possible",
+        "reasoning": "Observed specific labels including Add User, Create User, Change Status, Export Session, Copy, and Download CSV. Evidence: validation_and_empty_state_copy-shared.png, export_drawer_visual_chrome-shared.png"
+      },
+      {
+        "id": "3.14",
+        "name": "validation_and_empty_state_copy",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Validation messages name the offending field and the fix, and empty state copy explains what belongs in the region and how to add it",
+        "reasoning": "Validation alerts named offending fields and constraints, while the empty state explained how to clear filters or add a user. Evidence: validation_and_empty_state_copy-validation.png, badge_and_empty_state_styling-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"overview_mosaic_asymmetric\":{\"score\":\"yes\",\"reasoning\":\"Asymmetric multi-span dashboard mosaic with a prominent inverse Revenue Run Rate card and dense Users table/form views observed. Evidence: overview_mosaic_asymmetric-shared.png\"},\"badge_and_empty_state_styling\":{\"score\":\"yes\",\"reasoning\":\"Role and status badges use distinct treatments, and the empty state visibly explains how to clear filters or add a user. Evidence: badge_and_empty_state_styling-users-all.png, badge_and_empty_state_styling-shared.png\"},\"theme_surfaces_accent_wash\":{\"score\":\"yes\",\"reasoning\":\"Both dark and light themes rendered, with a computed radial-gradient canvas wash. Evidence: overview_mosaic_asymmetric-shared.png, theme_surfaces_accent_wash-light.png\"},\"chart_accent_palette\":{\"score\":\"yes\",\"reasoning\":\"Charts visibly use teal, amber, sky, rose, and orange accents. Evidence: overview_mosaic_asymmetric-shared.png\"},\"card_shadow_hairline_density\":{\"score\":\"yes\",\"reasoning\":\"Cards visibly use subtle borders/shadows and dense stats, badges, progress, radial charts, tables, and list rows. Evidence: overview_mosaic_asymmetric-shared.png\"},\"consistent_icons_local_avatars\":{\"score\":\"yes\",\"reasoning\":\"Chrome uses a consistent outlined icon style; avatars rendered from localhost assets, with search and circular utility buttons present. Evidence: overview_mosaic_asymmetric-shared.png\"},\"responsive_drawer_breakpoints\":{\"score\":\"yes\",\"reasoning\":\"At 1440px the sidebar was visible; at 375px it collapsed and the hamburger opened an overlay drawer. Evidence: overview_mosaic_asymmetric-shared.png, responsive_drawer_breakpoints-narrow-closed.png, responsive_drawer_breakpoints-narrow-open.png\"},\"tables_scroll_in_containers\":{\"score\":\"yes\",\"reasoning\":\"At 375px the table wrapper measured 325px wide with 902px scroll width and overflow-x:auto. Evidence: tables_scroll_in_containers-shared.png\"},\"export_drawer_visual_chrome\":{\"score\":\"yes\",\"reasoning\":\"Export drawer visibly provided Session JSON and Users CSV tabs, monospaced previews, Copy, and format-specific Download actions. Evidence: export_drawer_visual_chrome-shared.png, export_drawer_visual_chrome-csv.png\"},\"consistent_capitalization\":{\"score\":\"yes\",\"reasoning\":\"Headings, navigation items, and action buttons consistently use title case. Evidence: overview_mosaic_asymmetric-shared.png\"},\"specific_action_labels\":{\"score\":\"yes\",\"reasoning\":\"Observed specific labels including Add User, Create User, Change Status, Export Session, Copy, and Download CSV. Evidence: validation_and_empty_state_copy-shared.png, export_drawer_visual_chrome-shared.png\"},\"validation_and_empty_state_copy\":{\"score\":\"yes\",\"reasoning\":\"Validation alerts named offending fields and constraints, while the empty state explained how to clear filters or add a user. Evidence: validation_and_empty_state_copy-validation.png, badge_and_empty_state_styling-shared.png\"}}",
+    "cost_usd": 0.3046864
+  },
+  "writing": {
+    "score": 0.875,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "headings_use_consistent_capitalization",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders headings and section titles, they use consistent capitalization (one convention \u2014 title case or sentence case \u2014 throughout).",
+        "reasoning": "yes \u2014 rendered headings consistently use title case, including \u201cAll Users,\u201d \u201cAccount Settings,\u201d and \u201cExport Session.\u201d Evidence: headings_use_consistent_capitalization-shared.png"
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_labels",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Where the app renders button or action labels, they are specific verbs (Add user, Change status, Export session, Copy), not generic (Submit, OK) when a specific label is possible.",
+        "reasoning": "FAIL: generic labels such as \u201cExport,\u201d \u201cDelete,\u201d and \u201cCancel\u201d are present where more specific labels could be used. Evidence: actions_use_specific_labels-shared.png"
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders validation or import errors, they name the field and the fix (for example firstName length or email format), not just a rejection (Invalid).",
+        "reasoning": "yes \u2014 validation messages identify fields and requirements, such as \u201cemail is required\u201d and \u201ctemporaryPassword must be at least 8 characters.\u201d Evidence: errors_name_problem_and_fix-after.png"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders empty states, the copy explains what belongs there and how to add it.",
+        "reasoning": "yes \u2014 the empty state says \u201cTry clearing the search or filters, or add a new user to the directory\u201d and provides an \u201cAdd User\u201d action. Evidence: empty_states_explain_next_step-shared.png"
+      },
+      {
+        "id": "15.5",
+        "name": "body_copy_is_well_written",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders body or helper copy in Users and Export, rate how free it is of spelling and grammatical errors.",
+        "reasoning": "yes \u2014 Users and Export copy is grammatical, clear, and free of observed spelling errors. Evidence: body_copy_is_well_written-shared.png"
+      },
+      {
+        "id": "15.6",
+        "name": "terminology_is_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders labels for the same concept in multiple places, terminology is consistent (User vs Users, Session JSON tab label).",
+        "reasoning": "yes \u2014 \u201cUsers,\u201d \u201cAdd User,\u201d \u201cSession JSON,\u201d and related labels are used consistently across views and export UI. Evidence: body_copy_is_well_written-shared.png"
+      },
+      {
+        "id": "15.7",
+        "name": "numbers_dates_and_units_are_consistent",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders KPI numbers, payments totals, and export timestamps, formatting is consistent.",
+        "reasoning": "yes \u2014 KPIs use compact notation and percentages consistently, payments use dollar formatting with comma separators, and export timestamps are clearly labeled. Evidence: body_copy_is_well_written-shared.png"
+      },
+      {
+        "id": "15.8",
+        "name": "success_messages_are_specific",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 0.5,
+        "description": "Where the app renders confirmation after create, delete, copy, or import, they state what happened rather than vague affirmations.",
+        "reasoning": "yes \u2014 the confirmation explicitly states \u201cCopied Session JSON\u201d and \u201cSession JSON copied (via MCP).\u201d Evidence: success_messages_are_specific-shared.png"
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        },
+        {
+          "name": "playwright_reduced_motion",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_RM_CDP_ENDPOINT",
+            "--isolated",
+            "--config",
+            "/tests/playwright_rm_config.json",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_resize",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_evaluate",
+            "browser_console_messages",
+            "browser_wait_for",
+            "browser_press_key",
+            "browser_click",
+            "browser_hover"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"headings_use_consistent_capitalization\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 rendered headings consistently use title case, including \u201cAll Users,\u201d \u201cAccount Settings,\u201d and \u201cExport Session.\u201d Evidence: headings_use_consistent_capitalization-shared.png\"},\"actions_use_specific_labels\":{\"score\":\"no\",\"reasoning\":\"FAIL: generic labels such as \u201cExport,\u201d \u201cDelete,\u201d and \u201cCancel\u201d are present where more specific labels could be used. Evidence: actions_use_specific_labels-shared.png\"},\"errors_name_problem_and_fix\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 validation messages identify fields and requirements, such as \u201cemail is required\u201d and \u201ctemporaryPassword must be at least 8 characters.\u201d Evidence: errors_name_problem_and_fix-after.png\"},\"empty_states_explain_next_step\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 the empty state says \u201cTry clearing the search or filters, or add a new user to the directory\u201d and provides an \u201cAdd User\u201d action. Evidence: empty_states_explain_next_step-shared.png\"},\"body_copy_is_well_written\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 Users and Export copy is grammatical, clear, and free of observed spelling errors. Evidence: body_copy_is_well_written-shared.png\"},\"terminology_is_consistent\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 \u201cUsers,\u201d \u201cAdd User,\u201d \u201cSession JSON,\u201d and related labels are used consistently across views and export UI. Evidence: body_copy_is_well_written-shared.png\"},\"numbers_dates_and_units_are_consistent\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 KPIs use compact notation and percentages consistently, payments use dollar formatting with comma separators, and export timestamps are clearly labeled. Evidence: body_copy_is_well_written-shared.png\"},\"success_messages_are_specific\":{\"score\":\"yes\",\"reasoning\":\"yes \u2014 the confirmation explicitly states \u201cCopied Session JSON\u201d and \u201cSession JSON copied (via MCP).\u201d Evidence: success_messages_are_specific-shared.png\"}}",
+    "cost_usd": 0.1839828
+  }
+}
