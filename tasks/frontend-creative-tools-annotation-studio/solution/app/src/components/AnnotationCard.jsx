@@ -62,7 +62,7 @@ function RegionWorkspace({ item, draft }) {
   const commitDrawing = (rect) => { drawingRef.current = rect; setDrawing(rect); };
   const pointerDown = (event) => {
     if (event.pointerType === 'mouse' && event.button !== 0) return;
-    try { event.currentTarget.setPointerCapture(event.pointerId); } catch { /* capture is best-effort */ }
+
     if (ui.tool === 'pan') {
       panRef.current = { x: event.clientX, y: event.clientY, panX: ui.panX, panY: ui.panY };
       return;
@@ -103,12 +103,12 @@ function RegionWorkspace({ item, draft }) {
     <div className="region-toolbar">
       <Dropdown id={`class-picker-${item.id}`} titleText="Armed class" label="Choose a class" items={taxonomy} selectedItem={armed} itemToString={(entry) => entry?.name || ''} onChange={({ selectedItem }) => updateUi(item.id, { armedClassId: selectedItem.id, tool: 'draw' })} />
       <div className="zoom-tools">
-        <Button hasIconOnly kind={ui.tool === 'draw' ? 'primary' : 'ghost'} size="sm" renderIcon={Cursor_1} iconDescription="Draw regions" onClick={() => updateUi(item.id, { tool: 'draw' })} />
-        <Button hasIconOnly kind={ui.tool === 'pan' ? 'primary' : 'ghost'} size="sm" renderIcon={PanHorizontal} iconDescription="Pan image" onClick={() => updateUi(item.id, { tool: 'pan' })} />
-        <Button hasIconOnly kind="ghost" size="sm" renderIcon={ZoomOut} iconDescription="Zoom out" onClick={() => updateUi(item.id, { zoom: Math.max(0.75, ui.zoom - 0.25) })} />
+        <Button hasIconOnly tooltipPosition="bottom" kind={ui.tool === 'draw' ? 'primary' : 'ghost'} size="sm" renderIcon={Cursor_1} iconDescription="Draw regions" onClick={() => updateUi(item.id, { tool: 'draw' })} />
+        <Button hasIconOnly tooltipPosition="bottom" kind={ui.tool === 'pan' ? 'primary' : 'ghost'} size="sm" renderIcon={PanHorizontal} iconDescription="Pan image" onClick={() => updateUi(item.id, { tool: 'pan' })} />
+        <Button hasIconOnly tooltipPosition="bottom" kind="ghost" size="sm" renderIcon={ZoomOut} iconDescription="Zoom out" onClick={() => updateUi(item.id, { zoom: Math.max(0.75, ui.zoom - 0.25) })} />
         <span>{Math.round(ui.zoom * 100)}%</span>
-        <Button hasIconOnly kind="ghost" size="sm" renderIcon={ZoomIn} iconDescription="Zoom in" onClick={() => updateUi(item.id, { zoom: Math.min(2.5, ui.zoom + 0.25) })} />
-        <Button hasIconOnly kind="ghost" size="sm" renderIcon={FitToScreen} iconDescription="Fit image" onClick={() => updateUi(item.id, { zoom: 1, panX: 0, panY: 0 })} />
+        <Button hasIconOnly tooltipPosition="bottom" kind="ghost" size="sm" renderIcon={ZoomIn} iconDescription="Zoom in" onClick={() => updateUi(item.id, { zoom: Math.min(2.5, ui.zoom + 0.25) })} />
+        <Button hasIconOnly tooltipPosition="bottom" kind="ghost" size="sm" renderIcon={FitToScreen} iconDescription="Fit image" onClick={() => updateUi(item.id, { zoom: 1, panX: 0, panY: 0 })} />
       </div>
     </div>
     <p className="region-help"><ClassIcon name={armed?.icon} /> {armed?.name} is armed · drag on the image to draw · shortcut {armed?.shortcut}</p>
@@ -131,7 +131,7 @@ function RegionWorkspace({ item, draft }) {
           const cls = taxonomy.find((c) => c.id === region.classId);
           return <div key={region.id} className={`region-row ${region.id === selectedRegionId ? 'selected' : ''}`} style={{ '--class-color': cls?.color || '#6f6f6f' }} onClick={() => selectRegion(region.id)}>
             <ClassIcon name={cls?.icon} /><span><strong>{cls?.name || 'Unclassified'}</strong><small>{Math.round(region.w)} × {Math.round(region.h)} at {Math.round(region.x)}, {Math.round(region.y)}</small>{Object.entries(region.attributeValues).map(([key, value]) => <em key={key}>{key}: {String(value)}</em>)}</span>
-            <Button hasIconOnly kind="ghost" size="sm" renderIcon={TrashCan} iconDescription={`Delete ${cls?.name || 'Unclassified'} region`} onClick={(event) => { event.stopPropagation(); deleteRegion(item.id, region.id); }} />
+            <Button hasIconOnly tooltipPosition="bottom" kind="ghost" size="sm" renderIcon={TrashCan} iconDescription={`Delete ${cls?.name || 'Unclassified'} region`} onClick={(event) => { event.stopPropagation(); deleteRegion(item.id, region.id); }} />
           </div>;
         })}
         {!draft.regions.length && <p className="empty-mini">No regions yet. Arm a class, then drag a box on the image.</p>}
