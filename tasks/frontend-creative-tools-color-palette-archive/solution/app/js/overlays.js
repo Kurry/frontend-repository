@@ -308,6 +308,7 @@ let idleTimer = null;
 const IDLE_MS = 45000;
 
 export function initPopup() {
+  try { if (sessionStorage.getItem('popupDismissed')) ui.popupDismissed = true; } catch (e) {}
   const reset = () => {
     if (ui.popupDismissed || ui.popupOpen) return;
     clearTimeout(idleTimer);
@@ -364,6 +365,7 @@ export function dismissPopup(viaSubmit = false) {
   if (!ui.popupOpen) return;
   ui.popupOpen = false;
   ui.popupDismissed = true; // stays dismissed for the rest of the session
+  try { sessionStorage.setItem('popupDismissed', 'true'); } catch (e) {}
   const el = $('#subscribe-popup');
   el.classList.remove('is-visible');
   if (popupEntry) { closeOverlay(popupEntry); popupEntry = null; }

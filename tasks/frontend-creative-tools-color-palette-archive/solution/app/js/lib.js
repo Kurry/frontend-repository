@@ -58,7 +58,7 @@ export function contrastRatio(hexA, hexB) {
 }
 
 export function isLight(hex) {
-  return luminance(hex) > 0.35;
+  return contrastRatio(hex, '#121210') > contrastRatio(hex, '#f9f8f2');
 }
 
 // Nomenclature ordering key: order by hue, with low-saturation / near-black
