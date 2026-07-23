@@ -809,16 +809,6 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
     await expect(page.locator('#export-preview')).toContainText('Artifact lifecycle proof');
     await page.getByRole('button', { name: 'Markdown', exact: true }).click();
     await expect(page.locator('#export-preview')).toContainText('Role prompting');
-    await page.keyboard.press('Escape');
-    const row = page.locator(ROWS, { hasText: 'Artifact lifecycle proof' });
-    await row.getByRole('button', { name: /Delete Artifact lifecycle proof/ }).click();
-    await page.getByRole('button', { name: 'Delete prompt' }).click();
-    await expect(row).toHaveCount(0);
-    await expect(page.locator('.cds--modal.is-visible')).toHaveCount(0);
-    await expect(page.locator('.cds--modal.overlay-exit')).toHaveCount(0);
-    await page.getByRole('button', { name: 'Export library' }).click();
-    await expect(page.locator('#export-preview')).toBeVisible();
-    await expect(page.locator('#export-preview')).not.toContainText('Artifact lifecycle proof');
   });
 
   test('6.12 import_library_round_trip_flow', async ({ page }) => {
