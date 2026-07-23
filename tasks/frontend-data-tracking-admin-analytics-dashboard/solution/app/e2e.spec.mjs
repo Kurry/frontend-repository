@@ -207,12 +207,12 @@ test('1.5 forms_have_explicit_labels', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   await page.getByRole('button', { name: 'Add user' }).click();
   const fields = [
-    ['firstName', 'First name'],
-    ['lastName', 'Last name'],
+    ['firstName', 'First Name'],
+    ['lastName', 'Last Name'],
     ['email', 'Email'],
     ['phone', 'Phone'],
     ['notes', 'Notes'],
-    ['temporaryPassword', 'Temporary password'],
+    ['temporaryPassword', 'Temporary Password'],
   ];
   for (const [id, labelText] of fields) {
     const label = page.locator(`label[for="${id}"]`);
@@ -404,4 +404,208 @@ test('regression Users CSV import requires the exact interoperable header', asyn
   await expect(drawer).toBeVisible();
   const after = JSON.parse(await drawer.locator('pre').innerText());
   expect(after.users).toEqual(original.users);
+});
+
+const readKpis = (page) => page.locator('.kpi-strip .k-val').allTextContents().then((values) => values.map(Number));
+const visibleRows = (page) => page.locator('table.tbl tbody tr');
+
+async function fillCreateForm(page, firstName = 'Nora', lastName = 'Quinn', email = 'nora.quinn@example.com') {
+  await page.getByLabel(/^First Name/).fill(firstName);
+  await page.getByLabel(/^Last Name/).fill(lastName);
+  await page.getByLabel(/^Email/).fill(email);
+  await page.getByLabel(/^Temporary Password/).fill('pineapple9');
+  await page.getByLabel(/^Role/).selectOption('Member');
+  await page.getByLabel(/^Status/).selectOption('Active');
+}
+
+test('remaining criteria: header search, popovers, density, edit prefill, hover and chart tooltip', async ({ page }) => {
+  await page.goto(BASE);
+  await page.getByRole('button', { name: 'All Users' }).click();
+
+  const search = page.getByRole('searchbox', { name: 'Search Users' });
+  await search.fill('Katherine');
+  await expect(visibleRows(page)).toHaveCount(1);
+  await expect(visibleRows(page).first()).toContainText('Katherine Johnson');
+  await expect(page.locator('.query-insight')).toContainText('1 of 10');
+  await page.getByRole('button', { name: 'Clear query' }).click();
+
+  await page.getByRole('button', { name: 'Open notifications' }).click();
+  await expect(page.getByRole('menu', { name: 'Notifications' }).getByRole('menuitem')).toHaveCount(4);
+  await expect(page.locator('.bell-dot')).toHaveCSS('animation-name', 'none');
+  await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: 'Open profile menu' }).click();
+  await expect(page.getByRole('menu', { name: 'Profile menu' })).toContainText('Inbox');
+  await page.keyboard.press('Escape');
+
+  const firstRow = visibleRows(page).first();
+  const comfortablePadding = await firstRow.locator('td').first().evaluate((el) => getComputedStyle(el).paddingTop);
+  await page.getByRole('button', { name: 'Compact' }).click();
+  const compactPadding = await firstRow.locator('td').first().evaluate((el) => getComputedStyle(el).paddingTop);
+  expect(parseFloat(compactPadding)).toBeLessThan(parseFloat(comfortablePadding));
+
+  const nav = page.getByRole('button', { name: 'Users', exact: true });
+  const before = await nav.evaluate((el) => getComputedStyle(el).backgroundColor);
+  await nav.hover();
+  await page.waitForTimeout(220);
+  expect(await nav.evaluate((el) => getComputedStyle(el).backgroundColor)).not.toBe(before);
+  await page.getByRole('button', { name: /^Edit Katherine/ }).click();
+  await expect(page.getByLabel(/^First Name/)).toHaveValue('Katherine');
+  await expect(page.getByLabel(/^Last Name/)).toHaveValue('Johnson');
+  await expect(page.getByLabel(/^Email/)).toHaveValue(/@/);
+  await expect(page.getByLabel(/^Role/)).not.toHaveValue('');
+  await expect(page.getByLabel(/^Status/)).not.toHaveValue('');
+
+  await page.getByRole('button', { name: 'Dashboard' }).click();
+  const chartTarget = page.locator('.chart .bar').first();
+  await chartTarget.hover({ position: { x: 2, y: 2 } });
+  await expect(page.locator('.chart-tooltip')).toBeVisible();
+  await expect(page.locator('.chart-tooltip')).toContainText(/\d/);
+});
+
+test('remaining criteria: invalid create, contract checklist, create/search/KPI/export and cancel', async ({ page }) => {
+  await page.goto(BASE);
+  await page.getByRole('button', { name: 'All Users' }).click();
+  const beforeRows = await visibleRows(page).count();
+  const beforeKpis = await readKpis(page);
+
+  await page.getByRole('main').getByRole('button', { name: 'Add User' }).click();
+  await page.getByRole('button', { name: 'Create User' }).click();
+  await expect(page.locator('#firstName-error')).toBeVisible();
+  await expect(page.locator('#email-error')).toBeVisible();
+  await expect(page.locator('#temporaryPassword-error')).toBeVisible();
+  await fillCreateForm(page);
+  await expect(page.locator('.contract li.ok')).toHaveCount(8);
+  await page.getByRole('button', { name: 'Create User' }).dblclick();
+  await expect(page.getByRole('heading', { name: 'All Users' })).toBeVisible();
+  await expect(visibleRows(page)).toHaveCount(beforeRows + 1);
+  const afterKpis = await readKpis(page);
+  expect(afterKpis[0]).toBe(beforeKpis[0] + 1);
+  expect(afterKpis[1]).toBe(beforeKpis[1] + 1);
+  await expect(page.locator('.mutation-chip')).toContainText('Created Nora');
+  await page.getByRole('searchbox', { name: 'Search Users' }).fill('Nora');
+  await expect(visibleRows(page)).toHaveCount(1);
+
+  await page.getByRole('button', { name: 'Open export drawer' }).click();
+  const drawer = page.getByRole('dialog', { name: 'Export and import session' });
+  await expect(drawer.locator('pre')).toContainText('nora.quinn@example.com');
+  await drawer.getByRole('tab', { name: 'Users CSV' }).click();
+  await expect(drawer.locator('pre')).toContainText('Nora,Quinn');
+  await drawer.getByRole('button', { name: 'Close export drawer' }).click();
+
+  await page.getByLabel('Administration sections').getByRole('button', { name: 'Add User' }).click();
+  await page.getByLabel(/^First Name/).fill('Cancelled');
+  await page.getByRole('button', { name: 'Cancel', exact: true }).first().click();
+  expect((await readKpis(page))[0]).toBe(afterKpis[0]);
+  await expect(page.getByText('Cancelled', { exact: false })).toHaveCount(0);
+});
+
+test('remaining criteria: status/filter, bulk-three KPI delta, delete selection and empty-to-repopulate', async ({ page }) => {
+  await page.goto(BASE);
+  await page.getByRole('button', { name: 'All Users' }).click();
+  const names = ['Katherine Johnson', 'Grace Hopper', 'Margaret Hamilton'];
+  const rows = names.map((name) => page.locator('tbody tr').filter({ hasText: name }));
+  const statuses = await Promise.all(rows.map((row) => row.locator('.badge-success, .badge-warning, .badge-error').innerText()));
+  const sourceStatus = statuses[0];
+  const targetStatus = sourceStatus === 'Suspended' ? 'Active' : 'Suspended';
+  const before = await readKpis(page);
+  for (const name of names) await page.getByRole('checkbox', { name: `Select ${name}` }).check();
+  await page.getByRole('combobox', { name: 'Change status for selected' }).selectOption(targetStatus);
+  for (const row of rows) await expect(row).toContainText(targetStatus);
+  const after = await readKpis(page);
+  const sourceIndex = sourceStatus === 'Active' ? 1 : 3;
+  const targetIndex = targetStatus === 'Active' ? 1 : 3;
+  expect(after[sourceIndex]).toBe(before[sourceIndex] - statuses.filter((v) => v === sourceStatus).length);
+  expect(after[targetIndex]).toBe(before[targetIndex] + statuses.filter((v) => v !== targetStatus).length);
+  await expect(page.locator('.toast').filter({ hasText: 'Status Changed' })).toBeVisible();
+
+  const victim = names[0];
+  const totalBeforeDelete = after[0];
+  await page.getByRole('button', { name: `Delete ${victim.split(' ')[0]}` }).click();
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Delete' }).click();
+  await expect(page.locator('tbody tr').filter({ hasText: victim })).toHaveCount(0);
+  expect((await readKpis(page))[0]).toBe(totalBeforeDelete - 1);
+  await expect(page.getByText(/selected/).first()).toContainText('0 selected');
+
+  await invokeTool(page, 'browse_clear_filter');
+  await page.getByRole('checkbox', { name: 'Select all rows' }).check();
+  await page.locator('.bulkbar .btn-error').click();
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Delete' }).click();
+  await expect(page.locator('.empty')).toContainText('No Matching Users');
+  expect((await readKpis(page))[0]).toBe(0);
+  await page.locator('.empty').getByRole('button', { name: 'Add User' }).click();
+  await fillCreateForm(page, 'Repopulated', 'Operator', 'repopulated@example.com');
+  await page.getByRole('button', { name: 'Create User' }).click();
+  await expect(page.locator('tbody tr')).toHaveCount(1);
+  expect((await readKpis(page))[0]).toBe(1);
+});
+
+test('remaining criteria: copy/download, session recovery and CSV import are atomic', async ({ page }) => {
+  await page.goto(BASE);
+  await page.getByRole('button', { name: 'Open export drawer' }).click();
+  const drawer = page.getByRole('dialog', { name: 'Export and import session' });
+  const exported = await drawer.locator('pre').innerText();
+  const downloadPromise = page.waitForEvent('download');
+  await drawer.getByRole('button', { name: /Download JSON/ }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe('session.json');
+  await drawer.getByRole('button', { name: 'Copy' }).click();
+  await expect(drawer.getByRole('button', { name: 'Copied!' })).toBeVisible();
+  await expect(page.locator('.mutation-chip')).toContainText('Copied Session JSON');
+  await drawer.getByRole('button', { name: 'Close export drawer' }).click();
+
+  const original = JSON.parse(exported);
+  await invokeTool(page, 'entity_delete', { entity: 'user', target_id: original.users[0].id, confirm: true });
+  await invokeTool(page, 'artifact_import', { import_modes: ['session-json'], content: exported });
+  await invokeTool(page, 'artifact_export', { export_formats: ['json'] });
+  const restored = JSON.parse(await drawer.locator('pre').innerText());
+  expect(restored.users).toEqual(original.users);
+  expect(restored.kpis).toEqual(original.kpis);
+
+  await drawer.getByRole('tab', { name: 'Users CSV' }).click();
+  const csv = await drawer.locator('pre').innerText();
+  await drawer.getByRole('button', { name: 'Import Session' }).click();
+  await drawer.getByLabel('Import payload').fill(csv);
+  await drawer.getByRole('button', { name: 'Import Data' }).click();
+  await expect(drawer).toContainText(`Imported ${original.users.length} user(s)`);
+  await drawer.getByRole('button', { name: 'Close export drawer' }).click();
+  await invokeTool(page, 'browse_clear_filter');
+  await invokeTool(page, 'browse_open', { destinations: ['all-users'] });
+  await expect(visibleRows(page)).toHaveCount(original.users.length);
+});
+
+test('remaining criteria: toast lifetime, motion markers, keyboard focus and mobile chrome continuity', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(BASE);
+  const hamburger = page.getByRole('button', { name: 'Open navigation' });
+  await hamburger.click();
+  await page.getByRole('button', { name: 'All Users' }).click();
+  await expect(page.getByRole('heading', { name: 'All Users' })).toBeVisible();
+  await page.getByRole('checkbox', { name: 'Toggle light and dark theme' }).check({ force: true });
+  await page.getByRole('button', { name: 'Open navigation' }).click();
+  await page.getByRole('button', { name: 'Dashboard' }).click();
+  await page.getByRole('button', { name: 'Open navigation' }).click();
+  await page.getByRole('button', { name: 'All Users' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+
+  await invokeTool(page, 'entity_create', { entity: 'user', entity_fields: { firstName: 'Toast', lastName: 'Probe', email: 'toast.probe@example.com', temporaryPassword: 'pineapple9', role: 'Member', status: 'Active', accountSegment: 'Internal' } });
+  const toast = page.locator('.toast[data-motion="slide-autodismiss"]').filter({ hasText: 'User Added' });
+  await expect(toast).toBeVisible();
+  await expect(toast).toHaveCSS('transform', /matrix|none/);
+  await page.waitForTimeout(4100);
+  await expect(toast).toHaveCount(0);
+
+  const exportButton = page.getByRole('button', { name: 'Open export drawer' });
+  await page.locator('body').click({ position: { x: 1, y: 1 } });
+  for (let i = 0; i < 150 && !await exportButton.evaluate((el) => document.activeElement === el); i += 1) await page.keyboard.press('Tab');
+  await expect(exportButton).toBeFocused();
+  expect(await exportButton.evaluate((el) => el.matches(':focus-visible'))).toBe(true);
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('dialog', { name: 'Export and import session' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(exportButton).toBeFocused();
+  await page.getByRole('button', { name: 'Open navigation' }).click();
+  await page.getByRole('button', { name: 'Dashboard' }).click();
+  const ping = page.locator('.ping-dot').first();
+  await expect(ping).toBeVisible();
+  expect(await ping.evaluate((el) => getComputedStyle(el, '::after').animationName)).toBe('ping');
 });

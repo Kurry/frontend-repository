@@ -217,6 +217,7 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--ff-display); letter-spacing: .01e
    cross-fades + rotates them over each other instead of side by side */
 .theme-toggle .ic > span { grid-area: 1 / 1; display: grid; place-items: center; }
 .bell-dot { position: absolute; top: .35rem; right: .4rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-error); }
+.bell-dot { animation: none !important; }
 
 .ctxbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .6rem 2.25rem .2rem; flex-wrap: wrap; }
 .crumbs { display: flex; align-items: center; gap: .5rem; color: var(--muted); font-size: .85rem; }
@@ -308,6 +309,9 @@ table.tbl tr.selected { background: color-mix(in oklab, var(--accent) 12%, trans
 .density-compact table.tbl td { padding: .32rem 1rem; }
 .density-compact table.tbl tr { min-height: 40px; }
 .row-act { display: inline-flex; gap: .25rem; }
+.query-insight { display: flex; align-items: center; gap: .7rem; padding: .65rem 1rem; border-bottom: var(--hairline); background: linear-gradient(90deg, color-mix(in oklab, var(--accent) 10%, transparent), transparent); font-size: .78rem; }
+.query-insight > span { color: var(--muted); }
+.query-insight > button { margin-left: auto; }
 
 /* toolbar */
 .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; padding: .8rem 1rem; border-bottom: var(--hairline); }
@@ -393,7 +397,7 @@ table.tbl tr.selected { background: color-mix(in oklab, var(--accent) 12%, trans
 
 /* -------------------------------------------------------------- toasts */
 .toast-stack { position: fixed; right: 1.2rem; bottom: 5.2rem; z-index: 120; display: flex; flex-direction: column; gap: .6rem; width: min(22rem, calc(100vw - 2.4rem)); pointer-events: none; }
-.toast { display: flex; align-items: flex-start; gap: .6rem; padding: .8rem 1rem; border-radius: .7rem; box-shadow: var(--shadow-pop); border: var(--hairline); background: var(--color-base-100); }
+.toast { display: flex; align-items: flex-start; gap: .6rem; padding: .8rem 1rem; border-radius: .7rem; box-shadow: var(--shadow-pop); border: var(--hairline); background: var(--color-base-100); will-change: transform, opacity; }
 .toast button { pointer-events: auto; }
 .toast.success { border-left: 4px solid var(--color-success); }
 .toast.error { border-left: 4px solid var(--color-error); }
@@ -403,8 +407,9 @@ table.tbl tr.selected { background: color-mix(in oklab, var(--accent) 12%, trans
 .toast .t-ico { flex: 0 0 auto; }
 
 /* last-mutation chip (innovation) */
-.mutation-chip { display: inline-flex; align-items: center; gap: .4rem; font-size: .72rem; background: var(--wash); border: var(--hairline); border-radius: var(--radius-pill); padding: .25rem .6rem; color: var(--color-base-content); }
+.mutation-chip { display: inline-flex; align-items: center; gap: .4rem; font-size: .72rem; background: var(--wash); border: var(--hairline); border-radius: var(--radius-pill); padding: .25rem .6rem; color: var(--color-base-content); animation: mutation-in .28s ease; }
 .mutation-chip .dot { width: .45rem; height: .45rem; border-radius: 50%; background: var(--accent); }
+@keyframes mutation-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 
 /* -------------------------------------------------------------- confirm dialog */
 .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 1001; display: grid; place-items: center; padding: 1rem; }
@@ -466,6 +471,7 @@ table.tbl tr.selected { background: color-mix(in oklab, var(--accent) 12%, trans
   .export-drawer { width: 100%; }
   .stat-row { flex-wrap: wrap; gap: 1rem; }
 }
+@media (max-width: 640px) { .query-insight { align-items: flex-start; flex-direction: column; } .query-insight > button { margin-left: 0; } }
 
 /* -------------------------------------------------------------- print summary */
 .print-summary { display: none; }

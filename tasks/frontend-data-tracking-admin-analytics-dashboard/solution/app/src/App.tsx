@@ -269,7 +269,7 @@ function KpiStrip({ users }: { users: User[] }) {
 function AllUsers() {
   const dispatch = useDispatch();
   const users = useSelector((s: RootState) => s.users.data);
-  const { filterRole, filterStatus, sort, selection, density } = useSelector((s: RootState) => s.ui);
+  const { filterRole, filterStatus, search, sort, selection, density } = useSelector((s: RootState) => s.ui);
   const filtered = useFiltered();
   const kpiUsers = useRoleStatusFiltered();
   const rowSelection = useMemo(() => {
@@ -327,6 +327,11 @@ function AllUsers() {
       </div>
       <div style={{ marginBottom: '1rem' }}><KpiStrip users={kpiUsers} /></div>
       <div className="card">
+        <div className="query-insight" role="status" aria-live="polite">
+          <div><b>{filtered.length}</b> of <b>{users.length}</b> users in this workspace</div>
+          <span>{search.trim() ? `Search: ${search.trim()}` : 'Live directory view'}{filterRole ? ` · ${filterRole}` : ''}{filterStatus ? ` · ${filterStatus}` : ''}</span>
+          {(search || filterRole || filterStatus) && <button className="btn btn-ghost btn-xs" onClick={() => dispatch(resetFilters())}>Clear query</button>}
+        </div>
         <div className="toolbar">
           <select className="select" style={{ width: 'auto' }} aria-label="Filter by role" value={filterRole} onChange={(e) => dispatch(setFilterRole(e.target.value))}>
             <option value="">All Roles</option>{ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
@@ -754,6 +759,7 @@ function ExportDrawer() {
     setCopied(true); window.setTimeout(() => setCopied(false), 1400);
     setMsg({ kind: 'success', text: `Copied ${exportTab === 'json' ? 'Session JSON' : 'Users CSV'} to clipboard` });
     dispatch(pushToast({ kind: 'success', title: 'Copied to Clipboard', body: `${exportTab === 'json' ? 'Session JSON' : 'Users CSV'} preview copied` }));
+    dispatch(setLastMutation(`Copied ${exportTab === 'json' ? 'Session JSON' : 'Users CSV'}`));
   };
   const download = () => {
     const blob = new Blob([text], { type: exportTab === 'json' ? 'application/json' : 'text/csv' });
@@ -761,14 +767,17 @@ function ExportDrawer() {
     const fname = exportTab === 'json' ? 'session.json' : 'users.csv';
     a.href = url; a.download = fname; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
     dispatch(pushToast({ kind: 'info', title: 'Download Started', body: `${fname} download started` }));
+    dispatch(setLastMutation(`Downloaded ${fname}`));
   };
   const doImport = () => {
     const res = exportTab === 'json' ? importSessionJson(draft) : importUsersCsv(draft);
     if (!res.ok) { setMsg({ kind: 'error', text: `Import failed: ${res.message}` }); dispatch(pushToast({ kind: 'error', title: 'Import Failed', body: res.message })); return; }
     dispatch(setUsers(res.users));
+    dispatch(clearSelection());
     if (res.applied) { dispatch(setFilterRole(res.applied.role || '')); dispatch(setFilterStatus(res.applied.status || '')); dispatch(setSort(res.applied.sort || 'newest')); dispatch(setTheme(res.applied.theme || 'dark')); if (res.applied.activeView) dispatch(setActiveView(res.applied.activeView as any)); }
     setMsg({ kind: 'success', text: `Imported ${res.users.length} user(s). All Users, KPIs, and previews now match.` });
     dispatch(pushToast({ kind: 'success', title: 'Import Successful', body: `${res.users.length} user(s) restored` }));
+    dispatch(setLastMutation(`Imported ${res.users.length} users`));
     setDraft(''); setImportMode(false);
   };
 
@@ -832,30 +841,29 @@ function ExportDrawer() {
 function Toasts() {
   const dispatch = useDispatch();
   const toasts = useSelector((s: RootState) => s.ui.toasts);
-  const scheduledRef = useRef(new Set<string>());
+  const timersRef = useRef(new Map<string, ReturnType<typeof setTimeout>>());
   useEffect(() => {
-    const timers: ReturnType<typeof setTimeout>[] = [];
     toasts.forEach((t) => {
-      if (scheduledRef.current.has(t.id)) return;
-      scheduledRef.current.add(t.id);
-      timers.push(setTimeout(() => {
-        scheduledRef.current.delete(t.id);
+      if (timersRef.current.has(t.id)) return;
+      const timer = setTimeout(() => {
+        timersRef.current.delete(t.id);
         dispatch(dismissToast(t.id));
-      }, 3800));
+      }, 3800);
+      timersRef.current.set(t.id, timer);
     });
-    return () => { timers.forEach(clearTimeout); };
-  }, [toasts, dispatch]);
-  useEffect(() => {
     const live = new Set(toasts.map((t) => t.id));
-    scheduledRef.current.forEach((id) => { if (!live.has(id)) scheduledRef.current.delete(id); });
-  }, [toasts]);
+    timersRef.current.forEach((timer, id) => {
+      if (!live.has(id)) { clearTimeout(timer); timersRef.current.delete(id); }
+    });
+  }, [toasts, dispatch]);
+  useEffect(() => () => { timersRef.current.forEach(clearTimeout); timersRef.current.clear(); }, []);
   const Icon = (k: string) => k === 'success' ? <CheckCircleIcon className="icon-md t-ico" style={{ color: 'var(--color-success)' }} /> : k === 'error' ? <ExclamationTriangleIcon className="icon-md t-ico" style={{ color: 'var(--color-error)' }} /> : <InformationCircleIcon className="icon-md t-ico" style={{ color: 'var(--color-info)' }} />;
   return (
     <div className="toast-stack" aria-live="polite" aria-atomic="false">
       <AnimatePresence>
         {toasts.map((t) => (
-          <motion.div key={t.id} className={`toast ${t.kind}`} role="status"
-            initial={{ opacity: 0, y: 50, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }}>
+          <motion.div key={t.id} className={`toast ${t.kind}`} role="status" data-motion="slide-autodismiss"
+            initial={{ opacity: 0, x: 32, scale: 0.95 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 24, scale: 0.95 }} transition={{ duration: 0.3 }}>
             {Icon(t.kind)}<div><div className="t-title">{t.title}</div>{t.body && <div className="t-body">{t.body}</div>}</div>
             <button className="btn btn-ghost btn-xs" style={{ marginLeft: 'auto' }} aria-label="Dismiss notification" onClick={() => dispatch(dismissToast(t.id))}><XMarkIcon className="icon-sm" /></button>
           </motion.div>
@@ -963,7 +971,7 @@ function WebMCPBinder() {
           case 'entity_delete': {
             const id = args.target_id; if (!id || !st.users.data.some((u) => u.id === id)) return { error: 'target_id not found' };
             if (args.confirm !== true) return { error: 'delete requires confirm=true' };
-            dispatch(deleteUser(id)); dispatch(pushToast({ kind: 'success', title: 'User Deleted', body: 'Removed via MCP' })); dispatch(setLastMutation(`Deleted user ${id}`)); return { result: `deleted user ${id}`, userCount: store.getState().users.data.length };
+            dispatch(deleteUser(id)); dispatch(setSelection(st.ui.selection.filter((selectedId) => selectedId !== id))); dispatch(pushToast({ kind: 'success', title: 'User Deleted', body: 'Removed via MCP' })); dispatch(setLastMutation(`Deleted user ${id}`)); return { result: `deleted user ${id}`, userCount: store.getState().users.data.length };
           }
           case 'artifact_export': {
             const fmt = (args.export_formats && args.export_formats[0]) || args.format || 'json';
@@ -978,6 +986,7 @@ function WebMCPBinder() {
             const res = mode === 'users-csv' ? importUsersCsv(content) : importSessionJson(content);
             if (!res.ok) return { error: res.message };
             dispatch(setUsers(res.users));
+            dispatch(clearSelection());
             if (res.applied) {
               dispatch(setFilterRole(res.applied.role || ''));
               dispatch(setFilterStatus(res.applied.status || ''));
@@ -992,6 +1001,7 @@ function WebMCPBinder() {
             const t = fmt === 'csv' ? buildCsv(st.users.data) : JSON.stringify(buildSession(st.users.data, { role: st.ui.filterRole, status: st.ui.filterStatus, sort: st.ui.sort, theme: st.ui.theme, activeView: st.ui.activeView }), null, 2);
             try { await navigator.clipboard.writeText(t); } catch { /* ignore */ }
             dispatch(pushToast({ kind: 'success', title: 'Copied to Clipboard', body: `${fmt === 'csv' ? 'Users CSV' : 'Session JSON'} copied (via MCP)` }));
+            dispatch(setLastMutation(`Copied ${fmt === 'csv' ? 'Users CSV' : 'Session JSON'}`));
             return { result: `copied ${fmt} preview (${t.length} chars)` };
           }
           default: return { error: `unknown tool ${name}` };
