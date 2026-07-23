@@ -1,1 +1,0 @@
-import{v as r}from"./core.min-DVALGa4Q.js";import{c as s}from"./gameLogic-BOGBTXck.js";import"./preloader-Bns9QiKi.js";const m=()=>{const[t,o]=r();t&&s(o,JSON.stringify(t,null,2))};export{m as s_FMSYg76N0Zs};
