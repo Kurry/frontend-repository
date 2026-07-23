@@ -38,7 +38,9 @@ export const invokeTool = (page, name, args = {}) => page.evaluate(async ([n, a]
 
 test.describe('workspace contract (canonical)', () => {
   test('serves non-empty app with zero console errors', async ({ page }) => {
-    await page.goto(BASE);
+    const response = await page.goto(BASE);
+    expect(response, 'navigation returns an HTTP response').not.toBeNull();
+    expect(response.ok(), `HTTP ${response.status()} from ${response.url()}`).toBe(true);
     await page.waitForLoadState('networkidle');
     const len = await page.evaluate(() => document.body?.innerText?.trim().length ?? 0);
     expect(len, 'body renders visible content').toBeGreaterThan(0);
@@ -53,10 +55,23 @@ test.describe('workspace contract (canonical)', () => {
       invoke_tool: typeof window.webmcp_invoke_tool,
     }));
     expect(kinds).toEqual({ session_info: 'function', list_tools: 'function', invoke_tool: 'function' });
+    const session = await page.evaluate(async () => {
+      const value = await window.webmcp_session_info();
+      return typeof value === 'string' ? JSON.parse(value) : value;
+    });
+    expect(session, 'webmcp_session_info returns metadata').toBeTruthy();
+    expect(Array.isArray(session), 'session metadata is an object, not an array').toBe(false);
+    expect(typeof session, 'session metadata is an object').toBe('object');
+    expect(Object.keys(session).length, 'session metadata is non-empty').toBeGreaterThan(0);
     const tools = await listTools(page);
     const arr = Array.isArray(tools) ? tools : tools?.tools ?? [];
     expect(arr.length, 'at least one webmcp tool registered').toBeGreaterThan(0);
-    for (const t of arr) expect(typeof (t.name ?? t.id), 'every tool has a name').toBe('string');
+    const names = arr.map((t) => t?.name ?? t?.id);
+    for (const name of names) {
+      expect(typeof name, 'every tool has a name').toBe('string');
+      expect(name.trim().length, 'tool names are non-empty').toBeGreaterThan(0);
+    }
+    expect(new Set(names).size, 'tool names are unique').toBe(names.length);
   });
 
   test('reduced motion behaviorally suppresses animation', async ({ page }) => {
@@ -118,31 +133,42 @@ test.describe('workspace contract (canonical)', () => {
 
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
 
-test('mobile panels stack in document flow without overlap', async ({ page }) => {
-  await page.setViewportSize({ width: 375, height: 812 });
-  await page.goto(BASE);
-  await page.waitForLoadState('networkidle');
-
-  const layout = await page.evaluate(() => {
-    const box = (selector) => {
-      const element = document.querySelector(selector);
-      const rect = element.getBoundingClientRect();
-      return {
-        top: rect.top,
-        bottom: rect.bottom,
-        height: rect.height,
-        scrollHeight: element.scrollHeight,
-      };
-    };
-    return {
-      themes: box('#themes-panel'),
-      editor: box('#editor-panel'),
-      preview: box('.preview-panel'),
-    };
+test.describe('task-specific criteria', () => {
+  test('7.8 no_horizontal_scroll_at_375', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    const overflow = await page.evaluate(() =>
+      document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow, 'no horizontal page scroll at 375px (criterion 7.8)').toBeLessThanOrEqual(1);
   });
 
-  expect(layout.editor.top).toBeGreaterThanOrEqual(layout.themes.bottom - 1);
-  expect(layout.preview.top).toBeGreaterThanOrEqual(layout.editor.bottom - 1);
-  expect(layout.themes.height).toBeGreaterThanOrEqual(layout.themes.scrollHeight - 1);
-  expect(layout.editor.height).toBeGreaterThanOrEqual(layout.editor.scrollHeight - 1);
+  test('panels_stack_below_768', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+
+    const layout = await page.evaluate(() => {
+      const box = (selector) => {
+        const element = document.querySelector(selector);
+        const rect = element.getBoundingClientRect();
+        return {
+          top: rect.top,
+          bottom: rect.bottom,
+          height: rect.height,
+          scrollHeight: element.scrollHeight,
+        };
+      };
+      return {
+        themes: box('#themes-panel'),
+        editor: box('#editor-panel'),
+        preview: box('.preview-panel'),
+      };
+    });
+
+    expect(layout.editor.top, 'editor panel starts at or below themes panel bottom').toBeGreaterThanOrEqual(layout.themes.bottom - 1);
+    expect(layout.preview.top, 'preview panel starts at or below editor panel bottom').toBeGreaterThanOrEqual(layout.editor.bottom - 1);
+    expect(layout.themes.height, 'themes panel is not internally clipped').toBeGreaterThanOrEqual(layout.themes.scrollHeight - 1);
+    expect(layout.editor.height, 'editor panel is not internally clipped').toBeGreaterThanOrEqual(layout.editor.scrollHeight - 1);
+  });
 });

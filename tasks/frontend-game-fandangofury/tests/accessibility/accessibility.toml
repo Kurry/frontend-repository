@@ -1,0 +1,186 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "controls_are_keyboard_accessible"
+description = "Every interactive Stage-map, combat, overlay, Export, Import, and Pause control is reachable with the keyboard alone and shows a visible focus indicator when focused"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "modals_manage_focus"
+description = "Cantina, Masks, History, Fighter Settings, Export Campaign, Import Campaign, Pause, and reset-confirmation overlays trap focus while open, close on Escape, and return focus to the control that opened them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "icons_have_accessible_names"
+description = "Icon-only or icon-leading controls (Cantina, Masks, Settings, History, Export, Import, Pause, Reset) expose accessible names via text or equivalent labels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "feedback_uses_live_regions"
+description = "Save Checkpoint, Copy confirmation, Import validation errors, and illegal-action feedback are exposed in a way assistive tech can notice (visible text and/or live region), not color alone"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.5"
+name = "forms_have_explicit_labels"
+description = "Fighter Settings fields (display name, effects intensity) and Import Campaign input have explicit labels associated with their controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "headings_follow_logical_order"
+description = "Stage-select title and overlay titles (Cantina, Masks, Fighter Settings, Export Campaign, Import Campaign, Pause, History) follow a logical heading order without skipping levels chaotically"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.7"
+name = "landmark_navigation_is_present"
+description = "The Stage map and combat view expose landmark or region structure so primary navigation and main combat content are distinguishable"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.8"
+name = "text_and_controls_have_contrast"
+description = "HUD text, Stage-map labels, and overlay controls maintain readable contrast against the dark festival surfaces"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "semantic_html_roles_are_used"
+description = "Primary actions use button/link semantics and overlays behave as dialogs rather than unlabeled generic containers for interactive content"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "reduced_motion_is_respected"
+description = "When prefers-reduced-motion is set, non-essential overlay enter transitions and celebratory bursts are reduced or removed while Pause, Export, Import, and combat flows remain completable"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.11"
+name = "combat_keys_and_pause_operable"
+description = "Every combat action is operable from the keyboard (Z, X, C, Space, F) and Pause is operable via P as well as its on-screen button"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "meters_not_color_only"
+description = "Health bar and Fury meter values are readable as text or accessible attributes, not color alone"
+type = "binary"
+weight = 1.0
+

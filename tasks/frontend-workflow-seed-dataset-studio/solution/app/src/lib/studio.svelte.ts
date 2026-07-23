@@ -489,6 +489,7 @@ export class StudioState {
       if (stepIndex === 2 && currentSeed.authoring.harvest.forceFailReproduce) {
         if (current.attempt >= 3) {
           current.status = 'failed';
+          current.backoff = 0;
           current.error = 'The reproduction fixture did not produce a stable failure after 3 attempts.';
           currentSeed.authoring.harvest.running = false;
           currentSeed.timeline.push(event('harvest', 'Harvest failed while reproducing the reported failure'));

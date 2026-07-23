@@ -122,4 +122,37 @@ test.describe('O&A Palette Library Oracle E2E Tests', () => {
       await page.keyboard.press('Escape');
     }
   });
+
+  test('Complementary harmony preserves the three-swatch palette contract', async ({ page }) => {
+    await page.evaluate(() => window.webmcp_invoke_tool('entity_select', { entity: 'palette' }));
+
+    await page.locator('#harmony-mode').selectOption('Complementary');
+    await page.getByRole('button', { name: 'Apply Harmony' }).click();
+
+    await expect(page.getByText(/3 swatches/).first()).toBeVisible();
+    await expect(page.getByRole('alert')).toHaveCount(0);
+
+    await page.evaluate(() => window.webmcp_invoke_tool('artifact_export', { format: 'library-json' }));
+    const packageText = await page.getByRole('tabpanel', { name: 'Package JSON' }).textContent();
+    const palettePackage = JSON.parse(packageText ?? '{}');
+    const updated = palettePackage.palettes.find((palette: { name: string }) => palette.name === "Werner's Greens");
+
+    expect(updated.swatches).toHaveLength(3);
+    expect(new Set(updated.swatches).size).toBe(3);
+  });
+
+  test('WebMCP favorite toggle reports and renders the new state', async ({ page }) => {
+    const firstId = await page.evaluate(() => {
+      const id = window.webmcp_invoke_tool('entity_select', { entity: 'palette' }).id;
+      window.webmcp_invoke_tool('browse_open', { destination: 'library-grid' });
+      return id;
+    });
+    const result = await page.evaluate((id) => window.webmcp_invoke_tool('entity_toggle', {
+      entity: 'palette',
+      id,
+    }), firstId);
+
+    expect(result.favorite).toBe(true);
+    await expect(page.getByRole('button', { name: /Remove Werner's Greens from favorites/i })).toHaveAttribute('aria-pressed', 'true');
+  });
 });

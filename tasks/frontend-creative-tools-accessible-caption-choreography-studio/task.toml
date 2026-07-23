@@ -1,6 +1,7 @@
 schema_version = "1.3"
 
 [task]
+id = "frontend-creative-tools-accessible-caption-choreography-studio"
 name = "mercor-intelligence/frontend-creative-tools-accessible-caption-choreography-studio"
 description = "A caption editor creating accessible timed text for one fictional short film"
 

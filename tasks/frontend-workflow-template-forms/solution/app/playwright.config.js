@@ -6,6 +6,6 @@ export default defineConfig({
   webServer: {
     command: 'npx vite --host 127.0.0.1 --port 3647',
     url: 'http://127.0.0.1:3647',
-    reuseExistingServer: false,
+    reuseExistingServer: !process.env.CI,
   },
 })

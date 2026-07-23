@@ -50,7 +50,6 @@ Build tooling: Vite, React, TypeScript. Styling: Tailwind CSS 4.3.2. Motion: Rea
 - Mobile viewport: becomes media header, current/adjacent cue cards, token picker, timecode sheets, vertical finding list, and transport bar without page-level overflow or sub-44px targets; precision operations remain available
 - The fictional 96-second VP9 WebM contains 11 shots, three speakers, 126 timestamped transcript tokens, five non-speech sounds, two overlapping utterances, one low-confidence phrase, and deterministic waveform/thumbnail data. The starter transcript has four deliberate alignment errors. Playback controlled by logical media clock.
 - All libraries installed via npm and bundled locally; no CDN imports.
-- All libraries installed via npm and bundled locally; no CDN imports.
 </requirements>
 
 <integrity>

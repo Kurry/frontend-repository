@@ -68,8 +68,8 @@ export default function ThemeFormPanel() {
   // Announce inline validation problems to the polite live region.
   const errorMessage = errors.name?.message ?? (!nameValue.trim() ? 'Theme name is required — enter a name for the theme' : '');
   useEffect(() => {
-    if (errorMessage) dispatch(announce(errorMessage));
-  }, [errorMessage, dispatch]);
+    if (open && errorMessage) dispatch(announce(errorMessage));
+  }, [open, errorMessage, dispatch]);
 
   const close = () => {
     dispatch(closeThemeForm());

@@ -207,15 +207,23 @@ function DatasetsView() {
   const datasets = usePipelineStore((s) => s.datasets);
   const openSubmission = usePipelineStore((s) => s.openSubmission);
   const [query, setQuery] = useState('');
+  const [catalogReady, setCatalogReady] = useState(false);
   const reducedMotion = useReducedMotion();
   const [datasetGridRef, enableAnimations] = useAutoAnimate({ duration: 220 });
   useEffect(() => enableAnimations(!reducedMotion), [enableAnimations, reducedMotion]);
+  // Commit the navigation chrome first, then mount the chart-heavy catalog on
+  // the next frame. This keeps view changes responsive under constrained CI
+  // CPUs without changing the resulting catalog or its interaction model.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setCatalogReady(true));
+    return () => cancelAnimationFrame(frame);
+  }, []);
   const filtered = datasets.filter((d) => d.name.toLowerCase().includes(query.toLowerCase()));
   return (
     <div className="view"><div className="view-heading"><div><p className="eyebrow">Training inventory</p><h1>Datasets</h1><p>Trace generated task sets back to the run and recipe that produced them.</p></div><TextInput value={query} onChange={(e) => setQuery(e.currentTarget.value)} leftSection={<Icon icon={IconSearch} label="Search" size={16} />} placeholder="Search datasets" aria-label="Search datasets" className="search-input"/></div>
       <div className="catalog-summary"><strong>{datasets.reduce((s,d)=>s+d.tasks,0).toLocaleString()}</strong><span>curated tasks across {datasets.length} datasets</span><div>{['Plan','Tool','Verify'].map((x,i)=><span key={x}><i style={{background:['#6d5dfc','#15a8a0','#e49744'][i]}}/>{x}</span>)}</div></div>
-      <div className="dataset-grid" ref={datasetGridRef}>{filtered.map((d)=><DatasetCard dataset={d} key={d.id}/>)}</div>
-      {!filtered.length && (datasets.length === 0
+      <div className="dataset-grid" ref={datasetGridRef}>{catalogReady && filtered.map((d)=><DatasetCard dataset={d} key={d.id}/>)}</div>
+      {catalogReady && !filtered.length && (datasets.length === 0
         ? <EmptyState title="No datasets available" body="Complete a Data generation job to add the first dataset." action="Submit job" onAction={openSubmission}/>
         : <EmptyState title={`No datasets match “${query}”`} body="Try a different dataset name or clear the search." action="Clear search" onAction={() => setQuery('')}/>)}
     </div>
@@ -363,12 +371,16 @@ function SubmissionDrawer() {
   const clearImportError = usePipelineStore((s)=>s.clearImportError);
   const importRef = useRef(null);
   const submitLock = useRef(false);
-  const eligibleDatasets = useMemo(()=>getEligibleDatasets(runs),[runs]);
-  const eligibleCheckpoints = useMemo(()=>getEligibleCheckpoints(runs),[runs]);
+  const eligibleDatasetsRaw = getEligibleDatasets(runs);
+  const eligibleDatasetsStr = eligibleDatasetsRaw.join(',');
+  const eligibleDatasets = useMemo(()=>eligibleDatasetsRaw,[eligibleDatasetsStr]);
+  const eligibleCheckpointsRaw = getEligibleCheckpoints(runs);
+  const eligibleCheckpointsStr = eligibleCheckpointsRaw.join(',');
+  const eligibleCheckpoints = useMemo(()=>eligibleCheckpointsRaw,[eligibleCheckpointsStr]);
   const schema = useMemo(()=>makeJobConfigSchema(eligibleDatasets,eligibleCheckpoints),[eligibleDatasets,eligibleCheckpoints]);
   const { control, watch, reset, handleSubmit, trigger, formState:{errors,isValid,isSubmitting} } = useForm({
     resolver:zodResolver(schema), mode:'onChange', reValidateMode:'onChange',
-    defaultValues:{jobType:'Fine-tune',dataset:'',model:'',count:5,cluster:'aurora',benchmark:undefined,repetitions:3,autoEvaluate:true},
+    defaultValues:{jobType:'Fine-tune',dataset:'',model:'',count:5,cluster:'aurora',benchmark:undefined,repetitions:undefined,autoEvaluate:true},
   });
   const values = watch();
   useEffect(()=>{ if(opened) setTimeout(()=>trigger(),0); },[opened,trigger]);
@@ -381,9 +393,9 @@ function SubmissionDrawer() {
   if(jobType==='Evaluate'){previewObject.benchmark=values.benchmark||'';previewObject.repetitions=Number(values.repetitions)||0}
   if(jobType==='Fine-tune') previewObject.autoEvaluate=Boolean(values.autoEvaluate);
   const preview = JSON.stringify(previewObject,null,2);
-  const applySuggestion = (item) => reset({...item.values,repetitions:item.values.repetitions??3,benchmark:item.values.benchmark,autoEvaluate:item.values.autoEvaluate??false});
+  const applySuggestion = (item) => reset({...item.values, repetitions: item.values.jobType==='Evaluate'?(item.values.repetitions??3):undefined, benchmark: item.values.jobType==='Evaluate'?item.values.benchmark:undefined, autoEvaluate: item.values.jobType==='Fine-tune'?(item.values.autoEvaluate??false):undefined});
   useEffect(()=>{
-    const fill = (e) => { reset({...e.detail,repetitions:e.detail.repetitions??3,autoEvaluate:e.detail.autoEvaluate??false}); setTimeout(()=>trigger(),0); };
+    const fill = (e) => { reset({...e.detail, repetitions: e.detail.jobType==='Evaluate'?(e.detail.repetitions??3):undefined, benchmark: e.detail.jobType==='Evaluate'?e.detail.benchmark:undefined, autoEvaluate: e.detail.jobType==='Fine-tune'?(e.detail.autoEvaluate??false):undefined}); setTimeout(()=>trigger(),0); };
     window.addEventListener('relay:form-fill',fill);
     return ()=>window.removeEventListener('relay:form-fill',fill);
   },[reset,trigger]);
@@ -408,7 +420,7 @@ function SubmissionDrawer() {
         <div className="form-section"><span className="form-step">01</span><div><h2>Job shape</h2><p>Choose the phase this job should execute.</p></div></div>
         <Controller name="jobType" control={control} render={({field})=>(
           <div>
-            <Select {...field} value={field.value??null} onChange={(v)=>reset({jobType:v,dataset:'',model:'',count:5,cluster:values.cluster||'aurora',benchmark:undefined,repetitions:3,autoEvaluate:false})} label="Job type" data={JOB_TYPES} error={errors.jobType?.message} allowDeselect={false} required/>
+            <Select {...field} value={field.value??null} onChange={(v)=>reset({jobType:v,dataset:'',model:'',count:5,cluster:values.cluster||'aurora',benchmark:undefined,repetitions:v==='Evaluate'?3:undefined,autoEvaluate:v==='Fine-tune'?false:undefined})} label="Job type" data={JOB_TYPES} error={errors.jobType?.message} allowDeselect={false} required/>
 
           </div>
         )}/>

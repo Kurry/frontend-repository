@@ -12,7 +12,7 @@
     "tailwindcss": "3.4.1"
   },
   "devDependencies": {
-    "@playwright/test": "1.61.0",
+    "@playwright/test": "^1.61.1",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "baseline-browser-mapping": "2.10.43",

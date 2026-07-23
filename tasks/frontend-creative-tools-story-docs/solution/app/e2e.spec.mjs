@@ -117,3 +117,337 @@ test.describe('workspace contract (canonical)', () => {
 });
 
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
+
+test.describe('frontend-creative-tools-story-docs criteria', () => {
+  test('1.1 seeded_scene_grid', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    const cards = page.locator('article.scene-item');
+    await expect(cards.first()).toBeVisible();
+    expect(await cards.count()).toBeGreaterThanOrEqual(8);
+    // Each card carries a scene number badge, an image, and a title.
+    const first = cards.first();
+    await expect(first.locator('.scene-position')).toBeVisible();
+    await expect(first.locator('img')).toBeVisible();
+    await expect(first.getByRole('heading').first()).not.toHaveText('');
+  });
+
+  test('1.3 count_delta_after_creates', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    const before = await page.locator('article.scene-item').count();
+    for (let i = 0; i < 3; i++) {
+      await page.getByRole('button', { name: 'Add Scene' }).first().click();
+      await page.getByRole('button', { name: 'Start', exact: true }).click();
+      await page.locator('#scene-title').fill(`E2E Scene ${i}`);
+      await page.locator('#scene-body').fill(`Body text for e2e scene number ${i}, long enough to pass.`);
+      await page.getByRole('button', { name: 'Review Scene' }).click();
+      await page.getByRole('button', { name: 'Add Scene', exact: true }).click();
+    }
+    const after = await page.locator('article.scene-item').count();
+    expect(after).toBe(before + 3);
+  });
+
+  test('1.4 slide_mode_single_scene', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    await page.getByRole('button', { name: 'Slide view' }).click();
+    await expect(page.locator('.is-slide article.scene-item')).toHaveCount(1);
+    await expect(page.getByRole('button', { name: 'Previous scene' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Next scene' })).toBeVisible();
+  });
+
+  test('1.5 edited_text_replaces_old', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    const firstCard = page.locator('article.scene-item').first();
+    await firstCard.getByRole('button', { name: 'Edit scene description' }).click();
+    const textarea = firstCard.locator('textarea[aria-label="Edit scene description"]');
+    await textarea.fill('Evening Cutaway description text for this scene, replaced.');
+    await textarea.blur();
+    await expect(page.getByText('Evening Cutaway description text for this scene, replaced.')).toBeVisible();
+    await expect(page.getByText('This text is a', { exact: false })).toHaveCount(0);
+  });
+
+  test('1.6 deleted_scene_removed', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    const firstCard = page.locator('article.scene-item').first();
+    const title = await firstCard.getByRole('heading').first().innerText();
+    await firstCard.getByRole('button', { name: /options$/ }).click();
+    await page.getByRole('menuitem', { name: 'Delete Scene' }).click();
+    await expect(page.getByRole('heading', { name: title })).toHaveCount(0);
+  });
+
+  test('1.7 empty_state_after_last_delete', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    let cards = page.locator('article.scene-item');
+    let count = await cards.count();
+    while (count > 0) {
+      await cards.first().getByRole('button', { name: /options$/ }).click();
+      await page.getByRole('menuitem', { name: 'Delete Scene' }).click();
+      await page.waitForTimeout(350); // exit animation settle
+      count = await cards.count();
+    }
+    await expect(page.getByRole('heading', { name: 'No Scenes Left' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Add Scene' })).toBeVisible();
+  });
+
+  test('1.8 invalid_create_blocked', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    const before = await page.locator('article.scene-item').count();
+    await page.getByRole('button', { name: 'Add Scene' }).first().click();
+    await page.getByRole('button', { name: 'Start', exact: true }).click();
+    // Leave title empty, fill only body, then attempt to trigger validation.
+    await page.locator('#scene-body').fill('This body is long enough to pass validation on its own.');
+    await page.locator('#scene-title').focus();
+    await page.locator('#scene-body').focus();
+    await expect(page.locator('#scene-title-error')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Review Scene' })).toBeDisabled();
+    const after = await page.locator('article.scene-item').count();
+    expect(after).toBe(before);
+  });
+
+  test('1.13 sidebar_rows_and_controls', async ({ page }) => {
+    await page.setViewportSize({ width: 1400, height: 900 });
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('button', { name: '1. Getting Started' })).toBeVisible();
+    await expect(page.getByRole('button', { name: '2. Create Your First Storyboard' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Add Storyboard' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Help' })).toBeVisible();
+  });
+
+  test('1.32 slide_bounds_no_wrap', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    await page.getByRole('button', { name: 'Slide view' }).click();
+    await expect(page.getByRole('button', { name: 'Previous scene' })).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Next scene' })).toBeEnabled();
+    const next = page.getByRole('button', { name: 'Next scene' });
+    let guard = 0;
+    while (await next.isEnabled() && guard < 20) {
+      await next.click();
+      guard += 1;
+    }
+    await expect(next).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Previous scene' })).toBeEnabled();
+  });
+
+  test('1.38 scene_field_contract_enforced', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    const before = await page.locator('article.scene-item').count();
+    await page.getByRole('button', { name: 'Add Scene' }).first().click();
+    await page.getByRole('button', { name: 'Start', exact: true }).click();
+    await page.locator('#scene-title').fill('A'); // 1 char, below min of 2
+    await page.locator('#scene-body').fill('short'); // below min of 8
+    await page.locator('#scene-camera').focus();
+    await expect(page.locator('#scene-title-error')).toContainText('Title');
+    await expect(page.locator('#scene-body-error')).toContainText('Description');
+    await expect(page.getByRole('button', { name: 'Review Scene' })).toBeDisabled();
+    const after = await page.locator('article.scene-item').count();
+    expect(after).toBe(before);
+  });
+
+  test('1.39 status_filter_and_search', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    const totalBefore = await page.locator('article.scene-item').count();
+    await page.locator('#status-filter').selectOption('ready');
+    const readyCount = await page.locator('article.scene-item').count();
+    expect(readyCount).toBeGreaterThan(0);
+    expect(readyCount).toBeLessThan(totalBefore);
+    for (const card of await page.locator('article.scene-item').all()) {
+      await expect(card.getByText('ready', { exact: true })).toBeVisible();
+    }
+    await page.locator('#status-filter').selectOption('all');
+    await expect(page.locator('article.scene-item')).toHaveCount(totalBefore);
+    await page.locator('#search-scenes').fill('Welcome to Docs');
+    await expect(page.locator('article.scene-item')).toHaveCount(1);
+    await expect(page.getByRole('heading', { name: 'Welcome to Docs!' })).toBeVisible();
+  });
+
+  test('1.41 undo_redo_restore_board', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    const before = await page.locator('article.scene-item').count();
+    await page.getByRole('button', { name: 'Add Scene' }).first().click();
+    await page.getByRole('button', { name: 'Start', exact: true }).click();
+    await page.locator('#scene-title').fill('Undo Redo Scene');
+    await page.locator('#scene-body').fill('A scene created purely to exercise undo and redo behavior here.');
+    await page.getByRole('button', { name: 'Review Scene' }).click();
+    await page.getByRole('button', { name: 'Add Scene', exact: true }).click();
+    await expect(page.locator('article.scene-item')).toHaveCount(before + 1);
+    await expect(page.getByRole('heading', { name: 'Undo Redo Scene' })).toBeVisible();
+    await page.getByRole('button', { name: 'Undo' }).click();
+    await expect(page.locator('article.scene-item')).toHaveCount(before);
+    await expect(page.getByRole('heading', { name: 'Undo Redo Scene' })).toHaveCount(0);
+    await page.getByRole('button', { name: 'Redo' }).click();
+    await expect(page.locator('article.scene-item')).toHaveCount(before + 1);
+    await expect(page.getByRole('heading', { name: 'Undo Redo Scene' })).toBeVisible();
+  });
+
+  test('1.42 command_palette_runs_handlers', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    await page.keyboard.press('Control+k');
+    const dialog = page.getByRole('dialog', { name: 'Command palette' });
+    await expect(dialog).toBeVisible();
+    await page.getByRole('option', { name: /Switch to List/ }).click();
+    await expect(dialog).toHaveCount(0);
+    await expect(page.locator('.scenes-grid.is-list')).toBeVisible();
+  });
+
+  test('1.45 status_badge_on_scenes', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    const first = page.locator('article.scene-item').first();
+    const badge = first.locator('span', { hasText: /^(draft|review|ready)$/ });
+    await expect(badge).toBeVisible();
+    await expect(badge).toHaveText(/^(draft|review|ready)$/);
+  });
+
+  test('1.46 markdown_bodies_render_with_checklists', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    // Scene 6 ("Checklists") is seeded with a checklist body.
+    const card = page.locator('article.scene-item', { has: page.getByRole('heading', { name: 'Checklists' }) });
+    await expect(card).toBeVisible();
+    const progress = card.locator('span[aria-label^="Checklist progress"]');
+    await expect(progress).toBeVisible();
+    const before = await progress.innerText();
+    const checkbox = card.locator('input.scene-checkbox').first();
+    const wasChecked = await checkbox.isChecked();
+    await checkbox.click();
+    await expect(checkbox).toBeChecked({ checked: !wasChecked });
+    const after = await progress.innerText();
+    expect(after).not.toBe(before);
+  });
+
+  test('2.13 alt_text_and_icon_labels', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    const img = page.locator('article.scene-item img').first();
+    const alt = await img.getAttribute('alt');
+    expect(alt && alt.trim().length).toBeGreaterThan(0);
+    await expect(page.getByRole('button', { name: 'Notifications' })).toHaveAttribute('aria-label', 'Notifications');
+    await expect(page.getByRole('button', { name: 'Account' })).toHaveAttribute('aria-label', 'Account');
+  });
+});
+
+const validPackage = (scenes) => ({
+  schemaVersion: 1,
+  project: 'Demo Projects',
+  storyboard: '1. Getting Started',
+  scenes,
+  generatedAt: new Date().toISOString(),
+});
+
+const validScene = {
+  title: 'Imported Scene',
+  body: 'A valid imported scene body.',
+  status: 'draft',
+  order: 1,
+};
+
+async function openImport(page, pkg) {
+  await page.getByRole('button', { name: 'Import', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Import StoryboardPackage' });
+  await dialog.getByRole('textbox', { name: 'StoryboardPackage JSON' }).fill(JSON.stringify(pkg));
+  return dialog;
+}
+
+test('storyboard package enforces required exact fields and board order', async ({ page }) => {
+  await page.goto(BASE);
+  await expect(page.getByRole('article')).toHaveCount(8);
+  const initialCount = await page.getByRole('article').count();
+  const candidates = [
+    (() => {
+      const pkg = validPackage([validScene]);
+      delete pkg.generatedAt;
+      return { pkg, field: 'generatedAt' };
+    })(),
+    { pkg: { ...validPackage([validScene]), generatedAt: 'tomorrow' }, field: 'generatedAt' },
+    { pkg: { ...validPackage([validScene]), unexpected: true }, field: 'Unrecognized key' },
+    { pkg: validPackage([{ ...validScene, internalId: 'not-portable' }]), field: 'Unrecognized key' },
+    {
+      pkg: validPackage([validScene, { ...validScene, title: 'Second Scene', order: 1 }]),
+      field: 'scenes.1.order',
+    },
+  ];
+
+  for (const candidate of candidates) {
+    const dialog = await openImport(page, candidate.pkg);
+    const textbox = dialog.getByRole('textbox', { name: 'StoryboardPackage JSON' });
+    await textbox.blur();
+    await expect(dialog.getByRole('button', { name: 'Import', exact: true })).toBeDisabled();
+    await expect(dialog.getByRole('alert')).toContainText(candidate.field);
+    await dialog.getByRole('button', { name: 'Close import dialog' }).click();
+    await expect(dialog).toHaveCount(0);
+    await expect(page.getByRole('article')).toHaveCount(initialCount);
+  }
+});
+
+test('empty storyboard package round-trips to the visible empty board', async ({ page }) => {
+  await page.goto(BASE);
+  const dialog = await openImport(page, validPackage([]));
+  await expect(dialog.getByRole('button', { name: 'Import', exact: true })).toBeEnabled();
+  await dialog.getByRole('button', { name: 'Import', exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'No Scenes Left' })).toBeVisible();
+  await expect(page.getByRole('article')).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Export', exact: true }).click();
+  const exportDrawer = page.getByRole('dialog', { name: 'Export storyboard' });
+  await exportDrawer.getByRole('tab', { name: 'JSON' }).click();
+  const exported = JSON.parse(await exportDrawer.getByLabel('json preview').innerText());
+  expect(exported.scenes).toEqual([]);
+  expect(exported.generatedAt).toMatch(/Z$/);
+});
+
+test('workspace heading outline does not skip levels', async ({ page }) => {
+  await page.goto(BASE);
+  await expect(page.getByRole('article')).toHaveCount(8);
+  const levels = await page.locator('h1, h2, h3, h4, h5, h6').evaluateAll((headings) =>
+    headings.map((heading) => Number(heading.tagName.slice(1)))
+  );
+  expect(levels[0]).toBe(1);
+  for (let index = 1; index < levels.length; index += 1) {
+    expect(levels[index]).toBeLessThanOrEqual(levels[index - 1] + 1);
+  }
+
+  await page.getByRole('button', { name: 'Add Scene', exact: true }).last().click();
+  const addScene = page.getByRole('region', { name: 'Add Scene' });
+  await expect(addScene.getByRole('heading', { name: 'Add Scene', level: 2 })).toBeVisible();
+  await page.getByRole('button', { name: 'Start', exact: true }).click();
+  await expect(addScene.getByLabel(/^Title/)).toBeVisible();
+  const formLevels = await page.locator('h1, h2, h3, h4, h5, h6').evaluateAll((headings) =>
+    headings.map((heading) => Number(heading.tagName.slice(1)))
+  );
+  for (let index = 1; index < formLevels.length; index += 1) {
+    expect(formLevels[index]).toBeLessThanOrEqual(formLevels[index - 1] + 1);
+  }
+});
+
+test('mobile header keeps both titles and utility tools visible', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto(BASE);
+  await expect(page.getByRole('button', { name: 'Demo Projects' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '1. Getting Started', level: 1 })).toBeVisible();
+  for (const name of [
+    'Open storyboard sidebar',
+    'Storyboard Options',
+    'Notifications',
+    'Dashboard',
+    'Account',
+  ]) {
+    await expect(page.getByRole('button', { name })).toBeVisible();
+  }
+  const overflow = await page.evaluate(() =>
+    document.documentElement.scrollWidth - document.documentElement.clientWidth
+  );
+  expect(overflow).toBeLessThanOrEqual(1);
+});

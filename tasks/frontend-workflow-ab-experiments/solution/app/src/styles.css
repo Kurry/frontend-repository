@@ -401,10 +401,12 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .recharts-bar-rectangles rect {
   transition: height 0.4s ease, y 0.4s ease, transform 0.4s ease;
   transform-origin: bottom center;
+  transform-box: fill-box;
 }
 
 .chart-bars-animate .recharts-bar-rectangle path {
   animation: barGrow 0.4s ease forwards;
+  transform-box: fill-box;
 }
 
 @keyframes barGrow {

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { Button, Select, SelectItem, Tag, ToastNotification, ContentSwitcher, Switch } from '@carbon/react'
 import {
   Asleep,
@@ -60,7 +61,7 @@ function Sidebar() {
               key={technique.id}
               className={`technique-item ${active ? 'is-active' : ''}`}
               aria-current={active ? 'page' : undefined}
-              onClick={() => selectTechnique(technique.id)}
+              onClick={() => flushSync(() => selectTechnique(technique.id))}
             >
               <span className="technique-index">{String(index + 1).padStart(2, '0')}</span>
               <span className="technique-name">{technique.name}</span>
@@ -192,7 +193,7 @@ function AppHeader() {
           type="button"
           kind="ghost"
           size="md"
-          className="theme-toggle"
+          className="header-preference theme-toggle"
           renderIcon={(props) => (theme === 'dark' ? <Light {...props} aria-hidden="true" /> : <Asleep {...props} aria-hidden="true" />)}
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
           aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
@@ -203,6 +204,7 @@ function AppHeader() {
           type="button"
           kind="ghost"
           size="md"
+          className="header-preference"
           onClick={() => setDensity(density === 'comfortable' ? 'compact' : 'comfortable')}
           aria-label={density === 'comfortable' ? 'Switch to compact density' : 'Switch to comfortable density'}
         >
@@ -212,7 +214,7 @@ function AppHeader() {
           type="button"
           kind="ghost"
           size="md"
-          className={voiceListening ? 'nav-active' : ''}
+          className={`header-preference${voiceListening ? ' nav-active' : ''}`}
           renderIcon={(props) => <Microphone {...props} aria-hidden="true" />}
           onClick={toggleVoice}
           aria-pressed={voiceListening}
@@ -259,17 +261,9 @@ function FormsView() {
           </motion.div>
         </div>
         <div className={`form-panel ${reduce ? '' : 'form-fade'}`}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={technique}
-              initial={reduce ? false : { opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={reduce ? undefined : { opacity: 0 }}
-              transition={{ duration: reduce ? 0 : 0.15 }}
-            >
-              <TechniqueForm technique={technique} active={true} />
-            </motion.div>
-          </AnimatePresence>
+          <div key={technique} className={reduce ? '' : 'technique-transition'}>
+            <TechniqueForm technique={technique} active={true} />
+          </div>
         </div>
         <PreviewPanel saveButtonRef={saveButtonRef} />
         <SaveModal launcherButtonRef={saveButtonRef} />

@@ -1,0 +1,33 @@
+{
+  "archive_records": 6197,
+  "awwwards_displayed_count_at_collection": 6410,
+  "display_pagination_difference": 213,
+  "fingerprinted_records": 6197,
+  "frontend_depth": {
+    "css_feature_pairs": 2131,
+    "css_features": 66,
+    "mirrored_html_sites": 4434,
+    "retained_advanced_asset_bytes": 61195478,
+    "retained_advanced_asset_files": 39,
+    "runtime_signals": 13,
+    "sites_with_css": 2210,
+    "sites_with_referenced_advanced_assets": 275,
+    "sites_with_retained_advanced_assets": 14,
+    "svg_retention_policy": "retained_as_vector_code_asset"
+  },
+  "generated_at": "2026-07-22T13:57:45+00:00",
+  "live_html_records": 4562,
+  "live_redirect_host_changed_records": 595,
+  "mirror_html_records": 4434,
+  "mirror_live_scope_complete": true,
+  "mirror_live_scope_records": 4562,
+  "mirror_out_of_scope_pilot_records": 35,
+  "mirror_status_records": 4597,
+  "newest_award_date": "2026-07-22",
+  "oldest_award_date": "2009-06-01",
+  "pagination_record_count": 6197,
+  "unique_awwwards_technology_tags": 126,
+  "unique_detected_technologies": 681,
+  "unique_detected_technology_categories": 79,
+  "unique_technology_pairs": 13783
+}

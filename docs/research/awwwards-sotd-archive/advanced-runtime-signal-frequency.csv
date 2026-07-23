@@ -1,0 +1,14 @@
+runtime_signal,site_count,percent_of_mirrored_sites
+offscreen_canvas,306,6.901
+shader_source,270,6.089
+web_worker,252,5.683
+lottie_runtime,203,4.578
+gltf_loader,116,2.616
+draco_decoder,113,2.548
+basis_ktx2_transcoder,101,2.278
+meshopt_decoder,94,2.12
+webassembly_runtime,59,1.331
+webgpu,23,0.519
+rive_runtime,22,0.496
+webxr,13,0.293
+lottie_asset,1,0.023

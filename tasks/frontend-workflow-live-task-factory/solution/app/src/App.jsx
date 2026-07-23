@@ -230,7 +230,7 @@ function ActiveChips({ filters, clear, setFilter }) {
 function AddRepositoryForm() {
   const addRepository = useAppStore((state) => state.addRepository)
   const [notice, setNotice] = useState('')
-  const form = useForm({ resolver: zodResolver(addRepositorySchema), defaultValues: { repository: '' } })
+  const form = useForm({ resolver: zodResolver(addRepositorySchema), defaultValues: { repository: '' }, mode: 'onChange' })
   const submit = form.handleSubmit(async (payload) => {
     const result = await addRepository(payload)
     setNotice(result.notice || '')

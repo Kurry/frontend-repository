@@ -52,6 +52,14 @@ export const SessionBaseSchema = z.object({
 }).strict();
 
 function addCellCollectionIssues(cells, rows, cols, ctx, path, requireFullGrid) {
+  if (requireFullGrid && cells.length === 0) {
+    ctx.addIssue({
+      code: "custom",
+      path,
+      message: "cells must contain a complete non-empty grid",
+    });
+    return;
+  }
   if (requireFullGrid && cells.length !== rows * cols) {
     ctx.addIssue({
       code: "custom",
@@ -76,6 +84,14 @@ function addCellCollectionIssues(cells, rows, cols, ctx, path, requireFullGrid) 
   });
 }
 
+function cellCollectionDimensions(cells) {
+  if (!cells.length) return { rows: 0, cols: 0 };
+  return {
+    rows: Math.max(...cells.map((cell) => cell.row)) + 1,
+    cols: Math.max(...cells.map((cell) => cell.col)) + 1,
+  };
+}
+
 export const SessionSchema = SessionBaseSchema.superRefine((session, ctx) => {
   const { rows, cols } = gridDimensions(session.cellSize);
   addCellCollectionIssues(session.cells, rows, cols, ctx, ["cells"], true);
@@ -86,7 +102,15 @@ export const SessionSchema = SessionBaseSchema.superRefine((session, ctx) => {
       ctx.addIssue({ code: "custom", path: ["boards", index, "name"], message: "board name must be unique" });
     }
     names.add(board.name);
-    addCellCollectionIssues(board.cells, rows, cols, ctx, ["boards", index, "cells"], true);
+    const boardDimensions = cellCollectionDimensions(board.cells);
+    addCellCollectionIssues(
+      board.cells,
+      boardDimensions.rows,
+      boardDimensions.cols,
+      ctx,
+      ["boards", index, "cells"],
+      true,
+    );
   });
 
   const actual = session.cells.reduce((stats, cell) => {

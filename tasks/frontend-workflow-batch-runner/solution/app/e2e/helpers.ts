@@ -527,18 +527,37 @@ export async function runViewRetentionProbe(page: Page) {
 }
 
 export async function multiFacetResetProbe(page: Page) {
-  await createProbe(page)
+  await boot(page)
+  await page.getByRole('button', { name: 'New job' }).click()
+  const dialog = page.getByRole('dialog', { name: 'New job' })
+  await dialog.getByLabel('Job name', { exact: true }).fill('E2E created workload')
+  await dialog.getByLabel('Prompt template').selectOption({ index: 1 })
+  await dialog.getByLabel('Model and rate').selectOption({ index: 1 })
+  // Use a large pasted dataset rather than one of the tiny (6-10 row) seeded
+  // slices: the run's item simulation advances on real wall-clock timestamps
+  // (not Playwright's clock), so a small job can fully settle in well under
+  // a second — before this test can even reach the queue-reorder step below
+  // — leaving zero pending items to move and making the assertion flaky
+  // under any CI/parallel-worker slowdown. A wide dataset guarantees pending
+  // items remain for the lifetime of this probe regardless of timing.
+  const rows = Array.from({ length: 60 }, (_, index) => ({ input: `Reset facet probe row ${index + 1}` }))
+  await dialog.getByLabel('Paste JSON array or CSV').fill(JSON.stringify(rows))
+  await dialog.getByRole('button', { name: 'Detect pasted rows' }).click()
+  const submit = dialog.getByRole('button', { name: 'Create ready job' })
+  await expect(submit).toBeEnabled()
+  await submit.click()
+  await expect(page.getByRole('heading', { name: 'E2E created workload' })).toBeVisible()
   await page.getByRole('button', { name: 'Schedule' }).click()
   const schedule = page.getByRole('dialog', { name: 'Schedule launch window' })
   await schedule.getByLabel('Schedule windowStart').fill('2030-01-01T01:00')
   await schedule.getByLabel('Schedule windowEnd').fill('2030-01-01T03:00')
   await schedule.getByRole('button', { name: 'Save schedule' }).click()
   await page.getByRole('button', { name: 'Launch batch' }).click()
+  await page.getByRole('button', { name: 'Pause all' }).click()
   const queue = page.getByRole('region', { name: 'Pending queue' })
   const movable = queue.locator('button.queue-move:not([disabled])')
   await expect(movable.first()).toBeEnabled()
   await movable.first().click()
-  await page.getByRole('button', { name: 'Pause all' }).click()
   await page.getByLabel('Filter timeline status').selectOption('running')
   await page.reload()
   await expect(page.locator('.job-card')).toHaveCount(3)
@@ -567,10 +586,14 @@ export async function durabilityPipelineProbe(page: Page) {
   await page.getByRole('button', { name: 'Launch batch' }).click()
   await expect(page.getByRole('grid')).toHaveAttribute('aria-rowcount', '240')
   const retry = page.getByRole('button', { name: /Retry failed items/ })
-  await expect(retry).toBeEnabled({ timeout: 60_000 })
+  // The 240-item run settles on real wall-clock timestamps (not Playwright's
+  // clock), typically taking ~40s on an unloaded machine; under CI/parallel-
+  // worker CPU contention that comfortably exceeded a 60s budget and flaked.
+  // Give it real headroom rather than shortening what we wait for.
+  await expect(retry).toBeEnabled({ timeout: 120_000 })
   await retry.click()
-  await expect(page.getByRole('region', { name: 'Event timeline' })).toContainText(/retry/i)
   await page.getByRole('button', { name: 'Pause all' }).click()
+  await expect(page.getByRole('region', { name: 'Event timeline' })).toContainText(/retry/i)
   await expect(page.getByRole('button', { name: 'Start all' })).toBeEnabled()
   await page.getByRole('button', { name: 'Stop all' }).click()
   await page.getByRole('button', { name: 'Export run' }).click()

@@ -359,11 +359,21 @@ test('1.30 export_csv_markdown_format', async ({ page }) => {
 
 test('1.31 import_success_message', async ({ page }) => {
   await page.goto('http://localhost:3000/');
-  const res = await page.evaluate(async () => {
-    return await window.webmcp_invoke_tool('artifact_import', { mode: 'seeded-sample' });
-  });
-  expect(res.ok).toBe(true);
-  expect(res.message).toContain('Seeded sample pack applied');
+  await page.getByRole('button', { name: 'Export pack' }).click();
+  const exportDialog = page.getByRole('dialog', { name: 'Export sourcing pack' });
+  const exported = await exportDialog.getByLabel('Active export text').textContent() ?? '';
+  const pack = JSON.parse(exported);
+  await exportDialog.getByRole('button', { name: 'Close' }).click();
+
+  await page.getByRole('button', { name: 'Import' }).click();
+  const importDialog = page.getByRole('dialog', { name: 'Import sourcing pack' });
+  await importDialog.getByLabel('Raw JSON text').fill(exported);
+  await importDialog.getByRole('button', { name: 'Apply import' }).click();
+
+  await expect(importDialog).not.toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: 'Complete' }).first()).toContainText(
+    `Import applied: ${pack.candidates.length} candidates and ${pack.queue.length} queue entries.`,
+  );
 });
 
 // ==== AUTOMATABLE WEB_MCP TESTS ====
@@ -388,15 +398,30 @@ test('6.3 quota_drilldown_then_select', async ({ page }) => {
 
 test('6.12 import_round_trip_flow', async ({ page }) => {
   await page.goto('http://localhost:3000/');
-  const packRes = await page.evaluate(async () => {
-    return await window.webmcp_invoke_tool('artifact_import', { mode: 'seeded-sample' });
-  });
-  expect(packRes.ok).toBe(true);
-  const info = await page.evaluate(async () => {
-    return window.webmcp_session_info?.();
-  });
-  expect(info).toBeDefined();
-  expect(info.contract_version).toBe('zto-webmcp-v1');
+  const row = page.getByRole('row').filter({ hasText: 'cloudthimble/mist-template' });
+  await expect(row).toContainText('Candidate');
+
+  await page.getByRole('button', { name: 'Export pack' }).click();
+  const exportDialog = page.getByRole('dialog', { name: 'Export sourcing pack' });
+  const exported = await exportDialog.getByLabel('Active export text').textContent() ?? '';
+  await exportDialog.getByRole('button', { name: 'Close' }).click();
+
+  await row.getByRole('checkbox').check();
+  await page.getByRole('button', { name: 'Bulk Score' }).click();
+  await expect(row).toContainText('Scored');
+
+  await page.getByRole('button', { name: 'Import' }).click();
+  const importDialog = page.getByRole('dialog', { name: 'Import sourcing pack' });
+  await importDialog.getByLabel('Raw JSON text').fill(exported);
+  await expect(importDialog.getByLabel('Preview of changes this import will apply')).toContainText(
+    'cloudthimble/mist-template: scored → candidate',
+  );
+  await importDialog.getByRole('button', { name: 'Apply import' }).click();
+
+  await expect(importDialog).not.toBeVisible();
+  await expect(row).toContainText('Candidate');
+  await page.getByRole('button', { name: 'Timeline', exact: true }).click();
+  await expect(page.getByText('Sourcing pack import')).toBeVisible();
 });
 
 /*

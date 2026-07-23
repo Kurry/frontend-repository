@@ -1,6 +1,6 @@
 # Session Compression Loom
 
-Session compression loom with trajectory event folding, summary capsules, token budget ruler, and provenance tracing.
+Session compression editor with capsule summaries, preview, and artifact export.
 
 A frontend-only Harbor eval task. A builder agent recreates the
 app in `instruction.md`, delivering a self-contained SPA in `/app`

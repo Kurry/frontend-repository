@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
-  Button, TextInput, TextArea, Select, SelectItem, NumberInput, Modal, Tag, Toggle,
+  Button, TextInput, TextArea, Select, SelectItem, NumberInput, Modal, Tag, DismissibleTag, Toggle,
   InlineLoading, ToastNotification, ProgressBar, Tabs, TabList, Tab, TabPanels, TabPanel, Slider,
   Tile, Checkbox, Dropdown, RadioButtonGroup, RadioButton, FileUploaderDropContainer
 } from '@carbon/react'
@@ -144,7 +144,7 @@ function Library({ rememberLauncher, rememberPanelLauncher }) {
       </div>
       <div className="active-filter-row">
         <span><strong>{visible.length}</strong> experiment{visible.length === 1 ? '' : 's'}</span>
-        {state.filters.map(filter => <Tag key={filter} type="purple" filter onClose={() => state.toggleFilter(filter)} title={`Remove ${statusLabel(filter)} filter`}>{statusLabel(filter)}</Tag>)}
+        {state.filters.map(filter => <DismissibleTag key={filter} type="purple" onClose={() => state.toggleFilter(filter)} title={`Remove ${statusLabel(filter)} filter`} text={statusLabel(filter)} />)}
         {(state.filters.length > 0 || state.search || state.showArchived) && <button className="text-action" onClick={state.clearFilters}>Clear filters</button>}
       </div>
       <AnimatePresence>{state.selectedIds.length > 0 && <motion.div className="bulk-bar" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}><strong>{state.selectedIds.length} selected</strong><Button size="sm" kind="secondary" renderIcon={Archive} onClick={openArchive}>Archive selected</Button><Button size="sm" kind="danger--tertiary" renderIcon={TrashCan} onClick={openDelete}>Delete selected</Button><Button size="sm" kind="ghost" onClick={() => state.setField('selectedIds', [])}>Clear</Button></motion.div>}</AnimatePresence>
@@ -254,6 +254,7 @@ function ChartCard({ title, subtitle, children, className = '' }) {
 }
 
 function ResultsTab({ experiment }) {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   const criteria = useStudio(state => state.criteria)
   const sort = useStudio(state => state.sampleSort)
   const setField = useStudio(state => state.setField)
@@ -271,7 +272,7 @@ function ResultsTab({ experiment }) {
     return { sample: index + 1, delta, lower: delta - band, upper: delta + band, range: [delta - band, delta + band] }
   })
   const rows = sampleRows(experiment).sort((a, b) => sort === 'asc' ? a.delta - b.delta : b.delta - a.delta)
-  return <div className="results-grid"><ChartCard title="Criterion performance" subtitle="Mean score by scoring criterion"><div className="chart-frame chart-bars-animate"><ResponsiveContainer width="100%" height={280}><BarChart data={barData} barGap={3}><CartesianGrid stroke="#252a3a" vertical={false} /><XAxis dataKey="criterion" tick={{ fill: '#a9b0c3', fontSize: 11 }} /><YAxis domain={[40, 100]} tick={{ fill: '#7f8799' }} /><Tooltip contentStyle={{ background: '#161b2a', border: '1px solid #343b52' }} /><Legend />{letters.map((letter, index) => <Bar key={letter} dataKey={letter} fill={COLORS[index]} radius={[3, 3, 0, 0]} animationDuration={400} name={`Variant ${letter}`} />)}</BarChart></ResponsiveContainer></div></ChartCard>
+  return <div className="results-grid"><ChartCard title="Criterion performance" subtitle="Mean score by scoring criterion"><div className="chart-frame chart-bars-animate"><ResponsiveContainer width="100%" height={280}><BarChart data={barData} barGap={3}><CartesianGrid stroke="#252a3a" vertical={false} /><XAxis dataKey="criterion" tick={{ fill: '#a9b0c3', fontSize: 11 }} /><YAxis domain={[40, 100]} tick={{ fill: '#7f8799' }} /><Tooltip contentStyle={{ background: '#161b2a', border: '1px solid #343b52' }} /><Legend />{letters.map((letter, index) => <Bar key={letter} dataKey={letter} fill={COLORS[index]} radius={[3, 3, 0, 0]} isAnimationActive={!reducedMotion} animationDuration={reducedMotion ? 0 : 400} name={`Variant ${letter}`} />)}</BarChart></ResponsiveContainer></div></ChartCard>
     <ChartCard title="Score distributions" subtitle="Unflagged response scores by variant"><DistributionStrip experiment={experiment} /></ChartCard>
     <ChartCard title="Difference and confidence" subtitle={`Leading variant vs. baseline · shaded 95% confidence band`} className="wide-card"><div className="chart-frame"><ResponsiveContainer width="100%" height={240}><ComposedChart data={diffData}><CartesianGrid stroke="#252a3a" vertical={false} /><XAxis dataKey="sample" tick={{ fill: '#7f8799' }} /><YAxis tick={{ fill: '#7f8799' }} /><Tooltip contentStyle={{ background: '#161b2a', border: '1px solid #343b52' }} /><ReferenceLine y={0} stroke="#687087" strokeDasharray="4 4" /><Area type="monotone" dataKey="range" fill="#7c5cff" fillOpacity={0.2} stroke="none" /><Line type="monotone" dataKey="delta" stroke="#9b86ff" strokeWidth={2.5} dot={false} /></ComposedChart></ResponsiveContainer></div></ChartCard>
     <section className="sample-card wide-card"><div className="chart-heading"><div><h3>Sample-level comparison</h3><p>Every seeded input and paired score.</p></div></div><div className="sample-table-wrap"><table className="sample-table"><thead><tr><th>Input</th>{letters.map(letter => <th key={letter}>Variant {letter}</th>)}<th><button onClick={() => setField('sampleSort', sort === 'asc' ? 'desc' : 'asc')}>Score delta {sort === 'asc' ? '↑' : '↓'}</button></th></tr></thead><tbody>{rows.map(row => <tr key={row.id}><td>{row.input}</td>{letters.map(letter => <td key={letter}>{row[letter]?.toFixed(1) ?? '—'}</td>)}<td className={row.delta >= 0 ? 'positive' : 'negative'}>{row.delta >= 0 ? '+' : ''}{row.delta.toFixed(2)}</td></tr>)}</tbody></table></div></section>

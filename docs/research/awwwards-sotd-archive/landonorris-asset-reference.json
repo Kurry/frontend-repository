@@ -1,0 +1,288 @@
+{
+  "available": true,
+  "file_count": 35,
+  "files": [
+    {
+      "bytes": 23588,
+      "category": "font",
+      "excluded_from_mirror": true,
+      "extension": "woff2",
+      "path": "67b6113a220f85ad6497495a_Brier-Bold.woff2",
+      "sha256": "29e02a38804299f651616500e6081190a92ad271312e94a7647002e1130bfefe"
+    },
+    {
+      "bytes": 167476,
+      "category": "font",
+      "excluded_from_mirror": true,
+      "extension": "woff2",
+      "path": "67bc6274c5b4108b123aa4d5_MonaSans-VariableFont_wdth%2Cwght.woff2",
+      "sha256": "b1805bff4463df0a5c4226c3ebf4a217adfe7fb41285bcafd51d165bcffa7115"
+    },
+    {
+      "bytes": 167476,
+      "category": "font",
+      "excluded_from_mirror": true,
+      "extension": "woff2",
+      "path": "67bc6274c5b4108b123aa4d5_MonaSans-VariableFont_wdth,wght.woff2",
+      "sha256": "b1805bff4463df0a5c4226c3ebf4a217adfe7fb41285bcafd51d165bcffa7115"
+    },
+    {
+      "bytes": 57529,
+      "category": "runtime",
+      "excluded_from_mirror": false,
+      "extension": "js",
+      "path": "basis/basis_transcoder.js",
+      "sha256": "8478b5b6d6b74e7d3082b89f6417321d8d1dc0307f2b30d4484bb11b441696a1"
+    },
+    {
+      "bytes": 527333,
+      "category": "runtime",
+      "excluded_from_mirror": false,
+      "extension": "wasm",
+      "path": "basis/basis_transcoder.wasm",
+      "sha256": "6cf17dc889352c42e9acf8897107978d127005fe3386c36a0e3845e27967630a"
+    },
+    {
+      "bytes": 392675,
+      "category": "environment_map",
+      "excluded_from_mirror": false,
+      "extension": "hdr",
+      "path": "hdri/studio_small_08_1k--dark.hdr",
+      "sha256": "1e27cdeddab59943acb0fa02f25389ba26d98b5cdd7d440f978063672fd1d014"
+    },
+    {
+      "bytes": 175712,
+      "category": "environment_map",
+      "excluded_from_mirror": false,
+      "extension": "hdr",
+      "path": "hdri/studio_small_08_1k--faded.hdr",
+      "sha256": "fbf3d36f26ff7d5e41397c7abb8add17b45e93c333176d1141b1d21e0d15a345"
+    },
+    {
+      "bytes": 386788,
+      "category": "environment_map",
+      "excluded_from_mirror": false,
+      "extension": "hdr",
+      "path": "hdri/studio_small_08_1k--light.hdr",
+      "sha256": "7d1ca2300066e820d3aff8693abe6f8a3d2d509b06d7ad1cbd3c49b37c97ba66"
+    },
+    {
+      "bytes": 358984,
+      "category": "3d_model",
+      "excluded_from_mirror": false,
+      "extension": "glb",
+      "path": "models/disco-02.glb",
+      "sha256": "6fb1665522b2dc642bc318e9c7e010410eec2be5f660e3cb7ab3446ddaf6776f"
+    },
+    {
+      "bytes": 139492,
+      "category": "3d_model",
+      "excluded_from_mirror": false,
+      "extension": "glb",
+      "path": "models/helmet-21.glb",
+      "sha256": "b18a32362bc59433059cc184b25454fe9014e28a9f902229c22ed2293824be47"
+    },
+    {
+      "bytes": 29664,
+      "category": "3d_model",
+      "excluded_from_mirror": false,
+      "extension": "glb",
+      "path": "models/sotd.glb",
+      "sha256": "70839b47bc6dd5d77840140312d1f44f1ea712021681d54677c20a507ad7b95b"
+    },
+    {
+      "bytes": 463920,
+      "category": "3d_model",
+      "excluded_from_mirror": false,
+      "extension": "glb",
+      "path": "models/tracks/tracks-05.glb",
+      "sha256": "8fc3256441224a3c5189dec5aa904b4bd5a0843e1efb038b14e00acaa1ef15ba"
+    },
+    {
+      "bytes": 463904,
+      "category": "3d_model",
+      "excluded_from_mirror": false,
+      "extension": "glb",
+      "path": "models/tracks/tracks.glb",
+      "sha256": "f321c179dff250bb36b99393b760d75324ffffecfb39e59876716b030c801b62"
+    },
+    {
+      "bytes": 4144,
+      "category": "rive_animation",
+      "excluded_from_mirror": false,
+      "extension": "riv",
+      "path": "rive/btn-ui.riv",
+      "sha256": "3ea92e910e784e81819daccdc2ab4194b3f4d08f22e4d2cad66d4bc13c180055"
+    },
+    {
+      "bytes": 36636,
+      "category": "rive_animation",
+      "excluded_from_mirror": false,
+      "extension": "riv",
+      "path": "rive/circuits.riv",
+      "sha256": "3a4b487c232b1c27c148481adbb11705741a8c58e25352783cbbf0cb4f14e461"
+    },
+    {
+      "bytes": 3770,
+      "category": "rive_animation",
+      "excluded_from_mirror": false,
+      "extension": "riv",
+      "path": "rive/ln4.riv",
+      "sha256": "6dc9b2e9b928ce6a4956c8cd10cce05fb30b04ee292c48d22200b4f8e20bb73d"
+    },
+    {
+      "bytes": 52818,
+      "category": "rive_animation",
+      "excluded_from_mirror": false,
+      "extension": "riv",
+      "path": "rive/mob-landscape.riv",
+      "sha256": "8813d247fd21dcf4b69040ffea7b5f4420e93867ed33b4262fa041f6475a2392"
+    },
+    {
+      "bytes": 5508,
+      "category": "rive_animation",
+      "excluded_from_mirror": false,
+      "extension": "riv",
+      "path": "rive/page-transition.riv",
+      "sha256": "be0aca3e661f2631d78493567ba360361ab30dddf5c8940d5e37ee4be79924e5"
+    },
+    {
+      "bytes": 68650,
+      "category": "rive_animation",
+      "excluded_from_mirror": false,
+      "extension": "riv",
+      "path": "rive/phrases.riv",
+      "sha256": "86896e210eb90d6eeeb2299c1d594e4950380a523f0b854e84e48d0b6a57e7d7"
+    },
+    {
+      "bytes": 72667,
+      "category": "rive_animation",
+      "excluded_from_mirror": false,
+      "extension": "riv",
+      "path": "rive/reef.riv",
+      "sha256": "4998e766d1bc6957b5878c1dcc313d599d1fe077afbc84a291b11c6a6bde0c56"
+    },
+    {
+      "bytes": 30851,
+      "category": "rive_animation",
+      "excluded_from_mirror": false,
+      "extension": "riv",
+      "path": "rive/signature.riv",
+      "sha256": "37a7cb898b20ba538eac24a67552de84463fe4c5ac52502cf92439da9a8db4ea"
+    },
+    {
+      "bytes": 24838,
+      "category": "image",
+      "excluded_from_mirror": true,
+      "extension": "webp",
+      "path": "textures-original/fonts__MonaSans-Bold-02.webp",
+      "sha256": "7d3c5880d2066d86c19a30e1882b8b930308ec1e4c80ddee2f68fb5c968d9320"
+    },
+    {
+      "bytes": 90920,
+      "category": "gpu_texture",
+      "excluded_from_mirror": false,
+      "extension": "ktx2",
+      "path": "textures-original/textures__glass__ktx2__Norris_Glass_mat_BaseColor.ktx2",
+      "sha256": "854fce3a654f9b1656b39911266022983a87fcf3b01a5d04dba07773b4899458"
+    },
+    {
+      "bytes": 39065,
+      "category": "gpu_texture",
+      "excluded_from_mirror": false,
+      "extension": "ktx2",
+      "path": "textures-original/textures__glass__ktx2__Norris_Glass_mat_Metallic.ktx2",
+      "sha256": "279fbd41bd284fcdad41409fca738a931b385c7137bea89b57a820a17085d8da"
+    },
+    {
+      "bytes": 217570,
+      "category": "gpu_texture",
+      "excluded_from_mirror": false,
+      "extension": "ktx2",
+      "path": "textures-original/textures__glass__ktx2__Norris_Glass_mat_Roughness.ktx2",
+      "sha256": "0f0f63a34366ad398d20cabf8efcbd8ba67a2e0235c2f468417768b67fd01119"
+    },
+    {
+      "bytes": 172037,
+      "category": "gpu_texture",
+      "excluded_from_mirror": false,
+      "extension": "ktx2",
+      "path": "textures-original/textures__head__ktx2__alpha.ktx2",
+      "sha256": "206a408f9b49b5dc109608fab8311dc5e0b384341c9c625ead652cef5f4211d7"
+    },
+    {
+      "bytes": 66599,
+      "category": "gpu_texture",
+      "excluded_from_mirror": false,
+      "extension": "ktx2",
+      "path": "textures-original/textures__head__ktx2__depth.ktx2",
+      "sha256": "9f4ed4eacfd30e9bc38cfc867934ac7657a1b2535393ea1c1f74fb9025625ca7"
+    },
+    {
+      "bytes": 334987,
+      "category": "gpu_texture",
+      "excluded_from_mirror": false,
+      "extension": "ktx2",
+      "path": "textures-original/textures__head__ktx2__diffuse.ktx2",
+      "sha256": "2b89ba9f6e8f1e9d9d353e3c31a1cffbf9e71a04eae865445c9b8a89084c87cd"
+    },
+    {
+      "bytes": 321721,
+      "category": "gpu_texture",
+      "excluded_from_mirror": false,
+      "extension": "ktx2",
+      "path": "textures-original/textures__head__ktx2__shadow-softer-edit.ktx2",
+      "sha256": "e99bbc33977ab3e144959108e5ac8d88dee6ac46a514fd8b39e9ada404def9de"
+    },
+    {
+      "bytes": 319542,
+      "category": "gpu_texture",
+      "excluded_from_mirror": false,
+      "extension": "ktx2",
+      "path": "textures-original/textures__head__ktx2__shadow.ktx2",
+      "sha256": "8cfcb6186a1f961054434a70d4f697d5a52ce180c7ca423e1110c33c1dee8727"
+    },
+    {
+      "bytes": 66610,
+      "category": "gpu_texture",
+      "excluded_from_mirror": false,
+      "extension": "ktx2",
+      "path": "textures-original/textures__helmet__ktx2__Norris_Helmet_mat_Metallic.ktx2",
+      "sha256": "d7bc79d58c5e4e0500c572b193c301cb6a62eb8824141c3d9bdfc6baf87ba5a3"
+    },
+    {
+      "bytes": 364243,
+      "category": "gpu_texture",
+      "excluded_from_mirror": false,
+      "extension": "ktx2",
+      "path": "textures-original/textures__helmet__ktx2__Norris_Helmet_mat_Roughness.ktx2",
+      "sha256": "7f581b4299a48b13bfa924c6dc1a92c825a0c72391a2da8737823a02e965ec4b"
+    },
+    {
+      "bytes": 96371,
+      "category": "gpu_texture",
+      "excluded_from_mirror": false,
+      "extension": "ktx2",
+      "path": "textures-original/textures__helmet__ktx2__disco__Norris_Helmet_mat_BaseColor.ktx2",
+      "sha256": "2fbbbc30f194c153de025f65a2debf3a5256f20748bd15050d7645f657f5164c"
+    },
+    {
+      "bytes": 470727,
+      "category": "gpu_texture",
+      "excluded_from_mirror": false,
+      "extension": "ktx2",
+      "path": "textures-original/textures__helmet__ktx2__disco__disco_mask-01.ktx2",
+      "sha256": "760191ddeb61f76d7c44b50e58cbec2e9a0e3d11d16b99617c68695728e1eab8"
+    },
+    {
+      "bytes": 284653,
+      "category": "gpu_texture",
+      "excluded_from_mirror": false,
+      "extension": "ktx2",
+      "path": "textures-original/textures__helmet__ktx2__gold__Norris_Helmet_mat_BaseColor.ktx2",
+      "sha256": "ff78a1d8edef644a0ed24c9bdc49e7ad757ee19e933dbb736cc3d715a5c8a025"
+    }
+  ],
+  "source_label": "landonorris-design-assets",
+  "total_bytes": 6499468
+}

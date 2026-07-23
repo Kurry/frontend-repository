@@ -93,7 +93,7 @@ export async function libraryCount(page: Page) {
 }
 
 export async function confirmDelete(page: Page, title: string) {
-  await page.getByRole('button', { name: `Delete ${title}` }).click()
+  await page.getByRole('button', { name: `Delete ${title}` }).first().click()
   const dialog = page.getByRole('dialog', { name: 'Delete prompt' })
   await expect(dialog).toBeVisible()
   await dialog.getByRole('button', { name: /Delete prompt/ }).click({ force: true })

@@ -6,11 +6,21 @@
   ],
   "scripts": {
     "build:webmcp-contracts": "npm run build -w @zto/webmcp-contracts",
+    "lint:playwright:changed": "node packages/corpuscheck/src/corpuscheck/assets/lint_changed_playwright.mjs",
     "test:webmcp-contracts": "npm run test -w @zto/webmcp-contracts",
     "typecheck:webmcp-contracts": "npm run typecheck -w @zto/webmcp-contracts"
   },
   "devDependencies": {
-    "@playwright/test": "^1.61.1",
-    "playwright": "^1.61.0"
+    "@playwright/test": "1.61.0",
+    "@typescript-eslint/parser": "8.63.0",
+    "eslint": "10.6.0",
+    "eslint-plugin-playwright": "2.10.5",
+    "playwright": "1.61.0",
+    "typescript": "6.0.3"
+  },
+  "overrides": {
+    "@eslint-community/eslint-utils": "4.9.0",
+    "@typescript-eslint/types": "8.63.0",
+    "flatted": "3.4.2"
   }
 }

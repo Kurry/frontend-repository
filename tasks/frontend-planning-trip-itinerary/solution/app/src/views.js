@@ -75,7 +75,7 @@ export function topbar() {
     h("div", { class: "spacer" }),
     h("div", { class: "seg hide-sm", role: "group", "aria-label": "Workspace document mode" },
       segBtn("Trip plan", icon.file, s.docMode !== "journal", () => { s.docMode = "plan"; S.emit(); setFocus("doc-plan"); }, "doc-plan"),
-      segBtn("Trip journal", icon.pencil, s.docMode === "journal", () => { s.docMode = "journal"; toast("Trip journal", "The journal view is a read-along companion in this demo trip.", "info"); setFocus("doc-journal"); }, "doc-journal")),
+      segBtn("Trip journal", icon.pencil, s.docMode === "journal", () => { s.docMode = "journal"; S.emit(); toast("Trip journal", "The journal view is a read-along companion in this demo trip.", "info"); setFocus("doc-journal"); }, "doc-journal")),
     h("button", { class: "btn primary", type: "button", html: icon.share + "<span>Share</span>", onclick: () => toast("Share trip", "A shareable link would be copied in the connected app; no outbound navigation here.", "info") }),
     ibtn(s.theme === "dark" ? "Switch to light theme" : "Switch to dark theme", s.theme === "dark" ? icon.sun : icon.moon, () => { setFocus("tb-theme"); S.toggleTheme(); }, "tb-theme"),
     ibtn("Export trip files", icon.download, () => openExport(), "tb-export"),
@@ -527,11 +527,11 @@ function spreadsheetTab() {
         const commit = () => {
           const v = inp.value;
           applyCell(x, col, v);
-          ssEditing = false; S.emit(); setFocus(`cell-${ri}-${ci}`);
+          ssEditing = false; setFocus(`cell-${ri}-${ci}`); S.emit();
         };
         inp.addEventListener("keydown", (e) => {
           if (e.key === "Enter") { e.preventDefault(); commit(); moveActive(1, 0); }
-          else if (e.key === "Escape") { e.preventDefault(); ssEditing = false; S.emit(); setFocus(`cell-${ri}-${ci}`); }
+          else if (e.key === "Escape") { e.preventDefault(); ssEditing = false; setFocus(`cell-${ri}-${ci}`); S.emit(); }
           else if (e.key === "Tab") { e.preventDefault(); commit(); moveActive(0, e.shiftKey ? -1 : 1); }
         });
         inp.addEventListener("blur", commit);
@@ -540,9 +540,9 @@ function spreadsheetTab() {
       } else {
         td.appendChild(h("span", { class: "cell", style: { display: "block", lineHeight: "28px", padding: "0 8px", pointerEvents: "none" } }, shown));
       }
-      td.addEventListener("click", () => { ssActive = { r: ri, c: ci }; ssEditing = false; S.emit(); setFocus(`cell-${ri}-${ci}`); });
-      td.addEventListener("dblclick", () => { ssActive = { r: ri, c: ci }; ssEditing = true; S.emit(); setFocus(`cell-${ri}-${ci}`); });
-      td.addEventListener("keydown", (e) => { if (e.key === "Enter" && !ssEditing) { e.preventDefault(); ssEditing = true; S.emit(); setFocus(`cell-${ri}-${ci}`); } else { cellKeydown(e, ri, ci, rows.length, cols.length); } });
+      td.addEventListener("click", () => { ssActive = { r: ri, c: ci }; ssEditing = false; setFocus(`cell-${ri}-${ci}`); S.emit(); });
+      td.addEventListener("dblclick", () => { ssActive = { r: ri, c: ci }; ssEditing = true; setFocus(`cell-${ri}-${ci}`); S.emit(); });
+      td.addEventListener("keydown", (e) => { if (e.key === "Enter" && !ssEditing) { e.preventDefault(); ssEditing = true; setFocus(`cell-${ri}-${ci}`); S.emit(); } else { cellKeydown(e, ri, ci, rows.length, cols.length); } });
       td.id = `cell-${ri}-${ci}`;
       tr.appendChild(td);
     });
@@ -574,7 +574,7 @@ function moveActive(dr, dc) {
   const s = st();
   const cols = 6 + s.customFields.length;
   ssActive = { r: clamp(ssActive.r + dr, 0, Math.max(0, s.expenses.length - 1)), c: clamp(ssActive.c + dc, 0, cols - 1) };
-  ssEditing = false; S.emit(); setFocus(`cell-${ssActive.r}-${ssActive.c}`);
+  ssEditing = false; setFocus(`cell-${ssActive.r}-${ssActive.c}`); S.emit();
 }
 function cellKeydown(e, ri, ci, rlen, clen) {
   if (ssEditing) return;
@@ -582,9 +582,9 @@ function cellKeydown(e, ri, ci, rlen, clen) {
   else if (e.key === "ArrowUp") { e.preventDefault(); moveActive(-1, 0); }
   else if (e.key === "ArrowRight") { e.preventDefault(); moveActive(0, 1); }
   else if (e.key === "ArrowLeft") { e.preventDefault(); moveActive(0, -1); }
-  else if (e.key === "Enter" || e.key === "F2") { e.preventDefault(); ssEditing = true; S.emit(); setFocus(`cell-${ri}-${ci}`); }
-  else if (e.key === " ") { e.preventDefault(); S.toggleRow(st().expenses[ri].id); setFocus(`cell-${ri}-${ci}`); }
-  else if (e.key.length === 1 && !e.metaKey && !e.ctrlKey) { ssEditing = true; S.emit(); setFocus(`cell-${ri}-${ci}`); }
+  else if (e.key === "Enter" || e.key === "F2") { e.preventDefault(); ssEditing = true; setFocus(`cell-${ri}-${ci}`); S.emit(); }
+  else if (e.key === " ") { e.preventDefault(); setFocus(`cell-${ri}-${ci}`); S.toggleRow(st().expenses[ri].id); }
+  else if (e.key.length === 1 && !e.metaKey && !e.ctrlKey) { ssEditing = true; setFocus(`cell-${ri}-${ci}`); S.emit(); }
 }
 function applyCell(x, col, v) {
   if (col.cf) { S.setCustomValue("exp:" + x.id, col.cf, col.type === "number" ? (v === "" ? "" : Number(v)) : v); return; }
@@ -887,8 +887,10 @@ function mkSelect(value, opts, fmt = (o) => o) { return h("select", { class: "se
 
 export function openStopForm(stop) {
   const s = st();
-  const editing = !!stop?.id;
-  const v = editing ? { ...stop } : { title: stop?.title || "", day: stop?.day || s.dayFilter || DATES[0], category: "sightseeing", location: "", startTime: "", endTime: "", notes: "" };
+  const editing = Boolean(stop?.id);
+  const v = editing
+    ? { ...stop }
+    : { title: "", day: s.dayFilter || DATES[0], category: "sightseeing", location: "", startTime: "", endTime: "", notes: "", ...(stop || {}) };
   const title = mkInput("text", v.title, { maxlength: "80" });
   const day = mkSelect(v.day, DATES, dayLabel);
   const category = mkSelect(v.category, STOP_CATS, cap);

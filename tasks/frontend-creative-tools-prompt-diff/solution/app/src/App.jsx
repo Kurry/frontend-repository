@@ -660,7 +660,23 @@ function AnnotationModal() {
   const range = state.selectedRange || { lineStart: 1, lineEnd: 1 };
   const existingThread = (state.annotations[state.selectedPromptId] || []).find((item) => item.lineStart === range.lineStart && item.lineEnd === range.lineEnd);
   const { register, handleSubmit, watch, reset, formState: { errors } } = useForm({ resolver: zodResolver(annotationCreateSchema), defaultValues: { bodyMarkdown: '', author: 'Mara Sol', lineStart: range.lineStart, lineEnd: range.lineEnd } });
-  useEffect(() => { if (isOpen) reset({ bodyMarkdown: '', author: 'Mara Sol', lineStart: range.lineStart, lineEnd: range.lineEnd }); }, [range.lineStart, range.lineEnd, reset, isOpen]);
+  useEffect(() => {
+    if (!isOpen) return;
+    const draft = useStudioStore.getState().annotationDraft;
+    const matchesRange = draft?.promptId === state.selectedPromptId && draft.lineStart === range.lineStart && draft.lineEnd === range.lineEnd;
+    reset(matchesRange ? { bodyMarkdown: draft.bodyMarkdown, author: draft.author, lineStart: draft.lineStart, lineEnd: draft.lineEnd } : { bodyMarkdown: '', author: 'Mara Sol', lineStart: range.lineStart, lineEnd: range.lineEnd });
+  }, [range.lineStart, range.lineEnd, reset, isOpen, state.selectedPromptId]);
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const subscription = watch((values) => useStudioStore.getState().setAnnotationDraft({
+      promptId: state.selectedPromptId,
+      bodyMarkdown: values.bodyMarkdown || '',
+      author: values.author || '',
+      lineStart: Number(values.lineStart),
+      lineEnd: Number(values.lineEnd),
+    }));
+    return () => subscription.unsubscribe();
+  }, [isOpen, state.selectedPromptId, watch]);
   const markdown = watch('bodyMarkdown') || '';
   const submit = (data) => {
     const result = useStudioStore.getState().postAnnotation({ ...data, lineStart: Number(data.lineStart), lineEnd: Number(data.lineEnd) });

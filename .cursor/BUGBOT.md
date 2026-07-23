@@ -326,12 +326,11 @@ of these rules is for the reviewer bot to spend the compute so humans don't have
    PR #1458: 4 of 6 advertised tools always returned success while changing
    nothing; PR #1474: the entire `webmcp_invoke_tool` was this pattern).
    BLOCKING; list every no-op tool by name.
-2. **Missing negative criteria in specialized dimension tomls.** The repo's
-   Reward Kit polarity gate requires `negate = true` entries in scored
-   dimensions; a newly-specialized `core_features`/`visual_design`/`motion`/
-   `technical` toml containing ONLY positive criteria fails that gate
-   (observed live, PR #1474: all four specialized tomls were positive-only).
-   BLOCKING — flag the toml(s) missing any `negate = true` entry.
+2. **Criterion polarity mismatch.** Negative criteria are allowed but are not
+   required. When a description asserts that a defect is present, it MUST use
+   `negate = true`; when `negate = true` is present, the description MUST state
+   the bad condition as present rather than describe its absence. BLOCKING —
+   flag each mismatched criterion, but never require a quota of negatives.
 3. **Dimension content mismatch.** Verify each specialized toml's criteria
    actually belong to its own dimension — a duplicated/copy-pasted section
    from another dimension (e.g. `accessibility.toml` containing `user_flows`
@@ -340,6 +339,24 @@ of these rules is for the reviewer bot to spend the compute so humans don't have
 4. Apply the existing Playwright-version-pin-drift check (scope-smuggling
    catalog) here too — new-task package.json/lockfiles drift from
    `tasks/_pins.py` just as often as suite-only PRs do.
+5. **Invalid criterion table key.** Dimension tomls MUST use `[[criterion]]`
+   — `[[criteria]]` (plural) is silently ignored by Reward Kit, so every
+   acceptance row in that table is skipped and the dimension effectively
+   grades nothing (observed live, PR #1526: all 5 `core_features` criteria
+   silently dropped this way). BLOCKING; grep every specialized toml for the
+   correct table name.
+6. **Nondeterministic seed/initial state.** The oracle's seeded/initial data
+   must be identical on every load — `Math.random()`, `Date.now()`, or any
+   other non-deterministic call used to construct seed state (not user
+   actions) breaks reproducibility across judge runs and reference
+   screenshots (observed live, PR #1540: initial locale-completeness pattern
+   randomized at module load via `Math.random() > 0.5`). BLOCKING.
+7. **Disallowed dependency license.** Apply the existing dependency-and-license
+   scan to every new runtime dependency. If its resolved license is GPL-2.0,
+   GPL-3.0, or AGPL-3.0, file the existing BLOCKING "Disallowed license
+   detected" Bug with the package, resolved version, and license (observed
+   live, PR #1540: `qrious` ^4.0.2 resolves GPL-3.0). Do not broaden the
+   blocked set beyond the repository policy in this section.
 
 ## Review depth expectations
 

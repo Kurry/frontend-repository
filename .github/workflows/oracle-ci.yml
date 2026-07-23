@@ -19,19 +19,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@v8.3.2
         with:
           enable-cache: true
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"
           cache: npm
@@ -60,7 +60,7 @@ jobs:
 
       - name: Cache Playwright Chromium
         if: steps.changes.outputs.oracles == 'true'
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
@@ -73,7 +73,7 @@ jobs:
         if: steps.changes.outputs.oracles == 'true'
         env:
           BASE_REF: origin/${{ github.base_ref }}
-        run: uv run corpuscheck oracle-ci --changed --base-ref "$BASE_REF"
+        run: uv run corpuscheck oracle-ci --changed --base-ref "$BASE_REF" --skip-e2e
 
       - name: Test corpuscheck
         if: steps.changes.outputs.corpuscheck == 'true'

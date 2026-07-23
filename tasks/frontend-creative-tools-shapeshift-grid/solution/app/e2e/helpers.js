@@ -55,14 +55,28 @@ export async function remove(page, name) {
 
 export async function removeAll(page) {
   await gallery(page)
+  const clearFilter = page.getByRole('button', { name: 'Clear filter' })
+  if (await clearFilter.isVisible()) {
+    await clearFilter.click()
+  } else {
+    await chooseTag(page, 'All tags').catch(() => {})
+  }
   while (await cards(page).count()) {
     const first = cards(page).first()
     const button = first.getByRole('button', { name: /^Delete / })
     const name = (await button.getAttribute('aria-label')).replace(/^Delete /, '')
     const card = cards(page).filter({ has: page.getByRole('heading', { name: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }) })
-    await button.click({ force: true })
-    await card.getByRole('button', { name: `Confirm delete ${name}` }).click({ force: true })
+    const confirm = card.getByRole('button', { name: `Confirm delete ${name}` })
+    await expect.poll(async () => {
+      if (await confirm.count()) return true
+      await button.click()
+      return false
+    }).toBe(true)
+    await confirm.click()
     await expect(card).toHaveCount(0)
+    if (await clearFilter.isVisible()) {
+      await clearFilter.click()
+    }
   }
 }
 

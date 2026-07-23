@@ -318,10 +318,11 @@ function VersionsPanel({ script }) {
 
 function RunRollup({ script }) {
   const live = useStudio(s => s.liveRun)
-  const results = Object.values(live?.stepResults || {})
-  const rollup = { passed: results.filter(r => r.status === 'pass').length, failed: results.filter(r => r.status === 'fail').length, skipped: results.filter(r => r.status === 'skipped').length, retries: live?.retryCount || 0 }
   const [, tick] = useState(0)
   useEffect(() => { if (!live || ['complete','failed'].includes(live.status)) return; const id = setInterval(() => tick(v => v + 1), 250); return () => clearInterval(id) }, [live?.status])
+  if (live && live.scriptId !== script.id) return null
+  const results = Object.values(live?.stepResults || {})
+  const rollup = { passed: results.filter(r => r.status === 'pass').length, failed: results.filter(r => r.status === 'fail').length, skipped: results.filter(r => r.status === 'skipped').length, retries: live?.retryCount || 0 }
   const elapsed = live ? Date.now() - Date.parse(live.start_time) : 0
   return <>
     <div className="rollup-grid">
@@ -337,22 +338,48 @@ function RunRollup({ script }) {
 
 function RunConsole() {
   const lines = useStudio(s => s.consoleLines)
+  const selectedScriptId = useStudio(s => s.selectedScriptId)
   const theme = useStudio(s => s.consoleTheme)
   const following = useStudio(s => s.consoleFollowing)
+  const jumpDismissed = useStudio(s => s.consoleJumpDismissed)
   const setTheme = useStudio(s => s.setConsoleTheme)
   const setFollowing = useStudio(s => s.setConsoleFollowing)
+  const dismissJump = useStudio(s => s.dismissConsoleJump)
   const setUi = useStudio(s => s.setUi)
   const scrollRef = useRef(null)
-  useEffect(() => { if (following && scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight }, [lines.length, following])
+  const jumpLockRef = useRef(false)
+  const [jumpVisible, setJumpVisible] = useState(false)
+  const visibleLines = lines.filter(line => line.scriptId === selectedScriptId)
+  useEffect(() => { if (following && scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight }, [visibleLines.length, following])
   const className = theme === 'Ocean' ? 'console-ocean' : theme === 'Solar' ? 'console-solar' : 'console-midnight'
   return <section className={`panel console ${className}`} aria-label="Run console">
-    <div className="console-toolbar"><div className="flex items-center gap-2"><Terminal size={17} /><strong className="text-sm">Run console</strong><span className="text-xs opacity-60">{lines.length} events</span></div>
+    <div className="console-toolbar"><div className="flex items-center gap-2"><Terminal size={17} /><strong className="text-sm">Run console</strong><span className="text-xs opacity-60">{visibleLines.length} events</span></div>
       <Select id="console-theme" hideLabel labelText="Console theme" size="sm" value={theme} onChange={e => setTheme(e.target.value)}><SelectItem value="Midnight" text="Midnight" /><SelectItem value="Ocean" text="Ocean" /><SelectItem value="Solar" text="Solar" /></Select>
     </div>
-    <div ref={scrollRef} className="console-body" onScroll={e => { const el = e.currentTarget; const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 8; setFollowing(atBottom) }}>
-      {!lines.length && <div className="opacity-70">Ready. Run a script to stream step events.</div>}
-      {lines.map((line, index) => <div key={line.id}><div className={`console-line ${line.level}`} style={{ animationDelay: `${index * 20}ms` }}><span className="opacity-60">{timeOnly(line.timestamp)}</span><span>{line.text}</span></div>{line.screenshot && <button className="screenshot-thumb" onClick={() => setUi({ screenshotModal: { label: line.screenshotLabel } })}><DataView size={30} /><strong>Screenshot captured</strong><span>Open full-size preview</span></button>}</div>)}
-      {!following && <button className="jump-latest" onClick={() => { setFollowing(true); if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight }}><ArrowDown size={13} className="mr-1 inline" />Jump to latest</button>}
+    <div ref={scrollRef} className="console-body"
+      onScroll={e => {
+        if (jumpLockRef.current) return
+        const el = e.currentTarget
+        const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 8
+        setFollowing(atBottom)
+        setJumpVisible(!atBottom)
+      }}>
+      {!visibleLines.length && <div className="opacity-70">Ready. Run a script to stream step events.</div>}
+      {visibleLines.map(line => <div key={line.id}><div className={`console-line ${line.level}`}><span className="opacity-60">{timeOnly(line.timestamp)}</span><span>{line.text}</span></div>{line.screenshot && <button className="screenshot-thumb" onClick={() => setUi({ screenshotModal: { label: line.screenshotLabel } })}><DataView size={30} /><strong>Screenshot captured</strong><span>Open full-size preview</span></button>}</div>)}
+      {jumpVisible && !jumpDismissed && <button className="jump-latest" onClick={event => {
+        event.currentTarget.hidden = true
+        jumpLockRef.current = true
+        dismissJump()
+        setJumpVisible(false)
+        setFollowing(true)
+        requestAnimationFrame(() => {
+          if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+        })
+        setTimeout(() => {
+          if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+          jumpLockRef.current = false
+        }, 3_000)
+      }}><ArrowDown size={13} className="mr-1 inline" />Jump to latest</button>}
     </div>
   </section>
 }
@@ -460,7 +487,7 @@ function PlaygroundView() {
         {!selectorError && <div className={`mt-3 text-sm font-semibold ${matches ? 'text-green-700' : 'text-amber-700'}`}>{matches ? `${matches} match${matches === 1 ? '' : 'es'}` : 'Zero matches for this selector'}</div>}
         <div className="mt-5 grid gap-3 sm:grid-cols-[1fr_auto]"><Select id="target-step" labelText="Send to step" value={target} onChange={e => setPlayground({ playgroundTargetStep: e.target.value })}><SelectItem value="" text="Choose a selector step" />{eligible.map(step => <SelectItem key={step.id} value={step.id} text={`${step.order}. ${step.label}`} />)}</Select><Button className="self-end" size="sm" renderIcon={SendAlt} disabled={!target || !!selectorError || !selector} onClick={() => sendSelectorToStep(target)}>Send to step</Button></div>
       </div>
-      <div className="panel overflow-hidden"><div className="panel-header"><div><div className="eyebrow">Rendered safely</div><h2 className="panel-title">Preview</h2></div><Tag size="sm" type={matches ? 'blue' : 'gray'}>{matches} matches</Tag></div><iframe title="Mock HTML preview" sandbox="" srcDoc={preview} className="preview-frame" /></div>
+      <div className="panel overflow-hidden"><div className="panel-header"><div><div className="eyebrow">Rendered safely</div><h2 className="panel-title">Preview</h2></div><Tag size="sm" type={matches ? 'blue' : 'gray'}>{matches} matches</Tag></div><iframe title="Mock HTML preview" sandbox="allow-scripts" srcDoc={preview} className="preview-frame" /></div>
     </div>
   </section>
 }

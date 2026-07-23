@@ -91,6 +91,9 @@
     if (state.sort === "title") return [...items].sort((a, b) => a.title.localeCompare(b.title));
     return [...items].sort((a, b) => (a.dayOrder ?? 9999) - (b.dayOrder ?? 9999) || stopTime(a).localeCompare(stopTime(b)));
   }
+  function chronological(items) {
+    return [...items].sort((a, b) => stopTime(a).localeCompare(stopTime(b)) || (a.dayOrder ?? 9999) - (b.dayOrder ?? 9999));
+  }
   function renumberDay(day) {
     sorted(state.stops.filter((item) => item.day === day)).forEach((item, index) => { item.dayOrder = index; });
   }
@@ -371,8 +374,24 @@
   function tripDocument() { return { schemaVersion: "1", trip: { title: els.tripTitle.textContent.trim(), dateStart: "2025-07-05", dateEnd: "2025-07-11" }, stops: state.stops.map(stopPayload) }; }
   function compileMarkdown() {
     const lines = [`# ${els.tripTitle.textContent.trim()}`, "", "July 5–11, 2025 · Côte d'Azur", ""];
-    DAYS.forEach((day) => { lines.push(`## ${day.label} — ${day.place}`); const items = sorted(state.stops.filter((item) => item.day === day.date)); if (!items.length) lines.push("- No stops planned"); items.forEach((item) => { lines.push(`- ${item.startTime || "All day"}${item.endTime ? `–${item.endTime}` : ""} — **${item.title}** · ${item.location} · ${fmtStatus(item.status)}`); if (item.notes) lines.push(`  - Notes: ${item.notes}`); }); lines.push(""); });
-    const ideas = state.stops.filter((item) => item.day === "unscheduled"); if (ideas.length) { lines.push("## Unscheduled ideas"); ideas.forEach((item) => { lines.push(`- **${item.title}** · ${item.location}`); if (item.notes) lines.push(`  - Notes: ${item.notes}`); }); }
+    DAYS.forEach((day) => {
+      lines.push(`## ${day.label} — ${day.place}`);
+      const items = chronological(state.stops.filter((item) => item.day === day.date));
+      if (!items.length) lines.push("- No stops planned");
+      items.forEach((item) => {
+        lines.push(`- ${item.startTime || "All day"}${item.endTime ? `–${item.endTime}` : ""} — **${item.title}** · ${item.location} · ${fmtStatus(item.status)}`);
+        if (item.notes) lines.push(`  - Notes: ${item.notes}`);
+      });
+      lines.push("");
+    });
+    const ideas = chronological(state.stops.filter((item) => item.day === "unscheduled"));
+    if (ideas.length) {
+      lines.push("## Unscheduled ideas");
+      ideas.forEach((item) => {
+        lines.push(`- **${item.title}** · ${item.location}`);
+        if (item.notes) lines.push(`  - Notes: ${item.notes}`);
+      });
+    }
     return lines.join("\n");
   }
   function icsEscape(value) { return String(value).replace(/\\/g, "\\\\").replace(/,/g, "\\,").replace(/;/g, "\\;").replace(/\n/g, "\\n"); }
@@ -560,7 +579,7 @@
     { title: "Build your day-by-day plan", copy: "Your itinerary stays in sync with the map and exports.", className: "step-plan" },
     { title: "Explore the map pane", copy: "Select numbered pins, switch layers, and focus one day at a time.", className: "step-map" },
     { title: "Collect ideas together", copy: "Open the ideas bucket and vote to promote a stop into the timeline.", className: "step-ideas" },
-  ]; let index = 0; const paint = () => { els.coachStep.textContent = `${index + 1} OF ${steps.length}`; els.coachTitle.textContent = steps[index].title; els.coachCopy.textContent = steps[index].copy; els.coachNext.textContent = index === steps.length - 1 ? "Start planning" : "Next"; els.coachmark.animate([{ opacity: .35, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 180 }); }; const close = () => els.coachmark.classList.add("hidden"); els.coachSkip.addEventListener("click", close); els.coachNext.addEventListener("click", () => { if (index === steps.length - 1) return close(); index++; paint(); }); paint(); }
+  ]; let index = 0; const paint = () => { els.coachStep.textContent = `${index + 1} OF ${steps.length}`; els.coachTitle.textContent = steps[index].title; els.coachCopy.textContent = steps[index].copy; els.coachNext.textContent = index === steps.length - 1 ? "Start planning" : "Next"; if (!matchMedia("(prefers-reduced-motion: reduce)").matches) els.coachmark.animate([{ opacity: .35, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 180 }); }; const close = () => els.coachmark.classList.add("hidden"); els.coachSkip.addEventListener("click", close); els.coachNext.addEventListener("click", () => { if (index === steps.length - 1) return close(); index++; paint(); }); paint(); }
 
   function registerWebMcp() {
     const destinations = ["overview", "day-detail", "activity-form", "export-canvas"];

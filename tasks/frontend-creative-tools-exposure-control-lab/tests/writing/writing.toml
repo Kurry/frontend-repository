@@ -1,0 +1,170 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+weight = 0.5
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "15.1"
+name = "uppercase_convention_on_dial_meter_mode"
+description = "Where the app renders dial titles, meter captions (UNDER EXPOSED / OVER EXPOSED), and mode labels, they keep one consistent uppercase convention throughout."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.2"
+name = "specific_verbs_on_actions"
+description = "Where the app renders button or action labels, they use specific verbs such as 'Apply preset', 'Copy stops', 'Download lab package', or 'Copy lab package' rather than generic 'Submit'/'OK' when a specific label is possible."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.3"
+name = "validation_names_problem_and_fix"
+description = "Where the app renders validation messages (for example empty preset name), they name the problem and the fix, not only a bare rejection like 'Invalid'."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.4"
+name = "empty_presets_copy_explains_next_step"
+description = "Where the app renders the empty presets state, the copy explains that no presets exist and how to create one."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.5"
+name = "help_explainers_polished"
+description = "Where the app renders help-panel explainers for aperture, shutter, and ISO, rate how free they are of spelling and grammatical errors and filler; each explainer should name the visible effect the control has on the preview."
+type = "likert"
+points = 5
+weight = 0.5
+
+[[criterion]]
+id = "15.6"
+name = "terminology_consistent_across_surfaces"
+description = "Where the app renders labels for the same concept in multiple places (APERTURE vs Aperture in help, SPEED vs Shutter Speed, ISO, presets), terminology stays consistent rather than inventing conflicting names for the same dial."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.7"
+name = "stop_readout_formatting_consistent"
+description = "Where the app renders stop values, formatting is consistent: aperture as f/N, shutter as 1/N, ISO as a bare integer — the same conventions in dials and preset stop readouts."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.8"
+name = "success_or_apply_feedback_specific"
+description = "Where the app renders confirmation or success feedback after applying or saving a preset, the copy states what happened rather than a vague affirmation alone."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.9"
+name = "import_error_names_problem"
+description = "Where the app renders an import error for malformed lab-package JSON, the copy names the problem and the fix rather than a bare rejection."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.10"
+name = "slider_and_look_names_exact"
+description = "Where develop sliders and looks appear, the slider names Exposure, Contrast, Highlights, Shadows, Whites, Blacks, Texture, Clarity, Vignette, and Grain and the look names Punch, Matte, Golden, and Mono render exactly and consistently"
+type = "binary"
+weight = 0.5
+

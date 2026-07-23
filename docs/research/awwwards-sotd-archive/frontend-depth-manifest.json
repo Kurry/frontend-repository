@@ -1,0 +1,13 @@
+{
+  "css_feature_pairs": 2131,
+  "css_features": 66,
+  "generated_at": "2026-07-22T16:00:24+00:00",
+  "mirrored_html_sites": 4434,
+  "retained_advanced_asset_bytes": 61195478,
+  "retained_advanced_asset_files": 39,
+  "runtime_signals": 13,
+  "sites_with_css": 2210,
+  "sites_with_referenced_advanced_assets": 275,
+  "sites_with_retained_advanced_assets": 14,
+  "svg_retention_policy": "retained_as_vector_code_asset"
+}

@@ -81,7 +81,24 @@ function announceStatus(get, agentName, nextStatus, detail = '') {
 }
 
 function mutationSnapshot(state) {
-  return { agents: clone(state.agents), detailAgentId: state.detailAgentId }
+  return {
+    agents: clone(state.agents),
+    detailAgentId: state.detailAgentId
+  }
+}
+
+function mergeAgentsWithCurrentRunState(previousAgents, currentAgents) {
+  return previousAgents.map(prev => {
+    const current = currentAgents.find(a => a.id === prev.id)
+    if (current) {
+      return { ...prev, status: current.status, lastSeen: current.lastSeen, timeline: current.timeline, activity: current.activity, run: current.run, runSerial: current.runSerial, failureScenario: current.failureScenario }
+    }
+    // Agent isn't present in the current state (e.g. it was removed by a
+    // later mutation and undo is now restoring it) — the snapshot already
+    // carries its full last-known state, so use it as-is instead of
+    // dropping down to a bare identity record.
+    return prev
+  })
 }
 
 function restoreImportedRun(agentId, source) {
@@ -128,7 +145,7 @@ export const useFleetStore = create((set, get) => ({
   addToast: (title, kind = 'success') => {
     const id = uid('toast')
     set((state) => ({ toasts: [...state.toasts, { id, title, kind }] }))
-    setTimeout(() => get().dismissToast(id), 3600)
+
   },
   dismissToast: (id) => set((state) => ({ toasts: state.toasts.filter((toast) => toast.id !== id) })),
   announce: (announcement) => set({ announcement }),
@@ -172,7 +189,7 @@ export const useFleetStore = create((set, get) => ({
     }))
     get().addToast(`${agent.name} registered`)
     restoreFocus()
-    setTimeout(() => set((state) => ({ agents: state.agents.map((item) => item.id === id ? { ...item, isNew: false } : item), registerLock: false })), 260)
+    set({ registerLock: false })
     return { ok: true, agent }
   },
 
@@ -205,7 +222,11 @@ export const useFleetStore = create((set, get) => ({
       get().addToast('Another agent removal is already in progress', 'error')
       return false
     }
-    set({ exitingAgentId: agentId, announcement: `Removing ${target.name}` })
+    set((current) => ({
+      agents: current.agents.map((agent) => agent.id === agentId ? { ...agent, isNew: false } : agent),
+      exitingAgentId: agentId,
+      announcement: `Removing ${target.name}`,
+    }))
     pendingRemovalTimer = window.setTimeout(() => {
       pendingRemovalTimer = null
       const current = get()
@@ -225,7 +246,7 @@ export const useFleetStore = create((set, get) => ({
         announcement: `${target.name} removed`,
       }))
       get().addToast(`${target.name} removed`)
-    }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 210)
+    }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 300)
     return true
   },
 
@@ -242,7 +263,7 @@ export const useFleetStore = create((set, get) => ({
     if (!state.undoStack.length) return false
     const previous = state.undoStack.at(-1)
     set({
-      agents: clone(previous.agents),
+      agents: mergeAgentsWithCurrentRunState(previous.agents, state.agents),
       detailAgentId: previous.detailAgentId,
       selectedIds: state.selectedIds.filter((id) => previous.agents.some((agent) => agent.id === id)),
       undoStack: state.undoStack.slice(0, -1),
@@ -261,7 +282,7 @@ export const useFleetStore = create((set, get) => ({
     if (!state.redoStack.length) return false
     const next = state.redoStack.at(-1)
     set({
-      agents: clone(next.agents),
+      agents: mergeAgentsWithCurrentRunState(next.agents, state.agents),
       detailAgentId: next.detailAgentId,
       selectedIds: state.selectedIds.filter((id) => next.agents.some((agent) => agent.id === id)),
       undoStack: [...state.undoStack, mutationSnapshot(state)],
@@ -449,8 +470,8 @@ export const useFleetStore = create((set, get) => ({
       })
     }
   },
-  copyExport: async () => {
-    const text = get().exportPreviewText || JSON.stringify(compileSnapshot(get().agents), null, 2)
+  copyExport: async (visibleText) => {
+    const text = visibleText || get().exportPreviewText || JSON.stringify(compileSnapshot(get().agents), null, 2)
     try {
       await navigator.clipboard.writeText(text)
       get().addToast('Fleet JSON copied')
@@ -461,15 +482,17 @@ export const useFleetStore = create((set, get) => ({
       return false
     }
   },
-  downloadExport: () => {
-    const text = get().exportPreviewText || JSON.stringify(compileSnapshot(get().agents), null, 2)
+  downloadExport: (visibleText) => {
+    const text = visibleText || get().exportPreviewText || JSON.stringify(compileSnapshot(get().agents), null, 2)
     const blob = new Blob([text], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const anchor = document.createElement('a')
     anchor.href = url
     anchor.download = `fleet-snapshot-${new Date().toISOString().slice(0, 10)}.json`
+    document.body.appendChild(anchor)
     anchor.click()
-    URL.revokeObjectURL(url)
+    document.body.removeChild(anchor)
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
   },
   openImport: () => { captureFocus(); set({ importOpen: true, importError: '', paletteOpen: false, exportOpen: false, modal: null }) },
   closeImport: () => { set({ importOpen: false, importError: '' }); restoreFocus() },

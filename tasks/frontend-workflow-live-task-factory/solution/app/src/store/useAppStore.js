@@ -37,8 +37,8 @@ const deterministicCreatedAt = (repo, prNumber) => `2026-06-${String((prNumber %
 function stripCredentialMaterial(value) {
   if (typeof value !== 'string') return value
   return value
-    .replace(/ghp_[A-Za-z0-9_]+/g, '[redacted-github-token]')
-    .replace(/(?<![A-Za-z0-9])sk-[A-Za-z0-9_-]+/g, '[redacted-ai-key]')
+    .replace(/\bghp_[A-Za-z0-9]{20,}\b/g, '[redacted-github-token]')
+    .replace(/\bsk-[A-Za-z0-9_-]{20,}\b/g, '[redacted-ai-key]')
 }
 
 const stageTemplate = () => [

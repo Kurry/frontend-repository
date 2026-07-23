@@ -115,7 +115,6 @@ export default function ImportModal({ launcherButtonRef }) {
       onRequestSubmit={attemptImport}
       onRequestClose={close}
       onSecondarySubmit={close}
-      preventCloseOnClickOutside={false}
       size="md"
       className="scale-modal"
       selectorPrimaryFocus="#import-document-text"

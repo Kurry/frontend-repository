@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures';
-import { fillEvaluate, openApp, openRun, openSubmit, submitAndGetNewRun } from './helpers';
+import { fillEvaluate, liveRegionLog, openApp, openRun, openSubmit, submitAndGetNewRun, watchLiveRegions } from './helpers';
 
 test.beforeEach(async ({ page }) => openApp(page));
 
@@ -24,8 +24,14 @@ test('1.3 images_and_icons_have_alt_text', async ({ page }) => {
 });
 
 test('1.4 feedback_uses_live_regions', async ({ page }) => {
+  // The polite live region(s) hold only the latest announcement, and the
+  // board's background simulation can push its own announcement (a seeded
+  // run completing) at any point, including before this test ever reads the
+  // region — even an immediate read after submission can miss it. Record
+  // the region's full history instead of a point-in-time snapshot.
+  await watchLiveRegions(page);
   const dialog = await fillEvaluate(page); await submitAndGetNewRun(page, dialog);
-  await expect(page.locator('.sr-only[aria-live="polite"]').filter({ hasText: /submitted/ })).toBeAttached();
+  expect((await liveRegionLog(page)).some((text) => /submitted/.test(text))).toBe(true);
   await openSubmit(page); await page.setInputFiles('#job-config-file', { name: 'bad.json', mimeType: 'application/json', buffer: Buffer.from('{bad') });
   await expect(page.locator('.field-error[role="alert"]')).toContainText('Import rejected');
 });

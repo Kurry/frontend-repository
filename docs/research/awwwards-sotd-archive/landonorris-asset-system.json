@@ -1,0 +1,547 @@
+{
+  "available": true,
+  "category_counts": {
+    "3d_model": 5,
+    "environment_map": 3,
+    "gpu_texture": 13,
+    "other": 5,
+    "vector_animation": 8,
+    "webassembly": 1
+  },
+  "file_count": 35,
+  "files": [
+    {
+      "bytes": 23588,
+      "category": "other",
+      "extension": "woff2",
+      "metadata": {},
+      "path": "67b6113a220f85ad6497495a_Brier-Bold.woff2",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 167476,
+      "category": "other",
+      "extension": "woff2",
+      "metadata": {},
+      "path": "67bc6274c5b4108b123aa4d5_MonaSans-VariableFont_wdth%2Cwght.woff2",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 167476,
+      "category": "other",
+      "extension": "woff2",
+      "metadata": {},
+      "path": "67bc6274c5b4108b123aa4d5_MonaSans-VariableFont_wdth,wght.woff2",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 57529,
+      "category": "other",
+      "extension": "js",
+      "metadata": {},
+      "path": "basis/basis_transcoder.js",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 527333,
+      "category": "webassembly",
+      "extension": "wasm",
+      "metadata": {
+        "wasm_version": 1
+      },
+      "path": "basis/basis_transcoder.wasm",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 392675,
+      "category": "environment_map",
+      "extension": "hdr",
+      "metadata": {
+        "pixel_height": 256,
+        "pixel_width": 512
+      },
+      "path": "hdri/studio_small_08_1k--dark.hdr",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 175712,
+      "category": "environment_map",
+      "extension": "hdr",
+      "metadata": {
+        "pixel_height": 256,
+        "pixel_width": 512
+      },
+      "path": "hdri/studio_small_08_1k--faded.hdr",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 386788,
+      "category": "environment_map",
+      "extension": "hdr",
+      "metadata": {
+        "pixel_height": 256,
+        "pixel_width": 512
+      },
+      "path": "hdri/studio_small_08_1k--light.hdr",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 358984,
+      "category": "3d_model",
+      "extension": "glb",
+      "metadata": {
+        "animations": 0,
+        "declared_bytes": 358984,
+        "extensions_required": [
+          "KHR_draco_mesh_compression"
+        ],
+        "extensions_used": [
+          "KHR_draco_mesh_compression"
+        ],
+        "glb_version": 2,
+        "materials": 0,
+        "meshes": 1,
+        "nodes": 15,
+        "scenes": 1,
+        "textures": 0
+      },
+      "path": "models/disco-02.glb",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 139492,
+      "category": "3d_model",
+      "extension": "glb",
+      "metadata": {
+        "animations": 0,
+        "declared_bytes": 139492,
+        "extensions_required": [
+          "KHR_draco_mesh_compression"
+        ],
+        "extensions_used": [
+          "KHR_draco_mesh_compression"
+        ],
+        "glb_version": 2,
+        "materials": 0,
+        "meshes": 3,
+        "nodes": 3,
+        "scenes": 1,
+        "textures": 0
+      },
+      "path": "models/helmet-21.glb",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 29664,
+      "category": "3d_model",
+      "extension": "glb",
+      "metadata": {
+        "animations": 0,
+        "declared_bytes": 29664,
+        "extensions_required": [
+          "EXT_texture_webp",
+          "KHR_draco_mesh_compression"
+        ],
+        "extensions_used": [
+          "EXT_texture_webp",
+          "KHR_draco_mesh_compression"
+        ],
+        "glb_version": 2,
+        "materials": 2,
+        "meshes": 2,
+        "nodes": 2,
+        "scenes": 1,
+        "textures": 2
+      },
+      "path": "models/sotd.glb",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 463920,
+      "category": "3d_model",
+      "extension": "glb",
+      "metadata": {
+        "animations": 0,
+        "declared_bytes": 463920,
+        "extensions_required": [],
+        "extensions_used": [],
+        "glb_version": 2,
+        "materials": 0,
+        "meshes": 24,
+        "nodes": 538,
+        "scenes": 1,
+        "textures": 0
+      },
+      "path": "models/tracks/tracks-05.glb",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 463904,
+      "category": "3d_model",
+      "extension": "glb",
+      "metadata": {
+        "animations": 0,
+        "declared_bytes": 463904,
+        "extensions_required": [],
+        "extensions_used": [],
+        "glb_version": 2,
+        "materials": 0,
+        "meshes": 24,
+        "nodes": 538,
+        "scenes": 1,
+        "textures": 0
+      },
+      "path": "models/tracks/tracks.glb",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 4144,
+      "category": "vector_animation",
+      "extension": "riv",
+      "metadata": {},
+      "path": "rive/btn-ui.riv",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 36636,
+      "category": "vector_animation",
+      "extension": "riv",
+      "metadata": {},
+      "path": "rive/circuits.riv",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 3770,
+      "category": "vector_animation",
+      "extension": "riv",
+      "metadata": {},
+      "path": "rive/ln4.riv",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 52818,
+      "category": "vector_animation",
+      "extension": "riv",
+      "metadata": {},
+      "path": "rive/mob-landscape.riv",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 5508,
+      "category": "vector_animation",
+      "extension": "riv",
+      "metadata": {},
+      "path": "rive/page-transition.riv",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 68650,
+      "category": "vector_animation",
+      "extension": "riv",
+      "metadata": {},
+      "path": "rive/phrases.riv",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 72667,
+      "category": "vector_animation",
+      "extension": "riv",
+      "metadata": {},
+      "path": "rive/reef.riv",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 30851,
+      "category": "vector_animation",
+      "extension": "riv",
+      "metadata": {},
+      "path": "rive/signature.riv",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 24838,
+      "category": "other",
+      "extension": "webp",
+      "metadata": {},
+      "path": "textures-original/fonts__MonaSans-Bold-02.webp",
+      "pbr_roles": []
+    },
+    {
+      "bytes": 90920,
+      "category": "gpu_texture",
+      "extension": "ktx2",
+      "metadata": {
+        "face_count": 1,
+        "layer_count": 0,
+        "level_count": 12,
+        "pixel_depth": 0,
+        "pixel_height": 2048,
+        "pixel_width": 2048,
+        "supercompression_scheme": 1,
+        "type_size": 1,
+        "vk_format": 0
+      },
+      "path": "textures-original/textures__glass__ktx2__Norris_Glass_mat_BaseColor.ktx2",
+      "pbr_roles": [
+        "base_color"
+      ]
+    },
+    {
+      "bytes": 39065,
+      "category": "gpu_texture",
+      "extension": "ktx2",
+      "metadata": {
+        "face_count": 1,
+        "layer_count": 0,
+        "level_count": 12,
+        "pixel_depth": 0,
+        "pixel_height": 2048,
+        "pixel_width": 2048,
+        "supercompression_scheme": 2,
+        "type_size": 1,
+        "vk_format": 0
+      },
+      "path": "textures-original/textures__glass__ktx2__Norris_Glass_mat_Metallic.ktx2",
+      "pbr_roles": [
+        "metallic"
+      ]
+    },
+    {
+      "bytes": 217570,
+      "category": "gpu_texture",
+      "extension": "ktx2",
+      "metadata": {
+        "face_count": 1,
+        "layer_count": 0,
+        "level_count": 12,
+        "pixel_depth": 0,
+        "pixel_height": 2048,
+        "pixel_width": 2048,
+        "supercompression_scheme": 2,
+        "type_size": 1,
+        "vk_format": 0
+      },
+      "path": "textures-original/textures__glass__ktx2__Norris_Glass_mat_Roughness.ktx2",
+      "pbr_roles": [
+        "roughness"
+      ]
+    },
+    {
+      "bytes": 172037,
+      "category": "gpu_texture",
+      "extension": "ktx2",
+      "metadata": {
+        "face_count": 1,
+        "layer_count": 0,
+        "level_count": 12,
+        "pixel_depth": 0,
+        "pixel_height": 2048,
+        "pixel_width": 2048,
+        "supercompression_scheme": 2,
+        "type_size": 1,
+        "vk_format": 0
+      },
+      "path": "textures-original/textures__head__ktx2__alpha.ktx2",
+      "pbr_roles": [
+        "alpha"
+      ]
+    },
+    {
+      "bytes": 66599,
+      "category": "gpu_texture",
+      "extension": "ktx2",
+      "metadata": {
+        "face_count": 1,
+        "layer_count": 0,
+        "level_count": 10,
+        "pixel_depth": 0,
+        "pixel_height": 512,
+        "pixel_width": 512,
+        "supercompression_scheme": 2,
+        "type_size": 1,
+        "vk_format": 0
+      },
+      "path": "textures-original/textures__head__ktx2__depth.ktx2",
+      "pbr_roles": [
+        "depth"
+      ]
+    },
+    {
+      "bytes": 334987,
+      "category": "gpu_texture",
+      "extension": "ktx2",
+      "metadata": {
+        "face_count": 1,
+        "layer_count": 0,
+        "level_count": 12,
+        "pixel_depth": 0,
+        "pixel_height": 2048,
+        "pixel_width": 2048,
+        "supercompression_scheme": 1,
+        "type_size": 1,
+        "vk_format": 0
+      },
+      "path": "textures-original/textures__head__ktx2__diffuse.ktx2",
+      "pbr_roles": [
+        "base_color"
+      ]
+    },
+    {
+      "bytes": 321721,
+      "category": "gpu_texture",
+      "extension": "ktx2",
+      "metadata": {
+        "face_count": 1,
+        "layer_count": 0,
+        "level_count": 12,
+        "pixel_depth": 0,
+        "pixel_height": 2048,
+        "pixel_width": 2048,
+        "supercompression_scheme": 1,
+        "type_size": 1,
+        "vk_format": 0
+      },
+      "path": "textures-original/textures__head__ktx2__shadow-softer-edit.ktx2",
+      "pbr_roles": [
+        "shadow"
+      ]
+    },
+    {
+      "bytes": 319542,
+      "category": "gpu_texture",
+      "extension": "ktx2",
+      "metadata": {
+        "face_count": 1,
+        "layer_count": 0,
+        "level_count": 12,
+        "pixel_depth": 0,
+        "pixel_height": 2048,
+        "pixel_width": 2048,
+        "supercompression_scheme": 1,
+        "type_size": 1,
+        "vk_format": 0
+      },
+      "path": "textures-original/textures__head__ktx2__shadow.ktx2",
+      "pbr_roles": [
+        "shadow"
+      ]
+    },
+    {
+      "bytes": 66610,
+      "category": "gpu_texture",
+      "extension": "ktx2",
+      "metadata": {
+        "face_count": 1,
+        "layer_count": 0,
+        "level_count": 12,
+        "pixel_depth": 0,
+        "pixel_height": 2048,
+        "pixel_width": 2048,
+        "supercompression_scheme": 2,
+        "type_size": 1,
+        "vk_format": 0
+      },
+      "path": "textures-original/textures__helmet__ktx2__Norris_Helmet_mat_Metallic.ktx2",
+      "pbr_roles": [
+        "metallic"
+      ]
+    },
+    {
+      "bytes": 364243,
+      "category": "gpu_texture",
+      "extension": "ktx2",
+      "metadata": {
+        "face_count": 1,
+        "layer_count": 0,
+        "level_count": 12,
+        "pixel_depth": 0,
+        "pixel_height": 2048,
+        "pixel_width": 2048,
+        "supercompression_scheme": 2,
+        "type_size": 1,
+        "vk_format": 0
+      },
+      "path": "textures-original/textures__helmet__ktx2__Norris_Helmet_mat_Roughness.ktx2",
+      "pbr_roles": [
+        "roughness"
+      ]
+    },
+    {
+      "bytes": 96371,
+      "category": "gpu_texture",
+      "extension": "ktx2",
+      "metadata": {
+        "face_count": 1,
+        "layer_count": 0,
+        "level_count": 12,
+        "pixel_depth": 0,
+        "pixel_height": 2048,
+        "pixel_width": 2048,
+        "supercompression_scheme": 1,
+        "type_size": 1,
+        "vk_format": 0
+      },
+      "path": "textures-original/textures__helmet__ktx2__disco__Norris_Helmet_mat_BaseColor.ktx2",
+      "pbr_roles": [
+        "base_color"
+      ]
+    },
+    {
+      "bytes": 470727,
+      "category": "gpu_texture",
+      "extension": "ktx2",
+      "metadata": {
+        "face_count": 1,
+        "layer_count": 0,
+        "level_count": 11,
+        "pixel_depth": 0,
+        "pixel_height": 1024,
+        "pixel_width": 1024,
+        "supercompression_scheme": 2,
+        "type_size": 1,
+        "vk_format": 0
+      },
+      "path": "textures-original/textures__helmet__ktx2__disco__disco_mask-01.ktx2",
+      "pbr_roles": [
+        "mask"
+      ]
+    },
+    {
+      "bytes": 284653,
+      "category": "gpu_texture",
+      "extension": "ktx2",
+      "metadata": {
+        "face_count": 1,
+        "layer_count": 0,
+        "level_count": 12,
+        "pixel_depth": 0,
+        "pixel_height": 2048,
+        "pixel_width": 2048,
+        "supercompression_scheme": 1,
+        "type_size": 1,
+        "vk_format": 0
+      },
+      "path": "textures-original/textures__helmet__ktx2__gold__Norris_Helmet_mat_BaseColor.ktx2",
+      "pbr_roles": [
+        "base_color"
+      ]
+    }
+  ],
+  "pbr_role_counts": {
+    "alpha": 1,
+    "base_color": 4,
+    "depth": 1,
+    "mask": 1,
+    "metallic": 2,
+    "roughness": 2,
+    "shadow": 2
+  },
+  "production_systems": {
+    "basis_transcode_pipeline": true,
+    "compressed_3d_pipeline": true,
+    "hdr_lighting_variants": 3,
+    "rive_state_machine_assets": 8
+  },
+  "source_label": "landonorris-design-assets",
+  "total_bytes": 6499468
+}

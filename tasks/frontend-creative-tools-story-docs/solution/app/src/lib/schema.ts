@@ -82,7 +82,7 @@ const packagedSceneSchema = z.object({
     .number({ required_error: 'order is required' })
     .int('order must be an integer')
     .min(1, 'order must be at least 1'),
-});
+}).strict();
 
 export const storyboardPackageSchema = z
   .object({
@@ -99,11 +99,23 @@ export const storyboardPackageSchema = z
       .array(packagedSceneSchema, {
         required_error: 'scenes is required',
         invalid_type_error: 'scenes must be an array',
-      })
-      .min(1, 'scenes must contain at least one scene'),
-    generatedAt: z.string().optional(),
+      }),
+    generatedAt: z
+      .string({ required_error: 'generatedAt is required' })
+      .datetime({ message: 'generatedAt must be an ISO-8601 datetime ending in Z' }),
   })
-  .passthrough();
+  .strict()
+  .superRefine((pkg, ctx) => {
+    pkg.scenes.forEach((scene, index) => {
+      if (scene.order !== index + 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['scenes', index, 'order'],
+          message: `order must be ${index + 1} to match the scene's board position`,
+        });
+      }
+    });
+  });
 
 export type StoryboardPackage = {
   schemaVersion: 1;

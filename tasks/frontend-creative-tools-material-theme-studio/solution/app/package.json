@@ -5,8 +5,8 @@
     "dev": "vite",
     "build": "vite build",
     "test:e2e": "playwright test",
-    "verify:build": "vite build",
-    "start": "vite --host 0.0.0.0 --port 3000",
+    "verify:build": "vite build && node -e \"require('fs').accessSync('dist/index.html')\"",
+    "start": "npx serve -s dist -l 3000",
     "test:e2e:canonical": "playwright test -c e2e.playwright.config.mjs"
   },
   "dependencies": {

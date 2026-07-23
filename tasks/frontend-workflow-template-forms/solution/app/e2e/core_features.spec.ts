@@ -158,7 +158,13 @@ test('1.9 reference_document_attachments', async ({ page }) => {
     await expect(badge).toBeVisible()
     await badge.hover()
     await expect(badge.getByRole('tooltip')).toContainText('PDF')
-    await badge.getByRole('button', { name: 'Remove brand-voice-guide.pdf' }).click()
+    const remove = badge.getByRole('button', { name: 'Remove brand-voice-guide.pdf' })
+    await remove.evaluate(async (node) => {
+      const animations = []
+      for (let current = node; current; current = current.parentElement) animations.push(...current.getAnimations())
+      await Promise.allSettled(animations.map((animation) => animation.finished))
+    })
+    await remove.click()
     await expect(badge).toHaveCount(0)
   }
 })

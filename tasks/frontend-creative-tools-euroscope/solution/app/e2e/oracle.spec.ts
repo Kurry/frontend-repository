@@ -52,3 +52,21 @@ test("theme, icon count, and wizard step remain coherent through reload", async 
     .toEqual(grey);
   expect(pageErrors).toEqual([]);
 });
+
+test("base selectors respond to arrow keys", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+
+  await page.getByRole("button", { name: /continue/i }).click();
+  const theme = page.getByLabel("Base theme");
+  await theme.focus();
+  await page.keyboard.press("ArrowDown");
+  await expect(theme).toHaveValue("Grey");
+
+  await page.getByRole("button", { name: /continue/i }).click();
+  const iconSet = page.getByLabel("Base icon set");
+  await iconSet.focus();
+  await page.keyboard.press("ArrowUp");
+  await expect(iconSet).toHaveValue("none");
+});

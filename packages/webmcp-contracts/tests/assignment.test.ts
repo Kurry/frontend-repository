@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
@@ -40,7 +40,7 @@ describe("assignment map", () => {
     ).toThrow(BindingValidationError);
   });
 
-  it("loads the canonical 103-task assignment inventory", () => {
+  it("matches the canonical task assignment inventory", () => {
     const path = join(
       root,
       "packages/corpuscheck/src/corpuscheck/schemas/webmcp-assignments.json",
@@ -61,8 +61,21 @@ describe("assignment map", () => {
       task: string;
       modules: string[];
     }>;
-    expect(entries).toHaveLength(103);
-    expect(new Set(entries.map((e) => e.task)).size).toBe(103);
+    const assignmentTasks = entries.map((entry) => entry.task);
+    const repositoryTasks = new Set(
+      ["tasks", "tasks-quarantine"].flatMap((directory) =>
+        readdirSync(join(root, directory), { withFileTypes: true })
+          .filter(
+            (entry) =>
+              entry.isDirectory() && entry.name.startsWith("frontend-"),
+          )
+          .map((entry) => entry.name),
+      ),
+    );
+    expect(new Set(assignmentTasks).size).toBe(entries.length);
+    expect([...new Set(assignmentTasks)].sort()).toEqual(
+      [...repositoryTasks].sort(),
+    );
     for (const e of entries) {
       expect(e.task).toMatch(/^frontend-[a-z0-9-]+$/);
       expect(e.modules.length).toBeGreaterThanOrEqual(1);

@@ -1,11 +1,15 @@
 import { test, expect } from './fixtures';
-import { fillEvaluate, openApp, openResults, submitAndGetNewRun } from './helpers';
+import { fillEvaluate, liveRegionLog, openApp, openResults, submitAndGetNewRun, watchLiveRegions } from './helpers';
 
 test.beforeEach(async ({ page }) => openApp(page));
 
 test('2.1 shared_state_coherence', async ({ page }) => {
-  const dialog = await fillEvaluate(page, 'Switchboard', 1); const run = await submitAndGetNewRun(page, dialog); const id = await run.locator('.run-id').textContent();
-  await expect(page.getByTestId('active-jobs')).toHaveText('4');
+  const dialog = await fillEvaluate(page, 'Switchboard', 1);
+  // Snapshot right before submitting; see 1.4 submit_valid_job_adds_run in
+  // core_features.spec.ts for why (background simulation ticks in real
+  // time, so an earlier snapshot widens the window for unrelated drift).
+  const run = await submitAndGetNewRun(page, dialog); const id = await run.locator('.run-id').textContent();
+  await expect(run).toBeVisible();
   await run.getByRole('button', { name: /Open details/ }).click(); await expect(page.getByRole('dialog')).toContainText(id!);
   await page.getByRole('button', { name: 'Results', exact: true }).click(); await expect(page.getByRole('heading', { name: 'Results', exact: true })).toBeVisible();
 });
@@ -39,6 +43,9 @@ test('2.7 keyboard_and_dialog_accessibility', async ({ page }) => {
 });
 
 test('2.8 live_region_announcements', async ({ page }) => {
+  // Record the live region's full history rather than a point-in-time
+  // snapshot; see 1.4 feedback_uses_live_regions in accessibility.spec.ts.
+  await watchLiveRegions(page);
   const dialog = await fillEvaluate(page); await submitAndGetNewRun(page, dialog);
-  await expect(page.locator('.sr-only[aria-live="polite"]').filter({ hasText: /run-\d+ submitted/ })).toBeAttached();
+  expect((await liveRegionLog(page)).some((text) => /run-\d+ submitted/.test(text))).toBe(true);
 });

@@ -37,7 +37,7 @@ async function runDelay(get, token, ms) {
 }
 
 function addConsole(set, get, level, text, stepId, extra = {}) {
-  const line = { id: makeId('line'), timestamp: isoNow(), level, text, stepId, ...extra }
+  const line = { id: makeId('line'), timestamp: isoNow(), scriptId: get().liveRun?.scriptId ?? null, level, text, stepId, ...extra }
   set({ consoleLines: [...get().consoleLines, line].slice(-500) })
 }
 
@@ -100,6 +100,7 @@ async function executeRun(set, get, token, startIndex = 0, forceCurrentPass = fa
       const live = get().liveRun
       set({ liveRun: { ...live, currentIndex: index, currentStepId: step.id, stepResults: { ...live.stepResults, [step.id]: result } } })
       addEvent(set, get, step, 'skipped', `${step.label}: Skipped`)
+      if (!(await runDelay(get, token, 50))) return
       addConsole(set, get, 'skipped', `[${step.type}] ${step.label} — Skipped`, step.id)
       continue
     }
@@ -111,7 +112,6 @@ async function executeRun(set, get, token, startIndex = 0, forceCurrentPass = fa
       set({ liveRun: { ...live, status: 'running', currentIndex: index, currentStepId: step.id, attempt, countdown: null,
         stepResults: { ...live.stepResults, [step.id]: { stepId: step.id, order: step.order, type: step.type, label: step.label, status: 'running', attempts: attempt, timestamp: isoNow() } } } })
       addEvent(set, get, step, 'running', `${step.label}: Running (attempt ${attempt})`)
-      addConsole(set, get, 'running', `[${step.type}] ${step.label} — attempt ${attempt}`, step.id)
       if (!(await runDelay(get, token, step.type === 'wait' ? Math.min(Number(step.params.ms) || 300, 900) : 240))) return
 
       const invalid = !paramSchemas[step.type].safeParse(step.params).success
@@ -126,7 +126,8 @@ async function executeRun(set, get, token, startIndex = 0, forceCurrentPass = fa
         const current = get().liveRun
         set({ liveRun: { ...current, stepResults: { ...current.stepResults, [step.id]: result } } })
         addEvent(set, get, step, 'pass', `${step.label}: Pass`)
-        addConsole(set, get, 'pass', `[${step.type}] ${step.label} — Pass${value ? ` · ${step.params.variable}=${value}` : ''}`, step.id, step.type === 'screenshot' ? { screenshot: true, screenshotLabel: step.label } : {})
+        if (!(await runDelay(get, token, 50))) return
+        addConsole(set, get, 'pass', `[${step.type}] ${step.label} — Pass${value ? ` \· ${step.params.variable}=${value}` : ''}`, step.id, step.type === 'screenshot' ? { screenshot: true, screenshotLabel: step.label } : {})
         break
       }
 
@@ -136,7 +137,6 @@ async function executeRun(set, get, token, startIndex = 0, forceCurrentPass = fa
         const current = get().liveRun
         set({ liveRun: { ...current, status: 'retrying', retryCount: current.retryCount + 1, countdown: 2 } })
         addEvent(set, get, step, 'retrying', `${step.label}: Retrying — attempt ${attempt + 1} of 3`)
-        addConsole(set, get, 'retrying', `[${step.type}] ${step.label} — Retrying; attempt ${attempt + 1} of 3`, step.id)
         for (let countdown = 2; countdown > 0; countdown--) {
           const retryLive = get().liveRun
           set({ liveRun: { ...retryLive, countdown } })
@@ -150,6 +150,7 @@ async function executeRun(set, get, token, startIndex = 0, forceCurrentPass = fa
       const result = { stepId: step.id, order: step.order, type: step.type, label: step.label, status: 'fail', attempts: 3, timestamp: isoNow(), error_reason: lastError }
       set({ liveRun: { ...current, status: 'failed', failedIndex: index, countdown: null, stepResults: { ...current.stepResults, [step.id]: result } }, announcement: `Step ${step.order} failed. ${lastError}` })
       addEvent(set, get, step, 'fail', `${step.label}: Fail — ${lastError}`)
+      if (!(await runDelay(get, token, 50))) return
       addConsole(set, get, 'fail', `[${step.type}] ${step.label} — Fail · ${lastError}`, step.id)
       finishRun(set, get, 'fail')
       return
@@ -165,7 +166,7 @@ export const useStudio = create((set, get) => ({
   selectedScripts: [], selectedSteps: [], selectedRuns: [], selectedVersion: null,
   editActions: [], historyCursor: 0, historyOpen: false, creatingScript: false,
   paletteOpen: false, paletteQuery: '', paletteIndex: 0,
-  consoleTheme: 'Midnight', consoleFollowing: true, consoleLines: [], liveRun: null,
+  consoleTheme: 'Midnight', consoleFollowing: true, consoleJumpDismissed: false, consoleLines: [], liveRun: null,
   timelineFilter: 'all', highlightedStepId: null,
   playgroundHtml: seededHtml, playgroundSelector: '.partner', playgroundMatches: 2, playgroundError: '', playgroundTargetStep: '',
   exportTab: 'definition', copied: false, screenshotModal: null, newScriptModal: false, scheduleOpen: false,
@@ -364,7 +365,7 @@ export const useStudio = create((set, get) => ({
   retryFailed: () => {
     const live = get().liveRun; if (!live || live.status !== 'failed') return
     engineToken += 1; const token = engineToken
-    set({ liveRun: { ...live, status: 'running', retryCount: live.retryCount + 1 }, announcement: 'Retry started' })
+    set({ liveRun: { ...live, status: 'running', finishedAt: null, retryCount: live.retryCount + 1 }, announcement: 'Retry started' })
     const script = get().scripts.find(s => s.id === live.scriptId); const step = script?.steps[live.failedIndex]
     addEvent(set, get, step, 'retrying', 'Manual retry started')
     executeRun(set, get, token, live.failedIndex, true)
@@ -375,6 +376,7 @@ export const useStudio = create((set, get) => ({
   highlightStep: id => set({ highlightedStepId: id, selectedVersion: null }),
   setConsoleTheme: theme => set({ consoleTheme: theme }),
   setConsoleFollowing: value => set({ consoleFollowing: value }),
+  dismissConsoleJump: () => set({ consoleJumpDismissed: true }),
   setPlayground: values => set(values),
   sendSelectorToStep: stepId => {
     const selector = get().playgroundSelector; if (!selector) return

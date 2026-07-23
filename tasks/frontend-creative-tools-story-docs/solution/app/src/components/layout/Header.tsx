@@ -13,7 +13,7 @@ export function Header() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-30 border-b border-gray-200/80 bg-white/95 backdrop-blur">
-      <div className="flex h-16 items-center gap-1.5 px-3 sm:gap-2 sm:px-5">
+      <div className="flex h-16 items-center gap-0 px-1 sm:gap-2 sm:px-5">
         {/* Mobile sidebar toggle — full 44px tap target */}
         <button
           type="button"
@@ -25,20 +25,20 @@ export function Header() {
           <Ri name="menu-line" size={22} />
         </button>
 
-        <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-yellow-400 text-gray-900 shadow-sm shadow-yellow-400/40">
+        <div className="flex min-w-0 items-center gap-1 sm:gap-3">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-yellow-400 text-gray-900 shadow-sm shadow-yellow-400/40 sm:h-10 sm:w-10 sm:rounded-xl">
             <Ri name="film-line" size={22} />
           </span>
-          <div className="flex min-w-0 items-center gap-2 sm:gap-2.5">
+          <div className="flex min-w-0 items-center gap-0.5 sm:gap-2.5">
             <button
               type="button"
               onClick={() => toastDemoOnly('Demo Projects')}
-              className="shrink-0 rounded-md text-sm font-semibold text-gray-500 transition-colors hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+              className="w-10 shrink-0 whitespace-normal rounded-md text-center text-[9px] font-semibold leading-tight text-gray-500 transition-colors hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 sm:w-auto sm:text-sm"
             >
               Demo Projects
             </button>
             <span className="hidden h-4 w-px bg-gray-300 sm:block" aria-hidden="true" />
-            <h1 className="truncate text-base font-bold tracking-tight text-gray-900 sm:text-lg">
+            <h1 className="w-14 shrink-0 whitespace-normal text-[11px] font-bold leading-[1.05] tracking-tight text-gray-900 sm:w-auto sm:truncate sm:text-lg sm:leading-normal">
               1. Getting Started
             </h1>
             <KebabMenu
@@ -53,7 +53,7 @@ export function Header() {
           </div>
         </div>
 
-        <div className="ml-auto flex items-center gap-0.5 sm:gap-1.5">
+        <div className="ml-auto flex items-center gap-0 sm:gap-1.5">
           <button
             type="button"
             aria-label="Notifications"

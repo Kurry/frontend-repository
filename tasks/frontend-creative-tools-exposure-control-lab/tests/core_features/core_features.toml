@@ -1,0 +1,442 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "meter_lab_shows_preview_and_dials"
+description = "On load, Meter/Lab mode shows the photo preview with aperture, shutter, and ISO dials plus the exposure meter"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "seeded_presets_at_least_six"
+description = "On load (or after opening Presets/Compare), the presets list shows at least 6 seeded exposure looks with names and stop readouts"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "create_preset_golden_hour_soft_visible"
+description = "After creating a preset named 'Golden Hour Soft' with valid stops, the text 'Golden Hour Soft' is visible in the presets list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "adding_three_presets_increases_count"
+description = "After adding 3 new presets on top of the seed set, the presets list shows exactly 3 more rows than the initial seeded count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "apply_preset_rerenders_all_surfaces"
+description = "Starting in Presets/Compare with the dials off the preset's values: apply a seeded preset, then confirm the three dial labels change to the preset's aperture, shutter, and ISO, the preview brightness, depth-of-field blur, visible motion frame, and noise overlay all re-render to match, and the meter dot moves to the position those stops imply — all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "edit_preset_propagates_everywhere"
+description = "After editing a preset's name to 'Night Street Grain' and changing its stops, the list row shows the new name and updated stop readout, the previous name is no longer visible, any compare panel showing that preset reflects the edit, and re-applying the preset drives the dials to the new stops — all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "delete_preset_removes_from_list"
+description = "After deleting a preset, that preset's name is no longer visible in the presets list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "empty_state_offers_create_control"
+description = "After deleting all presets, the presets list region shows an empty state with a message and a control that opens the create flow, and no preset rows remain"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "empty_name_rejects_create"
+description = "After submitting create with an empty required preset name, the presets count does not increase and validation feedback is visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "favorites_or_looktag_filter_narrows_list"
+description = "After filtering presets by favorites or a lookTag (with mixed items present), only matching presets remain visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "mode_switch_without_navigation"
+description = "After switching between Meter/Lab and Presets/Compare modes, the main canvas shows the other mode without full page navigation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "hover_wash_on_lab_controls"
+description = "When hovering steppers, preset rows, or primary controls, a visible hover wash, brightness, or shadow change appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "edge_stepper_faded_noninteractive"
+description = "At a stop-list edge, the corresponding up or down stepper is faded and non-interactive and does not change the dial value further"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "help_panel_explainer_visible"
+description = "After opening the help panel, an aperture / shutter / ISO explainer is visible on-page without leaving the simulator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "stepper_updates_and_aperture_direction"
+description = "Pressing a stepper updates its dial value instantly, and the aperture up control raises the f-number (narrows the aperture) while its down control lowers it (widens the aperture)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "steppers_change_preview_stack"
+description = "Pressing the steppers visibly changes the live preview: it brightens as the aperture widens, the shutter slows, or ISO rises (and darkens for the opposite moves), depth-of-field blur increases as the aperture widens, and the ISO noise overlay grows more opaque as ISO climbs"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "meter_dot_tracks_exposure"
+description = "The vertical exposure meter dot climbs toward OVER EXPOSED when overexposed and drops toward UNDER EXPOSED when underexposed, clamping within the track at the extremes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "default_stops_match_exact_lists"
+description = "On a fresh load the dials read f/16, 1/60, and ISO 100, and stepping each dial end to end traverses exactly the specified discrete lists: aperture f/22, 16, 11, 8, 5.6, 4, 2.8, 1.8 (8 stops); shutter 1/2, 1/4, 1/8, 1/15, 1/30, 1/60, 1/125, 1/250, 1/500, 1/1000 (10 stops); ISO 50, 100, 200, 400, 800, 1600, 3200 (7 stops) — no values outside these lists ever appear"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "shutter_stop_swaps_motion_frame"
+description = "Stepping the shutter dial swaps the visible motion frame to the one matching the current shutter stop: stepping through several shutter stops shows visibly different local frames rather than one unchanging image"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "inline_per_field_validation_gates_submit"
+description = "In the preset create and edit forms, an invalid or empty required field shows an error message naming that field next to it before submit, and the submit control stays disabled until every required field is valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "iso_step_updates_three_surfaces"
+description = "Starting from the default stops in Meter/Lab: step ISO up one stop and confirm, without a reload, that all three surfaces change together — the ISO dial label shows the next stop in the list, the tiled noise overlay becomes visibly more opaque than immediately before the press, the exposure meter dot moves up the vertical track from its prior position, and both the EV number and the histogram shape change"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "create_preset_flow_survives_mode_switch"
+description = "In Presets/Compare: note the visible preset count, create a valid preset with a lookTag from the closed enum (soft, crisp, grainy, night, daylight, cinematic), and confirm the count increases by exactly one (measured immediately around the submit), the new row shows its name and stop readout, applying its lookTag filter still shows the new row, the Export panel JSON presets array includes that name and lookTag, and switching to Meter/Lab and back to Presets/Compare shows the same new preset without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "favorite_then_delete_updates_all_surfaces"
+description = "Mark a preset as favorite and confirm its favorite badge appears immediately and switching the filter to favorites shows it; then delete that preset and confirm it disappears from the list, from any selection or compare slot showing it, and from the favorites filter results, with the visible preset count decreasing by exactly one measured immediately around the delete"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "reload_resets_all_facets_to_seed"
+description = "After stepping the dials off their defaults, moving develop sliders, applying a look, creating one preset, and marking one favorite: reload the page and confirm every facet returns to the seeded baseline together — dials back at f/16, 1/60, ISO 100, every develop slider back at its default, no active look, only the seeded presets and seeded snapshots, and empty undo/redo stacks — never a mix of reset and surviving facets"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "double_submit_creates_exactly_one_preset"
+description = "Double-activating the preset submit control in quick succession creates exactly one preset: the visible count increases by one and exactly one new row appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "long_preset_name_rejected_at_max_40"
+description = "Submitting a preset name longer than 40 characters is rejected with an error naming the name field (or input is blocked before submit) so no row is saved with a name over 40 characters"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "brand_chip_is_inert"
+description = "A brand chip labeled 'Camera Exposure Simulator' is visible, and activating it neither navigates away nor changes the view — it is an inert label, not a link"
+type = "binary"
+weight = 0.5
+
+
+[[criterion]]
+id = "1.36"
+name = "live_ev_readout_updates_with_dials"
+description = "A live EV readout near the meter shows a numeric exposure value; stepping aperture, shutter, or ISO changes that EV number on the same press without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "live_histogram_reshapes_with_exposure"
+description = "A live luma histogram is visible in the lab chrome; brightening the exposure (wider aperture, slower shutter, or higher ISO) visibly shifts histogram mass toward the right, and darkening shifts it toward the left — two clearly different stop combinations never leave an identical histogram shape"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "before_hold_shows_defaults_then_restores"
+description = "With dials and develop sliders off defaults: holding the Before control shows the original unedited photo — default exposure (f/16, 1/60, ISO 100) and every develop slider at its default — on the preview, meter, EV readout, and histogram without discarding the current stops or slider values; releasing Before restores the off-default dials, develop sliders, and all derived surfaces immediately"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "seeded_snapshots_restore_dials"
+description = "On load the Snapshots strip shows at least 2 named snapshots with stop readouts; restoring a snapshot whose state differs from the current edit writes its stops into the shared dials and its develop values into the sliders so preview, meter, EV, histogram, and slider readouts all match the saved version"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "snapshot_create_increases_count_by_one"
+description = "Saving a valid named snapshot captures the current stops and the current develop-slider values, increases the visible snapshot count by exactly one, and shows the new row with its name and stop readout"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "undo_redo_restore_dial_and_preset_state"
+description = "After stepping a dial and creating a preset: Undo restores the prior dials and removes the new preset (count decreases by one); Redo reapplies both; Undo/Redo are disabled when their stacks are empty"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "export_json_contains_session_mutations"
+description = "After stepping dials off defaults, moving develop sliders, applying a look, and creating a valid preset: the Export panel monospaced JSON is API-shaped with visible field names schemaVersion (exactly exposure-control-lab.package.v1), aperture, shutter, iso, ev, light, effects, look, presets, and snapshots; it includes the current aperture/shutter/iso/ev, the live light and effects slider values, the active look name, and a presets entry carrying name, aperture, shutter, iso, lookTag, and favorite for the new preset; an export that still shows only the pre-mutation seeded package fails"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "download_and_copy_lab_package"
+description = "Download lab package offers a real download of the visible lab-package JSON, and Copy lab package puts that exact JSON text on the clipboard and shows a brief copied confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "import_lab_package_reconstructs_session"
+description = "After exporting a mutated session (dials + develop sliders + active look + a created preset + a created snapshot), reloading to seed, then importing that package: dials, the develop sliders, the active look chip, the new preset, the new snapshot (including its light and effects values), EV, histogram, and Export panel text all match the pre-export session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "copy_stops_onto_selected_preset"
+description = "With a preset selected whose stops differ from the dials: activating Copy stops overwrites that preset's aperture, shutter, and ISO with the current dial values and updates that preset's stop readout in the list and in the Export panel JSON without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "batch_delete_selected_presets"
+description = "Selecting at least two presets shows a batch bar; Delete selected removes every selected preset at once, the visible count decreases by exactly the selected count, and the selection clears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "exposure_preset_field_contract_enforced"
+description = "The preset create/edit form enforces the ExposurePreset field contract: name required non-empty max 40 and unique; aperture/shutter/iso restricted to their discrete stop lists; lookTag restricted to soft, crisp, grainy, night, daylight, cinematic; invalid fields show inline errors naming that field and the submit control stays disabled until every required field is valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "dial_snapshot_field_contract_enforced"
+description = "The snapshot form enforces the DialSnapshot field contract: name required non-empty max 40 and unique among snapshots; aperture/shutter/iso restricted to their discrete stop lists; the record carries a required light object (exposure, contrast, highlights, shadows, whites, blacks) and a required effects object (texture, clarity, vignette, grain) within their stated bounds; invalid fields show inline errors naming that field and no snapshot row is added until valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "lab_package_api_shaped_field_names"
+description = "The Export panel JSON visibly uses the lab-package field contract: top-level schemaVersion exactly exposure-control-lab.package.v1 plus aperture, shutter, iso, ev, a light object (exposure, contrast, highlights, shadows, whites, blacks), an effects object (texture, clarity, vignette, grain), and look (null or one of Punch, Matte, Golden, Mono); each presets element shows name, aperture, shutter, iso, lookTag, and favorite; each snapshots element shows name, aperture, shutter, iso, light, and effects — and a newly created preset or snapshot appears in the matching array with those same field names"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "form_record_matches_export_shape"
+description = "After creating a valid preset, the object shape in the Export panel presets array matches the form payload (same field names name/aperture/shutter/iso/lookTag plus favorite); after creating a valid snapshot, the snapshots array entry matches the DialSnapshot payload field names"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "develop_slider_groups_live_readouts"
+description = "The Develop panel presents a Light group with Exposure, Contrast, Highlights, Shadows, Whites, and Blacks sliders and an Effects group with Texture, Clarity, Vignette, and Grain, each with a live integer readout defaulting to 0; dragging any slider updates its readout on the same gesture, visibly changes the preview (raising Grain adds visible film grain; raising Vignette darkens the frame corners while the center stays brighter), and reshapes the live histogram (raising Exposure shifts mass toward the right, lowering it shifts mass left)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "per_slider_reset_returns_only_that_slider"
+description = "With at least two develop sliders off default, activating one slider row's per-slider reset affordance returns only that slider to its default value while every other slider keeps its value, and the preview, readout, and histogram update on the same action"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "reset_to_original_single_undoable_action"
+description = "Reset to original returns every develop slider to its default and the dials to f/16, 1/60, ISO 100 in one press, clears the active look, and leaves the presets and snapshots collections intact; a single Undo afterwards restores the exact pre-reset dials and slider values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "look_chips_apply_and_manual_clear"
+description = "Each of the four look chips Punch, Matte, Golden, and Mono applies a stored multi-slider develop state in a single press with at least three develop sliders moving together and readouts, preview, and histogram updating on the same press; Mono removes visible color while the other three keep a color image; the active chip shows a selected treatment; and manually moving any develop slider afterwards clears the active-look indication while the other sliders keep the look's values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "copy_settings_dialog_group_checkboxes"
+description = "Copy settings opens a dialog listing exactly three group checkboxes — Dials, Light, and Effects — all checked by default; the confirm control is disabled while zero groups are checked; confirming shows a confirmation naming the copied groups"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.56"
+name = "paste_settings_selective_and_undoable"
+description = "Paste settings applies only the copied groups to the current edit state — every slider and dial in an uncopied group stays exactly as it was — the paste is a single undoable action, and Paste settings is visibly disabled until a copy has happened in this session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.57"
+name = "download_edited_png_bakes_current_edits"
+description = "Download edited PNG triggers a real file download named exposure-lab-edit.png whose image carries the current dial and develop-slider edits — the exported file matches the tonal look of the on-screen preview at export time rather than showing the unedited source photo"
+type = "binary"
+weight = 1.0
+

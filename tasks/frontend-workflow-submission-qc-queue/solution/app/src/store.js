@@ -140,6 +140,8 @@ export const useQcStore = defineStore('qc', {
     copyConfirmed: false,
     nextFinding: 300,
     mutationEpoch: 0,
+    draftFindings: {},
+    draftRevisions: {},
   }),
   getters: {
     activeSubmission: (state) => state.submissions.find((s) => s.id === state.activeSubmissionId) || null,

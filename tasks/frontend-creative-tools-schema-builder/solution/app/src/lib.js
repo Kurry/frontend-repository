@@ -158,9 +158,13 @@ export function fieldContractErrors(def, path = 'fields[i]') {
     } else if (def.enumValues.some((e) => typeof e !== 'string' || e === '')) {
       errs.push(`${path}.enumValues rejects empty or non-string entries`);
     }
+    if (def.type !== 'string') errs.push(`${path}.enumValues only applies when type is string`);
   }
   if (def.minimum !== undefined && typeof def.minimum !== 'number') errs.push(`${path}.minimum must be a number when present`);
   if (def.maximum !== undefined && typeof def.maximum !== 'number') errs.push(`${path}.maximum must be a number when present`);
+  if ((def.minimum !== undefined || def.maximum !== undefined) && def.type !== 'number') {
+    errs.push(`${path}.minimum and maximum only apply when type is number`);
+  }
   if (typeof def.minimum === 'number' && typeof def.maximum === 'number' && def.minimum > def.maximum) {
     errs.push(`${path}.minimum must not exceed maximum (minimum ${def.minimum} > maximum ${def.maximum})`);
   }
@@ -173,6 +177,13 @@ export function fieldContractErrors(def, path = 'fields[i]') {
         errs.push(`${path}.pattern must be a valid regular expression`);
       }
     }
+    if (def.type !== 'string') errs.push(`${path}.pattern only applies when type is string`);
+  }
+  if (['object', 'array'].includes(def.type) && !Array.isArray(def.children)) {
+    errs.push(`${path}.children must be an array when type is ${def.type}`);
+  }
+  if (!['object', 'array'].includes(def.type) && Array.isArray(def.children) && def.children.length) {
+    errs.push(`${path}.children must be omitted or empty when type is ${def.type}`);
   }
   if (Array.isArray(def.children)) {
     const seen = new Set();
@@ -232,6 +243,9 @@ export function validateSchemaPackage(text) {
   }
   if (!pkg.metadata || typeof pkg.metadata !== 'object' || Array.isArray(pkg.metadata)) {
     return { ok: false, error: 'Import package: metadata must be an object' };
+  }
+  if (Object.values(pkg.metadata).some((value) => typeof value !== 'string')) {
+    return { ok: false, error: 'Import package: metadata must map every label to a string value' };
   }
   if (!pkg.examplePayload || typeof pkg.examplePayload !== 'object' || Array.isArray(pkg.examplePayload)) {
     return { ok: false, error: 'Import package: examplePayload must be an object' };
@@ -374,8 +388,8 @@ export function nodeToFieldDef(n) {
     if (n.minimum !== undefined) def.minimum = n.minimum;
     if (n.maximum !== undefined) def.maximum = n.maximum;
   }
-  if ((n.type === 'object' || n.type === 'array') && (n.children || []).length) {
-    def.children = n.children.map(nodeToFieldDef);
+  if (n.type === 'object' || n.type === 'array') {
+    def.children = (n.children || []).map(nodeToFieldDef);
   }
   return def;
 }
@@ -441,7 +455,7 @@ export function compileSchema(tree, name) {
     s.properties[c.key] = compileNode(c);
   });
   const req = (tree.children || []).filter((c) => c.required).map((c) => c.key);
-  if (req.length) s.required = req;
+  s.required = req;
   return s;
 }
 

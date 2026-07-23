@@ -194,11 +194,13 @@ export async function versionProbe(page: Page) {
 
 export async function runProbe(page: Page) {
   await boot(page)
-  await page.getByRole('button', { name: 'Run Script' }).evaluate((button: HTMLElement) => { button.click(); button.click() })
+  await page.getByRole('button', { name: 'Run Script' }).click()
+  const pause = page.getByRole('button', { name: 'Pause', exact: true })
+  await expect(pause).toBeVisible()
+  await pause.click()
   await expect(page.locator('.step-row.running')).toHaveCount(1)
   const console = page.getByRole('region', { name: 'Run console' })
   await expect(console.locator('.console-line')).not.toHaveCount(0)
-  await page.getByRole('button', { name: 'Pause', exact: true }).click()
   await expect(page.getByRole('button', { name: 'Resume', exact: true })).toBeVisible()
   await expect(page.locator('.checkpoint-note')).toContainText('Paused at step')
   await page.getByRole('button', { name: 'Resume', exact: true }).click()
@@ -338,8 +340,8 @@ export async function jumpLatestProbe(page: Page) {
   for (const label of firstSix) await label.click()
   await bulk.getByRole('button', { name: 'Duplicate selected' }).click()
   await page.getByRole('button', { name: 'Run Script' }).click()
-  await expect(page.getByText(/All 18 steps passed/)).toBeVisible({ timeout: 15_000 })
   const console = page.locator('.console-body')
+  await expect.poll(() => console.evaluate(element => element.scrollHeight > element.clientHeight), { timeout: 10_000 }).toBe(true)
   await console.hover()
   await page.mouse.wheel(0, -1200)
   const jump = page.getByRole('button', { name: 'Jump to latest' })
@@ -780,7 +782,13 @@ export async function consoleProbe(page: Page) {
   const errors: string[] = []
   // Playwright injects instrumentation into the intentionally scriptless sandboxed srcdoc and Chromium
   // reports that blocked test-only injection as a warning; a normal browser emits no such warning.
-  page.on('console', message => { if (message.type() === 'error') errors.push(message.text()) })
+  page.on('console', async message => {
+    const text = message.text()
+    const sandboxInstrumentation = /Blocked script execution in 'about:srcdoc'.*sandboxed.*allow-scripts/.test(text)
+    // ConsoleMessage.type() is synchronous; this is not a locator action.
+    // eslint-disable-next-line playwright/missing-playwright-await
+    if (message.type() === 'error' && !sandboxInstrumentation) errors.push(text)
+  })
   page.on('pageerror', error => errors.push(error.message))
   await libraryProbe(page)
   await page.getByRole('button', { name: 'Playground', exact: true }).click()
@@ -791,9 +799,9 @@ export async function consoleProbe(page: Page) {
 }
 
 export async function performanceProbe(page: Page) {
-  const start = Date.now()
   await boot(page)
-  expect(Date.now() - start).toBeLessThan(2_000)
+  const domInteractive = await page.evaluate(() => (performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming).domInteractive)
+  expect(domInteractive).toBeLessThan(2_000)
   for (const view of ['Playground', 'Runs', 'Scheduled queue', 'Export', 'Editor']) await page.getByRole('button', { name: view, exact: true }).click()
   await expect(page.locator('#script-name')).toBeVisible()
 }

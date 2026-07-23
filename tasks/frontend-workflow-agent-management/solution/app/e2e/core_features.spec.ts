@@ -98,7 +98,7 @@ test('1.23 fleet_export_live_snapshot', async ({ page }) => {
 });
 
 test('1.24 export_copy_and_download', async ({ page, context }) => {
-  await context.grantPermissions(['clipboard-read','clipboard-write']); const modal = await openExport(page); const preview = await page.locator('.json-preview').textContent(); await modal.getByRole('button',{name:'Copy'}).click(); expect(await page.evaluate(()=>navigator.clipboard.readText())).toBe(preview); await expect(page.getByLabel('Notifications')).toContainText('Fleet JSON copied'); const event = page.waitForEvent('download'); await modal.getByRole('button',{name:'Download'}).click(); const download = await event; expect(download.suggestedFilename()).toMatch(/\.json$/); expect(await downloadedText(download)).toBe(preview);
+  await context.grantPermissions(['clipboard-read','clipboard-write']); const modal = await openExport(page); const preview = await page.locator('.json-preview').textContent(); await modal.getByRole('button',{name:'Copy'}).click(); expect(await page.evaluate(()=>navigator.clipboard.readText())).toBe(preview); await expect(page.getByLabel('Notifications')).toContainText('Fleet JSON copied'); const downloadPreview = await page.locator('.json-preview').textContent(); const event = page.waitForEvent('download'); await modal.getByRole('button',{name:'Download'}).click(); const download = await event; expect(download.suggestedFilename()).toMatch(/\.json$/); expect(await downloadedText(download)).toBe(downloadPreview);
 });
 
 test('1.25 fleet_import_round_trip', async ({ page }) => {

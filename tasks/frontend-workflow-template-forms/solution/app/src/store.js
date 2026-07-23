@@ -50,7 +50,9 @@ export const useStudioStore = create((set, get) => ({
     const current = get().drafts[technique]
     const nextDraft = { fields: clone(fields), attachments: clone(attachments) }
     if (JSON.stringify(current) === JSON.stringify(nextDraft)) return
-    const hasInput = JSON.stringify(nextDraft) !== JSON.stringify(defaultDrafts[technique])
+    const baseline = defaultDrafts[technique]
+    const hasInput = nextDraft.attachments.length > 0 || Object.entries(baseline.fields)
+      .some(([name, value]) => JSON.stringify(nextDraft.fields[name]) !== JSON.stringify(value))
     set((state) => {
       return {
         drafts: { ...state.drafts, [technique]: nextDraft },

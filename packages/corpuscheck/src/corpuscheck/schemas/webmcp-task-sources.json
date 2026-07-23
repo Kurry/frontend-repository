@@ -119,6 +119,11 @@
     "instruction": "tasks/frontend-creative-tools-schema-builder/instruction.md",
     "description": "Output schema builder with tree editor, playground, and versions."
   },
+  "frontend-creative-tools-session-compression-loom": {
+    "source": "Session Compression Loom",
+    "instruction": "tasks/frontend-creative-tools-session-compression-loom/instruction.md",
+    "description": "Session compression editor with capsule summaries, preview, and artifact export."
+  },
   "frontend-creative-tools-stack-trace-path-finder": {
     "source": "Stack-Trace Path Finder",
     "instruction": "tasks/frontend-creative-tools-stack-trace-path-finder/instruction.md",
@@ -158,11 +163,6 @@
     "source": "Vert",
     "instruction": "Vert/instruction.md",
     "description": "VERT private local file converter good-app eval."
-  },
-  "frontend-creative-tools-session-compression-loom": {
-    "source": "Session Compression Loom",
-    "instruction": "tasks/frontend-creative-tools-session-compression-loom/instruction.md",
-    "description": "Session compression loom with trajectory event folding, summary capsules, token budget ruler, and provenance tracing."
   },
   "frontend-creative-tools-weaving-draft-constraint-studio": {
     "source": "weaving draft and loom constraint studio concept",

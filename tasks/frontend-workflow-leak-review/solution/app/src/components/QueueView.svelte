@@ -52,6 +52,17 @@
       appState.openSubmission(id);
     }
   }
+
+  function handleThresholdKeydown(event) {
+    let next = appState.threshold;
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') next -= 0.01;
+    else if (event.key === 'ArrowRight' || event.key === 'ArrowUp') next += 0.01;
+    else if (event.key === 'Home') next = 0.5;
+    else if (event.key === 'End') next = 0.95;
+    else return;
+    event.preventDefault();
+    appState.setThreshold(next);
+  }
 </script>
 
 <div class="space-y-5 view-enter">
@@ -98,6 +109,7 @@
           max="0.95"
           step="0.01"
           bind:value={appState.threshold}
+          onkeydown={handleThresholdKeydown}
           class="h-3 w-full cursor-pointer accent-[#d95732]"
           aria-valuemin={0.5}
           aria-valuemax={0.95}

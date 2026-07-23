@@ -10,15 +10,15 @@
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "tailwindcss": "4.0.0",
-    "@tailwindcss/vite": "4.0.0",
+    "tailwindcss": "4.3.3",
+    "@tailwindcss/vite": "4.3.3",
     "framer-motion": "^10.16.4",
     "zustand": "^4.4.1"
   },
   "devDependencies": {
-    "@playwright/test": "1.61.0",
-    "@vitejs/plugin-react": "^4.2.1",
-    "vite": "^5.0.0"
+    "@playwright/test": "^1.40.0",
+    "@vitejs/plugin-react": "6.0.3",
+    "vite": "^8.1.5"
   },
   "overrides": {
     "baseline-browser-mapping": "2.10.42",

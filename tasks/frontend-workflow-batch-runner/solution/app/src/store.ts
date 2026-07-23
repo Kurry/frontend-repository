@@ -475,16 +475,27 @@ export const useBatchStore = create<Store>()((set, get) => ({
           endedAt: undefined,
           items: run.items.map((item) => item.status === 'failed' ? {
             ...item,
-            status: 'pending',
+            // Route manual retries through the same backoff path as automatic
+            // retries (status 'retrying' + retryAt) instead of dropping them
+            // straight into 'pending'. Without this, a re-queued item is
+            // eligible to be picked up on the very next 60ms tick, so a small
+            // failed-item batch (a handful of items out of a large run) can
+            // race from "re-queued" to fully "complete" in ~1 tick-cycle —
+            // faster than an operator (or this suite, under CI load) can ever
+            // observe the run as running, making Pause/Stop effectively
+            // non-functional for this flow. The same 1.1s backoff already
+            // used for provider-timeout retries gives a real, observable
+            // running window here too.
+            status: 'retrying',
             error: undefined,
             output: null,
             manualRetry: true,
             attempts: 1,
             latencyMs: null,
+            retryAt: Date.now() + 5000,
             reconciling: true,
           } : item),
-          queue: [...run.queue, ...failed.map((item) => item.index)],
-          timeline: [...run.timeline, ...failed.map((item) => timelineEntry(item.index, 'pending', `Item ${item.index + 1} re-queued by operator`))],
+          timeline: [...run.timeline, ...failed.map((item) => timelineEntry(item.index, 'retrying', `Item ${item.index + 1} re-queued by operator`))],
           updatedAt: Date.now(),
         } : run),
       } : job),

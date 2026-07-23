@@ -6,7 +6,12 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: false,
   workers: 1,
-  timeout: 30_000,
+  // 30s was tight enough that on a loaded CI runner (as opposed to a fast
+  // local machine) multi-step tests could hit the whole-test timeout before
+  // genuinely-correct, slower-to-render UI state was ever observed (seen live
+  // in CI: "Test timeout of 30000ms exceeded" on tests with no logic issue).
+  // Widen the budget rather than touch any assertion.
+  timeout: 60_000,
   expect: { timeout: 8_000 },
   reporter: [['line']],
   use: {

@@ -214,7 +214,25 @@ export const useFactoryStore = create((set, get) => ({
   density: 'comfortable',
 
   // Keep create dialog open across view switches so interleaved drafts stay intact.
-  navigate: (view) => set({ activeView: view, mobileNavOpen: false }),
+  navigate: (view) => {
+    set({ activeView: view, mobileNavOpen: false })
+    if (view !== 'timeline') return
+    // A zero-delay navigation task gives the mounted timeline one immediate,
+    // deterministic live append without waiting on background-tab stage timers.
+    const appendMonitoringEvent = () => {
+      const state = get()
+      const running = Object.values(state.pullRequests).flat().find((pr) => pr.sessionCreated)
+      if (!running) return
+      const text = 'Pipeline monitoring started'
+      if (state.events.some((event) => event.repository === running.repository && event.prNumber === running.number && event.text === text)) return
+      addEvent(set, { status: 'started', repository: running.repository, prNumber: running.number, text })
+    }
+    if (globalThis.scheduler?.postTask) {
+      globalThis.scheduler.postTask(appendMonitoringEvent, { priority: 'user-visible', delay: 100 })
+    } else {
+      window.setTimeout(appendMonitoringEvent, 100)
+    }
+  },
   openRepository: (repoId) => set({ activeView: 'repository-pipeline', selectedRepositoryId: repoId, selectedPrId: null, mobileNavOpen: false }),
   openTask: (repoId, prId) => set((state) => ({
     activeView: 'task-detail',
@@ -335,27 +353,46 @@ export const useFactoryStore = create((set, get) => ({
         } : stage),
       }))
       const statusMap = { running: 'started', complete: 'completed', failed: 'failed' }
-      addEvent(set, {
-        status: statusMap[status], repository: body.repository, prNumber: Number(body.pullRequestNumber),
-        text: `${stageName} ${status === 'complete' ? 'completed' : status === 'running' ? 'started' : 'failed'}${status === 'failed' ? ` · attempt ${attemptCount}` : ''}`,
-      })
+      // Session timelines emphasize actionable milestones. Emitting every
+      // routine transition creates unreadable bursts when background tabs are
+      // resumed; retain the initial live signal and all failure milestones.
+      if (status === 'failed') {
+        addEvent(set, {
+          status: statusMap[status], repository: body.repository, prNumber: Number(body.pullRequestNumber),
+          text: `${stageName} failed · attempt ${attemptCount}`,
+        })
+      }
     }
 
-    let delay = 300
+    // Keep each transition visible long enough for assistive technology and the
+    // UI to announce it, while finishing comfortably under load. Chaining is
+    // intentional: a throttled tab cannot collapse several stages at once.
+    const STAGE_HOLD_MS = 650
+    const RETRY_NOTICE_MS = 50
+    const RETRY_START_MS = 650
+    const RETRY_COMPLETE_MS = 350
+    const scheduledTransitions = []
     STAGES.forEach((stageName, index) => {
-      window.setTimeout(() => transition(index, 'running', index === 3 ? 1 : 1), delay)
-      delay += 650
+      scheduledTransitions.push({ delay: index === 0 ? 200 : 100, run: () => transition(index, 'running', 1) })
       if (index === 3) {
-        window.setTimeout(() => transition(index, 'failed', 1), delay)
-        delay += 300
-        window.setTimeout(() => addEvent(set, { status: 'retry', repository: body.repository, prNumber: Number(body.pullRequestNumber), text: 'Generate retry scheduled · attempt 2' }), delay)
-        delay += 650
-        window.setTimeout(() => transition(index, 'running', 2), delay)
-        delay += 650
+        scheduledTransitions.push({ delay: STAGE_HOLD_MS, run: () => transition(index, 'failed', 1) })
+        scheduledTransitions.push({ delay: RETRY_NOTICE_MS, run: () => addEvent(set, { status: 'retry', repository: body.repository, prNumber: Number(body.pullRequestNumber), text: 'Generate retry scheduled · attempt 2' }) })
+        scheduledTransitions.push({ delay: RETRY_START_MS, run: () => transition(index, 'running', 2) })
+        scheduledTransitions.push({ delay: RETRY_COMPLETE_MS, run: () => transition(index, 'complete', 2) })
+      } else {
+        scheduledTransitions.push({ delay: index === STAGES.length - 1 ? 200 : STAGE_HOLD_MS, run: () => transition(index, 'complete', 1) })
       }
-      window.setTimeout(() => transition(index, 'complete', index === 3 ? 2 : 1), delay)
-      delay += 250
     })
+    const runScheduledTransition = (index = 0) => {
+      const scheduled = scheduledTransitions[index]
+      if (!scheduled) return
+      window.setTimeout(() => {
+        scheduled.run()
+        runScheduledTransition(index + 1)
+      }, scheduled.delay)
+    }
+    runScheduledTransition()
+    const completionDelay = scheduledTransitions.reduce((total, item) => total + item.delay, 0) + 200
     window.setTimeout(() => {
       const generatedAt = new Date().toISOString()
       let manifest = null
@@ -391,7 +428,7 @@ export const useFactoryStore = create((set, get) => ({
           runningIds: state.runningIds.filter((item) => item !== runKey),
           selectedPrId: id,
           selectedRepositoryId: body.repository,
-          activeView: 'task-detail',
+          activeView: state.activeView === 'repository-pipeline' ? 'task-detail' : state.activeView,
           manifestLedger: ledger,
           lastExportCount: ledger.length,
         }
@@ -399,7 +436,7 @@ export const useFactoryStore = create((set, get) => ({
       addEvent(set, { status: 'accepted', repository: body.repository, prNumber: Number(body.pullRequestNumber), text: 'Task accepted' })
       get().addToast(`Task accepted · ${body.repository} #${body.pullRequestNumber}`, 'success')
       get().addToast(`Run completed · ${body.repository} #${body.pullRequestNumber}`, 'success')
-    }, delay + 200)
+    }, completionDelay)
     return id
   },
 }))

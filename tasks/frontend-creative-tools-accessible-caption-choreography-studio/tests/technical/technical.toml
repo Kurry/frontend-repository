@@ -115,7 +115,7 @@ weight = 1.0
 [[criterion]]
 id = "technical.3"
 name = "genre_storage_violation"
-description = "Storage is not empty, but transient previews, dialogs, and invalid drafts must not leak into persistence across reload."
+description = "Transient previews, dialogs, or invalid drafts leak into persistence across reload."
 type = "binary"
 weight = 1.0
 negate = true

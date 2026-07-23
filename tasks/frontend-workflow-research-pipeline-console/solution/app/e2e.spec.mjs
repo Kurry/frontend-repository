@@ -101,7 +101,10 @@ test.describe('workspace contract (canonical)', () => {
     // meaningfully timed RUNNING effect at any sample is a reduced-motion
     // failure. Apps with zero animations pass vacuously (the render/console
     // test still gates them).
-    await page.waitForTimeout(1500);
+    // Wait via an in-page setTimeout (not page.waitForTimeout) so this suite
+    // stays clean under the repo's playwright/no-wait-for-timeout lint rule
+    // while keeping the same 1.5s real-time observation window.
+    await page.evaluate(() => new Promise((resolve) => setTimeout(resolve, 1500)));
     const offenders = await page.evaluate(() => window.__reducedMotionOffenders ?? []);
     expect(offenders, 'no running animation/transition with meaningful duration under reduced motion').toEqual([]);
   });

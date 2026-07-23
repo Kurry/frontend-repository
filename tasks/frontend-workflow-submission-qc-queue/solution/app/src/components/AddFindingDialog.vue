@@ -16,12 +16,34 @@ const schema = z.object({
   description: z.string({ message: 'Description is required.' }).trim().min(10, 'Description must be at least 10 characters.'),
   evidence: z.string().optional(),
 })
-const { handleSubmit, meta, isSubmitting, resetForm, validate } = useForm({ validationSchema: toTypedSchema(schema), validateOnMount: true, initialValues: { tier: undefined, category: undefined, description: '', evidence: '' } })
+const emptyDraft = { tier: undefined, category: undefined, description: '', evidence: '' }
+const draft = computed(() => {
+  if (!submission.value) return emptyDraft
+  return store.draftFindings[submission.value.id] || emptyDraft
+})
+
+const { handleSubmit, meta, isSubmitting, resetForm, validate, values } = useForm({ validationSchema: toTypedSchema(schema), validateOnMount: true, initialValues: draft.value })
+
+watch(values, (newVals) => {
+  if (submission.value) {
+    store.draftFindings[submission.value.id] = JSON.parse(JSON.stringify(newVals))
+  }
+}, { deep: true })
+
 const tierOptions = [{ label: 'Blocker — gate stopping', value: 'blocker' }, { label: 'Major — material issue', value: 'major' }, { label: 'Minor — polish issue', value: 'minor' }]
 const categoryOptions = [{ label: 'Correctness', value: 'correctness' }, { label: 'Instruction clarity', value: 'instruction-clarity' }, { label: 'Rubric alignment', value: 'rubric-alignment' }, { label: 'Environment', value: 'environment' }, { label: 'Scoring', value: 'scoring' }, { label: 'Tooling', value: 'tooling' }]
-const submit = handleSubmit(async (values) => { if (store.addFinding(submission.value.id, values)) await nextTick(() => resetForm()) })
-const close = () => { resetForm(); store.dialogs.add = false }
-watch(() => store.dialogs.add, async (open) => { if (open) { await nextTick(); await validate() } })
+const submit = handleSubmit(async (values) => {
+  if (store.addFinding(submission.value.id, values)) {
+    if (submission.value) delete store.draftFindings[submission.value.id]
+    await nextTick(() => resetForm())
+  }
+})
+const close = () => { store.dialogs.add = false }
+// The dialog's <Field> inputs unmount when the modal closes (display-directive="if"),
+// and vee-validate drops their values on unmount — so every open must re-hydrate the
+// form from the per-submission draft rather than relying on the one-time initialValues
+// this component captured at its own (submission-independent) mount.
+watch(() => store.dialogs.add, async (open) => { if (open) { resetForm({ values: draft.value }); await nextTick(); await validate() } })
 </script>
 
 <template>

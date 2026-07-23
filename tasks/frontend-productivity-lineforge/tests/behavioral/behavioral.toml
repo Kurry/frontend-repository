@@ -1,0 +1,164 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "14.1"
+name = "multi_facet_reload_resets_in_memory"
+description = "Multi-facet round-trip: after starring an opening, saving a line, choosing Forest, and opening Export center, a reload coherently resets all facets to the seeded baseline (empty favorites/saved lines, Classic theme, empty undo stacks) — never a mix of persisted and reset facets"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "14.2"
+name = "theme_cycle_proves_live_board"
+description = "Theme-cycle proof: switch Classic to Forest then Slate; board squares visibly re-skin each time and Study pack boardTheme tracks the live selection rather than a hardcoded theme"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "14.3"
+name = "derived_export_responds_to_input"
+description = "Derived-view sensitivity: save a uniquely named line and star a specific opening; Export center Study pack JSON changes to include that name and openingCode rather than redrawing identically"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "14.4"
+name = "cross_view_echo_without_reload"
+description = "Cross-view echo: starring an opening updates the library star, Favorites Only membership, and Study pack favorites array without reload"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "14.5"
+name = "count_delta_is_exact"
+description = "Count-delta integrity: measure the header saved-line count immediately before and after a valid save; the delta is exactly +1 with no off-by-one or lagging counter"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "14.6"
+name = "different_inputs_change_outcomes"
+description = "Input-dependent output: save two lines with different names and move sequences; My Saved Lines and Study pack JSON differ in those names and moves accordingly"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "14.7"
+name = "interleaved_flows_preserve_state"
+description = "Interleaved-flow integrity: start saving a line, open Favorites Only, finish the save, then open Export center; the new entry appears in My Saved Lines and Study pack without corrupting favorites filter state"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "14.8"
+name = "empty_to_repopulated_round_trip"
+description = "Edge-state round-trip: delete all saved lines to the empty state, then save one; the empty state clears, the header count becomes 1, and Study pack savedLines lists that entry"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "14.9"
+name = "export_pipeline_contains_session_work"
+description = "Export pipeline probe: mutate favorites, saved lines, and theme, then read Export center text; Study pack JSON contains those exact session mutations and Current line PGN matches the displayed SAN sequence"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "14.10"
+name = "import_export_round_trip"
+description = "Import/export round-trip: export a Study pack, clear session collections, import the same pack; favorites, boardTheme, and saved line field-contract fields reconstruct to match"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "14.11"
+name = "undo_round_trip_restores"
+description = "Undo round-trip: save a line and bulk-tag it, Undo twice restores the prior collection and tags; Redo reapplies in order"
+type = "binary"
+weight = 1.0

@@ -1,0 +1,245 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "empty_presets_state_with_create_control"
+description = "After deleting all presets, the presets list region shows an empty-state message and a control that opens the create flow."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "preset_form_inline_validation_before_submit"
+description = "On the preset create/edit form, invalid fields show an error message naming that field next to it before submit, and the submit control stays disabled until every required field is valid."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "empty_name_validation_names_field"
+description = "Submitting create with an empty preset name shows visible validation feedback that names the name field and does not add a row."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "long_preset_name_rejected_over_40"
+description = "A preset name longer than 40 characters is rejected with an error naming the name field (or input is blocked before submit) so no row is saved with a name over 40 characters."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "stepper_edge_fades_and_noninteractive"
+description = "At each stop-list edge, the corresponding up/down stepper fades out and becomes non-interactive; pressing it changes nothing."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "meter_dot_clamps_within_track"
+description = "At extreme stop combinations the exposure meter dot clamps within the visible track — it never leaves the track bounds."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "help_explains_nonobvious_dials"
+description = "The in-page help panel provides aperture, shutter, and ISO explainer content so non-obvious dial behavior is guided in-app."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "preset_and_dial_controls_semantic"
+description = "Preset form inputs and dial/mode/help/preset controls use semantic button/input/label elements rather than unlabeled decorative wrappers."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "help_panel_dismissible_paths"
+description = "The help panel can be closed via its close control and via Escape, returning focus/workflow to the lab without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "double_submit_creates_exactly_one"
+description = "Double-activating the preset create submit control in quick succession creates exactly one preset: the visible row count increases by exactly one and exactly one new row appears."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "empty_undo_redo_disabled"
+description = "Undo with an empty undo stack and Redo with an empty redo stack are disabled controls; activating them changes nothing and produces no console errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "before_at_defaults_no_visible_change"
+description = "Holding Before while dials are already at defaults leaves the preview, meter, EV, and histogram visually unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "malformed_import_keeps_session"
+description = "Importing malformed, undecodable, or schema-invalid lab-package JSON (missing schemaVersion, wrong schemaVersion, missing required fields, out-of-list stops, or lookTag outside the closed enum) shows a visible error naming the import problem, leaves the current session state unchanged, and produces no console errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "empty_snapshot_name_adds_nothing"
+description = "Saving a snapshot with an empty name adds no snapshot row and shows inline validation naming the name field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "batch_favorite_requires_two_selected"
+description = "Batch Favorite selected with fewer than two presets selected is unavailable or does nothing; with two or more selected it marks every selected row favorite in one action."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "duplicate_preset_name_rejected"
+description = "Submitting create or edit with a preset name that already exists on another preset does not save and shows an error naming the name field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "out_of_list_stops_and_looktag_rejected"
+description = "Choosing or forcing an aperture, shutter, or iso outside the discrete stop lists, or a lookTag outside soft/crisp/grainy/night/daylight/cinematic, does not save and shows an error naming that field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.18"
+name = "duplicate_or_invalid_snapshot_rejected"
+description = "Saving a snapshot with a duplicate name or out-of-list stops adds no snapshot row and shows inline validation naming the offending field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.19"
+name = "develop_sliders_clamp_at_bounds"
+description = "Dragging a develop slider past -100, past 100, or past 0 for the Vignette and Grain lower bound leaves the value at the bound and the readout shows that bound"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.20"
+name = "paste_disabled_before_any_copy"
+description = "Before any copy has happened in the session, Paste settings is a disabled control; activating it changes no slider or dial value"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.21"
+name = "copy_dialog_zero_groups_disables_confirm"
+description = "In the Copy settings dialog, unchecking all three group checkboxes disables the confirm control"
+type = "binary"
+weight = 1.0
+

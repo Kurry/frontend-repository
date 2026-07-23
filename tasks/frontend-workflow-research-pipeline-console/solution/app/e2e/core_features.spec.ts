@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures';
-import { downloadText, fillEvaluate, fillFineTune, openApp, openResults, openRun, openSubmit, submitAndGetNewRun } from './helpers';
+import { activeJobs, downloadText, fillEvaluate, fillFineTune, openApp, openResults, openRun, openSubmit, submitAndGetNewRun } from './helpers';
 
 test.beforeEach(async ({ page }) => openApp(page));
 
@@ -40,10 +40,14 @@ test('1.3 running_phase_progress_advances', async ({ page }) => {
 });
 
 test('1.4 submit_valid_job_adds_run', async ({ page }) => {
-  const beforeActive = Number(await page.getByTestId('active-jobs').textContent());
   const dialog = await fillEvaluate(page);
+  // Snapshot right before submitting, not before the multi-step dialog fill:
+  // the board's background simulation ticks in real time, so capturing
+  // "before" any earlier than necessary widens the window in which an
+  // unrelated seeded run can legitimately finish and shift this count.
+  const beforeActive = await activeJobs(page);
   await submitAndGetNewRun(page, dialog);
-  await expect(page.getByTestId('active-jobs')).toHaveText(String(beforeActive + 1));
+  expect(await activeJobs(page)).toBe(beforeActive + 1);
   await expect(page.getByRole('dialog')).toHaveCount(0);
 });
 
@@ -186,21 +190,23 @@ test('1.16 timeline_filter_and_highlight', async ({ page }) => {
 });
 
 test('1.17 rollups_track_shared_state', async ({ page }) => {
-  const active = Number(await page.getByTestId('active-jobs').textContent());
+  const dialog = await fillEvaluate(page);
   const cost = await page.locator('.rollup', { hasText: 'Simulated cost' }).locator('strong').textContent();
-  const dialog = await fillEvaluate(page); await submitAndGetNewRun(page, dialog);
-  await expect(page.getByTestId('active-jobs')).toHaveText(String(active + 1));
+  await submitAndGetNewRun(page, dialog);
+  const liveActive = await page.locator('.run-strip:has(.status-running)').count();
+  expect(await activeJobs(page)).toBe(liveActive);
   await expect.poll(() => page.locator('.rollup', { hasText: 'Simulated cost' }).locator('strong').textContent()).not.toBe(cost);
   await page.getByRole('button', { name: 'Datasets', exact: true }).click(); await expect(page.locator('.rollup-strip')).toBeVisible();
 });
 
 test('1.18 double_submit_creates_one_run', async ({ page }) => {
-  const beforeRuns = Number((await page.getByTestId('run-count').textContent())!.match(/\d+/)![0]);
-  const beforeActive = Number(await page.getByTestId('active-jobs').textContent());
   const dialog = await fillEvaluate(page);
+  // Snapshot right before submitting; see 1.4 submit_valid_job_adds_run.
+  const beforeRuns = Number((await page.getByTestId('run-count').textContent())!.match(/\d+/)![0]);
+  const beforeActive = await activeJobs(page);
   await dialog.getByRole('button', { name: 'Submit job' }).dblclick();
   await expect(page.getByTestId('run-count')).toHaveText(`${beforeRuns + 1} runs`);
-  await expect(page.getByTestId('active-jobs')).toHaveText(String(beforeActive + 1));
+  expect(await activeJobs(page)).toBe(beforeActive + 1);
 });
 
 test('1.19 eval_completion_updates_leaderboard', async ({ page }) => {

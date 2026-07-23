@@ -235,27 +235,31 @@ export const useReviewStore = create<StoreState>((set, get) => ({
     return { ok: true };
   },
   startRerun: (slug, gateName) => {
-    const bundle = get().bundles.find((item) => item.slug === slug);
-    const existing = bundle?.reruns[gateName];
-    if (existing && ['running', 'paused'].includes(existing.status)) return;
-    const names = ['provision harness', 'collect trials', 'evaluate checks', 'publish result'] as const;
-    const runId = deterministicRerunId(slug, gateName);
-    const session = {
-      gateName,
-      status: 'running' as const,
-      runId,
-      currentStep: 0,
-      steps: names.map((name, index) => ({ name, status: index === 0 ? 'running' as const : 'pending' as const, attempt: index === 0 ? 1 : 0, maxAttempts: 3, timestamp: null as string | null, output: null as string | null, error: null as string | null, backoff: 0 })),
-    };
-    set((state) => ({
-      bundles: updateBundle(state.bundles, slug, (next) => {
-        next.reruns[gateName] = session;
-        next.timeline.unshift(event('re-run', `${gateName} re-run started`));
-        next.timeline.unshift(event('re-run-step', `${gateName}: provision harness running (attempt 1)`));
-      }),
-      ui: { ...state.ui, announcement: `${gateName} re-run started.` },
-    }));
-    scheduleAdvance(slug, gateName, 1800);
+    let started = false;
+    set((state) => {
+      const bundle = state.bundles.find((item) => item.slug === slug);
+      const existing = bundle?.reruns[gateName];
+      if (existing && ['running', 'paused'].includes(existing.status)) return state;
+      started = true;
+      const names = ['provision harness', 'collect trials', 'evaluate checks', 'publish result'] as const;
+      const runId = deterministicRerunId(slug, gateName);
+      const session = {
+        gateName,
+        status: 'running' as const,
+        runId,
+        currentStep: 0,
+        steps: names.map((name, index) => ({ name, status: index === 0 ? 'running' as const : 'pending' as const, attempt: index === 0 ? 1 : 0, maxAttempts: 3, timestamp: null as string | null, output: null as string | null, error: null as string | null, backoff: 0 })),
+      };
+      return {
+        bundles: updateBundle(state.bundles, slug, (next) => {
+          next.reruns[gateName] = session;
+          next.timeline.unshift(event('re-run', `${gateName} re-run started`));
+          next.timeline.unshift(event('re-run-step', `${gateName}: provision harness running (attempt 1)`));
+        }),
+        ui: { ...state.ui, announcement: `${gateName} re-run initiated.` },
+      };
+    });
+    if (started) scheduleAdvance(slug, gateName, 1800);
   },
   advanceRerun: (slug, gateName) => {
     let shouldContinue = false;
@@ -348,6 +352,12 @@ export const useReviewStore = create<StoreState>((set, get) => ({
           gate.status = gate.validTrials >= 3 && (gate.score ?? 0) >= 0.8 ? 'pass' : gate.validTrials < 3 ? 'inconclusive' : 'fail';
           gate.summary = `Quartz-Mini now measures ${gate.score.toFixed(2)} with ${gate.validTrials} of ${gate.totalTrials} valid trials after re-collection.`;
           gate.reasons = ['At least three trials are valid.', 'The aggregate difficulty score is at or above 0.80.'];
+          bundle.fixItems
+            .filter((item) => item.evidence.gateName === gateName && item.category === 'RERUN' && !item.resolved)
+            .forEach((item) => {
+              item.resolved = true;
+              bundle.timeline.unshift(event('fix-item', `Resolved ${item.category} item after successful re-run: ${item.title}`));
+            });
         }
       } else if (gateName === 'Oracle') {
         gate.score = 0.92;

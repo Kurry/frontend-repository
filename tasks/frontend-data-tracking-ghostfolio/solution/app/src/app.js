@@ -200,11 +200,16 @@ function allocationRows(list) {
 }
 
 // Position math derived from the activities ledger.
-function symbolStats(symbol) {
+function symbolStats(symbol, fallbackHolding = null) {
   const acts = state.activities.filter((a) => a.symbol === symbol);
   let buyCost = 0; let buyQty = 0;
   for (const a of acts) if (a.type === 'BUY') { buyCost += a.quantity * a.unitPrice; buyQty += a.quantity; }
-  const holding = state.holdings.find((h) => h.symbol === symbol);
+  // A portfolio may contain multiple valid positions with the same symbol.
+  // With no BUY history, each position falls back to its own unit price rather
+  // than inheriting the first matching position's price.
+  const holding = fallbackHolding?.symbol === symbol
+    ? fallbackHolding
+    : state.holdings.find((h) => h.symbol === symbol);
   const avgUnitCost = buyQty > 0
     ? buyCost / buyQty
     : (holding ? holding.unitPrice : (avgMemo.has(symbol) ? avgMemo.get(symbol) : 0));
@@ -213,7 +218,7 @@ function symbolStats(symbol) {
   return { avgUnitCost, realized, buyQty, buyCost };
 }
 function holdingMetrics(h) {
-  const { avgUnitCost, realized } = symbolStats(h.symbol);
+  const { avgUnitCost, realized } = symbolStats(h.symbol, h);
   // Round to cents at the derivation boundary so every surface (detail panel,
   // performance summary, exports) reads the same figures and the identities
   // (costBasis = avgUnitCost x quantity; unrealized = marketValue - costBasis)

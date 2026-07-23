@@ -117,3 +117,106 @@ test.describe('workspace contract (canonical)', () => {
 });
 
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
+
+test.describe('task-specific criteria', () => {
+  test('1.4 feedback_uses_live_regions', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+
+    // 1. Export copy confirmation
+    // Click the first task in the list
+    await page.click('button[aria-label^="Open task"]');
+    await expect(page.locator('text=Trial register')).toBeVisible();
+
+    // Click the first trial in the list
+    await page.locator('tr[aria-label^="Open review workspace"]').first().click();
+    await expect(page.locator('h2:has-text("Verdict register")').first()).toBeVisible();
+
+    await page.click('text=Export review package');
+
+    // Check export copy
+    await page.click('button:has-text("Copy")');
+    const copyNotice = page.locator('[role="status"][aria-live="polite"]');
+    await expect(copyNotice).toBeVisible();
+    await expect(copyNotice).toContainText('copied to clipboard');
+
+    await page.click('button[aria-label="Close export drawer"]');
+
+    // 2. Validation errors (Bulk Apply)
+    // The tour might be open; dismiss it first if present (no assertion made either way).
+    await page.locator('button:has-text("Dismiss tour")').click().catch(() => {});
+    await page.click('button:has-text("Flips only")');
+    const checkboxes = page.locator('input[type="checkbox"]');
+    await checkboxes.nth(0).click();
+    await page.click('text=Apply classification to selected');
+
+    // Check classification error — the bulk-apply form conveys validation
+    // failures via a `role="alert"` message (an implicit ARIA live region),
+    // which is what the "ARIA live regions or associated field messaging"
+    // criterion requires.
+    const classificationError = page.locator('p[role="alert"]', { hasText: 'classification:' });
+    await expect(classificationError).toBeVisible();
+
+    // Check rationale error
+    const rationaleError = page.locator('p[role="alert"]', { hasText: 'rationale:' });
+    await expect(rationaleError).toBeVisible();
+
+    // 3. Validation errors (Import)
+    await page.click('button:has-text("Import review package")');
+    // Clear first to trigger required error
+    await page.fill('textarea[name="json"]', '');
+    await page.click('button[type="submit"]:has-text("Import review package")');
+
+    const importJsonError = page.locator('p[role="alert"]', { hasText: 'document:' });
+    await expect(importJsonError).toBeVisible();
+
+    // also check JSON parse error
+    await page.fill('textarea[name="json"]', '{ invalid json }');
+    await page.click('button[type="submit"]:has-text("Import review package")');
+    await expect(page.locator('[role="alert"]', { hasText: 'Import validation failed' })).toBeVisible();
+
+    // Check successful import. The importer validates taskId/trialId/model/
+    // activeLabel/comparedLabels/dimensionRollup against the currently open
+    // trial (see src/schemas.js validateReviewPackage), so a fabricated
+    // payload with made-up ids is rejected. Build a genuinely valid package
+    // by reading the app's own "Export review package" preview (which is
+    // always in sync with the open trial) and grafting in one real
+    // criterionId read from the verdict register.
+    await page.click('button[aria-label="Close import surface"]').catch(() => {});
+
+    const firstCriterionRow = page.locator('[aria-label^="Select criterion "]').first();
+    const rowLabel = await firstCriterionRow.getAttribute('aria-label');
+    // aria-label is "Select criterion <id> <title>" — the id is the second token.
+    const criterionId = rowLabel.split(' ')[2];
+    expect(criterionId, 'a real criterionId must be extractable from the verdict register').toBeTruthy();
+
+    await page.click('text=Export review package');
+    const exportPreview = page.locator('pre');
+    await expect(exportPreview).toBeVisible();
+    const exportedPackage = JSON.parse(await exportPreview.textContent());
+    await page.click('button[aria-label="Close export drawer"]');
+
+    // evidenceStepIds is optional but, per src/schemas.js adjudicationSchema,
+    // must contain at least one entry when present — omit it rather than
+    // sending an empty array.
+    exportedPackage.adjudications = [
+      {
+        criterionId,
+        classification: 'agent-bug',
+        rationale: 'This is a valid rationale for the imported adjudication under test.',
+        reviewedAt: new Date().toISOString(),
+      },
+    ];
+    // summaryCounts must agree with the adjudications array (see
+    // src/schemas.js validateReviewPackage).
+    exportedPackage.summaryCounts = { 'agent-bug': 1, 'rubric-bug': 0, 'scorer-error': 0 };
+    const validJson = JSON.stringify(exportedPackage);
+
+    await page.click('button:has-text("Import review package")');
+    await page.fill('textarea[name="json"]', validJson);
+    await page.click('button[type="submit"]:has-text("Import review package")');
+
+    const globalAnnouncement = page.locator('div[aria-live="polite"] span');
+    await expect(globalAnnouncement).toContainText('Imported 1 adjudications successfully');
+  });
+});

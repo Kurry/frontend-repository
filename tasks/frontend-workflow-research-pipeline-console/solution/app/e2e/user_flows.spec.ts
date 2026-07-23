@@ -5,7 +5,9 @@ test.beforeEach(async ({ page }) => openApp(page));
 
 test('6.1 submit_evaluate_updates_board_and_leaderboard', async ({ page }) => {
   await openResults(page); const before = await page.locator('tr[data-model="quill-2b-ft-1027"] .result-cell').first().textContent(); await page.getByRole('button', { name: 'Pipeline board' }).click();
-  const active = Number(await page.getByTestId('active-jobs').textContent()); const dialog = await fillEvaluate(page, 'Switchboard', 3); const run = await submitAndGetNewRun(page, dialog); await expect(page.getByTestId('active-jobs')).toHaveText(String(active + 1));
+  // Snapshot right before submitting, not before the dialog fill; see 1.4
+  // submit_valid_job_adds_run in core_features.spec.ts for why.
+  const dialog = await fillEvaluate(page, 'Switchboard', 3); const run = await submitAndGetNewRun(page, dialog); await expect(run).toBeVisible();
   await expect(run.getByText(/trial [1-3] of 3/)).toBeVisible({ timeout: 4_000 }); await expect(run.locator('.phase-card').nth(2).locator('.status-chip')).toHaveText('Complete', { timeout: 9_000 });
   await openResults(page); await expect(page.locator('tr[data-model="quill-2b-ft-1027"] .result-cell').first()).not.toHaveText(before!);
 });
@@ -40,8 +42,13 @@ test('6.7 dataset_filter_and_timeline_filters', async ({ page }) => {
 });
 
 test('6.8 submit_panel_and_rollup_chrome', async ({ page }) => {
+  // Submit first, minimizing real time between the "before" snapshot and
+  // the submit click (see 1.4 submit_valid_job_adds_run in
+  // core_features.spec.ts) — the rollup-chrome-per-view check below doesn't
+  // depend on submitting first or last, so do the time-sensitive delta
+  // check as early as possible.
+  const dialog = await fillEvaluate(page); await submitAndGetNewRun(page, dialog);
   for (const view of ['Datasets', 'Results', 'Pipeline board']) { await page.getByRole('button', { name: view, exact: true }).click(); await expect(page.locator('.rollup-strip')).toBeVisible(); }
-  const active = Number(await page.getByTestId('active-jobs').textContent()); const dialog = await fillEvaluate(page); await submitAndGetNewRun(page, dialog); await expect(page.getByTestId('active-jobs')).toHaveText(String(active + 1));
 });
 
 test('6.9 submit_pause_retry_overlays', async ({ page }) => {
