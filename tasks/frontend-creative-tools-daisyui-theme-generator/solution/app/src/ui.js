@@ -75,10 +75,10 @@ export function buildShell() {
           <span class="hold-label"><span class="hold-icon" aria-hidden="true">&#43;</span> Hold to add theme</span>
         </button>
         <div class="my-themes-block">
-          <h3 id="my-themes-h" class="side-h">My Themes <span class="count-pill" id="my-count">0</span></h3>
+          <h3 id="my-themes-h" class="side-h">My themes <span class="count-pill" id="my-count">0</span></h3>
           <ul id="my-themes" class="theme-list" aria-labelledby="my-themes-h"></ul>
         </div>
-        <h3 id="builtin-themes-h" class="side-h">Built-in Themes</h3>
+        <h3 id="builtin-themes-h" class="side-h">Built-in themes</h3>
         <ul id="builtin-themes" class="theme-list" aria-labelledby="builtin-themes-h">
           ${BUILTINS.map((t) => themeRowHTML(t)).join('')}
         </ul>
@@ -102,11 +102,11 @@ export function buildShell() {
           <label class="field-label" for="theme-name">Name</label>
           <input id="theme-name" class="text-input" type="text" placeholder="mytheme" autocomplete="off"
                  aria-describedby="name-hint name-error" spellcheck="false" />
-          <p id="name-hint" class="hint">2–30 chars · lowercase letter first · a–z, 0–9, - and _</p>
+          <p id="name-hint" class="hint">2–30 chars · letter first · a–zA–Z, 0–9, spaces, -, and _</p>
           <p id="name-error" class="field-error" aria-live="polite"></p>
         </div>
 
-        <h3 class="side-h">Change Colors</h3>
+        <h3 class="side-h">Change colors</h3>
         <div class="color-grid">
           <div class="color-base">
             ${BASE_KEYS.map((k) => colorControlHTML(k)).join('')}
@@ -136,7 +136,7 @@ export function buildShell() {
         </div>
         <button id="btn-reset" class="mini-btn" type="button">Reset tokens</button>
 
-        <h3 class="side-h">Font Family</h3>
+        <h3 class="side-h">Font family</h3>
         <div class="seg" role="group" aria-label="Font family" data-seg="font">
           ${FONT_FAMILIES.map((f) => `<button class="seg-btn" type="button" data-font="${f.id}" aria-pressed="false" aria-label="Font family ${f.label}">${f.label}</button>`).join('')}
         </div>
@@ -205,13 +205,13 @@ export function buildShell() {
           <button id="btn-download" class="mini-btn" type="button">Download theme.css</button>
         </div>
         <div class="import-block">
-          <h3 class="side-h" id="import-h">Import Theme</h3>
+          <h3 class="side-h" id="import-h">Import theme</h3>
           <label class="field-label" for="import-src">Declared-theme JSON</label>
           <textarea id="import-src" class="import-src" rows="5" aria-describedby="import-hint import-msg"
-            placeholder='{"name":"my-theme","colors":{"--color-primary":"#4b28d7", ...},"radius":{...},"size":{...},"effects":{...},"options":{...},"generatedAt":"...Z"}'></textarea>
+            placeholder='{"name":"my-theme","colors":{"--color-primary":"#4b28d7", ...},"radius":{...},"size":{...},"depth":1,"noise":0,"options":{...},"generatedAt":"...Z"}'></textarea>
           <p id="import-hint" class="hint">Paste an exported theme JSON — the same request-body contract the JSON tab emits.</p>
           <ul id="import-msg" class="field-error-list" role="alert"></ul>
-          <button id="btn-import" class="mini-btn" type="button">Import Theme</button>
+          <button id="btn-import" class="mini-btn" type="button">Import theme</button>
         </div>
       </div>
     </div>
@@ -278,12 +278,13 @@ let els = {};
 function refreshThemeLists() {
   els.myCount.textContent = String(state.customs.length);
   const mine = state.customs.map((t) => themeRowHTML(t)).join('');
-  const ghosts = [...leavingRows.values()].map((t) => `<li class="theme-row-wrap row-leaving" aria-hidden="true">
+  const ghosts = [...leavingRows.values()].map((t) => `<li class="theme-row-wrap row-leaving" data-row="${t.id}" aria-hidden="true">
     <span class="theme-row theme-row-ghost"><span class="chip">${CHIP_KEYS.map((k) => `<i style="background:${t.colors[k]}"></i>`).join('')}</span>
     <span class="tname">${esc(t.name)}</span></span></li>`).join('');
-  els.myThemes.innerHTML = state.customs.length || leavingRows.size
+  els.myThemes.innerHTML = state.customs.length > 0 || leavingRows.size > 0
     ? mine + ghosts
     : `<li class="empty-state">Themes you create appear here.<br />Press and hold <strong>Hold to add theme</strong> for about three seconds, or fork a built-in by editing one of its tokens.</li>`;
+  if (state.customs.length === 0 && leavingRows.size === 0) els.myThemes.innerHTML = `<li class="empty-state">Themes you create appear here.<br />Press and hold <strong>Hold to add theme</strong> for about three seconds, or fork a built-in by editing one of its tokens.</li>`;
   // built-in rows: refresh pressed state + chips only
   for (const t of BUILTINS) {
     const btn = $(`[data-select="${t.id}"]`, els.builtinThemes);
@@ -335,6 +336,8 @@ function refreshEditorControls() {
   setSwitch('darkColorScheme', !!t.options.darkColorScheme);
   els.undoBtn.disabled = !state.past.length;
   els.redoBtn.disabled = !state.future.length;
+  els.cbFilter.value = state.colorBlind;
+  els.viewport.dataset.cb = state.colorBlind;
 }
 
 function syncSeg(kind, group, value) {
@@ -584,11 +587,11 @@ function finishHold(completed) {
 
 // ----------------------------------------------------------- comparison ----
 function setCompare(on) {
-  state.compareOn = !!on;
   if (on && !state.snapshots.length) {
-    const snap = saveSnapshot();
-    showToast(`Snapshot saved — ${snap.name}`);
+    showToast("No snapshots yet \u2014 save one to compare");
+    return;
   }
+  state.compareOn = !!on;
   els.compareBtn.setAttribute('aria-checked', String(state.compareOn));
   els.compareBtn.classList.toggle('is-on', state.compareOn);
   if (state.compareOn) refreshCompareStage();
