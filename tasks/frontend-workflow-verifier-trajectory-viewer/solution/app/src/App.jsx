@@ -1904,7 +1904,7 @@ function AdjudicationSummary({ records }) {
             )}
           >
             <div
-              className="count-pop font-mono text-xl font-extrabold"
+              className="mark-emphasis font-mono text-xl font-extrabold"
               key={`${classification}-${counts[classification]}`}
             >
               {counts[classification]}
@@ -2205,7 +2205,7 @@ function ExportDrawer({ trial, ui }) {
     await copyText(activeText);
     const notice =
       tab === "json"
-        ? "Review package JSON copied to clipboard"
+        ? "Verdict JSON copied to clipboard"
         : "Review memo Markdown copied to clipboard";
     setCopied(true);
     setCopyNotice(notice);
@@ -2380,7 +2380,7 @@ function ImportSurface({ task, trial }) {
     replace(result.data.adjudications);
     setImportErrors([]);
     setAnnouncement(
-      `Imported ${result.data.adjudications.length} adjudications successfully from Review Package JSON`,
+      `Successfully imported trajectory report`,
     );
     close("import");
   });
