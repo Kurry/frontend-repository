@@ -1,0 +1,489 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_queue_groups_and_badges"
+description = "On load, the left sidebar shows unannotated eval outputs grouped by at least 3 seeded suites, each suite entry carrying a count badge of remaining items"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "suite_click_loads_and_badge_decrements"
+description = "Clicking a suite loads its unannotated items into the main panel in queue order, and the suite's count badge decrements by exactly one each time an item is submitted"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "queue_entries_show_state_chips"
+description = "Each queue entry shows a selection checkbox and a review-state chip (Unlabeled, Labeled, Reviewed, or Disputed), and the chip updates in place when the item's state changes without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "select_all_and_bulk_bar_count"
+description = "A Select all control checks every visible item in a suite, and a bulk actions bar appears whenever at least one item is selected, showing a live selected count that tracks checks and unchecks exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "bulk_skip_moves_all_selected"
+description = "Bulk actions apply to every selected item at once: Skip selected moves them all to the end of the queue and raises the skipped badge by the selected count, Mark reviewed sets all their chips to Reviewed, and Clear selection unchecks everything and hides the bulk bar, with the selection cleared after each action"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "1.7"
+name = "card_prompt_snippet_and_response"
+description = "The annotation card shows the original prompt in a read-only code snippet block at the top and the model response in a scrollable body area below it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "binary_rating_highlight"
+description = "Selecting thumbs-up or thumbs-down highlights the active choice in the brand blue with a filled treatment while the unselected button stays outlined; switching the choice moves the highlight"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "rubric_sliders_with_live_values"
+description = "The rubric section shows one labeled slider per dimension (Accuracy, Clarity, and Relevance at minimum) ranging 1 to 5, with the current numeric value to the right of each track updating as the slider moves"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "comments_counter_and_500_cap"
+description = "The comments field shows a live character counter counting down from 500 as the annotator types, and input beyond 500 characters is prevented with the counter showing 0 remaining"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "image_area_only_on_image_items"
+description = "Items with an attached image show a region annotation area above the response body, while items without an image show only the prompt and response"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "submit_gated_on_full_interaction"
+description = "Submit & Next stays disabled until the binary rating is chosen and every rubric slider has been interacted with, then becomes enabled"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "submit_saves_and_advances"
+description = "Clicking Submit & Next saves the annotation, sets the item's state to Labeled, removes it from the unannotated queue, and loads the next unannotated item without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "skip_reorders_and_badges"
+description = "Skip moves the current item to the end of the queue without saving, and a skipped count badge appears on that suite's sidebar entry and increments with each skip"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "suite_complete_empty_state"
+description = "Submitting the last unannotated item in a suite shows an empty state in the main panel naming the suite as complete, with a control to switch suites or open the review queue"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "command_palette_opens_and_filters"
+description = "Pressing Ctrl+K (or Cmd+K) opens a command palette overlay with its search input focused, and typing fuzzy-matches across queue items, suites, taxonomy classes, and view names, narrowing the visible result list as the query grows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "palette_keyboard_activation"
+description = "Arrow keys move a visible highlight through palette results and Enter activates the highlighted one — an item result opens that item in the annotation card, a view result switches views — while Escape closes the palette; each result row shows a kind label (Item, Suite, Class, or View) and an unmatched query shows an empty-state line"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "taxonomy_list_shows_full_rows"
+description = "The Taxonomy view lists at least 5 seeded classes, each row showing the class name, a color swatch, its badge icon, its single-digit keyboard shortcut, and its attribute list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "class_form_fields_and_gating"
+description = "New Class opens a TaxonomyClassCreate form with name (1–60 chars, unique), color as #RRGGBB from a fixed palette, badge icon, keyboard shortcut (exactly one digit 1–9, unique), and optional attributes each with name and kind select (non-empty options) or text; Save stays disabled until name, color, icon, and a unique shortcut are valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "icon_picker_searchable_grid"
+description = "The class form's icon picker shows a searchable grid of at least 20 icons where typing filters the grid and clicking selects with a visible treatment, and the chosen badge icon then renders beside the class name in the taxonomy list, the class picker, and its region list rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "duplicate_shortcut_validation"
+description = "Submitting the class form with a keyboard shortcut already used by another class shows an inline validation message naming the shortcut field and identifying the conflicting class, and saves nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "new_class_live_in_picker_and_shortcut"
+description = "Saving a valid class adds exactly one row to the taxonomy list, and the new class immediately appears in the annotation card's class picker and responds to its keyboard shortcut without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "class_rename_propagates_everywhere"
+description = "Renaming a class through its prefilled edit form updates the name in the taxonomy list, the class picker, existing region labels, and the export preview, all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "class_delete_confirms_and_unclassifies"
+description = "Deleting a class used by existing regions shows a confirmation dialog stating how many regions carry it; confirming removes the class and marks those regions as Unclassified"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "1.26"
+name = "metadata_field_builder_adds_control"
+description = "Defining a custom metadata field (name plus kind of text, number, select, or checkbox) adds one row to the field list and immediately renders the matching control on the annotation card below the comments field, joining the at least 2 seeded fields (one select, one checkbox) already rendered there on first load"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "1.28"
+name = "metadata_values_saved_through"
+description = "Values entered in metadata fields save with the annotation and appear both in the History read-only view and inside that annotation's entry in the Labels JSON export preview, keyed by field name"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "metadata_number_validation_and_delete"
+description = "A number-kind metadata field rejects non-numeric input with an inline message naming the field, and deleting a metadata field shows a confirmation stating how many saved annotations carry values for it before removing its control from the card"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "armed_class_draws_labeled_box"
+description = "Pressing a class's keyboard shortcut or picking it from the class picker arms it, and dragging on an image draws a bounding box in that class's color with the class name as a label"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "region_list_syncs_with_boxes"
+description = "Each drawn box appears simultaneously in the region list with its class and attribute values; selecting a box on the image or in the list highlights it in both places and shows its attribute form, and deleting a list entry removes exactly that box from the image"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "1.33"
+name = "zoom_and_pan_keep_box_registration"
+description = "Zoom controls (plus, minus, fit) scale the image with boxes keeping their positions relative to the image content, and panning the zoomed image moves the boxes with it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "review_state_transitions"
+description = "Submitting an annotation moves an item from Unlabeled to Labeled, Mark reviewed moves Labeled to Reviewed, and Dispute (requiring a one-line reason) moves Labeled or Reviewed to Disputed, each transition reflected in the state chip"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "review_queue_tiers_live"
+description = "The Review queue shows three tiers top to bottom — Disputed, then Labeled awaiting review, then Reviewed — each with a live count, and items move between tiers immediately as their states change"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "resolve_dispute_promotes"
+description = "Resolving a disputed item with the Resolve control returns it to the Reviewed tier and decrements the Disputed tier count by exactly one, while a newly disputed item (including a re-disputed one) appears at the top of the Disputed tier rather than keeping its old position"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "1.38"
+name = "agreement_table_rows_complete"
+description = "The Agreement view renders one row per seeded double-annotated item (at least 12 across suites) showing both annotators' binary ratings, each rubric dimension's two scores, and an agreement indicator for Annotator A — Kestrel and Annotator B — Juniper"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "disagreement_flag_rule"
+description = "A row is flagged as a disagreement exactly when the binary ratings differ or any rubric dimension's scores differ by 2 or more; flagged rows carry a visibly distinct warning treatment and a Flag for dispute control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "agreement_summary_recomputes"
+description = "The summary strip shows the selected suite's agreement percentage and flagged-row count, and switching the suite selector recomputes both the table rows and the summary figures for the newly selected suite"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "flag_for_dispute_crosses_views"
+description = "Activating Flag for dispute on a disagreement row sets that item's review state to Disputed and the item immediately appears in the Review queue's Disputed tier"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "assist_steps_advance_visibly"
+description = "Run Assist starts a simulated pass with one visible step per unannotated item, each showing the item's title and a status advancing visibly through pending, running, and complete or failed, with retrying shown as its own status"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "assist_retry_backoff_counter"
+description = "A failing assist step retries automatically with a visible backoff countdown and an attempt counter (such as waiting before retry 2 of 3); exhausting retries marks it failed with an inline error summary and a manual Retry control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "assist_resume_from_failed_step"
+description = "Activating a failed step's Retry control resumes the run from that step, and pausing then resuming a running pass freezes and continues progression at exactly the current step — in both cases steps already completed keep their original outputs and timestamps and never re-execute"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "1.46"
+name = "assist_rollup_and_timeline"
+description = "A run-level rollup (n of m complete, elapsed duration, failure count) updates live as steps advance, and the run's event timeline lists step transitions with timestamps, filters by status, and highlights the corresponding step when an entry is selected"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "suggestion_accept_fills_not_submits"
+description = "A completed assist step attaches a rating visibly marked Suggested; a single accept control fills the binary rating and sliders, but the suggestion never counts as a submitted annotation until Submit & Next is pressed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "undo_redo_controls_and_shortcuts"
+description = "Undo and Redo appear in the toolbar, respond to Ctrl+Z and Ctrl+Shift+Z (Cmd variants on macOS), and each control is disabled when its stack is empty"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "undo_restores_complete_state"
+description = "Undo after a submitted annotation, a skip, a bulk action, a region change, a taxonomy edit, or a review-state change restores the exact prior state: queue counts, badges, chips, and the export preview all return to their previous values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "redo_and_stack_clearing"
+description = "Redo reapplies the most recently undone action completely, a new action after an undo clears the redo stack, and a history panel lists recent actions with human-readable labels (such as Submitted annotation, Skipped 3 items) where undoing visibly removes or marks the reverted entry"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "1.52"
+name = "annotation_history_tab"
+description = "The History tab lists all submitted annotations with response summary, binary rating, and date; clicking one opens a read-only view of the saved ratings, comments, metadata values, and any region boxes, and new submissions appear immediately while undone ones disappear"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "jsonl_download_shape"
+description = "The Download JSONL button above the queue exports all completed annotations as a JSONL file where each line is a JSON object with prompt, response, binary rating, dimension scores, and comments"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "export_view_labels_package_shape"
+description = "The Export view shows a live-compiled monospaced preview with Labels JSON and Stats summary tabs where Labels JSON is a LabelsPackage: schemaVersion exactly annotation-studio-labels-v1, taxonomy (id, name, color, icon, shortcut, attributes), metadataFields, and items (id, suite, review_state in unlabeled|labeled|reviewed|disputed, annotation null when unlabeled else AnnotationCreate with rating up|down, scores Accuracy/Clarity/Relevance integers 1–5, comment ≤500, metadata keyed by field name, regions with classId and x/y/w/h); these field names and enums are visible in the preview text, and submitting an annotation, resolving a dispute, or adding a region changes the corresponding preview values without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "annotation_create_field_contract"
+description = "Submit & Next produces an AnnotationCreate payload with rating exactly up or down, scores.Accuracy/Clarity/Relevance integers 1–5, comment at most 500 characters, metadata keyed by field name, and regions as RegionCreate objects; invalid rating, scores, comment length, or metadata kind blocks submit with an inline message naming the offending field and leaves the queue unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.56"
+name = "copy_export_exact_with_confirmation"
+description = "The Copy export control puts the exact visible preview text on the clipboard and shows a visible confirmation (icon swap or toast) that reverts after a moment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.57"
+name = "stats_match_other_surfaces"
+description = "The Stats summary's numbers match the rest of the app: suite progress equals the sidebar counts, the agreement percentage equals the Agreement view's figure, and the disputed count equals the Review queue's Disputed tier count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.58"
+name = "region_create_geometry_bounds"
+description = "Drawing a region produces a RegionCreate with classId matching a taxonomy class, x/y ≥ 0, w/h ≥ 8, and x+w / y+h within image bounds; boxes with w or h below 8 are discarded; region attributeValues for select attributes use one of that attribute's options"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.59"
+name = "labels_package_import_round_trip"
+description = "Import accepts a conforming LabelsPackage (schemaVersion annotation-studio-labels-v1) and restores taxonomy, metadata fields, annotations, regions, and review-state chips so History, Taxonomy, region lists, and the next Labels JSON preview match the imported document; Export then Import of the same Labels JSON reconstructs the same visible state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.60"
+name = "import_rejects_nonconforming_package"
+description = "Import of malformed JSON or a LabelsPackage failing the field contract (missing schemaVersion/taxonomy/metadataFields/items, schemaVersion not annotation-studio-labels-v1, review_state or rating outside closed enums, score outside 1–5, or region classId absent from taxonomy) shows a visible error naming the offending field and leaves taxonomy, annotations, and review states unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.61"
+name = "dispute_create_reason_contract"
+description = "Dispute submits a DisputeCreate with reason 1–200 characters after trim as a single line; empty, over-length, or multi-line reason shows an inline message naming reason and changes no review state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.62"
+name = "jsonl_line_full_field_contract"
+description = "Each line of the downloaded JSONL is an AnnotationsJsonlLine object carrying all seven required keys — prompt, response, rating (up or down), scores (object with Accuracy, Clarity, and Relevance integers 1–5), comment (string of at most 500 characters), metadata (object keyed by field name), and regions (array of RegionCreate objects) — including for annotations that carried metadata values or region boxes"
+type = "binary"
+weight = 1.0
