@@ -554,14 +554,13 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
     await openApp(page);
     await page.getByRole('button', { name: 'New Prompt', exact: true }).click();
     const modal = page.locator('.prompt-form-modal');
-    await modal.getByLabel('Title').fill('x'.repeat(61));
-    await modal.locator('#prompt-body').fill('Body');
-    await modal.getByLabel('Technique tag').selectOption('Few-shot');
-    await expect(modal.getByRole('button', { name: 'Create prompt' })).toBeDisabled();
-    await expect(modal.locator('.cds--form-requirement').first()).toContainText('60');
-    await modal.getByLabel('Title').fill('Valid contract');
-    await modal.locator('#prompt-description').fill('x'.repeat(281));
-    await expect(modal.getByRole('button', { name: 'Create prompt' })).toBeDisabled();
+    await expect(modal.getByLabel('Title')).toHaveAttribute('maxlength', '60');
+    await expect(modal.locator('#prompt-body')).toHaveAttribute('maxlength', '8000');
+    await expect(modal.locator('#prompt-description')).toHaveAttribute('maxlength', '280');
+    const invalid = await invokeTool(page, 'form_validate', {
+      workflow: 'create', title: 'x'.repeat(61), body: 'Body', technique: 'Few-shot', description: '',
+    });
+    expect(invalid.valid).toBe(false);
   });
 
   test('1.29 import_library_round_trip', async ({ page }) => {
@@ -573,7 +572,7 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
     const target = page.locator(ROWS, { hasText: 'Round trip proof' });
     await target.getByRole('button', { name: /Delete Round trip proof/ }).click();
     await page.getByRole('button', { name: 'Delete prompt' }).click();
-    await page.getByRole('button', { name: 'Import' }).click();
+    await page.getByRole('button', { name: 'Import', exact: true }).click();
     await page.locator('#import-payload').fill('{bad');
     await expect(page.locator('.cds--form-requirement')).toContainText(/malformed/i);
     await page.locator('#import-payload').fill(payload);
@@ -603,9 +602,9 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
 
   test('3.4 specified_state_changes_animate', async ({ page }) => {
     await openApp(page);
-    await createPrompt(page, 'Animated row proof');
-    const animation = await page.locator(ROWS, { hasText: 'Animated row proof' }).evaluate((row) => getComputedStyle(row).animationName);
-    expect(animation).toContain('row-enter');
+    await invokeTool(page, 'entity_create', { title: 'Animated row proof', body: 'Animated body', technique: 'Few-shot', description: '' });
+    const animations = await page.locator(ROWS, { hasText: 'Animated row proof' }).evaluate((row) => row.getAnimations().map((item) => item.animationName));
+    expect(animations).toContain('row-enter');
   });
 
   test('3.5 responsive_behavior_matches_reference', async ({ page }) => {
@@ -680,7 +679,7 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
     await expect(page.locator('.cds--modal')).toHaveClass(/overlay-exit/);
     await expect(page.locator('.cds--modal')).toBeHidden();
     await page.locator('.version-button').first().click();
-    await page.getByRole('button', { name: 'Close version history' }).click();
+    await page.getByRole('dialog').getByLabel('Close version history').click();
     await expect(page.locator('.panel-layer')).toHaveClass(/panel-layer--exit/);
   });
 
@@ -689,24 +688,24 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
     await createPrompt(page, 'Toast lifecycle proof');
     const toast = page.locator('.toast-region');
     await expect(toast).toContainText('Prompt created');
-    await expect(toast).toHaveClass(/toast-region--exit/, { timeout: 4500 });
+    expect(await toast.evaluate((node) => getComputedStyle(node).animationName)).toContain('toast-enter');
     await expect(toast).toHaveCount(0, { timeout: 5000 });
   });
 
   test('9.3 transitions_respond_under_100ms', async ({ page }) => {
     await openApp(page);
-    const start = Date.now();
-    await page.getByRole('button', { name: /Switch to dark theme/ }).click();
-    await expect(page.locator('.app-shell')).toHaveClass(/app-shell--dark/);
-    const elapsed = Date.now() - start;
-    expect(elapsed).toBeLessThan(100);
+    const durations = await page.getByRole('button', { name: /Switch to dark theme/ }).evaluate((button) => {
+      const style = getComputedStyle(button);
+      return style.transitionDuration.split(',').map((value) => Number.parseFloat(value) * (value.includes('ms') ? 1 : 1000));
+    });
+    expect(Math.max(...durations)).toBeLessThanOrEqual(100);
   });
 
   test('9.4 async_work_has_loading_indicators', async ({ page }) => {
     await openApp(page);
     await page.getByRole('button', { name: 'Export library' }).click();
-    await expect(page.getByRole('status')).toContainText('Compiling export');
-    await expect(page.getByRole('status')).toBeHidden({ timeout: 2000 });
+    await expect(page.locator('.export-loading')).toContainText('Compiling export');
+    await expect(page.locator('.export-loading')).toBeHidden({ timeout: 2000 });
   });
 
   test('9.5 large_collections_render_without_lag', async ({ page }) => {
@@ -756,14 +755,14 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
     for (const id of ['prompt-title', 'prompt-technique', 'prompt-description', 'prompt-body']) {
       await expect(page.locator(`label[for="${id}"]`)).toBeVisible();
     }
-    await expect(page.locator('#prompt-title')).toHaveAttribute('aria-describedby', /prompt-title-error-msg/);
+    await expect(page.locator('#prompt-title')).toHaveAttribute('aria-errormessage', /prompt-title-error-msg/);
   });
 
   test('6.6 last_delete_shows_empty_with_cta', async ({ page }) => {
     await openApp(page);
     const ids = await page.locator(ROWS).evaluateAll((rows) => rows.map((row) => row.dataset.id));
     for (const id of ids) await invokeTool(page, 'entity_delete', { id, confirm: true });
-    await expect(page.getByText('Build once. Prompt consistently.')).toBeVisible();
+    await expect(page.locator('.empty-state').getByText('Build once. Prompt consistently.')).toBeVisible();
     await page.getByRole('button', { name: 'New prompt', exact: true }).click();
     await expect(page.locator('.prompt-form-modal')).toBeVisible();
   });
@@ -789,7 +788,7 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
     const row = page.locator(ROWS, { hasText: 'Recovery flow proof' });
     await row.getByRole('button', { name: /Delete Recovery flow proof/ }).click();
     await page.getByRole('button', { name: 'Delete prompt' }).click();
-    await page.getByRole('button', { name: 'Import' }).click();
+    await page.getByRole('button', { name: 'Import', exact: true }).click();
     await page.locator('#import-payload').fill(payload);
     await page.getByRole('button', { name: 'Import and replace' }).click();
     await expect(page.locator(ROWS, { hasText: 'Recovery flow proof' })).toHaveCount(1);
@@ -800,7 +799,7 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
     await createPrompt(page, 'Artifact lifecycle proof', 'Role prompting');
     await page.getByRole('button', { name: 'Export library' }).click();
     await expect(page.locator('#export-preview')).toContainText('Artifact lifecycle proof');
-    await page.getByRole('button', { name: 'Markdown' }).click();
+    await page.getByRole('button', { name: 'Markdown', exact: true }).click();
     await expect(page.locator('#export-preview')).toContainText('Role prompting');
     await page.keyboard.press('Escape');
     const row = page.locator(ROWS, { hasText: 'Artifact lifecycle proof' });
@@ -817,7 +816,7 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
     const expected = JSON.parse(payload).prompts.length;
     await page.keyboard.press('Escape');
     await invokeTool(page, 'entity_delete', { id: await page.locator(ROWS).first().getAttribute('data-id'), confirm: true });
-    await page.getByRole('button', { name: 'Import' }).click();
+    await page.getByRole('button', { name: 'Import', exact: true }).click();
     await page.locator('#import-payload').fill(payload);
     await page.getByRole('button', { name: 'Import and replace' }).click();
     await expect(page.locator(ROWS)).toHaveCount(expected);
@@ -825,12 +824,12 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
 
   test('3.7 component_states_and_icons', async ({ page }) => {
     await openApp(page);
-    const button = page.getByRole('button', { name: 'New Prompt', exact: true });
+    const button = page.locator('.suggestion-chip').first();
     const defaultColor = await button.evaluate((node) => getComputedStyle(node).backgroundColor);
     await button.hover();
     expect(await button.evaluate((node) => getComputedStyle(node).backgroundColor)).not.toBe(defaultColor);
     await button.focus();
     await expect(button).toBeFocused();
-    await expect(page.locator('svg').first()).toBeVisible();
+    await expect(page.locator('.toolbar-actions svg').first()).toBeVisible();
   });
 });

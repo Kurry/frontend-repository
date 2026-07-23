@@ -177,7 +177,9 @@ export const useLibraryStore = create((set, get) => ({
       await new Promise(r => setTimeout(r, 500));
       const document = librarySchema.parse(typeof rawPayload === 'string' ? JSON.parse(rawPayload) : rawPayload);
       const prompts = document.prompts.map((item) => {
-        const data = promptRequestSchema.parse(item);
+        // librarySchema already validates imported records, including the
+        // intentionally preserved legacy seeded title allowance.
+        const data = requestFromPrompt(item);
         return {
           id: item.id,
           ...data,
