@@ -213,6 +213,7 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     redoStack.value.push(makeSnapshot())
     applySnapshot(undoStack.value.pop())
     editorEpoch.value += 1
+    persistWorkspace()
     notify('Change undone')
   }
 
@@ -221,6 +222,7 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     undoStack.value.push(makeSnapshot())
     applySnapshot(redoStack.value.pop())
     editorEpoch.value += 1
+    persistWorkspace()
     notify('Change restored')
   }
 
@@ -296,13 +298,13 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     if (!field) return { ok: false, error: 'Field was not found.' }
     const candidate = { ...field, [property]: value }
     const parsed = fieldSchema.safeParse(candidate)
-    if (!parsed.success) return { ok: false, error: firstZodError(parsed.error) }
     if (property === 'submitter' && !submitters.value.some((item) => item.name === value)) {
       return { ok: false, error: 'submitter: Submitter must match one of submitters[].name.' }
     }
-    if (field[property] === parsed.data[property]) return { ok: true }
     record()
-    field[property] = parsed.data[property]
+    field[property] = value
+    persistWorkspace()
+    if (!parsed.success) return { ok: false, error: firstZodError(parsed.error) }
     notify(property === 'submitter' ? `Field assigned to ${value}` : 'Field updated')
     return { ok: true }
   }
@@ -321,6 +323,7 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     }
     activeTemplate.value.fields.push(copy)
     selectedFieldIds.value = [copy.id]
+    persistWorkspace()
     notify('Field duplicated')
     return copy
   }
@@ -331,6 +334,7 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     record()
     activeTemplate.value.fields = activeTemplate.value.fields.filter((field) => !targets.has(field.id))
     selectedFieldIds.value = []
+    persistWorkspace()
     notify(targets.size > 1 ? `${targets.size} fields deleted` : 'Field deleted')
     return true
   }
@@ -341,6 +345,7 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     if (targets.every((field) => field.submitter === submitterName)) return true
     record()
     targets.forEach((field) => { field.submitter = submitterName })
+    persistWorkspace()
     notify(`${targets.length} fields assigned to ${submitterName}`)
     return true
   }
@@ -374,6 +379,7 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     if (activeTemplate.value.name === parsed.data.name) return { ok: true }
     record()
     activeTemplate.value.name = parsed.data.name
+    persistWorkspace()
     notify('Template name updated')
     return { ok: true }
   }
@@ -388,6 +394,7 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     const submitter = { id: uid('submitter'), ...parsed.data }
     submitters.value.push(submitter)
     activeSubmitterId.value = submitter.id
+    persistWorkspace()
     notify(`${submitter.name} added`)
     return { ok: true, submitter }
   }
@@ -407,6 +414,7 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     templates.value.forEach((template) => template.fields.forEach((field) => {
       if (field.submitter === oldName) field.submitter = submitter.name
     }))
+    persistWorkspace()
     notify('Submitter updated')
     return { ok: true }
   }
@@ -422,6 +430,7 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     record()
     submitters.value = submitters.value.filter((item) => item.id !== id)
     if (activeSubmitterId.value === id) activeSubmitterId.value = submitters.value[0].id
+    persistWorkspace()
     notify('Submitter deleted')
     return { ok: true }
   }
@@ -443,6 +452,7 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     record()
     activeTemplate.value.status = 'pending'
     activeTemplate.value.signingIndex = 0
+    persistWorkspace()
     notify(`Awaiting ${submitters.value[0].name}`)
     return { ok: true }
   }
@@ -483,6 +493,7 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     activeTemplate.value.fields = parsed.data.fields.map((field) => ({ id: uid('field'), ...field }))
     selectedFieldIds.value = []
     editorEpoch.value += 1
+    persistWorkspace()
     notify('Template JSON imported')
     return { ok: true }
   }

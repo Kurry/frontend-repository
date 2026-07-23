@@ -63,7 +63,7 @@ const fieldTypes = computed(() => Object.keys(TYPE_LABELS).map((type) => ({
           v-for="submitter in store.submitters"
           :key="submitter.id"
           type="button"
-          class="submitter-row"
+          class="submitter-row" :style="{ '--submitter-color': submitter.color }"
           :class="{ active: submitter.id === store.activeSubmitterId }"
           @click="store.selectSubmitter(submitter.id)"
         >

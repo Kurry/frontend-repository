@@ -13,6 +13,7 @@ import ImportDialog from './ImportDialog.vue'
 
 const store = useWorkspaceStore()
 const sendError = ref('')
+const compact = ref(false)
 
 function handleTemplateName(event, handleChange) {
   handleChange(event, true)
@@ -76,6 +77,9 @@ function advance() {
         </button>
       </div>
 
+      <button type="button" class="top-action compact" :aria-label="compact ? 'Comfortable density' : 'Compact density'" @click="compact = !compact; store.notify(compact ? 'Compact density active' : 'Comfortable density active')">
+        <span>{{ compact ? 'Compact' : 'Comfortable' }}</span>
+      </button>
       <ExportDialog />
       <ImportDialog />
 

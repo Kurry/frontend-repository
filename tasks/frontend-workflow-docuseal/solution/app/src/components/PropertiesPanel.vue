@@ -177,7 +177,8 @@ function applyBatch() {
         </dl>
         <div class="selection-hint">
           <PhInfo :size="17" />
-          <p>Select a field on the document to edit its name, submitter and required state.</p>
+          <p v-if="store.activeTemplate.fields.length === 0">0 fields placed. Use the field palette in the left rail to add fields to this document template.</p>
+          <p v-else>Select a field on the document to edit its name, submitter and required state, or use the field palette to add more fields.</p>
         </div>
       </section>
 

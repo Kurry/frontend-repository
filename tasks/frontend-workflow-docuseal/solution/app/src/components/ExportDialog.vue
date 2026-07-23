@@ -43,13 +43,25 @@ function downloadArtifact() {
   window.setTimeout(() => { confirmation.value = '' }, 1800)
 }
 
+function handleKeyDown(e) {
+  if (e.key === 'Escape' && open.value) {
+    open.value = false
+  }
+}
+
 function handleExternalOpen(event) {
   tab.value = event.detail?.format === 'markdown' ? 'summary' : 'json'
   open.value = true
 }
 
-onMounted(() => window.addEventListener('docuseal:open-export', handleExternalOpen))
-onBeforeUnmount(() => window.removeEventListener('docuseal:open-export', handleExternalOpen))
+onMounted(() => {
+  window.addEventListener('docuseal:open-export', handleExternalOpen)
+  window.addEventListener('keydown', handleKeyDown)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('docuseal:open-export', handleExternalOpen)
+  window.removeEventListener('keydown', handleKeyDown)
+})
 </script>
 
 <template>
