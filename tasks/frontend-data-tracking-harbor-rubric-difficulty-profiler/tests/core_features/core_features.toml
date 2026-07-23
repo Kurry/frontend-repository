@@ -1,0 +1,139 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "core_features.1"
+name = "import_valid_cohort"
+description = "When providing a valid ZIP archive containing cohort-manifest.json and declared job subdirectories, the app must parse it and present an ingest checklist. Manifest, jobs, and source hashes must agree with the ingested state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.2"
+name = "validate_compatibility"
+description = "The user must be able to group jobs by task ID/checksum and rubric hash. An exact primary task/rubric group must be selectable, and excluded reasons must appear for incompatible jobs."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.3"
+name = "compute_profile"
+description = "Criterion counts, difficulty, ranks, and blocked rates must match the standard formula (1 - mean(value)) and the active policy. Missing/blocked observations are excluded from the primary difficulty calculation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.4"
+name = "brush_and_drill_down"
+description = "The user must be able to set a numeric range on a criterion distribution chart (by brushing or numeric input). The rank ribbon, criterion table, distribution shape, model breakdown, and list of contributing jobs must update to reflect this filtered selection."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.5"
+name = "switch_sensitivity_policy"
+description = "The user must be able to switch between the primary difficulty profile and a blocked-as-fail sensitivity mode. The primary profile must remain visible, and versioned deltas (rank shifts, provenance) must update appropriately."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.6"
+name = "resolve_warnings_approve"
+description = "The user must be able to resolve non-blocking warnings, address blocking warnings, and grant approval. A final matching JSON and CSV export must be produced containing the exact immutable state."
+type = "binary"
+weight = 1.0
