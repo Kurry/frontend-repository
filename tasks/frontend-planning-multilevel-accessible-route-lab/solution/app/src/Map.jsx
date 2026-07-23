@@ -35,7 +35,7 @@ export default function Map({ route, activeBuilding, activeFloor }) {
 
   return (
     <div className="w-full h-full bg-slate-100 flex items-center justify-center relative overflow-hidden p-4 rounded border border-slate-300">
-      <svg width={width} height={height} className="bg-white shadow-inner rounded border border-slate-200">
+      <svg aria-label="Campus Map" role="img" width="100%" height="100%" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid meet" className="bg-white shadow-inner rounded border border-slate-200">
         {/* Draw Edges */}
         {visibleEdges.map(e => {
           const s = CAMPUS_NODES.find(n => n.id === e.source);
