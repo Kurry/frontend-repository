@@ -1,0 +1,75 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "10.1"
+name = "performance_scale"
+description = "With a sequence containing 1,000 steps, 100,000 total faces/vertices, and 500 branches, direct manipulation acknowledges within 100 ms and linked views settle within 500 ms, without layout jumps or dropped interactions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.2"
+name = "performance_export_import"
+description = "At maximum fixture size, exporting the exact SVG/JSON/CSV dossier and re-importing it both complete within 2 seconds."
+type = "binary"
+weight = 1.0
