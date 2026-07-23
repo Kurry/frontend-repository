@@ -1,0 +1,175 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+[[criterion]]
+id = "cf.1"
+name = "task_contract_capture"
+description = "Capture a new task with outcome, next action, area, effort, deadline, commitment class, owner, and completion evidence rule. Verify all fields are persisted and immediately visible in the backlog list without a full page reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.2"
+name = "context_evidence_binding"
+description = "Bind a new context card (revision, time, source, freshness horizon) to a task. Verify the context card appears attached to the task and the task readiness status updates."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.3"
+name = "stale_context_review"
+description = "For a task with stale context, attempt to delete it. The application prevents deletion and requires review instead."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.4"
+name = "dependency_graph_edges"
+description = "Create a dependency edge (blocks, requires, contributes, duplicate-of, waiting-on, follow-up-after) between two tasks. The visual representation of the task list/graph updates to show this link."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.5"
+name = "dependency_graph_cycle_reject"
+description = "Attempt to create a blocking/requires cycle between two or more tasks. The application rejects the creation and shows a clear validation error without mutating the graph."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.6"
+name = "priority_budget_allocator"
+description = "Allocate exactly 100 integer points among active nonwaiting tasks. The unallocated reserve accurately displays the remaining points. Exceeding 100 points is blocked."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.7"
+name = "logical_decay_risk_field"
+description = "Advance the logical clock. Observe that the freshness derives from the last meaningful review and the risk score combines deadline slack, dependency fan-out, wait duration, effort, and priority correctly according to transitions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.8"
+name = "triage_session_decisions"
+description = "Select a bounded queue and perform a triage decision (do-next, schedule, defer, waiting, split, merge, archive) on a task. A rationale field is required, and the exact affected task updates."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.9"
+name = "wip_schedule_planner"
+description = "Drag a selected task into a daily effort lane. Verify the fixed capacity, dependency constraints, and deadline are enforced and displayed on the lane."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.10"
+name = "archive_revival_followup"
+description = "Revive an archived task. It correctly prompts for context/evidence revalidation, dependency repair, and priority allocation before returning to active."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.11"
+name = "responsive_observatory_artifacts"
+description = "Export the backlog to a canonical artifact (JSON/CSV/ICS/SVG). Import the artifact into a fresh session and verify that the exact previous state is reconstructed."
+type = "binary"
+weight = 1.0
