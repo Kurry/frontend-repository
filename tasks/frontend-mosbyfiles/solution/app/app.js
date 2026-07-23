@@ -132,6 +132,7 @@
   var popup = $("#popup"), popupMedia = $("#popupMedia"), popupInfo = $("#popupInfo");
   var readingList = $("#readingList"), dossierPanel = $("#dossierPanel"), commandPalette = $("#commandPalette");
   var galleryTimer = null, audioEl = null, waveInterval = null, paletteFocusEl = null;
+  var scrollDriver = { current: 0, target: 0, raf: 0, frozen: false, overscroll: 0, advancing: false };
   var reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var overlayOpeners = { reading: null, dossier: null, popup: null };
 
@@ -501,6 +502,7 @@
           '<button type="button" id="saveNoteBtn" aria-label="Save note">Save note</button>' +
           '<button type="button" id="undoBtn" aria-label="Undo">Undo</button>' +
           '<button type="button" id="redoBtn" aria-label="Redo">Redo</button>' +
+          '<button type="button" id="resetLayoutBtn" aria-label="Reset scrapbook layout">Reset layout</button>' +
         "</div>" +
         '<div class="case-layout">' +
           '<div class="case-folder" id="caseFolder">' +
@@ -566,6 +568,18 @@
       setTimeout(function () { btn.classList.remove("is-press"); }, 180);
       redoScrapbook();
     });
+    $("#resetLayoutBtn").addEventListener("click", function () {
+      var hadOffsets = !!(state.scrapbookOffsets[slug] && Object.keys(state.scrapbookOffsets[slug]).length);
+      delete state.scrapbookOffsets[slug];
+      state.undoStack = state.undoStack.filter(function (entry) { return entry.slug !== slug; });
+      state.redoStack = state.redoStack.filter(function (entry) { return entry.slug !== slug; });
+      renderScrapbook(slug);
+      requestAnimationFrame(function () { var board = $("#scrapbook"); if (board) board.classList.add("is-revealed"); });
+      refreshDossierPreview();
+      announce(hadOffsets ? "Scrapbook layout reset to its archival arrangement" : "Scrapbook layout is already at its archival arrangement");
+      var btn = $("#resetLayoutBtn");
+      if (btn) { btn.classList.add("is-confirmed"); setTimeout(function () { btn.classList.remove("is-confirmed"); }, motionDelay(900)); }
+    });
     viewCase.querySelectorAll(".tag[data-sibling]").forEach(function (t) {
       t.addEventListener("click", function (e) {
         e.stopPropagation();
@@ -630,6 +644,8 @@
       el.style.transform = "rotate(" + it.rot + "deg)";
       el.dataset.rot = it.rot;
       el.innerHTML = it.html;
+      $$("img", el).forEach(function (image) { image.draggable = false; });
+      el.addEventListener("dragstart", function (event) { event.preventDefault(); });
       if (it.kind) {
         el.dataset.kind = it.kind;
         el.tabIndex = 0;
@@ -729,21 +745,26 @@
     if (!max) return 0;
     return Math.max(0, Math.min(100, (n / max) * 100));
   }
+  var dragLayer = 10;
   function makeDraggable(el, slug) {
     var sx, sy, ox, oy, dragging = false, moved = false, startX, startY;
     el.addEventListener("pointerdown", function (e) {
       if (e.target.closest(".content-play")) return;
+      e.preventDefault();
       dragging = true; moved = false;
       el.classList.add("dragging");
+      el.style.zIndex = String(++dragLayer);
       sx = e.clientX; sy = e.clientY;
       var r = el.getBoundingClientRect(), pr = el.offsetParent.getBoundingClientRect();
       ox = r.left - pr.left; oy = r.top - pr.top;
       startX = pct(ox, pr.width);
       startY = pct(oy, pr.height);
       el.style.left = ox + "px"; el.style.top = oy + "px";
-      el.setPointerCapture(e.pointerId);
+      document.addEventListener("pointermove", move);
+      document.addEventListener("pointerup", end, { once: true });
+      document.addEventListener("pointercancel", end, { once: true });
     });
-    el.addEventListener("pointermove", function (e) {
+    function move(e) {
       if (!dragging) return;
       if (Math.abs(e.clientX - sx) > 2 || Math.abs(e.clientY - sy) > 2) moved = true;
       var pr = el.offsetParent.getBoundingClientRect();
@@ -753,13 +774,20 @@
       newTop = Math.max(0, Math.min(newTop, pr.height - el.offsetHeight));
       el.style.left = newLeft + "px";
       el.style.top = newTop + "px";
-    });
-    function end(e) { if(e && e.pointerId) { try { el.releasePointerCapture(e.pointerId); } catch(err) {} }
+    }
+    function end() {
+      document.removeEventListener("pointermove", move);
+      document.removeEventListener("pointerup", end);
+      document.removeEventListener("pointercancel", end);
       if (!dragging) return;
       dragging = false;
       var pr = el.offsetParent.getBoundingClientRect();
       var leftPx = parseFloat(el.style.left) || 0;
       var topPx = parseFloat(el.style.top) || 0;
+      var maxLeft = Math.max(0, pr.width - el.offsetWidth - 4);
+      var maxTop = Math.max(0, pr.height - el.offsetHeight - 4);
+      leftPx = Math.max(0, Math.min(leftPx, maxLeft));
+      topPx = Math.max(0, Math.min(topPx, maxTop));
       var x = Math.round(pct(leftPx, pr.width) * 100) / 100;
       var y = Math.round(pct(topPx, pr.height) * 100) / 100;
       el.style.left = x + "%";
@@ -775,8 +803,6 @@
       }
       setTimeout(function () { el.classList.remove("dragging"); }, 0);
     }
-    el.addEventListener("pointerup", end);
-    el.addEventListener("pointercancel", end);
   }
   function applyItemPos(slug, id, pos) {
     var el = viewCase.querySelector('.scrapbook-item[data-item-id="' + id + '"]');
@@ -811,6 +837,52 @@
     window.scrollTo(0, 0);
   }
 
+  function freezeScrollDriver(duration) {
+    scrollDriver.frozen = true;
+    scrollDriver.target = window.scrollY;
+    scrollDriver.current = window.scrollY;
+    setTimeout(function () { scrollDriver.frozen = false; }, motionDelay(duration || 0));
+  }
+
+  function resetOverscrollLift() {
+    scrollDriver.overscroll = 0;
+    state.overscroll = 0;
+    var page = $(".page-case");
+    if (page) page.style.setProperty("--overscroll-lift", "0vh");
+    var next = $("#caseNext");
+    if (next) next.setAttribute("data-progress", "0");
+  }
+
+  function runScrollDriver() {
+    scrollDriver.raf = 0;
+    if (scrollDriver.frozen || state.route === "home" || window.innerWidth <= 768) return;
+    scrollDriver.current += (scrollDriver.target - scrollDriver.current) * 0.14;
+    if (Math.abs(scrollDriver.target - scrollDriver.current) < 0.5) scrollDriver.current = scrollDriver.target;
+    window.scrollTo(0, scrollDriver.current);
+    if (scrollDriver.current !== scrollDriver.target) scrollDriver.raf = requestAnimationFrame(runScrollDriver);
+  }
+
+  function driveCaseScroll(event) {
+    if (state.route === "home" || window.innerWidth <= 768 || event.ctrlKey || scrollDriver.frozen) return;
+    event.preventDefault();
+    var max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    scrollDriver.current = window.scrollY;
+    scrollDriver.target = Math.max(0, Math.min(max, scrollDriver.target + event.deltaY));
+    var atBottom = window.scrollY >= max - 3 && event.deltaY > 0;
+    if (atBottom && !scrollDriver.advancing) {
+      scrollDriver.overscroll = Math.min(1, scrollDriver.overscroll + event.deltaY / 600);
+      state.overscroll = scrollDriver.overscroll;
+      var page = $(".page-case");
+      if (page) page.style.setProperty("--overscroll-lift", (-75 * scrollDriver.overscroll) + "vh");
+      var next = $("#caseNext");
+      if (next) next.setAttribute("data-progress", String(Math.round(scrollDriver.overscroll * 100)));
+      if (scrollDriver.overscroll >= 1) advanceCase();
+    } else if (event.deltaY < 0 && scrollDriver.overscroll) {
+      resetOverscrollLift();
+    }
+    if (!scrollDriver.raf) scrollDriver.raf = requestAnimationFrame(runScrollDriver);
+  }
+
   function goHome(opts) {
     opts = opts || {};
     stopGallery();
@@ -835,9 +907,22 @@
     updateNav();
   }
 
+  function closeCaseToHome() {
+    var folder = $("#caseFolder");
+    var scrapbook = $("#scrapbook");
+    if (!folder || state.route === "about") { goHome(); return; }
+    freezeScrollDriver(820);
+    folder.classList.add("is-flipping");
+    folder.classList.remove("is-open");
+    if (scrapbook) scrapbook.classList.remove("is-revealed");
+    setTimeout(function () { goHome(); }, motionDelay(820));
+  }
+
   function openCase(slug, transition, opts) {
     opts = opts || {};
     if (!ARCHITECTS[slug]) return false;
+    freezeScrollDriver(1200);
+    resetOverscrollLift();
     stopGallery();
     state.route = slug; state.activeSlug = slug; state.folderOpen = false;
     stopMedia();
@@ -857,6 +942,7 @@
     var sb = $("#scrapbook");
     var caseTitle = $("#caseTitle");
     viewCase.classList.add("case-enter");
+    viewCase.classList.toggle("folder-next-enter", transition === "folder-next");
     folder.classList.add("is-flipping");
     caseTitle.querySelectorAll(".char").forEach(function (c) {
       c.style.opacity = "0"; c.style.transform = "translateX(-40px)";
@@ -876,6 +962,7 @@
         });
         setTimeout(function () { sb.classList.add("is-revealed"); }, motionDelay(1000));
         setTimeout(function () { folder.classList.remove("is-flipping"); }, motionDelay(600));
+        setTimeout(function () { viewCase.classList.remove("folder-next-enter"); }, motionDelay(1200));
       });
     });
     updateNav();
@@ -897,9 +984,18 @@
     if (idx === -1) return { ok: false, error: "not on a case route" };
     var next = order[(idx + 1) % order.length];
     var el = $("#caseNext");
+    if (scrollDriver.advancing) return { ok: true, route: next };
+    scrollDriver.advancing = true;
+    freezeScrollDriver(900);
     if (el) el.classList.add("is-lifting");
     state.overscroll = 1;
-    setTimeout(function () { openCase(next, "folder-next"); state.overscroll = 0; }, 350);
+    var page = $(".page-case");
+    if (page) page.style.setProperty("--overscroll-lift", "-75vh");
+    setTimeout(function () {
+      openCase(next, "folder-next");
+      scrollDriver.advancing = false;
+      resetOverscrollLift();
+    }, motionDelay(650));
     return { ok: true, route: next };
   }
 
@@ -967,9 +1063,25 @@
       mp4Src.src = "/media/videos/" + a.video; mp4Src.type = "video/mp4";
       v.appendChild(webmSrc); v.appendChild(mp4Src);
       v.poster = img(videoPosterFor(slug));
-      v.controls = true; v.playsInline = true; v.preload = "metadata";
+      v.controls = false; v.playsInline = true; v.preload = "metadata";
       v.id = "popupVideo";
-      popupMedia.appendChild(v);
+      var controls = document.createElement("div");
+      controls.className = "video-controls";
+      controls.innerHTML = '<button type="button" class="video-controls__toggle" aria-label="Play video">&#9658;</button><span class="video-controls__status" aria-live="polite">Paused</span>';
+      popupMedia.appendChild(v); popupMedia.appendChild(controls);
+      $(".video-controls__toggle", controls).addEventListener("click", function () { state.videoPlaying ? pauseVideo() : playVideo(); });
+      v.addEventListener("play", function () {
+        state.videoPlaying = true; popupMedia.classList.add("is-playing");
+        $(".video-controls__toggle", controls).innerHTML = "&#10073;&#10073;";
+        $(".video-controls__toggle", controls).setAttribute("aria-label", "Pause video");
+        $(".video-controls__status", controls).textContent = "Playing";
+      });
+      v.addEventListener("pause", function () {
+        state.videoPlaying = false; popupMedia.classList.remove("is-playing");
+        $(".video-controls__toggle", controls).innerHTML = "&#9658;";
+        $(".video-controls__toggle", controls).setAttribute("aria-label", "Play video");
+        $(".video-controls__status", controls).textContent = "Paused";
+      });
       v.load();
       popupInfo.textContent = a.name + " — archival footage (local poster; offline player)";
       state.videoPlaying = false;
@@ -1004,8 +1116,8 @@
     restoreOverlayFocus("popup", 310);
   }
 
-  function playVideo() { var v = $("#popupVideo"); if (v) { v.play(); state.videoPlaying = true; return true; } return false; }
-  function pauseVideo() { var v = $("#popupVideo"); if (v) { v.pause(); state.videoPlaying = false; } }
+  function playVideo() { var v = $("#popupVideo"); if (v) { var promise = v.play(); if (promise && promise.catch) promise.catch(function () {}); return true; } return false; }
+  function pauseVideo() { var v = $("#popupVideo"); if (v) v.pause(); state.videoPlaying = false; }
 
   var WAVE_PARTS = {
     1: { mp3: "/media/blob/audio/julian-kade-interview-part-1.mp3", json: "/media/blob/audio/julian_kade_part_1.json" },
@@ -1248,7 +1360,8 @@
     if (el.dataset.navBound) return; el.dataset.navBound = "1";
     el.addEventListener("click", function () {
       var t = el.dataset.nav;
-      if (t === "home") goHome();
+      if (t === "home" && state.route !== "home") closeCaseToHome();
+      else if (t === "home") goHome();
       else if (t === "about") goAbout();
     });
   }
@@ -1529,6 +1642,12 @@
     window.addEventListener("popstate", function () {
       var route = routeFromPath(location.pathname) || "home";
       navigate(route, { skipHistory: true, replace: true });
+    });
+    window.addEventListener("wheel", driveCaseScroll, { passive: false });
+    window.addEventListener("resize", function () {
+      scrollDriver.current = window.scrollY;
+      scrollDriver.target = window.scrollY;
+      if (window.innerWidth <= 768) resetOverscrollLift();
     });
   }
 

@@ -6,11 +6,11 @@
 
 :root {
   --header-height: 3.75rem;
-  --container-offset: 32px;
+  --container-offset: 2rem;
 }
-@media (max-width: 1024px) { :root { --container-offset: 30px; } }
-@media (max-width: 768px)  { :root { --container-offset: 20px; } }
-@media (max-width: 480px)  { :root { --container-offset: 18px; } }
+@media (max-width: 1024px) { :root { --container-offset: 2rem; } }
+@media (max-width: 768px)  { :root { --container-offset: 1.5rem; } }
+@media (max-width: 480px)  { :root { --container-offset: 1.25rem; } }
 @media (min-width: 1440px) { :root { --container-offset: 2.25rem; } }
 @media (min-width: 1920px) { :root { --container-offset: 3rem; } }
 
@@ -106,7 +106,8 @@ body.route-about .the-header {
 .section-hero__title {
   font-family: "Founders Grotesk", sans-serif; font-weight: 700;
   text-transform: uppercase; line-height: .82; margin: 0;
-  font-size: clamp(2.5rem, 1rem + 9vw, 11rem); letter-spacing: -.01em;
+  font-size: clamp(2.5rem, 1rem + 9vw, 11rem); letter-spacing: 0;
+  max-width: 76rem;
 }
 .section-hero__title .line { display: block; overflow: hidden; }
 .section-hero__title .char { display: inline-block; }
@@ -152,6 +153,7 @@ body.route-about .the-header {
 }
 .stack-group:hover .stack-cover { transform: rotateX(-3deg) translateY(1rem); }
 .stack-group.is-hovered .stack-cover::after { opacity: 1; }
+.stack-group:hover .stack-cover::after { opacity: 1; }
 .stack-cover__head {
   display: flex; align-items: center; justify-content: space-between; gap: 1rem;
   width: 100%; padding: 0; color: inherit; background: transparent; border: 0; text-align: left;
@@ -232,7 +234,12 @@ body.route-about .the-header {
 .the-sub-header__tools { display: flex; gap: .5rem; }
 
 /* ---------------- Case page ---------------- */
-.page-case { padding: calc(var(--header-height) + 2rem) var(--container-offset) 4rem; max-width: 1400px; margin: 0 auto; }
+.page-case {
+  --overscroll-lift: 0vh;
+  padding: calc(var(--header-height) + 2rem) var(--container-offset) 4rem;
+  max-width: 1400px; margin: 0 auto; transform: translateY(var(--overscroll-lift));
+  transition: transform .12s linear;
+}
 .page-case__content { position: relative; }
 .case-hero-title {
   font-size: clamp(4rem, 2.25rem + 5.833vw, 7.5rem); font-weight: 700; line-height: .8;
@@ -288,6 +295,7 @@ body.route-about .the-header {
   transition: opacity .75s ease, transform .75s cubic-bezier(.33,1,.68,1);
 }
 .case-folder-tags .tag.is-visible { opacity: 1; transform: translateY(0); }
+.folder-next-enter .case-folder-tags .tag { opacity: 0; transform: translateY(100%); }
 @media (hover: hover) { .case-folder-tags .tag:hover { transform: translateY(-10px); box-shadow: 0 -10px 20px #00000080; } }
 
 /* page-turn control */
@@ -298,6 +306,7 @@ body.route-about .the-header {
   transition: background .3s ease, transform .2s ease;
 }
 .case-controls button:hover { background: rgba(255,255,255,.2); transform: translateY(-2px); }
+.case-research button.is-confirmed { background: #FFE927; color: #191919; transform: scale(.98); }
 
 /* Scrapbook */
 .case-scrapbook {
@@ -310,6 +319,8 @@ body.route-about .the-header {
   transform: translateY(50vh); opacity: 0;
   transition: transform .5s cubic-bezier(.33,1,.68,1), opacity .5s ease;
 }
+.scrapbook-item img { -webkit-user-drag: none; user-select: none; pointer-events: none; }
+.scrapbook-item .content-play { pointer-events: auto; }
 .case-scrapbook.is-revealed .scrapbook-item { transform: translateY(0); opacity: 1; }
 .scrapbook-item.dragging { transition: none; z-index: 50; cursor: grabbing; }
 .content-note {
@@ -339,6 +350,10 @@ body.route-about .the-header {
   transform: translateY(0); transition: transform .35s cubic-bezier(.4,0,1,1);
 }
 .case-next.is-lifting { transform: translateY(-75vh); }
+.case-next::after {
+  content: attr(data-progress) "%"; display: block; margin-top: .5rem;
+  font-family: "IBM Plex Mono", monospace; font-size: .7rem; opacity: .55;
+}
 .case-next__label { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; font-size: .8rem; opacity: .7; }
 .case-next__btn {
   display: inline-block; margin-top: .75rem; background: #fff; color: #191919; border: 0;
@@ -391,9 +406,19 @@ body.route-about .the-header {
   pointer-events: auto;
 }
 .popup.is-shown .popup__box { opacity: 1; transform: translateY(0); }
-.popup__media { opacity: 0; transition: opacity .325s cubic-bezier(.33,1,.68,1); background:#000; border-radius: 6px; overflow:hidden; }
+.popup__media { position: relative; opacity: 0; transition: opacity .325s cubic-bezier(.33,1,.68,1); background:#000; border-radius: 6px; overflow:hidden; }
 .popup.is-shown .popup__media { opacity: 1; }
 .popup__media video { width: 100%; max-height: calc(100vh - 8rem); object-fit: contain; display: block; }
+.video-controls {
+  position: absolute; left: 1rem; right: 1rem; bottom: 1rem; display: flex; align-items: center; gap: .75rem;
+  padding: .75rem; border-radius: 999px; color: #fff; background: rgba(25,25,25,.82);
+  opacity: 1; transform: translateY(0); transition: opacity .45s ease 1.2s, transform .45s cubic-bezier(.33,1,.68,1) 1.2s;
+  font-family: "IBM Plex Mono", monospace; font-size: .75rem;
+}
+.popup__media.is-playing .video-controls { opacity: 0; transform: translateY(.75rem); }
+.popup__media.is-playing:hover .video-controls,
+.popup__media.is-playing:focus-within .video-controls { opacity: 1; transform: translateY(0); transition-delay: 0s; }
+.video-controls__toggle { width: 2.5rem; height: 2.5rem; border-radius: 50%; border: 0; background: #FFE927; color: #191919; }
 .popup__media img { width: 100%; max-height: calc(100vh - 8rem); object-fit: contain; }
 .popup__info { font-family: "IBM Plex Mono", monospace; font-size: .8rem; opacity: .8; margin-top: .75rem; color: #fff; }
 .popup__close {
@@ -550,6 +575,8 @@ body.route-about .the-header {
   .dossier__panel, .palette__panel { top: 8%; width: calc(100vw - 1rem); }
 }
 @media (max-width: 768px) {
+  html { scroll-behavior: auto; }
+  .page-case { transition: none; }
   .the-sub-header__tools button { font-size: .65rem; padding: .3rem .45rem; }
   .the-sub-header__cat { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .content-note { width: 150px; font-size: .85rem; }
