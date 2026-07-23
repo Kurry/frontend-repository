@@ -99,7 +99,7 @@ const getShortestPath = (startId, endId, profile, startTime) => {
 const computeFullRoute = (stops, profile, departureTime) => {
   if (stops.length < 2) return null;
 
-  let currentDeparture = departureTime;
+  let currentDeparture = departureTime + (stops[0].dwell || 0);
   const fullSegments = [];
   let fullDistance = 0;
   let fullDuration = 0;
@@ -116,12 +116,19 @@ const computeFullRoute = (stops, profile, departureTime) => {
       break;
     }
 
+    // Assign arrival times to segments
+    let runningTime = currentDeparture;
+    for (let seg of route.segments) {
+      runningTime += seg.duration;
+      seg.arrivalTime = Math.round(runningTime * 10) / 10;
+    }
+
     fullSegments.push(...route.segments);
     fullDistance += route.distance;
     fullDuration += route.duration;
 
-    // Add dwell time
-    currentDeparture += route.duration + (end.dwell || 0);
+    // Add route duration + destination dwell, keeping precision errors in check
+    currentDeparture = Math.round((currentDeparture + route.duration + (end.dwell || 0)) * 10) / 10;
   }
 
   if (!allValid) return null;
