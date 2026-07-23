@@ -1,0 +1,91 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+
+[[criterion]]
+id = "technical.1"
+name = "ac_04_technical"
+description = "Interleave UI/WebMCP protocol, observation, confounder, analysis, evaluator, decision, history, and transfer actions. IDs, pairings, checksums, and artifacts match."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "technical.2"
+name = "dashboard_import_transaction"
+description = "Treat every import mode as an atomic transaction over the API-shaped schema. Validate before commit and reject invalid records with zero state mutation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "technical.3"
+name = "dashboard_artifact_contract"
+description = "Make the useful end state an interoperable downloadable artifact. A successful import must restore authored/derived state, and re-export must be semantically identical except for exportedAt."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "technical.4"
+name = "dashboard_reload_isolation"
+description = "Persisted state survives reload exactly. Transient previews, hover, drag, and invalid drafts do not leak into persistence."
+type = "binary"
+weight = 1.0
