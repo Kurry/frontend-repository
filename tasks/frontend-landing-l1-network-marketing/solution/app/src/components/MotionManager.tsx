@@ -47,7 +47,15 @@ export default function MotionManager() {
 
     // --- Page Load Entrance Sequence (double rAF mount, NOT IntersectionObserver) ---
     const entranceTimeline = gsap.timeline();
-    gsap.set('#chrome', { yPercent: -100 });
+    // The CSS pre-paint rule (`.entrance-pending #chrome { transform: translateY(-100%) }`)
+    // resolves to a fixed pixel matrix before GSAP ever touches the element; GSAP
+    // parses that into an independent, non-percent "y" component and preserves it
+    // alongside its own yPercent tracking unless explicitly zeroed here — without
+    // this `y: 0`, the chrome ends up permanently offset by its own height even
+    // after the yPercent tween finishes. Clearing the inline style first, then
+    // setting y/yPercent together, keeps GSAP's transform authoritative.
+    gsap.set('#chrome', { clearProps: 'transform' });
+    gsap.set('#chrome', { y: 0, yPercent: -100 });
     gsap.set('.bento-mission, .bento-clock', { clipPath: 'inset(100% 0 0 0)', y: 20 });
     gsap.set('.hero-plane', { clipPath: 'inset(100% 0 0 0)', scale: 1.05 });
     // GSAP now owns the pre-entrance styles inline; drop the CSS pre-paint class.
