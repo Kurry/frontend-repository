@@ -1,0 +1,38 @@
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+description = "Verify that the frontend utilizes exclusively browser native capabilities and local dependencies for styling without external network requests or CDNs."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+description = "Verify that session personalization state is strictly bound to the active page session state and does not persist across independent page loads in browser storage APIs."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+description = "Initiate a JSON export of the score. Verify that the resulting artifact contains the canonical schema including fixture, axis bounds, keyframes, beats, viewports, branches, and UTC exportedAt timestamp."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+description = "Modify a keyframe, then immediately inspect the generated export artifacts. Verify that the generated styling, storyboard images, and specification text compile live on the mutation and are not stale."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+description = "Attempt an import with an invalid schema or out of bound geometry values. Verify that the import acts as an atomic transaction, rejecting the import completely with zero state mutation and reporting diagnostics together."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+description = "Perform a successful import of a valid score JSON. Verify that the authored and derived state is restored, and an immediate re export yields an identical file except for regenerated metadata (like exportedAt)."
+type = "binary"
+weight = 1.0

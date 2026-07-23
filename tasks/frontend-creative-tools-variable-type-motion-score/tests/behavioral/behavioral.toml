@@ -1,0 +1,14 @@
+[scoring]
+aggregation = "all_pass"
+
+[[criterion]]
+id = "13.1"
+description = "Interleave stage position edits, keyframe additions, viewport overrides, reduced score definitions, and branch merges, followed by an undo operation. Verify that the tracks, samples, and lineage round trip accurately and the previous canonical snapshot is restored exactly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "13.2"
+description = "Execute a full authoring session across multiple viewports. Export the score, clear the application state, and import the same score file. Verify the tracks, UI state, active branch, and keyframe data strictly round trip with identical representation."
+type = "binary"
+weight = 1.0

@@ -1,0 +1,26 @@
+[scoring]
+aggregation = "all_pass"
+
+[[criterion]]
+id = "6.1"
+description = "Edit a keyframe exactly at frame 0 and another exactly at frame 288. Verify that both keyframes are recorded precisely at the boundaries without exceeding the 12 second limit."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.2"
+description = "Set the weight axis to exactly 200 and the width axis to exactly 125. Verify these boundary values are accepted and render correctly without throwing validation errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.3"
+description = "Drag a text block completely out of the stage safe area. Verify that the validator properly identifies the safe area edge violation and blocks score approval until corrected."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.4"
+description = "Forge an import payload with duplicate keyframe IDs and a forged derived checksum. Verify the import mechanism rejects the forged payload atomically, leaving the current score untouched."
+type = "binary"
+weight = 1.0

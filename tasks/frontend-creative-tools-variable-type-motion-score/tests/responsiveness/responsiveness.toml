@@ -1,0 +1,20 @@
+[scoring]
+aggregation = "all_pass"
+
+[[criterion]]
+id = "7.1"
+description = "Resize the viewport from 1440px to 375px. Verify that the mobile block cards, property and keyframe sheets, vertical beat timeline, and viewport drawer replace the desktop layout without losing any user action capabilities."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.2"
+description = "Verify that at the 375px mobile viewport, there is no page level horizontal overflow and all interactive targets are at least 44 pixels in size."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.3"
+description = "Trigger a container geometry resize in the preview. Verify that the line break map and anchor positions recompute deterministically without stranding an anchor on the wrong line."
+type = "binary"
+weight = 1.0

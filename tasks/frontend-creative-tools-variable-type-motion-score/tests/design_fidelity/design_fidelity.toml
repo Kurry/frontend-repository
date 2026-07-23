@@ -1,0 +1,14 @@
+[scoring]
+aggregation = "all_pass"
+
+[[criterion]]
+id = "12.1"
+description = "Verify fixed point interpolation, easing curves, metric wraps, inheritance, prominence scores, and reduced motion rules match the kinetic type editor genre expectations and display visually flawless motion type semantics."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.2"
+description = "Verify that the generated CSS and SVG artifacts map identically to the approved canonical score layout and timeline."
+type = "binary"
+weight = 1.0
