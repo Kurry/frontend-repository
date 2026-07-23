@@ -86,6 +86,8 @@ test('mobile layout has reachable controls and no page overflow', async ({ page 
   await expect(page.getByRole('button', { name: 'score', exact: true })).toBeVisible();
   const dimensions = await page.evaluate(() => ({ width: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }));
   expect(dimensions.width).toBe(dimensions.client);
+  // The callback executes in the browser, so DOM reads are synchronous.
+  // eslint-disable-next-line playwright/missing-playwright-await
   const smallTargets = await page.locator('button:visible').evaluateAll(buttons => buttons.filter(button => { const rect = button.getBoundingClientRect(); return rect.width < 44 || rect.height < 44; }).map(button => button.getAttribute('aria-label') || button.textContent.trim()));
   expect(smallTargets).toEqual([]);
 });
@@ -94,6 +96,8 @@ test('reduced motion removes meaningful animation duration and console stays cle
   const context = await browser.newContext({ reducedMotion: 'reduce' });
   const page = await context.newPage();
   const errors = [];
+  // Playwright console messages expose synchronous type/text accessors.
+  // eslint-disable-next-line playwright/missing-playwright-await
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/');
