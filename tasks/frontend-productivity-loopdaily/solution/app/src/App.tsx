@@ -16,6 +16,7 @@ import ImportExport from "./components/ImportExport";
 import RecoveryBanner from "./components/RecoveryBanner";
 import { Toaster, toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { isDayComplete, todayKey } from "./utils/helpers";
 
 export default function App() {
   const [habits] = useAtom(habitsAtom);
@@ -43,6 +44,9 @@ export default function App() {
     : sortedHabits;
   const activeHabits = filteredHabits.filter((h) => !h.paused);
   const pausedHabits = filteredHabits.filter((h) => h.paused);
+  const completedToday = sortedHabits.filter((habit) => !habit.paused && isDayComplete(habit, todayKey())).length;
+  const activeTotal = sortedHabits.filter((habit) => !habit.paused).length;
+  const nextHabit = sortedHabits.find((habit) => !habit.paused && !isDayComplete(habit, todayKey()));
   const activeKey = activeHabits.map((h) => h.id).join("|");
 
   useEffect(() => {
@@ -250,6 +254,28 @@ export default function App() {
         {view === "habits" && (
           <>
             <CategoryFilter />
+
+            {habits.length > 0 && (
+              <section
+                className="today-glance rounded-[8px] border border-[#D8E4DF] bg-[#EAF7F2] px-4 py-3"
+                aria-labelledby="today-glance-title"
+                data-enhancement="today-glance"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <h2 id="today-glance-title" className="text-base font-bold text-[#1B2430]">
+                      Today at a glance
+                    </h2>
+                    <p className="text-sm text-[#475569]" aria-live="polite">
+                      {completedToday} of {activeTotal} active habits complete
+                    </p>
+                  </div>
+                  <p className="rounded-[8px] bg-white px-3 py-2 text-sm font-semibold text-[#0F6F54]">
+                    {nextHabit ? `Up next: ${nextHabit.name}` : "All active habits complete"}
+                  </p>
+                </div>
+              </section>
+            )}
 
             {habits.length === 0 ? (
               showForm ? (

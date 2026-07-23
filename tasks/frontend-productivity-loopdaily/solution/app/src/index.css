@@ -352,6 +352,14 @@ h4 {
   animation: toastIn 0.32s cubic-bezier(0.21, 1.02, 0.73, 1);
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
+[data-sonner-toast][data-removed="true"] {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.today-glance {
+  background-image: radial-gradient(circle at 92% 18%, rgba(15, 157, 116, 0.16), transparent 34%);
+}
 
 /* ---- Scrollbar ---- */
 ::-webkit-scrollbar {

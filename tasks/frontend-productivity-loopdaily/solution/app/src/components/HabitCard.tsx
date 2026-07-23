@@ -165,6 +165,7 @@ export default function HabitCard({ habit, onOpenHeatmap, onDragHandlePointerDow
         data-habit-id={habit.id}
         data-habit-paused={habit.paused}
         data-habit-count={count}
+        data-habit-streak={currentStreak}
         tabIndex={0}
         role="group"
         aria-label={`${habit.name}, ${currentStreak} day streak${habit.paused ? ", paused" : ""}. Press C to check in.`}
@@ -349,6 +350,7 @@ export default function HabitCard({ habit, onOpenHeatmap, onDragHandlePointerDow
                       key={count}
                       className={`frac-pop text-sm font-bold tabular-nums ${done ? "text-[#0F9D74]" : "text-[#1B2430]"}`}
                       data-fraction
+                      aria-live="polite"
                     >
                       {count}/{habit.targetCount}
                     </span>

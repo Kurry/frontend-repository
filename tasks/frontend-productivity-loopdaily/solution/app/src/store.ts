@@ -7,6 +7,12 @@ const BACKUP_STORAGE_KEY = "loopdaily.appState.backup.v1";
 const UI_PREFS_KEY = "loopdaily.ui.v1";
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
+function isIsoDateTime(value: unknown): value is string {
+  if (typeof value !== "string" || !value.includes("T")) return false;
+  const parsed = new Date(value);
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString() === value;
+}
+
 function genId() {
   return Math.random().toString(36).substring(2, 9);
 }
@@ -65,7 +71,7 @@ function writeUiPrefs(prefs: UiPrefs) {
 // --- New Habit form schema (API-shaped HabitUpsert) ---
 const CategorySchema = z.object({
   id: z.string().min(1),
-  name: z.string().max(40),
+  name: z.string().trim().min(1).max(40),
 });
 
 const HabitSchema = z
@@ -87,27 +93,19 @@ const HabitSchema = z
 function isValidCategory(value: unknown): value is Category {
   if (!value || typeof value !== "object") return false;
   const c = value as Record<string, unknown>;
-  return typeof c.id === "string" && typeof c.name === "string";
+  return (
+    typeof c.id === "string" &&
+    c.id.length > 0 &&
+    typeof c.name === "string" &&
+    c.name.trim().length > 0 &&
+    c.name.trim().length <= 40
+  );
 }
 
 function isValidHabit(value: unknown): value is Habit {
   if (!value || typeof value !== "object") return false;
   const h = value as Record<string, unknown>;
-  return (
-    typeof h.id === "string" &&
-    typeof h.name === "string" &&
-    typeof h.icon === "string" &&
-    (h.targetType === "once" || h.targetType === "count") &&
-    typeof h.targetCount === "number" &&
-    (h.categoryId === null || typeof h.categoryId === "string") &&
-    typeof h.reminder === "string" &&
-    typeof h.paused === "boolean" &&
-    !!h.completions &&
-    typeof h.completions === "object" &&
-    !Array.isArray(h.completions) &&
-    typeof h.order === "number" &&
-    typeof h.createdAt === "string"
-  );
+  return HabitSchema.safeParse(h).success;
 }
 
 function isValidAppState(value: unknown): value is AppState {
@@ -115,7 +113,12 @@ function isValidAppState(value: unknown): value is AppState {
   const s = value as Record<string, unknown>;
   if (!Array.isArray(s.habits) || !Array.isArray(s.categories)) return false;
   if (!(s.activeCategoryFilter === null || typeof s.activeCategoryFilter === "string")) return false;
-  return s.habits.every(isValidHabit) && s.categories.every(isValidCategory);
+  if (!s.habits.every(isValidHabit) || !s.categories.every(isValidCategory)) return false;
+  const categoryIds = new Set((s.categories as Category[]).map((category) => category.id));
+  if (typeof s.activeCategoryFilter === "string" && !categoryIds.has(s.activeCategoryFilter)) return false;
+  return (s.habits as Habit[]).every(
+    (habit) => habit.categoryId === null || categoryIds.has(habit.categoryId)
+  );
 }
 
 function parseStoredState(raw: string | null): AppState | null {
@@ -139,7 +142,7 @@ export function validateWorkspaceDoc(data: unknown): string[] {
   if (obj.schemaVersion !== "loopdaily.workspace.v1") {
     errors.push("schemaVersion must be exactly loopdaily.workspace.v1");
   }
-  if (typeof obj.exportedAt !== "string") {
+  if (!isIsoDateTime(obj.exportedAt)) {
     errors.push("exportedAt is required (ISO-8601 datetime string)");
   }
   if (!Array.isArray(obj.habits)) {
@@ -208,7 +211,7 @@ export function validateWorkspaceDoc(data: unknown): string[] {
     if (typeof rec.paused !== "boolean") errors.push(`${p}.paused must be a boolean`);
     if (typeof rec.order !== "number" || !Number.isInteger(rec.order) || rec.order < 0)
       errors.push(`${p}.order must be a non-negative integer`);
-    if (typeof rec.createdAt !== "string") errors.push(`${p}.createdAt must be an ISO-8601 datetime string`);
+    if (!isIsoDateTime(rec.createdAt)) errors.push(`${p}.createdAt must be an ISO-8601 datetime string`);
     if (!rec.completions || typeof rec.completions !== "object" || Array.isArray(rec.completions)) {
       errors.push(`${p}.completions must be an object mapping YYYY-MM-DD to counts`);
     } else {

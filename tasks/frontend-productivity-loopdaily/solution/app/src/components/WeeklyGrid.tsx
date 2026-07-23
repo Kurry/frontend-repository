@@ -48,8 +48,11 @@ export default function WeeklyGrid({ habit }: WeeklyGridProps) {
           <div key={day} className="flex flex-col items-center gap-0.5">
             <div
               className={cellClass}
+              data-weekly-cell
               data-day={day}
               data-day-state={cellState}
+              data-today={isToday}
+              data-complete={done}
               title={`${shortDayLabel(day)} — ${
                 cellState === "done"
                   ? "done"
