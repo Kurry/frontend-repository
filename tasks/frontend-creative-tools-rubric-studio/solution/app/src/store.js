@@ -265,8 +265,10 @@ export const useStudioStore = defineStore('studio', () => {
     if (ui.versionCommitBusy && !allowBusyCommit) return { ok: false, message: 'Pending change is already being applied' }
     const pending = pendingChange.value
     if (!pending || !requiredVersion(pending.kind, activeRubric.value.version, version)) return { ok: false, message: `${pending?.kind || 'version'} bump required` }
+    const targetRubric = rubrics.value.find((rubric) => rubric.slug === activeSlug.value)
+    if (!targetRubric) return { ok: false, message: 'The active rubric is no longer available' }
     commit(`${pending.action} ${pending.criterionId}`, () => {
-      const rubric = rubrics.value.find(x => x.slug === activeSlug.value)
+      const rubric = targetRubric
       if (pending.action === 'edit') {
         const index = rubric.criteria.findIndex((item) => item.id === pending.criterionId)
         const previousThreshold = thresholds.value[activeSlug.value][pending.criterionId]

@@ -219,14 +219,13 @@ test('1.6 criterion_form_inline_validation', async ({ page }) => {
     await input.blur();
   };
 
-  // Empty required fields on mount: the submit remains operable so a keyboard
-  // or pointer submission can announce the errors and leave state unchanged.
+  // Empty required fields on mount: per-field messages naming id/name/description
+  // are present and the submit control is disabled.
+  await expect(submit).toBeDisabled();
   await expect(submit).toHaveAttribute('data-incomplete', 'true');
-  await submit.click();
   await expect(idError).not.toBeEmpty();
   await expect(nameError).not.toBeEmpty();
   await expect(descError).not.toBeEmpty();
-  await expect(page.getByRole('status').first()).toContainText(/validation failed/i);
 
   // Give name + description valid values so each remaining case is isolated to
   // the field under test.
@@ -236,37 +235,39 @@ test('1.6 criterion_form_inline_validation', async ({ page }) => {
   await expect(descError).toBeEmpty();
 
   // Id violating the allowed pattern (uppercase + punctuation): the id message
-  // names the pattern rule and submit remains marked incomplete.
+  // names the pattern rule and submit stays disabled.
   await page.fill('#criterion-id', 'Bad ID!');
   await expect(idError).toContainText(/lowercase letters/i);
+  await expect(submit).toBeDisabled();
   await expect(submit).toHaveAttribute('data-incomplete', 'true');
 
   // Duplicate id (valid pattern but collides with a seeded criterion): the id
-  // message names the collision and submit stays incomplete.
+  // message names the collision and submit stays disabled.
   await page.fill('#criterion-id', 'clarity-check');
   await expect(idError).toContainText(/already in use/i);
-  await expect(submit).toHaveAttribute('data-incomplete', 'true');
+  await expect(submit).toBeDisabled();
 
   // A unique valid id clears the id error.
   await page.fill('#criterion-id', 'inline-validation-probe');
   await expect(idError).toBeEmpty();
 
-  // Weight outside 0.5-5: the weight message names the bound.
+  // Weight outside 0.5-5: the weight message names the bound and submit stays
+  // disabled.
   await fillNumber('#criterion-weight', 9);
   await expect(weightError).toContainText(/between 0\.5 and 5/i);
-  await expect(submit).toHaveAttribute('data-incomplete', 'true');
+  await expect(submit).toBeDisabled();
   await fillNumber('#criterion-weight', 2);
   await expect(weightError).toBeEmpty();
 
   // Likert range where min is not less than max: switch to likert, set min>=max,
-  // and both range fields surface inline messages while submit stays incomplete.
+  // and both range fields surface inline messages while submit stays disabled.
   await page.locator('label[for="criterion-type"]').locator('..').locator('.p-select').first().click();
   await page.getByRole('option', { name: 'likert' }).click();
   await fillNumber('#criterion-min', 5);
   await fillNumber('#criterion-max', 5);
   await expect(page.locator('#criterion-min-error')).toContainText(/lower than likert max/i);
   await expect(page.locator('#criterion-max-error')).toContainText(/greater than likert min/i);
-  await expect(submit).toHaveAttribute('data-incomplete', 'true');
+  await expect(submit).toBeDisabled();
 
   // Across every invalid state above, no criterion was added to the rubric.
   expect(await page.locator('.criterion-panel').count()).toBe(baselineCount);
