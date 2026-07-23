@@ -1,8 +1,10 @@
-import * as store from './store';
+import * as store from './store.js';
 
 const FORM_FIELD_MAP = {
   'first-name': 'firstName',
+  'first_name': 'firstName',
   'last-name': 'lastName',
+  'last_name': 'lastName',
   'temporary-password': 'temporaryPassword',
   'account-segment': 'accountSegment',
   email: 'email',
@@ -19,6 +21,11 @@ const FORM_FIELD_MAP = {
 export function normalizeFormFields(input = {}) {
   const raw = input.fields && typeof input.fields === 'object' ? input.fields : input;
   const out = {};
+  if (raw.name) {
+    const parts = raw.name.trim().split(/\s+/).filter(Boolean);
+    if (parts[0] && !raw['first-name'] && !raw.firstName) raw.firstName = parts[0];
+    if (parts.length > 1 && !raw['last-name'] && !raw.lastName) raw.lastName = parts.slice(1).join(' ');
+  }
   for (const [key, value] of Object.entries(raw)) {
     const mapped = FORM_FIELD_MAP[key] || key;
     out[mapped] = value;
@@ -41,13 +48,13 @@ export function normalizeEntityFields(input = {}) {
   const payload = {
     firstName,
     lastName,
-    email: raw.email || '',
-    phone: raw.phone || '',
-    notes: raw.notes || '',
-    temporaryPassword: raw['temporary-password'] || raw.temporaryPassword || 'Password1!',
-    accountSegment: raw['account-segment'] || raw.accountSegment || 'External',
-    role: raw.role || 'Member',
-    status: raw.status || 'Active',
+    email: raw.email,
+    phone: raw.phone,
+    notes: raw.notes,
+    temporaryPassword: raw['temporary-password'] || raw.temporaryPassword,
+    accountSegment: raw['account-segment'] || raw.accountSegment,
+    role: raw.role,
+    status: raw.status,
     sendInvitation: false,
     twoFactorEnabled: false,
     productAccess: true,
@@ -123,6 +130,7 @@ export function registerWebMcp() {
     { type: 'object', properties: { query: { type: 'string', maxLength: 100 } }, required: ['query'], additionalProperties: false },
     ({ query }) => {
       store.searchQuery.value = query;
+      store.filters.value = { role: null, status: null };
       store.setView('all-users');
       return { matching: store.visibleUsers.value.length };
     }
