@@ -661,7 +661,7 @@ button:disabled { cursor: not-allowed; opacity: 0.38; }
 .export-content { height: min(390px, 47vh); overflow: auto; border: 1px solid var(--ink); border-top: 0; background: #111; }
 .export-content pre { min-width: 100%; width: max-content; margin: 0; padding: 16px; color: #f7f7f7; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 9.5px; line-height: 1.45; }
 .png-content { display: grid; place-items: center; padding: 12px; background: #dcdcdc; overflow: auto; }
-.png-content img { display: block; width: min(100%, 420px); height: auto; border: 1px solid var(--ink); box-shadow: 7px 8px 0 rgba(0, 0, 0, 0.15); object-fit: contain; }
+.png-content img { display: block; width: min(100%, 420px); height: 100%; max-height: 100%; border: 1px solid var(--ink); box-shadow: 7px 8px 0 rgba(0, 0, 0, 0.15); object-fit: contain; }
 .rendering { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; }
 .export-footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
 .export-footer p { margin: 14px 0 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 8px; }
