@@ -18,7 +18,7 @@ import { initWebmcp } from "./webmcp.js";
 gsap.registerPlugin(ScrollTrigger);
 rive.RuntimeLoader.setWasmUrl(riveWasmUrl);
 
-const RM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const isRM = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // A reload always restarts the sequence from the top.
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
@@ -56,7 +56,7 @@ function initLoader() {
   let exited = false, revealed = false;
   const reveal = () => { if (revealed) return; revealed = true; window.dispatchEvent(new CustomEvent("loaderExited")); };
 
-  if (RM) {
+  if (isRM()) {
     if (bar) bar.style.width = "100%";
     requestAnimationFrame(() => {
       if (loader) { loader.classList.add("rm-exit"); loader.style.pointerEvents = "none"; loader.remove(); }
@@ -128,7 +128,7 @@ function initHeroChrome() {
  * ------------------------------------------------------------------ */
 function initHeroFade() {
   const els = $$("[data-hero-fade]");
-  if (RM) { gsap.set(els, { opacity: 1, y: 0 }); return; }
+  if (isRM()) { gsap.set(els, { opacity: 1, y: 0 }); return; }
   gsap.set(els, { opacity: 0, y: 30 });
   window.addEventListener("threeJsCanvas", (e) => {
     if (e.detail && e.detail.active) return;
@@ -150,10 +150,10 @@ function initWordReveal() {
       .join(" ");
     const inner = $$(".wr-word", el);
     el._wrWords = inner; el._wrTween = null; el._wrShown = false;
-    if (RM) { gsap.set(inner, { opacity: 1 }); return; }
+    if (isRM()) { gsap.set(inner, { opacity: 1 }); return; }
     gsap.set(inner, { opacity: 0.12 });
   });
-  if (RM) return;
+  if (isRM()) return;
   let heroRevealed = false;
   window.addEventListener("threeJsCanvas", (e) => { if (e.detail && !e.detail.active) heroRevealed = true; });
   const enter = new IntersectionObserver((entries) => {
@@ -165,7 +165,7 @@ function initWordReveal() {
       if (el._wrTween) el._wrTween.kill();
       el._wrTween = gsap.to(el._wrWords, { opacity: 1, duration: 0.7, ease: "power2.out", stagger: 0.07, overwrite: true });
     }
-  }, { rootMargin: "-20% 0px 0px 0px", threshold: 0 });
+  }, { rootMargin: "0px", threshold: 0 });
   const reset = new IntersectionObserver((entries) => {
     for (const entry of entries) {
       const el = entry.target;
@@ -194,7 +194,7 @@ function initNav() {
     for (const cell of spyCells) {
       const section = document.getElementById(cell.getAttribute("data-section"));
       if (!section) continue;
-      if (section.getBoundingClientRect().top <= navH + 12) active = cell;
+      if (section.getBoundingClientRect().top <= window.innerHeight / 2) active = cell;
     }
     cells.forEach((c) => { c.classList.remove("is-active", "is-clicked"); c.removeAttribute("aria-current"); });
     if (active) { active.classList.add("is-active"); active.setAttribute("aria-current", "true"); }
@@ -203,7 +203,7 @@ function initNav() {
   if (logoCell) logoCell.addEventListener("click", (e) => {
     e.preventDefault();
     cells.forEach((c) => { c.classList.remove("is-active", "is-clicked"); c.removeAttribute("aria-current"); });
-    window.scrollTo({ top: 0, behavior: RM ? "auto" : "smooth" });
+    window.scrollTo({ top: 0, behavior: isRM() ? "auto" : "smooth" });
     try { history.replaceState(null, "", location.pathname + location.search); } catch {}
   });
   spyCells.forEach((cell) => {
@@ -247,6 +247,12 @@ function initMobileMenu() {
   };
   toggle.addEventListener("click", () => set(!open));
   $$("#mobile-menu a").forEach((a) => a.addEventListener("click", () => open && set(false)));
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && open) {
+      e.stopPropagation();
+      set(false);
+    }
+  });
 }
 
 /* ------------------------------------------------------------------ *
@@ -264,6 +270,7 @@ function initVideoModal() {
     if (poster) video.poster = poster;
     if (id) {
       video.src = "/assets/videos/" + id + ".webm";
+      video.autoplay = true;
       try { video.load(); } catch {}
       const p = video.play(); if (p && p.catch) p.catch(() => {});
     }
@@ -315,7 +322,7 @@ function initStackMotion() {
     layer.className = "parallax-layer";
     layer.style.backgroundImage = `url("${src}")`;
     section.insertBefore(layer, section.firstChild);
-    if (!RM) {
+    if (!isRM()) {
       gsap.to(layer, { y: () => -section.offsetHeight * 0.3, ease: "none",
         scrollTrigger: { trigger: section, start: "top bottom", end: "bottom top", scrub: true } });
     }
@@ -331,7 +338,7 @@ function initFooterFade() {
   const overlay = document.createElement("div");
   overlay.className = "footer__gradient";
   footer.insertBefore(overlay, footer.firstChild);
-  if (RM) { overlay.style.opacity = "1"; return; }
+  if (isRM()) { overlay.style.opacity = "1"; return; }
   const io = new IntersectionObserver((entries) => {
     for (const entry of entries) {
       gsap.to(overlay, { opacity: entry.isIntersecting ? 1 : 0,
@@ -353,13 +360,13 @@ function initRiveEmbeds() {
     if (!src) return;
     let w = host.offsetWidth, h = host.offsetHeight;
     if (w <= 0 || h <= 0) { const r = host.getBoundingClientRect(); w = Math.round(r.width); h = Math.round(r.height); }
-    if (w <= 0 || h <= 0) { setTimeout(() => hydrate(host), 400); return; }
+    if (w <= 0 || h <= 0) { w = 300; h = 200; }
     const canvas = document.createElement("canvas");
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     canvas.width = Math.round(Math.min(w, window.innerWidth * 1.5) * dpr);
     canvas.height = Math.round(Math.min(h, window.innerHeight * 1.5) * dpr);
     host.appendChild(canvas);
-    const config = { src, canvas, autoplay: !RM,
+    const config = { src, canvas, autoplay: !isRM(),
       layout: new rive.Layout({ fit: rive.Fit.Contain, alignment: rive.Alignment.Center }),
       onLoad: () => { try { instance.resizeDrawingSurfaceToCanvas(); } catch {} } };
     const sm = host.getAttribute("data-rive-sm"), artboard = host.getAttribute("data-rive-artboard");
@@ -628,14 +635,22 @@ function wireChrome() {
   const undoBtn = $("#btn-undo"), redoBtn = $("#btn-redo");
   if (undoBtn) undoBtn.addEventListener("click", () => {
     const a = window.appState.undoStack.pop(); if (!a) return;
-    if (a.type === "pin") window.appMutations.unpinFeature(a.name, true);
+    if (a.type === "pin") {
+      const i = window.appState.shortlist.indexOf(a.name);
+      if (i !== -1) window.appState.shortlist.splice(i, 1);
+      updateShortlistUI();
+    }
     else { window.appState.shortlist.splice(a.index, 0, a.name); updateShortlistUI(); }
     window.appState.redoStack.push(a); updateUndoRedoButtons();
   });
   if (redoBtn) redoBtn.addEventListener("click", () => {
     const a = window.appState.redoStack.pop(); if (!a) return;
     if (a.type === "pin") { window.appState.shortlist.push(a.name); updateShortlistUI(); }
-    else window.appMutations.unpinFeature(a.name, true);
+    else {
+      const i = window.appState.shortlist.indexOf(a.name);
+      if (i !== -1) window.appState.shortlist.splice(i, 1);
+      updateShortlistUI();
+    }
     window.appState.undoStack.push(a); updateUndoRedoButtons();
   });
 
@@ -658,7 +673,8 @@ function wireChrome() {
   }
   const btnDownload = $("#btn-download");
   if (btnDownload) btnDownload.addEventListener("click", () => {
-    const data = window.updateBriefPreview();
+    const data = window.generateBriefData();
+    window.updateBriefPreview();
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -669,7 +685,8 @@ function wireChrome() {
   });
   const btnCopy = $("#btn-copy"), copyConfirm = $("#copy-confirm");
   if (btnCopy) btnCopy.addEventListener("click", async () => {
-    const text = JSON.stringify(window.updateBriefPreview(), null, 2);
+    const text = JSON.stringify(window.generateBriefData(), null, 2);
+    window.updateBriefPreview();
     let copied = false;
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -710,6 +727,9 @@ function wireChrome() {
     watchedExecutives: ["Arjun Mehta"],
     themeFilter: "Agentic Stack", searchQuery: "", generatedAt: new Date().toISOString(),
   }));
+
+  const btnPaletteTrigger = $("#btn-palette-trigger");
+  if (btnPaletteTrigger) btnPaletteTrigger.addEventListener("click", openPalette);
 
   const cmdPalette = $("#command-palette"), paletteSearch = $("#palette-search"), paletteResults = $("#palette-results");
   if (cmdPalette) {

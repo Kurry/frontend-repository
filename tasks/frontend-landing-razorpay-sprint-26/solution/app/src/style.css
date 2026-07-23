@@ -21,9 +21,9 @@
   --yellow: #e3f51a;
   --sky: #b8cbd1;
   --grey: #2c2c2c;
-  --ink: #767676;             /* body copy on light bands (AA on white) */
-  --ink-on-dark: #a8a8a8;     /* body copy on dark bands (AA on #151515) */
-  --secondary: #8a8a8a;       /* rgb(138,138,138) index numerals / mono meta */
+  --ink: #595959;             /* body copy on light bands (AA on white) */
+  --ink-on-dark: #b3b3b3;     /* body copy on dark bands (AA on #151515) */
+  --secondary: #767676;       /* rgb(138,138,138) index numerals / mono meta */
   --stack-overlap: 100px;
   --nav-h: 70px;
   --gutter: 66px;
@@ -47,8 +47,8 @@ button { background: none; border: 0; padding: 0; cursor: pointer; font: inherit
    SiteLoader — exact CSS is normative (PRD -> Components -> SiteLoader)
    ========================================================================= */
 #site-loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; will-change: transform; pointer-events: all; }
-.loader-logo { width: 220px; height: auto; display: block; filter: brightness(0) invert(1); opacity: 0; animation: loaderFadeIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards 0.3s; user-select: none; pointer-events: none; -webkit-user-drag: none; }
-.loader-track { width: 220px; height: 2px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; overflow: hidden; opacity: 0; animation: loaderFadeIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards 0.5s; }
+.loader-logo { width: 220px; height: auto; display: block; filter: brightness(0) invert(1); opacity: 1; user-select: none; pointer-events: none; -webkit-user-drag: none; }
+.loader-track { width: 220px; height: 2px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; overflow: hidden; opacity: 1; }
 .loader-bar { height: 100%; width: 0%; background: var(--blue-spy); border-radius: 2px; transition: width 0.12s linear; will-change: width; }
 @keyframes loaderFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 #site-loader.is-exiting { transform: translateY(-100%); transition: transform 0.9s cubic-bezier(0.76, 0, 0.24, 1); }
@@ -100,7 +100,7 @@ button { background: none; border: 0; padding: 0; cursor: pointer; font: inherit
 .seg-logo { width: 150px; height: auto; }
 /* Mutual exclusivity is enforced in JS; click flash must win while pressed. */
 .seg-cell.is-active { background-color: var(--blue-spy); }
-.seg-cell.is-clicked { background-color: var(--blue-click); }
+.seg-cell.is-clicked { background-color: var(--blue-click) !important; }
 
 /* keep all six labels on one row down to 1280 without clipping */
 @media (min-width: 768px) and (max-width: 1439px) {
@@ -210,6 +210,10 @@ a.cta-pill { text-decoration: underline; text-underline-offset: 2px; }
 .cta-pill--blue { color: #fff; background-color: var(--blue-click); }
 .cta-pill--black { color: #fff; background-color: #000; }
 .cta-pill--white { color: #151515; background-color: var(--white); }
+
+.cta::after, .cta-pill::after { content: ""; display: inline-block; width: 10px; height: 10px; background-size: contain; background-repeat: no-repeat; background-position: center; margin-left: 6px; }
+.cta--black::after, .cta-pill--white::after { background-image: url('/assets/img/chevron-black.svg'); }
+.cta-pill--blue::after, .cta-pill--black::after { background-image: url('/assets/img/chevron-white.svg'); }
 
 /* Leader (executive quote) blocks */
 .leader { display: flex; justify-content: space-between; align-items: stretch; gap: 48px; margin-bottom: 72px; }
