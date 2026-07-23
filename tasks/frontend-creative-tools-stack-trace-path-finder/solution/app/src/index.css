@@ -5,3 +5,48 @@
 body {
   @apply bg-gray-900 text-gray-100;
 }
+
+/* Committed route edges flow along the call direction. */
+@keyframes dashflow {
+  to { stroke-dashoffset: -18; }
+}
+.route-edge {
+  stroke-dasharray: 12 6;
+  animation: dashflow 1.2s linear infinite;
+}
+
+/* OS-level reduced motion: instant endpoints, no running animations. */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .route-edge {
+    animation: none !important;
+  }
+}
+
+/* In-app reduced-motion toggle: same instant endpoints regardless of OS setting. */
+.reduce-motion *,
+.reduce-motion ::before,
+.reduce-motion ::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+
+/* High-contrast color mode: pure-black panels, brighter borders and muted text. */
+.theme-contrast,
+.theme-contrast .bg-gray-900 { background-color: #000 !important; }
+.theme-contrast .bg-gray-800 { background-color: #0a0a0a !important; }
+.theme-contrast .bg-gray-700 { background-color: #1a1a1a !important; }
+.theme-contrast .border-gray-700,
+.theme-contrast .border-gray-600,
+.theme-contrast .border-gray-500 { border-color: #d1d5db !important; }
+.theme-contrast .text-gray-400,
+.theme-contrast .text-gray-500 { color: #e5e7eb !important; }
+.theme-contrast .graph-label { fill: #ffffff !important; }
+.theme-contrast .graph-node { stroke-width: 2.5; }

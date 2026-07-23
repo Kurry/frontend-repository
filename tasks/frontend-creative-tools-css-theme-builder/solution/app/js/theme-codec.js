@@ -80,12 +80,12 @@ export const NAME_PATTERN = /^[a-z0-9_-]+$/;
 export function validateThemeName(name) {
   const raw = String(name ?? "");
   const trimmed = raw.trim();
-  if (!trimmed) return "Theme name is required — enter a name to apply it.";
+  if (!trimmed) return "name: Theme name is required — enter a name to apply it.";
   if (trimmed.length > NAME_MAX) {
-    return `Theme name must be ${NAME_MAX} characters or fewer (currently ${trimmed.length}) — shorten it.`;
+    return `name: Theme name must be ${NAME_MAX} characters or fewer (currently ${trimmed.length}) — shorten it.`;
   }
   if (!NAME_PATTERN.test(trimmed)) {
-    return "Theme name may only use lowercase letters, numbers, hyphens, and underscores — remove spaces, uppercase letters, or other characters.";
+    return "name: Theme name may only use lowercase letters, numbers, hyphens, and underscores — remove spaces, uppercase letters, or other characters.";
   }
   return null;
 }

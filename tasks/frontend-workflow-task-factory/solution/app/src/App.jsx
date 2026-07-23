@@ -506,8 +506,9 @@ function TimelineView() {
     <div className="page">
       <div className="page-header"><div><p className="page-eyebrow"><IconHistory size={14} />Factory activity</p><h1 className="page-title">Event timeline</h1><p className="page-subtitle">A durable in-session record of stage transitions, retries, and accepted tasks.</p></div><div className="header-actions"><Button variant="secondary" onClick={exportAllAccepted}><IconDownload size={15} />Export accepted tasks</Button></div></div>
       <div className="filter-row" aria-label="Filter events by status"><button className={cn('filter-chip', !filter && 'active')} onClick={() => setFilter(null)}>All · {events.length}</button>{EVENT_STATUSES.map((status) => <button key={status} className={cn('filter-chip', filter === status && 'active')} onClick={() => setFilter(status)}>{status}</button>)}</div>
+      <p className="timeline-summary" role="status" data-visible-count={filtered.length} data-total-count={events.length}>Showing {filtered.length} of {events.length} events{filter ? ` · ${filter} only` : ''}</p>
       <Card>
-        {filtered.length ? <div className="timeline" ref={listRef}>{filtered.map((event) => <div className="event-row" key={event.id}><span className={cn('event-icon', event.status)}>{event.status === 'failed' ? <IconX size={11} aria-hidden /> : event.status === 'retry' ? <IconRefresh size={11} aria-hidden /> : event.status === 'started' ? <IconActivity size={11} aria-hidden /> : <IconCheck size={11} aria-hidden />}</span><div className="event-main"><strong>{event.text}</strong><span>{event.repository} · PR #{event.prNumber}</span></div><time className="event-time" dateTime={event.at}>{formatTime(event.at)} UTC</time></div>)}</div> : <EmptyState title="No events match" description="No timeline entries carry this status. The underlying event record is unchanged." onClear={() => setFilter(null)} />}
+        {filtered.length ? <div className="timeline" key={filter || 'all'} ref={listRef}>{filtered.map((event) => <div className="event-row" key={event.id}><span className={cn('event-icon', event.status)}>{event.status === 'failed' ? <IconX size={11} aria-hidden /> : event.status === 'retry' ? <IconRefresh size={11} aria-hidden /> : event.status === 'started' ? <IconActivity size={11} aria-hidden /> : <IconCheck size={11} aria-hidden />}</span><div className="event-main"><strong>{event.text}</strong><span>{event.repository} · PR #{event.prNumber}</span></div><time className="event-time" dateTime={event.at}>{formatTime(event.at)} UTC</time></div>)}</div> : <EmptyState title="No events match" description="No timeline entries carry this status. The underlying event record is unchanged." onClear={() => setFilter(null)} />}
       </Card>
     </div>
   )
@@ -560,7 +561,7 @@ function AnalyticsView() {
     return weeks.map((week) => ({ week: week.label, tasks: tasks.filter((task) => task.createdAt.slice(0, 10) >= week.from && task.createdAt.slice(0, 10) < week.to).length }))
   }, [tasks])
   const languages = useMemo(() => repositories.map((repo) => ({ name: repo.language, value: tasks.filter((task) => task.repository === repo.id).length })).filter((item) => item.value > 0), [repositories, tasks])
-  const difficulty = ['Easy', 'Medium', 'Hard'].map((name) => ({ name, tasks: tasks.filter((task) => task.difficulty === name).length }))
+  const difficulty = useMemo(() => ['Easy', 'Medium', 'Hard'].map((name) => ({ name, tasks: tasks.filter((task) => task.difficulty === name).length })), [tasks])
   useEffect(() => {
     const onScroll = () => setParallax(Math.min(48, window.scrollY * 0.12))
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -651,7 +652,7 @@ function CreateTaskDialog() {
       const currentRepo = watch('repository') || 'quartz-orm'
       reset(state.createDrafts[currentRepo])
     }
-  }, [open, reset])
+  }, [open, reset, watch])
   useEffect(() => {
     const resetHandler = () => {
       const blank = { repository: 'quartz-orm', pullRequestNumber: '', minFiles: '2', maxFiles: '20' }
@@ -686,28 +687,20 @@ function CreateTaskDialog() {
   }
   const cancel = () => setOpen(false)
   const prValue = watch('pullRequestNumber')
+  const repoValue = watch('repository') || 'quartz-orm'
+  // Reactive duplicate-run guard: subscribe to runningIds so the submit control
+  // disables the instant a run with this exact repository + PR number starts
+  // (runKey format matches startRun's `${repository}-${pullRequestNumber}`).
+  const runningIds = useFactoryStore((s) => s.runningIds)
+  const duplicateRunning = runningIds.includes(`${repoValue}-${prValue}`)
   const returnFocusRef = useRef(null)
-  const [portalMounted, setPortalMounted] = useState(open)
-  useEffect(() => {
-    if (open) {
-      setPortalMounted(true)
-      return undefined
-    }
-    const timer = window.setTimeout(() => setPortalMounted(false), 320)
-    return () => window.clearTimeout(timer)
-  }, [open])
+
   return (
     <Dialog.Root open={open} modal={false} onOpenChange={(next) => setOpen(next)}>
-      {portalMounted ? <Dialog.Portal forceMount>
-        <Dialog.Overlay
-          className="dialog-overlay"
-          forceMount
-          data-state={open ? 'open' : 'closed'}
-        />
+      <Dialog.Portal>
+        <Dialog.Overlay className="dialog-overlay" />
         <Dialog.Content
           className="dialog-content"
-          forceMount
-          data-state={open ? 'open' : 'closed'}
           aria-describedby="create-task-description"
           onOpenAutoFocus={() => { returnFocusRef.current = document.activeElement }}
           onCloseAutoFocus={(event) => {
@@ -716,7 +709,12 @@ function CreateTaskDialog() {
             returnFocusRef.current.focus()
           }}
           onEscapeKeyDown={() => setOpen(false)}
+          aria-modal="true"
           onInteractOutside={(event) => {
+            // The dialog is deliberately non-modal for sidebar interleaving:
+            // clicking sidebar navigation must NOT dismiss an in-progress draft
+            // (interleaved flows keep their state), so cancel the outside-
+            // interaction dismissal for sidebar targets only.
             if (event.target instanceof Element && event.target.closest('.sidebar')) event.preventDefault()
           }}
           onKeyDown={(event) => {
@@ -744,10 +742,10 @@ function CreateTaskDialog() {
                 <span>Or swipe up on mobile with gesture shortcuts enabled</span>
               </div>
             </div>
-            <div className="dialog-actions"><Button type="button" variant="secondary" onClick={cancel}>Cancel</Button><Button type="submit" disabled={!isValid || isSubmitting}><IconSparkles size={15} aria-hidden />Start pipeline run</Button></div>
+            <div className="dialog-actions"><Button type="button" variant="secondary" onClick={cancel}>Cancel</Button><Button type="submit" disabled={!isValid || isSubmitting || duplicateRunning}><IconSparkles size={15} aria-hidden />Start pipeline run</Button></div>
           </form>
         </Dialog.Content>
-      </Dialog.Portal> : null}
+      </Dialog.Portal>
     </Dialog.Root>
   )
 }

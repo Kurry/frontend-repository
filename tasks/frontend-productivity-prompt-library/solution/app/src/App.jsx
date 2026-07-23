@@ -88,10 +88,14 @@ function displayTableTitle(title) {
   return title.length > 60 ? `${title.slice(0, 59)}…` : title;
 }
 
-function useModalFocusTrap(active) {
+function useModalFocusTrap(active, onClose) {
   useEffect(() => {
     if (!active) return undefined;
     const onKeyDown = (event) => {
+      if (event.key === 'Escape' && onClose) {
+        onClose();
+        return;
+      }
       if (event.key !== 'Tab') return;
       const modal = document.querySelector('.cds--modal.is-visible, .side-panel[aria-modal="true"]');
       if (!modal) return;
@@ -115,8 +119,18 @@ function useModalFocusTrap(active) {
 }
 
 function closeModalWithFocus() {
-  useLibraryStore.getState().closeModal();
-  restoreModalFocus();
+  const layer = document.querySelector('.cds--modal.is-visible');
+  if (!layer || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    useLibraryStore.getState().closeModal();
+    restoreModalFocus();
+    return;
+  }
+  if (layer.classList.contains('overlay-exit')) return;
+  layer.classList.add('overlay-exit');
+  window.setTimeout(() => {
+    useLibraryStore.getState().closeModal();
+    restoreModalFocus();
+  }, 220);
 }
 
 function restoreModalFocus() {
@@ -184,10 +198,10 @@ function CopyButton({ text, feedbackKey, label = 'Copy prompt body', size = 'sm'
   const copy = async () => {
     if (isExporting) return;
     setIsExporting(true);
+    showCopyFeedback(feedbackKey, 'Copied exact prompt body to clipboard');
+    setCopiedKey(feedbackKey);
     try {
       await writeClipboard(text);
-      showCopyFeedback(feedbackKey, 'Copied exact prompt body to clipboard');
-      setCopiedKey(feedbackKey);
       setTimeout(() => setCopiedKey(null), 1800);
     } finally {
       setIsExporting(false);
@@ -284,7 +298,7 @@ function AttachmentRows({ attachments, editable = false, onRemove }) {
               kind="danger--ghost"
               size="sm"
               renderIcon={TrashCan}
-              aria-label="Remove attachment"
+              aria-label={`Remove attachment ${item.filename}`}
               onClick={() => onRemove(item)}
             >
               Remove
@@ -602,15 +616,17 @@ function LibraryTable({ prompts }) {
 
 function PromptFormModal({ modal }) {
   const prompts = useLibraryStore((state) => state.prompts);
+  const draftPrompt = useLibraryStore((state) => state.draftPrompt);
   const closeModal = closeModalWithFocus;
   const createPrompt = useLibraryStore((state) => state.createPrompt);
   const updatePrompt = useLibraryStore((state) => state.updatePrompt);
   const setDraftPrompt = useLibraryStore((state) => state.setDraftPrompt);
   const clearDraftPrompt = useLibraryStore((state) => state.clearDraftPrompt);
   const existing = modal.type === 'edit' ? prompts.find((prompt) => prompt.id === modal.promptId) : null;
-  const initial = modal.restoredData || (existing ? requestFromPrompt(existing) : { title: '', body: '', technique: '', description: '' });
+  const initial = modal.restoredData || (existing ? requestFromPrompt(existing) : draftPrompt) || { title: '', body: '', technique: '', description: '' };
   const [attachments, setAttachments] = useState(existing?.attachments || []);
   const submitLock = useRef(false);
+  const [submitting, setSubmitting] = useState(false);
   const {
     register,
     handleSubmit,
@@ -627,9 +643,11 @@ function PromptFormModal({ modal }) {
     return () => window.clearTimeout(timer);
   }, [modal.type, setDraftPrompt, values]);
 
-  const submit = (data) => {
+  const submit = async (data) => {
     if (submitLock.current) return;
     submitLock.current = true;
+    setSubmitting(true);
+    await new Promise((resolve) => window.setTimeout(resolve, 180));
     if (existing) updatePrompt(existing.id, data, attachments);
     else {
       createPrompt(data);
@@ -648,13 +666,14 @@ function PromptFormModal({ modal }) {
       modalLabel={existing ? `Version ${existing.version}` : 'Prompt Library'}
       primaryButtonText={existing ? 'Save new version' : 'Create prompt'}
       secondaryButtonText="Cancel"
-      primaryButtonDisabled={submitLock.current || !isValid}
+      primaryButtonDisabled={submitting || !isValid}
       launcherButtonRef={modalTriggerRef}
       onRequestClose={closeModal}
       onSecondarySubmit={closeModal}
       onRequestSubmit={handleSubmit(submit)}
       selectorPrimaryFocus="#prompt-title"
     >
+      {submitting && <div className="mutation-progress" role="status"><span className="export-loading__spinner" aria-hidden="true" />Saving prompt…</div>}
       {modal.restoredVersion && (
         <InlineNotification
           lowContrast
@@ -1082,7 +1101,14 @@ function DetailModal({ promptId }) {
 
 function HistoryPanel({ promptId }) {
   const prompt = useLibraryStore((state) => state.prompts.find((item) => item.id === promptId));
-  const closeHistory = () => { useLibraryStore.getState().closeHistory(); closeModalWithFocus(); };
+  const closeHistory = () => {
+    const layer = document.querySelector('.panel-layer:not(.panel-layer--sources)');
+    const finish = () => { useLibraryStore.getState().closeHistory(); restoreModalFocus(); };
+    if (!layer || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return finish();
+    if (layer.classList.contains('panel-layer--exit')) return;
+    layer.classList.add('panel-layer--exit');
+    window.setTimeout(finish, 240);
+  };
   const restoreVersionToEdit = useLibraryStore((state) => state.restoreVersionToEdit);
   useEscape(closeHistory);
   if (!prompt) return null;
@@ -1158,7 +1184,7 @@ function ToastRegion() {
   const toast = useLibraryStore((state) => state.toast);
   if (!toast) return <div className="sr-only" aria-live="polite" />;
   return (
-    <div className="toast-region" aria-live="polite">
+    <div className={`toast-region ${toast.exiting ? 'toast-region--exit' : ''}`} aria-live="polite">
       <InlineNotification
         lowContrast
         hideCloseButton
@@ -1510,12 +1536,35 @@ function TechniqueChart({ prompts }) {
   );
 }
 
+function LibraryHealth({ prompts }) {
+  const withDescriptions = prompts.filter((prompt) => prompt.description?.trim()).length;
+  const withAttachments = prompts.filter((prompt) => prompt.attachments.length).length;
+  const withVersions = prompts.filter((prompt) => prompt.version > 1).length;
+  const score = prompts.length
+    ? Math.round(((withDescriptions + withAttachments + withVersions) / (prompts.length * 3)) * 100)
+    : 0;
+  return (
+    <section className="library-health" aria-label="Library health diagnostic">
+      <div className="library-health__heading">
+        <span>Library health</span>
+        <strong>{score}%</strong>
+      </div>
+      <div className="library-health__meter" role="meter" aria-label="Library health score" aria-valuemin="0" aria-valuemax="100" aria-valuenow={score}>
+        <span style={{ width: `${score}%` }} />
+      </div>
+      <p>{withDescriptions} described · {withAttachments} with context · {withVersions} evolved</p>
+      <span className="offline-ready"><span aria-hidden="true" /> Offline-ready workspace</span>
+    </section>
+  );
+}
+
 function HeaderPreferences() {
   const theme = useLibraryStore((state) => state.theme);
   const density = useLibraryStore((state) => state.density);
   const setTheme = useLibraryStore((state) => state.setTheme);
   const setDensity = useLibraryStore((state) => state.setDensity);
   const setSearchQuery = useLibraryStore((state) => state.setSearchQuery);
+  const addPerformanceSample = useLibraryStore((state) => state.addPerformanceSample);
 
   const startVoiceSearch = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1530,6 +1579,7 @@ function HeaderPreferences() {
 
   return (
     <div className="header-actions">
+      <Button className="performance-sample-button" type="button" kind="ghost" size="sm" onClick={addPerformanceSample}>Load 60 sample prompts</Button>
       <Button type="button" kind="ghost" size="sm" onClick={startVoiceSearch} aria-label="Start voice search">Voice</Button>
       <Select id="density-pref" labelText="Density" hideLabel value={density} onChange={(event) => setDensity(event.target.value)}>
         <SelectItem value="comfortable" text="Comfortable" />
@@ -1556,9 +1606,12 @@ function OnboardingTour() {
   if (complete || step >= ONBOARDING_STEPS.length) return null;
   const current = ONBOARDING_STEPS[step];
   return (
-    <div className="onboarding-layer" role="dialog" aria-modal="true" aria-labelledby="onboarding-title" onClick={(e) => { if (e.target === e.currentTarget) completeOnboarding(); }}>
-      <button type="button" className="onboarding-backdrop" aria-label="Skip onboarding" onClick={completeOnboarding} />
+    <aside className="onboarding-layer" aria-labelledby="onboarding-title">
       <div className="onboarding-card">
+        <div className="onboarding-progress" role="progressbar" aria-label="Onboarding progress" aria-valuemin="1" aria-valuemax={ONBOARDING_STEPS.length} aria-valuenow={step + 1}>
+          {ONBOARDING_STEPS.map((item, index) => <span key={item.title} className={index <= step ? 'is-complete' : ''} />)}
+        </div>
+        <span className="eyebrow">Step {step + 1} of {ONBOARDING_STEPS.length}</span>
         <h2 id="onboarding-title">{current.title}</h2>
         <p>{current.body}</p>
         <div className="onboarding-actions">
@@ -1568,7 +1621,7 @@ function OnboardingTour() {
           </Button>
         </div>
       </div>
-    </div>
+    </aside>
   );
 }
 
@@ -1592,7 +1645,18 @@ function App() {
   );
 
   useEffect(() => registerWebMCPTools(), []);
-  useModalFocusTrap(Boolean(activeModal) || Boolean(detailPromptId) || Boolean(historyPromptId));
+  useModalFocusTrap(Boolean(activeModal) || Boolean(detailPromptId) || Boolean(historyPromptId), () => {
+    const state = useLibraryStore.getState();
+    if (state.activeModal) {
+      closeModalWithFocus();
+    } else if (state.detailPromptId) {
+      state.closeDetail();
+      restoreModalFocus();
+    } else if (state.historyPromptId) {
+      state.closeHistory();
+      restoreModalFocus();
+    }
+  });
   useEffect(() => {
     const onClick = (e) => {
       if (e.target.classList.contains('cds--modal') && e.target.classList.contains('is-visible')) {
@@ -1640,6 +1704,7 @@ function App() {
             <strong>{String(prompts.length).padStart(2, '0')}</strong>
             <span>live prompts</span>
             <TechniqueChart prompts={prompts} />
+            <LibraryHealth prompts={prompts} />
           </div>
         </section>
         <section className="library-card" aria-label="Prompt collection">

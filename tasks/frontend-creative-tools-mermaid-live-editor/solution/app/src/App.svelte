@@ -27,7 +27,7 @@
 <div class="flex h-full flex-col bg-slate-100 font-sans text-slate-900 dark:bg-slate-950 dark:text-slate-100 h-screen w-screen overflow-hidden">
   <header class="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-4 py-2.5 transition-colors motion-safe:duration-300 dark:border-slate-800 dark:bg-slate-900">
     <div class="flex items-center gap-2">
-      <span class="text-lg" aria-hidden="true">🧜‍♀️</span>
+      <svg viewBox="0 0 24 24" class="size-6 text-indigo-500" aria-hidden="true" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
       <h1 class="text-base font-semibold">Mermaid Live Editor</h1>
       {#if badgeLabel}
         {#key store.diagramType}

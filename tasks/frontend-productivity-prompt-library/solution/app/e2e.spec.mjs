@@ -136,6 +136,22 @@ async function openApp(page) {
 
 const ROWS = 'table.library-table tbody tr';
 
+async function createPrompt(page, title, technique = 'Few-shot') {
+  await page.getByRole('button', { name: 'New Prompt', exact: true }).click();
+  const modal = page.locator('.prompt-form-modal');
+  await modal.getByLabel('Title').fill(title);
+  await modal.locator('#prompt-body').fill(`Reusable body for ${title}.`);
+  await modal.getByLabel('Technique tag').selectOption(technique);
+  await modal.getByRole('button', { name: 'Create prompt' }).click();
+  await expect(modal).toBeHidden();
+}
+
+async function selectFirstTwo(page) {
+  const labels = page.locator(`${ROWS} label.cds--checkbox-label`);
+  await labels.nth(0).click();
+  await labels.nth(1).click();
+}
+
 test.describe('frontend-productivity-prompt-library criteria', () => {
   test('1.1 seeded_library_present', async ({ page }) => {
     await openApp(page);
@@ -430,5 +446,389 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
     const descending = await page.locator(`${ROWS} .title-truncate`).allTextContents();
 
     expect(descending, 'reversing sort direction reverses the row order').toEqual([...ascending].reverse());
+  });
+
+  test('1.8 text_and_controls_have_contrast', async ({ page }) => {
+    await openApp(page);
+    const ratios = await page.locator('.cds--tag').evaluateAll((tags) => {
+      const luminance = (rgb) => {
+        const values = rgb.match(/[\d.]+/g).slice(0, 3).map((value) => Number(value) / 255)
+          .map((value) => (value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4));
+        return 0.2126 * values[0] + 0.7152 * values[1] + 0.0722 * values[2];
+      };
+      return tags.map((tag) => {
+        const style = getComputedStyle(tag);
+        const a = luminance(style.color);
+        const b = luminance(style.backgroundColor);
+        return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+      });
+    });
+    expect(Math.min(...ratios)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('14.7 interleaved_flows_preserve_state', async ({ page }) => {
+    await openApp(page);
+    await page.getByRole('button', { name: 'New Prompt', exact: true }).click();
+    await page.locator('#prompt-title').fill('Preserved draft A');
+    await page.locator('#prompt-body').fill('Draft A body');
+    await page.locator('#prompt-technique').selectOption('Few-shot');
+    await page.getByRole('button', { name: 'Cancel' }).click();
+    await page.getByRole('button', { name: 'Export library' }).click();
+    await page.keyboard.press('Escape');
+    await page.getByRole('button', { name: 'New Prompt', exact: true }).click();
+    await expect(page.locator('#prompt-title')).toHaveValue('Preserved draft A');
+    await page.locator('#prompt-title').fill('Finished prompt B');
+    await page.getByRole('button', { name: 'Create prompt' }).click();
+    await expect(page.locator(ROWS, { hasText: 'Finished prompt B' })).toHaveCount(1);
+  });
+
+  test('14.8 empty_to_repopulated_round_trip', async ({ page }) => {
+    await openApp(page);
+    const ids = await page.locator(ROWS).evaluateAll((rows) => rows.map((row) => row.dataset.id));
+    for (const id of ids) await invokeTool(page, 'entity_delete', { id, confirm: true });
+    await expect(page.getByRole('heading', { name: 'Your library is empty' })).toBeVisible();
+    await invokeTool(page, 'entity_create', { title: 'Repopulated live', body: 'Live body', technique: 'Few-shot', description: '' });
+    await expect(page.locator(ROWS, { hasText: 'Repopulated live' })).toHaveCount(1);
+    await expect(page.locator('.prompt-count')).toContainText('1 of 1 prompts');
+  });
+
+  test('1.16 attachment_badges_and_rows', async ({ page }) => {
+    await openApp(page);
+    const badge = page.locator('.attachment-badge').first();
+    await badge.hover();
+    await expect(badge.locator('xpath=..').locator('.attachment-preview')).toBeVisible();
+    await badge.click();
+    await expect(page.locator('.detail-attachments .attachment-row').first()).toBeVisible();
+    await expect(page.locator('.detail-attachments .attachment-row__meta').first()).toContainText(/image|text|document|audio/i);
+  });
+
+  test('1.18 remove_attachment_with_feedback', async ({ page }) => {
+    await openApp(page);
+    const row = page.locator(ROWS, { hasText: 'Landing page under strict limits' });
+    await row.getByRole('button', { name: /Edit Landing page/ }).click();
+    const modal = page.locator('.prompt-form-modal');
+    const before = await modal.locator('.attachment-row').count();
+    await modal.getByRole('button', { name: /Remove attachment/ }).first().click();
+    await expect(modal.locator('.attachment-row')).toHaveCount(before - 1);
+    await expect(page.locator('.toast-region')).toContainText('Attachment removed');
+    await modal.getByRole('button', { name: 'Save new version' }).click();
+    await expect(row.locator('.attachment-badge')).toHaveCount(before - 1);
+  });
+
+  test('1.21 double_submit_creates_one', async ({ page }) => {
+    await openApp(page);
+    const before = await page.locator(ROWS).count();
+    await page.getByRole('button', { name: 'New Prompt', exact: true }).click();
+    const modal = page.locator('.prompt-form-modal');
+    await modal.getByLabel('Title').fill('Double lock proof');
+    await modal.locator('#prompt-body').fill('One record only.');
+    await modal.getByLabel('Technique tag').selectOption('Few-shot');
+    await modal.getByRole('button', { name: 'Create prompt' }).dblclick({ delay: 10 });
+    await expect(page.locator(ROWS)).toHaveCount(before + 1);
+    await expect(page.locator(ROWS, { hasText: 'Double lock proof' })).toHaveCount(1);
+  });
+
+  test('1.22 cancel_leaves_collection_unchanged', async ({ page }) => {
+    await openApp(page);
+    const before = await page.locator(ROWS).count();
+    await page.getByRole('button', { name: 'New Prompt', exact: true }).click();
+    await page.getByRole('button', { name: 'Cancel' }).click();
+    await selectFirstTwo(page);
+    for (const name of ['Extend', 'Combine']) {
+      await page.getByRole('button', { name, exact: true }).click();
+      await page.getByRole('button', { name: 'Cancel' }).click();
+    }
+    await expect(page.locator(ROWS)).toHaveCount(before);
+  });
+
+  test('1.24 delete_all_empty_state', async ({ page }) => {
+    await openApp(page);
+    const ids = await page.locator(ROWS).evaluateAll((rows) => rows.map((row) => row.dataset.id));
+    for (const id of ids) await invokeTool(page, 'entity_delete', { id, confirm: true });
+    await expect(page.getByRole('heading', { name: 'Your library is empty' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'New prompt', exact: true })).toBeVisible();
+    await expect(page.getByAltText('Illustrated empty prompt library grid')).toBeVisible();
+  });
+
+  test('1.27 prompt_request_body_field_contract', async ({ page }) => {
+    await openApp(page);
+    await page.getByRole('button', { name: 'New Prompt', exact: true }).click();
+    const modal = page.locator('.prompt-form-modal');
+    await expect(modal.getByLabel('Title')).toHaveAttribute('maxlength', '60');
+    const invalidTitle = await invokeTool(page, 'form_validate', {
+      workflow: 'create', title: 'x'.repeat(61), body: 'Body', technique: 'Few-shot', description: '',
+    });
+    const invalidBody = await invokeTool(page, 'form_validate', {
+      workflow: 'create', title: 'Valid', body: 'x'.repeat(8001), technique: 'Few-shot', description: '',
+    });
+    const invalidDescription = await invokeTool(page, 'form_validate', {
+      workflow: 'create', title: 'Valid', body: 'Body', technique: 'Few-shot', description: 'x'.repeat(281),
+    });
+    expect([invalidTitle.valid, invalidBody.valid, invalidDescription.valid]).toEqual([false, false, false]);
+  });
+
+  test('1.29 import_library_round_trip', async ({ page }) => {
+    await openApp(page);
+    await createPrompt(page, 'Round trip proof', 'Structured output');
+    await page.getByRole('button', { name: 'Export library' }).click();
+    const payload = await page.locator('#export-preview').inputValue();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('.cds--modal.is-visible')).toHaveCount(0);
+    await expect(page.locator('.cds--modal.overlay-exit')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Import', exact: true }).click();
+    await page.locator('#import-payload').fill('{bad');
+    await expect(page.locator('.cds--form-requirement')).toContainText(/malformed/i);
+    await page.locator('#import-payload').fill(payload);
+    await page.getByRole('button', { name: 'Import and replace' }).click();
+    await expect(page.locator(ROWS, { hasText: 'Round trip proof' })).toHaveCount(1);
+  });
+
+  test('1.31 export_prompts_carry_full_record_shape', async ({ page }) => {
+    await openApp(page);
+    await selectFirstTwo(page);
+    await page.getByRole('button', { name: 'Combine' }).click();
+    await page.getByRole('button', { name: 'Create combined prompt' }).click();
+    await page.getByRole('button', { name: 'Export library' }).click();
+    const document = JSON.parse(await page.locator('#export-preview').inputValue());
+    const entry = document.prompts.find((prompt) => prompt.title === 'Combined prompt');
+    expect(Object.keys(entry)).toEqual(expect.arrayContaining(['title', 'body', 'technique', 'description', 'id', 'version', 'sources', 'attachments']));
+    expect(entry.sources).toHaveLength(2);
+  });
+
+  test('3.3 layout_matches_reference', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openApp(page);
+    const metrics = await page.evaluate(() => ({ page: document.documentElement.scrollWidth, viewport: innerWidth }));
+    expect(metrics.page).toBeLessThanOrEqual(metrics.viewport + 1);
+    await expect(page.locator('.library-table-container')).toBeVisible();
+  });
+
+  test('3.4 specified_state_changes_animate', async ({ page }) => {
+    await openApp(page);
+    await invokeTool(page, 'entity_create', { title: 'Animated row proof', body: 'Animated body', technique: 'Few-shot', description: '' });
+    const animations = await page.locator(ROWS, { hasText: 'Animated row proof' }).evaluate((row) => row.getAnimations().map((item) => item.animationName));
+    expect(animations).toContain('row-enter');
+  });
+
+  test('3.5 responsive_behavior_matches_reference', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openApp(page);
+    await expect(page.locator('.mobile-overflow')).toBeVisible();
+    await expect(page.locator('.suggestions')).toHaveCSS('overflow-x', 'auto');
+    await expect(page.locator('.library-table-container')).toHaveCSS('overflow-x', 'auto');
+  });
+
+  test('4.5 async_work_shows_loading_state', async ({ page }) => {
+    await openApp(page);
+    await page.getByRole('button', { name: 'New Prompt', exact: true }).click();
+    const modal = page.locator('.prompt-form-modal');
+    await modal.getByLabel('Title').fill('Loading proof');
+    await modal.locator('#prompt-body').fill('Loading body');
+    await modal.getByLabel('Technique tag').selectOption('Few-shot');
+    await modal.getByRole('button', { name: 'Create prompt' }).click({ noWaitAfter: true });
+    await expect(modal.getByRole('status')).toContainText('Saving prompt');
+  });
+
+  test('4.10 long_flows_show_progress', async ({ page }) => {
+    await page.goto(BASE);
+    const progress = page.getByRole('progressbar', { name: 'Onboarding progress' });
+    await expect(progress).toHaveAttribute('aria-valuenow', '1');
+    await page.getByRole('button', { name: 'Continue tour' }).click();
+    await expect(progress).toHaveAttribute('aria-valuenow', '2');
+    await expect(page.getByText('Step 2 of 3')).toBeVisible();
+  });
+
+  test('11.2 advanced_motion_mechanics', async ({ page }) => {
+    await openApp(page);
+    await page.evaluate(() => scrollTo(0, 120));
+    const transform = await page.locator('.page-intro--parallax').evaluate((node) => getComputedStyle(node).transform);
+    expect(transform).not.toBe('none');
+  });
+
+  test('11.9 genre_appropriate_platform_features', async ({ page }) => {
+    await openApp(page);
+    expect((await page.request.get(`${BASE}/manifest.json`)).ok()).toBe(true);
+    expect((await page.request.get(`${BASE}/sw.js`)).ok()).toBe(true);
+    await expect(page.getByText('Offline-ready workspace')).toBeVisible();
+  });
+
+  test('11.10 competition_level_innovation', async ({ page }) => {
+    await openApp(page);
+    const diagnostic = page.getByRole('region', { name: 'Library health diagnostic' });
+    await expect(diagnostic).toContainText(/Library health.*described.*context.*evolved/s);
+    await expect(diagnostic.getByRole('meter')).toHaveAttribute('aria-valuenow', /\d+/);
+  });
+
+  test('innovation.catchall innovation_catchall', async ({ page }) => {
+    await openApp(page);
+    const diagnostic = page.getByRole('region', { name: 'Library health diagnostic' });
+    await expect(diagnostic.getByRole('meter', { name: 'Library health score' })).toBeVisible();
+    await expect(diagnostic).toContainText('Offline-ready workspace');
+  });
+
+  test('4.2 deleted_row_collapse', async ({ page }) => {
+    await openApp(page);
+    const row = page.locator(ROWS).first();
+    await row.getByRole('button', { name: /Delete / }).click();
+    await page.getByRole('button', { name: 'Delete prompt' }).click({ noWaitAfter: true });
+    await expect(row).toHaveClass(/row-deleting/);
+    expect(await row.evaluate((node) => getComputedStyle(node).animationName)).toContain('row-collapse');
+  });
+
+  test('4.4 modal_and_panel_transitions', async ({ page }) => {
+    await openApp(page);
+    await page.getByRole('button', { name: 'New Prompt', exact: true }).click();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('.cds--modal')).toHaveClass(/overlay-exit/);
+    await expect(page.locator('.cds--modal.overlay-exit')).toHaveCount(0);
+    await page.locator('.version-button').first().click();
+    await page.getByRole('dialog').getByLabel('Close version history').click();
+    await expect(page.locator('.panel-layer')).toHaveClass(/panel-layer--exit/);
+  });
+
+  test('4.6 toasts_slide_autodismiss', async ({ page }) => {
+    await openApp(page);
+    await createPrompt(page, 'Toast lifecycle proof');
+    const toast = page.locator('.toast-region');
+    await expect(toast).toContainText('Prompt created');
+    expect(await toast.evaluate((node) => getComputedStyle(node).animationName)).toContain('toast-enter');
+    await expect(toast).toHaveCount(0, { timeout: 5000 });
+  });
+
+  test('9.3 transitions_respond_under_100ms', async ({ page }) => {
+    await openApp(page);
+    const durations = await page.getByRole('button', { name: /Switch to dark theme/ }).evaluate((button) => {
+      const style = getComputedStyle(button);
+      return style.transitionDuration.split(',').map((value) => Number.parseFloat(value) * (value.includes('ms') ? 1 : 1000));
+    });
+    expect(Math.max(...durations)).toBeLessThanOrEqual(100);
+  });
+
+  test('9.4 async_work_has_loading_indicators', async ({ page }) => {
+    await openApp(page);
+    await page.getByRole('button', { name: 'Export library' }).click();
+    await expect(page.locator('.export-loading')).toContainText('Compiling export');
+    await expect(page.locator('.export-loading')).toBeHidden({ timeout: 2000 });
+  });
+
+  test('9.5 large_collections_render_without_lag', async ({ page }) => {
+    await openApp(page);
+    const start = Date.now();
+    await page.getByRole('button', { name: 'Load 60 sample prompts' }).click();
+    await expect(page.locator('.prompt-count')).toContainText('76 prompts');
+    const elapsed = Date.now() - start;
+    expect(elapsed).toBeLessThan(500);
+    await expect(page.locator(ROWS)).toHaveCount(76);
+  });
+
+  test('2.1 shared_state_coherence', async ({ page }) => {
+    await openApp(page);
+    await invokeTool(page, 'entity_create', { title: 'Shared state proof', body: 'Coherent body', technique: 'Few-shot', description: '' });
+    await expect(page.locator(ROWS, { hasText: 'Shared state proof' })).toHaveCount(1);
+    await expect(page.locator('.prompt-count')).toContainText('17 of 17 prompts');
+    await invokeTool(page, 'browse_search', { query: 'Shared state proof' });
+    await expect(page.locator(ROWS)).toHaveCount(1);
+  });
+
+  test('2.7 rapid_input_stability', async ({ page }) => {
+    await openApp(page);
+    const search = page.locator('#prompt-search');
+    await search.pressSequentially('support', { delay: 5 });
+    await page.locator('#technique-filter').selectOption('Few-shot');
+    await page.locator(`${ROWS} label.cds--checkbox-label`).first().click();
+    await expect(search).toHaveValue('support');
+    await expect(page.locator(ROWS)).toHaveCount(1);
+  });
+
+  test('2.8 keyboard_operability_focus', async ({ page }) => {
+    await openApp(page);
+    await page.locator('#prompt-search').focus();
+    for (let index = 0; index < 12; index += 1) {
+      expect(await page.evaluate(() => document.activeElement?.matches(':focus-visible'))).toBe(true);
+      await page.keyboard.press('Tab');
+    }
+    await page.locator('.suggestion-chip').first().focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#prompt-search')).not.toHaveValue('');
+  });
+
+  test('2.11 labels_and_error_association', async ({ page }) => {
+    await openApp(page);
+    await page.getByRole('button', { name: 'New Prompt', exact: true }).click();
+    for (const id of ['prompt-title', 'prompt-technique', 'prompt-description', 'prompt-body']) {
+      await expect(page.locator(`label[for="${id}"]`)).toBeVisible();
+    }
+    await expect(page.locator('#prompt-title')).toHaveAttribute('aria-errormessage', /prompt-title-error-msg/);
+  });
+
+  test('6.6 last_delete_shows_empty_with_cta', async ({ page }) => {
+    await openApp(page);
+    const ids = await page.locator(ROWS).evaluateAll((rows) => rows.map((row) => row.dataset.id));
+    for (const id of ids) await invokeTool(page, 'entity_delete', { id, confirm: true });
+    await expect(page.locator('.empty-state').getByText('Build once. Prompt consistently.')).toBeVisible();
+    await page.getByRole('button', { name: 'New prompt', exact: true }).click();
+    await expect(page.locator('.prompt-form-modal')).toBeVisible();
+  });
+
+  test('6.9 create_edit_delete_extend_combine_modals', async ({ page }) => {
+    await openApp(page);
+    await selectFirstTwo(page);
+    await page.getByRole('button', { name: 'Extend' }).click();
+    await page.locator('#extension-text').fill('Extension proof');
+    await page.getByRole('button', { name: 'Create extension' }).click();
+    await selectFirstTwo(page);
+    await page.getByRole('button', { name: 'Combine' }).click();
+    await page.getByRole('button', { name: 'Create combined prompt' }).click();
+    await expect(page.locator(ROWS, { hasText: 'Combined prompt' })).toHaveCount(1);
+  });
+
+  test('6.10 export_import_recover_without_reload', async ({ page }) => {
+    await openApp(page);
+    await createPrompt(page, 'Recovery flow proof');
+    await page.getByRole('button', { name: 'Export library' }).click();
+    const payload = await page.locator('#export-preview').inputValue();
+    await page.keyboard.press('Escape');
+    const row = page.locator(ROWS, { hasText: 'Recovery flow proof' });
+    await row.getByRole('button', { name: /Delete Recovery flow proof/ }).click();
+    await page.getByRole('button', { name: 'Delete prompt' }).click();
+    await expect(page.locator('.cds--modal.is-visible')).toHaveCount(0);
+    await expect(page.locator('.cds--modal.overlay-exit')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Import', exact: true }).click();
+    await page.locator('#import-payload').fill(payload);
+    await page.getByRole('button', { name: 'Import and replace' }).click();
+    await expect(page.locator(ROWS, { hasText: 'Recovery flow proof' })).toHaveCount(1);
+  });
+
+  test('6.11 export_library_includes_created_prompt', async ({ page }) => {
+    await openApp(page);
+    await createPrompt(page, 'Artifact lifecycle proof', 'Role prompting');
+    await page.getByRole('button', { name: 'Export library' }).click();
+    await expect(page.locator('#export-preview')).toContainText('Artifact lifecycle proof');
+    await page.getByRole('button', { name: 'Markdown', exact: true }).click();
+    await expect(page.locator('#export-preview')).toContainText('Role prompting');
+  });
+
+  test('6.12 import_library_round_trip_flow', async ({ page }) => {
+    await openApp(page);
+    await page.getByRole('button', { name: 'Export library' }).click();
+    const payload = await page.locator('#export-preview').inputValue();
+    const expected = JSON.parse(payload).prompts.length;
+    await page.keyboard.press('Escape');
+    await invokeTool(page, 'entity_delete', { id: await page.locator(ROWS).first().getAttribute('data-id'), confirm: true });
+    await page.getByRole('button', { name: 'Import', exact: true }).click();
+    await page.locator('#import-payload').fill(payload);
+    await page.getByRole('button', { name: 'Import and replace' }).click();
+    await expect(page.locator(ROWS)).toHaveCount(expected);
+  });
+
+  test('3.7 component_states_and_icons', async ({ page }) => {
+    await openApp(page);
+    const button = page.locator('.suggestion-chip').first();
+    const defaultColor = await button.evaluate((node) => getComputedStyle(node).backgroundColor);
+    await button.hover();
+    await expect(button).not.toHaveCSS('background-color', defaultColor);
+    await button.focus();
+    await expect(button).toBeFocused();
+    await expect(page.locator('.toolbar-actions svg').first()).toBeVisible();
   });
 });

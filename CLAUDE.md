@@ -46,8 +46,12 @@ Maintainers can comment exactly `/judge` on an open PR to run
 `.github/workflows/judge-oracle.yml` for a PR whose diff is confined to exactly one
 `tasks/<slug>/solution/app/` tree.
 The workflow uses `gpt-5.6-luna` and the repository's `CODEX_AUTH_JSON`
-secret, updates a sticky PR score comment, and appends a successful score to
-`docs/judge-ledger.jsonl` on `main`. Reward artifacts remain ephemeral and must
+secret, updates a sticky PR score comment, and opens a small PR appending a
+successful score to `docs/judge-ledger.jsonl` (targeting `main`) for a
+maintainer to review and merge. It cannot self-merge that PR: `main`'s
+`approved_pr_to_merge` ruleset requires one approving review with no bypass
+actors, so the ledger is only current on `main` once someone merges the
+`ci/judge-ledger-<slug>-<run>` branch it opens. Reward artifacts remain ephemeral and must
 never be committed inside task directories. This workflow consumes the owner's
 ChatGPT-plan quota, never runs automatically on PR-controlled code, is globally
 serialized, and accepts one task only; do not add
@@ -78,7 +82,7 @@ Every one of these is a corpus defect if violated, and each has a guard:
 - `instruction.md` — PRD the builder sees. Content sections (`<summary>`, `<core_features>`, `<visual_design>`, `<motion>`, `<requirements>`) are written as observable behaviors (action → expected evidence, quantifiers resolved). Protected sections (`<integrity>`, `<delivery>`, `<webmcp_action_contract>`, `<reference_screenshots>`) are contract/plumbing — the webmcp block is rendered by `corpuscheck webmcp apply` (`corpuscheck/webmcp_h3.py`) from corpuscheck schemas/webmcp-assignments.json and module specs in `packages/webmcp-contracts`. The contract is mandatory at authoring time (never deferred; the unit suite fails contract-less task dirs), and bindings aim to cover every `Feature:` group — groups the modules can't express get an explicit `mechanics_exclusions` entry.
 - `README.md` — canonical generated surface (title + one-line description from corpuscheck schemas/webmcp-task-sources.json, standard Judging/Running sections), rendered by `corpuscheck propagate` — never hand-edited.
 - `environment/` — Dockerfile + `reference-screenshots/` (copied to `/reference-screenshots` in the builder container; images are advisory, instruction text wins).
-- `solution/app` — the oracle. Used by `solve.sh`, by the screenshot capture script, and validated to serve with zero console/page errors. Oracles that serve a build output (`vite preview`, `http-server dist`) keep the built `dist/` committed alongside the source so both the capture harness and `test.sh` (`verify:build` then `start`) work. Its `README.md` is likewise a generated `corpuscheck propagate` surface (module list from corpuscheck schemas/webmcp-assignments.json).
+- `solution/app` — the oracle. Used by `solve.sh`, by the screenshot capture script, and validated to serve with zero console/page errors. Build output (`dist/`, `build/`, `out/`, etc.) is never committed — `test.sh` always runs `verify:build` before `start`, and the screenshot capture harness (`corpuscheck/assets/capture_reference_screenshots.mjs`) builds it on demand itself before spawning `start` whenever `start` serves a pre-built directory (`vite preview`, `http-server dist`, …) it doesn't build inline; `.gitignore` covers these dirs both repo-wide and with a scoped `tasks/*/solution/app/` safety net. Its `README.md` is likewise a generated `corpuscheck propagate` surface (module list from corpuscheck schemas/webmcp-assignments.json).
 - `tests/` — `test.sh` (verifier entry), `system_prompt.md`, `mcp/webmcp_stdio_server.mjs`, and thirteen tag-aligned `<dim>/<dim>.toml` rubrics (31–42 criteria in the four core dims; baseline criteria in the rest until specialized).
 
 ### Verifier / judge stack

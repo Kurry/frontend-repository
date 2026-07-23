@@ -18,7 +18,7 @@ on:
 permissions:
   contents: write
   issues: write
-  pull-requests: read
+  pull-requests: write
 
 concurrency:
   group: judge-oracle-codex-oauth
@@ -236,12 +236,13 @@ jobs:
               stream.write(f"success={'true' if success else 'false'}\n")
           PY
 
-      # harbor's own exit code stays 0 even when every trial raises (0 valid
-      # trials => report.outputs.success=false), so gate on that instead of
-      # steps.harbor.outcome. Jobs dir is otherwise discarded with the runner,
-      # taking the only copy of the per-trial exception traceback with it.
-      - name: Upload jobs dir for failed runs
-        if: always() && steps.report.outputs.success == 'false'
+      # Always upload, success or failure: the jobs dir (including reward.json)
+      # is otherwise discarded with the runner, and a downstream step (PR
+      # comment, ledger commit) can still fail after a valid score - the
+      # artifact is then the only surviving copy of that score, or of the
+      # per-trial exception traceback when harbor produced 0 valid trials.
+      - name: Upload jobs dir
+        if: always() && steps.target.outcome == 'success'
         uses: actions/upload-artifact@v7
         with:
           name: judge-jobs-${{ github.run_id }}
@@ -274,44 +275,50 @@ jobs:
             gh api --method POST "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --input - <<<"$payload"
           fi
 
-      # main requires signed commits (org ruleset "verify_commits", no bypass
-      # actors), and a plain `git commit` from CI has no signature - that push
-      # would be rejected. The Contents API instead has GitHub author and sign
-      # the commit itself, which satisfies the required-signatures check.
-      - name: Append committed judge ledger
+      # main's "approved_pr_to_merge" ruleset requires 1 approving review with
+      # no bypass actors (not even admins), so a direct Contents-API commit to
+      # main can never land - it isn't a race, it fails identically every
+      # retry. Open a PR instead: commits still go through the Contents API
+      # (GitHub-authored and signed, satisfying the all-branches
+      # "verify_commits" ruleset) but target a fresh branch, then a maintainer
+      # reviews and merges. The ledger is therefore NOT auto-current on main -
+      # see docs/judge-ledger.jsonl's staleness until that merge happens.
+      - name: Open judge ledger PR
         id: ledger
         if: always() && steps.report.outputs.success == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           REPORT_JSON: ${{ runner.temp }}/judge-result.json
           SLUG: ${{ steps.target.outputs.slug }}
+          PR_NUMBER: ${{ steps.target.outputs.pr_number }}
         run: |
           set -euo pipefail
           line="$(jq -c . "$REPORT_JSON")"
+          branch="ci/judge-ledger-$SLUG-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+
+          main_sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
+          gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" \
+            -f "ref=refs/heads/$branch" -f "sha=$main_sha" >/dev/null
+
           path="repos/$GITHUB_REPOSITORY/contents/docs/judge-ledger.jsonl"
-          for attempt in {1..5}; do
-            if current="$(gh api "$path?ref=main" 2>/dev/null)"; then
-              sha_field="$(jq -n --arg sha "$(jq -r .sha <<<"$current")" '{sha: $sha}')"
-              existing="$(jq -r .content <<<"$current" | base64 --decode)"
-            else
-              sha_field='{}'
-              existing=""
-            fi
-            new_content="$(printf '%s%s\n' "$existing" "$line" | base64 -w0)"
-            payload="$(jq -n \
-              --arg msg "ci: record OAuth oracle score for $SLUG" \
-              --arg content "$new_content" \
-              --arg branch "main" \
-              --argjson sha_field "$sha_field" \
-              '{message: $msg, content: $content, branch: $branch} + $sha_field')"
-            if gh api --method PUT "$path" --input - <<<"$payload" >/dev/null; then
-              exit 0
-            fi
-            echo "Ledger push raced with main (attempt $attempt/5); retrying." >&2
-            sleep "$attempt"
-          done
-          echo "Could not publish the judge ledger after 5 attempts." >&2
-          exit 1
+          current="$(gh api "$path?ref=$branch")"
+          existing="$(jq -r .content <<<"$current" | base64 --decode)"
+          new_content="$(printf '%s%s\n' "$existing" "$line" | base64 -w0)"
+          payload="$(jq -n \
+            --arg msg "ci: record OAuth oracle score for $SLUG" \
+            --arg content "$new_content" \
+            --arg branch "$branch" \
+            --arg sha "$(jq -r .sha <<<"$current")" \
+            '{message: $msg, content: $content, branch: $branch, sha: $sha}')"
+          gh api --method PUT "$path" --input - <<<"$payload" >/dev/null
+
+          body="Automated ledger entry from the OAuth oracle judge."
+          if [[ -n "$PR_NUMBER" ]]; then
+            body="$body"$'\n\n'"Triggered by /judge on #$PR_NUMBER."
+          fi
+          gh pr create --base main --head "$branch" \
+            --title "ci: record OAuth oracle score for $SLUG" \
+            --body "$body"
 
       - name: Enforce successful judge result
         if: always() && steps.target.outcome == 'success'

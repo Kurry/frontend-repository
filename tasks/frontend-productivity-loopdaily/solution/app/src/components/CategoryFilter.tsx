@@ -1,5 +1,6 @@
 import { useEffect, useId, useState } from "react";
 import { useAtom } from "jotai";
+import { Gear, X } from "@phosphor-icons/react";
 import { categoriesAtom, activeFilterAtom, addCategoryAtom, deleteCategoryAtom } from "../store";
 
 export default function CategoryFilter() {
@@ -93,7 +94,7 @@ export default function CategoryFilter() {
           aria-label="Manage categories"
           title="Manage categories"
         >
-          ⚙️
+          <Gear size={18} aria-hidden="true" />
         </button>
       )}
 
@@ -111,8 +112,12 @@ export default function CategoryFilter() {
                 setNewName(e.target.value);
                 if (nameError && e.target.value.trim()) setNameError("");
               }}
-              className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] text-sm text-[#1B2430] outline-none focus:border-[#0F9D74] min-h-12"
+              className={`w-full px-3 py-2 rounded-lg border text-sm text-[#1B2430] outline-none min-h-12 ${
+                nameError ? "border-[#EF4444] bg-red-50" : "border-[#E2E8F0] focus:border-[#0F9D74]"
+              }`}
               autoFocus
+              aria-invalid={!!nameError}
+              aria-describedby={nameError ? `${inputId}-error` : undefined}
               data-field="category-name"
             />
             {nameError && (
@@ -123,7 +128,7 @@ export default function CategoryFilter() {
           </div>
           <div className="flex gap-2">
             <button type="submit" className="btn-primary px-4 py-2 text-sm font-medium" data-action="add-category-submit">
-              Add
+              Add category
             </button>
             <button
               type="button"
@@ -153,7 +158,7 @@ export default function CategoryFilter() {
                   data-action="delete-category"
                   data-category-id={cat.id}
                 >
-                  ✕
+                  <X size={12} aria-hidden="true" />
                 </button>
               </div>
             ))}

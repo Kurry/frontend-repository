@@ -59,9 +59,12 @@ export default function HeatmapView({ habitId, onBack }: HeatmapViewProps) {
       case "low":
         return "bg-[#0F9D74]/30";
       case "future":
+        // Not-yet-elapsed: solid muted shade, visibly different from the
+        // bordered not-done cells below.
         return "bg-[#E2E8F0]";
       default:
-        return "bg-[#F4F7F6]";
+        // Not done: near-white with a border so it still reads as a cell.
+        return "bg-[#F4F7F6] border border-[#E2E8F0]";
     }
   };
 
@@ -96,7 +99,7 @@ export default function HeatmapView({ habitId, onBack }: HeatmapViewProps) {
             <path d="M13 4l-6 6 6 6" />
           </svg>
         </button>
-        <h2 className="text-lg font-bold text-[#1B2430]">
+        <h2 className="text-xl font-bold text-[#1B2430]">
           <span aria-hidden="true">{habit.icon}</span> {habit.name} — {monthLabel}
         </h2>
       </div>
@@ -127,9 +130,15 @@ export default function HeatmapView({ habitId, onBack }: HeatmapViewProps) {
               title={tip}
               className={`aspect-square rounded-[8px] flex items-center justify-center text-xs font-medium transition-colors cursor-default ${intensityClass(
                 intensity
-              )} ${["full", "high"].includes(intensity) ? "text-white" : "text-[#1B2430]"} ${
-                isToday ? "ring-2 ring-[#0F9D74] ring-offset-1" : ""
-              }`}
+              )} ${
+                ["full", "high"].includes(intensity)
+                  ? "text-white"
+                  : intensity === "future"
+                  ? "text-[#94A3B8]"
+                  : "text-[#1B2430]"
+              } ${isToday ? "ring-2 ring-[#0F9D74] ring-offset-1" : ""}`}
+              data-day={day}
+              data-intensity={intensity}
               onMouseEnter={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect();
                 setTooltip({
@@ -183,6 +192,10 @@ export default function HeatmapView({ habitId, onBack }: HeatmapViewProps) {
         <div className="flex items-center gap-1">
           <div className="w-4 h-4 rounded-[8px] bg-[#F4F7F6] border border-[#E2E8F0]" />
           <span className="text-xs text-[#64748B]">Not done</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="w-4 h-4 rounded-[8px] bg-[#E2E8F0]" />
+          <span className="text-xs text-[#64748B]">Not yet elapsed</span>
         </div>
       </div>
     </div>

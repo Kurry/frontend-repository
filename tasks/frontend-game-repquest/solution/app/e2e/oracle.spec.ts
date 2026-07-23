@@ -141,7 +141,7 @@ test.describe('RepQuest Oracle E2E Tests', () => {
 
     // Check history
     await page.getByRole('tab', { name: 'History' }).click();
-    await expect(page.locator('span').filter({ hasText: 'Logged 50 reps' })).toBeVisible();
+    await expect(page.locator('[data-action="delete-set"]')).toHaveCount(1);
 
     // Check gear
     await page.getByRole('tab', { name: 'Gear' }).click();
@@ -322,5 +322,193 @@ test.describe('RepQuest Oracle E2E Tests', () => {
     // Reduced motion
     await page.emulateMedia({ reducedMotion: 'reduce' });
     expect(errors).toHaveLength(0);
+  });
+});
+
+test.describe('issue 2297 completion contract', () => {
+  async function reset(page) {
+    await page.goto('/');
+    await page.getByRole('tab', { name: 'Settings' }).click();
+    await page.getByRole('button', { name: 'Reset quest' }).click();
+    await page.getByRole('button', { name: 'Reset everything' }).click();
+  }
+
+  test('serializes 25 WebMCP logs, unlocks zone, recalculates delete, and preserves branches rapid_logging_integrity', async ({ page }) => {
+    await reset(page);
+    const results = await page.evaluate(async () => {
+      const invoke = (window as any).webmcp_invoke_tool;
+      return Promise.all(Array.from({ length: 25 }, (_, i) => invoke('entity.create', { reps: 4, note: `rapid-${i}` })));
+    });
+    expect(results.every((result: any) => result.ok)).toBeTruthy();
+    await expect(page.locator('[data-stat="lifetime-reps"]').first()).toHaveText('100');
+    await expect(page.getByText('Zone:').locator('..')).toContainText('Canyon');
+    await expect(page.getByText(/Zone unlocked: Canyon/i)).toBeVisible();
+
+    await page.getByRole('tab', { name: 'History' }).click();
+    await expect(page.locator('[data-action="delete-set"]')).toHaveCount(25);
+    await page.locator('[data-action="delete-set"]').first().click();
+    await expect(page.locator('[data-action="delete-set"]')).toHaveCount(24);
+    await expect(page.getByRole('button', { name: /96 reps/ })).toBeVisible();
+
+    await page.getByRole('tab', { name: 'Quest' }).click();
+    await expect(page.locator('[data-stat="lifetime-reps"]').first()).toHaveText('96');
+    await page.getByRole('button', { name: 'Undo' }).click();
+    await expect(page.locator('[data-stat="lifetime-reps"]').first()).toHaveText('100');
+    await page.getByLabel('Number of reps').fill('7');
+    await page.getByRole('button', { name: 'Log reps' }).click();
+    await expect(page.getByText('History branches')).toBeVisible();
+    const branches = page.getByText(/^Branch \d+$/);
+    await expect(branches).toHaveCount(1);
+    await page.getByRole('button', { name: 'Main' }).click();
+    await expect(page.locator('[data-stat="lifetime-reps"]').first()).toHaveText('100');
+    await branches.click();
+    await expect(page.locator('[data-stat="lifetime-reps"]').first()).toHaveText('107');
+  });
+
+  test('preserves interleaved state and proves every lifecycle state plus checkpoint challenge_run_lifecycle_gating', async ({ page }) => {
+    await reset(page);
+    await page.getByRole('tab', { name: 'Quest' }).click();
+    await page.getByRole('button', { name: 'Challenge mode' }).click();
+    const targets: number[] = [];
+    for (const difficulty of ['Easy', 'Normal', 'Hard']) {
+      await page.getByRole('button', { name: difficulty, exact: true }).click();
+      targets.push(Number((await page.getByText(/Target this run:/).textContent())?.match(/(\d+) reps/)?.[1]));
+    }
+    expect(targets[0]).toBeLessThan(targets[1]);
+    expect(targets[1]).toBeLessThan(targets[2]);
+
+    await page.getByRole('button', { name: 'Start run' }).click();
+    await expect(page.getByText('Run status: Active')).toBeVisible();
+    await page.getByRole('tab', { name: 'History' }).click();
+    await page.getByRole('tab', { name: 'Quest' }).click();
+    await expect(page.getByText('Run status: Active')).toBeVisible();
+    await page.getByLabel('Challenge rep count').fill('5');
+    await page.getByRole('button', { name: 'Log challenge reps' }).click();
+    await page.getByRole('button', { name: 'Pause' }).click();
+    await expect(page.getByText('Run status: Paused')).toBeVisible();
+    await page.getByRole('button', { name: 'Save progress' }).click();
+    const checkpoint = page.getByText('Saved checkpoint').locator('..');
+    await expect(checkpoint).toContainText('Hard');
+    await expect(checkpoint).toContainText('paused');
+
+    await page.reload();
+    await page.getByRole('button', { name: 'Challenge mode' }).click();
+    await page.getByRole('button', { name: 'Resume saved run' }).click();
+    await expect(page.getByText('Run status: Paused')).toBeVisible();
+    await expect(page.getByText(/Run logged:/)).toContainText('5');
+    await page.getByRole('button', { name: 'End run' }).click();
+    await expect(page.getByRole('heading', { name: 'Defeat' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Defeat' }).locator('..')).toContainText(/short by/i);
+    await page.getByRole('button', { name: 'Restart', exact: true }).click();
+    await expect(page.getByText('Run status: Idle')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Easy', exact: true }).click();
+    await page.getByRole('button', { name: 'Start run' }).click();
+    await page.getByLabel('Challenge rep count').fill(String(targets[0]));
+    await page.getByRole('button', { name: 'Log challenge reps' }).click();
+    await expect(page.getByText('Run status: Victory')).toBeVisible();
+    await expect(page.locator('[data-celebration="confetti"]')).toBeVisible();
+  });
+
+  test('validates settings and notes, reminder attention, heatmap, hover and mobile targets daily_goal_invalid_rejected', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 760 });
+    await reset(page);
+    const goal = page.getByLabel(/Daily goal/i);
+    await goal.fill('0');
+    await page.getByRole('button', { name: /Save settings/i }).click();
+    await expect(page.getByText(/Daily goal.*1.*9999/i)).toBeVisible();
+    await goal.fill('10');
+    await page.locator('label[for="daily-reminder"]').click();
+    await page.getByLabel('Remind after').selectOption('0');
+    await page.getByRole('button', { name: /Save settings/i }).click();
+    const banner = page.getByText(/Daily reminder/i).last();
+    await expect(banner).toBeVisible();
+    expect(await page.locator('.reminder-banner').evaluate((el) => getComputedStyle(el).animationName)).not.toBe('none');
+
+    await page.getByRole('tab', { name: 'Quest' }).click();
+    const log = page.getByRole('button', { name: 'Log reps' });
+    const before = await log.evaluate((el) => ({ filter: getComputedStyle(el).filter, transform: getComputedStyle(el).transform }));
+    await log.hover();
+    const after = await log.evaluate((el) => ({ filter: getComputedStyle(el).filter, transform: getComputedStyle(el).transform }));
+    expect(after).not.toEqual(before);
+    expect((await log.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+
+    await page.getByLabel('Number of reps').fill('10');
+    await page.getByLabel('Note (optional)').fill('goal set');
+    await log.click();
+    await expect(page.getByRole('button', { name: /10 reps, goal met/ })).toBeVisible();
+    await expect(banner).toBeHidden();
+    await page.getByLabel('Number of reps').fill('2');
+    await page.getByLabel('Note (optional)').fill('x'.repeat(121));
+    await log.click();
+    await expect(page.getByText(/Note: keep it to 120 characters/i)).toBeVisible();
+    await page.getByRole('tab', { name: 'History' }).click();
+    await expect(page.getByText('goal set')).toBeVisible();
+    await expect(page.locator('[data-action="delete-set"]')).toHaveCount(1);
+  });
+
+  test('handles JSON and CSV atomically, persists complete state, and survives blocked storage import_quest_log_round_trip', async ({ page, browser }) => {
+    const errors: string[] = [];
+    page.on('pageerror', error => errors.push(error.message));
+    page.on('console', msg => {
+      // eslint-disable-next-line playwright/missing-playwright-await -- ConsoleMessage.type() is synchronous.
+      const kind = msg.type();
+      if (kind === 'error' || kind === 'warning') errors.push(msg.text());
+    });
+    await reset(page);
+    await page.getByRole('tab', { name: 'Quest' }).click();
+    await page.getByLabel('Number of reps').fill('100');
+    await page.getByLabel('Note (optional)').fill('round trip');
+    await page.getByRole('button', { name: 'Log reps' }).click();
+    await page.getByRole('tab', { name: 'Gear' }).click();
+    await page.locator('[data-action="buy-gear"]').first().click();
+    await page.locator('[data-action="equip-gear"]').first().click();
+    await page.getByRole('tab', { name: 'Settings' }).click();
+    await page.getByLabel(/Daily goal/i).fill('75');
+    await page.getByRole('button', { name: /Save settings/i }).click();
+
+    const csvDownload = page.waitForEvent('download');
+    await page.getByRole('button', { name: /Export workout CSV/i }).click();
+    const csv = await (await csvDownload).createReadStream();
+    let csvText = '';
+    for await (const chunk of csv) csvText += chunk.toString();
+    expect(csvText).toContain('date,reps,note');
+    expect(csvText).toContain('100');
+    expect(csvText).toContain('round trip');
+
+    const jsonDownload = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Export Quest Log' }).click();
+    const exported = await (await jsonDownload).path();
+    const beforePreview = await page.locator('[data-export-preview="json"]').textContent();
+    await page.getByRole('button', { name: 'Reset quest' }).click();
+    await page.getByRole('button', { name: 'Reset everything' }).click();
+    let chooser = page.waitForEvent('filechooser');
+    await page.getByRole('button', { name: 'Import Quest Log' }).click();
+    await (await chooser).setFiles(exported!);
+    await expect(page.getByLabel('Quest Log export and import').locator('[data-artifact-feedback]')).toContainText('state restored');
+    await expect(page.locator('[data-export-preview="json"]')).toContainText('round trip');
+    await expect(page.locator('[data-export-preview="json"]')).toContainText('"dailyGoal": 75');
+
+    const stablePreview = await page.locator('[data-export-preview="json"]').textContent();
+    chooser = page.waitForEvent('filechooser');
+    await page.getByRole('button', { name: 'Import Quest Log' }).click();
+    await (await chooser).setFiles({ name: 'bad.json', mimeType: 'application/json', buffer: Buffer.from('{"bad":true}') });
+    await expect(page.getByLabel('Quest Log export and import').locator('[data-artifact-feedback]')).toContainText('Invalid Quest Log file');
+    await expect(page.locator('[data-export-preview="json"]')).toHaveText(stablePreview!);
+    await page.reload();
+    await page.getByRole('tab', { name: 'Settings' }).click();
+    await expect(page.locator('[data-export-preview="json"]')).toContainText('round trip');
+    expect(beforePreview).toContain('round trip');
+    expect(errors).toEqual([]);
+
+    const blocked = await browser.newContext();
+    await blocked.addInitScript(() => {
+      Object.defineProperty(Storage.prototype, 'getItem', { configurable: true, value() { throw new DOMException('blocked'); } });
+      Object.defineProperty(Storage.prototype, 'setItem', { configurable: true, value() { throw new DOMException('blocked'); } });
+    });
+    const blockedPage = await blocked.newPage();
+    await blockedPage.goto('/');
+    await expect(blockedPage.getByRole('heading', { name: 'RepQuest' })).toBeVisible();
+    await blocked.close();
   });
 });

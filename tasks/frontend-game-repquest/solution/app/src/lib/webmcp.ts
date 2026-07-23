@@ -360,20 +360,25 @@ const TOOLS: { name: string; description: string; handler: Handler }[] = [
 
 export function initWebMcp(): void {
   const w = window as unknown as Record<string, unknown>;
+  let invocationQueue: Promise<unknown> = Promise.resolve();
   w.webmcp_session_info = () => ({
     contract_version: CONTRACT_VERSION,
     modules: ["browse-query-v1", "entity-collection-v1", "command-session-v1", "artifact-transfer-v1"],
     tools: TOOLS.map((t) => t.name),
   });
   w.webmcp_list_tools = () => TOOLS.map((t) => ({ name: t.name, description: t.description }));
-  w.webmcp_invoke_tool = async (name: string, args: Args = {}) => {
+  w.webmcp_invoke_tool = (name: string, args: Args = {}) => {
     const tool = TOOLS.find((t) => t.name === name);
-    if (!tool) return { ok: false, error: `unknown tool: ${name}` };
-    try {
-      return await tool.handler(args || {});
-    } catch (err) {
-      return { ok: false, error: String(err) };
-    }
+    if (!tool) return Promise.resolve({ ok: false, error: `unknown tool: ${name}` });
+    const invocation = invocationQueue.then(async () => {
+      try {
+        return await tool.handler(args || {});
+      } catch (err) {
+        return { ok: false, error: String(err) };
+      }
+    });
+    invocationQueue = invocation.then(() => undefined, () => undefined);
+    return invocation;
   };
 }
 

@@ -48,7 +48,7 @@ const App: Component = () => {
       <div
         class="min-h-screen flex overflow-x-hidden"
         classList={{
-          'bg-slate-950 text-slate-200': store.theme === 'dark',
+          'bg-slate-950 text-slate-200 dark': store.theme === 'dark',
           'bg-slate-50 text-slate-900': store.theme === 'light',
         }}
         data-theme={store.theme}
@@ -126,7 +126,10 @@ const App: Component = () => {
           <div class="mt-auto space-y-2">
             <button
               type="button"
-              onClick={() => setVaultDrawerOpen(true)}
+              onClick={() => {
+                setVaultDrawerOpen(true);
+                toaster.create({ title: 'Exporting', description: 'Opening vault export drawer...' });
+              }}
               class="w-full text-left rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-700/60 text-slate-300"
             >
               Export vault

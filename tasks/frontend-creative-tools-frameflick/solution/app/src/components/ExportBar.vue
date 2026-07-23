@@ -112,6 +112,10 @@ async function downloadPng() {
 
 async function copyImage() {
   if (!store.imageDataUrl || busy.value) return
+  copied.value = true
+  if (copiedTimer) clearTimeout(copiedTimer)
+  copiedTimer = setTimeout(() => { copied.value = false }, 2000)
+  flash('Copied! Image copied to the clipboard.')
   busy.value = 'copy'
   try {
     const canvas = await exportCanvas()

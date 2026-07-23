@@ -305,7 +305,7 @@ body {
 .ascii { color: var(--accent); font-size: 9px; line-height: 1.15; margin: 0 0 12px; overflow-x: auto; }
 @media (min-width: 640px) { .ascii { font-size: 11px; } }
 .welcome-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-@media (min-width: 640px) { .welcome-grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 769px) { .welcome-grid { grid-template-columns: 1fr 1fr; } }
 .welcome-col { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; background: var(--surface); }
 .welcome-h { color: var(--accent); font-weight: 700; margin: 0 0 8px; font-size: 0.95em; }
 .welcome-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; font-size: 0.9em; }

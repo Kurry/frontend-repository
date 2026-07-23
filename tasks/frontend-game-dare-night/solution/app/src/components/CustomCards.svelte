@@ -37,7 +37,7 @@
 </script>
 
 <div>
-  <h2 class="text-lg font-semibold mb-2.5" style="color: var(--color-accent);">Custom cards</h2>
+  <h2 class="text-lg font-semibold mb-2.5" style="color: var(--color-accent);">Custom Cards</h2>
 
   <div class="space-y-2.5 mb-5">
     <label class="block text-xs font-medium text-gray-700 mb-1" for="custom-card-prompt">Card prompt</label>

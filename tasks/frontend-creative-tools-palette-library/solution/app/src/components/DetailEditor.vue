@@ -180,14 +180,6 @@ function applyHarmony() {
 }
 
 function onDeleteClick() {
-  if (!confirmingDelete.value) {
-    confirmingDelete.value = true;
-    if (confirmTimer) clearTimeout(confirmTimer);
-    confirmTimer = setTimeout(() => {
-      confirmingDelete.value = false;
-    }, 4000);
-    return;
-  }
   const name = palette.value.name;
   store.deletePalette(palette.value.id);
   store.closeDetail();

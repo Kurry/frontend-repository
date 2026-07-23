@@ -143,6 +143,7 @@ export default function PreviewTab() {
 
         <div className="flex-1 overflow-auto flex justify-center py-4 relative">
           <div
+            data-preview-frame
             className={`relative transition-all duration-300 ease-in-out bg-white shadow-2xl overflow-hidden ${
               device === 'phone' ? 'w-[375px] h-[667px] border-[12px] border-gray-800 rounded-3xl' :
               device === 'tablet' ? 'w-[768px] h-[1024px] border-[16px] border-gray-800 rounded-3xl' :

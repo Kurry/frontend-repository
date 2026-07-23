@@ -170,7 +170,7 @@ button:focus-visible, [role="button"]:focus-visible, input:focus-visible, textar
 .submitter-row { animation: row-in .18s ease-out; }
 .template-row:hover, .submitter-row:hover { background: #f6f9fb; border-color: #e1e7ed; }
 .template-row.active { background: #e8f9f7; border-color: #9ee5df; }
-.submitter-row.active { background: #fafafa; border-color: #6259ed; }
+.submitter-row.active { background: color-mix(in srgb, var(--submitter-color, #4f46e5) 8%, white); border-color: var(--submitter-color, #4f46e5); box-shadow: 0 0 0 3px color-mix(in srgb, var(--submitter-color, #4f46e5) 24%, transparent); }
 .row-meta { flex: 0 0 auto; color: #6b7586; font-size: 9px; font-weight: 500; }
 .submitter-main { min-width: 0; gap: 8px; }
 .submitter-swatch { display: inline-block; flex: 0 0 auto; width: 14px; height: 14px; border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(15,23,42,.08); }

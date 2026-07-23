@@ -236,6 +236,7 @@ kbd {
 .hue-strip {
   display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 3px;
   padding-bottom: 4px; scrollbar-width: thin;
+  transition: filter 0.45s var(--ease-out);
 }
 .hue-chip {
   flex: 1 0 26px; min-width: 26px; height: 30px; border: 0; padding: 0;
@@ -362,6 +363,7 @@ kbd {
 
 /* ---------- library canvas: views ------------------------------------------------------ */
 .palette-library__view { display: none; max-width: 1400px; margin: 0 auto; }
+#library-canvas { transition: filter 0.45s var(--ease-out); }
 .palette-library__view.active { display: grid; }
 
 /* nomenclature */
@@ -418,6 +420,7 @@ kbd {
 .fav-star { width: 19px; height: 19px; color: rgba(var(--ink), 0.55); transition: transform 0.25s var(--ease-out), color 0.25s ease; display: block; }
 .fav-star.is-filled { color: rgb(var(--ink)); }
 .palette-card__fav:hover .fav-star { transform: scale(1.18); color: rgb(var(--ink)); }
+.palette-card__fav[aria-pressed="true"] { animation: fav-pop 0.4s var(--ease-out); }
 .palette-card__fav[aria-pressed="true"] .fav-star { animation: fav-pop 0.4s var(--ease-out); }
 @keyframes fav-pop { 0% { transform: scale(0.6); } 55% { transform: scale(1.35); } 100% { transform: scale(1); } }
 
@@ -955,3 +958,8 @@ textarea.ed-input { border: 1px solid rgba(var(--ink), 0.4); resize: vertical; }
   }
   [data-reveal] { opacity: 1; transform: none; }
 }
+
+#catalog-preview { animation: veil-in 0.25s ease; }
+
+#btn-copy-export { transition: background-color 0.3s ease, color 0.3s ease; }
+#btn-copy-export.is-copied { background-color: rgb(var(--ink)); color: rgb(var(--bg)); }

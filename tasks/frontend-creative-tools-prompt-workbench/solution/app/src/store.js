@@ -122,7 +122,7 @@ export const useWorkbench = create((set, get) => ({
     const title = payload.title.trim()
     if (get().library.some((item) => normalizedTitle(item.title) === normalizedTitle(title))) return false
     const record = { id: `lib-${Date.now()}`, ...structuredClone(payload), title }
-    withHistory(set, get, () => ({ library: [...get().library, record], saveOpen: false }))
+    withHistory(set, get, () => ({ library: [...get().library, record], saveOpen: false, techniqueFilter: '' }))
     get().addToast(`“${record.title}” saved to library`, 'success')
     return record
   },

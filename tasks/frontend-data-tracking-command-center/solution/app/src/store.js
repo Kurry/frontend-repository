@@ -6,13 +6,13 @@ export const AGENT_STATES = ['idle', 'running', 'error']
 export const KPI_KEYS = ['total-prompts', 'active-agents', 'evaluations-run', 'cost-this-month']
 
 export const agentInputSchema = z.object({
-  name: z.string().trim().min(1, 'Agent name is required and cannot be whitespace only.').max(80, 'Agent name must be 80 characters or fewer.'),
+  name: z.string().trim().min(1, 'name: Agent name is required and cannot be whitespace only.').max(80, 'name: Agent name must be 80 characters or fewer.'),
   model: z.enum(MODELS, { error: 'Model is required and must be one of the four allowed models.' }),
-  description: z.string().max(280, 'Description must be 280 characters or fewer.').default(''),
+  description: z.string().max(280, 'description: Description must be 280 characters or fewer.').default(''),
 }).strict()
 
 export const renameSchema = z.object({
-  name: z.string().trim().min(1, 'Agent name is required and cannot be whitespace only.').max(80, 'Agent name must be 80 characters or fewer.'),
+  name: z.string().trim().min(1, 'name: Agent name is required and cannot be whitespace only.').max(80, 'name: Agent name must be 80 characters or fewer.'),
 }).strict()
 
 const timeField = (label) => z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, `${label} is required in 24-hour HH:MM format.`)
@@ -30,7 +30,7 @@ export const nightScheduleSchema = z.object({
 })
 
 const exportedAgentSchema = z.object({
-  name: z.string().trim().min(1, 'Agent name is required.').max(80, 'Agent name must be 80 characters or fewer.'),
+  name: z.string().trim().min(1, 'Agent name is required.').max(80, 'name: Agent name must be 80 characters or fewer.'),
   model: z.enum(MODELS),
   description: z.string().max(280, 'Agent description must be 280 characters or fewer.'),
   state: z.enum(AGENT_STATES),

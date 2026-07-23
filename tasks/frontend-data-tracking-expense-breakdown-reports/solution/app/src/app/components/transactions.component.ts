@@ -217,7 +217,7 @@ const ISO = /^\d{4}-\d{2}-\d{2}$/;
                     <td data-label="Account" class="hidden text-ink-soft md:table-cell">{{ tx.account }}</td>
                     <td data-label="Amount" class="whitespace-nowrap font-display font-bold tabular-nums"
                       [class.text-positive]="tx.amount > 0">
-                      {{ tx.amount > 0 ? '+' + money(tx.amount) : money(tx.amount) }}
+                      {{ signedMoney(tx.amount) }}
                     </td>
                     <td data-label="Status" class="hidden sm:table-cell">
                       @if (tx.status) {

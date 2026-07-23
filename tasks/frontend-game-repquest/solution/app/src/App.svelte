@@ -63,7 +63,7 @@
 
 <Toasts />
 {#if quest.celebration}
-  <div class="confetti" aria-hidden="true">
+  <div class="confetti" data-celebration="confetti" aria-hidden="true">
     {#each Array.from({length: 28}) as _, i}<i style={`--i:${i}`}></i>{/each}
   </div>
 {/if}

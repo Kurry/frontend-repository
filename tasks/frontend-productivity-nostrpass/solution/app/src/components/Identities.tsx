@@ -35,6 +35,7 @@ const Identities: Component = () => {
   } = createForm({
     extend: validator({ schema: identityFormSchema }),
     onSubmit: (values) => {
+      if (store.isCreatingIdentity) return;
       createIdentity(values.label);
       setShowCreate(false);
       resetCreate();
@@ -202,7 +203,7 @@ const Identities: Component = () => {
           {(identity) => (
             <div
               ref={handleEntrance}
-              class="hover-wash rounded-xl border p-4 max-w-full overflow-hidden"
+              class="hover-wash rounded-xl border p-4 max-w-full overflow-hidden card-enter"
               classList={{
                 'border-violet-500 bg-violet-500/10': identity.id === store.activeIdentityId,
                 'border-slate-700 bg-slate-800/60': identity.id !== store.activeIdentityId,
@@ -285,7 +286,10 @@ const Identities: Component = () => {
                 <button
                   type="button"
                   class="hover-wash rounded-lg border border-slate-600 px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-700"
-                  onClick={() => setBackupDrawerIdentityId(identity.id)}
+                  onClick={() => {
+                  setBackupDrawerIdentityId(identity.id);
+                  toaster.create({ title: 'Exporting', description: 'Opening backup export drawer...' });
+                }}
                 >
                   Export backup
                 </button>

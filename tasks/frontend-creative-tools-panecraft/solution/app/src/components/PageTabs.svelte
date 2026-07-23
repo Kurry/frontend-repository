@@ -74,7 +74,7 @@
         <button
           type="button"
           class="tap-target px-3 py-1.5 text-sm whitespace-nowrap rounded-t-[var(--radius-base)] transition-colors {store.getActivePageId() === page.id
-            ? 'font-semibold text-[var(--color-text-primary)] border-b-2 border-[var(--color-primary)] bg-white'
+            ? 'font-bold text-[var(--color-text-primary)] border-b-2 border-[var(--color-primary)] bg-white'
             : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]'}"
           aria-current={store.getActivePageId() === page.id ? 'page' : undefined}
           onclick={() => store.setActivePageId(page.id)}

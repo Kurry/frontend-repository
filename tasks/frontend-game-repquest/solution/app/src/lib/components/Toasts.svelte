@@ -22,6 +22,9 @@
       class="pointer-events-auto flex items-start gap-2 rounded-xl border bg-slate-800/95 backdrop-blur px-3.5 py-2.5 shadow-2xl text-sm font-medium"
       style="animation: rq-slide-in .28s ease-out"
       class:border-emerald-500={toast.tone === 'victory'}
+      onanimationend={(e) => {
+        if (e.animationName === 'rq-slide-out') quest.dismissToast(toast.id);
+      }}
     >
       <span class="mt-0.5 shrink-0" style={toast.tone === 'victory' ? 'color: var(--color-success)' : toast.tone === 'defeat' ? 'color: var(--color-danger)' : 'color: var(--accent-strong)'}>
         {#if toast.tone === 'victory'}<Trophy size={18} weight="fill" />

@@ -163,6 +163,258 @@ test('regression modal dialogs trap and restore focus', async ({ page }) => {
   await expect(page.locator('#subscribe-popup')).toBeHidden();
 });
 
+const paletteFields = (suffix, overrides = {}) => ({
+  name: `Studio Palette ${suffix}`,
+  artist: `Studio Artist ${suffix}`,
+  period: 'Modern',
+  swatches: ['#102A43', '#2CB67D', '#F6C344'],
+  favorite: false,
+  tags: ['studio', `set-${suffix.toLowerCase()}`],
+  notes: `## Provenance ${suffix}\n\n**Bold** and *italic*\n\n- one\n- two`,
+  archived: false,
+  ...overrides,
+});
+
+async function createViaContract(page, suffix, overrides = {}) {
+  const result = await invokeTool(page, 'entity_create', {
+    entity: 'palette',
+    fields: paletteFields(suffix, overrides),
+  });
+  expect(result.success).toBe(true);
+  return result.entity_id;
+}
+
+async function openPaletteView(page) {
+  await page.locator('button[data-view="palette"]').click();
+  await expect(page.locator('#palette-view')).toHaveClass(/active/);
+}
+
+async function exportedPalette(page, id) {
+  await page.locator('#btn-export').click();
+  await page.locator('[data-tab="json"]').click();
+  const doc = JSON.parse(await page.locator('#export-preview').innerText());
+  await page.locator('#export-close').click();
+  await expect(page.locator('#export-drawer')).toBeHidden();
+  return doc.palettes.find((palette) => palette.id === id);
+}
+
+test('oracle-fix copy feedback, hover motion, vision easing, and narrow interaction', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto(BASE);
+  await openPaletteView(page);
+
+  const firstCard = page.locator('.palette-card').first();
+  const swatches = firstCard.locator('.palette-card__swatch');
+  await swatches.nth(0).click();
+  await swatches.nth(1).click();
+  await swatches.nth(2).click();
+  await expect(swatches.nth(0).locator('.copy-label')).toContainText('Copied');
+  await expect(swatches.nth(1).locator('.copy-label')).toContainText('Copied');
+  await expect(swatches.nth(2).locator('.copy-label')).toContainText('Copied');
+  await expect(swatches.nth(2)).toHaveClass(/is-flashing/);
+  await expect(firstCard.locator('.copy-label')).toHaveCount(0, { timeout: 2000 });
+
+  await swatches.first().hover();
+  await expect(swatches.first().locator('.palette-card__swatch-hex')).toHaveCSS('opacity', '1');
+  const title = firstCard.locator('.palette-card__meta-title');
+  await title.click();
+  await expect(page.locator('#editor-panel')).toBeVisible();
+  await page.locator('#editor-close').click();
+  await expect(page.locator('#editor-panel')).toBeHidden();
+
+  await page.locator('#VisionSimulation').selectOption('deuteranopia');
+  await expect(page.locator('#library-canvas')).not.toHaveCSS('filter', 'none');
+  expect(await page.locator('#library-canvas').evaluate((el) => getComputedStyle(el).transitionProperty)).toContain('filter');
+});
+
+test('oracle-fix create validation and live multi-surface export pipeline', async ({ page }) => {
+  await page.goto(BASE);
+  const initial = Number((await page.locator('#library-count').innerText()).match(/^\d+/)?.[0]);
+
+  await page.locator('#btn-create').click();
+  await page.locator('#ed-name').fill('Invalid');
+  await expect(page.locator('#ed-save')).toBeDisabled();
+  await expect(page.locator('#err-artist')).toContainText('Artist');
+  await expect(page.locator('#err-period')).toContainText('Period');
+  await expect(page.locator('#err-swatches')).toContainText('at least 3');
+  await page.locator('#editor-close').click();
+
+  const ids = [];
+  ids.push(await createViaContract(page, 'A', { swatches: ['#102A43', '#2CB67D', '#F6C344'] }));
+  ids.push(await createViaContract(page, 'B', { swatches: ['#6D214F', '#B33771', '#F8A5C2'] }));
+  ids.push(await createViaContract(page, 'C', { swatches: ['#1B1464', '#0652DD', '#12CBC4'], favorite: true }));
+  expect(Number((await page.locator('#library-count').innerText()).match(/^\d+/)?.[0])).toBe(initial + 3);
+
+  await openPaletteView(page);
+  await expect(page.locator(`.palette-card[data-palette-id="${ids[2]}"]`)).toContainText('Studio Palette C');
+  await page.locator('#PeriodFilter').selectOption('Modern');
+  await page.locator('#search-input').fill('set-c');
+  await expect(page.locator('.palette-card')).toHaveCount(1);
+  await page.locator('#search-input').fill('');
+  await page.locator('#PeriodFilter').selectOption('');
+
+  await page.locator('#btn-export').click();
+  for (const tab of ['css', 'utility-theme', 'scss', 'json']) {
+    await page.locator(`[data-tab="${tab}"]`).click();
+    const preview = await page.locator('#export-preview').innerText();
+    expect(preview).toContain(tab === 'json' ? 'Studio Palette C' : '#12CBC4');
+  }
+  await expect(page.locator('#export-preview')).toContainText('"favorite": true');
+});
+
+test('oracle-fix reorder, notes, catalog, edit echo, and listener lifecycle', async ({ page }) => {
+  await page.goto(BASE);
+  const id = await createViaContract(page, 'Reorder', {
+    swatches: ['#112233', '#445566', '#778899'],
+    notes: '## Archive heading\n\n**Bold record** and *italic record*\n\n- alpha\n- beta',
+  });
+  await openPaletteView(page);
+  await page.locator(`.palette-card[data-palette-id="${id}"] .palette-card__meta-title`).click();
+  await page.locator('.js-move[data-index="0"][data-dir="1"]').click();
+  await page.locator('.js-move[data-index="1"][data-dir="1"]').click();
+  await expect(page.locator('.js-hex-input').nth(2)).toHaveValue('#112233');
+  await page.locator('#ed-name').fill('Studio Palette Reordered');
+  await page.locator('.ed-toggle-opt[data-mode="preview"]').click();
+  await expect(page.locator('#ed-notes-preview h3, #ed-notes-preview h4, #ed-notes-preview h5, #ed-notes-preview h6')).toHaveText('Archive heading');
+  await expect(page.locator('#ed-notes-preview strong')).toHaveText('Bold record');
+  await page.locator('#ed-save').click();
+  await expect(page.locator(`.palette-card[data-palette-id="${id}"]`)).toContainText('Studio Palette Reordered');
+
+  await page.locator(`.palette-card[data-palette-id="${id}"] .palette-card__meta-title`).click();
+  await expect(page.locator('.js-hex-input').nth(2)).toHaveValue('#112233');
+  await page.locator('#editor-close').click();
+  await page.locator('#btn-export').click();
+  await page.locator('[data-tab="json"]').click();
+  const json = JSON.parse(await page.locator('#export-preview').innerText());
+  expect(json.palettes.find((p) => p.id === id).swatches).toEqual(['#445566', '#778899', '#112233']);
+  await page.locator('[data-tab="catalog"]').click();
+  await expect(page.locator('#catalog-preview')).toContainText('Studio Palette Reordered');
+  await expect(page.locator('#catalog-preview h3, #catalog-preview h4, #catalog-preview h5, #catalog-preview h6').filter({ hasText: 'Archive heading' })).toBeVisible();
+  await expect(page.locator('#catalog-preview')).not.toContainText('**Bold record**');
+});
+
+test('oracle-fix archive compare restore and ordered undo redo', async ({ page }) => {
+  await page.goto(BASE);
+  const a = await createViaContract(page, 'Flow A', { swatches: ['#AA0000', '#00AA00', '#0000AA'] });
+  const b = await createViaContract(page, 'Flow B', { swatches: ['#BB1100', '#11BB00', '#0011BB'] });
+  const c = await createViaContract(page, 'Flow C');
+  await openPaletteView(page);
+  for (const id of [a, b, c]) await page.locator(`.js-select[data-palette-id="${id}"]`).check();
+  await page.locator('#tray-tag').click();
+  await page.locator('#batch-tag-input').fill('reviewed');
+  await page.locator('#batch-tag-apply').click();
+  await expect(page.locator('#tag-facets')).toContainText('reviewed');
+
+  await page.locator(`.js-select[data-palette-id="${c}"]`).uncheck();
+  await page.locator('#tray-compare').click();
+  await expect(page.locator('#compare-dialog')).toBeVisible();
+  await expect(page.locator('#compare-body')).toContainText('ΔHue');
+  await expect(page.locator('#compare-body')).toContainText('ΔLightness');
+  await page.locator('#compare-close').click();
+
+  await page.locator('#tray-archive').click();
+  await expect(page.locator(`.palette-card[data-palette-id="${a}"]`)).toHaveCount(0);
+  await page.locator('#archived-toggle').click();
+  await expect(page.locator(`.palette-card[data-palette-id="${a}"] .js-restore`)).toBeVisible();
+  await page.locator(`.palette-card[data-palette-id="${a}"] .js-restore`).click();
+  await expect(page.locator(`.palette-card[data-palette-id="${a}"]`)).toHaveCount(0);
+  await page.locator('#btn-undo').click();
+  expect((await exportedPalette(page, a)).archived).toBe(true);
+  await expect(page.locator(`.palette-card[data-palette-id="${a}"]`)).toBeVisible();
+  await page.locator('#btn-undo').click();
+  expect((await exportedPalette(page, a)).archived).toBe(false);
+  await page.locator('#btn-redo').click();
+  expect((await exportedPalette(page, a)).archived).toBe(true);
+});
+
+test('oracle-fix real UI create delete drag popup and copy motion', async ({ page }) => {
+  await page.goto(BASE);
+  await openPaletteView(page);
+  await page.locator('#btn-create').click();
+  await expect(page.locator('label[for="ed-name"]')).toBeVisible();
+  await expect(page.locator('label[for="ed-artist"]')).toBeVisible();
+  await expect(page.locator('label[for="ed-period"]')).toBeVisible();
+  await page.locator('#ed-name').fill('Mechanical Study');
+  await page.locator('#ed-artist').fill('Runtime Proof');
+  await page.locator('#ed-period').selectOption('Modern');
+  const hexes = ['#123456', '#ABCDEF', '#C05A3D'];
+  for (let i = 0; i < hexes.length; i++) await page.locator('.js-hex-input').nth(i).fill(hexes[i]);
+
+  const firstGrip = page.locator('.swatch-row__grip').first();
+  const thirdRow = page.locator('.swatch-row').nth(2);
+  const from = await firstGrip.boundingBox();
+  const to = await thirdRow.boundingBox();
+  expect(from).not.toBeNull();
+  expect(to).not.toBeNull();
+  await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 4 });
+  await expect(page.locator('.swatch-row.is-dragging')).toBeVisible();
+  expect(await page.locator('.swatch-row.is-dragging').evaluate((el) => getComputedStyle(el).transform)).not.toBe('none');
+  await page.mouse.up();
+  await expect(page.locator('.js-hex-input').nth(2)).toHaveValue('#123456');
+
+  await page.locator('#ed-save').click();
+  const card = page.locator('.palette-card', { hasText: 'Mechanical Study' });
+  await expect(card).toBeVisible();
+  expect(await card.evaluate((el) => getComputedStyle(el).animationName)).toBe('card-in');
+  await card.locator('.palette-card__meta-title').click();
+  await page.locator('#ed-delete').click();
+  await page.locator('#confirm-ok').click();
+  await expect(card).toHaveClass(/card-exit/);
+  await expect(card).toHaveCount(0);
+
+  await page.locator('#footer-newsletter').scrollIntoViewIfNeeded();
+  await page.locator('#footer-newsletter').click();
+  await page.locator('#popup-email').fill('invalid-email');
+  await page.locator('#popup-form button[type="submit"]').click();
+  await expect(page.locator('#popup-error')).toContainText('Email');
+  await expect(page.locator('#subscribe-popup')).toBeVisible();
+  await page.locator('#popup-email').fill('proof@studio.test');
+  await page.locator('#popup-form button[type="submit"]').click();
+  await expect(page.locator('#subscribe-popup')).toBeHidden({ timeout: 3000 });
+
+  await page.locator('#btn-export').click();
+  await expect(page.locator('label[for="import-file"]')).toBeVisible();
+  await page.locator('#btn-copy-export').click();
+  await expect(page.locator('#btn-copy-export')).toHaveClass(/is-copied/);
+  await expect(page.locator('#btn-copy-export')).toHaveText('Copy export', { timeout: 2500 });
+});
+
+test('oracle-fix delete-all empty export import and redo-stack edge', async ({ page }) => {
+  await page.goto(BASE);
+  const ids = await page.evaluate(() => window.webmcp_invoke_tool ? true : false);
+  expect(ids).toBe(true);
+  const seedIds = await page.locator('.nomenclature-source__title').evaluateAll((els) => [...new Set(els.map((el) => el.dataset.paletteId).filter(Boolean))]);
+  for (const id of seedIds) {
+    const result = await invokeTool(page, 'entity_delete', { entity: 'palette', entity_id: id, confirm: true });
+    expect(result.success).toBe(true);
+  }
+  await expect(page.locator('#empty-state')).toBeVisible();
+  await expect(page.locator('#empty-state .js-create')).toHaveText('New Palette');
+  await page.locator('#btn-export').click();
+  await page.locator('[data-tab="css"]').click();
+  await expect(page.locator('#export-preview')).toContainText('archive is empty');
+
+  const imported = {
+    version: 'palette-archive.v1',
+    palettes: [paletteFields('Imported', { id: 'imported-one', archived: true, favorite: true })],
+  };
+  await page.locator('[data-tab="json"]').click();
+  await page.locator('#import-input').fill(JSON.stringify(imported));
+  await page.locator('#btn-import').click();
+  await expect(page.locator('#import-feedback')).toContainText('Imported 1 palette');
+  const exported = JSON.parse(await page.locator('#export-preview').innerText());
+  expect(exported).toEqual(imported);
+  await page.locator('#export-close').click();
+  await page.locator('#archived-toggle').click();
+  await expect(page.locator('.palette-card, .nomenclature-row:not(.nomenclature-row--header)')).not.toHaveCount(0);
+  await page.locator('#btn-undo').click();
+  await expect(page.locator('#empty-state')).toBeVisible();
+  await createViaContract(page, 'Branch');
+  await expect(page.locator('#btn-redo')).toBeDisabled();
+});
+
 // NOT-AUTOMATABLE: 1.2 editor_export_popup_focus_trap — Unimplemented or requires visual evaluation
 // DROPPED (fails against oracle — hallucinated/incomplete selectors): test '1.3 ...'
 // NOT-AUTOMATABLE: 1.3 chrome_icons_have_accessible_names — Unimplemented or requires visual evaluation
