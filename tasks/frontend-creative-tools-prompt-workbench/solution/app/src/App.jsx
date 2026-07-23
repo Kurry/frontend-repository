@@ -263,7 +263,7 @@ function StepPanel({ run }) {
   )
 }
 
-function RichResponse({ text }) {
+function RichResponse({ text, isStreaming }) {
   const [copied, setCopied] = useState('')
   const addToast = useWorkbench((state) => state.addToast)
   const parts = text.split(/```([A-Za-z0-9_+-]*)\n([\s\S]*?)```/g)
@@ -276,7 +276,7 @@ function RichResponse({ text }) {
   return (
     <div className="response-prose">
       {parts.map((part, index) => {
-        if (index % 3 === 0) return <span key={index} className="response-text">{part}</span>
+        if (index % 3 === 0) return <span key={index} className="response-text">{part}{isStreaming && index === parts.length - 1 && <span className="stream-cursor" aria-hidden="true" />}</span>
         if (index % 3 === 1) return null
         const language = parts[index - 1] || 'text'
         return <div className="code-block" key={index}><div className="code-header"><span>{language}</span><button onClick={() => copyCode(part)}>{copied === part ? <CheckmarkOutline size={16} /> : <Copy size={16} />}{copied === part ? 'Copied' : 'Copy'}</button></div><pre><code>{part}</code></pre></div>
@@ -371,12 +371,19 @@ function ResponsePanel() {
           <StepPanel run={run} />
           <Reasoning run={run} />
           <div className="variant-row">
-            <span>{run.status === 'complete' ? run.variants[run.variantIndex].label : 'Live draft'}</span>
+            {run.status === 'complete' ? (
+              <div role="tablist" aria-label="Response variants" style={{ display: 'flex', gap: '4px' }}>
+                {run.variants.map((v, idx) => (
+                  <button key={v.label} type="button" role="tab" aria-selected={idx === run.variantIndex} className={`variant-chip ${idx === run.variantIndex ? 'active' : ''}`} style={{ border: '1px solid #dce3ed', borderRadius: '4px', padding: '2px 6px', background: idx === run.variantIndex ? '#eaf0ff' : 'white', cursor: 'pointer', fontSize: '10px' }} onClick={() => setVariant(run.id, idx)}>
+                    {v.label}
+                  </button>
+                ))}
+              </div>
+            ) : <span>Live draft</span>}
             {run.status === 'complete' && <div><Button size="sm" kind="ghost" renderIcon={ChevronLeft} onClick={() => setVariant(run.id, run.variantIndex - 1)} disabled={run.variantIndex === 0} {...iconOnly('Previous variant')} /><strong>{run.variantIndex + 1} of {run.variants.length}</strong><Button size="sm" kind="ghost" renderIcon={ChevronRight} onClick={() => setVariant(run.id, run.variantIndex + 1)} disabled={run.variantIndex === run.variants.length - 1} {...iconOnly('Next variant')} /></div>}
           </div>
           <div key={`${run.id}-${run.variantIndex}`} className={`response-body variant-${run.variantIndex} variant-in${settled ? ' settled' : ''}`} ref={bodyRef} onScroll={handleScroll}>
-            <RichResponse text={displayed} />
-            {isStreaming && <span className="stream-cursor" aria-hidden="true" />}
+            <RichResponse text={displayed} isStreaming={isStreaming} />
           </div>
           {!followScroll && isStreaming && <Button className="jump-latest" size="sm" kind="secondary" renderIcon={ArrowDown} onClick={jump}>Jump to Latest</Button>}
         </div>
@@ -401,7 +408,7 @@ function Workbench() {
   }, [streamingRunId, advanceRun])
 
   const handlePastePlaceholders = useCallback((names) => {
-    addToast(`Detected ${names.length} pasted placeholder${names.length > 1 ? 's' : ''}: ${names.join(', ')} — bind ${names.length > 1 ? 'their values' : 'its value'} in the panel`, 'info')
+    addToast(`Detected ${names.length} pasted variable${names.length > 1 ? 's' : ''}: ${names.join(', ')} — bind ${names.length > 1 ? 'their values' : 'its value'} in the panel`, 'info')
   }, [addToast])
 
   return (
@@ -443,7 +450,7 @@ function VariablePopover({ editorRef, variableSelectionRef }) {
   return (
     <div className="popover variable-popover" role="dialog" aria-modal="true" aria-labelledby="variable-popover-title" ref={dialogRef}>
       <div className="popover-arrow" />
-      <div className="popover-head"><div><p className="eyebrow">Placeholder</p><h2 id="variable-popover-title">Insert Variable</h2></div><Button size="sm" kind="ghost" renderIcon={Close} onClick={close} {...iconOnly('Close variable popover')} /></div>
+      <div className="popover-head"><div><p className="eyebrow">Variable</p><h2 id="variable-popover-title">Insert Variable</h2></div><Button size="sm" kind="ghost" renderIcon={Close} onClick={close} {...iconOnly('Close variable popover')} /></div>
       <form onSubmit={handleSubmit(confirm)} noValidate>
         <TextInput id="variable-name" labelText="Name" placeholder="customer_name" invalid={!!errors.name} invalidText={errors.name?.message} aria-describedby={errors.name ? 'variable-name-error-msg variable-name-error' : undefined} {...register('name')} /><div id="variable-name-error" className="sr-only" aria-live="polite">{errors.name?.message}</div>
         <p className="helper">Letters, digits, and underscores; 1–64 characters.</p>
