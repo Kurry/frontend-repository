@@ -125,19 +125,14 @@
     "description": "Session compression editor with capsule summaries, preview, and artifact export."
   },
   "frontend-creative-tools-stack-trace-path-finder": {
-    "source": "Stack-Trace Path Finder",
+    "source": "Stack-trace path finder task PRD",
     "instruction": "tasks/frontend-creative-tools-stack-trace-path-finder/instruction.md",
-    "description": "Stack-trace hypothesis workspace for frames, causal paths, and saved investigations."
+    "description": "Interactive stack-trace cartographer with frame mapping, path hypotheses, and portable session artifacts."
   },
   "frontend-creative-tools-shapeshift-grid": {
     "source": "Shapeshift",
     "instruction": "Shapeshift/instruction.md",
     "description": "SHAPESHIFT QR color grid painter good-app eval."
-  },
-  "frontend-creative-tools-stack-trace-path-finder": {
-    "source": "Stack-trace path finder task PRD",
-    "instruction": "tasks/frontend-creative-tools-stack-trace-path-finder/instruction.md",
-    "description": "Interactive stack-trace cartographer with frame mapping, path hypotheses, and portable session artifacts."
   },
   "frontend-creative-tools-icon-family-optical-studio": {
     "source": "Icon Family Optical Studio",
@@ -583,5 +578,8 @@
     "source": "feature-workflow-builder-workflow-builder PRD",
     "instruction": "tasks/frontend-workflow-workflow-builder/instruction.md",
     "description": "Node-graph workflow builder with durable executions and timelines."
+  },
+  "frontend-data-tracking-household-load-shift-planner": {
+    "description": "A frontend app for time-of-use energy planning."
   }
 }
