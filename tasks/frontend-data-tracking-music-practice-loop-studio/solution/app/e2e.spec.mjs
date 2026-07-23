@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
   if (await skip.isVisible()) await skip.click();
 });
 
-test('create_flow_updates_all_surfaces: CRUD, validation, persistence, and empty recovery', async ({ page }) => {
+test('create_flow_updates_all_surfaces', async ({ page }) => {
   await page.getByRole('button', { name: 'Create loop' }).click();
   await expect(page.getByRole('alert')).toContainText('Enter a loop name');
   await page.getByRole('button', { name: /Measure 12/ }).click();
@@ -39,7 +39,7 @@ test('create_flow_updates_all_surfaces: CRUD, validation, persistence, and empty
   await expect(page.getByTestId('loop-count')).toHaveText('1');
 });
 
-test('controls_are_keyboard_accessible: session, schedule, alignment, and personalization', async ({ page }) => {
+test('controls_are_keyboard_accessible', async ({ page }) => {
   await page.getByRole('button', { name: 'tempo', exact: true }).focus();
   await page.keyboard.press('Enter');
   await page.getByRole('button', { name: 'Start session' }).press('Enter');
@@ -62,7 +62,7 @@ test('controls_are_keyboard_accessible: session, schedule, alignment, and person
   await expect(page.getByLabel('Compact spacing')).toBeChecked();
 });
 
-test('ac_04_interleave_ui_webmcp_match: UI and WebMCP share live state', async ({ page }) => {
+test('ac_04_interleave_ui_webmcp_match', async ({ page }) => {
   const tools = await page.evaluate(() => window.webmcp_list_tools());
   expect(Array.isArray(tools) ? tools.length : tools.tools.length).toBeGreaterThan(5);
   const created = await page.evaluate(() => window.webmcp_invoke_tool('entity.create', { name: 'MCP phrase', start: 9, end: 13, repetitions: 4 }));
@@ -81,7 +81,7 @@ test('ac_04_interleave_ui_webmcp_match: UI and WebMCP share live state', async (
   expect(copied.ok).toBeTruthy();
 });
 
-test('layout_adapts_desktop_to_mobile: controls remain reachable without overflow', async ({ page }) => {
+test('layout_adapts_desktop_to_mobile', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await expect(page.getByRole('button', { name: 'score', exact: true })).toBeVisible();
   const dimensions = await page.evaluate(() => ({ width: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }));
@@ -92,7 +92,7 @@ test('layout_adapts_desktop_to_mobile: controls remain reachable without overflo
   expect(smallTargets).toEqual([]);
 });
 
-test('reduced_motion_is_respected: animation duration and console stay clean', async ({ browser }) => {
+test('reduced_motion_is_respected', async ({ browser }) => {
   const context = await browser.newContext({ reducedMotion: 'reduce' });
   const page = await context.newPage();
   const errors = [];
