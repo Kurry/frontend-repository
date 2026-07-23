@@ -821,6 +821,7 @@ function FileBadge({ kind }) {
 
 function CodeBlock({ content, language = "typescript", filePath }) {
   const [copied, setCopied] = useState(false);
+  const setAnnouncement = useReviewStore((s) => s.setAnnouncement);
   const safeCode = typeof content === "string" ? content : String(content ?? "");
   const safeLanguage = [
     "typescript",
@@ -835,8 +836,13 @@ function CodeBlock({ content, language = "typescript", filePath }) {
     ? language
     : "typescript";
   const copy = async () => {
-    await copyText(safeCode);
+    const succeeded = await copyText(safeCode);
+    if (!succeeded) {
+      setAnnouncement(`Could not copy ${filePath}`);
+      return;
+    }
     setCopied(true);
+    setAnnouncement(`Copied exact contents of ${filePath} to clipboard`);
     setTimeout(() => setCopied(false), 1400);
   };
   const plain = (
@@ -1044,6 +1050,7 @@ function TerminalStream({ trial, step }) {
   const length = step.terminal ? step.terminal.length : 0;
   const [visible, setVisible] = useState(0);
   const [complete, setComplete] = useState(false);
+  const [run, setRun] = useState(0);
   useEffect(() => {
     if (!step.terminal) return undefined;
     const reduced = window.matchMedia(
@@ -1068,7 +1075,7 @@ function TerminalStream({ trial, step }) {
     }, 45);
     return () => clearInterval(timer);
     // Re-stream whenever the active terminal step changes.
-  }, [key, step.terminal, length]);
+  }, [key, step.terminal, length, run]);
   if (!step.terminal) return null;
   return (
     <section className="border-t border-line bg-[#121b17] text-[#d6e6dd]">
@@ -1077,14 +1084,30 @@ function TerminalStream({ trial, step }) {
           <IconTerminal2 size={14} />
           Active-step terminal
         </div>
-        <StatusPill tone={complete ? "positive" : "warning"}>
+        <StatusPill
+          tone={complete ? "positive" : "warning"}
+          className="terminal-status"
+        >
           {!complete && (
             <span className="stream-dot size-1.5 rounded-full bg-warning" />
           )}
           {complete ? "Complete" : "Streaming"}
         </StatusPill>
+        {complete && (
+          <button
+            type="button"
+            className="focus-ring rounded px-2 py-1 text-[10px] font-bold text-white/80 hover:bg-white/10 hover:text-white"
+            onClick={() => setRun((value) => value + 1)}
+          >
+            Replay stream
+          </button>
+        )}
       </div>
-      <pre className="scroll-thin min-h-24 max-h-40 overflow-auto whitespace-pre-wrap p-3 font-mono text-[11px] leading-5">
+      <pre
+        className="scroll-thin min-h-24 max-h-40 overflow-auto whitespace-pre-wrap p-3 font-mono text-[11px] leading-5"
+        aria-label="Terminal output"
+        aria-busy={!complete}
+      >
         {step.terminal.slice(0, visible)}
         {!complete && <span className="stream-dot">▋</span>}
       </pre>
@@ -1722,7 +1745,7 @@ function CriterionTable({ trial, ui }) {
                             <span className="block size-5" />
                           )}
                         </td>
-                        <td className="px-2 py-2">
+                        <td className="px-2 py-2" data-label="Criterion">
                           <div className="flex items-center gap-2">
                             <span className="font-mono text-[10px] font-bold text-muted">
                               {criterion.id}
@@ -1735,10 +1758,10 @@ function CriterionTable({ trial, ui }) {
                             {criterion.title}
                           </div>
                         </td>
-                        <td className="px-2 py-2 font-mono text-xs">
+                        <td className="px-2 py-2 font-mono text-xs" data-label="Weight">
                           {criterion.weight}
                         </td>
-                        <td className="px-2 py-2">
+                        <td className="px-2 py-2" data-label="Verdict">
                           <StatusPill
                             tone={verdict.yes ? "positive" : "negative"}
                           >
@@ -1750,7 +1773,7 @@ function CriterionTable({ trial, ui }) {
                             {verdict.yes ? "Yes" : "No"}
                           </StatusPill>
                         </td>
-                        <td className="px-2 py-2">
+                        <td className="px-2 py-2" data-label="Scorer reasoning">
                           <p
                             className={cx(
                               "text-xs leading-5 text-[#4b554f]",
@@ -1763,6 +1786,7 @@ function CriterionTable({ trial, ui }) {
                         </td>
                         <td
                           className="px-2 py-2"
+                          data-label="Evidence"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <Button
@@ -1775,6 +1799,7 @@ function CriterionTable({ trial, ui }) {
                         </td>
                         <td
                           className="px-2 py-2"
+                          data-label="Review"
                           onClick={(e) => e.stopPropagation()}
                         >
                           {adjudication ? (
@@ -2004,6 +2029,49 @@ function AdjudicationSummary({ records }) {
   );
 }
 
+function ReviewReadiness({ trial, ui }) {
+  const flips = flippedCriterionIds(trial, ui.comparedLabels);
+  const reviewed = new Set(ui.adjudications.map((record) => record.criterionId));
+  const unresolved = trial.criteria.filter((criterion) => {
+    const verdict = trial.results[ui.activeLabel].verdicts[criterion.id];
+    return (flips.includes(criterion.id) || !verdict.yes) && !reviewed.has(criterion.id);
+  });
+  const actionable = trial.criteria.filter((criterion) => {
+    const verdict = trial.results[ui.activeLabel].verdicts[criterion.id];
+    return flips.includes(criterion.id) || !verdict.yes;
+  }).length;
+  const complete = Math.max(0, actionable - unresolved.length);
+  const percent = actionable ? Math.round((complete / actionable) * 100) : 100;
+  return (
+    <section className="review-readiness panel p-3" aria-label="Review readiness">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h3 className="text-xs font-extrabold">Review readiness</h3>
+          <p className="mt-0.5 text-[11px] text-muted">
+            Live completion signal for actionable verdicts
+          </p>
+        </div>
+        <strong className="font-mono text-lg text-accent">{percent}%</strong>
+      </div>
+      <div
+        className="mt-3 h-2 overflow-hidden rounded-full bg-black/[.08]"
+        role="progressbar"
+        aria-label="Actionable verdicts reviewed"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow={percent}
+      >
+        <div className="readiness-fill h-full rounded-full bg-accent" style={{ width: `${percent}%` }} />
+      </div>
+      <p className="mt-2 text-[11px] font-semibold text-muted">
+        {unresolved.length
+          ? `${unresolved.length} actionable verdict${unresolved.length === 1 ? "" : "s"} remaining`
+          : "All actionable verdicts are adjudicated"}
+      </p>
+    </section>
+  );
+}
+
 function VerdictWorkspace({ trial, ui }) {
   const setActiveLabel = useReviewStore((s) => s.setActiveLabel);
   const toggleFlips = useReviewStore((s) => s.toggleFlips);
@@ -2044,6 +2112,7 @@ function VerdictWorkspace({ trial, ui }) {
           </div>
           <div className="space-y-3">
             <AdjudicationSummary records={ui.adjudications} />
+            <ReviewReadiness trial={trial} ui={ui} />
             <div className="panel p-3">
               <div className="mb-3 flex items-center justify-between gap-3">
                 <div>
@@ -2343,19 +2412,15 @@ function ExportDrawer({ trial, ui }) {
               id="memo"
               className="scroll-thin min-h-0 flex-1 overflow-auto p-4 outline-none sm:p-5"
             >
-              <div className="rich-text min-h-full rounded-lg border border-line bg-white p-5 text-sm">
-                <ReactMarkdown components={embeddedHeadings}>
-                  {memoText}
-                </ReactMarkdown>
-              </div>
+              <pre className="min-h-full whitespace-pre-wrap break-words rounded-lg border border-line bg-white p-5 font-mono text-xs leading-6 text-ink">
+                {memoText}
+              </pre>
             </TabPanel>
           </Tabs>
           <div className="space-y-2 border-t border-line px-4 py-3 sm:px-5">
             {copyNotice && (
               <p
                 className="rounded-md border border-positive/30 bg-positive-soft px-3 py-2 text-xs font-bold text-positive"
-                role="status"
-                aria-live="polite"
               >
                 {copyNotice}
               </p>
@@ -2434,9 +2499,7 @@ function ImportSurface({ task, trial }) {
     replace(result.data.adjudications);
     setImportErrors([]);
     setAnnouncement(
-      `Imported ${result.data.adjudications.length} adjudication${
-        result.data.adjudications.length === 1 ? "" : "s"
-      } successfully from Review Package JSON`,
+      `Imported ${result.data.adjudications.length} adjudications successfully from Review Package JSON`,
     );
     close("import");
   });
@@ -2935,6 +2998,7 @@ export default function App() {
         <ReviewWorkspace />
       )}
       <div
+        role="status"
         aria-live="polite"
         aria-atomic="true"
         className="fixed bottom-3 left-1/2 z-[100] -translate-x-1/2"
