@@ -194,3 +194,140 @@ test('reduced motion preserves overlay hidden opacity while closing', async ({ p
   await page.keyboard.press('Escape');
   await expect(dialog).toHaveCSS('opacity', '0', { timeout: 200 });
 });
+
+test('recorded 14.7 failure: an unfinished create survives a main-tab round trip and creates exactly once', async ({ page }) => {
+  await page.getByRole('tab', { name: 'Saved Themes' }).click();
+  const before = await page.locator('[data-theme-card]').count();
+  await page.getByRole('button', { name: 'New Theme' }).first().click();
+  await page.getByLabel('Theme name').fill('Discard this draft');
+  await page.getByRole('tab', { name: 'Components' }).click();
+  await expect(page.getByRole('tab', { name: 'Components' })).toHaveAttribute('aria-selected', 'true');
+  await page.getByRole('tab', { name: 'Saved Themes' }).click();
+  await page.getByLabel('Theme name').fill('Interleaved Theme');
+  await page.getByRole('button', { name: 'Create Theme' }).click();
+  await expect(page.locator('[data-theme-card]')).toHaveCount(before + 1);
+  await expect(page.getByText('Interleaved Theme', { exact: true })).toBeVisible();
+});
+
+test('recorded 6.3/1.13 failure: palette edit, export, save status, and saved-card swatch stay atomic', async ({ page }) => {
+  const primary = page.getByLabel(/primary\.main hex value/);
+  await primary.fill('#123456');
+  await primary.press('Enter');
+  await expect(page.getByText('Unsaved', { exact: true })).toBeVisible();
+  await expect(page.locator('.monaco-editor')).toContainText('#123456');
+
+  await page.getByRole('tab', { name: 'Export' }).click();
+  await expect(page.locator('[data-export-preview]')).toContainText('#123456');
+  await page.getByRole('tab', { name: 'Preview' }).click();
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(page.getByText('Theme saved', { exact: true })).toBeVisible();
+  await expect(page.getByText('All changes saved', { exact: true })).toBeVisible();
+
+  await page.getByRole('tab', { name: 'Saved Themes' }).click();
+  await expect(page.locator('[data-theme-card="default"] span').filter({ has: page.locator('xpath=..') }).first()).toBeAttached();
+  const swatches = page.locator('[data-theme-card="default"] [aria-hidden="true"] span');
+  await expect(swatches.first()).toHaveCSS('background-color', 'rgb(18, 52, 86)');
+});
+
+test('recorded 1.25 failure: added fonts can be removed while Roboto stays protected', async ({ page }) => {
+  await page.getByRole('tab', { name: 'Fonts' }).click();
+  await page.getByLabel('Font family name').fill('Lato');
+  await page.getByRole('button', { name: 'Add', exact: true }).click();
+  await expect(page.getByText('Lato', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Remove Lato' }).click();
+  await expect(page.getByText('Lato', { exact: true })).toBeHidden();
+  await expect(page.getByLabel('Roboto is protected from removal')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Remove Roboto' })).toHaveCount(0);
+});
+
+test('recorded 1.33/4.4 failure: snippets patch source and show an auto-dismissing confirmation', async ({ page }) => {
+  await page.getByRole('tab', { name: 'Snippets' }).click();
+  await page.getByRole('button', { name: /Rounded shapes/ }).click();
+  await expect(page.locator('.monaco-editor')).toContainText('borderRadius');
+  const toast = page.getByText(/Rounded shapes.*applied/i);
+  await expect(toast).toBeVisible();
+  await expect(toast).toBeHidden({ timeout: 5_000 });
+});
+
+test('recorded 1.38/1.49 failure: rename rejects empty, duplicate, and overlong names without mutation', async ({ page }) => {
+  await page.getByRole('tab', { name: 'Saved Themes' }).click();
+  const card = page.locator('[data-theme-card="default"]');
+  await card.getByRole('button', { name: 'Rename' }).click();
+  const name = page.getByLabel('Theme name');
+  await name.fill('');
+  await expect(page.getByText(/Theme name is required/)).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Rename Theme' })).toBeDisabled();
+  await name.fill('Forest');
+  await expect(page.getByText(/must be unique/)).toBeVisible();
+  await name.fill('x'.repeat(65));
+  await expect(page.getByText(/64 characters or fewer/)).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(card.getByText('Default Theme', { exact: true })).toBeVisible();
+});
+
+test('recorded 1.47/6.13 failure: version validation, save, and restore round-trip all live surfaces', async ({ page }) => {
+  const primary = page.getByLabel(/primary\.main hex value/);
+  await primary.fill('#112233');
+  await primary.press('Enter');
+  await page.getByRole('tab', { name: 'Saved Themes' }).click();
+  await page.getByRole('button', { name: 'Save version' }).click();
+  await expect(page.getByText(/Version name is required/)).toBeVisible();
+  await page.getByLabel('Version name').fill('Before second edit');
+  await page.getByRole('button', { name: 'Save version' }).click();
+  await expect(page.getByText('Before second edit', { exact: true })).toBeVisible();
+
+  await page.getByRole('tab', { name: 'Preview' }).click();
+  await primary.fill('#abcdef');
+  await primary.press('Enter');
+  await page.getByRole('tab', { name: 'Saved Themes' }).click();
+  await page.getByRole('button', { name: 'Restore' }).click();
+  await page.getByRole('tab', { name: 'Export' }).click();
+  await expect(page.locator('[data-export-preview]')).toContainText('#112233');
+  await page.getByRole('tab', { name: 'Preview' }).click();
+  await expect(primary).toHaveValue('#112233');
+  await expect(page.getByText('Unsaved', { exact: true })).toBeVisible();
+});
+
+test('recorded 1.42/6.11 failure: invalid import preserves state and valid export-import restores all fields', async ({ page }) => {
+  const primary = page.getByLabel(/primary\.main hex value/);
+  await primary.fill('#13579b');
+  await primary.press('Enter');
+  await page.getByRole('tab', { name: 'Typography' }).click();
+  await page.getByLabel('Border Radius (0–24px)').fill('17');
+  await page.getByRole('tab', { name: 'Export' }).click();
+  const preview = page.locator('[data-export-preview]');
+  const exported = await preview.innerText();
+  const box = page.getByLabel('Import ThemeOptions JSON');
+
+  const invalid = JSON.parse(exported);
+  invalid.palette.primary.main = 'red';
+  await box.fill(JSON.stringify(invalid));
+  await page.getByRole('button', { name: 'Import ThemeOptions' }).click();
+  await expect(page.getByRole('alert')).toContainText('palette.primary.main');
+  await expect(preview).toContainText('#13579b');
+
+  await page.getByRole('tab', { name: 'Preview' }).click();
+  await primary.fill('#2468ac');
+  await primary.press('Enter');
+  await page.getByRole('tab', { name: 'Typography' }).click();
+  await page.getByLabel('Border Radius (0–24px)').fill('3');
+  await page.getByRole('tab', { name: 'Export' }).click();
+  await box.fill(exported);
+  await page.getByRole('button', { name: 'Import ThemeOptions' }).click();
+  await expect(preview).toContainText('#13579b');
+  await expect(preview).toContainText('"borderRadius": 17');
+});
+
+test('recorded 1.4/2.8/1.50 failure: field-path errors and save/import statuses reach polite live output', async ({ page }) => {
+  const announcer = page.locator('[data-announcer]');
+  const primary = page.getByLabel(/primary\.main hex value/);
+  await primary.fill('not-a-hex');
+  await primary.press('Enter');
+  await expect(page.getByText(/palette\.primary\.main/)).toBeVisible();
+  await expect(announcer).toContainText('palette.primary.main');
+
+  await page.getByRole('tab', { name: 'Typography' }).click();
+  await page.getByLabel('Border Radius (0–24px)').fill('99');
+  await expect(page.getByText(/shape\.borderRadius/)).toBeVisible();
+  await expect(announcer).toContainText('shape.borderRadius');
+});
