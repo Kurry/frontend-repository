@@ -389,17 +389,6 @@ footer { max-width: 1520px; margin: 0 auto; padding: 20px 40px 32px; color: #697
 .topology-coverage .is-missing strong { color: #fddc69; }
 .topology-coverage .is-missing i { background: #f1c21b; }
 
-@media (prefers-reduced-motion: reduce) {
-  .guidance-topology,
-  .guidance-topology *,
-  .guidance-topology::before,
-  .guidance-topology *::before,
-  .guidance-topology *::after {
-    animation-duration: .001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: .001ms !important;
-  }
-}
 .topology-recommendation { grid-column: 2 / 4; display: flex; align-items: center; gap: 12px; margin-top: -7px; padding: 9px 12px; border-left: 3px solid #42beb9; background: rgb(4 17 34 / .38); }
 .topology-recommendation strong { color: #d9fbf8; font-size: 11px; font-weight: 500; }
 
@@ -419,3 +408,14 @@ footer { max-width: 1520px; margin: 0 auto; padding: 20px 40px 32px; color: #697
 @font-face { font-family: 'IBM Plex Sans'; src: local('IBM Plex Sans'), local('Helvetica Neue'), local('Arial'); font-weight: 400; font-display: swap; }
 @font-face { font-family: 'IBM Plex Sans'; src: local('IBM Plex Sans'), local('Helvetica Neue'), local('Arial'); font-weight: 600; font-display: swap; }
 @font-face { font-family: 'IBM Plex Mono'; src: local('IBM Plex Mono'), local('Menlo'), local('monospace'); font-weight: 400; font-display: swap; }
+
+@media (prefers-reduced-motion: reduce) {
+  html body *,
+  html body *::before,
+  html body *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
