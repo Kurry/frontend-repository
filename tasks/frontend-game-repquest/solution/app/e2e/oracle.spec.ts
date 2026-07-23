@@ -333,7 +333,7 @@ test.describe('issue 2297 completion contract', () => {
     await page.getByRole('button', { name: 'Reset everything' }).click();
   }
 
-  test('rapid_logging_integrity serializes 25 WebMCP logs, unlocks zone, recalculates delete, and preserves branches', async ({ page }) => {
+  test('serializes 25 WebMCP logs, unlocks zone, recalculates delete, and preserves branches rapid_logging_integrity', async ({ page }) => {
     await reset(page);
     const results = await page.evaluate(async () => {
       const invoke = (window as any).webmcp_invoke_tool;
@@ -365,7 +365,7 @@ test.describe('issue 2297 completion contract', () => {
     await expect(page.locator('[data-stat="lifetime-reps"]').first()).toHaveText('107');
   });
 
-  test('challenge_run_lifecycle_gating preserves interleaved state and proves every lifecycle state plus checkpoint', async ({ page }) => {
+  test('preserves interleaved state and proves every lifecycle state plus checkpoint challenge_run_lifecycle_gating', async ({ page }) => {
     await reset(page);
     await page.getByRole('tab', { name: 'Quest' }).click();
     await page.getByRole('button', { name: 'Challenge mode' }).click();
@@ -410,7 +410,7 @@ test.describe('issue 2297 completion contract', () => {
     await expect(page.locator('[data-celebration="confetti"]')).toBeVisible();
   });
 
-  test('daily_goal_invalid_rejected validates settings and notes, reminder attention, heatmap, hover and mobile targets', async ({ page }) => {
+  test('validates settings and notes, reminder attention, heatmap, hover and mobile targets daily_goal_invalid_rejected', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 760 });
     await reset(page);
     const goal = page.getByLabel(/Daily goal/i);
@@ -447,7 +447,7 @@ test.describe('issue 2297 completion contract', () => {
     await expect(page.locator('[data-action="delete-set"]')).toHaveCount(1);
   });
 
-  test('import_quest_log_round_trip handles JSON and CSV atomically, persists complete state, and survives blocked storage', async ({ page, browser }) => {
+  test('handles JSON and CSV atomically, persists complete state, and survives blocked storage import_quest_log_round_trip', async ({ page, browser }) => {
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
     page.on('console', msg => {
