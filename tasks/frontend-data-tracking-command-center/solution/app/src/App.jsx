@@ -456,7 +456,7 @@ function NightSchedule({ badgeRef }) {
           </div>
           <span id="night-start-validation" className="sr-only">{errors.startTime?.message || 'Start time must use 24-hour HH:MM format when the schedule is enabled.'}</span>
           <span id="night-end-validation" className="sr-only">{errors.endTime?.message || 'End time must use 24-hour HH:MM format when the schedule is enabled.'}</span>
-          <Button size="sm" type="submit">Save schedule</Button>
+          <Button size="sm" type="submit" disabled={Object.keys(errors).length > 0}>Save schedule</Button>
         </form>
         <div className="accent-row" role="group" aria-label="Chart accent color">
           <span className="accent-label">Chart accent</span>

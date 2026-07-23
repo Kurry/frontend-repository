@@ -388,7 +388,7 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible, input:focus-vis
   .app-header { padding: 10px 12px; }
   .brand-block { width: 100%; }
   .environment { margin-left: auto; }
-  .environment { width: 12px; overflow: visible; font-size: 0 !important; }
+  .environment { width: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0 !important; }
   .header-actions { display: grid; grid-template-columns: auto auto 1fr; align-items: center; }
   .header-actions > .cds--btn { min-width: 0; padding-inline: 10px; }
   .history-actions { grid-column: 2; }
@@ -449,4 +449,23 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible, input:focus-vis
   .brand-block > div span, .environment, .app-header kbd, .last-action, .night-badge, .eyebrow, .health-pill, .kpi-heading, .trend, .spark-tooltip, .spark-tooltip strong, .chart-tooltip, .panel-header p:not(.eyebrow), .agent-avatar, .agent-name, .agent-model, .agent-progress span, .agent-progress strong, .status-chip.cds--tag, .detail-meta span, .detail-meta strong, .step-indicator, .step strong, .step small, .suggestion-chip, .filter-chip, .clear-filter, .feed-description, .feed-meta, .jump-latest, .empty-state p, .modal-heading p:not(.eyebrow), .drawer-heading p:not(.eyebrow), .char-count, .export-summary span, .export-summary strong, .export-format-tab, .preview-heading, .copied-note, .palette-search kbd, .palette-footer kbd, .command-list strong, .command-list small, .command-empty, .palette-footer, .back-button, .detail-current > span:first-child, .breakdown-table, .breakdown-table th, .density-toggle, [data-density="compact"] .agent-avatar, [data-density="compact"] .feed-description, .accent-label, .summary-stamp, .summary-kpis span, .summary-kpis em, .summary-body h3, .summary-empty, .summary-schedule, .shortcut-list li, .shortcut-list kbd {
     font-size: clamp(14px, 1em, 2rem) !important;
   }
+}
+
+
+/* Night mode theme rules */
+body.theme-night,
+.theme-night {
+  background-color: #161616 !important;
+  color: #f4f4f4 !important;
+}
+body.theme-night .app-header {
+  background-color: #262626 !important;
+  border-bottom-color: #393939 !important;
+}
+body.theme-night .panel,
+body.theme-night .agent-card,
+body.theme-night .kpi-card {
+  background-color: #262626 !important;
+  border-color: #393939 !important;
+  color: #f4f4f4 !important;
 }
