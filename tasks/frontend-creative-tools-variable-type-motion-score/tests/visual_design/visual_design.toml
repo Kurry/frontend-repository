@@ -1,0 +1,26 @@
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+description = "Verify that the desktop layout presents the stage preview, timeline and curves, block and axis inspector, and multi viewport and validator rail."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+description = "On the desktop layout, inspect the timeline when multiple blocks and properties are active. Verify that overlapping curves or prominence states maintain legible hierarchy."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+description = "Trigger a validation error by exceeding an axis bound. Verify that the error copy clearly identifies the field, the rejected value or rule, and the recovery action."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+description = "While a validation error is active, correct the value. Verify that only the corresponding error clears."
+type = "binary"
+weight = 1.0

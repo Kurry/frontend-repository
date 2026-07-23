@@ -1,0 +1,38 @@
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+description = "Click play on the timeline. Verify that logical playback supports real time scrubbing, play, pause, frame step, and beat loop."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+description = "Inspect an animated transition on the timeline. Verify that the transition explicitly states its variable axis interpolation path, exact duration, and easing rule in the user interface (no vague terms like 'smooth')."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+description = "Toggle the reduced motion preference. Verify that the application switches to the static or crossfade only reduced motion score while preserving all semantic beats in reading order."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+description = "With reduced motion enabled, verify that spatial and axis animation halts beyond the declared limits, and movement is replaced by static cues such as weight, size, or underline."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+description = "While reduced motion is enabled, verify that the emphasis order in the accessibility fallback precisely matches the animated version's emphasis order."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+description = "Disable reduced motion. Verify that toggling the preference back restores the active score to use the canonical full motion keys."
+type = "binary"
+weight = 1.0

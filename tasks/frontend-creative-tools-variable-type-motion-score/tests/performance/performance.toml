@@ -1,0 +1,14 @@
+[scoring]
+aggregation = "all_pass"
+
+[[criterion]]
+id = "9.1"
+description = "Verify that when interacting with keyframes or manipulating text blocks, direct manipulation acknowledges within 100 milliseconds and linked views settle within 500 milliseconds without visual tearing or layout jumps."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.2"
+description = "Trigger a full export operation. Verify that the export completes within 2 seconds without hanging the interface or producing console errors."
+type = "binary"
+weight = 1.0

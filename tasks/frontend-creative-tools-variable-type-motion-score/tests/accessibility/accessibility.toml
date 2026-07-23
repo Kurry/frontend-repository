@@ -1,0 +1,20 @@
+[scoring]
+aggregation = "all_pass"
+
+[[criterion]]
+id = "8.1"
+description = "Using only the keyboard, move and resize a block, edit axis values, add keyframes, scrub the timeline, assign a beat, author a viewport fallback, merge a branch, and export. Verify that focus management and state match the pointer interactions completely."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.2"
+description = "Verify that the semantic emphasis choreography explicitly follows document object model focus reading order, so keyboard traversal reaches every text block in semantic reading order regardless of animation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.3"
+description = "Open a modal dialog (such as the branch comparison or export dialog). Verify that focus is trapped within the modal and returns to the opener when closed."
+type = "binary"
+weight = 1.0

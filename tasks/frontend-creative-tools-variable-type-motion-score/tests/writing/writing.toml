@@ -1,0 +1,14 @@
+[scoring]
+aggregation = "all_pass"
+
+[[criterion]]
+id = "10.1"
+description = "Trigger a layout overlap conflict and an axis bounds violation. Verify that the resulting error copy exactly names the block, property, frame, viewport, beat, value, and precise recovery action."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.2"
+description = "Review the generated Markdown motion and accessibility spec. Verify that the output accurately describes the motion cues, timing rules, and reduced motion fallbacks in professional specification writing."
+type = "binary"
+weight = 1.0

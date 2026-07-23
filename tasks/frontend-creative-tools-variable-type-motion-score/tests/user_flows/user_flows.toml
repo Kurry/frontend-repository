@@ -1,0 +1,14 @@
+[scoring]
+aggregation = "all_pass"
+
+[[criterion]]
+id = "5.1"
+description = "Complete the full authoring user flow: layout text blocks, adjust axes and add keyframes, map semantic beats, define viewport overrides, switch to reduced motion and define fallbacks, branch and merge, validate, approve, and export. Verify that all exported files and samples agree with the final approved state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.2"
+description = "Verify the import round trip user flow: edit the score layout, axes, and keyframes, export the score, reset the session to empty, and import the previously exported file. Verify the application restores exactly the same state."
+type = "binary"
+weight = 1.0

@@ -1,0 +1,74 @@
+[scoring]
+aggregation = "all_pass"
+
+[[criterion]]
+id = "1.1"
+description = "Load the app in a clean browser state. Verify that the initial state loads the 12 second fixture with six text blocks and five semantic beats but no user edits, branch history, or approval state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+description = "Drag a text block on the stage. Verify that it moves within a fixed safe area and updates the stage position."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+description = "Edit the base weight axis for a text block using the axis inspector. Verify that the axis value is clamped between 200 and 900, and updates the text appearance."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+description = "Select a block and view the timeline. Create a new keyframe for the width axis and adjust its value. Verify the interpolation curve displays the transition over time."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+description = "Drag an axis keyframe along the timeline across a semantic beat marker. Verify that the live preview, axis curves, line break map, container geometry, emphasis order, branch diff, and validation findings all update simultaneously in one transition without a page reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+description = "Attempt to drag an axis keyframe past another keyframe for the same property on the timeline. Verify that the keyframes do not reorder without an explicit confirmation dialog."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+description = "Select a semantic beat interval and change the primary emphasis to a different text block. Verify that the prominence score updates and the semantic lane reflects the new emphasis roles."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+description = "Create a viewport override for a text block's maximum lines at the tablet (768px) breakpoint. Verify that the override applies to tablet preview and updates the line break map, while desktop (1440px) remains unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+description = "Open the branch and compare view. Fork a new score branch. Verify that branching copies the full keyframe and emphasis state from the active score."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+description = "Modify a keyframe on the newly created branch, then view the branch diff. Verify that the diff highlights the per keyframe delta between the trunk and the branch without altering the trunk score."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+description = "Run the validator while an axis value is pushed beyond bounds or text overlaps illegally. Verify the validator checks the active score and blocks approval with a named reason and zero state mutation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+description = "Rapidly double click to add a keyframe at the exact same frame and beat. Verify that exactly one keyframe is produced according to the duplicate property merge rule."
+type = "binary"
+weight = 1.0
