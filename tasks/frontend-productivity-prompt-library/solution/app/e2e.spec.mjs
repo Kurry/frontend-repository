@@ -697,7 +697,7 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
     await openApp(page);
     const elapsed = await page.getByRole('button', { name: /Switch to dark theme/ }).evaluate(async (button) => {
       const start = performance.now();
-      button.click();
+      button.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       while (!document.querySelector('.app-shell--dark')) await new Promise(requestAnimationFrame);
       return performance.now() - start;
     });
@@ -715,7 +715,7 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
     await openApp(page);
     const elapsed = await page.getByRole('button', { name: 'Load 120 sample prompts' }).evaluate(async (button) => {
       const start = performance.now();
-      button.click();
+      button.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       while (!document.body.innerText.includes('136 prompts')) await new Promise(requestAnimationFrame);
       return performance.now() - start;
     });
