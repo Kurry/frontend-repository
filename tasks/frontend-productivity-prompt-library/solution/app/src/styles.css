@@ -1198,6 +1198,8 @@ button:active:not(:disabled),
 }
 
 @media (max-width: 48rem) {
+  .performance-sample-button { display: none !important; }
+
   .app-header {
     height: 4rem;
     padding: 0 1rem;

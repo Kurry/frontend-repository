@@ -1556,7 +1556,7 @@ function HeaderPreferences() {
 
   return (
     <div className="header-actions">
-      <Button type="button" kind="ghost" size="sm" onClick={addPerformanceSample}>Load 120 sample prompts</Button>
+      <Button className="performance-sample-button" type="button" kind="ghost" size="sm" onClick={addPerformanceSample}>Load 120 sample prompts</Button>
       <Button type="button" kind="ghost" size="sm" onClick={startVoiceSearch} aria-label="Start voice search">Voice</Button>
       <Select id="density-pref" labelText="Density" hideLabel value={density} onChange={(event) => setDensity(event.target.value)}>
         <SelectItem value="comfortable" text="Comfortable" />
