@@ -129,6 +129,47 @@ export async function modalFocusProbe(page: Page) {
   await expect(searchTrigger).toBeFocused()
 }
 
+export async function overlayClosePathsProbe(page: Page) {
+  await boot(page)
+
+  const exercise = async (open: () => Promise<void>, dialog: () => ReturnType<Page['getByRole']>, close: () => Promise<void>) => {
+    await open(); await expect(dialog()).toBeVisible(); await close(); await expect(dialog()).toBeHidden()
+    await open(); await expect(dialog()).toBeVisible(); await page.keyboard.press('Escape'); await expect(dialog()).toBeHidden()
+    await open(); await expect(dialog()).toBeVisible(); await page.locator('.dialog-overlay').click({ position: { x: 5, y: 5 } }); await expect(dialog()).toBeHidden()
+  }
+
+  const connectionsTrigger = page.getByRole('button', { name: 'Connections' })
+  await exercise(
+    () => connectionsTrigger.click(),
+    () => page.getByRole('dialog', { name: 'Connections' }),
+    () => page.getByRole('dialog', { name: 'Connections' }).getByRole('button', { name: 'Close Connections' }).click(),
+  )
+
+  await nav(page, 'Triage')
+  const rejectTrigger = page.locator('.triage-card[data-pr-number="52"]').getByRole('button', { name: 'Reject PR' })
+  await exercise(
+    () => rejectTrigger.click(),
+    () => page.getByRole('dialog', { name: 'Reject PR #52' }),
+    () => page.getByRole('dialog', { name: 'Reject PR #52' }).getByRole('button', { name: 'Close reject reason chooser' }).click(),
+  )
+
+  await nav(page, 'Library')
+  await page.locator('.library-row').first().click()
+  const deleteTrigger = page.getByRole('button', { name: 'Delete package' })
+  await exercise(
+    () => deleteTrigger.click(),
+    () => page.getByRole('alertdialog', { name: 'Delete this package?' }),
+    () => page.getByRole('alertdialog', { name: 'Delete this package?' }).getByRole('button', { name: 'Cancel' }).click(),
+  )
+
+  const paletteTrigger = page.getByRole('button', { name: /Search/ })
+  await exercise(
+    () => paletteTrigger.click(),
+    () => page.getByRole('dialog', { name: 'Search TaskFoundry' }),
+    () => page.getByRole('dialog', { name: 'Search TaskFoundry' }).getByRole('button', { name: 'Close search' }).click(),
+  )
+}
+
 export async function liveRegionProbe(page: Page) {
   await acceptAndRun(page, 31)
   const live = page.locator('[aria-live="assertive"]')

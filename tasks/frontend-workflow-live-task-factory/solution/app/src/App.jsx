@@ -6,6 +6,7 @@ import * as Tabs from '@radix-ui/react-tabs'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
+  IconContext,
   Archive, ArrowClockwise, ArrowLeft, ArrowRight, BracketsCurly, Check, CheckCircle,
   CircleNotch, Clock, CloudArrowDown, Code, Command, Copy, Database, DownloadSimple,
   Eye, EyeSlash, FileArrowUp, FileCode, FileText, Funnel, GithubLogo, Info, Key,
@@ -143,7 +144,7 @@ function Sidebar() {
     <aside className={cx('sidebar', open && 'open')}>
       <div className="nav-label">Workbench</div>
       <nav className="nav-list" aria-label="Primary navigation">
-        {navItems.map(({ id, label, icon: Icon }) => <button key={id} className={cx('nav-item', active === id && 'active')} aria-current={active === id ? 'page' : undefined} onClick={() => setView(id)}><Icon size={18} weight={active === id ? 'fill' : 'regular'} />{label}</button>)}
+        {navItems.map(({ id, label, icon: Icon }) => <button key={id} className={cx('nav-item', active === id && 'active')} aria-current={active === id ? 'page' : undefined} onClick={() => setView(id)}><Icon size={18} weight={active === id ? 'fill' : 'regular'} aria-hidden="true" />{label}</button>)}
       </nav>
       <div className="nav-foot"><strong>Portable by design</strong>Every completed run becomes a validated JSON bundle you can export, import, and keep.</div>
     </aside>
@@ -152,7 +153,7 @@ function Sidebar() {
 
 function ConnectionStatus({ status, connectedText }) {
   return <span className={cx('credential-status', status === 'connected' && 'connected')}>
-    {status === 'checking' ? <CircleNotch className="spinner" size={11} /> : status === 'connected' ? <CheckCircle size={11} weight="fill" /> : <span className="mode-dot" />}
+    {status === 'checking' ? <CircleNotch className="spinner" size={11} aria-hidden="true" /> : status === 'connected' ? <CheckCircle size={11} weight="fill" aria-hidden="true" /> : <span className="mode-dot" />}
     {status === 'checking' ? 'Checking' : status === 'connected' ? connectedText : 'Disconnected'}
   </span>
 }
@@ -183,34 +184,34 @@ function ConnectionsPanel() {
           </div>
 
           <section className="card credential-card">
-            <div className="credential-head"><div className="credential-name"><GithubLogo size={20} /> GitHub</div><ConnectionStatus status={store.githubStatus} connectedText={store.githubLogin ? `Connected · ${store.githubLogin}` : 'Connected'} /></div>
+            <div className="credential-head"><div className="credential-name"><GithubLogo size={20} aria-hidden="true" /> GitHub</div><ConnectionStatus status={store.githubStatus} connectedText={store.githubLogin ? `Connected · ${store.githubLogin}` : 'Connected'} /></div>
             <form className="credential-form" onSubmit={submitGithub} noValidate>
-              <label className="field">
+              <label className="field" htmlFor="githubToken">
                 <span className="field-label">GitHub token</span>
-                <span className="input-wrap"><input className={cx('input', gh.formState.errors.githubToken && 'error')} type={showGithub ? 'text' : 'password'} autoComplete="off" aria-invalid={!!gh.formState.errors.githubToken} aria-describedby="github-token-error" {...gh.register('githubToken')} /><button type="button" className="field-toggle" onClick={() => setShowGithub((value) => !value)} aria-label={showGithub ? 'Hide GitHub token' : 'Show GitHub token'}>{showGithub ? <EyeSlash size={16} /> : <Eye size={16} />}</button></span>
+                <span className="input-wrap"><input id="githubToken" className={cx('input', gh.formState.errors.githubToken && 'error')} type={showGithub ? 'text' : 'password'} autoComplete="off" aria-invalid={!!gh.formState.errors.githubToken} aria-describedby="github-token-error" {...gh.register('githubToken')} /><button type="button" className="field-toggle" onClick={() => setShowGithub((value) => !value)} aria-label={showGithub ? 'Hide GitHub token' : 'Show GitHub token'}>{showGithub ? <EyeSlash size={16} /> : <Eye size={16} />}</button></span>
                 {gh.formState.errors.githubToken && <span id="github-token-error" className="field-error">{gh.formState.errors.githubToken.message}</span>}
               </label>
-              {store.githubError && <div className="notice error"><Warning size={15} /> <span>{store.githubError}. Check the token and try again; demo data is still available.</span></div>}
-              <div className="credential-actions">{store.githubStatus === 'connected' ? <Button type="button" variant="danger" onClick={() => { store.disconnectGithub(); gh.reset() }}>Disconnect GitHub</Button> : <Button type="submit" variant="primary" disabled={store.githubStatus === 'checking'}>{store.githubStatus === 'checking' ? <CircleNotch className="spinner" size={14} /> : <PlugsConnected size={14} />} Connect GitHub</Button>}</div>
+              {store.githubError && <div className="notice error"><Warning size={15} aria-hidden="true" /> <span>{store.githubError}. Check the token and try again; demo data is still available.</span></div>}
+              <div className="credential-actions">{store.githubStatus === 'connected' ? <Button type="button" variant="danger" onClick={() => { store.disconnectGithub(); gh.reset() }}>Disconnect GitHub</Button> : <Button type="submit" variant="primary" disabled={store.githubStatus === 'checking'}>{store.githubStatus === 'checking' ? <CircleNotch className="spinner" size={14} aria-hidden="true" /> : <PlugsConnected size={14} aria-hidden="true" />} Connect GitHub</Button>}</div>
             </form>
           </section>
 
           <section className="card credential-card">
-            <div className="credential-head"><div className="credential-name"><Robot size={20} /> AI endpoint</div><ConnectionStatus status={store.aiStatus} connectedText="Connected" /></div>
+            <div className="credential-head"><div className="credential-name"><Robot size={20} aria-hidden="true" /> AI endpoint</div><ConnectionStatus status={store.aiStatus} connectedText="Connected" /></div>
             <form className="credential-form" onSubmit={submitAI} noValidate>
-              <label className="field"><span className="field-label">AI base URL</span><input className={cx('input', ai.formState.errors.aiBaseUrl && 'error')} type="url" aria-invalid={!!ai.formState.errors.aiBaseUrl} aria-describedby="ai-url-error" {...ai.register('aiBaseUrl')} />{ai.formState.errors.aiBaseUrl && <span id="ai-url-error" className="field-error">{ai.formState.errors.aiBaseUrl.message}</span>}</label>
-              <label className="field">
+              <label className="field" htmlFor="aiBaseUrl"><span className="field-label">AI base URL</span><input id="aiBaseUrl" className={cx('input', ai.formState.errors.aiBaseUrl && 'error')} type="url" aria-invalid={!!ai.formState.errors.aiBaseUrl} aria-describedby="ai-url-error" {...ai.register('aiBaseUrl')} />{ai.formState.errors.aiBaseUrl && <span id="ai-url-error" className="field-error">{ai.formState.errors.aiBaseUrl.message}</span>}</label>
+              <label className="field" htmlFor="aiApiKey">
                 <span className="field-label">AI API key</span>
-                <span className="input-wrap"><input className={cx('input', ai.formState.errors.aiApiKey && 'error')} type={showAI ? 'text' : 'password'} autoComplete="off" aria-invalid={!!ai.formState.errors.aiApiKey} aria-describedby="ai-key-error" {...ai.register('aiApiKey')} /><button type="button" className="field-toggle" onClick={() => setShowAI((value) => !value)} aria-label={showAI ? 'Hide AI API key' : 'Show AI API key'}>{showAI ? <EyeSlash size={16} /> : <Eye size={16} />}</button></span>
+                <span className="input-wrap"><input id="aiApiKey" className={cx('input', ai.formState.errors.aiApiKey && 'error')} type={showAI ? 'text' : 'password'} autoComplete="off" aria-invalid={!!ai.formState.errors.aiApiKey} aria-describedby="ai-key-error" {...ai.register('aiApiKey')} /><button type="button" className="field-toggle" onClick={() => setShowAI((value) => !value)} aria-label={showAI ? 'Hide AI API key' : 'Show AI API key'}>{showAI ? <EyeSlash size={16} /> : <Eye size={16} />}</button></span>
                 {ai.formState.errors.aiApiKey && <span id="ai-key-error" className="field-error">{ai.formState.errors.aiApiKey.message}</span>}
               </label>
-              {store.aiError && <div className="notice error"><Warning size={15} /> <span>{store.aiError}. Check the URL and key; deterministic demo generation remains active.</span></div>}
-              <div className="credential-actions">{store.aiStatus === 'connected' ? <Button type="button" variant="danger" onClick={() => { store.disconnectAI(); ai.setValue('aiApiKey', '') }}>Disconnect AI</Button> : <Button type="submit" variant="primary" disabled={store.aiStatus === 'checking'}>{store.aiStatus === 'checking' ? <CircleNotch className="spinner" size={14} /> : <PlugsConnected size={14} />} Connect AI</Button>}</div>
+              {store.aiError && <div className="notice error"><Warning size={15} aria-hidden="true" /> <span>{store.aiError}. Check the URL and key; deterministic demo generation remains active.</span></div>}
+              <div className="credential-actions">{store.aiStatus === 'connected' ? <Button type="button" variant="danger" onClick={() => { store.disconnectAI(); ai.setValue('aiApiKey', '') }}>Disconnect AI</Button> : <Button type="submit" variant="primary" disabled={store.aiStatus === 'checking'}>{store.aiStatus === 'checking' ? <CircleNotch className="spinner" size={14} aria-hidden="true" /> : <PlugsConnected size={14} aria-hidden="true" />} Connect AI</Button>}</div>
             </form>
           </section>
 
           <section className="card card-pad" style={{ marginTop: 15 }}>
-            <div className="credential-head"><div><div className="credential-name"><Sparkle size={18} /> Coachmarks</div><p className="field-help" style={{ marginTop: 5 }}>Restore the first-run tips across Connections, Triage, and Runs.</p></div><Button variant="outline" size="sm" onClick={() => { store.resetCoachmarks(); store.toast('Tips reset', 'All three coachmarks are visible again.') }}><ArrowClockwise size={13} /> Reset tips</Button></div>
+            <div className="credential-head"><div><div className="credential-name"><Sparkle size={18} /> Coachmarks</div><p className="field-help" style={{ marginTop: 5 }}>Restore the first-run tips across Connections, Triage, and Runs.</p></div><Button variant="outline" size="sm" onClick={() => { store.resetCoachmarks(); store.toast('Tips reset', 'All three coachmarks are visible again.') }}><ArrowClockwise size={13} aria-hidden="true" /> Reset tips</Button></div>
           </section>
           </FocusTrap>
         </Dialog.Content>
@@ -223,8 +224,55 @@ function ActiveChips({ filters, clear, setFilter }) {
   const chips = []
   if (filters.min != null || filters.max != null) chips.push({ key: 'range', label: `Source files ${filters.min ?? 'any'}–${filters.max ?? 'any'}`, remove: () => setFilter({ min: null, max: null }) })
   if (filters.requireIssue) chips.push({ key: 'issue', label: 'Linked issue required', remove: () => setFilter({ requireIssue: false }) })
-  if (!chips.length) return null
-  return <div className="chip-row" aria-label="Active filters">{chips.map((chip) => <span className="chip" key={chip.key}>{chip.label}<button onClick={chip.remove} aria-label={`Remove ${chip.label} filter`}><X size={11} /></button></span>)}<Button variant="ghost" size="sm" onClick={clear}>Clear all</Button></div>
+  const [leaving, setLeaving] = useState([])
+  const prevRef = useRef(chips)
+  useEffect(() => {
+    const previous = prevRef.current
+    const gone = previous.filter((chip) => !chips.some((next) => next.key === chip.key))
+    prevRef.current = chips
+    if (!gone.length) return undefined
+    setLeaving((current) => [...current.filter((chip) => !gone.some((entry) => entry.key === chip.key)), ...gone])
+    const timer = setTimeout(() => setLeaving((current) => current.filter((chip) => !gone.some((entry) => entry.key === chip.key))), 220)
+    return () => clearTimeout(timer)
+  })
+  const exiting = leaving.filter((chip) => !chips.some((current) => current.key === chip.key))
+  if (!chips.length && !exiting.length) return null
+  return <div className="chip-row" aria-label="Active filters">
+    {chips.map((chip) => <span className="chip" key={chip.key}>{chip.label}<button onClick={chip.remove} aria-label={`Remove ${chip.label} filter`}><X size={11} aria-hidden="true" /></button></span>)}
+    {exiting.map((chip) => <span className="chip chip-leaving" key={`leaving-${chip.key}`} aria-hidden="true">{chip.label}</span>)}
+    {chips.length > 0 && <Button variant="ghost" size="sm" onClick={clear}>Clear all</Button>}
+  </div>
+}
+
+const tourSteps = [
+  { title: 'Work demo-first, connect when ready', body: 'Every repository, pull request, and package on screen is seeded fixture data, so the whole factory is explorable immediately. Open Connections in the top bar whenever you want to add a GitHub token or AI endpoint — the same controls switch to live data without losing your work.' },
+  { title: 'Shape the queue on the Triage board', body: 'Accept strong candidates or reject with a precise, bounded reason. Every move updates the board totals instantly and stays reversible, and keyboard users can focus a card and press A to accept or R to reject.' },
+  { title: 'Run the pipeline, keep the package', body: 'Start a run from any accepted PR and watch Fetch, Evaluate, Generate, and Package stream to completion — pause, inspect the event timeline, or retry a failed stage along the way. Finished bundles land in the Library, ready to export, re-import, and compare.' },
+]
+
+function GuidedTour() {
+  const done = useAppStore((state) => state.onboardingDone)
+  const complete = useAppStore((state) => state.completeOnboarding)
+  const [step, setStep] = useState(0)
+  if (done) return null
+  const last = step === tourSteps.length - 1
+  return <section className="card tour-card" aria-label="Guided first-run tour">
+    <div className="tour-head">
+      <div className="eyebrow"><Sparkle size={12} aria-hidden="true" /> First-run tour · step {step + 1} of {tourSteps.length}</div>
+      <Button variant="ghost" size="sm" onClick={complete}>Skip tour</Button>
+    </div>
+    <h2 className="section-title">{tourSteps[step].title}</h2>
+    <p className="tour-body">{tourSteps[step].body}</p>
+    <div className="tour-foot">
+      <div className="tour-dots" aria-hidden="true">{tourSteps.map((_, index) => <span key={index} className={cx('tour-dot', index === step && 'active')} />)}</div>
+      <div className="tour-actions">
+        {step > 0 && <Button variant="ghost" size="sm" onClick={() => setStep(step - 1)}>Back</Button>}
+        {last
+          ? <Button variant="primary" size="sm" onClick={complete}>Finish tour</Button>
+          : <Button variant="primary" size="sm" onClick={() => setStep(step + 1)}>Next</Button>}
+      </div>
+    </div>
+  </section>
 }
 
 function AddRepositoryForm() {
@@ -238,21 +286,34 @@ function AddRepositoryForm() {
   })
   return <form onSubmit={submit} noValidate>
     <div className="inline-form">
-      <label className="field"><span className="field-label">Repository</span><input className={cx('input', form.formState.errors.repository && 'error')} aria-invalid={!!form.formState.errors.repository} aria-describedby="repository-error" {...form.register('repository')} />{form.formState.errors.repository && <span id="repository-error" className="field-error">repository: {form.formState.errors.repository.message}</span>}</label>
-      <Button type="submit" variant="primary"><Plus size={14} /> Add repository</Button>
+      <label className="field" htmlFor="repository"><span className="field-label">Repository</span><input id="repository" className={cx('input', form.formState.errors.repository && 'error')} aria-invalid={!!form.formState.errors.repository} aria-describedby="repository-error" {...form.register('repository')} />{form.formState.errors.repository && <span id="repository-error" className="field-error">repository: {form.formState.errors.repository.message}</span>}</label>
+      <Button type="submit" variant="primary"><Plus size={14} aria-hidden="true" /> Add repository</Button>
     </div>
-    {notice && <div className={cx('notice', notice.includes('added') && 'success')} style={{ marginTop: 9 }}><Info size={14} /><span>{notice}</span></div>}
+    {notice && <div className={cx('notice', notice.includes('added') && 'success')} style={{ marginTop: 9 }}><Info size={14} aria-hidden="true" /><span>{notice}</span></div>}
   </form>
+}
+
+function DiffstatBar({ additions, deletions, max }) {
+  const total = additions + deletions
+  const width = max > 0 ? Math.max(8, Math.round((total / max) * 100)) : 0
+  const addShare = total > 0 ? (additions / total) * 100 : 0
+  return <span className="diffstat" role="img" aria-label={`${additions} additions and ${deletions} deletions`}>
+    <span className="diffstat-track" style={{ width: `${width}%` }}><span className="diffstat-add" style={{ width: `${addShare}%` }} /><span className="diffstat-del" style={{ width: `${100 - addShare}%` }} /></span>
+  </span>
 }
 
 function PrDetail({ repo, pr }) {
   const sources = sourceFiles(pr)
+  const totalAdditions = pr.files.reduce((sum, file) => sum + file.additions, 0)
+  const totalDeletions = pr.files.reduce((sum, file) => sum + file.deletions, 0)
+  const maxChange = Math.max(...pr.files.map((file) => file.additions + file.deletions), 1)
+  const addShare = totalAdditions + totalDeletions > 0 ? (totalAdditions / (totalAdditions + totalDeletions)) * 100 : 0
   return <div className="detail">
-    <div className="detail-top"><div><div className="eyebrow"><GithubLogo size={12} /> Pull request #{pr.number}</div><h3 className="section-title">{pr.title}</h3></div><span className={cx('difficulty', `difficulty-${sources.length >= 3 && sources.length <= 10 ? difficultyFor(sources.length) : 'hard'}`)}>{sources.length} source files</span></div>
+    <div className="detail-top"><div><div className="eyebrow"><GithubLogo size={12} aria-hidden="true" /> Pull request #{pr.number}</div><h3 className="section-title">{pr.title}</h3></div><span className={cx('difficulty', `difficulty-${sources.length >= 3 && sources.length <= 10 ? difficultyFor(sources.length) : 'hard'}`)}>{sources.length} source files</span></div>
     <p className="detail-body">{pr.body}</p>
-    {pr.linkedIssue ? <div className="issue-card"><LinkSimple size={17} /><div><strong>Linked issue #{pr.linkedIssue.number}</strong><div className="subtle" style={{ marginTop: 2 }}>{pr.linkedIssue.title}</div></div></div> : <div className="notice"><Warning size={15} /><span><strong>No linked issue.</strong> This PR only carries context from its title and body.</span></div>}
-    <div className="list-head" style={{ marginTop: 17 }}><div><h4 className="section-title">Changed files</h4><div className="subtle tiny" style={{ marginTop: 3 }}>{pr.files.length} changed · {sources.length} non-test source</div></div></div>
-    <div className="table-wrap"><table><thead><tr><th>Filename</th><th>Additions</th><th>Deletions</th></tr></thead><tbody>{pr.files.map((file) => <tr key={file.filename}><td className="file-name">{file.filename}{isTestFile(file.filename) && <span className="test-badge">Test file</span>}</td><td className="additions">+{file.additions}</td><td className="deletions">−{file.deletions}</td></tr>)}</tbody></table></div>
+    {pr.linkedIssue ? <div className="issue-card"><LinkSimple size={17} aria-hidden="true" /><div><strong>Linked issue #{pr.linkedIssue.number}</strong><div className="subtle" style={{ marginTop: 2 }}>{pr.linkedIssue.title}</div></div></div> : <div className="notice"><Warning size={15} aria-hidden="true" /><span><strong>No linked issue.</strong> This PR only carries context from its title and body.</span></div>}
+    <div className="list-head" style={{ marginTop: 17 }}><div><h4 className="section-title">Changed files</h4><div className="subtle tiny" style={{ marginTop: 3 }}>{pr.files.length} changed · {sources.length} non-test source</div></div><div className="diff-summary" aria-label={`${totalAdditions} total additions and ${totalDeletions} total deletions`}><span className="additions">+{totalAdditions}</span><span className="deletions">−{totalDeletions}</span><span className="diff-summary-track"><span className="diffstat-add" style={{ width: `${addShare}%` }} /><span className="diffstat-del" style={{ width: `${100 - addShare}%` }} /></span></div></div>
+    <div className="table-wrap"><table><thead><tr><th>Filename</th><th>Additions</th><th>Deletions</th><th>Change profile</th></tr></thead><tbody>{pr.files.map((file) => <tr key={file.filename}><td className="file-name">{file.filename}{isTestFile(file.filename) && <span className="test-badge">Test file</span>}</td><td className="additions">+{file.additions}</td><td className="deletions">−{file.deletions}</td><td className="diffstat-cell"><DiffstatBar additions={file.additions} deletions={file.deletions} max={maxChange} /></td></tr>)}</tbody></table></div>
   </div>
 }
 
@@ -275,11 +336,12 @@ function CandidatesView() {
   const loaded = filtered.slice(0, loadedCounts[repo.name] || 5)
   const detailPr = repo.prs.find((pr) => pr.number === selectedPr)
   return <div className="view">
-    <div className="page-head"><div><div className="eyebrow"><Sparkle size={12} /> Candidate discovery</div><h1 className="page-title">Find the right merged change.</h1><p className="page-description">Review real pull request shape, separate tests from source, and narrow the queue before triage.</p></div><div style={{ minWidth: 330, maxWidth: 470, width: '100%' }}><AddRepositoryForm /></div></div>
+    <div className="page-head"><div><div className="eyebrow"><Sparkle size={12} aria-hidden="true" /> Candidate discovery</div><h1 className="page-title">Find the right merged change.</h1><p className="page-description">Review real pull request shape, separate tests from source, and narrow the queue before triage.</p></div><div style={{ minWidth: 330, maxWidth: 470, width: '100%' }}><AddRepositoryForm /></div></div>
+    <GuidedTour />
     <div className="candidate-grid">
-      <section className="card card-pad repo-panel"><div className="list-head"><div><h2 className="section-title">Repositories</h2><div className="subtle tiny" style={{ marginTop: 3 }}>{repositories.length} workspaces</div></div><Database size={19} className="subtle" /></div><div className="repo-list">{repositories.map((item) => <button className={cx('repo-row', item.name === repo.name && 'active')} key={item.name} onClick={() => selectRepo(item.name)}><div className="repo-row-top"><span className="repo-name">{item.name}</span><ArrowRight size={13} /></div><div className="repo-desc">{item.description}</div><div className="meta-line"><span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><span className="language-dot" />{item.language}</span><span>{item.prs.length} merged PRs</span></div></button>)}</div></section>
+      <section className="card card-pad repo-panel"><div className="list-head"><div><h2 className="section-title">Repositories</h2><div className="subtle tiny" style={{ marginTop: 3 }}>{repositories.length} workspaces</div></div><Database size={19} className="subtle" /></div><div className="repo-list">{repositories.map((item) => <button className={cx('repo-row', item.name === repo.name && 'active')} key={item.name} onClick={() => selectRepo(item.name)}><div className="repo-row-top"><span className="repo-name">{item.name}</span><ArrowRight size={13} aria-hidden="true" /></div><div className="repo-desc">{item.description}</div><div className="meta-line"><span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><span className="language-dot" />{item.language}</span><span>{item.prs.length} merged PRs</span></div></button>)}</div></section>
       <section className="card card-pad">
-        <div className="list-head"><div><div className="eyebrow" style={{ marginBottom: 4 }}>{repo.language} repository</div><h2 className="section-title">{repo.name}</h2></div><span className="connection-chip"><GithubLogo size={13} /> {repo.prs.length} merged</span></div>
+        <div className="list-head"><div><div className="eyebrow" style={{ marginBottom: 4 }}>{repo.language} repository</div><h2 className="section-title">{repo.name}</h2></div><span className="connection-chip"><GithubLogo size={13} aria-hidden="true" /> {repo.prs.length} merged</span></div>
         <div className="filter-row">
           <label className="field number-field"><span className="field-label">Min files</span><input className="input" type="number" min="0" max="99" value={filters.min ?? ''} onChange={(event) => setFilters({ min: event.target.value === '' ? null : Number(event.target.value) })} /></label>
           <label className="field number-field"><span className="field-label">Max files</span><input className="input" type="number" min="0" max="99" value={filters.max ?? ''} onChange={(event) => setFilters({ max: event.target.value === '' ? null : Number(event.target.value) })} /></label>
@@ -319,15 +381,15 @@ function TriageCard({ item, column }) {
     const result = startRun(item.repo, item.pr.number)
     if (!result.ok) toast('Pipeline blocked', result.error)
   }
-  return <article className="triage-card" data-repo={item.repo} data-pr-number={item.pr.number}>
+  return <article className="triage-card" tabIndex={0} data-repo={item.repo} data-pr-number={item.pr.number}>
     <div className="triage-card-meta"><span className="mono">{item.repo.split('/')[1]} · #{item.pr.number}</span><span>{sourceCount(item.pr)} source files</span></div>
     <h3 className="triage-card-title">{item.pr.title}</h3>
     <div className="triage-card-meta"><span>{item.language}</span><span>{item.pr.linkedIssue ? `Issue #${item.pr.linkedIssue.number}` : 'No linked issue'}</span></div>
     {placement?.reason && <div style={{ marginTop: 8 }}><ReasonBadge reason={placement.reason} /></div>}
     <div className="triage-actions">
-      {column === 'inbox' && <><Button variant="primary" size="sm" onClick={() => triage(item.repo, item.pr.number, 'accepted')}><Check size={13} /> Accept</Button><RejectDialog repo={item.repo} pr={item.pr} /></>}
-      {column === 'accepted' && <><Button variant="primary" size="sm" onClick={launch}><Play size={13} /> Run pipeline</Button><Button variant={queued ? 'primary' : 'ghost'} size="sm" onClick={() => toggleQueue(item.repo, item.pr.number)}><Queue size={13} /> {queued ? 'Queued' : 'Queue'}</Button></>}
-      {column === 'rejected' && <Button variant="ghost" size="sm" onClick={() => triage(item.repo, item.pr.number, 'accepted')}><ArrowClockwise size={13} /> Accept instead</Button>}
+      {column === 'inbox' && <><Button variant="primary" size="sm" title="Keyboard shortcut: A" onClick={() => triage(item.repo, item.pr.number, 'accepted')}><Check size={13} aria-hidden="true" /> Accept</Button><RejectDialog repo={item.repo} pr={item.pr} /></>}
+      {column === 'accepted' && <><Button variant="primary" size="sm" onClick={launch}><Play size={13} aria-hidden="true" /> Run pipeline</Button><Button variant={queued ? 'primary' : 'ghost'} size="sm" onClick={() => toggleQueue(item.repo, item.pr.number)}><Queue size={13} aria-hidden="true" /> {queued ? 'Queued' : 'Queue'}</Button></>}
+      {column === 'rejected' && <Button variant="ghost" size="sm" onClick={() => triage(item.repo, item.pr.number, 'accepted')}><ArrowClockwise size={13} aria-hidden="true" /> Accept instead</Button>}
     </div>
   </article>
 }
@@ -338,16 +400,18 @@ function TriageView() {
   const stats = useMemo(() => selectTriageStats({ triage }), [triage])
   const rejectFilter = useAppStore((state) => state.rejectedFilter)
   const setRejectFilter = useAppStore((state) => state.setRejectedFilter)
+  const undoAction = useAppStore((state) => state.undoAction)
+  const undoTriage = useAppStore((state) => state.undoTriage)
   const candidates = repositories.flatMap((repo) => repo.prs.map((pr) => ({ repo: repo.name, language: repo.language, pr })))
   const columns = ['inbox', 'accepted', 'rejected']
   return <div className="view">
-    <div className="page-head"><div><div className="eyebrow"><SquaresFour size={12} /> Decision board</div><h1 className="page-title">Shape the evaluation queue.</h1><p className="page-description">Accept strong candidates, reject with a bounded reason, and undo the last move without losing context.</p></div></div>
+    <div className="page-head"><div><div className="eyebrow"><SquaresFour size={12} aria-hidden="true" /> Decision board</div><h1 className="page-title">Shape the evaluation queue.</h1><p className="page-description">Accept strong candidates, reject with a bounded reason, and undo the last move without losing context.</p></div>{undoAction && <Button variant="outline" onClick={undoTriage}><ArrowClockwise size={13} aria-hidden="true" /> Restore last triage move</Button>}</div>
     <Coachmark kind="triage" title="Triage is reversible" className="coachmark-inline">Move a card to Accepted or choose a precise reject reason. The toast’s Undo restores both the card and every total.</Coachmark>
     <div className="stats-grid"><div className="card stat-card"><div className="stat-label">Candidates</div><div className="stat-value">{stats.total}</div></div><div className="card stat-card"><div className="stat-label">Accepted</div><div className="stat-value">{stats.accepted}</div></div><div className="card stat-card"><div className="stat-label">Rejected</div><div className="stat-value">{stats.rejected}</div></div><div className="card stat-card"><div className="stat-label">Rejected breakdown</div><div className="reason-row">{rejectReasons.map((reason) => <ReasonBadge key={reason} reason={reason} count={stats.reasons[reason]} />)}</div></div></div>
     <div className="board">{columns.map((column) => {
       let items = candidates.filter((item) => (triage[cardId(item.repo, item.pr.number)]?.column || 'inbox') === column)
       if (column === 'rejected' && rejectFilter !== 'all') items = items.filter((item) => triage[cardId(item.repo, item.pr.number)]?.reason === rejectFilter)
-      return <section className="board-column" key={column}><div className="column-head"><div className="column-name">{column === 'inbox' ? <Rows size={15} aria-hidden /> : column === 'accepted' ? <CheckCircle size={15} aria-hidden /> : <XCircle size={15} aria-hidden />}{column[0].toUpperCase() + column.slice(1)} <span className="count-badge">{items.length}</span></div>{column === 'rejected' && <div className="reject-filter-row" role="group" aria-label="Filter rejected cards by reason"><button type="button" className={cx('reject-filter-btn', rejectFilter === 'all' && 'active')} onClick={() => setRejectFilter('all')}><span className={cx('reason-badge', 'reason-docs-only')}>All reasons</span></button>{rejectReasons.map((reason) => <button type="button" key={reason} className={cx('reject-filter-btn', rejectFilter === reason && 'active')} onClick={() => setRejectFilter(reason)} aria-label={`Filter ${titleReason(reason)}`}><ReasonBadge reason={reason} /></button>)}</div>}</div><div className="triage-list">{items.map((item) => <TriageCard key={cardId(item.repo, item.pr.number)} item={item} column={column} />)}{!items.length && <div className="empty-state" style={{ padding: 22 }}><p>{column === 'rejected' && rejectFilter !== 'all' ? `No cards rejected for ${titleReason(rejectFilter)}. Accept candidates from Inbox or change the reason filter.` : column === 'rejected' ? 'No cards in rejected. Reject candidates from Inbox with a precise reason to populate this column.' : column === 'accepted' ? 'No cards in accepted. Accept strong candidates from Inbox to queue pipeline runs.' : 'No cards in inbox. Every seeded pull request starts here before triage.'}</p></div>}</div></section>
+      return <section className="board-column" key={column}><div className="column-head"><h2 className="column-name">{column === 'inbox' ? <Rows size={15} aria-hidden /> : column === 'accepted' ? <CheckCircle size={15} aria-hidden /> : <XCircle size={15} aria-hidden />}{column[0].toUpperCase() + column.slice(1)} <span className="count-badge">{items.length}</span></h2>{column === 'rejected' && <div className="reject-filter-row" role="group" aria-label="Filter rejected cards by reason"><button type="button" className={cx('reject-filter-btn', rejectFilter === 'all' && 'active')} onClick={() => setRejectFilter('all')}><span className={cx('reason-badge', 'reason-docs-only')}>All reasons</span></button>{rejectReasons.map((reason) => <button type="button" key={reason} className={cx('reject-filter-btn', rejectFilter === reason && 'active')} onClick={() => setRejectFilter(reason)} aria-label={`Filter ${titleReason(reason)}`}><ReasonBadge reason={reason} /></button>)}</div>}</div><div className="triage-list">{items.map((item) => <TriageCard key={cardId(item.repo, item.pr.number)} item={item} column={column} />)}{!items.length && <div className="empty-state" style={{ padding: 22 }}><p>{column === 'rejected' && rejectFilter !== 'all' ? `No cards rejected for ${titleReason(rejectFilter)}. Accept candidates from Inbox or change the reason filter.` : column === 'rejected' ? 'No cards in rejected. Reject candidates from Inbox with a precise reason to populate this column.' : column === 'accepted' ? 'No cards in accepted. Accept strong candidates from Inbox to queue pipeline runs.' : 'No cards in inbox. Every seeded pull request starts here before triage.'}</p></div>}</div></section>
     })}</div>
   </div>
 }
@@ -402,7 +466,7 @@ function PackageViewer({ bundle, onBack, showReexport = false }) {
 
 function StageOutput({ stage, run }) {
   if (stage.id === 'fetch' && stage.output) return <div className="fetch-grid"><div className="fetch-item"><strong>Title</strong>{stage.output.title}</div><div className="fetch-item"><strong>Linked issue</strong>{stage.output.issue ? `#${stage.output.issue.number} · ${stage.output.issue.title}` : 'No linked issue'}</div><div className="fetch-item"><strong>Base commit</strong><span className="mono">{stage.output.baseSha}</span></div><div className="fetch-item"><strong>Source files fed forward</strong>{stage.output.sourceFiles.join(', ') || 'None'}</div></div>
-  if (stage.id === 'evaluate') return <><div className="stream-block">{stage.output || (stage.status === 'pending' ? 'Waiting for Fetch to complete.' : '')}{stage.status === 'running' && <span className="stream-cursor" aria-label="Streaming" />}</div>{stage.verdict && <div className={cx('verdict', stage.verdict)}>{stage.verdict === 'substantial' ? <CheckCircle size={18} weight="fill" /> : <Warning size={18} weight="fill" />}<div><strong>{stage.verdict[0].toUpperCase() + stage.verdict.slice(1)} verdict</strong><div style={{ marginTop: 2 }}>{stage.reason}</div>{stage.verdict === 'trivial' && <div style={{ marginTop: 4 }}><strong>Run ended after Evaluate. No package was created.</strong></div>}</div></div>}</>
+  if (stage.id === 'evaluate') return <><div className="stream-block">{stage.output || (stage.status === 'pending' ? 'Waiting for Fetch to complete.' : '')}{stage.status === 'running' && <span className="stream-cursor" aria-label="Streaming" />}</div>{stage.verdict && <div className={cx('verdict', stage.verdict)}>{stage.verdict === 'substantial' ? <CheckCircle size={18} weight="fill" aria-hidden="true" /> : <Warning size={18} weight="fill" aria-hidden="true" />}<div><strong>{stage.verdict[0].toUpperCase() + stage.verdict.slice(1)} verdict</strong><div style={{ marginTop: 2 }}>{stage.reason}</div>{stage.verdict === 'trivial' && <div style={{ marginTop: 4 }}><strong>Run ended after Evaluate. No package was created.</strong></div>}</div></div>}</>
   if (stage.id === 'generate') return <div className="stream-block">{stage.output || (stage.status === 'pending' ? 'Waiting for a substantial verdict.' : '')}{stage.status === 'running' && <span className="stream-cursor" aria-label="Streaming" />}</div>
   if (stage.id === 'package' && stage.output) return <PackageViewer bundle={stage.output} />
   return null
@@ -412,8 +476,8 @@ function StageCard({ stage, run }) {
   const retry = useAppStore((state) => state.retryStage)
   const highlighted = useAppStore((state) => state.highlightedStage)
   return <section id={`stage-${stage.id}`} className={cx('stage-card', highlighted === stage.id && 'highlighted')}>
-    <div className="stage-head"><div className={cx('stage-icon', `status-${stage.status}`)}>{stage.id === 'fetch' ? <CloudArrowDown size={16} /> : stage.id === 'evaluate' ? <ListChecks size={16} /> : stage.id === 'generate' ? <FileText size={16} /> : <Package size={16} />}</div><div><div className="stage-title">{stage.label}</div><div className="stage-time">{stage.startedAt ? `Started ${formatTime(stage.startedAt)}` : 'Not started'}{stage.completedAt ? ` · finished ${formatTime(stage.completedAt)}` : ''}</div></div><StatusBadge status={stage.status} attempt={stage.attempt} maxAttempts={stage.maxAttempts} /></div>
-    {(stage.status !== 'pending' || stage.output) && <div className="stage-output">{stage.status === 'retrying' && <div className="notice" style={{ marginBottom: 9 }}><Clock size={15} /><span><strong>{stage.error?.status} {stage.error?.message}</strong><br />Reset in {stage.countdown ?? 0}s · attempt {stage.attempt} of {stage.maxAttempts}</span></div>}{stage.status === 'failed' && <div className="error-block" style={{ marginBottom: 9 }}><strong>{stage.error?.status}: {stage.error?.message}</strong><div style={{ marginTop: 8 }}><Button variant="danger" size="sm" onClick={retry}><ArrowClockwise size={12} /> Retry {stage.label}</Button></div></div>}<StageOutput stage={stage} run={run} /></div>}
+    <div className="stage-head"><div className={cx('stage-icon', `status-${stage.status}`)}>{stage.id === 'fetch' ? <CloudArrowDown size={16} /> : stage.id === 'evaluate' ? <ListChecks size={16} aria-hidden="true" /> : stage.id === 'generate' ? <FileText size={16} /> : <Package size={16} aria-hidden="true" />}</div><div><div className="stage-title">{stage.label}</div><div className="stage-time">{stage.startedAt ? `Started ${formatTime(stage.startedAt)}` : 'Not started'}{stage.completedAt ? ` · finished ${formatTime(stage.completedAt)}` : ''}</div></div><StatusBadge status={stage.status} attempt={stage.attempt} maxAttempts={stage.maxAttempts} /></div>
+    {(stage.status !== 'pending' || stage.output) && <div className="stage-output">{stage.status === 'retrying' && <div className="notice" style={{ marginBottom: 9 }}><Clock size={15} /><span><strong>{stage.error?.status} {stage.error?.message}</strong><br />Reset in {stage.countdown ?? 0}s · attempt {stage.attempt} of {stage.maxAttempts}</span></div>}{stage.status === 'failed' && <div className="error-block" style={{ marginBottom: 9 }}><strong>{stage.error?.status}: {stage.error?.message}</strong><div style={{ marginTop: 8 }}><Button variant="danger" size="sm" onClick={retry}><ArrowClockwise size={12} aria-hidden="true" /> Retry {stage.label}</Button></div></div>}<StageOutput stage={stage} run={run} /></div>}
   </section>
 }
 
@@ -425,6 +489,44 @@ function Timeline({ run }) {
   return <aside className="card timeline"><div className="list-head"><div><h3 className="section-title">Event timeline</h3><div className="subtle tiny" style={{ marginTop: 3 }}>{run.timeline.length} stage transitions</div></div><Clock size={17} /></div><label className="field" style={{ marginTop: 11 }}><span className="field-label">Filter by status</span><select className="select" value={filter} onChange={(event) => setFilter(event.target.value)}><option value="all">All statuses</option><option value="running">Running</option><option value="retrying">Retrying</option><option value="complete">Complete</option><option value="failed">Failed</option></select></label><div className="timeline-list">{items.map((item) => <button key={item.id} className={cx('timeline-entry', item.status)} onClick={() => { highlight(item.stage); document.getElementById(`stage-${item.stage}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }) }}><span className="timeline-dot" /><span><div className="timeline-message"><strong>{item.stage[0].toUpperCase() + item.stage.slice(1)}</strong> · {item.message}</div><div className="timeline-time">{formatTime(item.timestamp)}</div></span></button>)}{!items.length && <p className="subtle tiny">No timeline entries match this status.</p>}</div></aside>
 }
 
+function StageFlow({ stages }) {
+  return <section className="stage-flow" aria-label="Pipeline stage choreography">
+    {stages.map((stage, index) => <React.Fragment key={stage.id}>
+      {index > 0 && <span className={cx('stage-flow-link', stages[index - 1].status === 'complete' && 'complete')} aria-hidden="true"><span /></span>}
+      <div className={cx('stage-flow-node', `flow-${stage.status}`)} data-stage={stage.id}>
+        <span className="stage-flow-orbit" aria-hidden="true" />
+        <span className="stage-flow-label">{stage.label}</span>
+        <span className="stage-flow-state">{stage.status}</span>
+      </div>
+    </React.Fragment>)}
+  </section>
+}
+
+function RunRetrospective({ run }) {
+  if (run.status !== 'complete') return null
+  const completed = run.stages.filter((stage) => stage.completedAt)
+  const durations = completed.map((stage) => ({
+    label: stage.label,
+    milliseconds: Math.max(0, new Date(stage.completedAt).getTime() - new Date(stage.startedAt).getTime()),
+  }))
+  const bottleneck = durations.reduce((slowest, stage) => stage.milliseconds > slowest.milliseconds ? stage : slowest, durations[0] || { label: 'None', milliseconds: 0 })
+  const totalSeconds = Math.max(1, Math.round((new Date(run.completedAt).getTime() - new Date(run.startedAt).getTime()) / 1000))
+  return <section className="card run-retrospective" aria-label="Run retrospective">
+    <div>
+      <div className="eyebrow"><Sparkle size={12} aria-hidden="true" /> Factory insight</div>
+      <h2 className="section-title">This run is ready to hand off.</h2>
+      <p>{completed.length} checkpoints completed in {totalSeconds}s. <strong>{bottleneck.label}</strong> was the longest stage at {(bottleneck.milliseconds / 1000).toFixed(1)}s.</p>
+    </div>
+    <div className="retrospective-bars" aria-label="Stage duration comparison">
+      {durations.map((stage) => <div className="retrospective-row" key={stage.label}>
+        <span>{stage.label}</span>
+        <span className="retrospective-track"><span style={{ width: `${Math.max(8, bottleneck.milliseconds ? (stage.milliseconds / bottleneck.milliseconds) * 100 : 8)}%` }} /></span>
+        <strong>{(stage.milliseconds / 1000).toFixed(1)}s</strong>
+      </div>)}
+    </div>
+  </section>
+}
+
 function BatchComposer() {
   const repositories = useAppStore((state) => state.repositories)
   const triage = useAppStore((state) => state.triage)
@@ -433,12 +535,13 @@ function BatchComposer() {
   const start = useAppStore((state) => state.startBatch)
   const batch = useAppStore((state) => state.batch)
   const report = useAppStore((state) => state.batchReport)
+  const queueAll = useAppStore((state) => state.queueAllAccepted)
   const [error, setError] = useState('')
   const accepted = repositories.flatMap((repo) => repo.prs.map((pr) => ({ repo: repo.name, pr }))).filter((item) => triage[cardId(item.repo, item.pr.number)]?.column === 'accepted')
   const launch = async () => { const result = await start(); if (!result.ok) setError(result.error); else setError('') }
-  return <section className="card batch-card"><div className="list-head"><div><div className="eyebrow" style={{ marginBottom: 4 }}><Queue size={12} /> Sequential batch</div><h2 className="section-title">Batch composer</h2><div className="subtle tiny" style={{ marginTop: 3 }}>Queue at least 2 accepted PRs. Each item runs to one final outcome.</div></div><Button variant="primary" disabled={queue.length < 2 || batch?.status === 'running'} onClick={launch}><Play size={13} /> Start batch · {queue.length}</Button></div><div className="accepted-strip">{accepted.map((item) => { const queued = queue.some((entry) => cardId(entry.repo, entry.prNumber) === cardId(item.repo, item.pr.number)); return <button key={cardId(item.repo, item.pr.number)} className={cx('queue-item', queued && 'queued')} onClick={() => toggle(item.repo, item.pr.number)}><span>{queued ? <CheckCircle size={13} weight="fill" /> : <Plus size={13} />}</span>{item.repo.split('/')[1]} #{item.pr.number}</button> })}</div>{error && <p className="field-error" style={{ marginTop: 8 }}>{error}</p>}
-    {batch && <div style={{ marginTop: 14 }}><div className="list-footer"><strong>Overall progress</strong><span>{batch.completed} of {batch.total} complete · {Math.round(((batch.progress ?? batch.completed) / batch.total) * 100)}%</span></div><div className="progress-track" style={{ marginTop: 7 }} role="progressbar" aria-label="Batch progress" aria-valuemin={0} aria-valuemax={batch.total} aria-valuenow={batch.progress ?? batch.completed}><div className="progress-fill" style={{ width: `${Math.min(100, ((batch.progress ?? batch.completed) / batch.total) * 100)}%` }} /></div><div className="batch-items">{batch.items.map((item) => <div className="batch-row" key={cardId(item.repo, item.prNumber)}><strong>{item.repo} #{item.prNumber}</strong><span>{item.stage}</span><span className={cx('status', `status-${item.status === 'queued' ? 'pending' : item.status === 'complete' ? 'complete' : 'running'}`)}>{item.outcome || item.status}</span></div>)}</div></div>}
-    {report && <div style={{ marginTop: 14 }}><div className="list-head"><div><h3 className="section-title">BatchRunReport</h3><div className="subtle tiny">Every queued PR appears in exactly one bucket.</div></div><Button variant="outline" size="sm" onClick={() => downloadFile(`batch-report-${Date.now()}.json`, stripCredentialMaterial(JSON.stringify(report, null, 2)), 'application/json')}><DownloadSimple size={12} aria-hidden /> Download report</Button></div><div className="report-grid">{['packaged', 'trivial', 'failed', 'skipped'].map((key) => <div className="report-bucket" key={key}><strong>{report[key]}</strong><span className="tiny">{key}</span></div>)}</div></div>}
+  return <section className="card batch-card"><div className="list-head"><div><div className="eyebrow" style={{ marginBottom: 4 }}><Queue size={12} aria-hidden="true" /> Sequential batch</div><h2 className="section-title">Batch composer</h2><div className="subtle tiny" style={{ marginTop: 3 }}>Queue at least 2 accepted PRs. Each item runs to one final outcome.</div></div><div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}><Button variant="outline" disabled={accepted.length < 2 || batch?.status === 'running'} onClick={queueAll}>Queue all accepted</Button><Button variant="primary" disabled={queue.length < 2 || batch?.status === 'running'} onClick={launch}><Play size={13} aria-hidden="true" /> Start batch · {queue.length}</Button></div></div><div className="accepted-strip">{accepted.map((item) => { const queued = queue.some((entry) => cardId(entry.repo, entry.prNumber) === cardId(item.repo, item.pr.number)); return <button key={cardId(item.repo, item.pr.number)} className={cx('queue-item', queued && 'queued')} onClick={() => toggle(item.repo, item.pr.number)}><span>{queued ? <CheckCircle size={13} weight="fill" aria-hidden="true" /> : <Plus size={13} aria-hidden="true" />}</span>{item.repo.split('/')[1]} #{item.pr.number}</button> })}</div>{error && <p className="field-error" style={{ marginTop: 8 }}>{error}</p>}
+    {batch && <div style={{ marginTop: 14 }}><div className="list-footer"><strong>Overall progress</strong><span>{batch.completed} of {batch.total} complete · {Math.round(((batch.progress ?? batch.completed) / batch.total) * 100)}%</span></div><div className="progress-track" style={{ marginTop: 7 }} role="progressbar" aria-label="Batch progress" aria-valuemin={0} aria-valuemax={batch.total} aria-valuenow={batch.progress ?? batch.completed}><div className="progress-fill" style={{ width: `${Math.min(100, ((batch.progress ?? batch.completed) / batch.total) * 100)}%` }} /></div><div className="batch-items">{batch.items.map((item) => <div className="batch-row" key={cardId(item.repo, item.prNumber)}><strong>{item.repo} #{item.prNumber}</strong><span>{item.stage}</span><span className={cx('status', `status-${item.outcome === 'packaged' ? 'complete' : item.outcome === 'trivial' ? 'retrying' : item.outcome === 'failed' ? 'failed' : item.outcome === 'skipped' ? 'pending' : item.status === 'queued' ? 'pending' : item.status === 'complete' ? 'complete' : 'running'}`)}>{item.outcome || item.status}</span></div>)}</div></div>}
+    {report && <div style={{ marginTop: 14 }}><div className="list-head"><div><h3 className="section-title">BatchRunReport</h3><div className="subtle tiny">Every queued PR appears in exactly one bucket.</div></div><Button variant="outline" size="sm" onClick={() => downloadFile(`batch-report-${Date.now()}.json`, stripCredentialMaterial(JSON.stringify(report, null, 2)), 'application/json')}><DownloadSimple size={12} aria-hidden /> Download report</Button></div><div className="report-grid">{['packaged', 'trivial', 'failed', 'skipped'].map((key) => <div className={cx('report-bucket', `bucket-${key}`)} key={key}><strong>{report[key]}</strong><span className="tiny">{key}</span></div>)}</div></div>}
   </section>
 }
 
@@ -453,11 +556,13 @@ function RunsView() {
   const accepted = repositories.flatMap((repo) => repo.prs.map((pr) => ({ repo: repo.name, language: repo.language, pr }))).filter((item) => triage[cardId(item.repo, item.pr.number)]?.column === 'accepted')
   const launch = (repo, number) => { const result = startRun(repo, number); setStartError(result.ok ? '' : result.error) }
   return <div className="view">
-    <div className="page-head"><div><div className="eyebrow"><ListChecks size={12} /> Pipeline runner</div><h1 className="page-title">From merged change to task package.</h1><p className="page-description">Watch each checkpoint, preserve completed outputs across recovery, and finish with portable session work.</p></div></div>
+    <div className="page-head"><div><div className="eyebrow"><ListChecks size={12} aria-hidden="true" /> Pipeline runner</div><h1 className="page-title">From merged change to task package.</h1><p className="page-description">Watch each checkpoint, preserve completed outputs across recovery, and finish with portable session work.</p></div></div>
     <Coachmark kind="pipeline" title="Runs preserve checkpoints" className="coachmark-inline">Start from any accepted PR. You can pause mid-stream, inspect events, and retry only the failed stage.</Coachmark>
     <BatchComposer />
-    {!run ? <section className="card card-pad"><div className="list-head"><div><h2 className="section-title">Accepted PRs</h2><div className="subtle tiny" style={{ marginTop: 3 }}>Choose a candidate to start one stage sequence.</div></div></div><div className="pr-list">{accepted.map((item) => <div className="pr-row" key={cardId(item.repo, item.pr.number)} style={{ gridTemplateColumns: '54px minmax(180px, 1fr) 100px auto' }}><span className="pr-num">#{item.pr.number}</span><span><span className="pr-title" style={{ display: 'block' }}>{item.pr.title}</span><span className="subtle tiny">{item.repo}</span></span><span className="pr-meta"><FileCode size={12} /> {sourceCount(item.pr)} source</span><Button variant="primary" size="sm" onClick={() => launch(item.repo, item.pr.number)}>Run pipeline <ArrowRight size={12} /></Button></div>)}</div>{startError && <div className="notice error" style={{ marginTop: 10 }}><Warning size={14} />{startError}</div>}</section> : <>
-      <div className="run-banner"><div><div className="eyebrow" style={{ color: '#dafa9e', marginBottom: 4 }}>Active run · {run.status}</div><strong>{run.repo} · PR #{run.prNumber}</strong><div className="subtle tiny" style={{ marginTop: 4 }}>Started {formatTime(run.startedAt)} · {run.language}</div></div><div className="run-controls">{run.status === 'running' && (run.paused ? <Button variant="dark" size="sm" onClick={resume}><Play size={13} /> Resume</Button> : <Button variant="dark" size="sm" onClick={pause}><Pause size={13} /> Pause</Button>)}<Button variant="ghost" size="sm" style={{ color: '#d8e3dc' }} onClick={() => useAppStore.setState({ run: null })}>Choose another</Button></div></div>
+    {!run ? <section className="card card-pad"><div className="list-head"><div><h2 className="section-title">Accepted PRs</h2><div className="subtle tiny" style={{ marginTop: 3 }}>Choose a candidate to start one stage sequence.</div></div></div><div className="pr-list">{accepted.map((item) => <div className="pr-row" key={cardId(item.repo, item.pr.number)} style={{ gridTemplateColumns: '54px minmax(180px, 1fr) 100px auto' }}><span className="pr-num">#{item.pr.number}</span><span><span className="pr-title" style={{ display: 'block' }}>{item.pr.title}</span><span className="subtle tiny">{item.repo}</span></span><span className="pr-meta"><FileCode size={12} aria-hidden="true" /> {sourceCount(item.pr)} source</span><Button variant="primary" size="sm" onClick={() => launch(item.repo, item.pr.number)}>Run pipeline <ArrowRight size={12} aria-hidden="true" /></Button></div>)}</div>{startError && <div className="notice error" style={{ marginTop: 10 }}><Warning size={14} aria-hidden="true" />{startError}</div>}</section> : <>
+      <div className="run-banner">{run.outcome === 'packaged' && <div className="celebration" aria-hidden="true">{Array.from({ length: 14 }, (_, index) => <span key={index} className="confetti" style={{ '--confetti-index': index }} />)}</div>}<div><div className="eyebrow" style={{ color: '#dafa9e', marginBottom: 4 }}>Active run · {run.status}</div><strong>{run.repo} · PR #{run.prNumber}</strong><div className="subtle tiny" style={{ marginTop: 4 }}>Started {formatTime(run.startedAt)} · {run.language}</div></div><div className="run-controls">{run.status === 'running' && (run.paused ? <Button variant="dark" size="sm" onClick={resume}><Play size={13} aria-hidden="true" /> Resume</Button> : <Button variant="dark" size="sm" onClick={pause}><Pause size={13} aria-hidden="true" /> Pause</Button>)}<Button variant="ghost" size="sm" style={{ color: '#d8e3dc' }} onClick={() => useAppStore.setState({ run: null })}>Choose another</Button></div></div>
+      <StageFlow stages={run.stages} />
+      <RunRetrospective run={run} />
       <div className="runs-layout"><div className="stage-list">{run.stages.map((stage) => <StageCard key={stage.id} stage={stage} run={run} />)}</div><Timeline run={run} /></div>
     </>}
   </div>
@@ -480,7 +585,33 @@ function ImportBundle() {
     }
     event.target.value = ''
   }
-  return <div><input ref={inputRef} className="sr-only" type="file" accept="application/json,.json" onChange={read} aria-label="Import TaskPackageBundle JSON" /><Button variant="primary" onClick={() => inputRef.current?.click()}><FileArrowUp size={14} /> Import bundle</Button>{errors.length > 0 && <div className="notice error import-errors" role="alert"><Warning size={15} /><div><strong>Bundle rejected. Fix these fields:</strong>{errors.map((error, index) => <div key={`${error.field}-${index}`}><span className="mono">{error.field}</span>: {error.message}</div>)}</div></div>}</div>
+  return <div>
+    <div style={{ marginBottom: 12 }}>
+      <label className="sr-only" htmlFor="paste-bundle">Paste bundle</label>
+      <textarea id="paste-bundle" className="input" style={{ minHeight: 80, resize: 'vertical' }} placeholder="Paste JSON bundle here to import..." onChange={(e) => {
+        if (!e.target.value.trim()) { setErrors([]); return; }
+        try {
+          const value = JSON.parse(e.target.value);
+          const result = importErrors(value);
+          if (result.errors.length) setErrors(result.errors);
+          else { importPackage(result.data); setErrors([]); e.target.value = ''; }
+        } catch {
+          setErrors([{ field: 'bundle', message: 'invalid JSON' }]);
+        }
+      }} />
+    </div>
+    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      <input ref={inputRef} className="sr-only" type="file" accept="application/json,.json" onChange={read} aria-label="Import TaskPackageBundle JSON" />
+      <Button variant="primary" onClick={() => inputRef.current?.click()}><FileArrowUp size={14} aria-hidden="true" /> Import file</Button>
+    </div>
+    {errors.length > 0 && <div className="notice error import-errors" role="alert" style={{ marginTop: 12 }}>
+      <Warning size={15} aria-hidden="true" />
+      <div>
+        <strong>Bundle rejected. Fix these fields:</strong>
+        {errors.map((error, index) => <div key={`${error.field}-${index}`}><span className="mono">{error.field}</span>: {error.message}</div>)}
+      </div>
+    </div>}
+  </div>
 }
 
 function DeletePackage({ bundle }) {
@@ -542,7 +673,7 @@ function CommandPalette() {
 function Toasts() {
   const toasts = useAppStore((state) => state.toasts)
   const dismiss = useAppStore((state) => state.dismissToast)
-  return <div className="toast-stack" aria-live="polite">{toasts.map((toast) => <div className="toast" key={toast.id}><div className="toast-icon"><Check size={14} weight="bold" /></div><div><strong>{toast.title}</strong><p>{toast.message}</p></div><div className="toast-actions">{toast.undo && <button onClick={() => { toast.undo(); dismiss(toast.id) }}>Undo</button>}<button onClick={() => dismiss(toast.id)} aria-label="Dismiss notification"><X size={11} /></button></div></div>)}</div>
+  return <div className="toast-stack" aria-live="polite">{toasts.map((toast) => <div className="toast" key={toast.id}><div className="toast-icon"><Check size={14} weight="bold" aria-hidden="true" /></div><div><strong>{toast.title}</strong><p>{toast.message}</p></div><div className="toast-actions">{toast.undo && <button onClick={() => { toast.undo(); dismiss(toast.id) }}>Undo</button>}<button onClick={() => dismiss(toast.id)} aria-label="Dismiss notification"><X size={11} /></button></div></div>)}</div>
 }
 
 function AppView() {
@@ -574,5 +705,5 @@ export default function App() {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [activeView, triage, triagePr])
-  return <div className={cx('app-shell', theme === 'dark' && 'theme-dark')}><TopBar /><Sidebar /><main className="main"><AppView /></main><ConnectionsPanel /><CommandPalette /><Toasts /><div className="sr-only" aria-live="assertive" aria-atomic="true">{announcement}</div></div>
+  return <IconContext.Provider value={{ 'aria-hidden': true }}><div className={cx('app-shell', theme === 'dark' && 'theme-dark')}><TopBar /><Sidebar /><main className="main"><AppView /></main><ConnectionsPanel /><CommandPalette /><Toasts /><div className="sr-only" aria-live="assertive" aria-atomic="true">{announcement}</div></div></IconContext.Provider>
 }

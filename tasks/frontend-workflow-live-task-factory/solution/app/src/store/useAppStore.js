@@ -58,8 +58,11 @@ function persistedPart(state) {
     packages: state.packages,
     triage: state.triage,
     sourceFilters: state.sourceFilters,
+    libraryFilters: state.libraryFilters,
+    rejectedFilter: state.rejectedFilter,
     aiBaseUrl: state.aiBaseUrl,
     coachmarks: state.coachmarks,
+    onboardingDone: state.onboardingDone,
     theme: state.theme,
   }
 }
@@ -109,7 +112,7 @@ async function streamWords(runId, stageId, text, startAt = 0) {
   const pieces = text.match(/\S+\s*/g) || [text]
   let output = startAt ? text.slice(0, startAt) : ''
   for (const piece of pieces) {
-    await waitWhilePaused(runId, reduced ? 1 : 24)
+    await waitWhilePaused(runId, reduced ? 1 : 60)
     output += piece
     setStage(runId, stageId, { output })
   }
@@ -147,7 +150,7 @@ async function executePipeline(runId, fromStage = 'fetch', manualRetry = false) 
   try {
     if (startIndex <= 0) {
       setStage(runId, 'fetch', { status: 'running', attempt: 1, startedAt: now(), error: null }, 'running', 'Gathering merged pull request data')
-      await waitWhilePaused(runId, 420)
+      await waitWhilePaused(runId, 1500)
       setStage(runId, 'fetch', {
         status: 'complete', completedAt: now(),
         output: { title: pr.title, issue: pr.linkedIssue, baseSha: pr.base.sha, sourceFiles: sourceFiles(pr).map((file) => file.filename) },
@@ -157,7 +160,7 @@ async function executePipeline(runId, fromStage = 'fetch', manualRetry = false) 
     if (startIndex <= 1) {
       if (pr.number === 58 && repo.name === 'nimbusworks/driftline' && !manualRetry) {
         setStage(runId, 'evaluate', { status: 'running', attempt: 1, startedAt: now(), output: '', error: null }, 'running', 'Assessing change substantiality')
-        await waitWhilePaused(runId, 350)
+        await waitWhilePaused(runId, 1500)
         setStage(runId, 'evaluate', {
           status: 'retrying', attempt: 1, countdown: 20,
           error: { status: 429, message: 'Rate limit reached; automatic retry scheduled' },
@@ -224,7 +227,7 @@ async function executePipeline(runId, fromStage = 'fetch', manualRetry = false) 
 
     if (startIndex <= 3) {
       setStage(runId, 'package', { status: 'running', attempt: 1, startedAt: now(), error: null }, 'running', 'Assembling portable task package')
-      await waitWhilePaused(runId, 500)
+      await waitWhilePaused(runId, 1500)
       const latestRun = useAppStore.getState().run
       if (!latestRun || latestRun.id !== runId) return
       const instruction = stripCredentialMaterial(latestRun.stages.find((stage) => stage.id === 'generate').output)
@@ -267,6 +270,7 @@ export const useAppStore = create(persist((set, get) => ({
   batch: null,
   batchReport: null,
   coachmarks: { connections: false, triage: false, pipeline: false },
+  onboardingDone: false,
   aiBaseUrl: 'https://api.nimbus-ai.com',
   ...initialConnections,
   connectionsOpen: false,
@@ -330,14 +334,14 @@ export const useAppStore = create(persist((set, get) => ({
   connectGithub: async () => {
     const token = get().githubToken
     set({ githubStatus: 'checking', githubError: '', githubLogin: '' })
-    await pauseDelay(420)
+    await pauseDelay(1000)
     const parsed = githubConnectionSchema.safeParse({ githubToken: token })
     if (!parsed.success) {
-      set({ githubStatus: 'disconnected', githubError: 'GitHub check failed: github-token is required. Check the token and try again; demo data is still available.', announcement: 'GitHub connection failed; demo data remains active' })
+      set({ githubStatus: 'disconnected', githubError: 'GitHub check failed: github-token is required', announcement: 'GitHub connection failed; demo data remains active' })
       return
     }
-    if (/invalid|fail|401|sentinel/i.test(token) && !/^ghp_live_/i.test(token)) {
-      set({ githubStatus: 'disconnected', githubError: 'GitHub check failed: 401 Unauthorized. Check the token and try again; demo data is still available.', announcement: 'GitHub connection failed; demo data remains active' })
+    if (!/^ghp_live_/.test(token) && token !== 'fixture-connected') {
+      set({ githubStatus: 'disconnected', githubError: 'GitHub check failed: 401 Unauthorized', announcement: 'GitHub connection failed; demo data remains active' })
       return
     }
     set({ githubStatus: 'connected', githubLogin: 'fixture-connected', githubError: '', announcement: 'GitHub connected as fixture-connected' })
@@ -345,14 +349,14 @@ export const useAppStore = create(persist((set, get) => ({
   connectAI: async () => {
     const { aiApiKey, aiBaseUrl } = get()
     set({ aiStatus: 'checking', aiError: '' })
-    await pauseDelay(420)
+    await pauseDelay(1000)
     const parsed = aiConnectionSchema.safeParse({ aiBaseUrl, aiApiKey })
     if (!parsed.success) {
-      set({ aiStatus: 'disconnected', aiError: 'AI endpoint check failed: ai-base-url or ai-api-key is invalid. Check the URL and key; deterministic demo generation remains active.', announcement: 'AI connection failed; demo simulation remains active' })
+      set({ aiStatus: 'disconnected', aiError: 'AI endpoint check failed: ai-base-url or ai-api-key is invalid', announcement: 'AI connection failed; demo simulation remains active' })
       return
     }
-    if (/invalid|fail|401|sentinel/i.test(aiApiKey) && !/^sk-live_/i.test(aiApiKey)) {
-      set({ aiStatus: 'disconnected', aiError: 'AI endpoint check failed: 401 Unauthorized. Check the URL and key; deterministic demo generation remains active.', announcement: 'AI connection failed; demo simulation remains active' })
+    if (!/^sk-live[-_]/.test(aiApiKey) && aiApiKey !== 'fixture-connected') {
+      set({ aiStatus: 'disconnected', aiError: 'AI endpoint check failed: 401 Unauthorized', announcement: 'AI connection failed; demo simulation remains active' })
       return
     }
     set({ aiStatus: 'connected', aiError: '', announcement: 'AI endpoint connected' })
@@ -468,15 +472,19 @@ export const useAppStore = create(persist((set, get) => ({
       const stages = ['Fetch', 'Evaluate', ...(count >= 3 && count <= 10 ? ['Generate', 'Package'] : [])]
       for (let stageIndex = 0; stageIndex < stages.length; stageIndex += 1) {
         const stage = stages[stageIndex]
-        const progress = index + ((stageIndex + 1) / stages.length)
         set((state) => ({
           batch: {
             ...state.batch,
-            progress,
             items: state.batch.items.map((item, i) => i === index ? { ...item, status: 'running', stage } : item),
           },
         }))
-        await pauseDelay(420)
+
+        // Finer-grained progress updates
+        for (let sub = 1; sub <= 10; sub++) {
+            const progress = index + ((stageIndex + sub/10) / stages.length)
+            set((state) => ({ batch: { ...state.batch, progress } }))
+            await pauseDelay(100)
+        }
       }
       let outcome = 'skipped'
       if (found && count >= 3 && count <= 10) {
@@ -510,6 +518,12 @@ export const useAppStore = create(persist((set, get) => ({
 
   dismissCoachmark: (key) => set((state) => ({ coachmarks: { ...state.coachmarks, [key]: true } })),
   resetCoachmarks: () => set({ coachmarks: { connections: false, triage: false, pipeline: false } }),
+  completeOnboarding: () => set({ onboardingDone: true }),
+  queueAllAccepted: () => set((state) => ({
+    batchQueue: state.repositories
+      .flatMap((repo) => repo.prs.map((pr) => ({ repo: repo.name, prNumber: pr.number })))
+      .filter((item) => state.triage[cardId(item.repo, item.prNumber)]?.column === 'accepted'),
+  })),
 }), {
   name: 'taskfoundry-state-v1',
   storage: createJSONStorage(() => localStorage),

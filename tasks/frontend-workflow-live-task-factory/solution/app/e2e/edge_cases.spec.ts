@@ -1,5 +1,5 @@
 import { test } from '@playwright/test';
-import { candidateProbe, cleanConsoleProbe, connectionsProbe, downloadProbe, filterProbe, importProbe, libraryProbe, mobileProbe, objectiveVisualProbe, paletteProbe, pauseProbe, persistenceProbe, pipelineProbe, reducedMotionProbe, rejectProbe, shellProbe, triageProbe, validationProbe, webmcpProbe } from './helpers';
+import { candidateProbe, cleanConsoleProbe, connectionsProbe, downloadProbe, filterProbe, importProbe, libraryProbe, mobileProbe, objectiveVisualProbe, overlayClosePathsProbe, paletteProbe, pauseProbe, persistenceProbe, pipelineProbe, reducedMotionProbe, rejectProbe, shellProbe, triageProbe, validationProbe, webmcpProbe } from './helpers';
 import { emptyStateProbe, libraryDeleteProbe } from './helpers';
 
 test('4.1 empty_states_are_designed', async ({ page }) => {
@@ -39,7 +39,7 @@ test('4.8 controls_use_semantic_tags', async ({ page }) => {
 });
 
 test('4.9 overlays_close_by_multiple_paths', async ({ page }) => {
-  await connectionsProbe(page);
+  await overlayClosePathsProbe(page);
 });
 
 test('4.10 long_flows_show_progress', async ({ page }) => {
