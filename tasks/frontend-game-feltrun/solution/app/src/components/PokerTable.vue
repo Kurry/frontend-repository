@@ -50,6 +50,7 @@ import { useGameStore } from '../stores/game'
 import { cardKey, isRed } from '../utils/poker'
 import type { Card } from '../utils/poker'
 import PlayerSeat from './PlayerSeat.vue'
+import confetti from 'canvas-confetti'
 
 const store = useGameStore()
 const { s } = storeToRefs(store)
