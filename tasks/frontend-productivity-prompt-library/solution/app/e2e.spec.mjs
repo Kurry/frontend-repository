@@ -576,6 +576,7 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
     const target = page.locator(ROWS, { hasText: 'Round trip proof' });
     await target.getByRole('button', { name: /Delete Round trip proof/ }).click();
     await page.getByRole('button', { name: 'Delete prompt' }).click();
+    await expect(page.locator('.cds--modal.is-visible')).toHaveCount(0);
     await expect(page.locator('.cds--modal.overlay-exit')).toHaveCount(0);
     await page.getByRole('button', { name: 'Import', exact: true }).click();
     await page.locator('#import-payload').fill('{bad');
@@ -793,6 +794,8 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
     const row = page.locator(ROWS, { hasText: 'Recovery flow proof' });
     await row.getByRole('button', { name: /Delete Recovery flow proof/ }).click();
     await page.getByRole('button', { name: 'Delete prompt' }).click();
+    await expect(page.locator('.cds--modal.is-visible')).toHaveCount(0);
+    await expect(page.locator('.cds--modal.overlay-exit')).toHaveCount(0);
     await page.getByRole('button', { name: 'Import', exact: true }).click();
     await page.locator('#import-payload').fill(payload);
     await page.getByRole('button', { name: 'Import and replace' }).click();
@@ -811,7 +814,8 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
     await row.getByRole('button', { name: /Delete Artifact lifecycle proof/ }).click();
     await page.getByRole('button', { name: 'Delete prompt' }).click();
     await expect(row).toHaveCount(0);
-    await expect(page.locator('.cds--modal')).toBeHidden();
+    await expect(page.locator('.cds--modal.is-visible')).toHaveCount(0);
+    await expect(page.locator('.cds--modal.overlay-exit')).toHaveCount(0);
     await page.getByRole('button', { name: 'Export library' }).click();
     await expect(page.locator('#export-preview')).toBeVisible();
     await expect(page.locator('#export-preview')).not.toContainText('Artifact lifecycle proof');
