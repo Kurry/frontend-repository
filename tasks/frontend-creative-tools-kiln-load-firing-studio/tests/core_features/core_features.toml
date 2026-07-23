@@ -1,0 +1,153 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "cf.1"
+name = "catalog_and_place"
+description = "Catalog pieces and place them on kiln shelves. Confirm geometry constraints (bounds, pairwise clearance, shelf-post exclusion, load, height) are strictly enforced."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.2"
+name = "glaze_and_adjacency"
+description = "Define glaze adjacency rules. Confirm that selecting a rule highlights exact pieces/shelf regions, contradictory exceptions reject, and allowed exceptions require fixture type and note."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.3"
+name = "witness_sensor_placement"
+description = "Place witness fixtures to cover low/mid/high zones without collision, and bind sensor channels. Confirm coverage updates immediately when moving pieces or witnesses."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.4"
+name = "firing_curve_composer"
+description = "Compose an ordered firing curve with ramp, hold, and cool segments on time/temperature axes. Ensure continuity, bounds, rate, and hold duration satisfy rules."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.5"
+name = "deterministic_prediction"
+description = "Predict results based on material lots, zones, and sampled curve. Confirm that forking plans and comparing changes to predictions is fully observable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.6"
+name = "batch_execution_and_results"
+description = "Advance batch execution from reserve pieces to unload inspection. Simulate a sensor dropout, hold deviation, and piece defects. Quarantine pieces and create a refire plan preserving attempts."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.7"
+name = "export_import_artifacts"
+description = "Export the load, firing, and provenance artifacts (JSON, SVG, CSV, Markdown). Re-import into a clean state and confirm exact reconstruction of the previous state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "cf.8"
+name = "ac_01_core_features"
+description = "AC-01: Catalog/place/constrain, witness/sensor, curve/branch/predict, batch/deviate/recover/result/refire, and export. Verify all geometry/values/files agree."
+type = "binary"
+weight = 1.0
