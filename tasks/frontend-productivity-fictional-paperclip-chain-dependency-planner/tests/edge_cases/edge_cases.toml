@@ -1,0 +1,15 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+
+[[criterion]]
+id = "AC-06"
+title = "Invalid states restore fully"
+description = "Exercise duration 4/5/120/121, brush 4/5/360/361, snap 15/16/17, port clip counts 3/4/5, wrong port/self/duplicate/locked/stale/cross-session clip, cycle, route collision, outside release, cancel/double confirm, stale approval, bad hash, route mismatch, and stale slack; every rejection preserves exact state."
+weight = 1.0

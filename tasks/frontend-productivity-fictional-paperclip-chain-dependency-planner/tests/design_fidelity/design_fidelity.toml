@@ -1,0 +1,15 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+
+[[criterion]]
+id = "AC-12"
+title = "Reference match across states"
+description = "Fresh, first-jaw, second-jaw, canonical, invalid-return, linked-selection, brushed, cycle, rehearsal, branched, approved, desktop, compact, reduced-motion, SVG, and standalone HTML states match authored oracle geometry, patterns, hierarchy, and endpoints."
+weight = 1.0

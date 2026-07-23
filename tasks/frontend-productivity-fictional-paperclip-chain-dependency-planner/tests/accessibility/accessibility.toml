@@ -1,0 +1,15 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+
+[[criterion]]
+id = "AC-08"
+title = "Keyboard parity and announcements"
+description = "Without pointer input, select CLIP-09, choose TASK-05/TASK-07 ports, confirm, brush, inspect linked evidence, cancel cycle, undo/redo, rehearse, review, and export; focus/trap/return, announcements, event, route, schedule, hashes, and artifacts equal pointer use."
+weight = 1.0

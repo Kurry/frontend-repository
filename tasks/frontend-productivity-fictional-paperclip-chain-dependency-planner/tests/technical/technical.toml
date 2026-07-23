@@ -1,0 +1,15 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+
+[[criterion]]
+id = "AC-04"
+title = "Exact logic and UI/WebMCP parity"
+description = "Perform canonical UI and WebMCP flows in clean sessions; visible topology/geometry/schedule/history, tool state, persistence, hashes, and all ten parsed artifacts agree with no console/page error, stale view, layout shift, or network dependency."
+weight = 1.0

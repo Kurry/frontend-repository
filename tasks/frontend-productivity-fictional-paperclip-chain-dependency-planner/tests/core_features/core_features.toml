@@ -1,0 +1,15 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+
+[[criterion]]
+id = "AC-01"
+title = "Complete canonical pointer threading"
+description = "one event commits `CLIP-09` from TASK-05 to TASK-07, produces exact shifted intervals, 12:00 finish, 15-minute buffer, zero violation, resolved `ISSUE-03`, nine dependencies, zero loose clips, named critical chain, changed topology hash, and selected clip."
+weight = 1.0

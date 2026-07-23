@@ -1,0 +1,15 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+
+[[criterion]]
+id = "AC-07"
+title = "390x844 compact transformation"
+description = "At 390x844, complete exact canonical attachment, inspect schedule/slack/issues, reject cycle, comment, compare, rehearse, review, approve, and export through focused stack/spine/sheets/cards with no page overflow, clipped evidence, hidden action, or target under 44x44."
+weight = 1.0

@@ -1,0 +1,15 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+
+[[criterion]]
+id = "AC-09"
+title = "Max fixture settling time"
+description = "With 1,000 tasks, 4,000 clips, 10,000 issues/comments, and 20,000 events, attach one visible clip and scrub 100 schedule/history states; acknowledgement remains under 100 ms, views settle under 500 ms, and import/export finishes under 2 seconds without dropped input or resource growth."
+weight = 1.0

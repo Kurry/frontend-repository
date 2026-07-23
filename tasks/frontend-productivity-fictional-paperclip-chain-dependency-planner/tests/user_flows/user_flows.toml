@@ -1,0 +1,15 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+
+[[criterion]]
+id = "AC-05"
+title = "Complete flow traversal"
+description = "Starting incomplete, brush the timeline, thread the clip, inspect linked evidence, preview/cancel a cycle, comment, selectively undo/redo, fork/compare, rehearse all tasks, review, approve, export, mutate, import, and reproduce proof."
+weight = 1.0

@@ -1,0 +1,15 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+
+[[criterion]]
+id = "AC-13"
+title = "Alternate order and rejection preservation"
+description = "Exercise pointer/exact parity, brush before/after clip, comment before/after selective undo, cancel cycle, reset/replay, undo then branch, reload, and export->mutate->import->re-export; equivalent orders converge and canceled/rejected paths preserve view/focus/history/persistence and semantic artifact equality."
+weight = 1.0
