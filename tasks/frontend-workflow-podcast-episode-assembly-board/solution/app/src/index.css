@@ -1,5 +1,28 @@
 @import "tailwindcss";
 
+/* Theme + accent variables (personalization: dark/light plus three accents). */
+.theme-dark {
+  --bg: #0b1220;
+  --panel: #131c2e;
+  --panel2: #1d2a44;
+  --border: #2c3b58;
+  --text: #e6edf7;
+  --muted: #92a5c0;
+}
+
+.theme-light {
+  --bg: #eef2f7;
+  --panel: #ffffff;
+  --panel2: #e3eaf3;
+  --border: #c3d0e0;
+  --text: #182740;
+  --muted: #5a6c86;
+}
+
+.accent-violet { --accent: #8b5cf6; }
+.accent-sky { --accent: #0ea5e9; }
+.accent-amber { --accent: #d97706; }
+
 @media (prefers-reduced-motion: reduce) {
   *,
   ::before,
