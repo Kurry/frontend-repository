@@ -11,8 +11,8 @@
 @media (max-width: 1024px) { :root { --container-offset: 30px; } }
 @media (max-width: 768px)  { :root { --container-offset: 20px; } }
 @media (max-width: 480px)  { :root { --container-offset: 18px; } }
-@media (min-width: 1440px) { :root { --container-offset: 2rem; } }
-@media (min-width: 1920px) { :root { --container-offset: 48px; } }
+@media (min-width: 1440px) { :root { --container-offset: 2.25rem; } }
+@media (min-width: 1920px) { :root { --container-offset: 3rem; } }
 
 html { font-size: 15px; }
 @media (max-width: 1024px) { html { font-size: 14px; } }
@@ -48,8 +48,8 @@ button { font-family: inherit; cursor: pointer; }
 .the-header.is-hidden { transform: translateY(-100%); transition-duration: .325s; }
 .the-header__logo {
   background: none; border: 0; color: var(--color-light);
-  font-family: "Founders Grotesk", sans-serif; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .02em; font-size: 1.05rem;
+  font-family: "IBM Plex Mono", monospace; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .04em; font-size: 1rem;
 }
 .the-nav { position: absolute; right: var(--container-offset); }
 .the-nav__item {
@@ -59,19 +59,17 @@ button { font-family: inherit; cursor: pointer; }
 }
 @media (hover: hover) { .the-nav__item:hover { opacity: 1; } }
 .the-nav__item.is-active { opacity: 1; }
-.the-header__tools {
-  position: absolute; left: var(--container-offset);
-  display: flex; gap: .75rem;
-}
-.the-header__tools button,
+.home-toolbar__tools { display: flex; gap: .5rem; flex-wrap: wrap; }
+.home-toolbar__tools button,
 .the-sub-header__tools button {
   background: transparent; border: 1px solid rgba(255,255,255,.15);
   color: var(--color-light); font-family: "IBM Plex Mono", monospace;
   font-size: .75rem; text-transform: uppercase; padding: .35rem .6rem;
   border-radius: 2px;
 }
-.the-header__tools button:focus-visible,
+.home-toolbar__tools button:focus-visible,
 .the-sub-header__tools button:focus-visible,
+.tag:focus-visible,
 .home-filter:focus-visible,
 .pin-btn:focus-visible,
 .case-research button:focus-visible,
@@ -125,18 +123,23 @@ body.route-about .the-header {
   transition: opacity .9s cubic-bezier(.33,1,.68,1), transform .9s cubic-bezier(.33,1,.68,1);
 }
 
-/* ---------------- Stack ---------------- */
+/* ---------------- Stack (filing cabinet: contiguous covers + paper tab tags) ---------------- */
 .stack {
   perspective: 3000px; padding: 0 var(--container-offset) 6rem;
-  display: flex; flex-direction: column; gap: 1rem; max-width: 1400px; margin: 0 auto;
-  transition: opacity .65s ease;
+  display: flex; flex-direction: column; gap: 0; max-width: 1400px; margin: 0 auto;
+  transition: opacity .65s ease; transform-style: preserve-3d;
 }
-.stack-group { perspective: 3000px; transform-style: preserve-3d; transition: transform .65s cubic-bezier(.33,1,.68,1); border-radius: var(--stack-border-radius); }
+.stack-group {
+  position: relative; perspective: 3000px; transform-style: preserve-3d;
+  transition: transform .65s cubic-bezier(.33,1,.68,1); border-radius: var(--stack-border-radius);
+}
+/* Each later drawer front tucks its paper tabs over the cover above it. */
+.stack-group + .stack-group { margin-top: -3.25rem; }
 .stack-cover {
   position: relative; border-radius: var(--stack-border-radius);
-  padding: 1.25rem 1.5rem; min-height: 5.5rem;
-  color: #fff; box-shadow: var(--stack-shadow);
-  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 1.1rem 1.5rem 3.5rem; min-height: 8.75rem;
+  color: #fff; box-shadow: var(--stack-shadow), 0 -12px 28px rgba(0, 0, 0, .35);
+  display: flex; flex-direction: column; justify-content: flex-start;
   transition: transform .65s cubic-bezier(.33,1,.68,1);
 }
 .stack-cover::after {
@@ -166,19 +169,29 @@ body.route-about .the-header {
   font-family: "IBM Plex Mono", monospace;
   font-size: clamp(.75rem,0rem + .833vw,1rem); opacity: .85; margin: .5rem 0 0; max-width: 40rem;
 }
-.stack-cover__tags { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1rem; }
-.tag { font-family: Signifier, serif; font-size: 1.625rem;
-  font-family: Signifier, serif;
-  background: rgba(255,255,255,.14); color: #fff; border: 1px solid rgba(255,255,255,.35);
-  border-radius: 6px 6px 0 0; padding: .35rem 1.1rem;
+/* Paper tag tabs ride on top of their cover, overlapping the drawer above. */
+.stack-cover__tags {
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: .75rem;
+  padding: 0 1.5rem; position: relative; z-index: 2; min-height: 3.25rem;
+  pointer-events: none;
+}
+.stack-cover__tags .tag { pointer-events: auto; }
+.tag {
+  font-family: Signifier, serif; font-size: 1.625rem; line-height: 1.1;
+  background: #fdfaf7; color: #191919; border: 1px solid rgba(25, 25, 25, .18); border-bottom: 0;
+  border-radius: 12px 12px 0 0; padding: .4rem 1.4rem .5rem;
+  box-shadow: 0 -8px 18px rgba(0, 0, 0, .3);
   opacity: 0; transition: opacity .45s ease, transform .325s cubic-bezier(.33,1,.68,1), box-shadow .325s cubic-bezier(.33,1,.68,1);
- }
+}
 .stack-group .tag.is-visible { opacity: 1; }
 @media (hover: hover) {
   .tag:hover { transform: translateY(-10px); box-shadow: 0 -10px 20px #00000080; }
 }
 /* unfolded stack cover reveals embedded footer */
-.stack-cover__footer { max-height: 0; overflow: hidden; transition: max-height .65s cubic-bezier(.33,1,.68,1); }
+.stack-cover__footer {
+  max-height: 0; overflow: hidden; transition: max-height .65s cubic-bezier(.33,1,.68,1);
+  font-family: "IBM Plex Mono", monospace; font-size: .75rem; text-transform: uppercase;
+}
 .stack-group.is-unfolded .stack-cover__footer { max-height: 400px; }
 
 /* ---------------- Footer ---------------- */
@@ -232,7 +245,7 @@ body.route-about .the-header {
 /* Folder = cover + sheet with 3D open */
 .case-folder {
   position: relative; perspective: 3000px; flex: 0 0 auto;
-  width: min(420px, 90vw);
+  width: min(420px, 100%);
 }
 .case-folder__stage { position: relative; transform-style: preserve-3d; }
 .case-folder-sheet {
@@ -271,6 +284,7 @@ body.route-about .the-header {
 .case-folder-tags { display: flex; flex-direction: column; gap: .5rem; margin-left: .25rem; }
 .case-folder-tags .tag {
   writing-mode: vertical-rl; opacity: 0; transform: translateY(100%);
+  border: 1px solid rgba(25,25,25,.18); border-radius: 0 12px 12px 0;
   transition: opacity .75s ease, transform .75s cubic-bezier(.33,1,.68,1);
 }
 .case-folder-tags .tag.is-visible { opacity: 1; transform: translateY(0); }
@@ -287,8 +301,9 @@ body.route-about .the-header {
 
 /* Scrapbook */
 .case-scrapbook {
-  position: relative; flex: 1 1 480px; min-height: 520px; min-width: 320px;
+  position: relative; flex: 1 1 480px; min-height: 520px; min-width: min(320px, 100%);
   border: 1px dashed rgba(255,255,255,.15); border-radius: 8px; padding: 1rem;
+  overflow: hidden;
 }
 .scrapbook-item {
   position: absolute; touch-action: none; user-select: none;
@@ -445,8 +460,14 @@ body.route-about .the-header {
 .field-note__error { color: #ff8a8a; font-family: "IBM Plex Mono", monospace; font-size: .75rem; }
 
 /* ---------------- Drawer / palette / dossier ---------------- */
-.drawer, .palette, .dossier {
+.drawer, .dossier {
   position: fixed; inset: 0; z-index: 1800; display: none;
+  background: rgba(0,0,0,.45);
+}
+/* The palette can layer over an open media popup (z 2000) — Escape must close
+   the palette first while the popup stays visibly open beneath it. */
+.palette {
+  position: fixed; inset: 0; z-index: 2100; display: none;
   background: rgba(0,0,0,.45);
 }
 .drawer.is-open, .palette.is-open, .dossier.is-open { display: block; }
@@ -526,8 +547,14 @@ body.route-about .the-header {
 
 @media (max-width: 390px) {
   .home-toolbar { flex-direction: column; align-items: stretch; }
-  .the-header__tools { display: none; }
   .dossier__panel, .palette__panel { top: 8%; width: calc(100vw - 1rem); }
+}
+@media (max-width: 768px) {
+  .the-sub-header__tools button { font-size: .65rem; padding: .3rem .45rem; }
+  .the-sub-header__cat { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .content-note { width: 150px; font-size: .85rem; }
+  .content-photo { width: 140px; }
+  .content-plan, .content-pdf, .content-video, .content-audio { width: 150px; }
 }
 
 /* reduced motion */

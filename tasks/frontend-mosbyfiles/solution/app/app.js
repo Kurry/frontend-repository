@@ -148,10 +148,10 @@
       .filter(function (element) { return !element.hidden && (element.offsetWidth > 0 || element.offsetHeight > 0 || element.getClientRects().length > 0); });
   }
   function activeOverlay() {
-    if (state.popup.open) return popup;
+    if (state.paletteOpen) return commandPalette;
     if (state.dossierOpen) return dossierPanel;
     if (state.readingListOpen) return readingList;
-    if (state.paletteOpen) return commandPalette;
+    if (state.popup.open) return popup;
     return null;
   }
   function trapOverlayFocus(event) {
@@ -171,7 +171,12 @@
   function restoreOverlayFocus(key, delay) {
     var opener = overlayOpeners[key];
     overlayOpeners[key] = null;
-    setTimeout(function () { if (opener && opener.isConnected) opener.focus({ preventScroll: true }); }, motionDelay(delay || 0));
+    setTimeout(function () {
+      // If another overlay (or the same one) has opened in the meantime, leave
+      // focus inside it instead of stealing it back to the page.
+      if (activeOverlay()) return;
+      if (opener && opener.isConnected) opener.focus({ preventScroll: true });
+    }, motionDelay(delay || 0));
   }
 
   function categoryOf(slug) {
@@ -424,14 +429,14 @@
 
   function footerHTML() {
     var rose = '<svg class="wind-rose" viewBox="0 0 100 100" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="1.5"><circle cx="50" cy="50" r="45"/><circle cx="50" cy="50" r="30"/><path d="M50 2 L58 50 L50 98 L42 50 Z" fill="#fff" stroke="none"/><path d="M2 50 L50 42 L98 50 L50 58 Z" fill="#fff" opacity=".5" stroke="none"/><path d="M18 18 L50 50 L82 82 M82 18 L50 50 L18 82" opacity=".6"/></g></svg>';
-    return '<div class="the-footer">' +
+    return '<footer class="the-footer">' +
       rose + rose +
       '<img class="the-footer__scale" src="/images/scale.svg" alt="Architectural scale" />' +
       '<span class="signature" aria-label="Archivist signature"></span>' +
       '<a class="the-footer__credit" href="#atlas-press" rel="noopener">' +
         '<span class="the-footer__credit-mark">Atlas Press</span></a>' +
       '<span class="the-footer__year">© 2026 Field Notes Archive</span>' +
-    "</div>";
+    "</footer>";
   }
 
   function renderStack() {
@@ -445,23 +450,17 @@
         return '<button type="button" class="tag" data-tag="' + slug + '">' + ARCHITECTS[slug].name + "</button>";
       }).join("");
       group.innerHTML =
+        '<div class="stack-cover__tags">' + tags + "</div>" +
         '<div class="stack-cover" style="background-color:' + cat.color + '">' +
           '<button type="button" class="stack-cover__head" aria-expanded="false">' +
             '<h2 class="stack-cover__title">' + cat.title + "</h2>" +
             '<span class="stack-cover__chevron" aria-hidden="true">&rsaquo;</span>' +
           "</button>" +
           '<p class="stack-cover__desc">' + cat.thesis + "</p>" +
-          '<div class="stack-cover__tags">' + tags + "</div>" +
           (cat.id === "place" ? '<div class="stack-cover__footer">' + footerHTML() + "</div>" : "") +
         "</div>";
       group.addEventListener("mouseenter", function () { group.classList.add("is-hovered"); });
       group.addEventListener("mouseleave", function () { group.classList.remove("is-hovered"); });
-      group.querySelectorAll('.tag').forEach(function(tagBtn) {
-        tagBtn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          openCase(tagBtn.dataset.tag, "folder-open");
-        });
-      });
       $(".stack-cover__head", group).addEventListener("click", function (event) {
         group.classList.toggle("is-unfolded");
         state.unfolded = group.classList.contains("is-unfolded") ? cat.id : null;
@@ -588,6 +587,10 @@
     }
   }
 
+  function videoPosterFor(slug) {
+    var all = photosFor(slug);
+    return all[3] || all[0] || "video.avif";
+  }
   function seedItems(slug) {
     var a = ARCHITECTS[slug];
     var items = [];
@@ -603,7 +606,7 @@
     if (a.plan) items.push({ id: "plan-0", cls: "content-plan", top: 55, left: 55, rot: -3,
       html: '<img src="' + img(a.plan) + '" alt="plan" /><span class="scrapbook-item__badge">plan</span>' });
     if (a.video) items.push({ id: "video-0", cls: "content-video", kind: "video", top: 40, left: 8, rot: 2,
-      html: '<img src="' + img("video.avif") + '" alt="video poster" /><span class="scrapbook-item__badge">video</span><button type="button" class="content-play" aria-label="Play video">&#9658;</button>' });
+      html: '<img src="' + img(videoPosterFor(slug)) + '" alt="' + a.name + ' video poster" /><span class="scrapbook-item__badge">video</span><button type="button" class="content-play" aria-label="Play video">&#9658;</button>' });
     if (a.pdf) items.push({ id: "pdf-0", cls: "content-pdf", kind: "pdf", top: 60, left: 20, rot: -4,
       html: '<img src="' + img(a.pdf) + '" alt="pdf preview" /><span class="scrapbook-item__badge">pdf</span>' });
     if (a.audio) items.push({ id: "audio-0", cls: "content-audio", kind: "audio", top: 45, left: 30, rot: 1,
@@ -705,6 +708,7 @@
     el.innerHTML = "";
     words.forEach(function (w, wi) {
       var line = document.createElement("span"); line.className = "line";
+      line.setAttribute("aria-hidden", "true");
       w.split("").forEach(function (ch, ci) {
         var s = document.createElement("span"); s.className = "char";
         s.setAttribute("aria-hidden", "true");
@@ -962,7 +966,7 @@
       var mp4Src = document.createElement("source");
       mp4Src.src = "/media/videos/" + a.video; mp4Src.type = "video/mp4";
       v.appendChild(webmSrc); v.appendChild(mp4Src);
-      v.poster = img("video.avif");
+      v.poster = img(videoPosterFor(slug));
       v.controls = true; v.playsInline = true; v.preload = "metadata";
       v.id = "popupVideo";
       popupMedia.appendChild(v);
@@ -1419,22 +1423,26 @@
   };
 
   // ================= Boot =================
+  function on(selector, eventName, handler) {
+    var el = $(selector);
+    if (el) el.addEventListener(eventName, handler);
+  }
   function wireChrome() {
-    popup.addEventListener("click", function(e) { if(e.target === popup) closePopup(); });
-
     document.querySelectorAll("[data-nav]").forEach(bindNav);
-    $("#readingListBtn").addEventListener("click", openReadingList);
-    $("#readingListBtnCase").addEventListener("click", openReadingList);
-    $("#readingListClose").addEventListener("click", closeReadingList);
-    $("#exportDossierBtn").addEventListener("click", openDossier);
-    $("#exportDossierBtnCase").addEventListener("click", openDossier);
-    $("#dossierClose").addEventListener("click", closeDossier);
+    on("#readingListBtn", "click", openReadingList);
+    on("#readingListBtnCase", "click", openReadingList);
+    on("#readingListClose", "click", closeReadingList);
+    on("#exportDossierBtn", "click", openDossier);
+    on("#exportDossierBtnCase", "click", openDossier);
+    on("#paletteBtn", "click", openPalette);
+    on("#paletteBtnCase", "click", openPalette);
+    on("#dossierClose", "click", closeDossier);
     $$(".dossier__format").forEach(function (b) {
       b.addEventListener("click", function () { setDossierFormat(b.dataset.format); });
     });
-    $("#dossierCopy").addEventListener("click", function () { copyDossier(); });
-    $("#dossierDownload").addEventListener("click", downloadDossier);
-    $("#dossierImportBtn").addEventListener("click", function () {
+    on("#dossierCopy", "click", function () { copyDossier(); });
+    on("#dossierDownload", "click", downloadDossier);
+    on("#dossierImportBtn", "click", function () {
       importDossierJson($("#dossierImportArea").value);
     });
     $("#dossierImportFile").addEventListener("change", function (e) {
@@ -1475,8 +1483,10 @@
 
     popup.addEventListener("click", function (e) {
       var t = e.target;
-      if (t === popup || (t && t.hasAttribute && t.hasAttribute("data-popup-close"))) {
-        if (t.closest && t.closest(".popup__box") && !t.hasAttribute("data-popup-close")) return;
+      if (!t || !t.closest) return;
+      // Any click outside the media box (the dimmed backdrop / popup padding)
+      // or on an explicit close control dismisses the popup.
+      if (!t.closest(".popup__box") || (t.hasAttribute && t.hasAttribute("data-popup-close"))) {
         closePopup();
       }
     });
