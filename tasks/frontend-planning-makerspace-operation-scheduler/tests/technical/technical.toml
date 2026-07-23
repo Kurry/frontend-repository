@@ -1,0 +1,133 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "technical.1"
+name = "webmcp_ui_parity"
+description = "Interleave a mix of UI gestures (clicks, drags) and WebMCP tool calls for project, graph, assignment, setup, evidence, and run actions. Confirm that the underlying canonical state remains identical and perfectly synced regardless of whether the action came from the UI or WebMCP."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "technical.2"
+name = "genre_reload_isolation"
+description = "Reload the page. Confirm that the state the PRD promises to persist survives the reload exactly, while transient previews, open dialogs, hover states, drag operations, and invalid drafts do not leak into the persisted state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "technical.3"
+name = "import_transaction_atomicity"
+description = "Attempt an import with a corrupted manifest or cross-field contradictions. Confirm that the system rejects it atomically, showing all diagnostics together, with zero partial state mutation or leakage."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "technical.4"
+name = "export_artifact_schema"
+description = "Export the schedule to the JSON and CSV formats. Confirm that the resulting files match the required schema exactly (including required keys/columns, units, and precision) without any bad IDs, overlaps, cycles, or broken lot arithmetic."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "technical.n1"
+name = "state_cross_session_leakage"
+description = "Open two separate sessions or trigger a fresh reset/import. State from a previous run or a different import attempt silently shares or overwrites the current canonical state."
+type = "binary"
+negate = true
+weight = 1.0
