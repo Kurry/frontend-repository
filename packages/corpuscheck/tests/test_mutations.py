@@ -260,6 +260,18 @@ def test_missing_verify_build_fails_oracle(copy_task, tmp_path):
     assert any("verify:build" in message for message in result.messages)
 
 
+def test_build_output_start_is_valid_without_committed_output(copy_task, tmp_path):
+    _, task = copy_task(DOCUSEAL_SLUG, tmp_path)
+    path = task / "solution/app/package.json"
+    package = json.loads(path.read_text())
+    package["scripts"]["start"] = "npx serve -l 3000 -n dist"
+    path.write_text(json.dumps(package))
+
+    result = validate_oracle(task)
+
+    assert result.passed, result.messages
+
+
 def test_unassigned_task_directory_is_orphan(tmp_path):
     tasks_root = tmp_path / "tasks"
     (tasks_root / "frontend-no-schema-assignment").mkdir(parents=True)

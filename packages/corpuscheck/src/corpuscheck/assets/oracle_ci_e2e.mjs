@@ -114,9 +114,14 @@ export function generatedDirConfigSource(appDir) {
     'export default {',
     `  testDir: ${JSON.stringify(path.join(appDir, TASK_SUITE_DIR))},`,
     `  testMatch: ${JSON.stringify('**/*.spec.{mjs,cjs,js,ts,tsx,jsx}')},`,
-    '  fullyParallel: true,',
-    '  workers: 4,',
-    '  timeout: 30_000,',
+    // A task suite drives one stateful oracle instance. Running its files in
+    // parallel makes independent browser contexts contend for the same CI CPU
+    // while app timers and actionability checks advance, which creates false
+    // timeouts that do not reproduce under the task's own serial config.
+    '  fullyParallel: false,',
+    '  workers: 1,',
+    '  timeout: 60_000,',
+    '  expect: { timeout: 8_000 },',
     '  retries: 0,',
     '  projects: [',
     '    {',
