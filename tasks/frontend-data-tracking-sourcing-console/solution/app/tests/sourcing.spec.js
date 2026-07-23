@@ -316,3 +316,241 @@ test('command palette invokes candidate and top-level flows with focus restorati
     await expect(opener).toBeFocused()
   }
 })
+
+test('interleaved pin quota rejection and cancel preserve both candidates', async ({ page }) => {
+  const pending = 'emberforge/ash-parser'
+  const rejected = 'northloom/thread-cache'
+  await candidateRow(page, pending).getByRole('button', { name: 'Pin' }).click()
+  await page.getByRole('dialog', { name: /Pin emberforge\/ash-parser/ }).getByLabel(/Notes/).fill('leave pending')
+  await page.getByRole('button', { name: 'Quota', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Quota dashboard' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Resume pending pin' })).toBeVisible()
+
+  await page.getByRole('button', { name: 'Candidates', exact: true }).click()
+  await candidateRow(page, rejected).getByRole('button', { name: 'Reject' }).click()
+  await page.getByRole('dialog', { name: /Reject northloom\/thread-cache/ }).getByLabel('Rejection reason').selectOption('duplicate-cluster')
+  await page.getByRole('dialog', { name: /Reject northloom\/thread-cache/ }).getByRole('button', { name: 'Reject', exact: true }).click()
+  await page.getByRole('button', { name: 'Resume pending pin' }).click()
+  const resumed = page.getByRole('dialog', { name: /Pin emberforge\/ash-parser/ })
+  await expect(resumed.getByLabel(/Notes/)).toHaveValue('leave pending')
+  await resumed.getByRole('button', { name: 'Cancel' }).click()
+
+  await expect(candidateRow(page, pending)).toContainText('Selected')
+  await expect(candidateRow(page, pending)).not.toContainText(/^[0-9a-f]{12}$/)
+  await expect(candidateRow(page, rejected)).toContainText('duplicate-cluster')
+})
+
+test('one candidate traverses score select pin queue while another rejection reaches clipboard export', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+  const queuedName = 'emberforge/cinder-cli'
+  const rejectedName = 'northloom/thread-cache'
+  const row = candidateRow(page, queuedName)
+  await row.getByRole('button', { name: 'Score' }).click()
+  await row.getByRole('button', { name: 'Select' }).click()
+  await row.getByRole('button', { name: 'Pin' }).click()
+  await page.getByRole('dialog', { name: /Pin emberforge\/cinder-cli/ }).getByRole('button', { name: 'Confirm pin' }).click()
+  await row.getByRole('button', { name: 'Queue' }).click()
+
+  await candidateRow(page, rejectedName).getByRole('button', { name: 'Reject' }).click()
+  await page.getByRole('dialog', { name: /Reject northloom\/thread-cache/ }).getByLabel('Rejection reason').selectOption('gui-heavy')
+  await page.getByRole('dialog', { name: /Reject northloom\/thread-cache/ }).getByRole('button', { name: 'Reject', exact: true }).click()
+
+  await page.getByRole('button', { name: 'Export pack' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Export sourcing pack' })
+  const text = await dialog.getByLabel('Active export text').textContent()
+  const pack = JSON.parse(text)
+  const queued = pack.candidates.find((candidate) => candidate.name === queuedName)
+  expect(queued).toMatchObject({ status: 'queued' })
+  expect(queued.commit).toMatch(/^[0-9a-f]{12}$/)
+  expect(queued.queuePosition).toBe(pack.queue.find((entry) => entry.name === queuedName).position)
+  expect(pack.candidates.find((candidate) => candidate.name === rejectedName).rejectionReason).toBe('gui-heavy')
+  await dialog.getByRole('button', { name: 'Copy', exact: true }).click()
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(text)
+})
+
+test('command palette covers score select reject pin queue fetch export and import', async ({ page }) => {
+  const invoke = async (query, expected) => {
+    await page.getByRole('button', { name: 'Open command palette' }).click()
+    const palette = page.getByRole('dialog', { name: 'Command palette' })
+    await palette.getByLabel('Search commands').fill(query)
+    await palette.getByRole('button', { name: expected }).click()
+  }
+  const flow = 'emberforge/cinder-cli'
+  await candidateRow(page, flow).click()
+  await invoke('score cinder', new RegExp(`Score ${flow.replace('/', '\\/')}`))
+  await invoke('select cinder', new RegExp(`Select ${flow.replace('/', '\\/')}`))
+  await invoke('pin cinder', new RegExp(`Pin ${flow.replace('/', '\\/')}`))
+  await page.getByRole('dialog', { name: /Pin emberforge\/cinder-cli/ }).getByRole('button', { name: 'Confirm pin' }).click()
+  await candidateRow(page, flow).click()
+  await invoke('queue cinder', new RegExp(`Queue ${flow.replace('/', '\\/')}`))
+  await expect(candidateRow(page, flow)).toContainText('Queued')
+
+  const rejected = 'northloom/thread-cache'
+  await candidateRow(page, rejected).click()
+  await invoke('reject thread', new RegExp(`Reject ${rejected.replace('/', '\\/')}`))
+  await page.getByRole('dialog', { name: /Reject northloom\/thread-cache/ }).getByLabel('Rejection reason').selectOption('license-blocked')
+  await page.getByRole('dialog', { name: /Reject northloom\/thread-cache/ }).getByRole('button', { name: 'Reject', exact: true }).click()
+
+  await invoke('fetch', /Fetch more candidates/)
+  await expect(page.getByRole('button', { name: 'Sourcing in progress…' })).toBeDisabled()
+  await expect(page.getByRole('button', { name: 'Fetch more candidates' })).toBeEnabled()
+  await invoke('export', /Export sourcing pack/)
+  await expect(page.getByRole('dialog', { name: 'Export sourcing pack' })).toBeVisible()
+  await page.keyboard.press('Escape')
+  await invoke('import', /Import sourcing pack/)
+  await expect(page.getByRole('dialog', { name: 'Import sourcing pack' })).toBeVisible()
+})
+
+test('all required overlays trap focus, close on Escape, and restore their opener', async ({ page }) => {
+  const cases = [
+    { opener: () => candidateRow(page, 'emberforge/ash-parser').getByRole('button', { name: 'Pin' }), dialog: /Pin emberforge\/ash-parser/ },
+    { opener: () => page.getByRole('button', { name: 'Open command palette' }), dialog: 'Command palette' },
+    { opener: () => page.getByRole('button', { name: 'Export pack' }), dialog: 'Export sourcing pack' },
+    { opener: () => page.getByRole('button', { name: 'Import', exact: true }), dialog: 'Import sourcing pack' }
+  ]
+  for (const item of cases) {
+    const opener = item.opener()
+    await opener.focus()
+    await opener.click()
+    const dialog = page.getByRole('dialog', { name: item.dialog })
+    await expect(dialog).toBeVisible()
+    const focusables = dialog.locator('button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled)')
+    await focusables.last().focus()
+    await page.keyboard.press('Tab')
+    expect(await dialog.evaluate((node) => node.contains(document.activeElement))).toBe(true)
+    await page.keyboard.press('Escape')
+    await expect(dialog).toBeHidden()
+    await expect(opener).toBeFocused()
+  }
+
+  await candidateRow(page, 'northloom/thread-cache').getByRole('button', { name: 'Reject' }).click()
+  const reject = page.getByRole('dialog', { name: /Reject northloom\/thread-cache/ })
+  await reject.getByRole('button', { name: 'Reject', exact: true }).click()
+  const error = reject.getByRole('alert')
+  await expect(error).toBeVisible()
+  await expect(reject.getByLabel('Rejection reason')).toHaveAttribute('aria-describedby', await error.getAttribute('id'))
+})
+
+test('motion states and reduced motion are observable through real controls', async ({ page }) => {
+  const durationMs = async (locator) => locator.evaluate((node) => {
+    const style = getComputedStyle(node)
+    const values = `${style.transitionDuration},${style.animationDuration}`.match(/[\d.]+m?s/g) || []
+    return Math.max(...values.map((value) => value.endsWith('ms') ? Number.parseFloat(value) : Number.parseFloat(value) * 1000), 0)
+  })
+
+  const chip = candidateRow(page, 'northloom/thread-cache').locator('.status-chip')
+  expect(await durationMs(chip)).toBeGreaterThanOrEqual(200)
+  await candidateRow(page, 'emberforge/ash-parser').getByRole('button', { name: 'Pin' }).click()
+  expect(await durationMs(page.getByRole('dialog', { name: /Pin emberforge\/ash-parser/ }))).toBeGreaterThanOrEqual(200)
+  await page.keyboard.press('Escape')
+  await page.getByRole('button', { name: 'Open command palette' }).click()
+  expect(await durationMs(page.getByRole('dialog', { name: 'Command palette' }))).toBeGreaterThanOrEqual(200)
+  await page.keyboard.press('Escape')
+
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.getByRole('button', { name: 'Export pack' }).click()
+  expect(await durationMs(page.getByRole('dialog', { name: 'Export sourcing pack' }))).toBeLessThan(1)
+  await page.keyboard.press('Escape')
+  await page.getByRole('button', { name: 'Import', exact: true }).click()
+  expect(await durationMs(page.getByRole('dialog', { name: 'Import sourcing pack' }))).toBeLessThan(1)
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('button', { name: 'Import', exact: true })).toBeFocused()
+})
+
+test('control states expose hover focus disabled and field-linked error treatments', async ({ page }) => {
+  const fetch = page.getByRole('button', { name: 'Fetch more candidates' })
+  const background = await fetch.evaluate((node) => getComputedStyle(node).backgroundColor)
+  await fetch.hover()
+  await expect.poll(() => fetch.evaluate((node) => getComputedStyle(node).backgroundColor)).not.toBe(background)
+  await fetch.focus()
+  expect(await fetch.evaluate((node) => getComputedStyle(node).outlineStyle)).not.toBe('none')
+  await fetch.click()
+  await expect(page.getByRole('button', { name: 'Sourcing in progress…' })).toBeDisabled()
+  await expect(page.getByRole('button', { name: 'Fetch more candidates' })).toBeEnabled()
+
+  await candidateRow(page, 'northloom/thread-cache').getByRole('button', { name: 'Reject' }).click()
+  const field = page.getByRole('dialog', { name: /Reject northloom\/thread-cache/ }).getByLabel('Rejection reason')
+  await page.getByRole('dialog', { name: /Reject northloom\/thread-cache/ }).getByRole('button', { name: 'Reject', exact: true }).click()
+  await expect(field).toHaveAttribute('aria-invalid', 'true')
+  expect(await field.evaluate((node) => getComputedStyle(node).borderColor)).toBe('rgb(255, 143, 160)')
+})
+
+test('snapshot comparison is an additional operator-efficiency enhancement', async ({ page }) => {
+  await page.getByRole('button', { name: 'Export pack' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Export sourcing pack' })
+  await dialog.getByRole('button', { name: 'Take snapshot' }).click()
+  await page.keyboard.press('Escape')
+  await candidateRow(page, 'northloom/thread-cache').getByRole('button', { name: 'Select' }).click()
+  await page.getByRole('button', { name: 'Export pack' }).click()
+  await dialog.getByRole('button', { name: 'Take snapshot' }).click()
+  await dialog.getByRole('button', { name: 'Compare snapshots' }).click()
+  await expect(dialog.getByLabel('Snapshot comparison')).toContainText('northloom/thread-cache: scored → selected')
+})
+
+test('undo redo mutation matrix keeps table queue timeline quota and export coherent', async ({ page }) => {
+  const statusInExport = async (name) => (await exportPack(page)).candidates.find((candidate) => candidate.name === name).status
+  const undoRedoStatus = async (name, before, after) => {
+    await page.getByRole('button', { name: 'Undo' }).click()
+    await expect(candidateRow(page, name)).toContainText(before)
+    expect(await statusInExport(name)).toBe(before.toLowerCase())
+    await page.getByRole('button', { name: 'Redo' }).click()
+    await expect(candidateRow(page, name)).toContainText(after)
+    expect(await statusInExport(name)).toBe(after.toLowerCase())
+  }
+
+  const flow = 'emberforge/cinder-cli'
+  await candidateRow(page, flow).getByRole('button', { name: 'Score' }).click()
+  await undoRedoStatus(flow, 'Candidate', 'Scored')
+  await candidateRow(page, flow).getByRole('button', { name: 'Select' }).click()
+  await undoRedoStatus(flow, 'Scored', 'Selected')
+  await candidateRow(page, flow).getByRole('button', { name: 'Pin' }).click()
+  await page.getByRole('dialog', { name: /Pin emberforge\/cinder-cli/ }).getByRole('button', { name: 'Confirm pin' }).click()
+  await undoRedoStatus(flow, 'Selected', 'Pinned')
+  await candidateRow(page, flow).getByRole('button', { name: 'Queue' }).click()
+  await undoRedoStatus(flow, 'Pinned', 'Queued')
+
+  await page.getByRole('button', { name: 'Build queue', exact: true }).click()
+  await page.getByRole('button', { name: `Remove ${flow} from queue` }).click()
+  await page.getByRole('button', { name: 'Candidates', exact: true }).click()
+  await undoRedoStatus(flow, 'Queued', 'Selected')
+
+  await page.getByRole('button', { name: 'Build queue', exact: true }).click()
+  const firstBefore = await page.getByRole('list', { name: 'Ordered build queue' }).locator('li').first().textContent()
+  await page.getByRole('button', { name: /Move .* down/ }).first().click()
+  const firstAfter = await page.getByRole('list', { name: 'Ordered build queue' }).locator('li').first().textContent()
+  expect(firstAfter).not.toBe(firstBefore)
+  await page.getByRole('button', { name: 'Undo' }).click()
+  await expect(page.getByRole('list', { name: 'Ordered build queue' }).locator('li').first()).toContainText(firstBefore.match(/[a-z]+\/[a-z-]+/)[0])
+  await page.getByRole('button', { name: 'Redo' }).click()
+  await expect(page.getByRole('list', { name: 'Ordered build queue' }).locator('li').first()).toContainText(firstAfter.match(/[a-z]+\/[a-z-]+/)[0])
+
+  await page.getByRole('button', { name: 'Candidates', exact: true }).click()
+  const bulk = ['lanternvale/glow-jobs', 'bluequartz/prism-diff', 'willowgrid/sedge-graph']
+  for (const name of bulk) await candidateRow(page, name).getByRole('checkbox').check()
+  await page.getByRole('button', { name: 'Bulk Score' }).click()
+  for (const name of bulk) await expect(candidateRow(page, name)).toContainText('Scored')
+  await page.getByRole('button', { name: 'Undo' }).click()
+  for (const name of bulk) await expect(candidateRow(page, name)).toContainText('Candidate')
+  await page.getByRole('button', { name: 'Redo' }).click()
+  for (const name of bulk) await expect(candidateRow(page, name)).toContainText('Scored')
+
+  const beforeImport = await exportPack(page)
+  await candidateRow(page, 'northloom/thread-cache').getByRole('button', { name: 'Reject' }).click()
+  await page.getByRole('dialog', { name: /Reject northloom\/thread-cache/ }).getByLabel('Rejection reason').selectOption('too-large')
+  await page.getByRole('dialog', { name: /Reject northloom\/thread-cache/ }).getByRole('button', { name: 'Reject', exact: true }).click()
+  await page.getByRole('button', { name: 'Import', exact: true }).click()
+  await page.getByRole('dialog', { name: 'Import sourcing pack' }).getByLabel('Raw JSON text').fill(JSON.stringify(beforeImport))
+  await page.getByRole('dialog', { name: 'Import sourcing pack' }).getByRole('button', { name: 'Apply import' }).click()
+  await expect(candidateRow(page, 'northloom/thread-cache')).toContainText('Scored')
+  await page.getByRole('button', { name: 'Undo' }).click()
+  await expect(candidateRow(page, 'northloom/thread-cache')).toContainText('Rejected')
+  await page.getByRole('button', { name: 'Redo' }).click()
+  await expect(candidateRow(page, 'northloom/thread-cache')).toContainText('Scored')
+
+  await page.getByRole('button', { name: 'Timeline', exact: true }).click()
+  await expect(page.getByRole('button', { name: /Import · 1/ })).toBeVisible()
+  await page.getByRole('button', { name: 'Quota', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Quota dashboard' })).toBeVisible()
+  await page.getByRole('button', { name: 'Candidates', exact: true }).click()
+  expect((await exportPack(page)).queue.map((entry) => entry.name)).toEqual(beforeImport.queue.map((entry) => entry.name))
+})

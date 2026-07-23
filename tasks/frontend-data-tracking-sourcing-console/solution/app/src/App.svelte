@@ -60,6 +60,7 @@
   let modalCard = $state(null);
   let panelCard = $state(null);
   let paletteCard = $state(null);
+  let deferredPin = $state(null);
 
   const importFormSchema = z.object({ raw:z.string().min(1,'JSON field: paste a sourcing pack or choose the sample.').superRefine((raw,ctx) => {
     let data; try { data=JSON.parse(raw); } catch { ctx.addIssue({code:'custom',message:'JSON field: enter valid JSON.'}); return; }
@@ -162,7 +163,14 @@
   function toggleVisibleSelection() {
     const all=app.visibleCandidates.length>0 && app.visibleCandidates.every((candidate)=>app.selectedIds.includes(candidate.id)); app.selectAllVisible(!all);
   }
-  function switchView(view) { app.activeView=view; app.queueOpen=false; app.mobileMenu=false; }
+  function switchView(view) {
+    if (app.modal?.type==='pin') { deferredPin={...app.modal}; app.modal=null; }
+    app.activeView=view; app.queueOpen=false; app.mobileMenu=false;
+  }
+  function resumeDeferredPin() {
+    if (!deferredPin) return;
+    modalReturnFocus=document.activeElement; app.modal=deferredPin; deferredPin=null; focusDialog(()=>modalCard);
+  }
   function sortLabel(key) { return app.sort.key===key ? (app.sort.direction==='asc'?'ascending':'descending') : undefined; }
   async function copyText(text,label) {
     try { await navigator.clipboard.writeText(text); copied=label; app.notify(`${label} copied to the clipboard.`); setTimeout(()=>copied='',1800); }
@@ -263,6 +271,7 @@
           <button class="btn-soft icon-btn" onclick={()=>app.undo()} disabled={!app.undoStack.length} aria-label="Undo" title="Undo (Ctrl/Command-Z)"><IconArrowBackUp size={17}/></button>
           <button class="btn-soft icon-btn" onclick={()=>app.redo()} disabled={!app.redoStack.length} aria-label="Redo" title="Redo (Ctrl/Command-Shift-Z)"><IconRotateClockwise size={17}/></button>
         </div>
+        {#if deferredPin}<button class="btn-soft" onclick={resumeDeferredPin} aria-label="Resume pending pin"><IconPin size={16}/>Pending pin</button>{/if}
         <button class="btn-soft desktop-actions" onclick={()=>openPanel('import')}><IconDatabaseImport size={16}/>Import</button>
         <button class="btn-soft desktop-actions" onclick={()=>openPanel('export')}><IconFileExport size={16}/>Export pack</button>
         <button class="btn-soft icon-btn desktop-actions" onclick={openHelp} aria-label="Keyboard shortcuts" title="Keyboard shortcuts"><IconKeyboard size={17}/></button>
