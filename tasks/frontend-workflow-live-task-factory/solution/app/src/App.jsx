@@ -143,7 +143,7 @@ function Sidebar() {
     <aside className={cx('sidebar', open && 'open')}>
       <div className="nav-label">Workbench</div>
       <nav className="nav-list" aria-label="Primary navigation">
-        {navItems.map(({ id, label, icon: Icon }) => <button key={id} className={cx('nav-item', active === id && 'active')} aria-current={active === id ? 'page' : undefined} onClick={() => setView(id)}><Icon size={18} weight={active === id ? 'fill' : 'regular'} />{label}</button>)}
+        {navItems.map(({ id, label, icon: Icon }) => <button key={id} className={cx('nav-item', active === id && 'active')} aria-current={active === id ? 'page' : undefined} onClick={() => { setView(id); setOpen(false); }}><Icon size={18} weight={active === id ? 'fill' : 'regular'} />{label}</button>)}
       </nav>
       <div className="nav-foot"><strong>Portable by design</strong>Every completed run becomes a validated JSON bundle you can export, import, and keep.</div>
     </aside>
