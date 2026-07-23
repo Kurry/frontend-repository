@@ -1,4 +1,5 @@
 import { Component, For, Show } from 'solid-js';
+import { Dialog } from '@ark-ui/solid';
 import {
   store,
   activeIdentity,
@@ -44,8 +45,7 @@ const Dashboard: Component = () => {
               <div>
                 <div class="text-xs text-slate-400 mb-1">Public key (npub)</div>
                 <div class="flex flex-wrap items-start gap-2">
-                  <div
-                    data-testid="dashboard-npub"
+                  <div data-testid="dashboard-npub" style={{ "view-transition-name": "dashboard-npub" }} style={{ "view-transition-name": "dashboard-npub" }}
                     class="flex-1 min-w-0 rounded-lg bg-slate-900 px-3 py-2 font-mono text-sm text-slate-200 break-all overflow-hidden"
                   >
                     {identity().npub}
@@ -58,13 +58,37 @@ const Dashboard: Component = () => {
                   >
                     Copy npub
                   </button>
+                <Dialog.Root>
+                  <Dialog.Trigger class="hover-wash rounded-lg border border-slate-600 px-3 py-2 text-xs font-medium text-slate-200 hover:bg-slate-700">
+                    Rotate keys
+                  </Dialog.Trigger>
+                  <Dialog.Backdrop class="fixed inset-0 bg-black/60 z-40 dialog-backdrop" />
+                  <Dialog.Positioner class="fixed inset-0 flex items-center justify-center p-4 z-50">
+                    <Dialog.Content class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-xl max-w-sm w-full dialog-panel">
+                      <Dialog.Title class="text-lg font-semibold text-slate-100 mb-2">Rotate keys?</Dialog.Title>
+                      <Dialog.Description class="text-sm text-slate-400 mb-6">
+                        This will generate a new keypair for {identity().nickname}. The old keys will be lost permanently.
+                      </Dialog.Description>
+                      <div class="flex justify-end gap-3">
+                        <Dialog.CloseTrigger class="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700">Cancel</Dialog.CloseTrigger>
+                        <Dialog.CloseTrigger
+                          onClick={() => {
+                            if (!document.startViewTransition) { rotateIdentityKeys(identity().id); } else { document.startViewTransition(() => { rotateIdentityKeys(identity().id); toaster.create({ title: 'Success', description: 'Keys rotated successfully.' }); }); }
+                          }}
+                          class="px-4 py-2 rounded-lg text-sm font-medium bg-rose-600 text-white hover:bg-rose-500"
+                        >
+                          Rotate
+                        </Dialog.CloseTrigger>
+                      </div>
+                    </Dialog.Content>
+                  </Dialog.Positioner>
+                </Dialog.Root>
                 </div>
               </div>
               <div>
                 <div class="text-xs text-slate-400 mb-1">Private key (nsec)</div>
                 <div class="flex flex-wrap items-start gap-2">
-                  <div
-                    data-testid="dashboard-nsec"
+                  <div data-testid="dashboard-nsec" style={{ "view-transition-name": "dashboard-nsec" }} style={{ "view-transition-name": "dashboard-nsec" }}
                     class="flex-1 min-w-0 rounded-lg bg-slate-900 px-3 py-2 font-mono text-sm text-slate-200 break-all overflow-hidden"
                   >
                     {store.revealedIdentityId === identity().id ? identity().nsec : '•'.repeat(20)}
