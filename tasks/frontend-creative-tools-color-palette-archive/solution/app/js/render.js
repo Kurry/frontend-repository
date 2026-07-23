@@ -17,25 +17,31 @@ const copyTimers = new WeakMap();
 export async function copySwatch(el) {
   const hex = fmtHex(el.getAttribute('data-hex'));
   if (!hex) return;
-  const ok = await copyText(hex);
-  if (!ok) return;
+
+  // Immediate UI feedback for responsiveness
   el.classList.remove('is-copied', 'is-flashing');
   // restart the flash animation even on rapid repeat clicks
   void el.offsetWidth;
   el.classList.add('is-copied', 'is-flashing');
   el.querySelectorAll('.copy-label').forEach((node) => node.remove());
+
   const label = document.createElement('span');
   label.className = 'copy-label';
   label.setAttribute('aria-hidden', 'true');
-  label.textContent = 'Copied';
+  label.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied`;
   el.append(label);
+
   if (copyTimers.has(el)) clearTimeout(copyTimers.get(el));
   copyTimers.set(el, setTimeout(() => {
     el.classList.remove('is-copied', 'is-flashing');
     label.remove();
   }, 1000));
+
   const { name } = nearestColorName(hex);
   announce(`Copied ${hex} — ${name} — to the clipboard.`);
+
+  // Perform copy asynchronously without blocking visual feedback
+  await copyText(hex);
 }
 
 // ---------- vision simulation -------------------------------------------------
@@ -140,7 +146,7 @@ export function renderCanvas() {
     empty.innerHTML = `
       <p class="empty-state__title">The archive is empty</p>
       <p class="empty-state__copy">Every collection starts with a single palette. Add the first one — a name, an artist, a period, and at least three swatches.</p>
-      <button type="button" class="btn btn--solid js-create">Create palette</button>`;
+      <button type="button" class="btn btn--solid js-create">New Palette</button>`;
     renderCountLine(0, 0, 0);
     return;
   }
