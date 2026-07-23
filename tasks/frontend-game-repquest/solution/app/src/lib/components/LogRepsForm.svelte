@@ -93,7 +93,7 @@
     <button
       onclick={handleSubmit}
       data-action="log-reps"
-      class="text-slate-900 font-bold px-5 py-3 rounded-lg text-sm transition-all hover:shadow-lg whitespace-nowrap self-end focus-visible:ring-2"
+      class="text-slate-900 font-bold px-5 py-3 rounded-lg text-sm transition-all hover:shadow-lg hover:brightness-110 whitespace-nowrap self-end focus-visible:ring-2"
       style="background: var(--accent); box-shadow: 0 0 0 0 transparent;"
     >
       Log reps

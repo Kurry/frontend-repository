@@ -34,11 +34,10 @@
     <ul class="max-h-72 overflow-y-auto space-y-2 pr-1" data-history-list>
       {#each repHistory as set (set.id)}
         <li
-          in:fly={{ y: -14, opacity: 0, duration: 260 }}
-          out:fly={{ x: 28, opacity: 0, duration: 220 }}
-          class="flex items-center justify-between gap-2 bg-slate-900 rounded-lg px-3 py-2.5 group hover:bg-slate-900/70 transition-colors border border-slate-800"
+          class="flex items-center justify-between gap-2 bg-slate-900 rounded-lg px-3 py-2.5 group hover:bg-slate-900/70 transition-colors border border-slate-800 history-row"
           data-history-row={set.id}
           data-rep-count={set.reps}
+          out:fade={{ duration: 220 }}
         >
           <div class="flex-1 min-w-0">
             <div class="flex items-baseline gap-2">
@@ -65,3 +64,13 @@
     </ul>
   {/if}
 </div>
+
+<style>
+  .history-row {
+    animation: history-enter 0.26s ease-out forwards;
+  }
+  @keyframes history-enter {
+    from { opacity: 0; transform: translateY(-14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
