@@ -535,15 +535,15 @@
     splitChars(titleEl, a.name);
     renderScrapbook(slug);
 
-    $("#pageTurnBtn").addEventListener("click", pageTurn);
-    $("#caseNextBtn").addEventListener("click", advanceCase);
-    $("#pinBtn").addEventListener("click", function () {
+    var el_pageTurnBtn = $("#pageTurnBtn"); if (el_pageTurnBtn) el_pageTurnBtn.addEventListener("click", pageTurn);
+    var el_caseNextBtn = $("#caseNextBtn"); if (el_caseNextBtn) el_caseNextBtn.addEventListener("click", advanceCase);
+    var el_pinBtn = $("#pinBtn"); if (el_pinBtn) el_pinBtn.addEventListener("click", function () {
       var btn = $("#pinBtn");
       btn.classList.add("is-press");
       setTimeout(function () { btn.classList.remove("is-press"); }, 180);
       togglePin(slug);
     });
-    $("#saveNoteBtn").addEventListener("click", function () {
+    var el_saveNoteBtn = $("#saveNoteBtn"); if (el_saveNoteBtn) el_saveNoteBtn.addEventListener("click", function () {
       var val = $("#fieldNote").value;
       var res = saveNote(slug, val);
       var err = $("#fieldNoteError");
@@ -555,13 +555,13 @@
         err.textContent = "";
       }
     });
-    $("#undoBtn").addEventListener("click", function () {
+    var el_undoBtn = $("#undoBtn"); if (el_undoBtn) el_undoBtn.addEventListener("click", function () {
       var btn = $("#undoBtn");
       btn.classList.add("is-press");
       setTimeout(function () { btn.classList.remove("is-press"); }, 180);
       undoScrapbook();
     });
-    $("#redoBtn").addEventListener("click", function () {
+    var el_redoBtn = $("#redoBtn"); if (el_redoBtn) el_redoBtn.addEventListener("click", function () {
       var btn = $("#redoBtn");
       btn.classList.add("is-press");
       setTimeout(function () { btn.classList.remove("is-press"); }, 180);
@@ -1023,7 +1023,7 @@
       "</div>";
     container.appendChild(wrap);
     loadWavePart(1);
-    $("#wavePlay").addEventListener("click", function () { state.audioPlaying ? pauseAudio() : playAudio(); });
+    var el_wavePlay = $("#wavePlay"); if (el_wavePlay) el_wavePlay.addEventListener("click", function () { state.audioPlaying ? pauseAudio() : playAudio(); });
     wrap.querySelectorAll(".wave-player__part").forEach(function (b) {
       b.addEventListener("click", function () {
         wrap.querySelectorAll(".wave-player__part").forEach(function (x) { x.classList.remove("is-active"); });
@@ -1420,24 +1420,23 @@
 
   // ================= Boot =================
   function wireChrome() {
-    popup.addEventListener("click", function(e) { if(e.target === popup) closePopup(); });
 
     document.querySelectorAll("[data-nav]").forEach(bindNav);
-    $("#readingListBtn").addEventListener("click", openReadingList);
-    $("#readingListBtnCase").addEventListener("click", openReadingList);
-    $("#readingListClose").addEventListener("click", closeReadingList);
-    $("#exportDossierBtn").addEventListener("click", openDossier);
-    $("#exportDossierBtnCase").addEventListener("click", openDossier);
-    $("#dossierClose").addEventListener("click", closeDossier);
+    var rlb = $("#readingListBtn"); if(rlb) rlb.addEventListener("click", openReadingList);
+    var el_readingListBtnCase = $("#readingListBtnCase"); if (el_readingListBtnCase) el_readingListBtnCase.addEventListener("click", openReadingList);
+    var el_readingListClose = $("#readingListClose"); if (el_readingListClose) el_readingListClose.addEventListener("click", closeReadingList);
+    var edb = $("#exportDossierBtn"); if(edb) edb.addEventListener("click", openDossier);
+    var el_exportDossierBtnCase = $("#exportDossierBtnCase"); if (el_exportDossierBtnCase) el_exportDossierBtnCase.addEventListener("click", openDossier);
+    var el_dossierClose = $("#dossierClose"); if (el_dossierClose) el_dossierClose.addEventListener("click", closeDossier);
     $$(".dossier__format").forEach(function (b) {
       b.addEventListener("click", function () { setDossierFormat(b.dataset.format); });
     });
-    $("#dossierCopy").addEventListener("click", function () { copyDossier(); });
-    $("#dossierDownload").addEventListener("click", downloadDossier);
-    $("#dossierImportBtn").addEventListener("click", function () {
+    var el_dossierCopy = $("#dossierCopy"); if (el_dossierCopy) el_dossierCopy.addEventListener("click", function () { copyDossier(); });
+    var el_dossierDownload = $("#dossierDownload"); if (el_dossierDownload) el_dossierDownload.addEventListener("click", downloadDossier);
+    var el_dossierImportBtn = $("#dossierImportBtn"); if (el_dossierImportBtn) el_dossierImportBtn.addEventListener("click", function () {
       importDossierJson($("#dossierImportArea").value);
     });
-    $("#dossierImportFile").addEventListener("change", function (e) {
+    var el_dossierImportFile = $("#dossierImportFile"); if (el_dossierImportFile) el_dossierImportFile.addEventListener("change", function (e) {
       var file = e.target.files && e.target.files[0];
       if (!file) return;
       var reader = new FileReader();
@@ -1450,14 +1449,14 @@
     $$(".home-filter").forEach(function (b) {
       b.addEventListener("click", function () { setCategoryFilter(b.dataset.filter); });
     });
-    $("#homeSearch").addEventListener("input", function (e) {
+    var el_homeSearch = $("#homeSearch"); if (el_homeSearch) el_homeSearch.addEventListener("input", function (e) {
       setSearchQuery(e.target.value);
     });
-    $("#paletteInput").addEventListener("input", function (e) {
+    var el_paletteInput = $("#paletteInput"); if (el_paletteInput) el_paletteInput.addEventListener("input", function (e) {
       state.paletteIndex = 0;
       renderPalette(e.target.value);
     });
-    $("#paletteInput").addEventListener("keydown", function (e) {
+    var el_paletteInput = $("#paletteInput"); if (el_paletteInput) el_paletteInput.addEventListener("keydown", function (e) {
       var results = paletteResults(e.target.value);
       if (e.key === "ArrowDown") {
         e.preventDefault();
