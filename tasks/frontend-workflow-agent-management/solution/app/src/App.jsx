@@ -265,7 +265,7 @@ function AgentModal() {
   if (!open) return null
   const onSubmit = (payload) => isEdit ? updateAgent(current.id, payload) : registerAgent(payload)
   return (
-    <Modal open modalHeading={isEdit ? `Edit ${current?.name}` : 'Register Agent'} modalLabel="Agent registry" primaryButtonText={isEdit ? 'Save changes' : 'Register Agent'} secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || isSubmitting} onRequestClose={closeModal} onSecondarySubmit={closeModal} onRequestSubmit={handleSubmit(onSubmit)} preventCloseOnClickOutside selectorPrimaryFocus="#agent-name">
+    <Modal open modalHeading={isEdit ? `Edit ${current?.name}` : 'Register Agent'} modalLabel="Agent registry" primaryButtonText={isEdit ? 'Save changes' : 'Register Agent'} secondaryButtonText="Cancel" primaryButtonDisabled={isSubmitting} onRequestClose={closeModal} onSecondarySubmit={closeModal} onRequestSubmit={handleSubmit(onSubmit)} preventCloseOnClickOutside selectorPrimaryFocus="#agent-name">
       <div ref={containerRef}>
         <p className="modal-intro">{isEdit ? 'Update the API configuration for this fleet agent.' : 'Create the exact payload sent to the fleet registration API.'}</p>
         <div className="form-grid">
@@ -384,6 +384,17 @@ function ActivityTab({ agent }) {
 function DetailPanel() {
   const store = useFleetStore()
   const agent = store.agents.find((item) => item.id === store.detailAgentId)
+  useEffect(() => {
+    if (!agent) return undefined
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        event.stopPropagation()
+        store.closeDetail()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [agent, store.closeDetail])
   if (!agent) return null
   return (
     <>
@@ -456,7 +467,7 @@ function ImportModal() {
     if (result.success) importFleet(result.data)
   }
   return (
-    <Modal open modalHeading="Import fleet" modalLabel="Fleet snapshot" primaryButtonText="Import fleet" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || isSubmitting} onRequestClose={close} onSecondarySubmit={close} onRequestSubmit={handleSubmit(submit)} size="lg" preventCloseOnClickOutside selectorPrimaryFocus="#fleet-json-import">
+    <Modal open modalHeading="Import fleet" modalLabel="Fleet snapshot" primaryButtonText="Import fleet" secondaryButtonText="Cancel" primaryButtonDisabled={isSubmitting} onRequestClose={close} onSecondarySubmit={close} onRequestSubmit={handleSubmit(submit)} size="lg" preventCloseOnClickOutside selectorPrimaryFocus="#fleet-json-import">
       <div ref={containerRef}>
         <p className="modal-intro">Paste a complete fleet JSON document. A valid import replaces the current registry and can be undone.</p>
         <Controller name="jsonText" control={control} render={({ field }) => (
