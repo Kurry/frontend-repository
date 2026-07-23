@@ -52,6 +52,31 @@ h1, h2, h3, h4, h5, h6, .display-font, .chapter-title {
   font-family: 'Space Grotesk', system-ui, sans-serif;
 }
 
+/* Instruction-mandated all-caps chapter titles (expressive display face).
+   The convention: chapter display titles render ALL CAPS; nav labels, manager
+   labels, and CTAs use Title Case — applied uniformly across the app. */
+.chapter-title { text-transform: uppercase; }
+
+/* Visible focus indicator on every interactive control (keyboard operability). */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ---- Pre-entrance hidden state ----
+   An inline head script adds .entrance-pending before first paint (unless
+   prefers-reduced-motion), so a fresh load paints the chrome, bento cells, and
+   hero plane in their pre-entrance state even before the React islands hydrate.
+   MotionManager removes the class the moment GSAP owns these styles inline. */
+html.entrance-pending #chrome { transform: translateY(-100%); }
+html.entrance-pending .bento-mission,
+html.entrance-pending .bento-clock,
+html.entrance-pending .hero-plane { clip-path: inset(100% 0 0 0); }
+
+/* ---- Lenis smooth-scroll host styles (recommended by the library) ---- */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+
 .notch-br {
   border-bottom-right-radius: var(--ridge-radius-module);
   border-top-left-radius: 4px;
@@ -135,13 +160,13 @@ tbody tr.row-exit {
   from { opacity: 1; transform: scale(1) translateY(0); }
   to   { opacity: 0; transform: scale(0.96) translateY(8px); }
 }
-.overlay-in  { animation: ridge-overlay-in 0.18s cubic-bezier(0.16, 0.84, 0.44, 1) both; }
-.overlay-out { animation: ridge-overlay-out 0.16s ease-in both; }
+.overlay-in  { animation: ridge-overlay-in 0.24s cubic-bezier(0.16, 0.84, 0.44, 1) both; }
+.overlay-out { animation: ridge-overlay-out 0.2s ease-in both; }
 
 @keyframes ridge-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes ridge-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
-.backdrop-in  { animation: ridge-backdrop-in 0.18s ease both; }
-.backdrop-out { animation: ridge-backdrop-out 0.16s ease both; }
+.backdrop-in  { animation: ridge-backdrop-in 0.24s ease both; }
+.backdrop-out { animation: ridge-backdrop-out 0.2s ease both; }
 
 /* ---- Mega menu drawer slide ---- */
 @keyframes ridge-drawer-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
@@ -258,15 +283,29 @@ tbody tr.row-exit {
 .events-card:hover {
   transform: translateY(-4px);
 }
-tr[data-event-row] {
+tr[data-event-row], li[data-event-row] {
   transition: background-color 0.2s ease;
 }
 tr[data-event-row]:hover, li[data-event-row]:hover {
   background-color: color-mix(in srgb, var(--color-ink) 10%, transparent);
 }
+/* Notched CTA: brighten + slight lift + arrow nudge, all eased (never a snap). */
+.cta {
+  transition: filter 0.25s ease, transform 0.25s cubic-bezier(0.16, 0.84, 0.44, 1);
+}
+.cta svg {
+  transition: transform 0.25s cubic-bezier(0.16, 0.84, 0.44, 1);
+}
 .cta:hover {
   filter: brightness(1.1);
+  transform: translateY(-2px);
 }
 .cta:hover svg {
   transform: translateX(4px);
 }
+/* Theme toggle: rotate/fade icon swap on each theme change. */
+@keyframes ridge-theme-icon {
+  from { transform: rotate(-90deg) scale(0.6); opacity: 0; }
+  to   { transform: rotate(0deg) scale(1); opacity: 1; }
+}
+.theme-icon-swap { display: inline-flex; animation: ridge-theme-icon 0.3s cubic-bezier(0.16, 0.84, 0.44, 1) both; }

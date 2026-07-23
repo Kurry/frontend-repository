@@ -31,7 +31,7 @@ export default function CommandPalette() {
     window.setTimeout(() => {
       $commandPaletteOpen.set(false);
       setClosing(false);
-    }, 160);
+    }, 200);
   };
 
   useEffect(() => {

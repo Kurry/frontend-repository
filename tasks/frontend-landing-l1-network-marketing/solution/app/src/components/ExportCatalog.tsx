@@ -14,6 +14,7 @@ export default function ExportCatalog() {
   const [copiedIcs, setCopiedIcs] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
   const [importSuccess, setImportSuccess] = useState<string | null>(null);
+  const [pasteText, setPasteText] = useState('');
   const [closing, setClosing] = useState(false);
   const firstFocusRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -29,7 +30,7 @@ export default function ExportCatalog() {
     window.setTimeout(() => {
       $exportCatalogOpen.set(false);
       setClosing(false);
-    }, 160);
+    }, 200);
   };
 
   useEffect(() => {
@@ -92,6 +93,24 @@ export default function ExportCatalog() {
       if (fileInputRef.current) fileInputRef.current.value = '';
     };
     reader.readAsText(file);
+  };
+
+  // Paste-based import path: accepts the same declared-catalog packet without a
+  // file picker, sharing loadCatalog (and its validation/rejection) with the
+  // file path above.
+  const handlePasteImport = () => {
+    const res = loadCatalog(pasteText, 'pasted catalog');
+    if (res.ok) {
+      setImportSuccess('Pasted catalog loaded — events and leads restored.');
+      setImportError(null);
+      setPasteText('');
+      announce('Catalog imported from pasted JSON. Events and leads restored.');
+      setTimeout(() => setImportSuccess(null), 5000);
+    } else {
+      setImportError(res.error || 'Import failed: pasted catalog is not a valid catalog.');
+      setImportSuccess(null);
+      announce(res.error || 'Catalog import failed.');
+    }
   };
 
   const trapFocus = (e: React.KeyboardEvent) => {
@@ -180,6 +199,23 @@ export default function ExportCatalog() {
                 />
                 <button className="btn btn-outline notch-br gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => fileInputRef.current?.click()}>
                   <UploadSimple size={16} /> Load catalog
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label htmlFor="catalog-paste" className="text-sm font-medium">Or paste catalog JSON</label>
+                <textarea
+                  id="catalog-paste"
+                  className="textarea textarea-bordered w-full h-24 font-mono text-xs notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                  placeholder='Paste a previously exported catalog packet ({"version": 1, ...}) here'
+                  value={pasteText}
+                  onChange={e => setPasteText(e.target.value)}
+                />
+                <button
+                  className="btn btn-outline btn-sm notch-br gap-2 self-start focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                  onClick={handlePasteImport}
+                >
+                  <UploadSimple size={16} /> Load pasted catalog
                 </button>
               </div>
 

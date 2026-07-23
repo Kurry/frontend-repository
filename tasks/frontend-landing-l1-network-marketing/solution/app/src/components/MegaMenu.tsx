@@ -114,7 +114,7 @@ export default function MegaMenu() {
             <p className="text-sm text-accent uppercase tracking-widest mb-2">{panel.label}</p>
             <h3 className="font-semibold text-2xl mb-3">{panel.title}</h3>
             <p className="text-sm opacity-75 mb-5">{panel.copy}</p>
-            <button type="button" className="btn btn-sm btn-primary notch-br gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => jumpTo(panel.target)}>
+            <button type="button" className="cta btn btn-sm btn-primary notch-br gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => jumpTo(panel.target)}>
               {panel.cta} <ArrowRight size={15} aria-hidden="true" />
             </button>
           </section>

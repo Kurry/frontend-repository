@@ -25,18 +25,29 @@ export default function ContactForm() {
     mode: 'all',
   });
 
+  const showSuccess = () => {
+    setSuccess(true);
+    setTimeout(() => setSuccess(false), 5000);
+  };
+
   const onSubmit = (data: ContactFormValues) => {
     addLead(data);
-    setSuccess(true);
+    showSuccess();
     announce(`Contact lead captured from ${data.name}. Session leads total updated.`);
     reset();
-    setTimeout(() => setSuccess(false), 5000);
   };
 
   useEffect(() => {
     const resetFromWorkflow = () => { reset(); setSuccess(false); };
+    // WebMCP form.submit routes through the same store action as the visible
+    // form; this event keeps the visible success state in sync with it.
+    const successFromWorkflow = () => { reset(); showSuccess(); };
     window.addEventListener('ridge:contact-reset', resetFromWorkflow);
-    return () => window.removeEventListener('ridge:contact-reset', resetFromWorkflow);
+    window.addEventListener('ridge:contact-success', successFromWorkflow);
+    return () => {
+      window.removeEventListener('ridge:contact-reset', resetFromWorkflow);
+      window.removeEventListener('ridge:contact-success', successFromWorkflow);
+    };
   }, [reset]);
 
   const errorSummary = Object.values(errors).map(e => e?.message).filter(Boolean).join(' ');

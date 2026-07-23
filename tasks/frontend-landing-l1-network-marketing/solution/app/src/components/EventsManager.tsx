@@ -38,7 +38,7 @@ export default function EventsManager() {
       setClosing(false);
       lastFocused.current?.focus({ preventScroll: true });
       lastFocused.current = null;
-    }, 160);
+    }, 200);
   };
 
   useEffect(() => {
@@ -162,6 +162,16 @@ export default function EventsManager() {
                 <ArrowUUpRight size={18} />
               </button>
             </div>
+
+            {/* Always-present bulk control: activating it with zero rows selected
+                is inert (no confirmation dialog, no count change) — deliberately
+                clickable so that inertness stays observable. */}
+            <button
+              className={`btn btn-ghost btn-sm notch-br gap-2 border-l border-white/10 pl-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${selectedIds.length === 0 ? 'opacity-50' : 'text-error'}`}
+              onClick={handleDeleteSelected}
+            >
+              <Trash size={16} /> Delete selected{selectedIds.length > 0 ? ` (${selectedIds.length})` : ''}
+            </button>
           </div>
 
           <div className="flex items-center gap-2 text-sm" aria-live="polite">
@@ -173,7 +183,7 @@ export default function EventsManager() {
 
         {/* Animated bulk action bar — mounts with an entrance when selection is non-empty */}
         {selectedIds.length > 0 && (
-          <div className="bulk-bar-in overflow-hidden px-4 py-3 flex items-center justify-between gap-4 border-b border-accent/30 bg-accent/10" role="region" aria-label="Bulk selection actions">
+          <div className="bulk-bar-in overflow-hidden px-4 py-3 flex flex-wrap items-center justify-between gap-4 border-b border-accent/30 bg-accent/10" role="region" aria-label="Bulk selection actions">
             <span className="text-sm font-medium">{selectedIds.length} selected</span>
             <button className="btn btn-error btn-sm notch-br gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={handleDeleteSelected}>
               <Trash size={16} /> Delete selected
@@ -255,8 +265,8 @@ export default function EventsManager() {
                       Date {sort.by === 'date' && (sort.direction === 'asc' ? <ArrowUp size={14}/> : <ArrowDown size={14}/>)}
                     </button>
                   </th>
-                  <th>City</th>
-                  <th>Category</th>
+                  <th className="hidden sm:table-cell">City</th>
+                  <th className="hidden sm:table-cell">Category</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -265,7 +275,7 @@ export default function EventsManager() {
                 {filteredEvents.map(event => {
                   const leaving = leavingIds.includes(event.id);
                   return (
-                    <tr key={event.id} className={`group hover:bg-surface/50 transition-colors ${leaving ? 'row-exit' : 'row-enter'}`}>
+                    <tr key={event.id} data-event-row={event.id} className={`group hover:bg-surface/50 transition-colors ${leaving ? 'row-exit' : 'row-enter'}`}>
                       <td>
                         <input type="checkbox" className="checkbox checkbox-sm notch-br"
                           disabled={leaving}
@@ -274,10 +284,10 @@ export default function EventsManager() {
                           aria-label={`Select ${event.title}`}
                         />
                       </td>
-                      <td className="font-medium">{event.title}</td>
+                      <td className="font-medium max-w-[9rem] truncate sm:max-w-none">{event.title}</td>
                       <td className="tabular-nums">{formatEventDate(event.date)}</td>
-                      <td>{event.city}</td>
-                      <td>{event.category}</td>
+                      <td className="hidden sm:table-cell">{event.city}</td>
+                      <td className="hidden sm:table-cell">{event.category}</td>
                       <td>
                         <div className={`badge badge-sm notch-br ${
                           event.status === 'featured' ? 'badge-accent' :

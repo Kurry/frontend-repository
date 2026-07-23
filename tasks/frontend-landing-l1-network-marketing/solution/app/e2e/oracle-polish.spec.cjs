@@ -13,8 +13,10 @@ test('light theme, complete chapters, and mega-menu dismissal remain observable'
   }));
   expect(colors).toEqual({ body: 'rgb(0, 0, 0)', background: 'rgb(255, 255, 255)' });
 
-  for (const name of ['Developer resources', 'Solutions', 'Community', 'News & stories']) {
-    await expect(page.getByRole('heading', { name, exact: true })).toBeVisible();
+  // Chapter titles render ALL CAPS via text-transform (instruction-mandated
+  // casing), so match the accessible name case-insensitively.
+  for (const name of [/^developer resources$/i, /^solutions$/i, /^community$/i, /^news & stories$/i]) {
+    await expect(page.getByRole('heading', { name })).toBeVisible();
   }
 
   await page.getByRole('button', { name: 'Open menu' }).click();
