@@ -684,13 +684,15 @@
     titleRow.appendChild(selCb);
 
     if (t.notes && t.notes.length) {
-      var notes = el("span", "notes-ind", "✎");
+      var notes = el("span", "notes-ind");
+      notes.innerHTML = '<svg viewBox="0 0 20 20" width="13" height="13" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 4l4 4M14.5 2.5a2.12 2.12 0 0 1 3 3L6 17H2v-4z"/></svg>';
       notes.setAttribute("role", "img");
       notes.setAttribute("aria-label", "Task has notes");
       notes.title = "Task has notes";
       titleRow.appendChild(notes);
     }
-    var del = el("button", "task-del", "×");
+    var del = el("button", "task-del");
+    del.innerHTML = '<svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M4 4l12 12M16 4L4 16"/></svg>';
     del.type = "button";
     del.dataset.act = "delete";
     del.setAttribute("aria-label", "Delete task: " + t.title);
@@ -972,10 +974,16 @@
     var tray = byId("bulk-tray");
     if (!tray) return;
     if (state.selected.length) {
+      tray.classList.remove("closing");
       tray.hidden = false;
       byId("bulk-count").textContent = state.selected.length + " selected";
     } else {
-      tray.hidden = true;
+      if (!tray.hidden && !tray.classList.contains("closing")) {
+        tray.classList.add("closing");
+        setTimeout(function() {
+          if (state.selected.length === 0) tray.hidden = true;
+        }, 220);
+      }
     }
     ["bulk-complete", "bulk-move", "bulk-delete"].forEach(function (id) {
       byId(id).disabled = state.selected.length === 0;
