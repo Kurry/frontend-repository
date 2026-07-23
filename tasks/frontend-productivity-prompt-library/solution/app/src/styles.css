@@ -1408,6 +1408,28 @@ button:active:not(:disabled),
   transition: transform 120ms linear;
 }
 
+.cds--tag--purple,
+.cds--tag--cyan,
+.cds--tag--blue,
+.cds--tag--teal,
+.cds--tag--magenta,
+.cds--tag--green {
+  color: #161616 !important;
+}
+
+.library-health {
+  min-width: 14rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #c6c6c6;
+}
+.library-health__heading { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.75rem; }
+.library-health__meter { height: 0.35rem; margin: 0.4rem 0; overflow: hidden; background: #e0e0e0; border-radius: 999px; }
+.library-health__meter span { display: block; height: 100%; background: linear-gradient(90deg, #007d79, #0f62fe); transition: width 320ms ease; }
+.library-health p { margin: 0; color: #525252; font-size: 0.6875rem; }
+.offline-ready { display: inline-flex; align-items: center; gap: 0.35rem; margin-top: 0.5rem; color: #005d5d; font-size: 0.6875rem; font-weight: 600; }
+.offline-ready > span { width: 0.45rem; height: 0.45rem; background: #24a148; border-radius: 50%; box-shadow: 0 0 0 0.2rem rgb(36 161 72 / 0.15); }
+
 .technique-chart {
   display: grid;
   gap: 0.45rem;

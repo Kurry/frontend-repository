@@ -616,13 +616,14 @@ function LibraryTable({ prompts }) {
 
 function PromptFormModal({ modal }) {
   const prompts = useLibraryStore((state) => state.prompts);
+  const draftPrompt = useLibraryStore((state) => state.draftPrompt);
   const closeModal = closeModalWithFocus;
   const createPrompt = useLibraryStore((state) => state.createPrompt);
   const updatePrompt = useLibraryStore((state) => state.updatePrompt);
   const setDraftPrompt = useLibraryStore((state) => state.setDraftPrompt);
   const clearDraftPrompt = useLibraryStore((state) => state.clearDraftPrompt);
   const existing = modal.type === 'edit' ? prompts.find((prompt) => prompt.id === modal.promptId) : null;
-  const initial = modal.restoredData || (existing ? requestFromPrompt(existing) : { title: '', body: '', technique: '', description: '' });
+  const initial = modal.restoredData || (existing ? requestFromPrompt(existing) : draftPrompt) || { title: '', body: '', technique: '', description: '' };
   const [attachments, setAttachments] = useState(existing?.attachments || []);
   const submitLock = useRef(false);
   const [submitting, setSubmitting] = useState(false);
@@ -1535,6 +1536,28 @@ function TechniqueChart({ prompts }) {
   );
 }
 
+function LibraryHealth({ prompts }) {
+  const withDescriptions = prompts.filter((prompt) => prompt.description?.trim()).length;
+  const withAttachments = prompts.filter((prompt) => prompt.attachments.length).length;
+  const withVersions = prompts.filter((prompt) => prompt.version > 1).length;
+  const score = prompts.length
+    ? Math.round(((withDescriptions + withAttachments + withVersions) / (prompts.length * 3)) * 100)
+    : 0;
+  return (
+    <section className="library-health" aria-label="Library health diagnostic">
+      <div className="library-health__heading">
+        <span>Library health</span>
+        <strong>{score}%</strong>
+      </div>
+      <div className="library-health__meter" role="meter" aria-label="Library health score" aria-valuemin="0" aria-valuemax="100" aria-valuenow={score}>
+        <span style={{ width: `${score}%` }} />
+      </div>
+      <p>{withDescriptions} described · {withAttachments} with context · {withVersions} evolved</p>
+      <span className="offline-ready"><span aria-hidden="true" /> Offline-ready workspace</span>
+    </section>
+  );
+}
+
 function HeaderPreferences() {
   const theme = useLibraryStore((state) => state.theme);
   const density = useLibraryStore((state) => state.density);
@@ -1681,6 +1704,7 @@ function App() {
             <strong>{String(prompts.length).padStart(2, '0')}</strong>
             <span>live prompts</span>
             <TechniqueChart prompts={prompts} />
+            <LibraryHealth prompts={prompts} />
           </div>
         </section>
         <section className="library-card" aria-label="Prompt collection">
