@@ -13,6 +13,9 @@
     autoplay: true,
     onLoad: () => {
       motif.resizeDrawingSurfaceToCanvas();
+      const dpr = Math.max(1, window.devicePixelRatio || 1);
+      canvas.width = Math.max(canvas.width, Math.ceil(canvas.clientWidth * dpr));
+      canvas.height = Math.max(canvas.height, Math.ceil(canvas.clientHeight * dpr));
       wrapper.classList.add('is-ready');
       wrapper.dataset.riveStatus = 'ready';
     },

@@ -33,6 +33,15 @@
   --accent-lime: #d2ff00;     /* rgb(210,255,0)  */
   --accent-lime-off: #b2c73a; /* rgb(178,199,58) */
   --accent-orange: #ff6b00;
+
+  --lime: #d2ff00;
+  --dark-green: #282c20;
+  --white: #f4f4ed;
+  --black: #111112;
+  --lime-off: #b2c73a;
+  --green-off-white-1: #dde1d2;
+  --green-off-white-2: #b4b8a5;
+  --orange: #ff6b00;
   --ease: cubic-bezier(0.65, 0.05, 0, 1);
   --unit: 1.25rem; /* 20px baseline */
   --sans: "Mona Sans", system-ui, sans-serif;
@@ -44,7 +53,9 @@ html, body { margin: 0; padding: 0; }
 html { overflow-x: hidden; overflow-x: clip; }
 body {
   font-family: var(--sans);
-  font-size: 16px;
+  /* Fluid body type: scales continuously between 390 and 1440 viewports
+     instead of jumping at the 992/991/767/479 breakpoints. */
+  font-size: clamp(14.75px, 14.05px + 0.21vw, 17px);
   background: var(--surface-dark);
   color: var(--text-offwhite);
   -webkit-font-smoothing: antialiased;
@@ -85,8 +96,8 @@ img, svg, video, canvas { max-width: 100%; }
 }
 .nav-brand-link { text-decoration: none; display: inline-flex; flex-direction: column; justify-self: start; }
 .nav-brand { display: flex; flex-direction: column; line-height: 0.86; }
-.wordmark-avery { font-family: var(--serif); font-weight: 400; font-size: 32px; color: var(--text-black); }
-.wordmark-vale { font-family: var(--sans); font-weight: 900; font-size: 32px; color: var(--text-black); letter-spacing: 0.01em; }
+.wordmark-avery { font-family: var(--serif); font-weight: 400; font-size: clamp(24px, 3vw, 32px); color: var(--text-black); }
+.wordmark-vale { font-family: var(--sans); font-weight: 900; font-size: clamp(24px, 3vw, 32px); color: var(--text-black); letter-spacing: 0.01em; }
 .nav-brand-sub { display: none; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; color: var(--text-black); opacity: 0.72; margin-top: 6px; }
 .nav-middle { justify-self: center; }
 .nav-monogram { display: inline-flex; transition: transform 0.4s var(--ease); }
@@ -140,10 +151,16 @@ body.is-menu-open .nav-monogram { transform: skewX(-8deg); }
 
 /* ===== Menu overlay (dark-green, ellipse clip expand 750ms) ===== */
 .nav-menu-w {
-  position: fixed; inset: 0; z-index: 80; background: var(--surface-dark);
+  position: fixed; inset: 0; z-index: 80; background-color: var(--surface-dark);
   visibility: hidden; clip-path: ellipse(0% 0% at 100% 0%);
   transition: clip-path 0.75s var(--ease), visibility 0s linear 0.75s;
   will-change: clip-path;
+  /* The overlay paints over the whole viewport but does not hit-test over the
+     top nav strip: pointer-events re-enables on the overlay content and the X
+     control below, so the hamburger keeps receiving clicks while the menu is
+     open and rapid hamburger/X toggling can never dead-lock on a covered
+     control. */
+  pointer-events: none;
 }
 .nav-menu-w.is-open { visibility: visible; clip-path: ellipse(150% 150% at 100% 0%); transition-delay: 0s; }
 .nav-menu-topo {
@@ -156,13 +173,17 @@ body.is-menu-open .nav-monogram { transform: skewX(-8deg); }
   background-repeat: no-repeat;
 }
 .nav-menu-close {
-  position: absolute; top: 20px; right: var(--unit); width: 60px; height: 60px;
+  position: absolute; top: 20px; right: 96px; width: 60px; height: 60px;
   border: 1px solid rgba(244, 244, 237, 0.35); border-radius: 12px; background: transparent;
   color: var(--text-offwhite); display: inline-flex; align-items: center; justify-content: center; z-index: 2;
   transition: border-color 0.25s var(--ease), background 0.25s var(--ease), color 0.25s var(--ease);
+  pointer-events: auto;
 }
 .nav-menu-close:hover { border-color: var(--accent-lime); color: var(--text-black); background: var(--accent-lime); }
-.nav-menu-inner { position: relative; height: 100%; max-width: 1600px; margin: 0 auto; padding: 120px var(--unit) var(--unit); overflow: auto; }
+.nav-menu-inner {
+  position: absolute; inset: 100px 0 0 0; max-width: 1600px; margin: 0 auto;
+  padding: var(--unit); overflow: auto; pointer-events: auto;
+}
 .nav-menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--unit); min-height: 100%; }
 .nav-menu-links-col { list-style: none; margin: 0; padding: 0; }
 .nav-menu-link-w { position: relative; display: inline-block; }
@@ -435,6 +456,8 @@ section { position: relative; }
 .presskit-head { display: flex; justify-content: space-between; align-items: center; }
 .presskit-head h2 { margin: 0; font-family: var(--serif); font-weight: 400; font-size: 28px; }
 .pk-summary { font-size: 12px; color: var(--text-muted-2); letter-spacing: 0.06em; margin: 2px 0 0; }
+.pk-empty-note { margin: 0; font-size: 13px; font-weight: 600; color: var(--text-muted); }
+.pk-empty-note[hidden] { display: none; }
 .drawer-close {
   background: none; border: 1px solid rgba(244, 244, 237, 0.3); border-radius: 8px;
   color: var(--text-offwhite); width: 40px; height: 40px;
@@ -520,7 +543,6 @@ section { position: relative; }
   #hero, #horizontal-media, #social-stream, #race-calendar { scroll-margin-top: 140px; }
 }
 @media (max-width: 479px) {
-  .wordmark-avery, .wordmark-vale { font-size: 24px; }
   .nav-ham { width: 48px; height: 48px; }
   .nav-ham { flex-basis: 48px; }
   .btn-w.is-nav { font-size: 16px; padding: 12px 14px; }
@@ -541,7 +563,7 @@ section { position: relative; }
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
-  .marquee-list { animation: none !important; }
+  .marquee-list { animation: none !important; animation-play-state: paused !important; }
   .transition-w { display: none !important; transition: none; }
   .transition-label { animation: none; }
   .horizontal-section { height: auto !important; }

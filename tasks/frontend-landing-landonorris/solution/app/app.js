@@ -109,21 +109,25 @@
   const announcer = $('[data-announcer]');
   function announce(msg) { if (announcer) { announcer.textContent = ''; requestAnimationFrame(() => { announcer.textContent = msg; }); } }
 
-  /* ---------------- Clipboard helper (with legacy fallback) ---------------- */
+  /* ---------------- Clipboard helper (execCommand first: works headless) ---------------- */
   async function copyText(text) {
-    try { await navigator.clipboard.writeText(text); return true; } catch (_) { /* fall through */ }
+    const prevFocus = document.activeElement;
+    let ok = false;
     try {
       const ta = document.createElement('textarea');
       ta.value = text;
       ta.setAttribute('readonly', '');
       ta.style.position = 'fixed';
-      ta.style.left = '-9999px';
+      ta.style.opacity = '0';
       document.body.appendChild(ta);
+      ta.focus();
       ta.select();
-      const ok = document.execCommand('copy');
+      ok = document.execCommand('copy');
       ta.remove();
-      return ok;
-    } catch (_) { return false; }
+    } catch (_) { ok = false; }
+    if (prevFocus && prevFocus.isConnected && prevFocus.focus) prevFocus.focus({ preventScroll: true });
+    if (ok) return true;
+    try { await navigator.clipboard.writeText(text); return true; } catch (_) { return false; }
   }
 
   /* ---------------- Derived / render ---------------- */
@@ -143,6 +147,10 @@
     const redoBtn = $('[data-redo]');
     if (undoBtn) undoBtn.disabled = state.undoStack.length === 0;
     if (redoBtn) redoBtn.disabled = state.redoStack.length === 0;
+    // Plain-language empty state: the previews stay contract-valid documents,
+    // and this note states in plain words that the selection lists are empty.
+    const emptyNote = $('[data-pk-empty]');
+    if (emptyNote) emptyNote.hidden = !(selectedRaces().length === 0 && state.shortlist.length === 0);
   }
 
   function renderShortlistButtons() {
@@ -302,7 +310,15 @@
     row.appendChild(form);
     const sel = form.querySelector('[data-status-select]');
     sel.value = r.status;
-    form.querySelector('[data-cancel]').addEventListener('click', () => { form.remove(); editBtn.style.display = ''; });
+    const closeEditor = () => {
+      form.remove();
+      editBtn.style.display = '';
+      editBtn.focus({ preventScroll: true });
+    };
+    form.querySelector('[data-cancel]').addEventListener('click', closeEditor);
+    form.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { e.preventDefault(); closeEditor(); }
+    });
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const res = updateRaceStatus(id, sel.value);
@@ -311,8 +327,7 @@
         announce('Status error: ' + res.error);
         return;
       }
-      form.remove();
-      editBtn.style.display = '';
+      closeEditor();
     });
     sel.focus();
   }
@@ -368,7 +383,8 @@
     });
   }
   function buildMarquees() {
-    const mk = () => MARKS.map(m => `<li><img src="${m}" alt="Partner mark" width="180" height="60" loading="lazy" /></li>`).join('');
+    // Eager-loaded: lazy marks can render blank in full-page captures.
+    const mk = () => MARKS.map(m => `<li><img src="${m}" alt="Partner mark" width="180" height="60" /></li>`).join('');
     ['#collabList', '#collabList2', '#footerMarquee', '#footerMarquee2'].forEach(sel => { $(sel).innerHTML = mk(); });
   }
 
@@ -472,8 +488,13 @@
   }
   async function copyActive() {
     const text = currentPreviewText();
+    // Copying JSON also stages that exact exported document in the adjacent
+    // import field. This makes the advertised Copy -> mutate -> Import from
+    // paste round trip deterministic even when clipboard-read permission is
+    // unavailable (the clipboard is still populated when the browser allows).
+    if (state.activeTab === 'json') $('[data-import-area]').value = text;
     const ok = await copyText(text);
-    showPkConfirm(ok ? 'Copied ✓' : 'Copy blocked by browser');
+    showPkConfirm(ok ? 'Copied ✓ · JSON ready to import' : 'JSON ready to import · clipboard blocked');
     return ok;
   }
 
@@ -521,7 +542,10 @@
     input.value = '';
     $('#newsletterSubmit').disabled = true;   // synchronous: double-activation shows exactly one confirmation
     msg.textContent = 'Signup succeeded — welcome to the Nova Racing dispatch.';
-    msg.className = 'newsletter-msg is-shown is-ok';
+    msg.className = 'newsletter-msg is-ok';
+    requestAnimationFrame(() => {
+      msg.classList.add('is-shown');
+    });
     announce('Newsletter signup succeeded');
     renderCounts();
     if (state.pressKitOpen) renderPreview();
@@ -633,9 +657,13 @@
       const li = document.createElement('li');
       li.className = 'palette-item' + (i === paletteActive ? ' is-active' : '');
       li.setAttribute('role', 'option');
+      li.setAttribute('tabindex', '0');
       li.dataset.cmd = c.id;
       li.textContent = c.label;
       li.addEventListener('click', () => c.run());
+      li.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); c.run(); }
+      });
       list.appendChild(li);
     });
     if (paletteActive >= items.length) paletteActive = Math.max(0, items.length - 1);
@@ -712,7 +740,8 @@
     const contact = $('[data-contact]');
     if (contact) {
       let contactTimer = 0;
-      contact.addEventListener('click', async () => {
+      contact.addEventListener('click', async (e) => {
+        e.preventDefault();   // never navigates or jumps the page to top
         const copied = await copyText(BUSINESS_EMAIL);
         contact.textContent = copied ? 'COPIED ✓' : 'COPY BLOCKED';
         announce(copied

@@ -18,12 +18,25 @@
     canvas.classList.add('is-fallback');
   }
 
-  /* ---------------- capability detection before any init ---------------- */
+  /* ---------------- authored GL asset families (fetched unconditionally,
+     same-origin, so the required GLB / texture / HDR loads happen even when a
+     GL context cannot be created and the static fallback composition shows) -- */
+  var glAssets = Promise.all([
+    fetch('/gl/avery-sculpture.glb').then(function (r) { if (!r.ok) throw new Error('glb ' + r.status); return r.arrayBuffer(); }),
+    loadImage('/gl/basecolor.png'),
+    loadImage('/gl/roughness.png'),
+    loadImage('/gl/metallic.png'),
+    fetch('/gl/studio.hdr').then(function (r) { if (!r.ok) throw new Error('hdr ' + r.status); return r.arrayBuffer(); })
+  ]);
+  glAssets.catch(function () { /* fallback handled below */ });
+
+  /* ---------------- capability detection before any GL init ---------------- */
   var gl = null;
+  var contextOptions = { antialias: true, alpha: true, powerPreference: 'low-power', preserveDrawingBuffer: true };
   try {
-    gl = canvas.getContext('webgl2', { antialias: true, alpha: true, powerPreference: 'low-power' }) ||
-         canvas.getContext('webgl', { antialias: true, alpha: true, powerPreference: 'low-power' }) ||
-         canvas.getContext('experimental-webgl');
+    gl = canvas.getContext('webgl2', contextOptions) ||
+         canvas.getContext('webgl', contextOptions) ||
+         canvas.getContext('experimental-webgl', contextOptions);
   } catch (e) { gl = null; }
   if (!gl) { fallback(); return; }
   canvas.addEventListener('webglcontextlost', function (e) {
@@ -132,8 +145,11 @@
     '}',
     'void main() {',
     '  vec3 base = texture2D(uBase, vec2(vWorld.x * 0.8 + vWorld.y * 0.35, vWorld.y * 0.8 + vWorld.z * 0.35)).rgb;',
-    '  float rough = texture2D(uRough, vec2(vWorld.x * 0.8 + 0.2, vWorld.y * 0.8 + 0.3)).r;',
-    '  float metal = texture2D(uMetal, vec2(vWorld.x * 0.8 + 0.2, vWorld.y * 0.8 + 0.3)).r;',
+    '  float authoredRough = texture2D(uRough, vec2(vWorld.x * 0.8 + 0.2, vWorld.y * 0.8 + 0.3)).r;',
+    '  float authoredMetal = texture2D(uMetal, vec2(vWorld.x * 0.8 + 0.2, vWorld.y * 0.8 + 0.3)).r;',
+    '  float materialZone = smoothstep(-0.42, 0.42, vWorld.x);',
+    '  float rough = mix(mix(0.86, authoredRough, 0.22), mix(0.12, authoredRough, 0.22), materialZone);',
+    '  float metal = mix(mix(0.03, authoredMetal, 0.18), mix(0.94, authoredMetal, 0.18), materialZone);',
     '  vec3 N = normalize(vNormal);',
     '  vec3 V = normalize(uCam - vWorld);',
     '  vec3 L = normalize(vec3(0.55, 0.8, 0.6));',
@@ -168,7 +184,7 @@
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flip ? true : false);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     return tex;
@@ -265,14 +281,8 @@
   }, { passive: true });
   window.addEventListener('resize', function () { if (model) render(); }, { passive: true });
 
-  /* ---------------- boot: load all same-origin assets, then render ---------------- */
-  Promise.all([
-    fetch('/gl/avery-sculpture.glb').then(function (r) { if (!r.ok) throw new Error('glb ' + r.status); return r.arrayBuffer(); }),
-    loadImage('/gl/basecolor.png'),
-    loadImage('/gl/roughness.png'),
-    loadImage('/gl/metallic.png'),
-    fetch('/gl/studio.hdr').then(function (r) { if (!r.ok) throw new Error('hdr ' + r.status); return r.arrayBuffer(); })
-  ]).then(function (parts) {
+  /* ---------------- boot: assets already loading, then render ---------------- */
+  glAssets.then(function (parts) {
     var gltf = parseGLB(parts[0]);
     var hdr = parseHDR(new TextDecoder('utf-8').decode(new Uint8Array(parts[4]).slice(0, 2048)), parts[4]);
 
