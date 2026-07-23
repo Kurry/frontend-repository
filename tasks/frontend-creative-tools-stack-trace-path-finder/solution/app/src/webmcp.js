@@ -59,7 +59,7 @@ window.webmcp_invoke_tool = (toolName, argsInput) => {
           hypotheses: store.hypotheses,
         };
       case 'artifact_import':
-        store.importSession(args.data);
+        store.importSession(args.data || args);
         return { success: true };
       default:
         throw new Error(`Unknown tool: ${toolName}`);
