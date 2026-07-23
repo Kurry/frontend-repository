@@ -452,3 +452,8 @@ NOT-AUTOMATABLE: 15.6 - license chips exact labels
 NOT-AUTOMATABLE: 15.7 - rejection reasons exact tokens
 NOT-AUTOMATABLE: 15.8 - no lorem ipsum
 */
+
+// Task-owned oracle regressions. The CI runner intentionally pins discovery to
+// this canonical entrypoint, so import the focused suite from the authored
+// suffix instead of relying on the app-local Playwright config.
+import './tests/sourcing.spec.js';
