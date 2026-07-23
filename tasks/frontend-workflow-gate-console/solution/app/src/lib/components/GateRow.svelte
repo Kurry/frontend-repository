@@ -154,7 +154,7 @@
   :global(.dark) .note-item { background:#091625; border-color:#263b51; }
   .note-item span { color:#5e3d84; font-size:.57rem; font-weight:850; text-transform:uppercase; letter-spacing:.05em; }
   .note-item p { margin:.15rem 0 0; font-size:.7rem; line-height:1.45; }
-  .note-item button { flex:none; display:grid; place-items:center; color:#8c5261; background:transparent; border:0; border-radius:.35rem; min-width:2.4rem; min-height:2.4rem; cursor:pointer; }
+  .note-item button { position:relative; z-index:3; flex:none; display:grid; place-items:center; color:#8c5261; background:transparent; border:0; border-radius:.35rem; min-width:2.4rem; min-height:2.4rem; cursor:pointer; }
   .note-item button:hover { background:#ffe8ec; color:#c33349; }
   @media (max-width:520px) {
     .gate-actions { flex-direction:column; align-items:stretch; padding:.45rem .45rem .45rem 0; }
