@@ -201,7 +201,7 @@ export default function App() {
                 <div className="flex-1 space-y-5 overflow-y-auto p-4">
                   <ApprovalStepper loading={loading} withLoading={withLoading} vertical />
                   <CitationsSection />
-                  {store.selectedInstance && <Inspector />}
+                  {store.selectedInstance && <Inspector idPrefix="desktop" />}
                   <HistorySection />
                 </div>
               </aside>
@@ -217,7 +217,7 @@ export default function App() {
             {/* Mobile bottom sheet for the selected clip */}
             {store.selectedInstance && (
               <div className="fixed inset-x-0 bottom-0 z-40 max-h-[62vh] overflow-y-auto rounded-t-xl border-t border-[var(--border)] bg-[var(--panel)] p-4 shadow-2xl md:hidden">
-                <Inspector />
+                <Inspector idPrefix="mobile" />
               </div>
             )}
           </DndContext>
@@ -551,7 +551,7 @@ function NumField({ id, label, value, onCommit, step = 10, min = 0 }: { id: stri
   );
 }
 
-function Inspector() {
+function Inspector({ idPrefix = 'inspector' }: { idPrefix?: string }) {
   const store = useStore();
   const inst = store.instances.find(i => i.id === store.selectedInstance);
   const src = inst && store.sources.find(s => s.id === inst.sourceId);
@@ -576,13 +576,13 @@ function Inspector() {
         <Waveform source={src} from={inst.sourceStart} to={inst.sourceEnd} />
 
         <div className="grid grid-cols-2 gap-2">
-          <NumField id="f-start" label="Episode start (ms)" value={inst.start} onCommit={v => store.updateInstance(inst.id, { start: v, end: v + (inst.end - inst.start) }, 'move')} />
-          <NumField id="f-end" label="Episode end (ms)" value={inst.end} onCommit={v => store.updateInstance(inst.id, { end: v }, 'trim-end')} />
-          <NumField id="f-sin" label="Source in (ms)" value={inst.sourceStart} onCommit={v => store.updateInstance(inst.id, { sourceStart: v }, 'trim-start')} />
-          <NumField id="f-sout" label="Source out (ms)" value={inst.sourceEnd} onCommit={v => store.updateInstance(inst.id, { sourceEnd: v }, 'trim-end')} />
-          <NumField id="f-gain" label="Clip gain (dB)" value={inst.gain} step={1} min={-24} onCommit={v => store.updateInstance(inst.id, { gain: Math.max(-24, Math.min(12, v)) }, 'gain')} />
-          <NumField id="f-fin" label="Fade in (ms)" value={inst.fadeIn} onCommit={v => store.updateInstance(inst.id, { fadeIn: v }, 'fade')} />
-          <NumField id="f-fout" label="Fade out (ms)" value={inst.fadeOut} onCommit={v => store.updateInstance(inst.id, { fadeOut: v }, 'fade')} />
+          <NumField id={`${idPrefix}-f-start`} label="Episode start (ms)" value={inst.start} onCommit={v => store.updateInstance(inst.id, { start: v, end: v + (inst.end - inst.start) }, 'move')} />
+          <NumField id={`${idPrefix}-f-end`} label="Episode end (ms)" value={inst.end} onCommit={v => store.updateInstance(inst.id, { end: v }, 'trim-end')} />
+          <NumField id={`${idPrefix}-f-sin`} label="Source in (ms)" value={inst.sourceStart} onCommit={v => store.updateInstance(inst.id, { sourceStart: v }, 'trim-start')} />
+          <NumField id={`${idPrefix}-f-sout`} label="Source out (ms)" value={inst.sourceEnd} onCommit={v => store.updateInstance(inst.id, { sourceEnd: v }, 'trim-end')} />
+          <NumField id={`${idPrefix}-f-gain`} label="Clip gain (dB)" value={inst.gain} step={1} min={-24} onCommit={v => store.updateInstance(inst.id, { gain: Math.max(-24, Math.min(12, v)) }, 'gain')} />
+          <NumField id={`${idPrefix}-f-fin`} label="Fade in (ms)" value={inst.fadeIn} onCommit={v => store.updateInstance(inst.id, { fadeIn: v }, 'fade')} />
+          <NumField id={`${idPrefix}-f-fout`} label="Fade out (ms)" value={inst.fadeOut} onCommit={v => store.updateInstance(inst.id, { fadeOut: v }, 'fade')} />
           <div>
             <span className="block text-[10px] text-[var(--muted)]">Lane</span>
             <select aria-label="Move clip to another lane" value={inst.lane} onChange={e => store.updateInstance(inst.id, { lane: e.target.value as LaneType }, 'lane-change')} className={inputCls}>
