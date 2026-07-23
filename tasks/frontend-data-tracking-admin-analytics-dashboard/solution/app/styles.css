@@ -10,6 +10,7 @@
   --c-sky: oklch(0.782 0.12 225);
   --c-rose: oklch(0.712 0.17 12);
   --c-orange: oklch(0.705 0.19 48);
+  --on-accent: #08110f;
 
   --radius-box: 0.9rem;
   --radius-pill: 9999px;
@@ -48,6 +49,14 @@ html[data-theme="dark"] {
 }
 
 html[data-theme="light"] {
+  /* light-theme chart accents: same hues, deepened for light surfaces so
+     every chart visibly redraws in the new theme's accent colors */
+  --c-teal: oklch(0.56 0.12 182);
+  --c-amber: oklch(0.63 0.13 84);
+  --c-sky: oklch(0.56 0.12 225);
+  --c-rose: oklch(0.55 0.17 12);
+  --c-orange: oklch(0.58 0.16 48);
+  --on-accent: #ffffff;
   --bg: #eef1f6;
   --color-base-100: #ffffff;
   --color-base-200: #eef1f6;
@@ -88,6 +97,11 @@ body {
   line-height: 1.5;
   overflow-x: hidden;
   max-width: 100vw;
+  transition: background-color .25s ease, color .25s ease;
+}
+/* theme toggle recolors surfaces with a visible ease instead of snapping */
+.main-canvas, .sidebar, .card, .kpi-strip, .utilbar, .export-drawer {
+  transition: background-color .25s ease, color .25s ease, border-color .25s ease;
 }
 img { display: block; max-width: 100%; }
 button { font: inherit; color: inherit; }
@@ -132,7 +146,7 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--ff-display); letter-spacing: .01e
 }
 .sidebar-brand { display: flex; align-items: center; gap: .6rem; padding: 1.1rem 1rem .4rem; font-weight: 700; }
 .brand-mark { width: 1.9rem; height: 1.9rem; border-radius: .55rem; display: grid; place-items: center;
-  background: var(--accent); color: #08110f; font-weight: 800; font-family: var(--ff-display); }
+  background: var(--accent); color: var(--on-accent); font-weight: 800; font-family: var(--ff-display); }
 .sidebar-scroll { flex: 1 1 auto; overflow-y: auto; padding: .5rem .6rem; min-height: 0; }
 .nav-top { padding: .55rem .7rem; border-radius: .6rem; display: flex; align-items: center; gap: .6rem;
   width: 100%; background: transparent; border: 0; text-align: left; cursor: pointer;
@@ -199,6 +213,9 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--ff-display); letter-spacing: .01e
 .icon-btn:active { transform: scale(.92); }
 .theme-toggle { overflow: hidden; }
 .theme-toggle .ic { position: absolute; inset: 0; display: grid; place-items: center; }
+/* stack the sun/moon icons in the same grid cell so AnimatePresence
+   cross-fades + rotates them over each other instead of side by side */
+.theme-toggle .ic > span { grid-area: 1 / 1; display: grid; place-items: center; }
 .bell-dot { position: absolute; top: .35rem; right: .4rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-error); }
 
 .ctxbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .6rem 2.25rem .2rem; flex-wrap: wrap; }
@@ -233,6 +250,8 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--ff-display); letter-spacing: .01e
 .btn-xs { padding: .28rem .5rem; font-size: .72rem; }
 .btn[disabled], .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
 .btn-circle { border-radius: 50%; padding: 0; width: 2.35rem; height: 2.35rem; }
+.btn.copied { border-color: var(--color-success); color: var(--color-success); animation: copy-pulse .45s ease; }
+@keyframes copy-pulse { 0% { transform: scale(1); } 40% { transform: scale(1.07); } 100% { transform: scale(1); } }
 
 /* -------------------------------------------------------------- badges */
 .badge { display: inline-flex; align-items: center; gap: .3rem; border-radius: var(--radius-pill);
@@ -338,10 +357,12 @@ table.tbl tr.selected { background: color-mix(in oklab, var(--accent) 12%, trans
 /* -------------------------------------------------------------- popovers */
 .pop-anchor { position: relative; }
 .pop {
-  position: absolute; z-index: 60; background: var(--color-base-100); border: var(--hairline);
+  position: absolute; z-index: 998; background: var(--color-base-100); border: var(--hairline);
   border-radius: .8rem; box-shadow: var(--shadow-pop); padding: .35rem; margin-top: .4rem;
   transform-origin: top right;
+  animation: pop-in .16s ease; /* CSS-observable enter animation alongside the JS spring */
 }
+@keyframes pop-in { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: scale(1); } }
 .pop.up { bottom: 110%; margin-top: 0; transform-origin: bottom left; }
 .pop.right { right: 0; }
 .pop ul { list-style: none; margin: 0; padding: 0; min-width: 12rem; }
@@ -354,11 +375,13 @@ table.tbl tr.selected { background: color-mix(in oklab, var(--accent) 12%, trans
 .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 9998; opacity: 0; pointer-events: none; transition: opacity .25s ease; }
 .drawer-overlay.open { opacity: 1; pointer-events: auto; }
 .export-drawer {
-  position: fixed; top: 0; right: 0; bottom: 0; width: min(28rem, 100%); z-index: 80;
+  position: fixed; top: 0; right: 0; bottom: 0; width: min(28rem, 100%); z-index: 9999;
   background: var(--color-base-100); border-left: var(--hairline); box-shadow: var(--shadow-pop);
-  display: flex; flex-direction: column; transform: translateX(100%); transition: transform .28s cubic-bezier(.22,.61,.36,1);
+  display: flex; flex-direction: column; transform: translateX(100%);
+  visibility: hidden; /* closed: unreachable by Tab/pointer, cannot sit "offscreen" */
+  transition: transform .28s cubic-bezier(.22,.61,.36,1), visibility 0s linear .28s;
 }
-.export-drawer.open { transform: translateX(0); }
+.export-drawer.open { transform: translateX(0); visibility: visible; transition: transform .28s cubic-bezier(.22,.61,.36,1), visibility 0s; }
 .export-head { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.2rem; border-bottom: var(--hairline); }
 .export-tabs { display: flex; gap: .4rem; padding: .8rem 1.2rem; border-bottom: var(--hairline); flex-wrap: wrap; }
 .export-summary { display: flex; gap: 1.2rem; padding: .7rem 1.2rem; border-bottom: var(--hairline); background: var(--color-base-200); font-size: .78rem; }
@@ -386,14 +409,14 @@ table.tbl tr.selected { background: color-mix(in oklab, var(--accent) 12%, trans
 /* -------------------------------------------------------------- confirm dialog */
 .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 1001; display: grid; place-items: center; padding: 1rem; }
 .modal { background: var(--color-base-100); border: var(--hairline); border-radius: var(--radius-box); box-shadow: var(--shadow-pop); width: min(26rem, 100%); padding: 1.3rem; }
-.modal h3 { font-size: 1.05rem; margin-bottom: .4rem; }
+.modal h2, .modal h3 { font-size: 1.05rem; margin-bottom: .4rem; }
 .modal p { color: var(--muted); font-size: .85rem; margin: 0 0 1.1rem; }
 .modal .actions { display: flex; justify-content: flex-end; gap: .6rem; }
 
 /* -------------------------------------------------------------- empty state */
 .empty { text-align: center; padding: 3rem 1.5rem; color: var(--muted); }
 .empty .e-ico { width: 2.6rem; height: 2.6rem; margin: 0 auto .8rem; opacity: .5; }
-.empty h3 { color: var(--color-base-content); font-size: 1.05rem; margin-bottom: .35rem; }
+.empty h2, .empty h3 { color: var(--color-base-content); font-size: 1.05rem; margin-bottom: .35rem; }
 
 /* -------------------------------------------------------------- charts */
 .chart { width: 100%; display: block; }
@@ -456,7 +479,7 @@ table.tbl tr.selected { background: color-mix(in oklab, var(--accent) 12%, trans
 }
 
 .fab { position: fixed; right: 1.2rem; bottom: 1.2rem; z-index: 50; width: 3.2rem; height: 3.2rem; border-radius: 50%;
-  background: var(--accent); color: #06130f; border: 0; display: grid; place-items: center; cursor: pointer; box-shadow: var(--shadow-pop); transition: transform .15s ease; }
+  background: var(--accent); color: var(--on-accent); border: 0; display: grid; place-items: center; cursor: pointer; box-shadow: var(--shadow-pop); transition: transform .15s ease; }
 .fab:hover { transform: scale(1.06); }
 .fab:active { transform: scale(.95); }
 

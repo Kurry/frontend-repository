@@ -90,10 +90,10 @@ function Header() {
   }, [dispatch]);
 
   const notifRows = [
-    { n: 1, t: 'New message', b: 'Ada: did you get the export?' },
+    { n: 1, t: 'New Message', b: 'Ada: did you get the export?' },
     { n: 2, t: 'Reminder', b: 'Governance review at 10:00' },
-    { n: 3, t: 'New payment', b: '$2,500 from Margaret Hamilton' },
-    { n: 4, t: 'New payment', b: '$1,900 from Grace Hopper' },
+    { n: 3, t: 'New Payment', b: '$2,500 from Margaret Hamilton' },
+    { n: 4, t: 'New Payment', b: '$1,900 from Grace Hopper' },
   ];
 
   return (
@@ -158,7 +158,7 @@ const GROUPS: { key: string; label: string; icon: any; items?: { key: ViewKey; l
   ] },
   { key: 'products', label: 'Products', icon: CubeIcon, items: [{ key: 'user-products', label: 'Catalog' }] },
   { key: 'transactions', label: 'Transactions', icon: ArrowsRightLeftIcon, items: [{ key: 'user-payments', label: 'Ledger' }] },
-  { key: 'orders', label: 'Orders', icon: ShoppingCartIcon, items: [{ key: 'user-logs', label: 'Order history' }] },
+  { key: 'orders', label: 'Orders', icon: ShoppingCartIcon, items: [{ key: 'user-logs', label: 'Order History' }] },
   { key: 'customers', label: 'Customers', icon: UserGroupIcon, items: [{ key: 'user-stats', label: 'Segments' }] },
   { key: 'messages', label: 'Messages', icon: ChatBubbleLeftRightIcon, badge: '12', items: [{ key: 'user-logs', label: 'Threads' }] },
   { key: 'media', label: 'Media', icon: PhotoIcon, items: [{ key: 'user-products', label: 'Library' }] },
@@ -215,7 +215,7 @@ function Sidebar() {
             </button>
             <Popover open={acct} onClose={() => setAcct(false)} up right width={220} triggerRef={acctRef} label="Account menu">
               <ul>
-                {[['Profile settings', Cog6ToothIcon], ['Activity log', ClipboardDocumentListIcon], ['Docs', DocumentTextIcon], ['Sign out', ArrowDownTrayIcon]].map(([label, Ic]: any) => (
+                {[['Profile Settings', Cog6ToothIcon], ['Activity Log', ClipboardDocumentListIcon], ['Docs', DocumentTextIcon], ['Sign Out', ArrowDownTrayIcon]].map(([label, Ic]: any) => (
                   <li key={label}><button type="button" className="pop-row" role="menuitem"><Ic className="icon-sm" /> {label}</button></li>
                 ))}
               </ul>
@@ -297,12 +297,12 @@ function AllUsers() {
     } },
     { header: 'Payments', accessorKey: 'payments', cell: (i) => `$${(i.getValue() as number).toLocaleString()}` },
     { header: 'Products', accessorKey: 'products' },
-    { header: 'Last active', accessorKey: 'lastActive', cell: (i) => relativeTime(i.getValue() as string) },
+    { header: 'Last Active', accessorKey: 'lastActive', cell: (i) => relativeTime(i.getValue() as string) },
     { id: 'actions', header: '', cell: ({ row }) => (
       <div className="row-act">
         <button className="btn btn-ghost btn-sm" aria-label={`Edit ${row.original.firstName}`} onClick={() => dispatch(setEditingId(row.original.id))}><PencilIcon className="icon-sm" /></button>
         <button className="btn btn-ghost btn-sm" style={{ color: 'var(--color-error)' }} aria-label={`Delete ${row.original.firstName}`}
-          onClick={() => dispatch(setConfirm({ open: true, title: 'Delete user', body: `Delete ${row.original.firstName} ${row.original.lastName}? This removes them from the list, KPIs, and export previews.`, ids: [row.original.id] }))}>
+          onClick={() => dispatch(setConfirm({ open: true, title: 'Delete User', body: `Delete ${row.original.firstName} ${row.original.lastName}? This removes them from the list, KPIs, and export previews.`, ids: [row.original.id] }))}>
           <TrashIcon className="icon-sm" /></button>
       </div>
     ) },
@@ -316,8 +316,8 @@ function AllUsers() {
     }, getCoreRowModel: getCoreRowModel(), getPaginationRowModel: getPaginationRowModel(), initialState: { pagination: { pageSize: 100 } } });
 
   const selCount = selection.length;
-  const applyStatus = (st: string) => { if (!st || !selCount) return; dispatch(updateUsersStatus({ ids: selection, status: st as any })); dispatch(pushToast({ kind: 'success', title: 'Status changed', body: `${selCount} user(s) set to ${st}` })); dispatch(setLastMutation(`Status → ${st} (${selCount})`)); };
-  const applyRole = (rl: string) => { if (!rl || !selCount) return; dispatch(updateUsersRole({ ids: selection, role: rl as any })); dispatch(pushToast({ kind: 'success', title: 'Role changed', body: `${selCount} user(s) set to ${rl}` })); dispatch(setLastMutation(`Role → ${rl} (${selCount})`)); };
+  const applyStatus = (st: string) => { if (!st || !selCount) return; dispatch(updateUsersStatus({ ids: selection, status: st as any })); dispatch(pushToast({ kind: 'success', title: 'Status Changed', body: `${selCount} user(s) set to ${st}` })); dispatch(setLastMutation(`Status → ${st} (${selCount})`)); };
+  const applyRole = (rl: string) => { if (!rl || !selCount) return; dispatch(updateUsersRole({ ids: selection, role: rl as any })); dispatch(pushToast({ kind: 'success', title: 'Role Changed', body: `${selCount} user(s) set to ${rl}` })); dispatch(setLastMutation(`Role → ${rl} (${selCount})`)); };
 
   return (
     <div className="span-12">
@@ -329,37 +329,35 @@ function AllUsers() {
       <div className="card">
         <div className="toolbar">
           <select className="select" style={{ width: 'auto' }} aria-label="Filter by role" value={filterRole} onChange={(e) => dispatch(setFilterRole(e.target.value))}>
-            <option value="">All roles</option>{ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+            <option value="">All Roles</option>{ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
           </select>
           <select className="select" style={{ width: 'auto' }} aria-label="Filter by status" value={filterStatus} onChange={(e) => dispatch(setFilterStatus(e.target.value))}>
-            <option value="">All statuses</option>{STATUSES.map((r) => <option key={r} value={r}>{r}</option>)}
+            <option value="">All Statuses</option>{STATUSES.map((r) => <option key={r} value={r}>{r}</option>)}
           </select>
           <select className="select" style={{ width: 'auto' }} aria-label="Sort users" value={sort} onChange={(e) => dispatch(setSort(e.target.value as SortKey))}>
-            <option value="newest">Newest</option><option value="last-active">Last active</option>
-            <option value="highest-spend">Highest spend</option><option value="name-az">Name A-Z</option>
+            <option value="newest">Newest</option><option value="last-active">Last Active</option>
+            <option value="highest-spend">Highest Spend</option><option value="name-az">Name A-Z</option>
           </select>
           <div className="density-toggle" role="group" aria-label="Row density">
             <button className={density === 'comfortable' ? 'on' : ''} aria-pressed={density === 'comfortable'} onClick={() => dispatch(setDensity('comfortable'))} title="Comfortable density">Comfortable</button>
             <button className={density === 'compact' ? 'on' : ''} aria-pressed={density === 'compact'} onClick={() => dispatch(setDensity('compact'))} title="Compact density">Compact</button>
           </div>
           <div className="spacer" />
-          {selCount > 0 && (
-            <div className="bulkbar">
-              <span className="badge badge-accent">{selCount} selected</span>
-              <select className="select" style={{ width: 'auto' }} aria-label="Change status for selected" value="" onChange={(e) => applyStatus(e.target.value)}>
-                <option value="">Change status…</option>{STATUSES.map((r) => <option key={r} value={r}>{r}</option>)}
-              </select>
-              <select className="select" style={{ width: 'auto' }} aria-label="Change role for selected" value="" onChange={(e) => applyRole(e.target.value)}>
-                <option value="">Change role…</option>{ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
-              </select>
-              <button className="btn btn-outline btn-sm" onClick={() => dispatch(setExportOpen(true))}><ArrowDownTrayIcon className="icon-sm" /> Export</button>
-              <button className="btn btn-error btn-sm" onClick={() => dispatch(setConfirm({ open: true, title: 'Delete selected users', body: `Delete ${selCount} selected user(s)? This cannot be undone.`, ids: [...selection] }))}><TrashIcon className="icon-sm" /> Delete</button>
-            </div>
-          )}
+          <div className="bulkbar">
+            <span className="badge badge-accent">{selCount} selected</span>
+            <select className="select" style={{ width: 'auto' }} aria-label="Change status for selected" value="" disabled={!selCount} onChange={(e) => applyStatus(e.target.value)}>
+              <option value="">Change Status…</option>{STATUSES.map((r) => <option key={r} value={r}>{r}</option>)}
+            </select>
+            <select className="select" style={{ width: 'auto' }} aria-label="Change role for selected" value="" disabled={!selCount} onChange={(e) => applyRole(e.target.value)}>
+              <option value="">Change Role…</option>{ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+            </select>
+            <button className="btn btn-outline btn-sm" onClick={() => dispatch(setExportOpen(true))}><ArrowDownTrayIcon className="icon-sm" /> Export</button>
+            <button className="btn btn-error btn-sm" disabled={!selCount} onClick={() => dispatch(setConfirm({ open: true, title: 'Delete Selected Users', body: `Delete ${selCount} selected user(s)? This cannot be undone.`, ids: [...selection] }))}><TrashIcon className="icon-sm" /> Delete</button>
+          </div>
         </div>
 
         {filtered.length === 0 ? (
-          <div className="empty"><UsersIcon className="e-ico" /><h2>No users match these filters</h2>
+          <div className="empty"><UsersIcon className="e-ico" /><h2>No Matching Users</h2>
             <p>Try clearing the search or filters, or add a new user to the directory.</p>
             <button className="btn btn-primary" onClick={() => dispatch(setActiveView('add-user'))}><PlusIcon className="icon-sm" /> Add User</button>
           </div>
@@ -418,6 +416,7 @@ function UserForm() {
   const isEdit = !!editing;
   const [live, setLive] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
   const formSchema = isEdit ? userEditSchema : userCreateSchema;
   const { register, handleSubmit, watch, formState: { errors, isValid }, reset } = useForm<UserCreateValues | UserEditValues>({
     resolver: zodResolver(formSchema), mode: 'onChange',
@@ -451,24 +450,25 @@ function UserForm() {
   }, [errors]);
 
   const onSubmit = (data: UserCreateValues) => {
-    if (submitting) return; // double-submit guard
+    if (submittingRef.current) return; // double-submit guard (ref survives same-tick re-entry)
+    submittingRef.current = true;
     setSubmitting(true);
     if (isEdit) {
       dispatch(updateUser({ ...editing!, firstName: data.firstName.trim(), lastName: data.lastName.trim(), email: data.email.trim(),
         phone: data.phone?.trim() || undefined, notes: data.notes?.trim() || undefined,
         accountSegment: data.accountSegment, sendInvitation: data.sendInvitation, enable2FA: data.enable2FA,
         productAccess: data.productAccess, permissions: data.permissions, role: data.role, status: data.status }));
-      dispatch(pushToast({ kind: 'success', title: 'User updated', body: `${data.firstName} ${data.lastName} saved across all views` }));
+      dispatch(pushToast({ kind: 'success', title: 'User Updated', body: `${data.firstName} ${data.lastName} saved across all views` }));
       dispatch(setLastMutation(`Updated ${data.firstName}`));
       dispatch(setActiveView('all-users'));
     } else {
       dispatch(addUser(makeUserFromCreate(data)));
-      dispatch(pushToast({ kind: 'success', title: 'User added', body: `${data.firstName} ${data.lastName} added to the directory` }));
+      dispatch(pushToast({ kind: 'success', title: 'User Added', body: `${data.firstName} ${data.lastName} added to the directory` }));
       dispatch(setLastMutation(`Created ${data.firstName}`));
       dispatch(clearAddUserDraft());
       setTimeout(() => dispatch(setActiveView('all-users')), 700);
     }
-    setTimeout(() => setSubmitting(false), 400);
+    setTimeout(() => { submittingRef.current = false; setSubmitting(false); }, 400);
   };
   const cancel = () => { if (!isEdit) dispatch(clearAddUserDraft()); dispatch(setActiveView('all-users')); };
 
@@ -478,7 +478,7 @@ function UserForm() {
   return (
     <div className="span-12">
       <div className="ctxbar" style={{ padding: 0 }}>
-        <div><div className="crumbs"><h1>{isEdit ? 'Edit user' : 'Add User'}</h1></div>
+        <div><div className="crumbs"><h1>{isEdit ? 'Edit User' : 'Add User'}</h1></div>
           <p style={{ color: 'var(--muted)', margin: '.1rem 0 0', fontSize: '.85rem' }}>The submit payload is the API-shaped UserCreate body the directory would accept.</p></div>
         <button className="btn btn-ghost" onClick={cancel}>Cancel</button>
       </div>
@@ -488,9 +488,9 @@ function UserForm() {
           <div className="card"><div className="card-body">
             <h3 className="card-title">Profile</h3>
             <div className="field-grid" style={{ marginTop: '1rem' }}>
-              <div className="field"><label htmlFor="firstName">First name <span className="req">*</span></label>
+              <div className="field"><label htmlFor="firstName">First Name <span className="req">*</span></label>
                 <input id="firstName" className={`input ${inv('firstName') ? 'err' : ''}`} autoComplete="given-name" aria-invalid={inv('firstName')} aria-describedby={inv('firstName') ? 'firstName-error' : undefined} {...register('firstName')} /><Err k="firstName" /></div>
-              <div className="field"><label htmlFor="lastName">Last name <span className="req">*</span></label>
+              <div className="field"><label htmlFor="lastName">Last Name <span className="req">*</span></label>
                 <input id="lastName" className={`input ${inv('lastName') ? 'err' : ''}`} autoComplete="family-name" aria-invalid={inv('lastName')} aria-describedby={inv('lastName') ? 'lastName-error' : undefined} {...register('lastName')} /><Err k="lastName" /></div>
               <div className="field"><label htmlFor="email">Email <span className="req">*</span></label>
                 <input id="email" type="email" className={`input ${inv('email') ? 'err' : ''}`} autoComplete="email" aria-invalid={inv('email')} aria-describedby={inv('email') ? 'email-error' : undefined} {...register('email')} /><Err k="email" /></div>
@@ -503,22 +503,22 @@ function UserForm() {
           <div className="card"><div className="card-body">
             <h3 className="card-title">Access</h3>
             <div className="field-grid" style={{ marginTop: '1rem' }}>
-              <div className="field"><label htmlFor="temporaryPassword">Temporary password {!isEdit && <span className="req">*</span>}</label>
+              <div className="field"><label htmlFor="temporaryPassword">Temporary Password {!isEdit && <span className="req">*</span>}</label>
                 <input id="temporaryPassword" type="password" className={`input ${inv('temporaryPassword') ? 'err' : ''}`} autoComplete="new-password" aria-invalid={inv('temporaryPassword')} aria-describedby={inv('temporaryPassword') ? 'temporaryPassword-error' : undefined} {...register('temporaryPassword')} /><Err k="temporaryPassword" /></div>
-              <div className="field"><label htmlFor="accountSegment">Account segment <span className="req">*</span></label>
+              <div className="field"><label htmlFor="accountSegment">Account Segment <span className="req">*</span></label>
                 <select id="accountSegment" className="select" {...register('accountSegment')}>{SEGMENTS.map((s) => <option key={s} value={s}>{s}</option>)}</select></div>
-              <div className="field"><label className="switch" style={{ marginTop: '.4rem' }}><span className={`track ${vals.sendInvitation ? 'on' : ''}`} /><input type="checkbox" className="sr-only" {...register('sendInvitation')} /> Send invitation email</label></div>
+              <div className="field"><label className="switch" style={{ marginTop: '.4rem' }}><span className={`track ${vals.sendInvitation ? 'on' : ''}`} /><input type="checkbox" className="sr-only" {...register('sendInvitation')} /> Send Invitation Email</label></div>
             </div>
           </div></div>
           <div className="card"><div className="card-body">
-            <h3 className="card-title">Account settings</h3>
+            <h3 className="card-title">Account Settings</h3>
             <div className="field-grid" style={{ marginTop: '1rem' }}>
               <div className="field"><label htmlFor="status">Status <span className="req">*</span></label>
                 <select id="status" className="select" {...register('status')}>{STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}</select></div>
               <div className="field"><label htmlFor="role">Role <span className="req">*</span></label>
                 <select id="role" className="select" {...register('role')}>{ROLES.map((s) => <option key={s} value={s}>{s}</option>)}</select></div>
               <div className="field"><label className="switch"><span className={`track ${vals.enable2FA ? 'on' : ''}`} /><input type="checkbox" className="sr-only" {...register('enable2FA')} /> Require 2FA</label></div>
-              <div className="field"><label className="switch"><span className={`track ${vals.productAccess ? 'on' : ''}`} /><input type="checkbox" className="sr-only" {...register('productAccess')} /> Product access</label></div>
+              <div className="field"><label className="switch"><span className={`track ${vals.productAccess ? 'on' : ''}`} /><input type="checkbox" className="sr-only" {...register('productAccess')} /> Product Access</label></div>
             </div>
           </div></div>
           <div className="card"><div className="card-body">
@@ -531,11 +531,11 @@ function UserForm() {
           </div></div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '.6rem' }}>
             <button type="button" className="btn btn-ghost" onClick={cancel}>Cancel</button>
-            <button type="submit" className="btn btn-primary" disabled={!isValid || submitting}>{isEdit ? 'Save changes' : 'Create user'}</button>
+            <button type="submit" className="btn btn-primary" disabled={submitting}>{isEdit ? 'Save Changes' : 'Create User'}</button>
           </div>
         </form>
         <aside className="card" aria-label="Field contract checklist"><div className="card-body">
-          <h3 className="card-title"><ShieldCheckIcon className="ico" /> Field contract</h3>
+          <h3 className="card-title"><ShieldCheckIcon className="ico" /> Field Contract</h3>
           <p className="card-sub">Each rule lights up as the payload becomes valid.</p>
           <ul className="contract" style={{ marginTop: '.8rem' }}>
             {rules.map(([label, ok]) => <li key={label as string} className={ok ? 'ok' : ''}><span className="ck">{ok ? '✓' : ''}</span>{label}</li>)}
@@ -559,9 +559,9 @@ function ExtraView({ title, kind }: { title: string; kind: 'roles' | 'permission
         <div className="table-wrap"><table className="tbl">
           <thead><tr>
             {kind === 'roles' && <><th>User</th><th>Role</th><th>Status</th><th>Segment</th></>}
-            {kind === 'permissions' && <><th>User</th><th>Role</th><th>2FA</th><th>Product access</th></>}
+            {kind === 'permissions' && <><th>User</th><th>Role</th><th>2FA</th><th>Product Access</th></>}
             {kind === 'logs' && <><th>User</th><th>Event</th><th>When</th></>}
-            {kind === 'stats' && <><th>User</th><th>Products</th><th>Payments</th><th>Last active</th></>}
+            {kind === 'stats' && <><th>User</th><th>Products</th><th>Payments</th><th>Last Active</th></>}
             {kind === 'payments' && <><th>User</th><th>Payments</th><th>Status</th></>}
             {kind === 'products' && <><th>User</th><th>Products</th><th>Email</th></>}
           </tr></thead>
@@ -595,27 +595,27 @@ function Overview() {
       </div>
     </section>
   );
-  const prog = (label: string, v: number) => (
-    <div style={{ marginBottom: '.7rem' }}><div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.8rem' }}><span>{label}</span><span>{v}%</span></div><div className="progress"><i style={{ width: `${v}%` }} /></div></div>
+  const prog = (label: string, v: number, color?: string) => (
+    <div style={{ marginBottom: '.7rem' }}><div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.8rem' }}><span>{label}</span><span>{v}%</span></div><div className="progress"><i style={{ width: `${v}%`, ...(color ? { background: color } : {}) }} /></div></div>
   );
   return (
     <div className="span-12">
       <div className="ctxbar" style={{ padding: 0 }}>
         <div className="crumbs"><button onClick={() => dispatch(setActiveView('operations-overview'))}>Dashboard</button><span className="sep">›</span><h1>Operations Overview</h1></div>
         <div style={{ display: 'flex', gap: '.5rem' }}>
-          <button className="btn btn-primary" onClick={() => dispatch(setActiveView('add-user'))}><PlusIcon className="icon-sm" /> New product</button>
-          <button className="btn" onClick={() => dispatch(setExportOpen(true))}><ArrowDownTrayIcon className="icon-sm" /> Export session</button>
+          <button className="btn btn-primary" onClick={() => dispatch(setActiveView('add-user'))}><PlusIcon className="icon-sm" /> New Product</button>
+          <button className="btn" onClick={() => dispatch(setExportOpen(true))}><ArrowDownTrayIcon className="icon-sm" /> Export Session</button>
           <button className="btn"><ShieldCheckIcon className="icon-sm" /> System Health</button>
         </div>
       </div>
       <div className="kpi-strip" style={{ margin: '1rem 0 1.5rem' }}>
         <div className="kpi"><div className="k-label">Revenue</div><div className="k-val">$842K</div><div className="k-chip up">▲ 12.8% vs prior period</div></div>
         <div className="kpi"><div className="k-label">Orders</div><div className="k-val">18.2K</div><div className="k-chip">624 awaiting fulfillment</div></div>
-        <div className="kpi"><div className="k-label">Active users</div><div className="k-val">{(k.active * 4700 / 1000).toFixed(1)}K</div><div className="k-chip up">▲ new this month</div></div>
+        <div className="kpi"><div className="k-label">Active Users</div><div className="k-val">{(k.active * 4700 / 1000).toFixed(1)}K</div><div className="k-chip up">▲ new this month</div></div>
         <div className="kpi"><div className="k-label">Support SLA</div><div className="k-val">94.2%</div><div className="k-chip">7 high-priority threads</div></div>
       </div>
       <div className="grid12" style={{ padding: 0 }}>
-        <Card title="Revenue and demand" sub="Commerce revenue, product demand, and checkout activity" icon={ChartBarIcon} span="span-8" link="Open sales analytics">
+        <Card title="Revenue and Demand" sub="Commerce revenue, product demand, and checkout activity" icon={ChartBarIcon} span="span-8" link="Open Sales Analytics">
           <div style={{ marginTop: '1rem' }}><ColumnChart values={OV.revenue} labels={OV.revenueLabels} showAvg color="var(--c-teal)" /></div>
           <div className="stat-row" style={{ marginTop: '.8rem' }}><div><div className="stat-big">$842K</div><span className="card-sub">Revenue</span></div><div><div className="stat-big">18.2K</div><span className="card-sub">Orders</span></div><div><div className="stat-big">4.8%</div><span className="card-sub">Checkout lift</span></div></div>
         </Card>
@@ -624,7 +624,7 @@ function Overview() {
           <div className="stat-row" style={{ marginTop: '.6rem', flexDirection: 'column', gap: '.3rem' }}><div>Delivered <b>5,492</b></div><div>In Progress <b>1,820</b></div></div>
         </Card>
 
-        <Card title="Recent Commerce Activity" icon={ClipboardDocumentListIcon} span="span-8" link="All orders">
+        <Card title="Recent Commerce Activity" icon={ClipboardDocumentListIcon} span="span-8" link="All Orders">
           <div className="table-wrap" style={{ marginTop: '1rem' }}><table className="tbl">
             <thead><tr><th>Record</th><th>Customer</th><th>Status</th><th>Amount</th><th></th></tr></thead>
             <tbody>
@@ -634,12 +634,12 @@ function Overview() {
             </tbody>
           </table></div>
         </Card>
-        <Card title="Governance and risk" sub="Payment, data access, security, and compliance posture" icon={ShieldCheckIcon} span="span-4">
+        <Card title="Governance and Risk" sub="Payment, data access, security, and compliance posture" icon={ShieldCheckIcon} span="span-4">
           <div style={{ display: 'grid', placeItems: 'center', margin: '1rem 0' }}><Radial value={91} /></div>
-          {prog('Gateway verification', 96)}{prog('Admin permission review', 84)}{prog('Webhook signing coverage', 78)}
+          {prog('Gateway verification', 96, 'var(--c-teal)')}{prog('Admin permission review', 84, 'var(--c-sky)')}{prog('Webhook signing coverage', 78, 'var(--c-amber)')}
         </Card>
 
-        <Card title="Priority queue" icon={ExclamationTriangleIcon} span="span-6" link="7 queued">
+        <Card title="Priority Queue" icon={ExclamationTriangleIcon} span="span-6" link="7 queued">
           <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '.6rem' }}>
             {[['Refund review: order #PBS-248', 'Accidental 248 PlayStation 5 order', 'Support'], ['Media processor backlog', '5K derivatives waiting', 'Ops'], ['Plugin updates', '6 updates available', 'Platform'], ['Warehouse cutoff risk', 'West dock needs labels', 'Orders']].map((q) => (
               <div key={q[0]} style={{ display: 'flex', alignItems: 'center', gap: '.6rem', padding: '.5rem', borderRadius: '.5rem', background: 'var(--wash)' }}>
@@ -648,21 +648,21 @@ function Overview() {
             ))}
           </div>
         </Card>
-        <Card title="Revenue run rate" sub="Daily booked revenue across storefront, invoices, and subscriptions" icon={BoltIcon} span="span-6" inverse>
+        <Card title="Revenue Run Rate" sub="Daily booked revenue across storefront, invoices, and subscriptions" icon={BoltIcon} span="span-6" inverse>
           <span className="badge" style={{ background: 'rgba(255,255,255,.2)', color: '#fff', marginTop: '.8rem', display: 'inline-flex' }}>$1.04M forecast</span>
-          <div style={{ marginTop: '.6rem' }}><ColumnChart values={OV.revenue.map((v) => v * 0.9)} labels={OV.revenueLabels} color="rgba(255,255,255,.55)" /></div>
+          <div style={{ marginTop: '.6rem' }}><ColumnChart values={OV.revenue.map((v) => v * 0.9)} labels={OV.revenueLabels} color="color-mix(in srgb, #ffffff 45%, var(--c-amber))" /></div>
           <div className="stat-row" style={{ marginTop: '.6rem' }}><div><div className="stat-big">$842K</div><span className="muted">Booked</span></div><div><div className="stat-big">$187K</div><span className="muted">Pipeline</span></div></div>
         </Card>
 
-        <Card title="Acquisition mix" sub="Sessions by top marketing channel" icon={ChartPieIcon} span="span-4"><div style={{ marginTop: '1rem' }}><DonutChart data={OV.acquisition} size={150} /></div></Card>
-        <Card title="Marketing performance" sub="Email and automation revenue movement" icon={MegaphoneIcon} span="span-4"><div style={{ marginTop: '1rem' }}><LineChart values={OV.marketing} color="var(--color-info)" /></div><div className="stat-row" style={{ marginTop: '.6rem' }}><div><div className="stat-big" style={{ fontSize: '1.3rem' }}>42.6%</div><span className="card-sub">Open rate</span></div><div><div className="stat-big" style={{ fontSize: '1.3rem' }}>$118K</div><span className="card-sub">Attributed</span></div></div></Card>
-        <Card title="Promotions health" icon={TagIcon} span="span-4"><div style={{ marginTop: '1rem' }}>{prog('Coupon margin', 72)}{prog('Gift card redemption', 56)}{prog('Fraud pressure', 11)}{prog('Offer health', 88)}</div></Card>
+        <Card title="Acquisition Mix" sub="Sessions by top marketing channel" icon={ChartPieIcon} span="span-4"><div style={{ marginTop: '1rem' }}><DonutChart data={OV.acquisition} size={150} /></div></Card>
+        <Card title="Marketing Performance" sub="Email and automation revenue movement" icon={MegaphoneIcon} span="span-4"><div style={{ marginTop: '1rem' }}><LineChart values={OV.marketing} color="var(--c-sky)" /></div><div className="stat-row" style={{ marginTop: '.6rem' }}><div><div className="stat-big" style={{ fontSize: '1.3rem' }}>42.6%</div><span className="card-sub">Open rate</span></div><div><div className="stat-big" style={{ fontSize: '1.3rem' }}>$118K</div><span className="card-sub">Attributed</span></div></div></Card>
+        <Card title="Promotions Health" icon={TagIcon} span="span-4"><div style={{ marginTop: '1rem' }}>{prog('Coupon margin', 72, 'var(--c-teal)')}{prog('Gift card redemption', 56, 'var(--c-sky)')}{prog('Fraud pressure', 11, 'var(--c-rose)')}{prog('Offer health', 88, 'var(--c-amber)')}</div></Card>
 
-        <Card title="Infrastructure uptime" sub="Last 24 hours across public services" icon={CircleStackIcon} span="span-4"><div style={{ marginTop: '1rem' }}><div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.8rem' }}><span>Storefront</span><span>100%</span></div><Uptime series={OV.uptimeStore} /><div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.8rem', marginTop: '.6rem' }}><span>API</span><span>99.9%</span></div><Uptime series={OV.uptimeApi} /></div></Card>
+        <Card title="Infrastructure Uptime" sub="Last 24 hours across public services" icon={CircleStackIcon} span="span-4"><div style={{ marginTop: '1rem' }}><div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.8rem' }}><span>Storefront</span><span>100%</span></div><Uptime series={OV.uptimeStore} /><div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.8rem', marginTop: '.6rem' }}><span>API</span><span>99.9%</span></div><Uptime series={OV.uptimeApi} /></div></Card>
         <Card title="Satisfaction" sub="Retention, refunds, satisfaction, and service workload" icon={BanknotesIcon} span="span-4"><div style={{ display: 'grid', placeItems: 'center', margin: '1rem 0' }}><Radial value={86} /></div><div style={{ fontSize: '.82rem' }}><div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Net revenue retention</span><b>112%</b></div><div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Refund pressure</span><b>3.8%</b></div><div style={{ display: 'flex', justifyContent: 'space-between' }}><span>VIP escalations</span><b>14</b></div></div></Card>
-        <Card title="Inventory pressure" icon={CubeIcon} span="span-4"><div style={{ marginTop: '1rem' }}>{prog('Low stock', 42)}{prog('Oversold', 7)}{prog('Healthy stock', 88)}</div></Card>
+        <Card title="Inventory Pressure" icon={CubeIcon} span="span-4"><div style={{ marginTop: '1rem' }}>{prog('Low stock', 42, 'var(--c-amber)')}{prog('Oversold', 7, 'var(--c-rose)')}{prog('Healthy stock', 88, 'var(--c-teal)')}</div></Card>
 
-        <Card title="Plugin and tool status" icon={PuzzlePieceIcon} span="span-6" link="Plugins">
+        <Card title="Plugin and Tool Status" icon={PuzzlePieceIcon} span="span-6" link="Plugins">
           <div className="table-wrap" style={{ marginTop: '1rem' }}><table className="tbl"><thead><tr><th>Component</th><th>Status</th><th>Signal</th></tr></thead><tbody>
             {[['Fraud Shield', 'Active', 'badge-success', '426 coupon blocks'], ['Media Optimizer', 'Update', 'badge-warning', 'Backlog impact'], ['Backup Vault', 'Active', 'badge-success', 'Last snapshot 18m ago'], ['Import queue', 'Ready', 'badge-info', '3 validated files']].map((r) => (
               <tr key={r[0]}><td>{r[0]}</td><td><span className={`badge ${r[2]}`}>{r[1]}</span></td><td>{r[3]}</td></tr>
@@ -702,6 +702,7 @@ function ExportDrawer() {
   const [draft, setDraft] = useState('');
   const [msg, setMsg] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
   const [printView, setPrintView] = useState(false);
+  const [copied, setCopied] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
   const lastFocus = useRef<HTMLElement | null>(null);
   const kpis = computeKpis(filterUsersForKpis(users, ui.filterRole, ui.filterStatus));
@@ -719,6 +720,13 @@ function ExportDrawer() {
       const opener = lastFocus.current;
       window.setTimeout(() => { if (opener && document.contains(opener)) opener.focus(); }, 0);
     }
+  }, [exportOpen]);
+  // Hard focus containment: everything behind the modal drawer is inert while
+  // it is open, so Tab can never reach the underlying page.
+  useEffect(() => {
+    const behind = [document.querySelector('.shell'), document.querySelector('.fab')];
+    behind.forEach((el) => { if (!el) return; if (exportOpen) el.setAttribute('inert', ''); else el.removeAttribute('inert'); });
+    return () => { behind.forEach((el) => el?.removeAttribute('inert')); };
   }, [exportOpen]);
   useEffect(() => {
     if (exportOpen) setMsg((current) => current?.text.startsWith('Imported ')
@@ -743,39 +751,40 @@ function ExportDrawer() {
 
   const copy = async () => {
     try { await navigator.clipboard.writeText(text); } catch { /* ignore */ }
+    setCopied(true); window.setTimeout(() => setCopied(false), 1400);
     setMsg({ kind: 'success', text: `Copied ${exportTab === 'json' ? 'Session JSON' : 'Users CSV'} to clipboard` });
-    dispatch(pushToast({ kind: 'success', title: 'Copied to clipboard', body: `${exportTab === 'json' ? 'Session JSON' : 'Users CSV'} preview copied` }));
+    dispatch(pushToast({ kind: 'success', title: 'Copied to Clipboard', body: `${exportTab === 'json' ? 'Session JSON' : 'Users CSV'} preview copied` }));
   };
   const download = () => {
     const blob = new Blob([text], { type: exportTab === 'json' ? 'application/json' : 'text/csv' });
     const url = URL.createObjectURL(blob); const a = document.createElement('a');
     const fname = exportTab === 'json' ? 'session.json' : 'users.csv';
     a.href = url; a.download = fname; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-    dispatch(pushToast({ kind: 'info', title: 'Download started', body: `${fname} download started` }));
+    dispatch(pushToast({ kind: 'info', title: 'Download Started', body: `${fname} download started` }));
   };
   const doImport = () => {
     const res = exportTab === 'json' ? importSessionJson(draft) : importUsersCsv(draft);
-    if (!res.ok) { setMsg({ kind: 'error', text: `Import failed: ${res.message}` }); dispatch(pushToast({ kind: 'error', title: 'Import failed', body: res.message })); return; }
+    if (!res.ok) { setMsg({ kind: 'error', text: `Import failed: ${res.message}` }); dispatch(pushToast({ kind: 'error', title: 'Import Failed', body: res.message })); return; }
     dispatch(setUsers(res.users));
     if (res.applied) { dispatch(setFilterRole(res.applied.role || '')); dispatch(setFilterStatus(res.applied.status || '')); dispatch(setSort(res.applied.sort || 'newest')); dispatch(setTheme(res.applied.theme || 'dark')); if (res.applied.activeView) dispatch(setActiveView(res.applied.activeView as any)); }
     setMsg({ kind: 'success', text: `Imported ${res.users.length} user(s). All Users, KPIs, and previews now match.` });
-    dispatch(pushToast({ kind: 'success', title: 'Import successful', body: `${res.users.length} user(s) restored` }));
+    dispatch(pushToast({ kind: 'success', title: 'Import Successful', body: `${res.users.length} user(s) restored` }));
     setDraft(''); setImportMode(false);
   };
 
   return (
     <>
-      <div className={`drawer-overlay ${exportOpen ? 'open' : ''}`} style={{ zIndex: 9998 }} onClick={() => dispatch(setExportOpen(false))} aria-hidden="true" />
-      <div ref={drawerRef} className={`export-drawer ${exportOpen ? 'open' : ''}`} style={{ zIndex: 9999 }} role="dialog" aria-modal="true" aria-label="Export and import session" aria-hidden={!exportOpen}>
+      <div className={`drawer-overlay ${exportOpen ? 'open' : ''}`} onClick={() => dispatch(setExportOpen(false))} aria-hidden="true" />
+      <div ref={drawerRef} className={`export-drawer ${exportOpen ? 'open' : ''}`} role="dialog" aria-modal="true" aria-label="Export and import session" aria-hidden={!exportOpen}>
         <div className="export-head">
-          <h2 style={{ fontSize: '1.1rem', fontWeight: 700 }}>{importMode ? 'Import session' : 'Export session'}</h2>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 700 }}>{importMode ? 'Import Session' : 'Export Session'}</h2>
           <button className="btn btn-ghost btn-circle" aria-label="Close export drawer" onClick={() => dispatch(setExportOpen(false))}><XMarkIcon className="icon-md" /></button>
         </div>
         <div className="export-tabs" role="tablist" aria-label="Export format">
           <button role="tab" aria-selected={exportTab === 'json'} className={`btn btn-sm ${exportTab === 'json' ? 'btn-neutral' : 'btn-ghost'}`} onClick={() => dispatch(setExportTab('json'))}>Session JSON</button>
           <button role="tab" aria-selected={exportTab === 'csv'} className={`btn btn-sm ${exportTab === 'csv' ? 'btn-neutral' : 'btn-ghost'}`} onClick={() => dispatch(setExportTab('csv'))}>Users CSV</button>
           <div style={{ flex: 1 }} />
-          <button className="btn btn-sm btn-ghost" onClick={() => setImportMode((v) => !v)}>{importMode ? 'Back to preview' : 'Import session'}</button>
+          <button className="btn btn-sm btn-ghost" onClick={() => setImportMode((v) => !v)}>{importMode ? 'Back to Preview' : 'Import Session'}</button>
         </div>
         {!importMode && (
           <div className="export-summary" aria-label="Export summary">
@@ -798,16 +807,18 @@ function ExportDrawer() {
             <>
               {!printView ? <pre className="export-pre" tabIndex={0}>{text}</pre>
                 : <div className="export-pre" style={{ whiteSpace: 'normal' }}><b>Session summary</b> — {users.length} users · total {kpis.total} · active {kpis.active} · paying {kpis.paying} · suspended {kpis.suspended} · sort {ui.sort} · theme {ui.theme} · view {ui.activeView}.</div>}
-              <button className="btn btn-sm btn-outline" onClick={() => { setPrintView((v) => !v); if (!printView) setTimeout(() => window.print(), 50); }}><DocumentTextIcon className="icon-sm" /> {printView ? 'Hide summary' : 'Print / share summary'}</button>
+              <button className="btn btn-sm btn-outline" onClick={() => { setPrintView((v) => !v); if (!printView) setTimeout(() => window.print(), 50); }}><DocumentTextIcon className="icon-sm" /> {printView ? 'Hide Summary' : 'Print / Share Summary'}</button>
             </>
           )}
         </div>
         <div className="export-foot">
           {importMode ? (
-            <button className="btn btn-primary" style={{ flex: 1 }} disabled={!draft.trim()} onClick={doImport}>Import data</button>
+            <button className="btn btn-primary" style={{ flex: 1 }} disabled={!draft.trim()} onClick={doImport}>Import Data</button>
           ) : (
             <>
-              <button className="btn btn-outline" style={{ flex: 1 }} onClick={copy}><ClipboardDocumentIcon className="icon-sm" /> Copy</button>
+              <button className={`btn btn-outline ${copied ? 'copied' : ''}`} style={{ flex: 1 }} onClick={copy}>
+                {copied ? <CheckCircleIcon className="icon-sm" /> : <ClipboardDocumentIcon className="icon-sm" />} {copied ? 'Copied!' : 'Copy'}
+              </button>
               <button className="btn btn-primary" style={{ flex: 1 }} onClick={download}><ArrowDownTrayIcon className="icon-sm" /> Download {exportTab === 'json' ? 'JSON' : 'CSV'}</button>
             </>
           )}
@@ -862,7 +873,7 @@ function ConfirmDialog() {
   const confirmDel = () => {
     const ids = confirm.ids; const n = ids.length;
     dispatch(deleteUsers(ids)); dispatch(clearSelection());
-    dispatch(pushToast({ kind: 'success', title: `${n} user(s) deleted`, body: 'Removed from list, KPIs, and export previews' }));
+    dispatch(pushToast({ kind: 'success', title: 'Users Deleted', body: `${n} user(s) removed from list, KPIs, and export previews` }));
     dispatch(setLastMutation(`Deleted ${n}`)); close();
   };
   useEffect(() => {
@@ -928,7 +939,7 @@ function WebMCPBinder() {
             if (!parsed.success) return { error: parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ') };
             const user = makeUserFromCreate(parsed.data);
             dispatch(addUser(user));
-            dispatch(pushToast({ kind: 'success', title: 'User added', body: `${parsed.data.firstName} ${parsed.data.lastName} (via MCP)` }));
+            dispatch(pushToast({ kind: 'success', title: 'User Added', body: `${parsed.data.firstName} ${parsed.data.lastName} (via MCP)` }));
             dispatch(setLastMutation(`Created ${parsed.data.firstName} ${parsed.data.lastName}`));
             return { result: `created user ${user.id}`, userId: user.id, userCount: store.getState().users.data.length };
           }
@@ -952,7 +963,7 @@ function WebMCPBinder() {
           case 'entity_delete': {
             const id = args.target_id; if (!id || !st.users.data.some((u) => u.id === id)) return { error: 'target_id not found' };
             if (args.confirm !== true) return { error: 'delete requires confirm=true' };
-            dispatch(deleteUser(id)); dispatch(pushToast({ kind: 'success', title: 'User deleted', body: 'Removed via MCP' })); dispatch(setLastMutation(`Deleted user ${id}`)); return { result: `deleted user ${id}`, userCount: store.getState().users.data.length };
+            dispatch(deleteUser(id)); dispatch(pushToast({ kind: 'success', title: 'User Deleted', body: 'Removed via MCP' })); dispatch(setLastMutation(`Deleted user ${id}`)); return { result: `deleted user ${id}`, userCount: store.getState().users.data.length };
           }
           case 'artifact_export': {
             const fmt = (args.export_formats && args.export_formats[0]) || args.format || 'json';
@@ -980,7 +991,7 @@ function WebMCPBinder() {
             const fmt = (args.export_formats && args.export_formats[0]) || st.ui.exportTab;
             const t = fmt === 'csv' ? buildCsv(st.users.data) : JSON.stringify(buildSession(st.users.data, { role: st.ui.filterRole, status: st.ui.filterStatus, sort: st.ui.sort, theme: st.ui.theme, activeView: st.ui.activeView }), null, 2);
             try { await navigator.clipboard.writeText(t); } catch { /* ignore */ }
-            dispatch(pushToast({ kind: 'success', title: 'Copied to clipboard', body: `${fmt === 'csv' ? 'Users CSV' : 'Session JSON'} copied (via MCP)` }));
+            dispatch(pushToast({ kind: 'success', title: 'Copied to Clipboard', body: `${fmt === 'csv' ? 'Users CSV' : 'Session JSON'} copied (via MCP)` }));
             return { result: `copied ${fmt} preview (${t.length} chars)` };
           }
           default: return { error: `unknown tool ${name}` };
