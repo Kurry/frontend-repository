@@ -30,7 +30,7 @@ export function csvFromEvents(events) {
   }
   return [
     'timestamp,model,request_label,prompt_tokens,completion_tokens,cost',
-    ...events.map((event) => [event.timestamp, event.model, event.request_label, event.prompt_tokens, event.completion_tokens, event.cost].map(escape).join(',')),
+    ...events.map((event) => [event.timestamp, event.model, event.request_label, event.prompt_tokens, event.completion_tokens, `$${Number(event.cost).toFixed(4)}`].map(escape).join(',')),
   ].join('\n')
 }
 
@@ -350,7 +350,7 @@ export const useAppStore = create((set, get) => ({
       })
       if (!models.some((item) => item.name === addition.name)) models = [addition, ...models]
       const removalActive = models.some((item) => item.name === removalName && item.lifecycle === 'departing')
-      const compareSelected = state.compareSelected.filter((name) => name !== removalName || !removalActive)
+      const activeModelNames = new Set(models.filter((m) => m.name !== removalName).map((m) => m.name)); const compareSelected = state.compareSelected.filter((name) => activeModelNames.has(name))
       const qualifies = becameFree && state.alertConfig.alerts_enabled && becameFree.context_window >= state.alertConfig.min_context_window
       const toast = qualifies ? makeFreeToast(becameFree.name) : null
       set({
