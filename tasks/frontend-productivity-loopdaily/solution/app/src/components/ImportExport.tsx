@@ -66,7 +66,6 @@ export default function ImportExport() {
       }
     };
     reader.readAsText(file);
-    e.target.value = "";
   };
 
   const handleConfirmImport = () => {
@@ -145,6 +144,7 @@ export default function ImportExport() {
           ref={fileRef}
           type="file"
           accept="application/json,.json"
+          onClick={(e) => { e.currentTarget.value = ""; }}
           onChange={handleFileChange}
           className="hidden"
           aria-label="Import JSON file"

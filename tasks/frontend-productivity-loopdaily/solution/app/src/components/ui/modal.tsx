@@ -72,7 +72,7 @@ export default function Modal({
       if (e.shiftKey && (active === firstEl || active === node)) {
         e.preventDefault();
         lastEl.focus();
-      } else if (!e.shiftKey && active === lastEl) {
+      } else if (!e.shiftKey && (active === lastEl || !items.includes(active))) {
         e.preventDefault();
         firstEl.focus();
       }
