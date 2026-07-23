@@ -63,7 +63,7 @@ import { CoachmarksComponent } from './components/coachmarks.component';
             <div>
               <p class="eyebrow text-[11px] font-semibold uppercase tracking-[0.16em] text-mint-600">Shared demo report</p>
               <h1 class="font-display report-title text-[28px] font-bold leading-tight tracking-tight text-teal-950 sm:text-[32px]">
-                Expense Breakdown
+                Expense breakdown
               </h1>
               <p class="mt-1 text-sm text-ink-soft">{{ month }} · Alex Rivera · Demo mode with sample data</p>
             </div>
