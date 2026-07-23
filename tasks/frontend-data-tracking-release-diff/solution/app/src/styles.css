@@ -563,7 +563,7 @@ select { height: 38px; margin-top: 6px; padding: 0 33px 0 10px; font-size: 11px;
   .diff-controls select { height: 44px; }
   .swap-button { width: 100%; }
   .summary-strip { grid-template-columns: 1fr 1fr; }
-  .diff-row { min-width: 610px; }
+  .diff-row { min-width: 0; width: 100%; grid-template-columns: 24px 60px 1fr; }
   .diff-list { overflow-x: auto; }
   .unchanged-disclosure { min-width: 610px; }
   .split-grid { grid-template-columns: 1fr; }
