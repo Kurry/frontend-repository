@@ -20,6 +20,7 @@ import {
   selectTheme,
   setColourBlindness,
   setSwatch,
+  setHexError,
   state,
 } from "../store";
 import PreviewPane from "./PreviewPane";
@@ -40,6 +41,9 @@ function SwatchRow(props: { index: number }) {
     untrack(() => {
       if (HEX_RE.test(draft()) && hexToInt(draft()) === v) return;
       setDraft(css(v));
+      if (error()) {
+        setHexError(false);
+      }
       setError(false);
     });
   });
@@ -47,15 +51,21 @@ function SwatchRow(props: { index: number }) {
   const onInput = (text: string) => {
     setDraft(text);
     if (HEX_RE.test(text)) {
+      if (error()) {
+        setHexError(false);
+      }
       setError(false);
       setSwatch(props.index, hexToInt(text));
     } else {
+      if (!error()) {
+        setHexError(true);
+      }
       setError(true);
     }
   };
 
   return (
-    <div class="flex flex-col rounded-md px-1 py-1 transition-colors duration-100 hover:bg-scope-bg2/70">
+    <div class="flex flex-col rounded-md px-1 py-1 transition-colors duration-100 hover:bg-scope-bg3/50">
       <div class="flex items-center gap-3">
         <input
           type="color"
@@ -89,7 +99,7 @@ function SwatchRow(props: { index: number }) {
         />
       </div>
       {error() && (
-        <p role="status" class="px-1 pt-1 text-xs font-medium text-red-600">
+        <p role="status" aria-live="polite" class="px-1 pt-1 text-xs font-medium text-red-600">
           {label()} needs a #RRGGBB hex value, e.g. #0b4136. The preview keeps the
           last valid colour until this is corrected.
         </p>

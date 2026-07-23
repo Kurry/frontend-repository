@@ -10,6 +10,7 @@ import {
 } from "../store";
 import Button from "./Button";
 import { Check, Copy, Download, ImportIcon } from "./Icon";
+import Alert from "./Alert";
 
 const TABS: { id: PatcherState["activeExportTab"]; label: string }[] = [
   { id: "recipe", label: "Patch recipe JSON" },
@@ -107,6 +108,7 @@ export default function ExportCenter() {
           {(flag) => (
             <span
               role="status"
+              aria-live="polite"
               classList={{
                 "confirm-in inline-flex items-center gap-1 text-xs font-medium text-green-700":
                   true,
@@ -146,16 +148,15 @@ export default function ExportCenter() {
       <div aria-live="polite">
         <Show when={importStatus()}>
           {(status) => (
-            <p
-              role="status"
-              classList={{
-                "rounded-md border px-3 py-2 text-xs font-medium": true,
-                "border-green-300 bg-green-50 text-green-800": status().ok,
-                "border-red-300 bg-red-50 text-red-800": !status().ok,
-              }}
-            >
-              {status().message}
-            </p>
+            <Show when={!status().ok} fallback={
+              <p role="status" class="rounded-md border border-green-300 bg-green-50 px-3 py-2 text-xs font-medium text-green-800">
+                {status().message}
+              </p>
+            }>
+              <div role="status" class="mt-2 text-left">
+                <Alert type="warn"><p>{status().message}</p></Alert>
+              </div>
+            </Show>
           )}
         </Show>
       </div>

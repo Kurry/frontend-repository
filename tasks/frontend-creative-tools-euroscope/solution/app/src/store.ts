@@ -79,6 +79,7 @@ function defaultState(): PatcherState {
     activeExportTab: "recipe",
     undoDepth: 0,
     redoDepth: 0,
+    invalidHexCount: 0,
   };
 }
 
@@ -107,6 +108,7 @@ function loadPersisted(): PatcherState {
       ? (parsed.snapshots as Array<Record<string, unknown>>)
           .filter(
             (s) =>
+              typeof s.id === "string" &&
               typeof s.name === "string" &&
               s.name.trim().length > 0 &&
               Array.isArray(s.colours) &&
@@ -184,7 +186,7 @@ function historySnapshot(): HistoryEntry {
     baseTheme: state.baseTheme,
     swatches: [...state.swatches],
     iconSet: state.iconSet,
-    keepOriginal: { ...state.keepOriginal },
+    keepOriginal: JSON.parse(JSON.stringify(state.keepOriginal)),
   };
 }
 
@@ -205,7 +207,7 @@ function applyHistory(entry: HistoryEntry) {
   setState("baseTheme", entry.baseTheme);
   setState("swatches", [...entry.swatches]);
   setState("iconSet", entry.iconSet);
-  setState("keepOriginal", reconcile({ ...entry.keepOriginal }));
+  setState("keepOriginal", reconcile(JSON.parse(JSON.stringify(entry.keepOriginal))));
   markPatchStale();
   persist();
 }
@@ -229,6 +231,7 @@ export function redo(): void {
 // ---- domain commands (the SAME code paths the visible controls call) --------
 
 export function goNext(): boolean {
+  if (state.invalidHexCount > 0) return false;
   if (state.step >= STEP_COUNT - 1) return false;
   const next = state.step + 1;
   setState("step", next);
@@ -267,6 +270,10 @@ export function setSwatch(index: number, value: number): void {
   setState("swatches", index, value & 0xffffff);
   markPatchStale();
   persist();
+}
+
+export function setHexError(hasError: boolean): void {
+  setState("invalidHexCount", state.invalidHexCount + (hasError ? 1 : -1));
 }
 
 export function selectIconSet(set: IconSet): void {
@@ -406,9 +413,9 @@ function recipeInput() {
     step: state.step,
     fileName: state.fileName,
     baseTheme: state.baseTheme,
-    swatches: state.swatches,
+    swatches: [...state.swatches],
     iconSet: state.iconSet,
-    keepOriginal: state.keepOriginal,
+    keepOriginal: { ...state.keepOriginal },
   };
 }
 
