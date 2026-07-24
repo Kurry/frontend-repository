@@ -229,7 +229,7 @@ export const useAppStore = create((set, get) => ({
     const idSet = new Set(ids)
     const remaining = s.personas.filter((p) => !idSet.has(p.id))
     const next = pushUndo(s, {
-      ...s, personas: remaining, selectedIds: [],
+      ...s, personas: remaining, selectedIds: s.selectedIds.filter(id => !idSet.has(id)),
       comparisonSlots: s.comparisonSlots.map((id) => idSet.has(id) ? null : id),
       testBench: { ...s.testBench, personaId: idSet.has(s.testBench.personaId) ? null : s.testBench.personaId },
     })
@@ -244,7 +244,8 @@ export const useAppStore = create((set, get) => ({
       return { ...p, tags }
     })
     const next = pushUndo(s, { ...s, personas, selectedIds: [] })
-    return { ...next, announce: `${remove ? 'Removed' : 'Added'} tag ${tag} ${remove ? 'from' : 'to'} ${ids.length} personas` }
+    const announceMsg = `${remove ? 'Removed' : 'Added'} tag ${tag} ${remove ? 'from' : 'to'} ${ids.length} personas`
+    return { ...next, announce: announceMsg, ui: { ...next.ui, toast: { id: uid('toast'), message: announceMsg } } }
   }),
   bulkArchive: (ids, archived) => set((s) => {
     const idSet = new Set(ids)
@@ -300,7 +301,7 @@ export const useAppStore = create((set, get) => ({
   }),
   restoreRun: (runId) => set((s) => {
     const run = s.testBench.history.find((r) => r.id === runId)
-    return run ? { testBench: { ...s.testBench, personaId: run.personaId, scenarioId: run.scenarioId, transcript: run.transcript, status: run.stopped ? 'stopped' : 'complete', target: '' } } : s
+    return run ? { testBench: { ...s.testBench, personaId: run.personaId, scenarioId: run.scenarioId, transcript: run.transcript, status: run.stopped ? 'stopped' : 'complete', target: '' }, announce: 'Transcript restored from history' } : s
   }),
 
   openDetail: (id) => { captureFocus(); set((s) => ({ ui: { ...s.ui, detailId: id } })) },
@@ -311,16 +312,20 @@ export const useAppStore = create((set, get) => ({
       set((s) => ({ poll: { ...s.poll, message: 'At least two iterations are needed to start a poll.' }, announce: 'At least two iterations are needed to start a poll.' }))
       return false
     }
-    set((s) => ({ poll: { open: true, personaId, votes: [], running: true, round: s.poll.round + 1, message: '' } }))
+    set((s) => ({ poll: { open: true, personaId, votes: [], running: true, round: s.poll.round + 1, message: '' }, announce: 'Iteration poll started; watch votes arrive.' }))
     return true
   },
-  addVote: (vote) => set((s) => s.poll.running ? { poll: { ...s.poll, votes: [...s.poll.votes, vote] } } : s),
+  addVote: (vote) => set((s) => {
+    if (!s.poll.running) return s
+    return { poll: { ...s.poll, votes: [...s.poll.votes, vote] }, announce: `Teammate ${vote.teammate} cast a vote` }
+  }),
   finishPoll: () => set((s) => {
     if (!s.poll.running) return s
     const counts = s.poll.votes.reduce((acc, v) => ({ ...acc, [v.iterationId]: (acc[v.iterationId] || 0) + 1 }), {})
     const winner = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0]
     const personas = s.personas.map((p) => p.id === s.poll.personaId ? { ...p, promotedIteration: winner } : p)
-    return { personas, poll: { ...s.poll, running: false }, announce: 'Poll closed and winning iteration promoted' }
+    const next = pushUndo(s, { ...s, personas, poll: { ...s.poll, running: false } })
+    return { ...next, announce: 'Poll closed and winning iteration promoted' }
   }),
   closePoll: () => set((s) => ({ poll: { ...s.poll, open: false } })),
 }))

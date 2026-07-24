@@ -1,1 +1,0 @@
-import{v as e}from"./core.min-DGtNB905.js";import{M as i}from"./gameLogic-BYBrtOsQ.js";import"./preloader-Bns9QiKi.js";const s=()=>{const[r]=e();r.phase!=="playing"||r.currentTurn!=="player"||r.isRivalThinking||r.hintsUsed>=i||(r.playerMode=r.playerMode==="hint"?"reveal":"hint")};export{s as s_Dei6RWBbu1A};

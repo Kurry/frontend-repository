@@ -1,1 +1,0 @@
-import{v as o}from"./core.min-DGtNB905.js";import{c as r}from"./gameLogic-BYBrtOsQ.js";import"./preloader-Bns9QiKi.js";const m=()=>{const[t]=o();r(t,JSON.stringify({matches:t.matchLog},null,2))};export{m as s_nIiEenZlTf8};

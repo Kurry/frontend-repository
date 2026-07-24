@@ -2,7 +2,8 @@ import React, { useEffect, useMemo, useRef } from 'react'
 import { Button, CodeSnippet } from '@carbon/react'
 import { Checkmark, Close, Copy, Download } from '@carbon/icons-react'
 import { clearFocusCapture, restoreFocus } from '../focus'
-import { TRAITS, toPayload, useAppStore, visiblePersonas } from '../store'
+import { TRAITS, useAppStore, visiblePersonas } from '../store'
+const toExportPayload = (persona) => ({ name: persona.name.trim(), role: persona.role, tone: persona.tone, tags: [...persona.tags], constraints: [...persona.constraints], goals: persona.goals, examples: JSON.parse(JSON.stringify(persona.examples || [])) })
 
 function reportFor(first, second) {
   if (!first || !second) return 'Comparison report\n\nChoose two personas in Compare to generate a complete report.'
@@ -29,7 +30,7 @@ export default function ExportDrawer() {
   const drawerRef = useRef(null)
   const first = personas.find((p) => p.id === slots[0])
   const second = personas.find((p) => p.id === slots[1])
-  const pack = useMemo(() => JSON.stringify({ schemaVersion: 1, personas: visible.map(toPayload), generatedAt: new Date().toISOString() }, null, 2), [visible, open])
+  const pack = useMemo(() => JSON.stringify({ schemaVersion: 1, personas: visible.map(toExportPayload), generatedAt: new Date().toISOString() }, null, 2), [visible, open])
   const report = useMemo(() => reportFor(first, second), [first, second, open])
   const text = tab === 'pack' ? pack : report
 
@@ -52,8 +53,8 @@ export default function ExportDrawer() {
         else if (!e.shiftKey && document.activeElement === focusable.at(-1)) { e.preventDefault(); focusable[0].focus() }
       }
     }
-    document.addEventListener('keydown', key)
-    return () => document.removeEventListener('keydown', key)
+    document.addEventListener('keydown', key, true)
+    return () => document.removeEventListener('keydown', key, true)
   }, [open])
 
   if (!open) return null

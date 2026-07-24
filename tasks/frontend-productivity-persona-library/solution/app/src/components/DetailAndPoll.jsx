@@ -22,11 +22,29 @@ function DiffView({ older, newer }) {
     return result
   }, [older, newer])
   if (!older || !newer) return <div className="diff-empty"><ChartRelationship /><p>Select exactly two iterations to compare.</p></div>
+
+  const renderPromptDiff = (beforeStr, afterStr) => {
+    const beforeLines = beforeStr.replace(/<[^>]*>/g, ' ').split('\n').map(l => l.trim()).filter(Boolean)
+    const afterLines = afterStr.replace(/<[^>]*>/g, ' ').split('\n').map(l => l.trim()).filter(Boolean)
+    const removed = beforeLines.filter(l => !afterLines.includes(l))
+    const added = afterLines.filter(l => !beforeLines.includes(l))
+    const lines = []
+    removed.forEach(l => lines.push(<pre key={`rem-${l}`} className="removed">− {l}</pre>))
+    added.forEach(l => lines.push(<pre key={`add-${l}`} className="added">+ {l}</pre>))
+    if (!removed.length && !added.length) {
+      if (beforeStr !== afterStr) {
+        lines.push(<pre key="rem-raw" className="removed">− {beforeStr.replace(/<[^>]*>/g, ' ')}</pre>)
+        lines.push(<pre key="add-raw" className="added">+ {afterStr.replace(/<[^>]*>/g, ' ')}</pre>)
+      }
+    }
+    return lines
+  }
+
   return (
     <div className="diff-view">
       <div className="diff-heading"><span>{new Date(older.timestamp).toLocaleString()}</span><b>→</b><span>{new Date(newer.timestamp).toLocaleString()}</span></div>
       {changes.length ? changes.map((change) => change.field === 'promptBody' ? (
-        <div className="diff-field prompt-diff" key={change.field}><h4>Prompt body</h4><pre className="removed">− {change.before.replace(/<[^>]*>/g, ' ')}</pre><pre className="added">+ {change.after.replace(/<[^>]*>/g, ' ')}</pre></div>
+        <div className="diff-field prompt-diff" key={change.field}><h4>Prompt body</h4>{renderPromptDiff(change.before, change.after)}</div>
       ) : (
         <div className="diff-field" key={change.field}><h4>{pretty(change.field)}</h4><div><span className="before">{displayValue(change.before)}</span><b>→</b><span className="after">{displayValue(change.after)}</span></div></div>
       )) : <p className="no-changes">No field-level changes between these iterations.</p>}

@@ -42,14 +42,18 @@ function BulkTray() {
   const clearSelection = useAppStore((s) => s.clearSelection)
   const toast = useAppStore((s) => s.toast)
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const { register, handleSubmit, getValues, formState: { errors }, reset } = useForm({ resolver: zodResolver(bulkTagSchema), defaultValues: { tag: '' }, mode: 'onChange' })
+  const { register, trigger, getValues, formState: { errors }, reset } = useForm({ resolver: zodResolver(bulkTagSchema), defaultValues: { tag: '' }, mode: 'onChange' })
   if (!selectedIds.length) return null
 
-  const applyTag = (remove = false) => handleSubmit(({ tag }) => {
-    bulkTags(selectedIds, tag, remove)
-    toast(`${remove ? 'Removed' : 'Added'} “${tag}” ${remove ? 'from' : 'to'} ${selectedIds.length} personas`)
-    reset()
-  })()
+  const applyTag = async (remove = false) => {
+    const valid = await trigger()
+    if (valid) {
+      const { tag } = getValues()
+      bulkTags(selectedIds, tag, remove)
+      toast(`${remove ? 'Removed' : 'Added'} “${tag}” ${remove ? 'from' : 'to'} ${selectedIds.length} personas`)
+      reset()
+    }
+  }
 
   return (
     <>
@@ -96,9 +100,9 @@ export default function LibraryView() {
         ) : (
           <div className="empty-state">
             <div className="empty-orbit"><span /></div>
-            <h2>{personas.length ? 'No Personas Match These Filters' : 'Your Library Is Ready for Its First Persona'}</h2>
-            <p>{personas.length ? `Active filters: ${filterNames.join(', ') || 'none'}.` : 'Create or import a persona to begin building your team.'}</p>
-            {personas.length ? <Button kind="tertiary" onClick={clearFilters}>Clear filters</Button> : <Button renderIcon={Add} onClick={() => openEditor(null)}>Create persona</Button>}
+            <h2>{personas.filter(p => p.archived === filters.archived).length ? 'No Personas Match These Filters' : 'Your Library Is Ready for Its First Persona'}</h2>
+            <p>{personas.filter(p => p.archived === filters.archived).length ? `Active filters: ${filterNames.join(', ') || 'none'}.` : 'Create or import a persona to begin building your team.'}</p>
+            {personas.filter(p => p.archived === filters.archived).length ? <Button kind="tertiary" onClick={clearFilters}>Clear filters</Button> : <Button renderIcon={Add} onClick={() => openEditor(null)}>Create persona</Button>}
           </div>
         )}
       </section>

@@ -69,7 +69,7 @@ export default function ComposeModal() {
         <TextInput id="blend-name" labelText="Blend name *" {...register('name')} invalid={Boolean(errors.name)} invalidText={errors.name?.message} />
         <div className="blend-weight">
           <div className="trait-label-row"><label htmlFor="blend-weight">Blend weighting</label><strong>{Number(values.weight || 0)}% toward second persona</strong></div>
-          <Slider id="blend-weight" labelText="" aria-label="Blend weight slider" hideTextInput min={0} max={100} value={Number(values.weight || 0)} onChange={({ value }) => setValue('weight', Number(value), { shouldValidate: true })} />
+          <Slider id="blend-weight" labelText="" aria-label="Blend weight slider"  min={0} max={100} value={Number(values.weight || 0)} onChange={({ value }) => setValue('weight', Number(value), { shouldValidate: true })} />
           {errors.weight && <p className="field-error">Blend weight: {errors.weight.message}</p>}
         </div>
         <div className="blend-preview">
