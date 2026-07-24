@@ -1,0 +1,158 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+[[criterion]]
+id = "core_features.bind_evidence"
+description = "Bind a source excerpt to a claim node via drag-and-drop or explicit UI action; confirm the source span is linked and visible on the claim."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.move_compose_cards"
+description = "Drag an article card from inbox to drafting; confirm the card status updates and the linked claim graph reflects the change."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.fork_merge_variants"
+description = "Fork a newsletter copy block into a channel variant, edit its properties, and merge the conflict; confirm the block updates with the merged values."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.run_parallel_reviews"
+description = "Start parallel fact and accessibility reviews for a card after editorial review; confirm both review types transition to active or complete statuses."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.stale_repair_approvals"
+description = "Edit a claim that has dependent blocks; confirm that every dependent block and channel artifact visually indicates a stale marker, and repairing/resolving it clears exactly that marker."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.schedule_package_retry"
+description = "Schedule a card on the release timeline, run the package batch which deterministically fails one social image plus the newsletter metadata, repair metadata, and retry failed-only; confirm successful outputs are not duplicated."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.export_agrees"
+description = "Export the final publication pack; confirm that all files (JSON, Markdown, SVG, CSV) agree exactly with the UI state, variants, and release slots."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.staleness_propagation_contract"
+description = "After a claim edit, verify every dependent deliverable block and every channel artifact citing it shows a visible stale marker naming the changed claim in one committed transition; resolving clears exactly its marker; reaching zero dependents leaves artifacts unchanged with no markers."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.consequential_moves_propagate"
+description = "Drag a card on the timeline or board where allowed; confirm the release timeline lane, channel packaging preview, and claim graph's dependency display update immediately with the previous position gone from every surface, and the reason for consequence names affected channels in visible text."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features.channel_artifacts_compile_live"
+description = "Verify packaged channel artifacts compile live on every mutation; confirm that if packaging touches a stale dependency, it blocks with a named diagnostic."
+type = "binary"
+weight = 1.0
