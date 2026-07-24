@@ -1,0 +1,146 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "ec_mass_balance_noop"
+description = "A placement that violates compartment capacity, center-of-mass/balance bounds, fragility stacking, incompatibility, or access-order rules is blocked with a visible reason, and all surfaces are identical before and after."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "ec_double_place"
+description = "Rapid double-place of the same item produces exactly one placement."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "ec_cancelled_drag"
+description = "A cancelled mid-drag leaves everything untouched."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "ec_double_rehearsal"
+description = "Re-recording the same checkpoint (rapid double action) produces exactly one entry."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "ec_dual_kit_ownership"
+description = "An item owned by two kits is blocked with a named diagnostic and zero mutation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "ec_boundary_touching"
+description = "Test exact boundary/touching, overlap, 90° rotation, layer fragility, nesting cycle/depth, mass/10% threshold, incompatible pair, blocker limit, lost/duplicate repack, stale cert, forged import and verify named recovery."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "ec_import_malformed"
+description = "Import rejects malformed layouts (e.g. nested cycle, missing fields) with per-field diagnostics and zero state mutation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "ec_fragility_violation_negative"
+description = "Fragility violations are committed with a warning instead of being blocked."
+type = "binary"
+negate = true
+weight = 1.0
