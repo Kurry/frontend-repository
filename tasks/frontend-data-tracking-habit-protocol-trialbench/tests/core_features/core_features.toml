@@ -1,0 +1,181 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "compose_phases"
+description = "The user can compose baseline, intervention, washout, and follow-up phases on a horizontal timeline, with dates not overlapping or leaving an internal gap, and durations between 3 and 21 days."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "phase_definitions"
+description = "Each intervention phase successfully accepts target minutes, allowed window, minimum qualifying dose, skip policy, and primary outcome lag of 0 to 3 days."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "drag_boundary_preview"
+description = "Dragging a phase boundary previews reassignment counts before commit."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "log_daily_adherence"
+description = "Each day stores planned target, actual minutes, status, entry timestamp, entry mode, outcome, sleep, and note."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "excused_skipped_distinction"
+description = "A dose can be recorded as below target but completed, and excused/skipped states are clearly distinct from each other."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "retrospective_entry_badge"
+description = "Retrospective entries carry a visible badge and appending a retrospective correction never overwrites the original log."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "edit_value_preview"
+description = "Editing an adherence value shows every derived lag pairing, phase metric, finding, and artifact consequence before commit."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "branchable_protocol"
+description = "Changing target, window, lag, or skip policy after observations exist creates a protocol branch effective on a selected future date."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "backdated_amendment_review"
+description = "Backdating an amendment requires explicit reclassification review and preserves old and new interpretations side by side."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "confounder_logging"
+description = "Users can successfully log travel, illness, and unusual-workload intervals with severity and notes, overlaying the timeline."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "missingness_ledger"
+description = "Missing dose, missing outcome, excused day, late entry, and confounded pair remain separately countable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "linked_heatmap_chart"
+description = "The heatmap encodes adherence state, the dose/outcome chart shows raw and lag-aligned points, and a distribution panel compares baseline versus each intervention."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "deterministic_evaluator"
+description = "An evaluator run successfully validates, pairs by lag, classifies exclusions, computes phase summaries, compares effect, checks robustness, and presents a finding (insufficient or no clear change or possible improvement or possible decline)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "decision_continuation"
+description = "The user can review findings, pin exact evidence rows, approve/reject with a note, and create a continuation plan (repeat, adjust dose, change lag, stop)."
+type = "binary"
+weight = 1.0
