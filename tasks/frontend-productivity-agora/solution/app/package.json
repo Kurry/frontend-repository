@@ -1,0 +1,24 @@
+{
+  "name": "solid-stores-tailwind",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "start": "vite preview --host 0.0.0.0 --port 3000 --strictPort",
+    "dev": "vite",
+    "verify:build": "vite build",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "4.3.2",
+    "solid-js": "1.9.14",
+    "tailwindcss": "4.3.2"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3",
+    "vite": "8.1.4",
+    "vite-plugin-solid": "2.11.12",
+    "@playwright/test": "^1.61.0"
+  }
+}

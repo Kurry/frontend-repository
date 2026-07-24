@@ -1,0 +1,194 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+# Design = visual fidelity to RepCadence's PRD-stated tokens: the red/green
+# phase palette, the Poppins/sans/monospace type stack, the pill button and
+# card radii, and the distinct rest-timer vs. phase-indicator treatments.
+# Interaction quality lives in ux.toml.
+
+[[criterion]]
+id = "AG-D-001"
+name = "ag_d_001"
+description = "Inspect the app's background and a primary/accent element (e.g. an active nav tab, a link, or the meditation progress ring) via computed styles. Confirm the page background resolves to #01080A, and confirm the primary or accent color used on prominent controls resolves to #38678B or #337AB7 respectively."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-D-002"
+name = "ag_d_002"
+description = "Inspect a card or panel surface distinct from the page background (e.g. a journal entry card or the quote card) via computed styles. Confirm it uses the secondary color (#021116) or a related dark surface tone as its background, and confirm body text placed on that surface remains clearly legible (sufficient contrast) rather than rendering the same near-black tone as its surface."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-D-003"
+name = "ag_d_003"
+description = "Examine a heading (e.g. the current view's title) and a body text element (e.g. a quote or journal entry text). Confirm both use the Heebo font stack (or sans-serif fallback), and confirm the heading renders visibly larger than the body text, consistent with the spec's larger heading size."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-D-004"
+name = "ag_d_004"
+description = "Inspect a card, button, or badge via computed styles against the 4px base spacing/radius system. Confirm corner rounding across these elements is small and consistent (around 4px) rather than mismatched between components."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-D-005"
+name = "ag_d_005"
+description = """Start a meditation session and observe the breathing overlay through at least one full Inhale/Hold/Exhale cycle. Confirm the current phase label stays legible against the animated circle at every point in the cycle, and confirm the circle visibly expands during "Inhale", holds size during "Hold", and visibly contracts during "Exhale"."""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-D-006"
+name = "ag_d_006"
+description = "Save journal entries tagged with each of the 4 virtues (Wisdom, Courage, Justice, Temperance). Confirm each virtue has its own distinguishable color/badge in Journal History, and confirm the Stats view uses those same 4 colors consistently for the corresponding virtue's bar or number."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-D-007"
+name = "ag_d_007"
+description = """Hover the cursor over a navigation tab and a primary button (e.g. "Save Entry" or "Start"). Confirm both show a clearly visible hover state distinct from their resting appearance."""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-D-008"
+name = "ag_d_008"
+description = "Press Tab to move keyboard focus onto a navigation tab, the virtue-tag selector, and a meditation control (Start/Pause/Reset). Confirm each shows a clearly visible focus indicator (outline or ring) while focused."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-D-009"
+name = "ag_d_009"
+description = "Set the viewport to approximately 375 pixels wide. Confirm the app renders with no horizontal scrolling, and the breathing overlay circle and timer controls remain centered, fully visible, and not clipped or overlapping other elements."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-D-OPT-001"
+name = "ag_d_opt_001"
+description = "Compare the meditation countdown's circular progress ring color against the accent token (#337AB7). Confirm the ring uses this accent consistently rather than an unrelated ad hoc color."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "AG-D-OPT-002"
+name = "ag_d_opt_002"
+description = "Compare a hyperlink-styled element (if present, e.g. an export or external reference link) against the link token (#337AB7). Confirm it is visually consistent with the accent color used elsewhere rather than a mismatched hue."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "AG-RB-D-001"
+name = "ag_rb_d_001"
+description = "Trigger invalid input, the rapid-use scenario, and the final multi-step state. Confirm feedback, progress, and completion states remain legible without layout overlap at desktop and approximately 375px widths."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "AG-RB-D-002"
+name = "ag_rb_d_002"
+description = "Trigger malformed-data and interrupted-edit recovery states. Confirm the recovery notice identifies the active condition, Retry and Reset are visually distinct from ordinary actions, focus remains visible, and the notice remains legible without obscuring core content at narrow width."
+type = "binary"
+weight = 0.5
+

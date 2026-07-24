@@ -1,0 +1,307 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+# Accessibility = WCAG 2.2 conformance, browser-verifiable subset, graded on
+# THIS task's own running app — not the reference's. Standards-based canonical
+# dimension (see CLAUDE.md's solution-sourced doctrine and
+# docs/plans/universal-dimensions.md): stamped byte-identical fleet-wide, never
+# customized per task, hash-checked by `zto check-drift`. Criteria are grouped
+# under the four WCAG principles — Perceivable / Operable / Understandable /
+# Robust (POUR, per "WCAG 2 at a Glance") — and every criterion cites its
+# Success Criterion (SC) number so conformance is traceable clause by clause.
+# Criteria that assume a feature the app may not have (forms, images,
+# dragging, error states, repeated controls, sticky chrome, status
+# confirmations) self-scope with "where the app has/shows…" and pass by
+# default when the feature is absent, so a feature-light app is not penalized
+# for what it doesn't attempt.
+#
+# Pilot posture (docs/plans/universal-dimensions.md, Decision 1): every
+# criterion below is `optional = true` for now, including the 8 Success
+# Criteria the plan designates "must-have core" — flipping them to
+# non-optional (the must_have default) is an explicit later decision, made
+# only after a pilot batch shows the fleet's references clear them; gating
+# before references conform would zero the fleet on day one. The
+# must-have-core criteria keep weight = 1.0 (their intended post-promotion
+# weight — `optional` has no effect on `weighted_mean` scoring, only on
+# `required_pass` gating and tier provenance; see skills/refine-rubric). The
+# optional-extras criteria are capped at weight <= 0.5, the nice-to-have
+# ceiling, since they are meant to stay optional even after promotion. Each
+# criterion below is commented with its tier for the future promotion pass.
+
+# ---------------------------------------------------------------------------
+# Perceivable (WCAG Principle 1) — optional extras only; the pilot's
+# must-have-core set has no Perceivable member.
+# ---------------------------------------------------------------------------
+
+# 1.1.1 Non-text Content — optional extra
+
+[[criterion]]
+id = "A11Y-P-001"
+name = "a11y_p_001"
+description = "WCAG 1.1.1 (Non-text Content). Take a snapshot of the app and identify any meaningful image, icon, or icon-only control it renders (excluding purely decorative graphics). Where such non-text content exists, confirm it exposes a text alternative — alt text, an aria-label, or an accessible name describing its purpose. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-P-002"
+name = "a11y_p_002"
+description = "WCAG 1.3.1 (Info and Relationships). Take a snapshot of the app's accessibility tree. Confirm headings, lists, and form-field labels the app visually presents as such are exposed with matching semantic roles (heading, list, and a programmatic label-to-input association) rather than being plain styled text with no underlying structure. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-P-003"
+name = "a11y_p_003"
+description = "WCAG 1.4.1 (Use of Color). Identify any place the app conveys status, validity, or category primarily through color (e.g., a red field for an error, a colored tag for a category). Where such color-only signaling exists, confirm it is paired with a non-color cue — text, an icon, or a pattern — so the meaning is not lost without color. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-P-004"
+name = "a11y_p_004"
+description = "WCAG 1.4.3 (Contrast Minimum, AA). Using browser_evaluate, read the computed foreground and background colors of the app's primary body text and of any large-scale text (at least 24px, or at least 18.66px bold). Confirm the computed contrast ratio is at least 4.5:1 for the body text and at least 3:1 for the large text."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-P-005"
+name = "a11y_p_005"
+description = "WCAG 1.4.4 (Resize Text, AA). Set the browser's page zoom to 200% (or an equivalent viewport/font-scale simulation) on the app's main screen. Confirm all text remains readable and no content, control, or functionality becomes clipped, overlapping, or unreachable as a result."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-P-006"
+name = "a11y_p_006"
+description = "WCAG 1.4.10 (Reflow, AA). Resize the viewport to 320 CSS px wide. Confirm the app's content reflows to fit that width and reading or operating it requires only vertical scrolling, not horizontal (two-dimensional) scrolling."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-P-007"
+name = "a11y_p_007"
+description = "WCAG 1.4.11 (Non-text Contrast, AA). Using browser_evaluate, read the computed border or outline color of an interactive control's boundary (a button, input, or checkbox) against its adjacent background. Confirm the contrast ratio is at least 3:1."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-O-001"
+name = "a11y_o_001"
+description = "WCAG 2.1.1 (Keyboard). Using only the keyboard (Tab, Shift+Tab, Enter, Space, and arrow keys — no pointer), attempt to complete one full core flow drawn from the PRD, start to finish. Confirm every step of that flow is achievable without the pointer."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-O-002"
+name = "a11y_o_002"
+description = "WCAG 2.1.2 (No Keyboard Trap). Tab into each distinct interactive region of the app (any dialog, menu, dropdown, or embedded widget). Confirm keyboard focus can always continue moving with Tab or Shift+Tab back out of that region on its own, without requiring a mouse."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-O-003"
+name = "a11y_o_003"
+description = """WCAG 2.4.2 (Page Titled). Inspect the document's <title>. Confirm it is non-empty and descriptive of the app or its current view, rather than a generic scaffold placeholder (e.g., "Vite App", "React App")."""
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-O-004"
+name = "a11y_o_004"
+description = "WCAG 2.4.3 (Focus Order). Press Tab repeatedly across the app's main screen. Confirm the sequence in which elements receive focus follows the visual/logical reading order (roughly left-to-right, top-to-bottom, region by region) rather than jumping unpredictably between distant elements."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-O-005"
+name = "a11y_o_005"
+description = """WCAG 2.4.6 (Headings and Labels, AA). Take a snapshot of the app's headings and form-field labels. Confirm each one's text describes the content or field it introduces, rather than being generic (e.g., "Section") or duplicated verbatim across unrelated parts of the app. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."""
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-O-006"
+name = "a11y_o_006"
+description = "WCAG 2.4.7 (Focus Visible, AA). Press Tab repeatedly through every interactive control on the app's main screen. Confirm each one shows a clearly visible focus indicator (an outline, ring, or equivalent) that is visually distinguishable from its unfocused and hover states."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-O-007"
+name = "a11y_o_007"
+description = "WCAG 2.4.11 (Focus Not Obscured, AA). Where the app has a sticky or fixed-position header, footer, or panel, Tab to a control located near it. Confirm the focused control remains at least partially visible rather than being fully hidden behind that fixed content. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-O-008"
+name = "a11y_o_008"
+description = "WCAG 2.5.3 (Label in Name). Take a snapshot of controls that show visible text (buttons, links, labeled inputs). Confirm each control's accessible name contains that visible label text verbatim, rather than an unrelated or reworded accessible name."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-O-009"
+name = "a11y_o_009"
+description = "WCAG 2.5.7 (Dragging Movements, AA). Where the app offers a feature achievable by dragging (reordering, resizing, drag-and-drop), confirm a non-drag alternative — a button, keyboard shortcut, or context-menu action — achieves the same outcome, unless the PRD makes the drag gesture itself the product. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-O-010"
+name = "a11y_o_010"
+description = "WCAG 2.5.8 (Target Size Minimum, AA). Using browser_evaluate, measure the rendered bounding box of the app's smallest interactive controls (icon buttons, close buttons, checkboxes). Confirm each is at least 24 by 24 CSS px, or has at least 24 CSS px of center-to-center spacing from the nearest other target."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-U-001"
+name = "a11y_u_001"
+description = "WCAG 3.1.1 (Language of Page). Inspect the root <html> element. Confirm it carries a lang attribute set to a valid language code matching the app's content language."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-U-002"
+name = "a11y_u_002"
+description = "WCAG 3.2.1 (On Focus) / 3.2.2 (On Input). Tab to each form control in turn and, for controls that accept a value, change that value. Confirm neither action alone ever triggers an unrequested context change — no surprise navigation, new window, or form submission — until the user explicitly activates a control designed to do so."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-U-003"
+name = "a11y_u_003"
+description = "WCAG 3.2.4 (Consistent Identification, AA). Where the app repeats a control that performs the same function in more than one place (e.g., a delete, close, or save action appearing in several views), confirm it uses the same label and icon everywhere it appears. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-U-004"
+name = "a11y_u_004"
+description = "WCAG 3.3.1 (Error Identification). Trigger a validation error the app is capable of producing (submit invalid or missing required input). Where such an error occurs, confirm it is identified in text located at or next to the offending field, not signaled only by a color change or a message shown elsewhere on the page. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-U-005"
+name = "a11y_u_005"
+description = "WCAG 3.3.2 (Labels or Instructions). Take a snapshot of every form input on the app's main screen. Confirm each has a persistent, visible label or instruction — placeholder text that disappears once the field has a value does not, on its own, count as a label."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-U-006"
+name = "a11y_u_006"
+description = "WCAG 3.3.3 (Error Suggestion, AA). Trigger a validation error the app is capable of producing. Where such an error occurs, confirm its message suggests how to fix the problem (the expected format, an example, or the corrective action) rather than only stating that something is wrong. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-R-001"
+name = "a11y_r_001"
+description = "WCAG 4.1.2 (Name, Role, Value). Take a snapshot of the app's main screen. Confirm every interactive control (button, input, or custom widget) exposes a non-empty accessible name and a correct role in the accessibility tree, with no unlabeled or role-less interactive element."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "A11Y-R-002"
+name = "a11y_r_002"
+description = "WCAG 4.1.3 (Status Messages, AA). Perform an action that produces a status the app communicates without moving focus (an item saved, added, or deleted). Where such a status is shown, confirm it is exposed through an aria-live region or equivalent so it would be announced without requiring focus to move to it. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."
+type = "binary"
+weight = 0.5
+

@@ -1,0 +1,257 @@
+[judge]
+judge = "claude-code"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+weight = 0.5
+
+# The judge drives the running app through the Playwright MCP (rewardkit PR #2008).
+# rewardkit registers this server (`claude mcp add`) and derives the judge's
+# allow-list from it — omitting allowed_tools ⇒ the judge may call any
+# mcp__playwright tool. The version is referenced, not hardcoded: rewardkit
+# expandvars-expands ${PLAYWRIGHT_MCP_VERSION} (exported by tests/test.sh from
+# tests/versions.env) at add time, so the pin stays in ONE place. --browser
+# chromium is required — see tests/test.sh.
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+# Interaction foundations — CANONICAL, stamped byte-identical fleet-wide
+# (docs/plans/universal-dimensions.md; the CLAUDE.md standards-canonical
+# carve-out from the no-generic-criteria rule: this pack grades conformance to
+# a cited external standard — Material 3 "Interaction" foundations — the same
+# bar for every app, not this app's specific last mile). It MERGES into the
+# `ux` dimension alongside the task's own solution-sourced tests/ux/ux.toml
+# via rewardkit's same-dimension multi-TOML reward merge; [judge].weight above
+# keeps this pack's share of the merged dimension low (0.25) so the
+# solution-sourced criteria in ux.toml keep dominating the score.
+#
+# Dedupe boundary: bare WCAG keyboard-operability / focus-visibility / label /
+# status-announcement conformance lives in the `accessibility` dimension, not
+# here. Every criterion below grades the QUALITY of the interaction language
+# ABOVE that pass/fail floor (state-language consistency, feedback immediacy,
+# selection/gesture ergonomics) — it does not re-check the floor itself. Every
+# criterion is OPTIONAL: this pack only widens the partial-credit gradient, it
+# never gates a pass, and each is phrased to self-scope ("where the app
+# supports/offers X…") so an app without a given surface (no drag, no
+# multi-select) is not penalized for lacking it.
+
+# ---------------------------------------------------------------------------
+# States — M3 states overview: enabled/hover/focused/pressed/selected/disabled
+# are visual indicators of a component's status; M3 state layers put hover at
+# roughly an 8% overlay and focus/pressed at roughly 10%, with disabled
+# content at roughly 38% opacity.
+# ---------------------------------------------------------------------------
+
+[[criterion]]
+id = "UXF-STATE-001"
+name = "uxf_state_001"
+description = """Exercise one representative interactive component of each kind the app has (for example a button, a list item, a form control) through its enabled, hover, and focused states, and its pressed, selected, and disabled variants where the app has them. Confirm every state the component supports is visually distinguishable from the others, and specifically that focus and hover render as DIFFERENT visual treatments rather than one identical highlight standing in for both."""
+type = "binary"
+optional = true
+weight = 0.5
+
+[[criterion]]
+id = "UXF-STATE-002"
+name = "uxf_state_002"
+description = """Click or press-and-hold an interactive control. Confirm visible pressed feedback appears immediately on pointer-down/click — not only after whatever operation the control triggers finishes — so the control never feels unresponsive in the gap between the click and its result."""
+type = "binary"
+optional = true
+weight = 0.5
+
+[[criterion]]
+id = "UXF-STATE-003"
+name = "uxf_state_003"
+description = """Compare the enabled/hover/focused/pressed treatment across several controls of the same kind (for example every primary button, or every list-item row). Confirm they all share ONE consistent state language rather than each instance inventing its own look for the same state."""
+type = "binary"
+optional = true
+weight = 0.5
+
+[[criterion]]
+id = "UXF-STATE-004"
+name = "uxf_state_004"
+description = """Where the app disables a control under some condition (for example a submit button before required fields are filled, or an action unavailable for the current selection), inspect that disabled control. Confirm it visibly reads as non-interactive — muted styling, no hover response — while its label text stays legible: it is dimmed, not hidden or removed."""
+type = "binary"
+optional = true
+weight = 0.5
+
+# ---------------------------------------------------------------------------
+# Inputs — M3 inputs: input methods are interchangeable; a user can complete a
+# flow with keyboard alone or with pointer alone.
+# ---------------------------------------------------------------------------
+
+[[criterion]]
+id = "UXF-INPUT-001"
+name = "uxf_input_001"
+description = """Complete one core flow using ONLY the keyboard (Tab, Shift+Tab, Enter, Space, arrow keys — no mouse), then repeat the same flow using ONLY pointer input (no keyboard). Confirm both paths reach the same outcome and that no step along the way is discoverable or operable with only one of the two input methods (no hover-only reveal, no action that responds to a click but not to Enter/Space while focused, or vice versa)."""
+type = "binary"
+optional = true
+weight = 0.5
+
+[[criterion]]
+id = "UXF-INPUT-002"
+name = "uxf_input_002"
+description = """With a text input or form focused, press Enter; with a dialog, popover, or search UI open, press Escape. Confirm Enter submits or confirms the focused input/form, and Escape dismisses the open dialog/popover/search, rather than either key doing nothing."""
+type = "binary"
+optional = true
+weight = 0.5
+
+[[criterion]]
+id = "UXF-INPUT-003"
+name = "uxf_input_003"
+description = """Where the app has a text field that expects a specific format (for example a date, a number, or a search query), inspect it and then submit an invalid value. Confirm the field carries a persistent label distinct from its placeholder (placeholder text alone never stands in as the label), the expected format is communicated, and validation feedback appears AT the field itself rather than only in a distant page-level message."""
+type = "binary"
+optional = true
+weight = 0.5
+
+# ---------------------------------------------------------------------------
+# Selection — M3 selection.
+# ---------------------------------------------------------------------------
+
+[[criterion]]
+id = "UXF-SELECT-001"
+name = "uxf_select_001"
+description = """Where the app supports selecting an item (a list row, a card, a tab, a checkbox), select one. Confirm the selected state is marked by more than color alone — a checkmark, checkbox, added weight/elevation, or a border — so the selection would stay legible to someone who cannot distinguish the color change."""
+type = "binary"
+optional = true
+weight = 0.5
+
+[[criterion]]
+id = "UXF-SELECT-002"
+name = "uxf_select_002"
+description = """Where the app supports selecting an item, select it and then perform the identical action again (click it again, or uncheck it). Confirm the selection reverses through that same action — selecting is symmetric, not a one-way action that needs a different control to undo."""
+type = "binary"
+optional = true
+weight = 0.5
+
+[[criterion]]
+id = "UXF-SELECT-003"
+name = "uxf_select_003"
+description = """Where the app supports selecting more than one item at once, select two or more. Confirm the UI surfaces a visible count (or equivalent indicator) of how many items are selected, together with contextual actions that appear once a selection exists and disappear once the selection is cleared."""
+type = "binary"
+optional = true
+weight = 0.5
+
+[[criterion]]
+id = "UXF-SELECT-004"
+name = "uxf_select_004"
+description = """Where the app offers a select-all control alongside multi-select, use it, then look for a way to deselect everything. Confirm deselect-all has the same parity as select-all — the same control toggles both ways, or an equally reachable counterpart exists — rather than select-all being one-way."""
+type = "binary"
+optional = true
+weight = 0.5
+
+# ---------------------------------------------------------------------------
+# Gestures — M3 gestures: every gesture needs feedback and a non-gesture
+# alternative.
+# ---------------------------------------------------------------------------
+
+[[criterion]]
+id = "UXF-GESTURE-001"
+name = "uxf_gesture_001"
+description = """Where the app supports dragging (reordering, moving an item between zones), start a drag and hold it mid-drag. Confirm the dragged item shows a lift/drag affordance (elevation, a ghost image, or an outline) and a visible drop target appears while dragging; then abort the drag (drop it outside any valid target, or press Escape) and confirm the item returns to its original position rather than vanishing or landing somewhere unintended."""
+type = "binary"
+optional = true
+weight = 0.5
+
+[[criterion]]
+id = "UXF-GESTURE-002"
+name = "uxf_gesture_002"
+description = """Where the app supports dragging to produce an outcome (reordering, moving between zones) and that outcome is not itself the product's core interaction, look for a non-drag alternative (buttons, a menu action, a keyboard shortcut). Confirm one exists, so the outcome is reachable without performing the drag gesture."""
+type = "binary"
+optional = true
+weight = 0.5
+
+[[criterion]]
+id = "UXF-GESTURE-003"
+name = "uxf_gesture_003"
+description = """Survey the app's interactive surface for any action that is conventionally offered via a button or menu item elsewhere (delete, favorite, expand, reorder) but here works only through a gesture (swipe, long-press, drag) with no visible button/menu equivalent. Confirm none exists — every conventional action also has a discoverable, non-gesture control."""
+type = "binary"
+optional = true
+weight = 0.5

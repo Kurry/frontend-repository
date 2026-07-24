@@ -1,0 +1,215 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+# Functional = observable user-journey behavior for RepCadence's tempo
+# builder, cadence playback, set/rest progression, presets, and history/stats,
+# graded in the live browser. Each criterion states its own setup; mode =
+# batched means all criteria share one continuous browser session.
+
+[[criterion]]
+id = "AG-FUNC-001"
+name = "ag_func_001"
+description = """On the home view, note the displayed reflection quote, then use "New Quote" repeatedly, recording each quote shown. Confirm each click shows a different quote than the one immediately before it, and confirm that at least 20 distinct quotes appear before any quote repeats — i.e. the full built-in list (20 or more quotes, per the PRD) is exhausted before any single quote is shown a second time."""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-FUNC-002"
+name = "ag_func_002"
+description = """Use the "Favorite" toggle on the currently shown quote. Confirm it now appears in the "Favorites" view. Toggle it off from wherever the toggle is available and confirm it no longer appears in Favorites."""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-FUNC-003"
+name = "ag_func_003"
+description = """Open the "Meditate" view and confirm three duration presets are offered — 3, 5, and 10 minutes. Select the 3-minute preset and click "Start"; confirm a countdown display and circular progress ring begin running. Click "Pause" and confirm the countdown stops advancing. Click "Reset" and confirm the countdown returns to the full 3-minute preset duration."""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-FUNC-004"
+name = "ag_func_004"
+description = """Start a meditation session and confirm the breathing overlay circle expands and contracts, cycling through the labeled phases "Inhale", "Hold", and "Exhale" in that repeating order while the countdown runs."""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-FUNC-005"
+name = "ag_func_005"
+description = """Start the shortest available meditation preset and let its countdown run to completion without pausing. Confirm playback stops automatically at 0 and a visible "Session Complete" banner appears."""
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "AG-FUNC-006"
+name = "ag_func_006"
+description = """Open the "Journal" view, pick one of the three fixed prompt questions from the dropdown, write a free-text response, choose one of the four virtue tags (e.g. "Courage"), and use "Save Entry". Confirm the entry now appears at the top of the Journal History with today's date, the chosen prompt, the chosen virtue tag, and the response text."""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-FUNC-007"
+name = "ag_func_007"
+description = """On a saved journal entry, use "Edit", change its response text, and save the change. Confirm the updated text now shows in Journal History. Then use "Delete" on that entry and confirm it no longer appears in the history."""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-FUNC-008"
+name = "ag_func_008"
+description = "Save a journal entry containing a distinctive word in its response text, then type that word into the Journal search input. Confirm the Journal History list narrows to only entries containing that word."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-FUNC-009"
+name = "ag_func_009"
+description = """Save at least 3 journal entries tagged with different virtues (including at least 2 with the same virtue), then open the "Stats" view. Confirm the count shown for each virtue tag matches the number of entries actually saved with that tag."""
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "AG-FUNC-010"
+name = "ag_func_010"
+description = """Starting from zero streak, complete a meditation session or save a journal entry today. Confirm the "Day Streak" counter updates immediately to reflect today's qualifying action, with no page reload."""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-FUNC-011"
+name = "ag_func_011"
+description = """In a fresh session with no prior activity, complete exactly one meditation session and save exactly two journal entries, all today. Confirm the home view's "This Week" summary counts exactly 1 completed meditation session and exactly 2 journal entries saved in the last 7 days — a distinct count for each of the two tracked quantities, not a single shared or hardcoded figure and not a total that ignores the 7-day window."""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-FUNC-012"
+name = "ag_func_012"
+description = """Save at least one journal entry, then confirm an "Export Journal" control is present and enabled, and that activating it triggers a `.txt` download without throwing a visible error."""
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "AG-FUNC-013"
+name = "ag_func_013"
+description = "Favorite a quote, save a journal entry, and note the current Day Streak value. Perform a full page refresh. Confirm the favorited quote (still in Favorites), the journal entry (still in Journal History), and the streak value all remain exactly as before the refresh."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "AG-RB-FUNC-001"
+name = "ag_rb_func_001"
+description = "Using the normal visible controls, create two entries in the app's primary collection, edit one so a distinctive value visibly changes, and delete the other. Confirm the edited entry remains with its new value, the deleted entry is absent, and the collection count or empty/populated state updates consistently."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-RB-FUNC-002"
+name = "ag_rb_func_002"
+description = "Put the surviving entry into a domain-specific state required by the app, such as completion, priority, grouping, streak, or filter membership. Switch to the second required view or interaction mode and confirm that mode exposes the same entry with the same state; switch back and confirm the state remains consistent."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-RB-FUNC-003"
+name = "ag_rb_func_003"
+description = "Create valid data, activate Load Malformed Sample, and confirm the app remains usable with a specific visible recovery alert. Confirm Retry and Reset are available, Retry preserves or restores the last valid snapshot without duplication, and Reset reaches the defined clean state."
+type = "binary"
+weight = 1.0
+

@@ -1,0 +1,194 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+# UX = interaction quality for RepCadence — empty History/Stats states, tempo
+# input validation, the Cancel Session confirmation, hover/focus visibility,
+# narrow-viewport usability, and mute-state feedback. Visual identity/styling
+# correctness lives in design.toml.
+
+[[criterion]]
+id = "AG-UX-001"
+name = "ag_ux_001"
+description = "Navigate to the application root URL in a fresh session. Confirm Agora renders directly into the home view with a quote displayed and no login form and no error page."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-UX-002"
+name = "ag_ux_002"
+description = "Before any journal entry exists, open the Journal History view. Confirm it shows a friendly prompt to write the first entry rather than a blank area."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-UX-003"
+name = "ag_ux_003"
+description = "Before any quote has been favorited, open the Favorites view. Confirm it shows a short explanatory message rather than a blank area."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-UX-004"
+name = "ag_ux_004"
+description = """Enter a search term in the Journal search that matches no saved entry's text. Confirm an explicit "no results" (or equivalent) message appears."""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-UX-005"
+name = "ag_ux_005"
+description = "In the Journal view, leave the response text blank and attempt to save the entry. Confirm submission is prevented AND explained via a visible inline error or shake/hint — a silently disabled Save button alone must not be the only signal."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-UX-006"
+name = "ag_ux_006"
+description = "Save a journal entry, favorite a quote, and let a meditation session run to completion, one at a time. Confirm each of these three actions shows its own transient confirmation (toast or equivalent)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-UX-007"
+name = "ag_ux_007"
+description = "Hover the cursor (without clicking) over a navigation tab, a virtue-tag selector option, and a journal-entry row. Confirm each visually responds to hover. If none of the three responds, fail."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-UX-008"
+name = "ag_ux_008"
+description = "From the home view, press Tab repeatedly (at least 8 times) to move focus through interactive elements (nav tabs, New Quote, Favorite toggle, meditation controls). At each step confirm the focused element shows a visible focus indicator. If focus is never visibly indicated, fail."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-UX-009"
+name = "ag_ux_009"
+description = "Set the browser viewport to approximately 375 pixels wide. Confirm the app renders with no horizontal scrolling, and the breathing overlay and the Meditate view's Start/Pause/Reset controls remain fully usable and centered at this width."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-UX-010"
+name = "ag_ux_010"
+description = "Set the browser viewport to approximately 375 pixels wide and use browser_evaluate to confirm document.scrollingElement.scrollWidth is not greater than its clientWidth (no horizontal page scroll). Then inspect the home view heading/title and the quote body text: confirm each has a sane computed font-size (heading visibly larger than body, body at least ~14px) and is not clipped or overflowing its container (element scrollWidth not exceeding its clientWidth), so typography reflows and stays legible rather than overflowing or truncating at this width."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-UX-OPT-001"
+name = "ag_ux_opt_001"
+description = "Confirm the Day Streak counter is visible on the home view without navigating into a separate settings or stats screen, and confirm it updates the moment a qualifying action (session completion or journal save) is performed, without a page reload."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "AG-UX-OPT-002"
+name = "ag_ux_opt_002"
+description = """Cycle through "New Quote" enough times to approach exhausting the built-in list. Confirm the app continues to show a valid quote each time rather than erroring or showing a blank card once the list is nearly exhausted."""
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "AG-UX-OPT-003"
+name = "ag_ux_opt_003"
+description = "Start a meditation session, then pause it partway through. Confirm the breathing overlay's animation also pauses (rather than continuing to cycle phases while the countdown is frozen), keeping the visual state consistent with the paused timer."
+type = "binary"
+weight = 0.5
+

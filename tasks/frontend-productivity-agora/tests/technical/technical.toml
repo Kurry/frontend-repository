@@ -1,0 +1,158 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+# Technical = is the running RepCadence build technically sound, observed only
+# from the live app's devtools surface (browser_evaluate, console, network) —
+# never by reading source code.
+
+[[criterion]]
+id = "AG-TECH-001"
+name = "ag_tech_001"
+description = "Navigate to the app root. Confirm it reaches an interactive UI (the home view's quote card and navigation to Meditate/Journal/Stats/Favorites are visible and operable) within a few seconds — not a blank page, a framework error overlay, or a noscript fallback."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-TECH-002"
+name = "ag_tech_002"
+description = "While loading the app root and then driving the core flow (cycle a quote, run a short meditation, save a journal entry), monitor the browser console. Confirm no uncaught JavaScript errors or unhandled promise rejections are logged at any point."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-TECH-003"
+name = "ag_tech_003"
+description = "While loading the app root and driving the core flow, monitor network requests. Confirm no same-origin request returns a 4xx or 5xx status."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-TECH-004"
+name = "ag_tech_004"
+description = "Save a journal entry and favorite a quote, then perform a hard reload of the page. Confirm the app re-renders its interactive UI cleanly with no visible error flash, blank frame, or hydration-failure state during or immediately after the reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-TECH-005"
+name = "ag_tech_005"
+description = "Resize the viewport to ~375px wide as the PRD's Narrow Viewport requirement specifies. Confirm the page renders with no horizontal scrollbar/overflow at the document level and the breathing overlay and timer controls remain usable and centered."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-TECH-006"
+name = "ag_tech_006"
+description = "Start a meditation session and let the breathing guide cycle through at least one full Inhale/Hold/Exhale rotation while monitoring the console. Confirm the repeating animation timer does not throw errors or leave duplicate/stacked interval timers running after Pause or Reset is clicked (confirm via browser_evaluate that the countdown does not advance after Pause)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-RB-TECH-001"
+name = "ag_rb_tech_001"
+description = "Exercise the primary primary content collection interaction through 25 rapid deterministic repetitions using its normal visible controls while monitoring the page and browser console. Confirm its final count/state is exact, the UI remains responsive throughout, and no blank screen, uncaught error, unhandled rejection, or sustained freeze occurs."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-RB-TECH-002"
+name = "ag_rb_tech_002"
+description = "After creating valid data, use browser_evaluate to replace the app's persisted value with malformed data and reload. Confirm the app reaches a usable UI without an uncaught error or blank screen, restores the last valid snapshot, and the visible Reset control produces a clean deterministic state."
+type = "binary"
+weight = 1.0
+

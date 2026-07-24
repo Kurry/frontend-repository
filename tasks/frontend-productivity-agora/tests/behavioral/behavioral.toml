@@ -1,0 +1,201 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+# Behavioral = does RepCadence's underlying state machine (tempo/session
+# progression, presets, history, stats) actually mutate and persist correctly,
+# not just render once. Each criterion states its own starting condition since
+# mode = batched shares one continuous browser session.
+
+[[criterion]]
+id = "AG-BEH-001"
+name = "ag_beh_001"
+description = """Starting from a fresh reload, favorite the currently shown quote and confirm it appears in the Favorites view. Toggle the same quote's favorite off from wherever the control is reachable and confirm it disappears from Favorites. Favorite a different quote (reached via "New Quote") and confirm only that new quote appears in Favorites."""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-BEH-002"
+name = "ag_beh_002"
+description = "Starting from a fresh reload, open Meditate, select the 3-minute preset, and click Start. Confirm the countdown and progress ring begin advancing. Click Pause and confirm the countdown value stops changing. Click Reset and confirm the countdown returns to the full 3:00 preset duration rather than resuming from where it paused."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-BEH-003"
+name = "ag_beh_003"
+description = """Starting from a fresh reload, start the shortest available meditation preset and let its countdown run to completion without pausing. Confirm playback stops automatically at 0:00 and a "Session Complete" banner appears. Confirm the countdown does not continue past 0 or wrap around to a negative or restarted value."""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-BEH-004"
+name = "ag_beh_004"
+description = "Starting from a fresh reload, save a journal entry with a distinctive response and a chosen virtue tag. Confirm it appears at the top of Journal History with today's date, the chosen prompt, tag, and text. Use Edit on it, change the response text, and save; confirm Journal History now shows the updated text and no duplicate entry was created. Then Delete it and confirm it no longer appears anywhere in Journal History."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-BEH-005"
+name = "ag_beh_005"
+description = """Starting from a fresh reload, save one journal entry containing a distinctive word, then type that word into the Journal search input and confirm the list narrows to only that entry. Change the search text to a string that matches no entry and confirm the documented "no results" message appears rather than a blank list. Clear the search and confirm the entry reappears."""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-BEH-006"
+name = "ag_beh_006"
+description = "Starting from a fresh reload, save three journal entries: two tagged with the same virtue and one tagged with a different virtue. Open the Stats view and confirm the count shown for the shared virtue is exactly 2 and the count for the third entry's virtue is exactly 1, and any untouched virtue shows 0."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-BEH-007"
+name = "ag_beh_007"
+description = """Starting from a fresh reload with a Day Streak of 0, complete a meditation session (or save a journal entry) today. Confirm the Day Streak counter updates immediately to a non-zero value with no page reload, and confirm the home view's "This Week" summary now reflects that action."""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-BEH-008"
+name = "ag_beh_008"
+description = "Starting from a fresh reload, use browser_evaluate to seed the app's own localStorage schema so the most recent qualifying activity (session or journal save) is dated more than one calendar day before today, then reload the page live. Confirm the Day Streak counter now reads 0, demonstrating a missed day actually resets the streak rather than only ever incrementing."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-BEH-009"
+name = "ag_beh_009"
+description = "Starting from a fresh reload, submit the Journal form with the response text left blank. Confirm the app prevents the save (no new entry appears in Journal History) and shows a visible inline error or equivalent explanation rather than silently doing nothing."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-BEH-011"
+name = "ag_beh_011"
+description = """Clear the app's own localStorage via browser_evaluate and reload so the Day Streak reads 0. Save a journal entry dated today and confirm the streak increments to 1. Without advancing the date, perform a second qualifying action the same calendar day (save another journal entry or complete a meditation session) and confirm the Day Streak still reads 1 rather than 2 — the counter reflects distinct qualifying calendar days, not the number of actions, as the PRD requires the streak to increment "once per calendar day"."""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-BEH-010"
+name = "ag_beh_010"
+description = """Favorite a quote, save a journal entry, and complete or advance toward the current Day Streak value. Note the home view's "This Week" summary counts (completed sessions and journal entries in the last 7 days). Perform a full page refresh (browser_navigate to the same URL). Confirm the favorited quote (still in Favorites), the journal entry (still in Journal History), the streak value, and the "This Week" summary counts all remain exactly as before the refresh."""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-RB-BEH-001"
+name = "ag_rb_beh_001"
+description = "Starting from a fresh reload, create and edit a primary collection entry, assign its domain-specific state, and switch through both required views or modes. Return to the original view and perform a full page refresh; confirm the exact edited value, domain state, collection membership, and current view contract are restored, then delete the entry and confirm a later refresh does not revive it."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-RB-BEH-002"
+name = "ag_rb_beh_002"
+description = "After establishing a valid visible state, submit invalid or extreme input and rapidly repeat the primary action 25 times through its normal controls. Confirm specific feedback appears, the last valid state is preserved, duplicate submissions do not create duplicate records or transitions, and the final visible count/state exactly matches the accepted actions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AG-RB-BEH-003"
+name = "ag_rb_beh_003"
+description = "Create valid user data, begin a pending edit, and refresh before completing it; then exercise Duplicate Action and Retry if exposed by the recovery scenario. Confirm committed data is not lost or duplicated, the pending edit resolves deterministically, and Retry never applies the same change twice."
+type = "binary"
+weight = 1.0
+

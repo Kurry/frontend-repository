@@ -1,0 +1,274 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+# Writing = UI text quality graded against two external, cited standards, on
+# THIS app's actual rendered copy — not the reference's, THIS task's own
+# running app. Every criterion below is optional (nice_to_have) and
+# self-scopes to "where the app shows/renders…" text of the relevant kind, so
+# an app with little or no prose/microcopy of a given shape passes that
+# criterion by default rather than being penalized for its absence. Precedence
+# (per the plan): Material 3 UX writing governs UI microcopy — labels,
+# buttons, counters, status lines, headings — including numerals and sentence
+# case EVERYWHERE in UI chrome; the AP Stylebook quick reference governs prose
+# SENTENCES the app renders (descriptions, empty-state paragraphs, help text)
+# and supplies the no-serial-comma rule. AP's journalism-only content
+# (datelines, state abbreviations, academic degrees, ethnic-group style,
+# place-name references) is out of scope. This file is a canonical,
+# standards-based dimension stamped byte-identical fleet-wide — never
+# customize it per task; app-particular writing polish belongs in that task's
+# own ux/design criteria, not here.
+
+# ---------------------------------------------------------------------------
+# M3 UX writing best practices — UI microcopy: labels, buttons, counters,
+# status lines, headings, and other UI chrome (not prose sentences).
+# ---------------------------------------------------------------------------
+
+[[criterion]]
+id = "WRITING-M3-001"
+name = "writing_m3_001"
+description = "Take a snapshot of the app's UI text — headings, labels, button text, and any status or helper lines. Where such text exists, confirm it is concise and scannable: short phrases rather than full sentences in labels and buttons, with the most important word or number stated first rather than buried at the end of a longer phrase. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "WRITING-M3-002"
+name = "writing_m3_002"
+description = """Where the app addresses the user directly in instructions, helper text, or empty-state copy, confirm that text uses second person ("your", "you"), present tense, and active voice rather than third person, past or future tense, or passive constructions. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."""
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "WRITING-M3-003"
+name = "writing_m3_003"
+description = "Take a snapshot of every heading, button, and label visible on the current screen. Confirm each uses sentence case — only the first word and proper nouns capitalized — rather than Title Case or ALL CAPS. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "WRITING-M3-004"
+name = "writing_m3_004"
+description = """Inspect every clickable button in the app (toolbar, forms, dialogs). Where a button performs an action, confirm its label begins with a verb naming that action (e.g., "Add", "Save", "Delete") and is one to three words long rather than a long descriptive phrase. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."""
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "WRITING-M3-005"
+name = "writing_m3_005"
+description = """Trigger a validation or error condition the app supports (an invalid input, a failed action, or similar). Where an error message appears, confirm it states what happened and how to resolve it, contains no bare error code or technical jargon, does not blame the user, and does not use "please", "sorry", "just", or "oops". If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."""
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "WRITING-M3-006"
+name = "writing_m3_006"
+description = """Compare the wording used for the same action or concept across different screens, views, or dialogs of the app (e.g., the word used for removing an item). Where the same concept is named in more than one place, confirm the app uses one consistent term for it everywhere rather than switching between synonyms (e.g., "delete" on one screen and "remove" on another). If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."""
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "WRITING-M3-007"
+name = "writing_m3_007"
+description = """Inspect any counters, status lines, or badges that report a quantity (e.g., item counts, progress indicators, pagination). Where such microcopy exists, confirm it uses numerals (e.g., "3 of 5 done") rather than spelled-out numbers. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."""
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "WRITING-M3-008"
+name = "writing_m3_008"
+description = """Inspect the app's UI text for emphasis and instructional copy. Confirm no UI text uses ALL-CAPS for emphasis, no idiom or culture-specific reference appears, and any instruction that refers to a control names that control by its visible label (e.g., "select Save") rather than only its position (e.g., "the button below"). If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."""
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "WRITING-M3-009"
+name = "writing_m3_009"
+description = "Inspect short labels, button text, and single-line helper text throughout the app. Confirm none carries a terminal period. Where the app also shows multi-sentence body text (two or more sentences together), confirm that text punctuates each sentence normally, including a closing period. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "WRITING-AP-001"
+name = "writing_ap_001"
+description = """Inspect the app's prose sentences (descriptions, empty-state paragraphs, help text — not counters or labels). Where such prose states a number, confirm numbers one through nine are spelled out and 10 and above are given as figures, no sentence begins with a numeral (recast or spelled out instead), and any spelled-out compound number is hyphenated (e.g., "twenty-one"). If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."""
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "WRITING-AP-002"
+name = "writing_ap_002"
+description = """Where the app's prose renders a specific clock time, confirm it uses figures with a colon and lowercase a.m./p.m. (e.g., "2:30 p.m."), and that noon or midnight are written as words rather than "12:00 p.m." or "12:00 a.m.". If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."""
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "WRITING-AP-003"
+name = "writing_ap_003"
+description = """Where the app's prose renders a calendar date, confirm it uses Arabic figures without ordinal suffixes (no "st"/"nd"/"rd"/"th"), the month is capitalized, an abbreviated month (Jan., Feb., Aug.–Dec.) appears only alongside a specific day, a month-and-year with no day has no comma between them (e.g., "February 1980"), and a full month-day-year date sets the year off with commas on both sides within a sentence (e.g., "Aug. 20, 1964, was…"). If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."""
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "WRITING-AP-004"
+name = "writing_ap_004"
+description = "Where the app's prose uses a possessive or the plural of a single letter, confirm singular possessives use 's (the user's list), plural possessives already ending in s use only an apostrophe (two users' lists), single-letter plurals use 's (mind your p's and q's), and plural decades use no apostrophe (the 1980s). If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "WRITING-AP-005"
+name = "writing_ap_005"
+description = """Where the app's prose lists three or more items in a simple series joined by "and" or "or", confirm there is no comma before the conjunction (e.g., "tasks, notes and reminders", not "tasks, notes, and reminders"). If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."""
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "WRITING-AP-006"
+name = "writing_ap_006"
+description = """Where the app's prose uses a compound modifier before a noun, confirm it is hyphenated (e.g., "a well-known shortcut") and not hyphenated when the same words appear after the noun they modify (e.g., "the shortcut is well known"). Where the app's prose uses a dash to set off a break in a sentence, confirm it is a spaced em dash. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."""
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "WRITING-AP-007"
+name = "writing_ap_007"
+description = """Where the app's prose contains sentence-ending periods, confirm exactly one space follows each period before the next sentence, and where the prose contains a set of initials (e.g., in a person's name), confirm there is no space between them (e.g., "J.R.R.", not "J. R. R."). If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."""
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "WRITING-AP-008"
+name = "writing_ap_008"
+description = "Where the app's prose contains quotation marks, confirm any period or comma is placed inside the closing quotation mark, and confirm a quotation nested inside another quotation uses single quotation marks. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "WRITING-AP-009"
+name = "writing_ap_009"
+description = "Where the app's prose uses a colon inside a sentence, confirm the word following the colon is capitalized only when it is a proper noun or begins a complete, independent sentence, and is otherwise lowercase. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "WRITING-AP-010"
+name = "writing_ap_010"
+description = "Where the app's prose uses a parenthetical aside inside a larger sentence, confirm the sentence's closing punctuation falls outside the closing parenthesis. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "WRITING-AP-011"
+name = "writing_ap_011"
+description = """Where the app's prose or microcopy refers to any of these terms, confirm the spelling matches AP style: "email" (not "e-mail"), "website" and "web page" (not run together as one word), "internet" and "online" lowercase (not capitalized "Internet"), and "smartphone" as one word; confirm "login"/"logon"/"logoff" are used only as a noun or adjective (e.g., "the login screen") and the verb form is always the two words "log in" (e.g., "log in to your account", not "login to your account"). If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."""
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "WRITING-AP-012"
+name = "writing_ap_012"
+description = "Where the app's prose mentions a season (spring, summer, fall/autumn, winter) or a compass direction used generically (north, southeast) rather than as part of a proper regional name, confirm it is written lowercase. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "WRITING-AP-013"
+name = "writing_ap_013"
+description = "Where the app displays the title of a creative work (a book, movie, song, or similar) as content, confirm the title is set in quotation marks and follows AP capitalization — the first and last word and all principal words capitalized, with articles, coordinating conjunctions, and short prepositions lowercase unless first or last. If the app renders and is usable but shows no such content, pass by default; if the app fails to render or is unusable, fail."
+type = "binary"
+weight = 0.5
+
