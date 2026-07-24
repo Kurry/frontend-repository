@@ -1,0 +1,182 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+[[criterion]]
+id = "core.formula_edit_conserves_mass"
+name = "core_formula_edit_conserves_mass"
+description = "Every formulation edit conserves total mass to the gram with the rounding rule for rational baker's percentages stated explicitly; the percentage table, batch ledger, and scaled variants all reconcile to the same conserved total."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core.substitution_propagates_channels"
+name = "core_substitution_propagates_channels"
+description = "Substituting one ingredient updates formulation mass, hydration (baker's percentage recomputed against flour weight, exact), allergen flags, cost, process steps, predictions, and the artifact together in one transition, with previous values gone from the formulation graph, percentage table, step timeline, batch ledger, sensory radar, and variant tree."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core.allergen_transitions_visible"
+name = "core_allergen_transitions_visible"
+description = "An allergen flag introduced by substitution is visible on every surface that shows the formula or its batches (formulation graph, ledger, handoff artifact) and can only be removed by a substitution that genuinely eliminates it, with the change recorded in history."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core.test_batch_recovery"
+name = "core_test_batch_recovery"
+description = "Failed or interrupted batch runs preserve completed observations; retrying reuses the same inputs and attempt history, increments attempt counts exactly once per retry, and never duplicates a recorded observation; the partial-run state is named and visible."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core.batch_evidence_immutable"
+name = "core_batch_evidence_immutable"
+description = "Recorded test batches, observations, and sensory scores are never rewritten by later substitutions or formula edits; the variant tree links each batch to the exact formula version it was baked from; deleting a variant branch removes only unexecuted state, never executed-batch records."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core.evaluator_findings_deterministic"
+name = "core_evaluator_findings_deterministic"
+description = "Evaluator findings are deterministic for the same formula and batch set and cite exact versions; approving a formula for handoff is graded on post-confirm state (status flips, handoff artifact reflects approved version, unapproved variants stay excluded)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core.compare_mode_deltas"
+name = "core_compare_mode_deltas"
+description = "Compare mode shows both variants' radar axes and deltas from one shared state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core.formula_editor"
+name = "core_formula_editor"
+description = "Editing grams or percentage updates the other and total yield; scaling servings, pan size, or target dough mass uses exact decimal rules. Locked ingredients and minimum/maximum role ratios reject invalid edits."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core.substitution_topology"
+name = "core_substitution_topology"
+description = "Users connect an original ingredient to a substitute with replacement ratio, moisture contribution, required companion adjustment, allergen change, and note. Cycles, conflicting replacements, duplicate active roles, and impossible mass balance remain preview-only."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core.parallel_step_timeline"
+name = "core_parallel_step_timeline"
+description = "Steps drag along a minute timeline with prerequisite edges, durations, temperature, active/rest state, and equipment occupancy. Overlapping use of one oven/mixer/pan blocks commit."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core.observations_sensory"
+name = "core_observations_sensory"
+description = "Blind tasting uses deterministic sample codes and requires all selected dimensions before reveal. The radar, batch table, photo-placeholder annotations, and variant tree share selection. Missing and not-measured remain distinct from zero."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core.handoff_scale"
+name = "core_handoff_scale"
+description = "The handoff view scales the approved recipe to a selected target and produces a shopping/prep sheet without changing canonical test evidence. A scaling operation preserves ratios exactly rather than rounding independently per ingredient."
+type = "binary"
+weight = 1.0
