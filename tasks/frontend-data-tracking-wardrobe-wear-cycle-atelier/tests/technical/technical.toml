@@ -1,0 +1,23 @@
+[[criterion]]
+id = "te_crud_substitution"
+name = "Achieves full CRUD substitution parity"
+description = "Verify that multi-item composition, immutable snapshots, constrained batches, and capsule interactions are not simplified to standard forms."
+type = "browser_interaction"
+weight = 1.0
+negate = false
+
+[[criterion]]
+id = "te_keyboard_paths"
+name = "Keyboard paths yield identical canonical events"
+description = "Verify that keyboard paths (including traversal, shortcuts, undo) yield identical canonical events, WebMCP state, and export behavior as pointer manipulations."
+type = "browser_interaction"
+weight = 1.0
+negate = false
+
+[[criterion]]
+id = "te_local_storage_negative"
+name = "Uses localStorage or sessionStorage for persistent state"
+description = "The application improperly uses `localStorage` or `sessionStorage` for persistent app state instead of keeping state in memory and relying on manual export/import."
+type = "browser_interaction"
+weight = 1.0
+negate = true

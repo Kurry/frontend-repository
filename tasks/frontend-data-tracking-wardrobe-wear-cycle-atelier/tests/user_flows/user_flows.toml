@@ -1,0 +1,7 @@
+[[criterion]]
+id = "uf_full_workflow"
+name = "Inventory to export workflow reconstructs exactly"
+description = "Verify the complete user flow: view inventory, compose outfit, plan, log actual wear, undergo care/repair, inspect analytics, branch capsule, export dossier, then reset and import to exact reconstruction."
+type = "browser_interaction"
+weight = 1.0
+negate = false

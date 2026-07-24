@@ -1,0 +1,7 @@
+[[criterion]]
+id = "pe_high_volume"
+name = "Retains performance with high volume fixtures"
+description = "Verify interactions remain responsive and stale analytics cancel when operating with 1,000 garments, 10,000 events, 2,000 outfits, and 100 capsule branches."
+type = "browser_interaction"
+weight = 1.0
+negate = false

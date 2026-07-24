@@ -1,0 +1,7 @@
+[[criterion]]
+id = "df_wardrobe_semantics"
+name = "Wardrobe semantics are exact"
+description = "Verify that slot/layer rules, immutable snapshots, event machine behavior, batch and kit resource conservation, calculated metrics, and CSV/SVG/ICS exports match exactly the provided wardrobe semantics."
+type = "browser_interaction"
+weight = 1.0
+negate = false

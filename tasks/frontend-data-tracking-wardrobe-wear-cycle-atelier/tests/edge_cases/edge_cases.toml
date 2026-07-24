@@ -1,0 +1,15 @@
+[[criterion]]
+id = "ec_invalid_cases_recovery"
+name = "Invalid interactions provide named recovery"
+description = "Verify boundary handling: test missing/duplicate slot, layer conflict, overlapping wear, edit-after-snapshot, wear-limit boundary, invalid lifecycle transition, care capacity/mix violations, batch partial failure, zero-wear cost display, retired future plan handling, and forged import. Ensure each triggers explicit, named recovery without corrupted state."
+type = "browser_interaction"
+weight = 1.0
+negate = false
+
+[[criterion]]
+id = "ec_transient_leak_negative"
+name = "Transient interactions leak into persistence"
+description = "The application incorrectly persists transient states such as previews, open dialogs, hover states, drag previews, or invalid drafts across reloads."
+type = "browser_interaction"
+weight = 1.0
+negate = true

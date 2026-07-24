@@ -1,0 +1,31 @@
+[[criterion]]
+id = "mo_causal_motion"
+name = "Causal motion explains item transitions"
+description = "Verify that dragging garments to slots, timeline snaps, and care batch flows visually explain their cause with durations of 150-300ms using early/settled frame sampling."
+type = "browser_interaction"
+weight = 1.0
+negate = false
+
+[[criterion]]
+id = "mo_hover_deltas"
+name = "Responsive computed hover deltas"
+description = "Verify that there are computed hover deltas on garments and matrix cells when hovered."
+type = "browser_interaction"
+weight = 1.0
+negate = false
+
+[[criterion]]
+id = "mo_reduced_motion"
+name = "Reduced motion path is testable via URL parameter"
+description = "Verify that the reduced motion path, activated via visible chrome toggle or `?reducedMotion=1` fresh load, removes non-essential transitions but retains persistent state and delta badges."
+type = "browser_interaction"
+weight = 1.0
+negate = false
+
+[[criterion]]
+id = "mo_prefers_reduced_motion_emulation_negative"
+name = "Reduced motion relies on browser prefers-reduced-motion emulation"
+description = "The application incorrectly relies on browser `prefers-reduced-motion` emulation instead of providing a verifiable chrome toggle or URL parameter."
+type = "browser_interaction"
+weight = 1.0
+negate = true

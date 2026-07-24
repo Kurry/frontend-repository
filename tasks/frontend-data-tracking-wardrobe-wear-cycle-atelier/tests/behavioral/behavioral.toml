@@ -1,0 +1,7 @@
+[[criterion]]
+id = "bh_interleave_workflows"
+name = "Interleaved workflows round-trip exactly"
+description = "Interleave plan revisions, actual wears, partial batch recovery, repair/retire cycles, capsule merge, undo plan-only edits, export, and import. Verify that all events, lineages, quantities, and file structures round-trip exactly."
+type = "browser_interaction"
+weight = 1.0
+negate = false
