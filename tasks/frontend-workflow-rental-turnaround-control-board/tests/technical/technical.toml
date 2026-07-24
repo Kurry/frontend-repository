@@ -1,0 +1,26 @@
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "interact_with_the_application"
+description = "Interact with the application heavily. Verify that no state is stored in `localStorage` or `sessionStorage` (in-memory only for this genre)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "verify_that_the_application"
+description = "Verify that the application operates entirely offline, loading all assets and libraries locally without relying on CDNs."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "reload_the_page_verify"
+description = "Reload the page. Verify that all in-memory state is lost and the app returns to a clean fixture state, demonstrating true in-memory isolation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "inspect_the_application_source"
+description = "Inspect the application source and DOM. Verify that restricted brand names (like 'Harbor') are NOT used, but generic terms ('Workflow') are used instead."
+type = "binary"
+weight = 1.0

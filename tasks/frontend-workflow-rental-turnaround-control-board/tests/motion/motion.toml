@@ -1,0 +1,32 @@
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "drag_a_work_block"
+description = "Drag a work block on the turnaround timeline using the real pointer interface. Verify that the motion takes between 150-300ms and smoothly transitions to the new position."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "trigger_a_dependency_or"
+description = "Trigger a dependency or readiness update. Verify that the connecting paths or readiness indicators reroute smoothly with a named duration between 150-300ms."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "hover_over_an_interactive"
+description = "Hover over an interactive SVG locus or timeline block. Verify that the element visually responds (e.g., changes style) while hovered."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "enable_the_system_prefersreducedmotion"
+description = "Enable the system `prefers-reduced-motion: reduce` setting. Perform a work block drag or state transition and verify that the UI snaps to the causal endpoint values immediately without animation delay."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "with_reduced_motion_enabled"
+description = "With reduced motion enabled, verify that all functionality remains accessible and no required interactions are blocked by removed transitions."
+type = "binary"
+weight = 1.0

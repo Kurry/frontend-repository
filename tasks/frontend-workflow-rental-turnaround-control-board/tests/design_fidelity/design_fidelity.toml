@@ -1,0 +1,39 @@
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "export_the_state_to"
+description = "Export the state to a JSON file. Verify that the resulting `turnaround.json` file contains exact schema fields, fixture hash, logical clock, loci, observations, evidence, tasks/edges, inventory, branches, approvals, events, and lineage."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "export_the_state_to"
+description = "Export the state to a CSV file. Verify that `work-order.csv` has one row per task containing locus, finding, timing, dependencies, assignee, lot/key ids, state, and verification columns."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "export_the_state_to"
+description = "Export the state to an ICS file. Verify that `turnaround.ics` contains accepted task/access blocks with stable UIDs and UTC timestamps."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "export_the_floorplan_verify"
+description = "Export the floorplan. Verify that `unit-status.svg` accurately reflects the room/fixture IDs, current overlays, selection, and accessible labels."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "export_the_markdown_handoff"
+description = "Export the Markdown handoff packet. Verify `handoff-packet.md` contains readiness by room, unresolved/waived findings, evidence hashes, custody, decisions, and revision provenance."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "trigger_a_download_using"
+description = "Trigger a download using a synthetic blob URL (`URL.createObjectURL`) instead of a data URI, making it difficult for the verifier to observe."
+type = "binary"
+negate = true
+weight = 1.0

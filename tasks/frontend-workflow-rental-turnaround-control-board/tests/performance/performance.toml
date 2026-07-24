@@ -1,0 +1,26 @@
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "interact_with_a_form"
+description = "Interact with a form field or drag a timeline block. Verify that the direct manipulation is acknowledged in the UI within 100 ms."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "select_a_locus_on"
+description = "Select a locus on the floorplan. Verify that the linked views (evidence ledger, timeline, resources) settle into their new state within 500 ms without layout jumps."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "trigger_an_import_of"
+description = "Trigger an import of a valid JSON file. Verify that the import completes and updates the UI within 2 seconds without dropping interactions or showing stale views."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "perform_a_series_of"
+description = "Perform a series of rapid UI actions (creating multiple findings, dragging blocks). Verify that no errors appear in the browser console."
+type = "binary"
+weight = 1.0

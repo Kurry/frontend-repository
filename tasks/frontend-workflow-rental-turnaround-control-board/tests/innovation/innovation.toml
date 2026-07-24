@@ -1,0 +1,15 @@
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "innovation.catchall"
+name = "innovation_catchall"
+description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "change_fixture_decision_after"
+description = "Change a fixture decision after a complex dependency graph is established. Verify that the floorplan, evidence, task graph, access, freshness, handoff readiness, and artifacts dynamically and coherently reflect the change."
+type = "binary"
+weight = 1.0

@@ -1,0 +1,74 @@
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "load_the_application_ensure"
+description = "Load the application. Ensure the fictional unit fixtures are pre-loaded (8 rooms, 46 fixtures, etc.) but no user scope, schedule, reservations, custody events, branches, approvals, or handoffs exist."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "select_a_floorplan_locus"
+description = "Select a floorplan locus. Ensure the app allows creating a finding, but blocks creation if no evidence (photo/note hash) is attached."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "record_a_finding_with"
+description = "Record a finding with evidence. Verify that it appears in the ledger with fixture, category, severity, note, evidence hash, captured-at time, and supersession state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "select_a_locus_and"
+description = "Select a locus and drag its work block onto the turnaround timeline. Verify that findings, evidence, inventory, access custody, dependencies, readiness, approval freshness, and handoff state all update together without requiring a second action or page navigation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "attempt_to_create_a"
+description = "Attempt to create a work block that is not linked to any finding or declared scope item. Verify that the creation is blocked and zero mutation occurs."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "schedule_a_work_block"
+description = "Schedule a work block past an unsatisfied dependency (e.g., clean-before-repair). Verify that the violated edge is surfaced and the readiness state for that locus is blocked."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "check_out_a_key"
+description = "Check out a key for a locus. Verify that the transfer records the exact holder and time, and the key's custody history is append-only."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "attempt_to_check_out"
+description = "Attempt to check out a key that is already checked out to another worker. Verify that the conflict is blocked with a named diagnostic and zero mutation occurs."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "reserve_and_consume_inventory"
+description = "Reserve and consume inventory for a work block. Verify that the quantity decrements exactly, and attempting to overallocate shows a named shortfall diagnostic and blocks the action."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "branch_a_repair_decision"
+description = "Branch a repair decision and approve it. Verify that the approval freezes the evidence and schedule basis."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "after_approving_a_scope"
+description = "After approving a scope branch, edit the related finding or inventory. Verify that the approval becomes visibly stale, and attempting to dispatch on it is blocked."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "perform_a_partial_handoff"
+description = "Perform a partial handoff (e.g., mark 19/22 tasks ready and hand off). Verify that the remaining 3 loci's state does NOT flip to completed/handed-off, and blocked rooms and missing keys are exposed."
+type = "binary"
+weight = 1.0

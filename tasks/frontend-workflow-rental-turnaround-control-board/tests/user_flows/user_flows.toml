@@ -1,0 +1,38 @@
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "inspect_an_uninspected_locus"
+description = "Inspect an uninspected locus and record a finding with evidence. Verify that the finding appears in the ledger and the locus's state updates on the floorplan."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "after_recording_a_finding"
+description = "After recording a finding, create a work block for it and schedule it on the timeline. Verify that the timeline updates, the finding links to the work, and the dependency graph reflects the new task."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "reserve_inventory_and_check"
+description = "Reserve inventory and check out a key for a scheduled work block. Verify that the lot decrements, the key transfer is recorded, and the work block shows its access requirements met."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "branch_a_repair_decision"
+description = "Branch a repair decision, compare cost/time, and approve the branch. Verify that the approval freezes the evidence and schedule basis for those loci."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "dispatch_approved_work_advance"
+description = "Dispatch approved work, advance the logical clock, and verify the completed work by appending verification records. Verify the verified state updates on the floorplan."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "initiate_a_partial_handoff"
+description = "Initiate a partial handoff for the ready tasks. Verify that the system records exactly which loci are handed off and clearly flags the remaining blocked loci and missing key returns."
+type = "binary"
+weight = 1.0
