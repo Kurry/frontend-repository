@@ -1,0 +1,368 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "recurrence_rule_composer"
+name = "recurrence_rule_composer"
+description = "Verify that recurrence rules support daily, weekly, monthly intervals, weekdays, day of month, nth or last weekday, start, end, count, local start time, duration, timezone, holiday behavior, and skip/reschedule policy."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "recurrence_rule_preview"
+name = "recurrence_rule_preview"
+description = "A live ribbon and occurrence list previews the next 20 instances. Invalid or no instance rules reject; month end and DST interpretations are explicitly labeled."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "scoped_occurrence_editing"
+name = "scoped_occurrence_editing"
+description = "Moving, renaming, resizing, changing priority, or completing an occurrence requires this, this and future, or entire series choice."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "scoped_editing_this"
+name = "scoped_editing_this"
+description = "Selecting 'this' creates an exception."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "scoped_editing_this_and_future"
+name = "scoped_editing_this_and_future"
+description = "Selecting 'this and future' closes the parent before the target recurrence id and creates a child."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "scoped_editing_entire_series"
+name = "scoped_editing_entire_series"
+description = "Selecting 'entire series' preserves immutable history and regenerates eligible future instances."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "scoped_editing_inspect_undo"
+name = "scoped_editing_inspect_undo"
+description = "Users can inspect and undo the exact scope delta."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "hardening_child_series_exact_boundary"
+name = "hardening_child_series_exact_boundary"
+description = "Editing 'this and future' must create a child series whose boundary is the exact edited occurrence named in the lineage, leaving all prior instances and their provenance byte identical."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "hardening_pre_boundary_unchanged"
+name = "hardening_pre_boundary_unchanged"
+description = "Pre boundary occurrence ids, times, and edit history remain unchanged after a 'this and future' split."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "hardening_lineage_graph_boundary"
+name = "hardening_lineage_graph_boundary"
+description = "The lineage graph shows parent to child with the boundary occurrence."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "hardening_re_splitting_boundary"
+name = "hardening_re_splitting_boundary"
+description = "Re splitting the same boundary twice via rapid double action produces exactly one child series."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "detach_occurrence"
+name = "detach_occurrence"
+description = "An occurrence may be detached to an arbitrary valid slot."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "skip_occurrence"
+name = "skip_occurrence"
+description = "An occurrence may be skipped with reason."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "rejoin_occurrence"
+name = "rejoin_occurrence"
+description = "An occurrence may be rejoined if its local fields again equal the generated occurrence. Rejoining removes the exception but keeps its audit event."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "rescheduled_holidays_distinct"
+name = "rescheduled_holidays_distinct"
+description = "Rescheduled holidays and manually detached instances are distinct."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "delete_series_keeps_records"
+name = "delete_series_keeps_records"
+description = "Deleting a series cannot delete historical completion or focus records."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "hardening_detached_provenance"
+name = "hardening_detached_provenance"
+description = "A detached occurrence becomes a standalone record retaining its series provenance."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "hardening_skip_records_state"
+name = "hardening_skip_records_state"
+description = "A skip records an explicit skipped state, never a deletion, and the histogram reflects it as skipped, not absent."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "hardening_rejoin_compatible_boundary"
+name = "hardening_rejoin_compatible_boundary"
+description = "Rejoin merges the detached instance back only at a compatible boundary with the merge rule stated."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "hardening_rejoin_incompatible_blocked"
+name = "hardening_rejoin_incompatible_blocked"
+description = "Rejoin of an incompatible instance is blocked with a named reason and zero mutation."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "dependency_lanes"
+name = "dependency_lanes"
+description = "Series or individual occurrences connect with finish before start and same day after edges."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "dependency_bindings"
+name = "dependency_bindings"
+description = "Generated dependencies bind by recurrence identity or nearest eligible date under a declared policy."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "drag_task_previews"
+name = "drag_task_previews"
+description = "Dragging a task previews downstream shifts, cycles, outside hours placement, and daily workload overload."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "invalid_commit_snaps_back"
+name = "invalid_commit_snaps_back"
+description = "Invalid commit snaps back; the histogram selects exact tasks."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "hardening_dependency_violation_blocked"
+name = "hardening_dependency_violation_blocked"
+description = "Moving an occurrence that would violate a dependency is blocked with a visible reason naming the violated dependency, all surfaces identical before and after."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "priority_interruption_triage"
+name = "priority_interruption_triage"
+description = "Each occurrence has impact, urgency, effort, energy, and fixed or flexible status."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "deterministic_triage_view"
+name = "deterministic_triage_view"
+description = "A deterministic triage view suggests move, shorten, split, or keep actions when collisions arise."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "triage_suggestions_disclose"
+name = "triage_suggestions_disclose"
+description = "Suggestions disclose rule inputs and remain proposals."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "accepting_split_creates_children"
+name = "accepting_split_creates_children"
+description = "Accepting a split creates two linked child occurrences whose durations sum to the original."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "hardening_triage_propagate_focus"
+name = "hardening_triage_propagate_focus"
+description = "Priority and interruption triage changes propagate to the focus log queue immediately."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "hardening_rapid_double_triage"
+name = "hardening_rapid_double_triage"
+description = "Rapid double triage produces exactly one state change."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "resumable_focus_sessions"
+name = "resumable_focus_sessions"
+description = "A focus session binds one occurrence, planned duration, phase sequence, interruptions, pause and resume events, and outcome."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "logical_clock_deterministic"
+name = "logical_clock_deterministic"
+description = "Logical clock controls make timing deterministic."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "reload_reconstructs_session"
+name = "reload_reconstructs_session"
+description = "Reload reconstructs an active or paused session."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "completing_records_seconds"
+name = "completing_records_seconds"
+description = "Completing records actual focused and interrupted seconds and optional evidence note."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "minimum_focused_duration"
+name = "minimum_focused_duration"
+description = "A task may need a minimum focused duration before completion. Duplicate terminal events reject."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "hardening_pause_resume_identical"
+name = "hardening_pause_resume_identical"
+description = "Pausing and resuming a focus session produces the identical continuation with same occurrence and same elapsed accounting."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "hardening_attempt_logs_append"
+name = "hardening_attempt_logs_append"
+description = "Attempt and elapsed logs append, never rewrite."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "hardening_completed_session_immutable"
+name = "hardening_completed_session_immutable"
+description = "A completed session log is immutable to later rescheduling of its occurrence."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "branch_compare_reconciliation"
+name = "branch_compare_reconciliation"
+description = "The user can fork a six week schedule before accepting multiple triage changes, then compare occurrence slots, workload, dependencies, exceptions, and completion forecast."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "merge_resolves_conflicts"
+name = "merge_resolves_conflicts"
+description = "Merge resolves each conflicting occurrence and series property."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "historical_sessions_never_move"
+name = "historical_sessions_never_move"
+description = "Historical sessions never move between branches; a winning branch must retain their bound occurrence identity."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "hardening_compare_shared_state"
+name = "hardening_compare_shared_state"
+description = "Comparing layout branches shows both from one shared state with per occurrence deltas named."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "hardening_reconciliation_explicit_choice"
+name = "hardening_reconciliation_explicit_choice"
+description = "Reconciliation requires an explicit choice per conflicting occurrence and never invents a resolution."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "hardening_reconcile_edit_converge"
+name = "hardening_reconcile_edit_converge"
+description = "Reconcile then edit and edit then reconcile converge where equivalent."
+type = "binary"
+weight = 1.0
